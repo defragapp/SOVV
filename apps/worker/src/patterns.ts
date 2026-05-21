@@ -6,24 +6,17 @@ import { getRecentInteractions, upsertPattern } from "./db.js";
 
 const PATTERN_SYSTEM_PROMPT = `You are a pattern recognition engine. Analyze the user's recent interactions and identify recurring behavioral or emotional patterns.
 
-Respond ONLY as valid JSON:
-{
-  "patterns": [
-    {
-      "type": "trigger" | "dynamic" | "defense" | "repetition" | "growth",
-      "content": "One clear sentence describing the pattern",
-      "confidence": "High" | "Medium" | "Low"
-    }
-  ]
-}
+You MUST respond with ONLY valid JSON in this exact format, no other text:
+{"patterns":[{"type":"trigger","content":"One clear sentence describing the pattern","confidence":"Medium"}]}
 
 Rules:
 - Only identify patterns that appear across MULTIPLE interactions
 - Be specific, not generic
 - Do not diagnose or label personality
 - Max 3 patterns per extraction
-- If no clear patterns exist, return empty array
-- Use everyday language, not clinical terms`;
+- If no clear patterns exist, return {"patterns":[]}
+- Use everyday language, not clinical terms
+- Pattern types: trigger, dynamic, defense, repetition, growth`;
 
 export async function extractPatterns(
   env: {
@@ -36,12 +29,13 @@ export async function extractPatterns(
 ) {
   try {
     const interactions = await getRecentInteractions(env.DB, sessionId, 10);
-    if (interactions.length < 2) return; // Need at least 2 interactions to find patterns
+    if (interactions.length < 2) return;
 
     const interactionSummary = interactions
       .slice(0, 8)
       .map((i, idx) => {
-        const result = JSON.parse(i.result || "{}");
+        let result: Record<string, string> = {};
+        try { result = JSON.parse(i.result || "{}"); } catch {}
         return `Interaction ${idx + 1}:
   Question: ${i.question}
   Context: ${i.text?.slice(0, 200)}
@@ -60,11 +54,38 @@ export async function extractPatterns(
           content: `Analyze these recent interactions for recurring patterns:\n\n${interactionSummary}`,
         },
       ],
+      response_format: {
+        type: "json_object",
+      },
       temperature: 0.3,
       max_tokens: 300,
     });
 
-    const parsed = JSON.parse(String(ai.response ?? "{}"));
+    // Robust parsing: handle various AI response shapes
+    let responseText = "";
+    if (typeof ai === "string") {
+      responseText = ai;
+    } else if (ai && typeof ai === "object") {
+      // Workers AI returns { response: "..." } for text models
+      responseText = String((ai as any).response || (ai as any).text || JSON.stringify(ai));
+    }
+
+    // Strip any markdown code fences if present
+    responseText = responseText.replace(/```json?\n?/g, "").replace(/```/g, "").trim();
+
+    let parsed: { patterns?: Array<{ type?: string; content?: string; confidence?: string }> } = {};
+    try {
+      parsed = JSON.parse(responseText);
+    } catch {
+      // Try to extract JSON from the response
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try { parsed = JSON.parse(jsonMatch[0]); } catch { return; }
+      } else {
+        return;
+      }
+    }
+
     const patterns = parsed?.patterns ?? [];
 
     for (const p of patterns) {
@@ -80,6 +101,6 @@ export async function extractPatterns(
     }
   } catch (err) {
     // Silent fail — pattern extraction is non-critical
-    console.error("Pattern extraction failed:", err);
+    console.error("Pattern extraction failed:", String(err));
   }
 }
