@@ -1,4 +1,4 @@
-name = "sovereign-api"
+name = "sovereign-os-api"
 main = "src/index.ts"
 compatibility_date = "2026-05-01"
 
@@ -7,10 +7,9 @@ binding = "AI"
 
 [[kv_namespaces]]
 binding = "KV"
-id = "REPLACE_WITH_KV_ID"
-preview_id = "REPLACE_WITH_KV_PREVIEW_ID"
+id = "3bd3ff5048a8468e82c574d7d66045c3"
 
 [vars]
 AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
-APP_URL = "https://sovereign.os"
+APP_URL = "https://defrag.app"
 FREE_DAILY_LIMIT = "15"
