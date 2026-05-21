@@ -46,7 +46,7 @@ export async function extractPatterns(
       .join("\n\n");
 
     const modelId = env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
-    const ai = await env.AI.run(modelId, {
+    const ai: any = await env.AI.run(modelId, {
       messages: [
         { role: "system", content: PATTERN_SYSTEM_PROMPT },
         {
@@ -61,32 +61,26 @@ export async function extractPatterns(
       max_tokens: 300,
     });
 
-    // Robust parsing: handle various AI response shapes
-    let responseText = "";
-    if (typeof ai === "string") {
-      responseText = ai;
-    } else if (ai && typeof ai === "object") {
-      // Workers AI returns { response: "..." } for text models
-      responseText = String((ai as any).response || (ai as any).text || JSON.stringify(ai));
+    // Workers AI returns { response: { patterns: [...] } } as a parsed object
+    // NOT as a string — so String(ai.response) gives "[object Object]"
+    let patterns: Array<{ type?: string; content?: string; confidence?: string }> = [];
+
+    if (ai?.response && typeof ai.response === "object") {
+      // response is already a parsed object
+      patterns = ai.response.patterns ?? [];
+    } else if (ai?.choices?.[0]?.message?.content) {
+      // OpenAI-compatible format
+      const content = ai.choices[0].message.content;
+      try {
+        const parsed = JSON.parse(content);
+        patterns = parsed?.patterns ?? [];
+      } catch {}
+    } else if (typeof ai?.response === "string") {
+      try {
+        const parsed = JSON.parse(ai.response);
+        patterns = parsed?.patterns ?? [];
+      } catch {}
     }
-
-    // Strip any markdown code fences if present
-    responseText = responseText.replace(/```json?\n?/g, "").replace(/```/g, "").trim();
-
-    let parsed: { patterns?: Array<{ type?: string; content?: string; confidence?: string }> } = {};
-    try {
-      parsed = JSON.parse(responseText);
-    } catch {
-      // Try to extract JSON from the response
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        try { parsed = JSON.parse(jsonMatch[0]); } catch { return; }
-      } else {
-        return;
-      }
-    }
-
-    const patterns = parsed?.patterns ?? [];
 
     for (const p of patterns) {
       if (!p.type || !p.content) continue;
@@ -100,7 +94,6 @@ export async function extractPatterns(
       });
     }
   } catch (err) {
-    // Silent fail — pattern extraction is non-critical
     console.error("Pattern extraction failed:", String(err));
   }
 }
