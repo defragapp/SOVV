@@ -28,6 +28,11 @@ export async function getBaseline(env: Env, sid: string): Promise<Baseline | nul
   return safeJsonParse<Baseline>(raw);
 }
 
+export function formatBaseline(baseline: Baseline): string {
+  const tob = baseline.tob.type === "exact" ? baseline.tob.value : `Approx ${baseline.tob.value}`;
+  return `DOB: ${baseline.dob}\nTOB: ${tob}\nPOB: ${baseline.pob}`;
+}
+
 export async function saveBaseline(env: Env, sid: string, baseline: BaselineRequest): Promise<Baseline> {
   const existing = await getBaseline(env, sid);
   const now = Date.now();
