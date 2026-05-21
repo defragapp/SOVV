@@ -15,6 +15,46 @@ export default {
     if (url.pathname === "/health") {
       return Response.json({ status: "ok", service: "sovereign-api" });
     }
+
+    // One-time utility to initialize Stripe Product/Price
+    if (url.pathname === "/api/billing/init-stripe" && req.method === "POST") {
+      if (!env.STRIPE_SECRET_KEY) {
+        return Response.json({ error: "STRIPE_SECRET_KEY not set" }, { status: 500 });
+      }
+
+      const productRes = await fetch('https://api.stripe.com/v1/products', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ name: 'Sovereign OS Pro' }).toString(),
+      });
+      const product = await productRes.json() as any;
+      if (product.error) return Response.json({ error: product.error }, { status: 400 });
+
+      const priceRes = await fetch('https://api.stripe.com/v1/prices', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          product: product.id,
+          currency: 'usd',
+          unit_amount: '900',
+          'recurring[interval]': 'month',
+        }).toString(),
+      });
+      const price = await priceRes.json() as any;
+
+      return Response.json({
+        message: "Stripe initialized. Save these IDs to your environment.",
+        productId: product.id,
+        priceId: price.id
+      });
+    }
+
     if (url.pathname === "/api/explain" && req.method === "POST") {
       return handleExplain(req, env, ctx);
     }
