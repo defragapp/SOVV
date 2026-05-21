@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+
 export default function Home() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
@@ -42,6 +43,8 @@ export default function Home() {
           <p className="text-white/50 text-sm">Confidence: Medium</p>
         </div>
       </div>
+
+      
     </main>
   );
 }
