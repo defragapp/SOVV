@@ -25,6 +25,7 @@ export interface PatternRow {
   occurrence_count: number;
   first_seen: number;
   last_seen: number;
+  verified: number;
 }
 
 export function mapInteraction(row: InteractionRow): CoreInteraction {
@@ -124,8 +125,8 @@ export async function upsertPattern(db: D1Database, data: Omit<CorePattern, "occ
   } else {
     await db
       .prepare(
-        `INSERT INTO patterns (id, session_id, pattern_type, content, source_interaction_ids, confidence, occurrence_count, first_seen, last_seen)
-         VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)`
+        `INSERT INTO patterns (id, session_id, pattern_type, content, source_interaction_ids, confidence, occurrence_count, first_seen, last_seen, verified)
+         VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, ?)`
       )
       .bind(
         data.id,
@@ -135,7 +136,8 @@ export async function upsertPattern(db: D1Database, data: Omit<CorePattern, "occ
         JSON.stringify(data.source_interaction_ids),
         String(data.confidence),
         now,
-        now
+        now,
+        data.verified ?? 0
       )
       .run();
   }

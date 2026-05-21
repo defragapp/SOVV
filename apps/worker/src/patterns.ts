@@ -2,7 +2,9 @@
 // Runs via ctx.waitUntil after the response is sent
 
 import type { D1Database, Ai } from "@cloudflare/workers-types";
-import { getRecentInteractions, upsertPattern } from "./db.js";
+import type { Env } from "./types-env.js";
+import { getRecentInteractions, upsertPattern, getPatterns } from "./db.js";
+import { getSessionId, cookieHeader } from "./plan.js";
 
 const PATTERN_SYSTEM_PROMPT = `You are a pattern recognition engine. Analyze the user's recent interactions and identify recurring behavioral or emotional patterns.
 
@@ -12,7 +14,8 @@ Respond ONLY as valid JSON:
     {
       "type": "trigger" | "dynamic" | "defense" | "repetition" | "growth",
       "content": "One clear sentence describing the pattern",
-      "confidence": "High" | "Medium" | "Low"
+      "confidence": "High" | "Medium" | "Low",
+      "matches_known": ""
     }
   ]
 }
@@ -23,7 +26,8 @@ Rules:
 - Do not diagnose or label personality
 - Max 3 patterns per extraction
 - If no clear patterns exist, return empty array
-- Use structural language. Avoid banned terms: trigger, trauma, healing.`;
+- Use structural language. Avoid banned terms: trigger, trauma, healing.
+- IMPORTANT: If a new pattern closely matches a known pattern listed below, set "matches_known" to the known pattern's content exactly. Otherwise leave "matches_known" empty.`;
 
 export async function extractPatterns(
   env: {
@@ -36,6 +40,11 @@ export async function extractPatterns(
 ) {
   try {
     const interactions = await getRecentInteractions(env.DB, sessionId, 10);
+    const existingPatterns = await getPatterns(env.DB, sessionId);
+    const knownPatternsSection = existingPatterns.length
+      ? `\n\nKnown patterns to check against (match these instead of creating duplicates):\n${existingPatterns.map(p => `- [${p.pattern_type}, seen ${p.occurrence_count}x] ${p.content}`).join("\n")}`
+      : "";
+
     if (interactions.length < 2) return; // Need at least 2 interactions to find patterns
 
     const interactionSummary = interactions
@@ -48,6 +57,10 @@ export async function extractPatterns(
   Why it repeats: ${i.result?.whyRepeating || ""}
   Frame: ${i.result?.frame || ""}
   Pressing on: ${i.result?.pressure || ""}
+  Activation: ${i.result?.activation || ""}
+  Rising: ${i.result?.rising || ""}
+  Relational Field: ${i.result?.field || ""}
+  Shift/Steadying: ${i.result?.shift || ""}
   Confidence: ${i.confidence}`;
       })
       .join("\n\n");
@@ -58,7 +71,7 @@ export async function extractPatterns(
         { role: "system", content: PATTERN_SYSTEM_PROMPT },
         {
           role: "user",
-          content: `Analyze these recent interactions for recurring patterns:\n\n${interactionSummary}`,
+          content: `Analyze these recent interactions for recurring patterns:\n\n${interactionSummary}${knownPatternsSection}`,
         },
       ],
       temperature: 0.3,
@@ -66,21 +79,48 @@ export async function extractPatterns(
     });
 
     const parsed = JSON.parse(String(ai.response ?? "{}"));
-    const patterns = parsed?.patterns ?? [];
 
-    for (const p of patterns) {
-      if (!p.type || !p.content) continue;
-      await upsertPattern(env.DB, {
-        id: crypto.randomUUID(),
-        session_id: sessionId,
-        pattern_type: p.type,
-        content: p.content,
-        source_interaction_ids: [newInteractionId],
-        confidence: p.confidence || "Low",
-      });
+    for (const pattern of parsed.patterns) {
+      if (!pattern.content || !pattern.type) continue;
+
+      if (pattern.matches_known) {
+        await env.DB.prepare(
+          "UPDATE patterns SET occurrence_count = occurrence_count + 1, last_seen = ? WHERE session_id = ? AND content = ?"
+        ).bind(Date.now(), sessionId, pattern.matches_known).run();
+      } else {
+        await upsertPattern(env.DB, {
+          id: crypto.randomUUID(),
+          session_id: sessionId,
+          pattern_type: pattern.type,
+          content: pattern.content,
+          confidence: pattern.confidence || "Medium",
+          verified: 0,
+          source_interaction_ids: [newInteractionId],
+        });
+      }
     }
   } catch (err) {
     // Silent fail — pattern extraction is non-critical
     console.error("Pattern extraction failed:", err);
   }
+}
+
+export async function handlePatternVerify(req: Request, env: Env): Promise<Response> {
+  const sid = await getSessionId(req);
+  const body = (await req.json().catch(() => ({}))) as { patternId?: string; action?: "confirm" | "dismiss" };
+
+  if (!body.patternId || !body.action) {
+    return Response.json({ error: "patternId and action (confirm|dismiss) required" }, { status: 400 });
+  }
+
+  const verified = body.action === "confirm" ? 1 : -1;
+
+  await env.DB.prepare(
+    "UPDATE patterns SET verified = ?, last_seen = ? WHERE id = ? AND session_id = ?"
+  ).bind(verified, Date.now(), body.patternId, sid).run();
+
+  return Response.json(
+    { success: true, patternId: body.patternId, verified },
+    { headers: { "set-cookie": cookieHeader(sid), "cache-control": "no-store" } }
+  );
 }

@@ -5,11 +5,23 @@ import { handleChips } from "./chips.js";
 import { handleGetBaseline, handleSaveBaseline } from "./baseline.js";
 import { handleCheckout, handleWebhook } from "./billing.js";
 import { handleHistory } from "./history.js";
-import { getSessionId, cookieHeader } from "./plan.js";
+import { getSessionId, cookieHeader, getPlan } from "./plan.js";
+import { handlePatternVerify } from "./patterns.js";
 import { getPatterns } from "./db.js";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "https://defrag.app",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Credentials": "true",
+};
 
 export default {
   async fetch(req: Request, env: Env, ctx: ExecutionContext) {
+    if (req.method === "OPTIONS") {
+      return new Response(null, { headers: corsHeaders });
+    }
+
     const url = new URL(req.url);
 
     if (url.pathname === "/health") {
@@ -55,43 +67,45 @@ export default {
       });
     }
 
+    let response: Response;
     if (url.pathname === "/api/explain" && req.method === "POST") {
-      return handleExplain(req, env, ctx);
-    }
-    if (url.pathname === "/api/chips" && req.method === "GET") {
-      return handleChips(req, env);
-    }
-    if (url.pathname === "/api/baseline" && req.method === "GET") {
-      return handleGetBaseline(req, env);
-    }
-    if (url.pathname === "/api/baseline" && req.method === "POST") {
-      return handleSaveBaseline(req, env);
-    }
-    if (url.pathname === "/api/billing/checkout" && req.method === "POST") {
-      return handleCheckout(req, env);
-    }
-    if (url.pathname === "/api/billing/webhook" && req.method === "POST") {
-      return handleWebhook(req, env);
-    }
-
-    // ─── Memory API endpoints ───
-    if (url.pathname === "/api/patterns" && req.method === "GET") {
+      response = await handleExplain(req, env, ctx);
+    } else if (url.pathname === "/api/chips" && req.method === "GET") {
+      response = await handleChips(req, env);
+    } else if (url.pathname === "/api/baseline" && req.method === "GET") {
+      response = await handleGetBaseline(req, env);
+    } else if (url.pathname === "/api/baseline" && req.method === "POST") {
+      response = await handleSaveBaseline(req, env);
+    } else if (url.pathname === "/api/billing/checkout" && req.method === "POST") {
+      response = await handleCheckout(req, env);
+    } else if (url.pathname === "/api/billing/webhook" && req.method === "POST") {
+      response = await handleWebhook(req, env);
+    } else if (url.pathname === "/api/patterns/verify" && req.method === "POST") {
+      response = await handlePatternVerify(req, env);
+    } else if (url.pathname === "/api/patterns" && req.method === "GET") {
+      // ─── Memory API endpoints ───
       try {
         const sid = await getSessionId(req);
         const patterns = await getPatterns(env.DB, sid);
-        return Response.json(
+        response = Response.json(
           { patterns },
           { headers: { "set-cookie": cookieHeader(sid), "cache-control": "no-store" } }
         );
       } catch {
-        return Response.json({ patterns: [] });
+        response = Response.json({ patterns: [] });
       }
+    } else if (url.pathname === "/api/history" && req.method === "GET") {
+      response = await handleHistory(req, env);
+    } else {
+      response = new Response("Not found", { status: 404 });
     }
 
-    if (url.pathname === "/api/history" && req.method === "GET") {
-      return handleHistory(req, env);
-    }
-
-    return new Response("Not found", { status: 404 });
+    return withCors(response);
   },
 };
+
+function withCors(response: Response): Response {
+  const newResponse = new Response(response.body, response);
+  Object.entries(corsHeaders).forEach(([k, v]) => newResponse.headers.set(k, v));
+  return newResponse;
+}

@@ -10,26 +10,40 @@ import { getBaseline, formatBaseline } from "./baseline.js";
 import { insertInteraction, getPatterns, formatPatternsForPrompt } from "./db.js";
 import { extractPatterns } from "./patterns.js";
 
+async function hash(text: string): Promise<string> {
+  const msgUint8 = new TextEncoder().encode(text);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 function fallbackResult() {
   return {
     whatsGoingOn: "I may not have enough detail to explain this clearly yet.",
     whyRepeating: "A bit more context would help identify what is repeating.",
     nextStep: "Add what happened right before and right after.",
+    frame: "The moment is still forming.",
+    pressure: "Insufficient detail to name the pressure.",
+    activation: "Internal state unclear.",
+    rising: "Observation requires more context.",
+    field: "Relational dynamic unknown.",
+    shift: "What steadies you requires more detail.",
+    opening: "Observe how the story opens.",
     limits: "If there is safety risk or ongoing disrespect, get support first.",
     confidence: "Low",
   };
 }
 
 function audioScript(r: Record<string, string>) {
-  return `${r.whatsGoingOn}\n\n${r.whyRepeating}\n\nOne better next step:\n${r.nextStep}\n\nConfidence: ${r.confidence}`;
+  return `What's happening: ${r.frame}\n\nWhat this is pressing on: ${r.pressure}\n\nWhat's getting activated: ${r.activation}\n\nWhat steadies you: ${r.shift}\n\nWhat opens the story: ${r.opening}`;
 }
 
 function videoScenes(r: Record<string, string>) {
   return [
-    { type: "messages", title: "What's going on", text: r.whatsGoingOn, seconds: 8 },
-    { type: "pattern", title: "Why it repeats", text: r.whyRepeating, seconds: 10 },
-    { type: "rewrite", title: "Try a calmer line", text: "Say it in one clear sentence without blame.", seconds: 7 },
-    { type: "action", title: "One better next step", text: r.nextStep, seconds: 8 },
+    { type: "messages", title: "What's happening", text: r.frame, seconds: 8 },
+    { type: "pattern", title: "What's activated", text: r.activation, seconds: 10 },
+    { type: "rewrite", title: "From their side", text: r.field, seconds: 7 },
+    { type: "action", title: "What steadies you", text: r.shift, seconds: 8 },
     { type: "confidence", title: "Confidence", text: r.confidence, seconds: 4 },
   ];
 }
@@ -71,6 +85,8 @@ export async function handleExplain(req: Request, env: Env, ctx: ExecutionContex
   if (plan === "free") {
     const usage = await useOne(env, sid);
     if (!usage.ok) {
+    const rateLimit = await env.RATE_LIMITER.limit({ key: sid });
+    if (!rateLimit.success) {
       return Response.json(
         {
           type: "ok",
@@ -82,6 +98,13 @@ export async function handleExplain(req: Request, env: Env, ctx: ExecutionContex
             nextStep: "Try again tomorrow or upgrade to Pro.",
             limits: "If you're in immediate risk, use support resources first.",
             confidence: "Not enough information",
+            frame: "Limit reached.",
+            pressure: "Daily execution capped.",
+            activation: "Maintain system integrity.",
+            rising: "Expansion paused.",
+            field: "Access restricted.",
+            shift: "Return tomorrow.",
+            opening: "Elevate to Pro.",
           },
           chips: ["Upgrade to Pro", "Try again tomorrow"],
           audio: { title: "Overview", script: "Free limit reached.", format: "overview" },
@@ -89,6 +112,7 @@ export async function handleExplain(req: Request, env: Env, ctx: ExecutionContex
           confidence: "Not enough information",
           plan,
           limits: { remainingToday: usage.remaining },
+          limits: { remainingToday: rateLimit.remaining },
         },
         { status: 429 }
       );
@@ -103,6 +127,13 @@ export async function handleExplain(req: Request, env: Env, ctx: ExecutionContex
   }
 
   const requestId = crypto.randomUUID();
+
+  // ─── AI Response Cache (Cost Optimization) ───
+  const cacheKey = `explain:${sid}:${await hash(input.text || "")}`;
+  const cached = await env.KV.get(cacheKey);
+  if (cached) {
+    return Response.json(JSON.parse(cached), { headers: { "set-cookie": cookieHeader(sid) } });
+  }
 
   // ─── Memory Layer: Fetch known patterns ───
   let memoryContext = "";
@@ -153,6 +184,9 @@ export async function handleExplain(req: Request, env: Env, ctx: ExecutionContex
     limits: { remainingToday },
   };
 
+  // Store result in cache
+  await env.KV.put(cacheKey, JSON.stringify(response), { expirationTtl: 3600 });
+
   // ─── Memory Layer: Log interaction + extract patterns (background) ───
   ctx.waitUntil(
     (async () => {
@@ -170,6 +204,8 @@ export async function handleExplain(req: Request, env: Env, ctx: ExecutionContex
 
         // Run pattern extraction after logging
         await extractPatterns(env, sid, requestId);
+        // Offload durability to Pattern Queue for async processing
+        await env.PATTERN_QUEUE.send({ requestId, sid, input, result });
       } catch {
         // Non-critical — don't block or fail the response
       }

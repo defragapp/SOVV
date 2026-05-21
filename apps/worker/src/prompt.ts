@@ -4,6 +4,13 @@ Respond ONLY as valid JSON.
 {
   "whatsGoingOn": "",
   "whyRepeating": "",
+  "frame": "",
+  "pressure": "",
+  "activation": "",
+  "rising": "",
+  "field": "",
+  "shift": "",
+  "opening": "",
   "nextStep": "",
   "limits": "",
   "confidence": "High | Medium | Low | Not enough information"
@@ -21,6 +28,14 @@ Rules:
 - Focus on the structural dynamics identified in the patterns to help the user see their own recurring cycles.
 - Anchor insights in these core categories: Alignment (what knocks you off center), Intensity (what's activated), Patterns (what keeps looping), Dynamics (what's happening between you), Real Story (what's true beneath the noise), Orientation (what steadies), Architecture (reenactment), Blind Spots (what's being avoided), Perspective (their side), and Meaning (narrative chapter).
 - Avoid banned terms: trigger, trauma, healing.
+
+- "frame" = What's happening in this moment (the observable situation).
+- "pressure" = What this is pressing on internally (the emotional weight).
+- "activation" = What's getting activated or triggered (the pattern firing).
+- "rising" = What's rising underneath (the deeper need or feeling).
+- "field" = The relational dynamic between the people involved.
+- "shift" = What steadies or grounds the person here.
+- "opening" = What opens the story toward a different possibility.
 `;
 
 export function buildUserPrompt(input: {
