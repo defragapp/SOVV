@@ -1,0 +1,165 @@
+:root{
+  --color-bone:#F6F5F3;
+  --color-carbon:#0B0B0B;
+  --timing-table-fade:900ms;
+  --timing-hole-deepen:700ms;
+  --timing-flip:1400ms;
+  --timing-halo-snap:120ms;
+  --easing-reveal:cubic-bezier(0.0,0.0,0.2,1);
+  --easing-snap:cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Container */
+.hero{
+  position:relative;
+  width:100%;
+  max-width:1200px;
+  height:640px;
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--color-carbon);
+  overflow:visible;
+  color:var(--color-bone);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Centered frame (table) */
+.centeredFrame{
+  width:480px;
+  height:480px;
+  display:grid;
+  place-items:center;
+  position:relative;
+  transform-origin:center;
+  opacity:0;
+  transform:scale(0.98);
+  animation:tableFadeIn var(--timing-table-fade) var(--easing-reveal) forwards;
+  z-index:2;
+}
+
+.circleSvg{width:100%;height:100%;display:block;pointer-events:none;}
+
+/* Hole depth */
+.holeDepth{
+  position:absolute;
+  width:60%;
+  height:60%;
+  border-radius:50%;
+  background:radial-gradient(circle at 50% 40%, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.65) 60%, rgba(0,0,0,0.85) 100%);
+  transform:translateY(6px);
+  opacity:0;
+  animation:holeDeepen var(--timing-hole-deepen) var(--easing-reveal) forwards;
+  z-index:3;
+}
+
+/* Lottie containers sit above the frame but below copy */
+.lottieContainer{
+  position:absolute;
+  width:800px;
+  height:800px;
+  pointer-events:none;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  z-index:1;
+}
+
+/* Copy */
+.copyBottomLeft{
+  position:absolute;
+  left:48px;
+  bottom:48px;
+  max-width:360px;
+  z-index:6;
+}
+.caption{
+  margin:0;font-size:14px;font-weight:600;letter-spacing:0.02em;
+}
+.sub{margin:6px 0 0 0;font-size:13px;opacity:0.9;line-height:1.35;}
+
+/* Upper right copy (optional) */
+.copyUpperRight{
+  position:absolute;
+  right:48px;
+  top:48px;
+  text-align:right;
+  z-index:6;
+}
+
+/* Center headline (revealed after halo) */
+.centerHeadline{
+  position:absolute;
+  text-align:center;
+  width:80%;
+  left:10%;
+  top:50%;
+  transform:translateY(-50%);
+  pointer-events:none;
+  opacity:0;
+  z-index:7;
+}
+.heroTitle{
+  margin:0;
+  font-family:"GT Sectra Display",serif;
+  font-size:48px;
+  line-height:1.02;
+  font-weight:400;
+  color:var(--color-bone);
+  letter-spacing:-0.01em;
+}
+
+/* Logo */
+.logoWrap{
+  position:absolute;
+  bottom:28px;
+  left:50%;
+  transform:translateX(-50%);
+  opacity:0;
+  z-index:7;
+}
+
+/* Animations */
+@keyframes tableFadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes holeDeepen {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes haloSnapIn {
+  0% { opacity: 0; transform: scaleY(0.98) translateY(-8px); }
+  60% { opacity: 1; transform: scaleY(1.02) translateY(0); }
+  100% { opacity: 1; transform: scaleY(1) translateY(0); }
+}
+@keyframes centerHeroFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes logoFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* State class toggled by component when halo plays */
+:global(body.sov-hero-halo) .centerHeadline { animation: centerHeroFade 420ms var(--easing-reveal) forwards 120ms; }
+:global(body.sov-hero-halo) .logoWrap { animation: logoFade 600ms var(--easing-reveal) forwards 260ms; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .centeredFrame, .holeDepth, .lottieContainer, .centerHeadline, .logoWrap {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+  }
+  .lottieContainer { display:none; }
+}
+
+/* Responsive */
+@media (max-width:720px){
+  .centeredFrame{width:320px;height:320px}
+  .lottieContainer{width:420px;height:420px}
+  .heroTitle{font-size:34px}
+}

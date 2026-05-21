@@ -1,0 +1,25 @@
+
+ ⛅️ wrangler 4.93.0
+───────────────────
+Your Worker has access to the following bindings:
+Binding                                                           Resource                  Mode
+env.KV (3bd3ff5048a8468e82c574d7d66045c3)                         KV Namespace              local
+env.DB (vibesdk-db)                                               D1 Database               local
+env.TEMPLATES (vibesdk-templates)                                 R2 Bucket                 local
+env.AI                                                            AI                        remote
+env.AI_MODEL ("@cf/meta/llama-3.1-8b-instruct-fast")              Environment Variable      local
+env.APP_URL ("https://defrag.app")                                Environment Variable      local
+env.FREE_DAILY_LIMIT ("15")                                       Environment Variable      local
+
+⎔ Establishing remote connection...
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mFailed to start the remote proxy session, see the error details below:[0m
+
+  
+  You must be logged in to use wrangler dev in remote mode. Try logging in, or run wrangler dev --local.
+
+
+[32mIf you think this is a bug then please create an issue at https://github.com/cloudflare/workers-sdk/issues/new/choose[0m
+? Would you like to report this error to Cloudflare? Wrangler's output and the error details will be shared with the Wrangler team to help us diagnose and fix the issue.
+🤖 Using fallback value in non-interactive context: no
+🪵  Logs were written to "/home/codespace/.config/.wrangler/logs/wrangler-2026-05-21_04-52-39_977.log"

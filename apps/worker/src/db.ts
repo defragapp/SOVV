@@ -1,44 +1,55 @@
 // ─── Relational Memory Layer: D1 Helpers ───
 
 import type { D1Database } from "@cloudflare/workers-types";
+import type { Interaction as CoreInteraction, Pattern as CorePattern } from "@sovereign/core";
 
-export interface Interaction {
+export interface InteractionRow {
   id: string;
   session_id: string;
   mode: string;
   question: string;
   text: string;
-  people: string; // JSON array
-  result: string; // JSON object
+  people: string;
+  result: string;
   confidence: string;
   created_at: number;
 }
 
-export interface Pattern {
+export interface PatternRow {
   id: string;
   session_id: string;
   pattern_type: string;
   content: string;
-  source_interaction_ids: string; // JSON array
+  source_interaction_ids: string;
   confidence: string;
   occurrence_count: number;
   first_seen: number;
   last_seen: number;
 }
 
+export function mapInteraction(row: InteractionRow): CoreInteraction {
+  return {
+    ...row,
+    mode: row.mode as any,
+    people: JSON.parse(row.people || "[]"),
+    result: JSON.parse(row.result || "{}"),
+    confidence: row.confidence as any,
+  };
+}
+
+export function mapPattern(row: PatternRow): CorePattern {
+  return {
+    ...row,
+    pattern_type: row.pattern_type as any,
+    source_interaction_ids: JSON.parse(row.source_interaction_ids || "[]"),
+    confidence: row.confidence as any,
+  };
+}
+
 /** Insert an interaction record */
 export async function insertInteraction(
   db: D1Database,
-  data: {
-    id: string;
-    session_id: string;
-    mode: string;
-    question: string;
-    text: string;
-    people: string[];
-    result: Record<string, unknown>;
-    confidence: string;
-  }
+  data: Omit<CoreInteraction, "created_at">
 ) {
   await db
     .prepare(
@@ -53,7 +64,7 @@ export async function insertInteraction(
       data.text,
       JSON.stringify(data.people),
       JSON.stringify(data.result),
-      data.confidence,
+      String(data.confidence),
       Date.now()
     )
     .run();
@@ -64,42 +75,32 @@ export async function getRecentInteractions(
   db: D1Database,
   sessionId: string,
   limit = 20
-): Promise<Interaction[]> {
+): Promise<CoreInteraction[]> {
   const { results } = await db
     .prepare(
       `SELECT * FROM interactions WHERE session_id = ? ORDER BY created_at DESC LIMIT ?`
     )
     .bind(sessionId, limit)
-    .run<Interaction>();
-  return results ?? [];
+    .all<InteractionRow>();
+  return (results ?? []).map(mapInteraction);
 }
 
 /** Get active patterns for a session (for context injection) */
 export async function getPatterns(
   db: D1Database,
   sessionId: string
-): Promise<Pattern[]> {
+): Promise<CorePattern[]> {
   const { results } = await db
     .prepare(
       `SELECT * FROM patterns WHERE session_id = ? AND occurrence_count >= 1 ORDER BY last_seen DESC LIMIT 10`
     )
     .bind(sessionId)
-    .run<Pattern>();
-  return results ?? [];
+    .all<PatternRow>();
+  return (results ?? []).map(mapPattern);
 }
 
 /** Upsert a pattern: increment count if similar content exists, otherwise insert */
-export async function upsertPattern(
-  db: D1Database,
-  data: {
-    id: string;
-    session_id: string;
-    pattern_type: string;
-    content: string;
-    source_interaction_ids: string[];
-    confidence: string;
-  }
-) {
+export async function upsertPattern(db: D1Database, data: Omit<CorePattern, "occurrence_count" | "first_seen" | "last_seen">) {
   // Check for existing similar pattern
   const existing = await db
     .prepare(
@@ -132,7 +133,7 @@ export async function upsertPattern(
         data.pattern_type,
         data.content,
         JSON.stringify(data.source_interaction_ids),
-        data.confidence,
+        String(data.confidence),
         now,
         now
       )
@@ -141,7 +142,7 @@ export async function upsertPattern(
 }
 
 /** Format patterns for injection into AI prompt */
-export function formatPatternsForPrompt(patterns: Pattern[]): string {
+export function formatPatternsForPrompt(patterns: CorePattern[]): string {
   if (!patterns.length) return "";
   const lines = patterns.map(
     (p) => `- [${p.pattern_type}, seen ${p.occurrence_count}x] ${p.content}`

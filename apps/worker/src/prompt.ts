@@ -17,6 +17,10 @@ Rules:
 - Do not predict outcomes.
 - Max 2 sentences per field.
 - If not enough detail is provided, set confidence to "Not enough information" and keep the answer short.
+- If behavioral patterns are provided in the context, prioritize them when explaining "whyRepeating" to show continuity across sessions.
+- Focus on the structural dynamics identified in the patterns to help the user see their own recurring cycles.
+- Anchor insights in these core categories: Alignment (what knocks you off center), Intensity (what's activated), Patterns (what keeps looping), Dynamics (what's happening between you), Real Story (what's true beneath the noise), Orientation (what steadies), Architecture (reenactment), Blind Spots (what's being avoided), Perspective (their side), and Meaning (narrative chapter).
+- Avoid banned terms: trigger, trauma, healing.
 `;
 
 export function buildUserPrompt(input: {

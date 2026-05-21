@@ -15,10 +15,13 @@ export type ExplainRequest = {
 };
 
 export type ExplainResult = {
-  whatsGoingOn: string;
-  whyRepeating: string;
-  nextStep: string;
-  limits: string;
+  frame: string;
+  pressure: string;
+  activation: string;
+  rising: string;
+  field: string;
+  shift: string;
+  opening: string;
   confidence: Exclude<Confidence, "Support mode">;
 };
 
@@ -86,4 +89,40 @@ export type ChipsResponse = {
 
 export type BillingCheckoutResponse = {
   url: string;
+};
+
+// ─── Relational Memory Types ───
+
+export type PatternType = "trigger" | "dynamic" | "defense" | "repetition" | "growth";
+
+export type Pattern = {
+  id: string;
+  session_id: string;
+  pattern_type: PatternType;
+  content: string;
+  source_interaction_ids: string[];
+  confidence: Confidence;
+  occurrence_count: number;
+  first_seen: number;
+  last_seen: number;
+};
+
+export type Interaction = {
+  id: string;
+  session_id: string;
+  mode: Mode;
+  question: string;
+  text: string;
+  people: string[];
+  result: ExplainResult;
+  confidence: Confidence;
+  created_at: number;
+};
+
+export type PatternsResponse = {
+  patterns: Pattern[];
+};
+
+export type HistoryResponse = {
+  interactions: Interaction[];
 };

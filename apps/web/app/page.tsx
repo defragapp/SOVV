@@ -4,15 +4,24 @@ export default function Home() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
       <h1 className="text-5xl font-semibold leading-tight">
-        Healing isn’t optional.
+        The questions you don’t
         <br />
-        Holding onto the pain… <span className="text-white">IS.</span>
+        know how to ask <span className="text-white">anywhere else.</span>
       </h1>
 
-      <p className="mt-6 text-lg text-white/80">
-        Sovereign helps you understand what’s happening between you and other people —
-        clearly and safely — and gives you one better next step.
-      </p>
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 text-white/60 font-light">
+        <ul className="space-y-4">
+          <li>• Am I in alignment right now?</li>
+          <li>• Why does this moment feel so intense?</li>
+          <li>• Why do I keep reacting this way?</li>
+          <li>• What’s actually happening between us?</li>
+        </ul>
+        <ul className="space-y-4">
+          <li>• Why does this keep happening to me?</li>
+          <li>• What am I not seeing about myself?</li>
+          <li>• What’s the meaning of this moment?</li>
+        </ul>
+      </div>
 
       <div className="mt-10 flex gap-3">
         <Link

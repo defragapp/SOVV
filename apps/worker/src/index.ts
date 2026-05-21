@@ -4,6 +4,9 @@ import { handleExplain } from "./explain.js";
 import { handleChips } from "./chips.js";
 import { handleGetBaseline, handleSaveBaseline } from "./baseline.js";
 import { handleCheckout, handleWebhook } from "./billing.js";
+import { handleHistory } from "./history.js";
+import { getSessionId, cookieHeader } from "./plan.js";
+import { getPatterns } from "./db.js";
 
 export default {
   async fetch(req: Request, env: Env, ctx: ExecutionContext) {
@@ -34,13 +37,11 @@ export default {
     // ─── Memory API endpoints ───
     if (url.pathname === "/api/patterns" && req.method === "GET") {
       try {
-        const { getSessionId } = await import("./plan.js");
-        const { getPatterns } = await import("./db.js");
         const sid = await getSessionId(req);
         const patterns = await getPatterns(env.DB, sid);
         return Response.json(
           { patterns },
-          { headers: { "set-cookie": `sid=${sid}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=31536000`, "cache-control": "no-store" } }
+          { headers: { "set-cookie": cookieHeader(sid), "cache-control": "no-store" } }
         );
       } catch {
         return Response.json({ patterns: [] });
@@ -48,18 +49,7 @@ export default {
     }
 
     if (url.pathname === "/api/history" && req.method === "GET") {
-      try {
-        const { getSessionId } = await import("./plan.js");
-        const { getRecentInteractions } = await import("./db.js");
-        const sid = await getSessionId(req);
-        const interactions = await getRecentInteractions(env.DB, sid, 50);
-        return Response.json(
-          { interactions },
-          { headers: { "set-cookie": `sid=${sid}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=31536000`, "cache-control": "no-store" } }
-        );
-      } catch {
-        return Response.json({ interactions: [] });
-      }
+      return handleHistory(req, env);
     }
 
     return new Response("Not found", { status: 404 });
