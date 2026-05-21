@@ -91,8 +91,11 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
   // Handle checkout.session.completed
   if (event?.type === "checkout.session.completed") {
     const session = event.data?.object;
-    const sid = session?.client_reference_id;
-    if (sid) await setPlan(env, sid, "pro");
+    // Ensure payment was successful (handles delayed payments & free trials)
+    if (session?.payment_status === "paid" || session?.payment_status === "no_payment_required") {
+      const sid = session?.client_reference_id;
+      if (sid) await setPlan(env, sid, "pro");
+    }
   }
 
   // Handle subscription deleted (optional)

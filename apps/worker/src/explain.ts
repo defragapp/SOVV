@@ -84,9 +84,11 @@ export async function handleExplain(req: Request, env: Env, ctx: ExecutionContex
 
   if (plan === "free") {
     const usage = await useOne(env, sid);
-    if (!usage.ok) {
-    const rateLimit = await env.RATE_LIMITER.limit({ key: sid });
-    if (!rateLimit.success) {
+    const rateLimit = env.RATE_LIMITER
+      ? await env.RATE_LIMITER.limit({ key: sid })
+      : { success: true, remaining: 999 };
+
+    if (!usage.ok || !rateLimit.success) {
       return Response.json(
         {
           type: "ok",
@@ -111,8 +113,7 @@ export async function handleExplain(req: Request, env: Env, ctx: ExecutionContex
           video: { format: "vertical", scenes: [] },
           confidence: "Not enough information",
           plan,
-          limits: { remainingToday: usage.remaining },
-          limits: { remainingToday: rateLimit.remaining },
+          limits: { remainingToday: usage.ok ? rateLimit.remaining : usage.remaining },
         },
         { status: 429 }
       );
@@ -187,7 +188,6 @@ export async function handleExplain(req: Request, env: Env, ctx: ExecutionContex
   // Store result in cache
   await env.KV.put(cacheKey, JSON.stringify(response), { expirationTtl: 3600 });
 
-  // ─── Memory Layer: Log interaction + extract patterns (background) ───
   ctx.waitUntil(
     (async () => {
       try {
@@ -201,13 +201,9 @@ export async function handleExplain(req: Request, env: Env, ctx: ExecutionContex
           result,
           confidence: result.confidence || "Low",
         });
-
-        // Run pattern extraction after logging
         await extractPatterns(env, sid, requestId);
-        // Offload durability to Pattern Queue for async processing
-        await env.PATTERN_QUEUE.send({ requestId, sid, input, result });
       } catch {
-        // Non-critical — don't block or fail the response
+        // Non-critical
       }
     })()
   );

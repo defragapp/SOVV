@@ -1,4 +1,5 @@
 import Link from "next/link";
+import MemoryInsights from "../components/MemoryInsights";
 
 export default function Home() {
   return (
@@ -42,6 +43,8 @@ export default function Home() {
           <p className="text-white/50 text-sm">Confidence: Medium</p>
         </div>
       </div>
+
+      <MemoryInsights />
     </main>
   );
 }
