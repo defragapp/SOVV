@@ -1,0 +1,16 @@
+name = "sovereign-api"
+main = "src/index.ts"
+compatibility_date = "2026-05-01"
+
+[ai]
+binding = "AI"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_KV_ID"
+preview_id = "REPLACE_WITH_KV_PREVIEW_ID"
+
+[vars]
+AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
+APP_URL = "https://sovereign.os"
+FREE_DAILY_LIMIT = "15"

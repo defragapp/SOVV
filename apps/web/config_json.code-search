@@ -1,0 +1,20 @@
+# Query: config.json
+# ContextLines: 1
+
+1 result - 1 file
+
+apps/worker/package.json:
+  7      "deploy": "wrangler deploy",
+  8:     "build": "tsc -p tsconfig.json --noEmit"
+  9    },
+{
+  "models": [
+    {
+      "title": "Cloudflare AI Gateway",
+      "provider": "openai",
+      "model": "openai/gpt-4.1",
+      "apiKey": "YOUR_CF_TOKEN",
+      "apiBase": "https://api.cloudflare.com/client/v4/accounts/8b1954d216d65077c6480d62583fe2c2/ai/v1"
+    }
+  ]
+}
