@@ -1,6 +1,7 @@
 import Link from "next/link";
 import MemoryInsights from "../components/MemoryInsights";
 
+
 export default function Home() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
@@ -45,6 +46,7 @@ export default function Home() {
       </div>
 
       <MemoryInsights />
+      
     </main>
   );
 }
