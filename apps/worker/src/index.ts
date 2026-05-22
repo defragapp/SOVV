@@ -1,4 +1,4 @@
-import type { ExecutionContext } from "@cloudflare/workers-types";
+import type { ExecutionContext, MessageBatch } from "@cloudflare/workers-types";
 import type { Env } from "./types-env.js";
 import { handleExplain } from "./explain.js";
 import { handleChips } from "./chips.js";
@@ -8,6 +8,7 @@ import { handleHistory } from "./history.js";
 import { getSessionId, cookieHeader, getPlan } from "./plan.js";
 import { handlePatternVerify } from "./patterns.js";
 import { getPatterns } from "./db.js";
+import { extractPatterns } from "./patterns.js";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "https://defrag.app",
@@ -102,6 +103,20 @@ export default {
 
     return withCors(response);
   },
+
+  // ─── Background AI Task Queue Consumer ───
+  async queue(batch: MessageBatch<{ sessionId: string; interactionId: string }>, env: Env): Promise<void> {
+    for (const message of batch.messages) {
+      try {
+        const { sessionId, interactionId } = message.body;
+        await extractPatterns(env, sessionId, interactionId);
+        message.ack();
+      } catch (err) {
+        console.error("Queue processing failed for pattern extraction:", err);
+        message.retry(); // Requeue the AI task if it failed
+      }
+    }
+  }
 };
 
 function withCors(response: Response): Response {

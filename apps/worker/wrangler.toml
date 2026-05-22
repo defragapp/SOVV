@@ -22,3 +22,23 @@ database_id = "c8c2fd8d-5297-46fc-8594-7629c8bad74d"
 [[r2_buckets]]
 binding = "TEMPLATES"
 bucket_name = "vibesdk-templates"
+
+[observability]
+enabled = true
+
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 15
+  period = 60
+
+[[queues.producers]]
+binding = "PATTERN_QUEUE"
+queue = "pattern-extraction-tasks"
+
+[[queues.consumers]]
+queue = "pattern-extraction-tasks"
+max_batch_size = 1
+max_batch_timeout = 5
