@@ -1,0 +1,1 @@
+{"version":3,"file":"prompt.d.ts","sourceRoot":"","sources":["prompt.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,YAAY,yzDAsCxB,CAAC;AAEF,wBAAgB,eAAe,CAAC,KAAK,EAAE;IACrC,IAAI,EAAE,MAAM,CAAC;IACb,QAAQ,EAAE,MAAM,CAAC;IACjB,IAAI,EAAE,MAAM,CAAC;IACb,MAAM,EAAE,MAAM,EAAE,CAAC;IACjB,eAAe,CAAC,EAAE,MAAM,CAAC;CAC1B,UAmBA"}

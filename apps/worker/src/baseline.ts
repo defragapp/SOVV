@@ -2,6 +2,7 @@ import type { Env } from "./types-env.js";
 import type { Baseline, BaselineRequest } from "@sovereign/core";
 import { safeJsonParse } from "@sovereign/core";
 import { getSessionId, cookieHeader } from "./plan.js";
+import { verifyAccessJWT } from "./auth.js";
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const USER_KEY = (sid: string) => `user:${sid}`;
@@ -52,6 +53,11 @@ export async function saveBaseline(env: Env, sid: string, baseline: BaselineRequ
 }
 
 export async function handleGetBaseline(req: Request, env: Env): Promise<Response> {
+  const user = await verifyAccessJWT(req);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const sid = await getSessionId(req);
   const baseline = await getBaseline(env, sid);
   return Response.json(
@@ -66,6 +72,11 @@ export async function handleGetBaseline(req: Request, env: Env): Promise<Respons
 }
 
 export async function handleSaveBaseline(req: Request, env: Env): Promise<Response> {
+  const user = await verifyAccessJWT(req);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const sid = await getSessionId(req);
   const body = (await req.json().catch(() => null)) as unknown;
 

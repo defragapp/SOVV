@@ -14,4 +14,9 @@ export interface Env {
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
   STRIPE_PRICE_ID?: string;
+
+  // Cloudflare Access
+  CF_API_TOKEN?: string;
+  CLOUDFLARE_ACCOUNT_ID?: string;
+  PAID_USERS_GROUP_ID?: string;
 }

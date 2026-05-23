@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-const API_BASE = 'https://api.defrag.app';
+const API_BASE = '';
 
 interface Pattern {
   id: string;
@@ -15,15 +15,20 @@ interface Pattern {
 export default function MemoryInsights() {
   const [patterns, setPatterns] = useState<Pattern[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(API_BASE + '/api/patterns', { credentials: 'include' })
       .then(r => r.json())
       .then(res => {
         if (res?.patterns) setPatterns(res.patterns);
-        setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setError('Failed to load relational memory insights.');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   const handleVerify = async (id: string, action: 'confirm' | 'dismiss') => {
@@ -38,7 +43,15 @@ export default function MemoryInsights() {
     });
   };
 
-  if (loading) return null;
+  if (loading) {
+    return null; // Or a loading indicator
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 my-4 text-red-200 text-sm">{error}</div>
+    );
+  }
 
   const visible = patterns.filter(p => p.verified !== -1);
   if (visible.length === 0) return null;

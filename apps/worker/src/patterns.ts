@@ -4,6 +4,7 @@
 import type { D1Database, Ai } from "@cloudflare/workers-types";
 import type { Env } from "./types-env.js";
 import { getRecentInteractions, upsertPattern, getPatterns } from "./db.js";
+import { verifyAccessJWT } from "./auth.js";
 import { getSessionId, cookieHeader } from "./plan.js";
 
 const PATTERN_SYSTEM_PROMPT = `You are a pattern recognition engine. Analyze the user's recent interactions and identify recurring behavioral or emotional patterns.
@@ -106,6 +107,11 @@ export async function extractPatterns(
 }
 
 export async function handlePatternVerify(req: Request, env: Env): Promise<Response> {
+  const user = await verifyAccessJWT(req);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const sid = await getSessionId(req);
   const body = (await req.json().catch(() => ({}))) as { patternId?: string; action?: "confirm" | "dismiss" };
 
@@ -121,6 +127,21 @@ export async function handlePatternVerify(req: Request, env: Env): Promise<Respo
 
   return Response.json(
     { success: true, patternId: body.patternId, verified },
+    { headers: { "set-cookie": cookieHeader(sid), "cache-control": "no-store" } }
+  );
+}
+
+export async function handleGetPatterns(req: Request, env: Env): Promise<Response> {
+  const user = await verifyAccessJWT(req);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const sid = await getSessionId(req);
+  const patterns = await getPatterns(env.DB, sid);
+
+  return Response.json(
+    { patterns },
     { headers: { "set-cookie": cookieHeader(sid), "cache-control": "no-store" } }
   );
 }

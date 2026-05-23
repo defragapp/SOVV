@@ -7,8 +7,8 @@ import { SYSTEM_RULES, buildUserPrompt } from "./prompt.js";
 import { getSessionId, getPlan, cookieHeader } from "./plan.js";
 import { useOne } from "./kv.js";
 import { getBaseline, formatBaseline } from "./baseline.js";
+import { verifyAccessJWT } from "./auth.js";
 import { insertInteraction, getPatterns, formatPatternsForPrompt } from "./db.js";
-import { extractPatterns } from "./patterns.js";
 
 async function hash(text: string): Promise<string> {
   const msgUint8 = new TextEncoder().encode(text);
@@ -48,22 +48,43 @@ function videoScenes(r: Record<string, string>) {
   ];
 }
 
+interface ExplainRequestBody {
+  mode?: "self" | "situation" | "pair" | "group";
+  question?: string;
+  text?: string;
+  people?: string[];
+}
+
+function isValidExplainRequest(body: unknown): body is ExplainRequestBody {
+  if (typeof body !== "object" || body === null) return false;
+  // This is a basic check. For more complex validation, a library like Zod would be beneficial.
+  const req = body as Record<string, unknown>;
+  return (typeof req.question === "string" || typeof req.question === "undefined");
+}
+
 export async function handleExplain(req: Request, env: Env, ctx: ExecutionContext) {
+  const user = await verifyAccessJWT(req);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const sid = await getSessionId(req);
   const plan = await getPlan(env, sid);
   const freeLimit = Number(env.FREE_DAILY_LIMIT || "15");
   const remainingToday = plan === "free" ? freeLimit : 9999;
 
-  const body = await req.json().catch(() => null);
-  const input =
-    body && typeof (body as any).question === "string"
-      ? {
-          mode: (body as any).mode || "self",
-          question: (body as any).question,
-          text: (body as any).text || "",
-          people: (body as any).people || [],
-        }
-      : { mode: "self", question: "", text: "", people: [] };
+  const body: unknown = await req.json().catch(() => null);
+
+  if (!isValidExplainRequest(body)) {
+    return new Response("Invalid request body.", { status: 400 });
+  }
+
+  const input = {
+    mode: body.mode || "self",
+    question: body.question || "",
+    text: body.text || "",
+    people: body.people || [],
+  };
 
   const baseline = await getBaseline(env, sid);
   if (!baseline) {
@@ -201,9 +222,17 @@ export async function handleExplain(req: Request, env: Env, ctx: ExecutionContex
           result,
           confidence: result.confidence || "Low",
         });
+<<<<<<< HEAD
         await extractPatterns(env, sid, requestId);
       } catch {
         // Non-critical
+=======
+        // Objective 1.4: Send message to queue for background processing
+        await env.PATTERN_QUEUE.send({ sid, requestId });
+      } catch (err) {
+        // Non-critical, but good to log for debugging
+        console.error(`Failed to insert interaction or queue pattern extraction for sid: ${sid}`, err);
+>>>>>>> 3891515 (Dynamic CORS + workspace middleware)
       }
     })()
   );

@@ -1,28 +1,39 @@
 name = "sovereign-os-api"
 main = "src/index.ts"
-compatibility_date = "2026-05-01"
+compatibility_date = "2024-05-10"
+
+workers_dev = false
+routes = [
+	{ pattern = "api.defrag.app", custom_domain = true }
+]
+
+[vars]
+FREE_DAILY_LIMIT = "15"
+AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
+
+# Objective 1.3: Add observability block
+[observability]
+enabled = true
+
+# --- Bindings ---
 
 [ai]
 binding = "AI"
-
-[[kv_namespaces]]
-binding = "KV"
-id = "3bd3ff5048a8468e82c574d7d66045c3"
-
-[vars]
-AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
-APP_URL = "https://defrag.app"
-FREE_DAILY_LIMIT = "15"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "vibesdk-db"
 database_id = "c8c2fd8d-5297-46fc-8594-7629c8bad74d"
 
+[[kv_namespaces]]
+binding = "KV"
+id = "3bd3ff5048a8468e82c574d7d66045c3"
+
 [[r2_buckets]]
 binding = "TEMPLATES"
 bucket_name = "vibesdk-templates"
 
+<<<<<<< HEAD
 [observability]
 enabled = true
 
@@ -34,11 +45,24 @@ namespace_id = "1001"
   limit = 15
   period = 60
 
+=======
+# Objective 1.2: Add rate limiting
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 15, period = 60 }
+
+# Objective 1.4: Wire up the queue
+>>>>>>> 3891515 (Dynamic CORS + workspace middleware)
 [[queues.producers]]
 binding = "PATTERN_QUEUE"
 queue = "pattern-extraction-tasks"
 
 [[queues.consumers]]
+<<<<<<< HEAD
 queue = "pattern-extraction-tasks"
 max_batch_size = 1
 max_batch_timeout = 5
+=======
+queue = "pattern-extraction-tasks"
+>>>>>>> 3891515 (Dynamic CORS + workspace middleware)

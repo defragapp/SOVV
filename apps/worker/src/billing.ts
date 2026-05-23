@@ -1,5 +1,6 @@
 import type { Env } from "./types-env.js";
 import { getSessionId, setPlan, cookieHeader } from "./plan.js";
+import { verifyAccessJWT } from "./auth.js";
 
 // Stripe webhook signature verification in Workers (no Stripe SDK):
 // Stripe signs: "t=timestamp,v1=signature"
@@ -37,6 +38,11 @@ async function verifyStripeSignature(rawBody: string, sigHeader: string, secret:
 }
 
 export async function handleCheckout(req: Request, env: Env): Promise<Response> {
+  const user = await verifyAccessJWT(req);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const sid = await getSessionId(req);
 
   if (!env.STRIPE_SECRET_KEY || !env.STRIPE_PRICE_ID || !env.APP_URL) {
@@ -54,6 +60,10 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
   // Attach sid so webhook can map to user/session (v1 approach)
   params.set("client_reference_id", sid);
 
+  // Add metadata with sid for cancellation handling.
+  // Note: To also handle email, you would need to update the subscription metadata
+  // in the 'checkout.session.completed' webhook with the customer's email.
+  params.set("subscription_data[metadata][sid]", sid);
   const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: {
@@ -75,6 +85,10 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
 }
 
 export async function handleWebhook(req: Request, env: Env): Promise<Response> {
+  // Stripe webhooks are verified by signature, not JWT.
+  // Do NOT add verifyAccessJWT here.
+
+
   if (!env.STRIPE_WEBHOOK_SECRET) {
     return new Response("Missing webhook secret", { status: 500 });
   }
@@ -87,6 +101,14 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
 
   const event = JSON.parse(raw);
 
+  // Idempotency check — prevent duplicate processing
+  const eventId = event.id;
+  if (eventId) {
+    const seen = await env.KV.get(`webhook:${eventId}`);
+    if (seen) return Response.json({ received: true, dedup: true });
+    await env.KV.put(`webhook:${eventId}`, "1", { expirationTtl: 86400 });
+  }
+
   // v1: when subscription becomes active, set plan to pro for client_reference_id (sid)
   // Handle checkout.session.completed
   if (event?.type === "checkout.session.completed") {
@@ -94,14 +116,117 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
     // Ensure payment was successful (handles delayed payments & free trials)
     if (session?.payment_status === "paid" || session?.payment_status === "no_payment_required") {
       const sid = session?.client_reference_id;
+<<<<<<< HEAD
       if (sid) await setPlan(env, sid, "pro");
+=======
+      const email = session?.customer_details?.email;
+      if (sid) await setPlan(env, sid, "pro");
+      // Add user to Cloudflare Access Paid group
+      if (email) await addUserToPaidGroup(email, env);
+
+      // Add email to subscription metadata for cancellation handling
+      if (email && session.subscription) {
+        await fetch(`https://api.stripe.com/v1/subscriptions/${session.subscription}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: `metadata[email]=${encodeURIComponent(email)}`,
+        });
+      }
+>>>>>>> 3891515 (Dynamic CORS + workspace middleware)
     }
   }
 
   // Handle subscription deleted (optional)
   if (event?.type === "customer.subscription.deleted") {
-    // If you store mapping subscription->sid later, downgrade here.
+    const subscription = event.data?.object;
+    const email = subscription?.metadata?.email;
+    const sid = subscription?.metadata?.sid;
+    if (email) await removeUserFromPaidGroup(email, env);
+    if (sid) await setPlan(env, sid, "free");
   }
 
   return Response.json({ received: true });
+}
+
+interface AccessGroupEmail {
+  email: { email: string };
+}
+
+interface AccessGroup {
+  id: string;
+  name: string;
+  include: AccessGroupEmail[];
+  // Add other properties if needed
+}
+
+async function updateAccessGroup(
+  email: string,
+  action: "add" | "remove",
+  env: Env,
+  retries = 1
+): Promise<void> {
+  const { CF_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, PAID_USERS_GROUP_ID } = env;
+  if (!CF_API_TOKEN || !CLOUDFLARE_ACCOUNT_ID || !PAID_USERS_GROUP_ID) {
+    console.error("Missing CF Access config for group update");
+    return;
+  }
+  const apiUrl = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/access/groups/${PAID_USERS_GROUP_ID}`;
+  const headers = {
+    Authorization: `Bearer ${CF_API_TOKEN}`,
+    "Content-Type": "application/json",
+  };
+
+  try {
+    // Get current group
+    const getResp = await fetch(apiUrl, { headers });
+    if (!getResp.ok) {
+      throw new Error(`GET group failed: ${await getResp.text()}`);
+    }
+    const groupData = await getResp.json<{ result: AccessGroup }>();
+
+    const existingEmails = (groupData.result.include || [])
+      .filter((r): r is AccessGroupEmail => !!r.email?.email)
+      .map((r) => r.email.email);
+
+    const userExists = existingEmails.includes(email);
+    let updatedInclude: AccessGroupEmail[];
+
+    if (action === "add") {
+      if (userExists) return; // User already in group, do nothing.
+      updatedInclude = [...(groupData.result.include || []), { email: { email } }];
+    } else { // remove
+      if (!userExists) return; // User not in group, do nothing.
+      updatedInclude = (groupData.result.include || []).filter(
+        (r) => r.email?.email !== email
+      );
+    }
+
+    const putResp = await fetch(apiUrl, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({ ...groupData.result, include: updatedInclude }),
+    });
+
+    if (!putResp.ok) {
+      if (putResp.status === 409 && retries > 0) {
+        // Race condition — retry with fresh group data
+        return updateAccessGroup(email, action, env, retries - 1);
+      }
+      throw new Error(`PUT group failed: ${await putResp.text()}`);
+    }
+    console.log(`${action === "add" ? "Added" : "Removed"} ${email} ${action === "add" ? "to" : "from"} Paid Users group`);
+  } catch (err) {
+    console.error(`Failed to ${action} user ${email} in Access group:`, err instanceof Error ? err.message : String(err));
+  }
+}
+
+async function addUserToPaidGroup(email: string, env: Env) {
+  await updateAccessGroup(email, "add", env);
+}
+
+async function removeUserFromPaidGroup(email: string, env: Env) {
+  await updateAccessGroup(email, "remove", env);
 }

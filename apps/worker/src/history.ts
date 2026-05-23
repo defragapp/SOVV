@@ -1,9 +1,15 @@
 import type { Env } from "./types-env.js";
 import { getSessionId, cookieHeader } from "./plan.js";
 import type { Interaction } from "@sovereign/core";
+import { verifyAccessJWT } from "./auth.js";
 import { mapInteraction, type InteractionRow } from "./db.js";
 
 export async function handleHistory(req: Request, env: Env) {
+  const user = await verifyAccessJWT(req);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const sid = await getSessionId(req);
   if (!sid) {
     return Response.json({ interactions: [] });
