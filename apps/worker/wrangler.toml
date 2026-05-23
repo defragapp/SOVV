@@ -33,19 +33,6 @@ id = "3bd3ff5048a8468e82c574d7d66045c3"
 binding = "TEMPLATES"
 bucket_name = "vibesdk-templates"
 
-<<<<<<< HEAD
-[observability]
-enabled = true
-
-[[ratelimits]]
-name = "RATE_LIMITER"
-namespace_id = "1001"
-
-  [ratelimits.simple]
-  limit = 15
-  period = 60
-
-=======
 # Objective 1.2: Add rate limiting
 [[ratelimits]]
 name = "RATE_LIMITER"
@@ -53,16 +40,11 @@ namespace_id = "1001"
 simple = { limit = 15, period = 60 }
 
 # Objective 1.4: Wire up the queue
->>>>>>> 3891515 (Dynamic CORS + workspace middleware)
 [[queues.producers]]
 binding = "PATTERN_QUEUE"
 queue = "pattern-extraction-tasks"
 
 [[queues.consumers]]
-<<<<<<< HEAD
 queue = "pattern-extraction-tasks"
 max_batch_size = 1
 max_batch_timeout = 5
-=======
-queue = "pattern-extraction-tasks"
->>>>>>> 3891515 (Dynamic CORS + workspace middleware)
