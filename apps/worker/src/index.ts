@@ -24,7 +24,7 @@ function withCors(response: Response): Response {
 const router = Router();
 
 // Handle CORS preflight requests
-router.options("*", () => new Response(null, { headers: corsHeaders }));
+router.options("*", () => new Response(null, { status: 204 }));
 
 router.get("/health", () => Response.json({ status: "ok", service: "sovereign-api" }));
 
