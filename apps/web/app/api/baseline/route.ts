@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 
-export const runtime = "edge";
-
 export async function GET(req: Request) {
   const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
   const headers = new Headers();
