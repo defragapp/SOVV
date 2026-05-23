@@ -1,8 +1,8 @@
 import type { Env } from "./types-env.js";
 import type { Baseline, BaselineRequest } from "@sovereign/core";
 import { safeJsonParse } from "@sovereign/core";
-import { getSessionId, cookieHeader } from "./plan.js";
-import { verifyAccessJWT } from "./auth.js";
+import { getSessionId, cookieHeader } from "./plan.ts";
+import { verifyAccessJWT } from "./auth.ts";
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const USER_KEY = (sid: string) => `user:${sid}`;

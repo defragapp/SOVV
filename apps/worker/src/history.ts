@@ -1,8 +1,8 @@
 import type { Env } from "./types-env.js";
 import { getSessionId, cookieHeader } from "./plan.js";
 import type { Interaction } from "@sovereign/core";
-import { verifyAccessJWT } from "./auth.js";
-import { mapInteraction, type InteractionRow } from "./db.js";
+import { verifyAccessJWT } from "./auth.ts";
+import { mapInteraction, type InteractionRow } from "./db.ts";
 
 export async function handleHistory(req: Request, env: Env) {
   const user = await verifyAccessJWT(req);

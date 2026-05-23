@@ -1,6 +1,6 @@
 import type { Env } from "./types-env.js";
-import { getSessionId, setPlan, cookieHeader } from "./plan.js";
-import { verifyAccessJWT } from "./auth.js";
+import { getSessionId, setPlan, cookieHeader } from "./plan.ts";
+import { verifyAccessJWT } from "./auth.ts";
 
 // Stripe webhook signature verification in Workers (no Stripe SDK):
 // Stripe signs: "t=timestamp,v1=signature"

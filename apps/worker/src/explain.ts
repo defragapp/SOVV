@@ -2,13 +2,13 @@ import type { ExecutionContext } from "@cloudflare/workers-types";
 import type { Env } from "./types-env.js";
 import { safeJsonParse } from "@sovereign/core";
 import { flatChips } from "@sovereign/core";
-import { safetyMode, supportResponse } from "./safety.js";
-import { SYSTEM_RULES, buildUserPrompt } from "./prompt.js";
-import { getSessionId, getPlan, cookieHeader } from "./plan.js";
-import { useOne } from "./kv.js";
-import { getBaseline, formatBaseline } from "./baseline.js";
-import { verifyAccessJWT } from "./auth.js";
-import { insertInteraction, getPatterns, formatPatternsForPrompt } from "./db.js";
+import { safetyMode, supportResponse } from "./safety.ts";
+import { SYSTEM_RULES, buildUserPrompt } from "./prompt.ts";
+import { getSessionId, getPlan, cookieHeader } from "./plan.ts";
+import { useOne } from "./kv.ts";
+import { getBaseline, formatBaseline } from "./baseline.ts";
+import { verifyAccessJWT } from "./auth.ts";
+import { insertInteraction, getPatterns, formatPatternsForPrompt } from "./db.ts";
 
 async function hash(text: string): Promise<string> {
   const msgUint8 = new TextEncoder().encode(text);

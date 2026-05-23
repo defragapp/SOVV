@@ -3,9 +3,9 @@
 
 import type { D1Database, Ai } from "@cloudflare/workers-types";
 import type { Env } from "./types-env.js";
-import { getRecentInteractions, upsertPattern, getPatterns } from "./db.js";
-import { verifyAccessJWT } from "./auth.js";
-import { getSessionId, cookieHeader } from "./plan.js";
+import { getRecentInteractions, upsertPattern, getPatterns } from "./db.ts";
+import { verifyAccessJWT } from "./auth.ts";
+import { getSessionId, cookieHeader } from "./plan.ts";
 
 const PATTERN_SYSTEM_PROMPT = `You are a pattern recognition engine. Analyze the user's recent interactions and identify recurring behavioral or emotional patterns.
 
