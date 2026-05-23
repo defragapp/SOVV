@@ -1,3 +1,4 @@
+// Refactored to use itty-router
 import type { ExecutionContext, MessageBatch } from "@cloudflare/workers-types";
 import type { Env } from "./types-env.js";
 import { Router } from "itty-router";
@@ -21,7 +22,6 @@ function withCors(response: Response): Response {
   return newResponse;
 }
 
-// Initialize itty-router
 const router = Router();
 
 // Handle CORS preflight requests
