@@ -116,9 +116,6 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
     // Ensure payment was successful (handles delayed payments & free trials)
     if (session?.payment_status === "paid" || session?.payment_status === "no_payment_required") {
       const sid = session?.client_reference_id;
-<<<<<<< HEAD
-      if (sid) await setPlan(env, sid, "pro");
-=======
       const email = session?.customer_details?.email;
       if (sid) await setPlan(env, sid, "pro");
       // Add user to Cloudflare Access Paid group
@@ -135,7 +132,6 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
           body: `metadata[email]=${encodeURIComponent(email)}`,
         });
       }
->>>>>>> 3891515 (Dynamic CORS + workspace middleware)
     }
   }
 

@@ -222,17 +222,11 @@ export async function handleExplain(req: Request, env: Env, ctx: ExecutionContex
           result,
           confidence: result.confidence || "Low",
         });
-<<<<<<< HEAD
-        await extractPatterns(env, sid, requestId);
-      } catch {
-        // Non-critical
-=======
-        // Objective 1.4: Send message to queue for background processing
-        await env.PATTERN_QUEUE.send({ sid, requestId });
+        // Send message to queue for background processing
+        await env.PATTERN_QUEUE.send({ sessionId: sid, interactionId: requestId });
       } catch (err) {
         // Non-critical, but good to log for debugging
         console.error(`Failed to insert interaction or queue pattern extraction for sid: ${sid}`, err);
->>>>>>> 3891515 (Dynamic CORS + workspace middleware)
       }
     })()
   );

@@ -5,7 +5,7 @@ declare const _default: {
     queue(batch: MessageBatch<{
         sessionId: string;
         interactionId: string;
-    }>, env: Env): Promise<void>;
+    }>, env: Env, ctx: ExecutionContext): Promise<void>;
 };
 export default _default;
 //# sourceMappingURL=index.d.ts.map
