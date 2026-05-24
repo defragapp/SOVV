@@ -10,6 +10,7 @@
     "dev:worker": "npm run dev -w apps/worker",
     "dev": "npm run dev:web & npm run dev:worker",
     "build": "npm run build -w apps/web && npm run build -w apps/worker",
+    "deploy:worker": "npm run deploy -w apps/worker",
     "lint": "npm run lint -w apps/web && npm run lint -w apps/worker"
   }
 }

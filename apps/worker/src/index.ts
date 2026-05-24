@@ -9,16 +9,22 @@ import { handleGetBaseline, handleSaveBaseline } from "./baseline.ts";
 import { handleHistory } from "./history.ts";
 import { handleCheckout, handleWebhook } from "./billing.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://defrag.app",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Credentials": "true",
-};
+interface StripeResponse {
+  id: string;
+  error?: string;
+}
 
-function withCors(response: Response): Response {
+function withCors(response: Response, req?: Request): Response {
   const newResponse = new Response(response.body, response);
-  Object.entries(corsHeaders).forEach(([k, v]) => newResponse.headers.set(k, v));
+  const origin = req?.headers.get("Origin");
+  const allowedOrigin = origin && (origin.includes("localhost") || origin.endsWith(".defrag.app") || origin === "https://defrag.app")
+    ? origin
+    : "https://defrag.app";
+
+  newResponse.headers.set("Access-Control-Allow-Origin", allowedOrigin);
+  newResponse.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  newResponse.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  newResponse.headers.set("Access-Control-Allow-Credentials", "true");
   return newResponse;
 }
 
@@ -45,7 +51,7 @@ router.post("/api/billing/init-stripe", async (req: Request, env: Env) => {
     },
     body: new URLSearchParams({ name: 'Sovereign OS Pro' }).toString(),
   });
-  const product = await productRes.json() as any;
+  const product = await productRes.json() as StripeResponse;
   if (product.error) return Response.json({ error: product.error }, { status: 400 });
   const priceRes = await fetch('https://api.stripe.com/v1/prices', {
     method: 'POST',
@@ -60,7 +66,7 @@ router.post("/api/billing/init-stripe", async (req: Request, env: Env) => {
       'recurring[interval]': 'month',
     }).toString(),
   });
-  const price = await priceRes.json() as any;
+  const price = await priceRes.json() as StripeResponse;
   return Response.json({
     message: "Stripe initialized. Save these IDs to your environment.",
     productId: product.id,
@@ -92,7 +98,7 @@ export default {
           { status: 500 }
         );
       })
-      .then(res => withCors(res));
+      .then(res => withCors(res, req));
   },
 
   async queue(batch: MessageBatch<{ sessionId: string; interactionId: string }>, env: Env, ctx: ExecutionContext): Promise<void> {
