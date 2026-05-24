@@ -22,6 +22,7 @@ function withCors(response: Response): Response {
   return newResponse;
 }
 
+// Initialize itty-router
 const router = Router();
 
 // Handle CORS preflight requests
