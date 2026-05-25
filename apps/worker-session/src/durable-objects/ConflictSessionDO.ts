@@ -1,60 +1,148 @@
-export class ConflictSessionDO {
-  // Map to store user IDs and their associated WebSocket connections
-  userConnections: Map<string, WebSocket[]> = new Map();
-  // Shared state accessible to all users
-  sharedState = {};
-  // Private state restricted to individual users
-  privateState: Record<string, any[]> = {};
+import { DurableObject } from "cloudflare:workers";
 
-  constructor(private state: DurableObjectState) {}
+interface Env {
+  CONFLICT_SESSION: DurableObjectNamespace;
+  AI_SERVICE: Fetcher;
+  BASELINE_KV?: KVNamespace;
+}
 
-  async fetch(request: Request) {
+interface WebSocketAttachment {
+  userId: string;
+}
+
+interface EmotionalDriversResponse {
+  privateView: {
+    headline: string;
+    summary: string;
+    suggestions: string[];
+  };
+  sharedView: {
+    headline: string;
+    summary: string;
+  };
+}
+
+export class ConflictSessionDO extends DurableObject<Env> {
+  constructor(ctx: DurableObjectState, env: Env) {
+    super(ctx, env);
+  }
+
+  async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
-    const userId = url.searchParams.get('userId');
-    
-    if (!userId || request.headers.get('Upgrade') !== 'websocket') {
-      return new Response('Expected Upgrade: websocket with userId', { status: 426 });
+
+    if (url.pathname.startsWith("/ws")) {
+      const upgradeHeader = request.headers.get("Upgrade");
+      if (upgradeHeader !== "websocket") {
+        return new Response("Expected Upgrade: websocket", { status: 426 });
+      }
+
+      const userId = url.searchParams.get("userId");
+      if (!userId) {
+        return new Response("Missing userId query parameter", { status: 400 });
+      }
+
+      const pair = new WebSocketPair();
+      const [client, server] = Object.values(pair);
+
+      this.ctx.acceptWebSocket(server, [userId]);
+      server.serializeAttachment({ userId } as WebSocketAttachment);
+
+      return new Response(null, { status: 101, webSocket: client });
     }
 
-    const [client, server] = new WebSocketPair();
-    await this.handleConnection(userId, server);
-
-    return new Response(null, { status: 101, webSocket: client });
+    return new Response("Not found", { status: 404 });
   }
 
-  async handleConnection(userId: string, socket: WebSocket) {
-    socket.accept();
-    
-    // Save the connection
-    const connections = this.userConnections.get(userId) || [];
-    connections.push(socket);
-    this.userConnections.set(userId, connections);
+  async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
+    const data = typeof message === "string" ? message : "";
+    if (!data) return;
 
-    socket.addEventListener('message', (event) => {
-      // On message, broadcast as a transcript to all users
-      this.broadcastShared({ type: 'transcript', text: event.data });
+    let parsed: { type?: string; content?: string; text?: string };
+    try {
+      parsed = JSON.parse(data);
+    } catch {
+      parsed = { content: data };
+    }
+
+    const messageContent = parsed.content ?? parsed.text ?? data;
+
+    const senderAttachment = ws.deserializeAttachment() as WebSocketAttachment | null;
+    const senderUserId = senderAttachment?.userId ?? "unknown";
+
+    const sharedPayload = JSON.stringify({
+      type: "shared",
+      userId: senderUserId,
+      content: messageContent,
+      timestamp: Date.now(),
+    });
+    this.broadcastShared(sharedPayload);
+
+    const uniqueUserIds = new Set<string>();
+    for (const socket of this.ctx.getWebSockets()) {
+      const attachment = socket.deserializeAttachment() as WebSocketAttachment | null;
+      if (attachment?.userId) {
+        uniqueUserIds.add(attachment.userId);
+      }
+    }
+
+    const privatePromises = Array.from(uniqueUserIds).map(async (userId) => {
+      try {
+        const aiResponse = await this.env.AI_SERVICE.fetch(
+          "http://internal/emotional-drivers",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              sessionId: this.ctx.id.toString(),
+              targetUserId: userId,
+              transcriptChunk: messageContent,
+            }),
+          }
+        );
+
+        if (!aiResponse.ok) return;
+
+        const drivers = (await aiResponse.json()) as EmotionalDriversResponse;
+
+        this.sendPrivate(
+          userId,
+          JSON.stringify({
+            type: "driver_update",
+            targetUserId: userId,
+            privateView: drivers.privateView,
+            timestamp: Date.now(),
+          })
+        );
+      } catch (err) {
+        console.error(`Failed to get emotional drivers for ${userId}:`, err);
+      }
     });
 
-    socket.addEventListener('close', () => {
-      const connections = this.userConnections.get(userId) || [];
-      this.userConnections.set(userId, connections.filter(s => s !== socket));
-    });
+    this.ctx.waitUntil(Promise.all(privatePromises));
   }
 
-  // Send a message to all connected users
-  broadcastShared(message: any) {
-    const data = JSON.stringify(message);
-    for (const connections of this.userConnections.values()) {
-      connections.forEach(socket => socket.send(data));
+  async webSocketClose(
+    ws: WebSocket,
+    code: number,
+    reason: string
+  ): Promise<void> {
+    // Socket is already closing — no action needed
+  }
+
+  private broadcastShared(message: string): void {
+    for (const ws of this.ctx.getWebSockets()) {
+      if (ws.readyState === WebSocket.READY_STATE_OPEN) {
+        ws.send(message);
+      }
     }
   }
 
-  // Send a message only to a specific user
-  sendPrivate(userId: string, message: any) {
-    const connections = this.userConnections.get(userId);
-    if (connections) {
-      const data = JSON.stringify(message);
-      connections.forEach(socket => socket.send(data));
+  private sendPrivate(userId: string, message: string): void {
+    const sockets = this.ctx.getWebSockets(userId);
+    for (const ws of sockets) {
+      if (ws.readyState === WebSocket.READY_STATE_OPEN) {
+        ws.send(message);
+      }
     }
   }
 }
