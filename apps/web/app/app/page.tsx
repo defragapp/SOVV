@@ -1,5 +1,5 @@
 import Link from "next/link";
-import MemoryInsights from "../components/MemoryInsights";
+import MemoryInsights from "../../components/MemoryInsights";
 
 export default function Home() {
   return (
@@ -10,13 +10,14 @@ export default function Home() {
         know how to ask <span className="text-white">anywhere else.</span>
       </h1>
 
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 text-white/60 font-light">
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 text-white/60 font-medium">
         <ul className="space-y-4">
           <li>• Am I in alignment right now?</li>
           <li>• Why does this moment feel so intense?</li>
           <li>• Why do I keep reacting this way?</li>
           <li>• What's actually happening between us?</li>
         </ul>
+
         <ul className="space-y-4">
           <li>• Why does this keep happening to me?</li>
           <li>• What am I not seeing about myself?</li>
@@ -37,10 +38,9 @@ export default function Home() {
       <div className="mt-14 rounded-2xl border border-white/15 p-6">
         <p className="text-white/70 text-sm mb-3">Example output</p>
         <div className="space-y-2">
-          <p><span className="font-semibold">What's going on:</span> One person wants reassurance. The other takes space.</p>
-          <p><span className="font-semibold">Why it repeats:</span> Accusation triggers defensiveness. Defensiveness triggers escalation.</p>
-          <p><span className="font-semibold">One better next step:</span> Replace blame with a direct feeling and a simple request.</p>
-          <p className="text-white/50 text-sm">Confidence: Medium</p>
+          <p><span className="font-semibold">What's going on:</span> One person wants to talk about something difficult, but the other is avoiding it. This is leading to a cycle of pursuit and withdrawal.</p>
+          <p><span className="font-semibold">Why it repeats:</span> Accusation triggers defensiveness, which feels like abandonment, which triggers more intense pursuit.</p>
+          <p><span className="font-semibold">What's needed:</span> To break the cycle, one person needs to share the underlying fear instead of the surface-level frustration.</p>
         </div>
       </div>
 
