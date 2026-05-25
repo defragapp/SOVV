@@ -4,16 +4,22 @@ export interface Env {
   AI: Ai;
 }
 
-const corsHeaders = {
+const responseHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,HEAD,POST,OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Max-Age": "86400",
+  "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+  "X-Frame-Options": "DENY",
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Content-Security-Policy":
+    "default-src 'self'; connect-src 'self' https://*.workers.dev wss://*.workers.dev; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'none';",
 };
 
-function withCors(response: Response): Response {
+function withHeaders(response: Response): Response {
   const newResponse = new Response(response.body, response);
-  Object.entries(corsHeaders).forEach(([key, value]) => {
+  Object.entries(responseHeaders).forEach(([key, value]) => {
     newResponse.headers.set(key, value);
   });
   return newResponse;
@@ -26,19 +32,21 @@ export default {
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
-        headers: corsHeaders,
+        headers: responseHeaders,
       });
     }
 
     if (url.pathname === "/emotional-drivers" && request.method === "POST") {
       const response = await handleEmotionalDrivers(request);
-      return withCors(response);
+      return withHeaders(response);
     }
 
     if (url.pathname === "/health" && request.method === "GET") {
-      return withCors(Response.json({ ok: true, worker: "worker-ai" }));
+      return withHeaders(
+        Response.json({ ok: true, worker: "worker-ai", hardened: true })
+      );
     }
 
-    return withCors(new Response("Not found", { status: 404 }));
+    return withHeaders(new Response("Not found", { status: 404 }));
   },
 } satisfies ExportedHandler<Env>;
