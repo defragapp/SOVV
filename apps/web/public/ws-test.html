@@ -24,7 +24,178 @@
     .panel.shared h2 { color: #6366f1; }
     .panel.private h2 { color: #f59e0b; }
     .msg { padding: 6px 0; border-bottom: 1px solid #1a1a1a; font-size: 13px; font-family: monospace; word-break: break-all; }
+    .msg .ts { color: #666; margin-right: 8px; }<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOVV — Session + AI Test</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0a0a0a; color: #e0e0e0; padding: 24px; }
+    h1 { font-size: 18px; margin-bottom: 16px; color: #fff; }
+    .section { margin-bottom: 24px; }
+    .section h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; color: #888; }
+    .config { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+    .config input { background: #1a1a1a; border: 1px solid #333; color: #e0e0e0; padding: 8px 12px; border-radius: 6px; font-size: 14px; }
+    .config input:focus { outline: none; border-color: #6366f1; }
+    .config button { padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; border: none; color: #fff; }
+    .btn-connect { background: #6366f1; }
+    .btn-connect:hover { background: #4f46e5; }
+    .btn-disconnect { background: #dc2626; }
+    .btn-send { background: #22c55e; }
+    .btn-ai { background: #f59e0b; }
+    .btn-ai:hover { background: #d97706; }
+    .send-row { display: flex; gap: 12px; margin-bottom: 12px; }
+    .send-row input { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #e0e0e0; padding: 8px 12px; border-radius: 6px; font-size: 14px; }
+    .send-row input:focus { outline: none; border-color: #6366f1; }
+    .panels { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .panel { background: #111; border: 1px solid #222; border-radius: 8px; padding: 16px; min-height: 250px; overflow-y: auto; max-height: 400px; }
+    .panel h3 { font-size: 13px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .panel.shared h3 { color: #6366f1; }
+    .panel.private h3 { color: #f59e0b; }
+    .panel.ai h3 { color: #22c55e; }
+    .msg { padding: 6px 0; border-bottom: 1px solid #1a1a1a; font-size: 12px; font-family: monospace; word-break: break-all; white-space: pre-wrap; }
     .msg .ts { color: #666; margin-right: 8px; }
+    .status { margin-bottom: 12px; font-size: 13px; }
+    .status.connected { color: #22c55e; }
+    .status.disconnected { color: #dc2626; }
+  </style>
+</head>
+<body>
+  <h1>SOVV — Session + AI Test</h1>
+
+  <div class="section">
+    <h2>WebSocket Session</h2>
+    <div class="config">
+      <input id="baseUrl" placeholder="Session Base URL" value="https://worker-session.sovereign-os-api.workers.dev" style="width:300px" />
+      <input id="sessionId" placeholder="Session ID" value="demo" style="width:120px" />
+      <input id="userId" placeholder="User ID" value="userA" style="width:100px" />
+      <button class="btn-connect" onclick="connect()">Connect</button>
+      <button class="btn-disconnect" onclick="disconnect()">Disconnect</button>
+    </div>
+    <div id="status" class="status disconnected">Disconnected</div>
+    <div class="send-row">
+      <input id="msgInput" placeholder="Type a transcript message..." onkeydown="if(event.key==='Enter')send()" />
+      <button class="btn-send" onclick="send()">Send</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>AI Worker Test</h2>
+    <div class="config">
+      <input id="aiBaseUrl" placeholder="AI Worker Base URL" value="https://worker-ai.sovereign-os-api.workers.dev" style="width:300px" />
+      <button class="btn-ai" onclick="testAI()">Test AI Worker</button>
+    </div>
+  </div>
+
+  <div class="panels">
+    <div class="panel shared">
+      <h3>Shared (broadcast)</h3>
+      <div id="sharedLog"></div>
+    </div>
+    <div class="panel private">
+      <h3>Private (driver_update)</h3>
+      <div id="privateLog"></div>
+    </div>
+    <div class="panel ai">
+      <h3>AI Worker Response</h3>
+      <div id="aiLog"></div>
+    </div>
+  </div>
+
+  <script>
+    let ws = null;
+
+    function connect() {
+      const base = document.getElementById('baseUrl').value.replace(/\/+$/, '');
+      const sid = document.getElementById('sessionId').value;
+      const uid = document.getElementById('userId').value;
+      const wsUrl = base.replace(/^https?/, 'wss') + '/ws/' + sid + '?userId=' + uid;
+
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        document.getElementById('status').textContent = 'Connected as ' + uid;
+        document.getElementById('status').className = 'status connected';
+      };
+
+      ws.onclose = () => {
+        document.getElementById('status').textContent = 'Disconnected';
+        document.getElementById('status').className = 'status disconnected';
+      };
+
+      ws.onerror = (e) => console.error('WebSocket error', e);
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          const ts = new Date().toLocaleTimeString();
+          if (msg.type === 'shared') {
+            appendLog('sharedLog', ts, msg);
+          } else if (msg.type === 'driver_update') {
+            appendLog('privateLog', ts, msg);
+          } else {
+            appendLog('sharedLog', ts, msg);
+          }
+        } catch {
+          appendLog('sharedLog', new Date().toLocaleTimeString(), { raw: event.data });
+        }
+      };
+    }
+
+    function disconnect() {
+      if (ws) ws.close();
+      ws = null;
+    }
+
+    function send() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return alert('Not connected');
+      const text = document.getElementById('msgInput').value;
+      if (!text) return;
+      ws.send(JSON.stringify({ type: 'transcript', text }));
+      document.getElementById('msgInput').value = '';
+    }
+
+    async function testAI() {
+      const base = document.getElementById('aiBaseUrl').value.replace(/\/+$/, '');
+      const url = base + '/emotional-drivers';
+      const ts = new Date().toLocaleTimeString();
+
+      appendLog('aiLog', ts, { status: 'SENDING...', url });
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: document.getElementById('sessionId').value,
+            targetUserId: document.getElementById('userId').value,
+            transcriptChunk: 'I felt ignored during the conversation'
+          })
+        });
+
+        const data = await res.json();
+        appendLog('aiLog', ts, { status: res.status, body: data });
+      } catch (err) {
+        appendLog('aiLog', ts, { error: err.message });
+      }
+    }
+
+    function appendLog(elId, ts, msg) {
+      const el = document.getElementById(elId);
+      const div = document.createElement('div');
+      div.className = 'msg';
+      div.innerHTML = '<span class="ts">' + ts + '</span>' + escapeHtml(JSON.stringify(msg, null, 2));
+      el.prepend(div);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+  </script>
+</body>
+</html>
     .status { margin-bottom: 12px; font-size: 13px; }
     .status.connected { color: #22c55e; }
     .status.disconnected { color: #dc2626; }
