@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOVV — WebSocket Test</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0a0a0a; color: #e0e0e0; padding: 24px; }
+    h1 { font-size: 18px; margin-bottom: 16px; color: #fff; }
+    .config { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .config input { background: #1a1a1a; border: 1px solid #333; color: #e0e0e0; padding: 8px 12px; border-radius: 6px; font-size: 14px; }
+    .config input:focus { outline: none; border-color: #6366f1; }
+    .config button { background: #6366f1; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .config button:hover { background: #4f46e5; }
+    .config button.disconnect { background: #dc2626; }
+    .send-row { display: flex; gap: 12px; margin-bottom: 16px; }
+    .send-row input { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #e0e0e0; padding: 8px 12px; border-radius: 6px; font-size: 14px; }
+    .send-row input:focus { outline: none; border-color: #6366f1; }
+    .send-row button { background: #22c55e; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .panel { background: #111; border: 1px solid #222; border-radius: 8px; padding: 16px; min-height: 300px; }
+    .panel h2 { font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .panel.shared h2 { color: #6366f1; }
+    .panel.private h2 { color: #f59e0b; }
+    .msg { padding: 6px 0; border-bottom: 1px solid #1a1a1a; font-size: 13px; font-family: monospace; word-break: break-all; }
+    .msg .ts { color: #666; margin-right: 8px; }
+    .status { margin-bottom: 12px; font-size: 13px; }
+    .status.connected { color: #22c55e; }
+    .status.disconnected { color: #dc2626; }
+  </style>
+</head>
+<body>
+  <h1>SOVV — WebSocket Session Test</h1>
+
+  <div class="config">
+    <input id="baseUrl" placeholder="Base URL" value="ws://localhost:8787" style="width:260px" />
+    <input id="sessionId" placeholder="Session ID" value="demo-session" style="width:160px" />
+    <input id="userId" placeholder="User ID" value="userA" style="width:120px" />
+    <button id="connectBtn" onclick="connect()">Connect</button>
+    <button class="disconnect" onclick="disconnect()">Disconnect</button>
+  </div>
+
+  <div id="status" class="status disconnected">Disconnected</div>
+
+  <div class="send-row">
+    <input id="msgInput" placeholder="Type a transcript message..." onkeydown="if(event.key==='Enter')send()" />
+    <button onclick="send()">Send</button>
+  </div>
+
+  <div class="panels">
+    <div class="panel shared">
+      <h2>Shared (broadcast)</h2>
+      <div id="sharedLog"></div>
+    </div>
+    <div class="panel private">
+      <h2>Private (driver_update)</h2>
+      <div id="privateLog"></div>
+    </div>
+  </div>
+
+  <script>
+    let ws = null;
+
+    function connect() {
+      const base = document.getElementById('baseUrl').value.replace(/\/+$/, '');
+      const sid = document.getElementById('sessionId').value;
+      const uid = document.getElementById('userId').value;
+      const url = `${base}/ws/${sid}?userId=${uid}`;
+
+      ws = new WebSocket(url);
+
+      ws.onopen = () => {
+        document.getElementById('status').textContent = `Connected as ${uid}`;
+        document.getElementById('status').className = 'status connected';
+      };
+
+      ws.onclose = () => {
+        document.getElementById('status').textContent = 'Disconnected';
+        document.getElementById('status').className = 'status disconnected';
+      };
+
+      ws.onerror = (e) => {
+        console.error('WebSocket error', e);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          const ts = new Date().toLocaleTimeString();
+
+          if (msg.type === 'shared') {
+            appendLog('sharedLog', ts, msg);
+          } else if (msg.type === 'driver_update') {
+            appendLog('privateLog', ts, msg);
+          } else {
+            appendLog('sharedLog', ts, msg);
+          }
+        } catch {
+          appendLog('sharedLog', new Date().toLocaleTimeString(), { raw: event.data });
+        }
+      };
+    }
+
+    function disconnect() {
+      if (ws) ws.close();
+      ws = null;
+    }
+
+    function send() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return alert('Not connected');
+      const text = document.getElementById('msgInput').value;
+      if (!text) return;
+      ws.send(JSON.stringify({ type: 'transcript', text }));
+      document.getElementById('msgInput').value = '';
+    }
+
+    function appendLog(elId, ts, msg) {
+      const el = document.getElementById(elId);
+      const div = document.createElement('div');
+      div.className = 'msg';
+      div.innerHTML = `<span class="ts">${ts}</span>${escapeHtml(JSON.stringify(msg, null, 2))}`;
+      el.prepend(div);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+  </script>
+</body>
+</html>
