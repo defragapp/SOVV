@@ -1,14 +1,50 @@
-import "../styles/globals.css";
+// apps/web/app/layout.tsx
 
-export const metadata = {
-  title: "sovereign.os",
-  description: "Clear insight. One better next step."
-};
+"use client";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import { useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    async function checkBaseline() {
+      try {
+        const res = await fetch("/api/explain", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: "self",
+            query: "baseline_check",
+          }),
+        });
+
+        const json = await res.json();
+
+        if (json?.type === "needs_baseline") {
+          if (pathname !== "/baseline") {
+            router.replace("/baseline");
+          }
+        }
+      } catch {
+        // fail silently — do not block UI on network errors
+      }
+    }
+
+    checkBaseline();
+  }, [pathname, router]);
+
   return (
     <html lang="en">
-      <body className="min-h-screen">{children}</body>
+      <body>{children}</body>
     </html>
   );
 }
