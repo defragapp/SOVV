@@ -2,6 +2,12 @@
 import { BaselineRecord, BASELINE_VERSION } from "@sovv/core/types";
 import { generateGeneKeys } from "@sovv/core/geneKeys";
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
 export async function getBaseline(
   kv: KVNamespace,
   userId: string
@@ -27,6 +33,10 @@ export async function getBaseline(
 }
 
 export async function handleExplain(c: any) {
+  if (c.req.method === "OPTIONS") {
+    return new Response(null, { headers: CORS_HEADERS });
+  }
+
   const userId = c.get("userId");
   const baseline = await getBaseline(c.env.KV_NAMESPACE, userId);
   const geneKeys = baseline ? generateGeneKeys(baseline) : null;
@@ -36,7 +46,7 @@ export async function handleExplain(c: any) {
 
   // Exact contract boundary match: { type: "needs_baseline" }
   if (needs_baseline) {
-    return c.json({ type: "needs_baseline" }, 200);
+    return c.json({ type: "needs_baseline" }, 200, CORS_HEADERS);
   }
 
   // Proceed to AI binding only after baseline is confirmed
@@ -67,11 +77,12 @@ Return JSON only in this format:
 
   try {
     const parsed = JSON.parse(response.response.trim());
-    return c.json({ type: "explanation", data: parsed });
+    return c.json({ type: "explanation", data: parsed }, 200, CORS_HEADERS);
   } catch {
     return c.json(
       { type: "error", message: "model_parse_failure", raw: response.response },
-      500
+      500,
+      CORS_HEADERS
     );
   }
 }
