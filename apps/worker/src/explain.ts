@@ -1,4 +1,3 @@
-// apps/worker/src/explain.ts
 import { BaselineRecord, BASELINE_VERSION } from "@sovv/core/types";
 import { generateGeneKeys } from "@sovv/core/geneKeys";
 
@@ -49,40 +48,45 @@ export async function handleExplain(c: any) {
     return c.json({ type: "needs_baseline" }, 200, CORS_HEADERS);
   }
 
+  // Ensure resolvedKeys is defined correctly before the AI binding call
+  const resolvedKeys = geneKeys;
+
   // Proceed to AI binding only after baseline is confirmed
   const response = await c.env.AI_BINDING.run("@cf/meta/llama-3-8b-instruct", {
     messages: [
       {
         role: "system",
-        content: `You are a structured data API. Respond with valid JSON only. No prose, no markdown. Schema: { "interpretation": string, "aspects": string[] }`,
+        content: "You are a precise analytical engine. Respond with valid JSON only. No prose, no markdown, no greetings. Schema: { \"interpretation\": string, \"aspects\": string[] }"
       },
       {
         role: "user",
-        content: `Interpret this user profile.
+        content: `Analyze this deterministic identity profile. Speak directly, clearly, and with total candor. You are an analyst reading a structural blueprint, not a life coach.
 
-Baseline:
+Baseline Profile:
 ${JSON.stringify(baseline)}
 
-Gene Keys:
-${JSON.stringify(geneKeys)}
+Resolved Gene Keys:
+${JSON.stringify(resolvedKeys)}
+
+Instructions:
+1. 'interpretation' (string): Write a sharp, 2-3 sentence synthesis of their core architecture based on the interaction of their keys. Focus on the tension between their shadows and gifts.
+2. 'aspects' (string[]): Return exactly 4 sharp bullet points. Each point MUST directly reference a Gene Key role (Life Work, Evolution, Radiance, or Purpose) and its specific theme.
+3. Tone: Esoteric Brutalism. Do not use abstract AI filler like "synergy," "holistic," "paradigm," or "journey". Use grounded, structural language. 
+4. Never repeat the raw JSON data back to the user. Synthesize it.
 
 Return JSON only in this format:
 {
   "interpretation": string,
   "aspects": string[]
-}`,
-      },
+}`
+      }
     ],
   });
 
-  try {
-    const parsed = JSON.parse(response.response.trim());
-    return c.json({ type: "explanation", data: parsed }, 200, CORS_HEADERS);
-  } catch {
-    return c.json(
-      { type: "error", message: "model_parse_failure", raw: response.response },
-      500,
-      CORS_HEADERS
-    );
-  }
+  return new Response(JSON.stringify(response), {
+    headers: {
+      ...CORS_HEADERS,
+      "Content-Type": "application/json",
+    },
+  });
 }
