@@ -1,5 +1,6 @@
 // apps/worker/src/explain.ts
 import { BaselineRecord, BASELINE_VERSION } from "@sovv/core/types";
+import { generateGeneKeys } from "@sovv/core/geneKeys";
 
 export async function getBaseline(
   kv: KVNamespace,
@@ -28,6 +29,7 @@ export async function getBaseline(
 export async function handleExplain(c: any) {
   const userId = c.get("userId");
   const baseline = await getBaseline(c.env.KV_NAMESPACE, userId);
+  const geneKeys = baseline ? generateGeneKeys(baseline) : null;
 
   const needs_baseline =
     !baseline || !baseline.dob || !baseline.tob || !baseline.pob;
@@ -46,7 +48,19 @@ export async function handleExplain(c: any) {
       },
       {
         role: "user",
-        content: `Explain based on: ${JSON.stringify(baseline)}`,
+        content: `Interpret this user profile.
+
+Baseline:
+${JSON.stringify(baseline)}
+
+Gene Keys:
+${JSON.stringify(geneKeys)}
+
+Return JSON only in this format:
+{
+  "interpretation": string,
+  "aspects": string[]
+}`,
       },
     ],
   });
