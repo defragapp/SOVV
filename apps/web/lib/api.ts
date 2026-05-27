@@ -1,46 +1,35 @@
-import type {
-  BaselineRequest,
-  BaselineResponse,
-  BillingCheckoutResponse,
-  ChipsResponse,
-  ExplainRequest,
-  ExplainResponse
-} from "@sovereign/core";
+// apps/web/lib/api.ts
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "";
+import type { ExplainRequest, ExplainResponse } from "@sovv/core/types";
 
-export async function apiExplain(payload: ExplainRequest): Promise<ExplainResponse> {
-  const res = await fetch(`${API_BASE}/api/explain`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(payload),
-    cache: "no-store"
-  });
-  return res.json();
-}
+export async function callExplain(
+  input: ExplainRequest
+): Promise<ExplainResponse> {
+  try {
+    const res = await fetch("/api/explain", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(input),
+    });
 
-export async function apiChips(mode: string): Promise<ChipsResponse> {
-  const res = await fetch(`${API_BASE}/api/chips?mode=${encodeURIComponent(mode)}`, {
-    cache: "no-store"
-  });
-  return res.json();
-}
+    const json = await res.json();
 
-export async function apiGetBaseline(): Promise<BaselineResponse> {
-  const res = await fetch(`${API_BASE}/api/baseline`, { cache: "no-store" });
-  return res.json();
-}
+    if (!json || typeof json.type !== "string") {
+      return {
+        type: "error",
+        message: "invalid_response_shape",
+        raw: JSON.stringify(json),
+      };
+    }
 
-export async function apiSaveBaseline(payload: BaselineRequest): Promise<BaselineResponse> {
-  const res = await fetch(`${API_BASE}/api/baseline`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-  return res.json();
-}
-
-export async function apiCheckout(): Promise<BillingCheckoutResponse> {
-  const res = await fetch(`${API_BASE}/api/billing/checkout`, { method: "POST" });
-  return res.json();
+    return json as ExplainResponse;
+  } catch (err: any) {
+    return {
+      type: "error",
+      message: "network_error",
+      raw: err?.message ?? String(err),
+    };
+  }
 }
