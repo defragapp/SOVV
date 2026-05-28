@@ -16,3 +16,7 @@ export async function handleChips(req: Request, _env: Env): Promise<Response> {
     headers: { "cache-control": "public, max-age=300" }
   });
 }
+
+export function registerChipsRoute(router: any, getEnv: () => Env) {
+  router.get("/api/chips", async (req: Request) => handleChips(req, getEnv()));
+}
