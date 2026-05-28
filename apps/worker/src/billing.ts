@@ -134,3 +134,8 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
 
   return new Response("OK");
 }
+
+export function registerBillingRoutes(router: any, getEnv: () => Env) {
+  router.post("/api/billing/checkout", async (req: Request) => handleCheckout(req, getEnv()));
+  router.post("/api/billing/webhook", async (req: Request) => handleWebhook(req, getEnv()));
+}
