@@ -37,3 +37,7 @@ export async function handleHistory(req: Request, env: Env) {
     return Response.json({ interactions: [] });
   }
 }
+
+export function registerHistoryRoute(router: any, getEnv: () => Env) {
+  router.get("/api/history", async (req: Request) => handleHistory(req, getEnv()));
+}
