@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 
-
 export async function POST(req: Request) {
   const body = await req.text();
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "https://api.defrag.app";
   const headers = new Headers(req.headers);
   if (!headers.has("content-type")) {
     headers.set("content-type", "application/json");
@@ -12,13 +11,13 @@ export async function POST(req: Request) {
   const r = await fetch(`${apiBase}/api/explain`, {
     method: "POST",
     headers,
-    body
+    body,
   });
 
   const data = await r.text();
   const response = new NextResponse(data, {
     status: r.status,
-    headers: { "content-type": "application/json" }
+    headers: { "content-type": "application/json" },
   });
 
   const setCookie = r.headers.get("set-cookie");
