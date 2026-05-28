@@ -145,3 +145,8 @@ export async function handleGetPatterns(req: Request, env: Env): Promise<Respons
     { headers: { "set-cookie": cookieHeader(sid), "cache-control": "no-store" } }
   );
 }
+
+export function registerPatternsRoutes(router: any, getEnv: () => Env) {
+  router.get("/api/patterns", async (req: Request) => handleGetPatterns(req, getEnv()));
+  router.post("/api/patterns/verify", async (req: Request) => handlePatternVerify(req, getEnv()));
+}
