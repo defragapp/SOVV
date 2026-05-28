@@ -1,12 +1,24 @@
-import { getAuthUser, jsonResponse } from "./auth"
+import type { Env } from "./types-env.ts";
+import { getAuthUser, jsonResponse, type Confidence } from "./auth.ts";
+import { getSessionId, cookieHeader } from "./plan.ts";
+import { getBaseline, formatBaseline } from "./baseline.ts";
+import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.ts";
+import { extractPatterns } from "./patterns.ts";
+import type {
+  ExplainRequest,
+  ExplainResponse,
+  Insight,
+  Move,
+  PressurePoint,
+  Shift,
+  Tier,
+} from "@sovereign/core";
 
-interface ExplainRequestBody {
-  message: string
-  target?: {
-    id: string
-    relation: string
-  }
-}
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
 
 const SYSTEM_SELF = `You are Sovereign — a perspective-shift engine, not a therapist.
 
@@ -18,6 +30,7 @@ Rules:
 - Be direct, specific, and structural
 - Name the pattern, not the symptom
 - Always provide a concrete move
+- If baseline or historical patterns are provided, use them for continuity without naming internal storage
 
 Respond in this exact JSON format only, no markdown, no code fences:
 {
@@ -25,7 +38,7 @@ Respond in this exact JSON format only, no markdown, no code fences:
   "shift": { "label": "Short shift name", "summary": "One sentence explaining the shift" },
   "move": { "label": "Short action name", "description": "Specific concrete next step", "difficulty": "gentle|moderate|direct" },
   "insights": [{ "id": "ins_001", "type": "pattern", "title": "Short title", "detail": "What the pattern is", "source": "baseline" }]
-}`
+}`;
 
 const SYSTEM_RELATIONAL = `You are Sovereign — a perspective-shift engine for relational dynamics.
 
@@ -36,6 +49,7 @@ Rules:
 - Name the dynamic, not the blame
 - Show both sides of the tension
 - Be structural, not sentimental
+- If baseline or historical patterns are provided, use them for continuity without naming internal storage
 
 Respond in this exact JSON format only, no markdown, no code fences:
 {
@@ -44,89 +58,226 @@ Respond in this exact JSON format only, no markdown, no code fences:
   "pressure_points": [{ "type": "emotional|structural|communication", "label": "Short name", "description": "What the tension is", "yours": "Your side", "theirs": "Their side" }],
   "move": { "label": "Short action name", "description": "Specific concrete next step", "difficulty": "gentle|moderate|direct" },
   "insights": [{ "id": "ins_001", "type": "pattern|dynamic|baseline", "title": "Short title", "detail": "What this reveals", "source": "baseline|comparison|conversation" }]
-}`
+}`;
 
-export function registerExplainRoute(router: any, getEnv: () => any) {
+function asText(value: unknown): string {
+  if (typeof value === "string") return value;
+  return value ? JSON.stringify(value) : "";
+}
+
+function parseJsonFromText(text: string): Record<string, any> {
+  const trimmed = text.trim();
+  const match = trimmed.match(/\{[\s\S]*\}/);
+  if (!match) return {};
+
+  try {
+    return JSON.parse(match[0]) as Record<string, any>;
+  } catch {
+    return {};
+  }
+}
+
+function normalizeShift(input: any): Shift {
+  if (input && typeof input.label === "string" && typeof input.summary === "string") {
+    return input;
+  }
+  return { label: "Unclear", summary: "The shift is still forming" };
+}
+
+function normalizeMove(input: any): Move {
+  if (
+    input &&
+    typeof input.label === "string" &&
+    typeof input.description === "string" &&
+    (input.difficulty === "gentle" || input.difficulty === "moderate" || input.difficulty === "direct")
+  ) {
+    return input;
+  }
+  return {
+    label: "Sit with it",
+    description: "Let this settle before acting",
+    difficulty: "gentle",
+  };
+}
+
+function normalizeInsights(input: any): Insight[] {
+  if (!Array.isArray(input)) return [];
+  return input
+    .filter((item) => item && typeof item.id === "string")
+    .map((item) => ({
+      id: item.id,
+      type: item.type === "dynamic" || item.type === "baseline" ? item.type : "pattern",
+      title: typeof item.title === "string" ? item.title : "Insight",
+      detail: typeof item.detail === "string" ? item.detail : "",
+      source:
+        item.source === "comparison" || item.source === "conversation" || item.source === "baseline"
+          ? item.source
+          : "conversation",
+    }));
+}
+
+function normalizePressurePoints(input: any): PressurePoint[] | undefined {
+  if (!Array.isArray(input)) return undefined;
+  const points = input
+    .filter((item) => item && typeof item.label === "string" && typeof item.description === "string")
+    .map((item) => ({
+      type:
+        item.type === "structural" || item.type === "communication" ? item.type : "emotional",
+      label: item.label,
+      description: item.description,
+      yours: typeof item.yours === "string" ? item.yours : undefined,
+      theirs: typeof item.theirs === "string" ? item.theirs : undefined,
+    }));
+  return points.length ? points : undefined;
+}
+
+async function buildExplainPrompt(args: {
+  message: string;
+  baselineText: string;
+  patternText: string;
+  targetName?: string;
+  targetBaseline?: unknown;
+  relational: boolean;
+}) {
+  const targetSection = args.targetName
+    ? `\nTarget person: ${args.targetName}${args.targetBaseline ? `\nTarget baseline: ${asText(args.targetBaseline)}` : ""}`
+    : "";
+
+  const contextSection = [args.baselineText, args.patternText].filter(Boolean).join("\n\n");
+
+  return `${args.relational ? SYSTEM_RELATIONAL : SYSTEM_SELF}\n\n${contextSection ? `Context:\n${contextSection}\n\n` : ""}Message:\n${args.message}${targetSection}`;
+}
+
+export async function handleExplain(req: Request, env: Env): Promise<Response> {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: CORS_HEADERS });
+  }
+
+  const user = await getAuthUser(req, env.DB);
+  if (!user) {
+    return jsonResponse({ error: "Unauthorized" }, 401, CORS_HEADERS);
+  }
+
+  const sid = await getSessionId(req);
+  const body = (await req.json().catch(() => ({}))) as Partial<ExplainRequest> & {
+    question?: string;
+    text?: string;
+    mode?: string;
+    people?: Array<{ id: string; relation?: string; name?: string }>;
+  };
+
+  const message = String(body.message ?? body.question ?? body.text ?? "").trim();
+  if (!message) {
+    return jsonResponse({ error: "message_required" }, 400, {
+      ...CORS_HEADERS,
+      "set-cookie": cookieHeader(sid),
+    });
+  }
+
+  const target = body.target;
+  const relational = Boolean(target);
+  const mode = (body.mode ?? (relational ? "pair" : "self")) as string;
+
+  if (relational && user.tier === "free") {
+    return jsonResponse(
+      { error: "Relational analysis requires Pro" },
+      403,
+      { ...CORS_HEADERS, "set-cookie": cookieHeader(sid) }
+    );
+  }
+
+  const baseline = await getBaseline(env, sid);
+  if (!baseline || !baseline.dob || !baseline.tob?.value || !baseline.pob) {
+    return jsonResponse(
+      { type: "needs_baseline" },
+      200,
+      { ...CORS_HEADERS, "set-cookie": cookieHeader(sid) }
+    );
+  }
+
+  const patterns = await getPatterns(env.DB, sid);
+  const baselineText = formatBaseline(baseline);
+  const patternText = formatPatternsForPrompt(patterns);
+  const targetBaseline =
+    relational && target
+      ? await env.KV.get(`baseline:${user.id}:person:${target.id}`, "json")
+      : null;
+
+  const prompt = await buildExplainPrompt({
+    message,
+    baselineText,
+    patternText,
+    targetName: target ? target.relation : undefined,
+    targetBaseline,
+    relational,
+  });
+
+  const modelId = env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
+  const ai = await env.AI.run(modelId, {
+    messages: [
+      { role: "system", content: relational ? SYSTEM_RELATIONAL : SYSTEM_SELF },
+      { role: "user", content: prompt },
+    ],
+    temperature: 0.35,
+    max_tokens: 900,
+  });
+
+  const rawText = asText((ai as any).response ?? ai);
+  const parsed = parseJsonFromText(rawText);
+
+  const result: ExplainResponse = {
+    response: typeof parsed.response === "string" ? parsed.response : rawText,
+    shift: normalizeShift(parsed.shift),
+    pressure_points: normalizePressurePoints(parsed.pressure_points),
+    move: normalizeMove(parsed.move),
+    insights: normalizeInsights(parsed.insights),
+    thread_meta: {
+      target_id: target?.id,
+      target_relation: target?.relation as ExplainResponse["thread_meta"]["target_relation"],
+      baseline_loaded: true,
+      target_baseline_loaded: relational ? Boolean(targetBaseline) : undefined,
+    },
+  };
+
+  const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
+  const confidence: Confidence = result.insights.length
+    ? "Medium"
+    : "Not enough information";
+
+  await insertInteraction(env.DB, {
+    id: interactionId,
+    session_id: sid,
+    mode,
+    question: message,
+    text: message,
+    people: target ? [{ id: target.id, relation: target.relation, name: target.relation }] : [],
+    result,
+    confidence,
+  });
+
+  void extractPatterns(env, sid, interactionId);
+
+  return jsonResponse(
+    {
+      type: "ok",
+      plan: user.tier,
+      ...result,
+      result,
+      audio: null,
+      video: { scenes: [] },
+    },
+    200,
+    {
+      ...CORS_HEADERS,
+      "set-cookie": cookieHeader(sid),
+      "cache-control": "no-store",
+    }
+  );
+}
+
+export async function registerExplainRoute(router: any, getEnv: () => Env) {
   router.post("/api/explain", async (request: Request) => {
-    const { DB, KV, AI } = getEnv()
-
-    const user = await getAuthUser(request, DB)
-    if (!user) {
-      return jsonResponse({ error: "needs_baseline" }, 401)
-    }
-
-    const body = await request.json() as ExplainRequestBody
-
-    if (body.target && user.tier === "free") {
-      return jsonResponse({ error: "Relational analysis requires Pro" }, 403)
-    }
-
-    const baseline = await KV.get(`baseline:${user.id}`, "json") as any
-    if (!baseline) {
-      return jsonResponse({ error: "needs_baseline" }, 401)
-    }
-
-    const isRelational = !!body.target
-    const systemPrompt = isRelational ? SYSTEM_RELATIONAL : SYSTEM_SELF
-
-    let userPrompt = `User baseline (hidden): DOB: ${baseline.dob}, TOB: ${baseline.tob}, POB: ${baseline.pob}\n\nMessage: ${body.message}`
-
-    if (isRelational && body.target) {
-      const targetBaseline = await KV.get(`baseline:${user.id}:person:${body.target.id}`, "json") as any
-      if (targetBaseline) {
-        userPrompt += `\n\nTarget (${targetBaseline.name || body.target.relation}) baseline: DOB: ${targetBaseline.dob}, TOB: ${targetBaseline.tob}, POB: ${targetBaseline.pob}`
-      }
-    }
-
-    const aiResponse = await AI.run("@cf/meta/llama-3.1-8b-instruct-fast", {
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      max_tokens: 1024,
-    })
-
-    let parsed: any
-    try {
-      const responseText = (aiResponse as any).response || ""
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/)
-      parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : { response: responseText }
-    } catch {
-      parsed = { response: (aiResponse as any).response || "Unable to process" }
-    }
-
-    // Ensure required fields exist
-    const result: any = {
-      response: parsed.response || "",
-      shift: parsed.shift || { label: "Unclear", summary: "The shift is still forming" },
-      move: parsed.move || { label: "Sit with it", description: "Let this settle before acting", difficulty: "gentle" },
-      insights: parsed.insights || [],
-      thread_meta: {
-        target_id: body.target?.id,
-        target_relation: body.target?.relation,
-        baseline_loaded: true,
-        target_baseline_loaded: isRelational ? !!await KV.get(`baseline:${user.id}:person:${body.target!.id}`) : undefined,
-      },
-    }
-
-    if (parsed.pressure_points) {
-      result.pressure_points = parsed.pressure_points
-    }
-
-    // Store interaction in D1
-    const now = Date.now()
-    await DB.prepare(
-      "INSERT INTO interactions (id, session_id, mode, input, output, people, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)"
-    ).bind(
-      `int_${crypto.randomUUID().replace(/-/g, "")}`,
-      user.id,
-      isRelational ? "relational" : "self",
-      body.message,
-      JSON.stringify(result),
-      isRelational ? JSON.stringify([body.target]) : "[]",
-      now
-    ).run()
-
-    return jsonResponse(result)
-  })
+    const env = getEnv();
+    return handleExplain(request, env);
+  });
 }
