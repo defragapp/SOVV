@@ -1,35 +1,44 @@
-// apps/web/lib/api.ts
+import type { Baseline, BaselineRequest, ExplainRequest, ExplainResponse } from "@sovereign/core";
 
-import type { ExplainRequest, ExplainResponse } from "@sovv/core/types";
+export async function apiGetBaseline(): Promise<{ baseline: Baseline | null }> {
+  const res = await fetch("/api/baseline", {
+    method: "GET",
+    credentials: "include",
+  });
 
-export async function callExplain(
-  input: ExplainRequest
-): Promise<ExplainResponse> {
-  try {
-    const res = await fetch("/api/explain", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(input),
-    });
-
-    const json = await res.json();
-
-    if (!json || typeof json.type !== "string") {
-      return {
-        type: "error",
-        message: "invalid_response_shape",
-        raw: JSON.stringify(json),
-      };
-    }
-
-    return json as ExplainResponse;
-  } catch (err: any) {
-    return {
-      type: "error",
-      message: "network_error",
-      raw: err?.message ?? String(err),
-    };
+  if (!res.ok) {
+    return { baseline: null };
   }
+
+  return res.json();
+}
+
+export async function apiSaveBaseline(
+  baseline: BaselineRequest
+): Promise<{ baseline: Baseline | null }> {
+  const res = await fetch("/api/baseline", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(baseline),
+  });
+
+  if (!res.ok) {
+    return { baseline: null };
+  }
+
+  return res.json();
+}
+
+export async function callExplain(input: ExplainRequest): Promise<ExplainResponse> {
+  const res = await fetch("/api/explain", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(input),
+  });
+
+  return res.json();
 }
