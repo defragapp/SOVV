@@ -1,5 +1,5 @@
 import type { Env } from "./types-env.ts";
-import { getAuthUser, jsonResponse, type Confidence } from "./auth.ts";
+import { getAuthUser, jsonResponse } from "./auth.ts";
 import { getSessionId, cookieHeader } from "./plan.ts";
 import { getBaseline, formatBaseline } from "./baseline.ts";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.ts";
@@ -11,7 +11,7 @@ import type {
   Move,
   PressurePoint,
   Shift,
-  Tier,
+  Confidence,
 } from "@sovereign/core";
 
 const CORS_HEADERS = {
@@ -131,7 +131,7 @@ function normalizePressurePoints(input: any): PressurePoint[] | undefined {
   return points.length ? points : undefined;
 }
 
-async function buildExplainPrompt(args: {
+function buildExplainPrompt(args: {
   message: string;
   baselineText: string;
   patternText: string;
@@ -203,7 +203,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       ? await env.KV.get(`baseline:${user.id}:person:${target.id}`, "json")
       : null;
 
-  const prompt = await buildExplainPrompt({
+  const prompt = buildExplainPrompt({
     message,
     baselineText,
     patternText,
