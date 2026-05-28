@@ -98,3 +98,8 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
     }
   );
 }
+
+export function registerBaselineRoutes(router: any, getEnv: () => Env) {
+  router.get("/api/baseline", async (req: Request) => handleGetBaseline(req, getEnv()));
+  router.post("/api/baseline", async (req: Request) => handleSaveBaseline(req, getEnv()));
+}
