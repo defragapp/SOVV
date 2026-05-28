@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "https://api.defrag.app";
   const headers = new Headers();
   const cookie = req.headers.get("cookie");
   if (cookie) headers.set("cookie", cookie);
