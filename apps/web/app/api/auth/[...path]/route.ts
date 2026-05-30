@@ -35,26 +35,32 @@ async function proxyAuth(req: Request, pathParts: string[] = []) {
   return response;
 }
 
-export async function GET(req: Request, { params }: { params: { path: string[] } }) {
+export async function GET(req: Request, props: { params: Promise<{ path: string[] }> }) {
+  const params = await props.params;
   return proxyAuth(req, params.path);
 }
 
-export async function POST(req: Request, { params }: { params: { path: string[] } }) {
+export async function POST(req: Request, props: { params: Promise<{ path: string[] }> }) {
+  const params = await props.params;
   return proxyAuth(req, params.path);
 }
 
-export async function PUT(req: Request, { params }: { params: { path: string[] } }) {
+export async function PUT(req: Request, props: { params: Promise<{ path: string[] }> }) {
+  const params = await props.params;
   return proxyAuth(req, params.path);
 }
 
-export async function PATCH(req: Request, { params }: { params: { path: string[] } }) {
+export async function PATCH(req: Request, props: { params: Promise<{ path: string[] }> }) {
+  const params = await props.params;
   return proxyAuth(req, params.path);
 }
 
-export async function DELETE(req: Request, { params }: { params: { path: string[] } }) {
+export async function DELETE(req: Request, props: { params: Promise<{ path: string[] }> }) {
+  const params = await props.params;
   return proxyAuth(req, params.path);
 }
 
-export async function OPTIONS(req: Request, { params }: { params: { path: string[] } }) {
+export async function OPTIONS(req: Request, props: { params: Promise<{ path: string[] }> }) {
+  const params = await props.params;
   return proxyAuth(req, params.path);
 }
