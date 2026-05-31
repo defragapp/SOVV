@@ -5,9 +5,9 @@ import { verifyAccessJWT } from "./auth";
 import { mapInteraction, type InteractionRow } from "./db";
 
 export async function handleHistory(req: Request, env: Env) {
-  const user = await verifyAccessJWT(req.raw, env);
-  if (!user) {
-    return new Response("Unauthorized", { status: 401 });
+  const authResponse = await verifyAccessJWT(req, env);
+  if (authResponse) {
+    return authResponse;
   }
 
   const sid = await getSessionId(req);
