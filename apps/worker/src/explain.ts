@@ -1,1 +1,1 @@
-export * from "./explain-extended.ts";
+export * from "./explain-extended";
