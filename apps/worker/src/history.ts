@@ -1,11 +1,11 @@
-import type { Env } from "./types-env.js";
-import { getSessionId, cookieHeader } from "./plan.js";
+import type { Env } from "./types-env";
+import { getSessionId, cookieHeader } from "./plan";
 import type { Interaction } from "@sovereign/core";
-import { verifyAccessJWT } from "./auth.ts";
-import { mapInteraction, type InteractionRow } from "./db.ts";
+import { verifyAccessJWT } from "./auth";
+import { mapInteraction, type InteractionRow } from "./db";
 
 export async function handleHistory(req: Request, env: Env) {
-  const user = await verifyAccessJWT(req);
+  const user = await verifyAccessJWT(req, env);
   if (!user) {
     return new Response("Unauthorized", { status: 401 });
   }
@@ -23,8 +23,8 @@ export async function handleHistory(req: Request, env: Env) {
     const { results } = await env.DB.prepare(
       "SELECT * FROM interactions WHERE session_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?"
     )
-      .bind(sid, limit, offset)
-      .all<InteractionRow>();
+    .bind(sid, limit, offset)
+    .all<InteractionRow>();
 
     const interactions: Interaction[] = (results ?? []).map(mapInteraction);
 
@@ -39,5 +39,8 @@ export async function handleHistory(req: Request, env: Env) {
 }
 
 export function registerHistoryRoute(router: any, getEnv: () => Env) {
-  router.get("/api/history", async (req: Request) => handleHistory(req, getEnv()));
+  router.get("/api/history", async (req: Request) => {
+    const env = getEnv();
+    return handleHistory(req, env);
+  });
 }
