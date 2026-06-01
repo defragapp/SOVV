@@ -9,7 +9,7 @@
     "dev:web": "npm run dev -w apps/web",
     "dev:worker": "npm run dev -w apps/worker",
     "dev": "npm run dev:web && npm run dev:worker",
-    "build": "npm run build --workspace=web",
+    "build": "npm --workspace=web exec opennextjs-cloudflare build",
     "deploy:worker": "npm run deploy -w apps/worker",
     "lint": "npm run lint -w apps/web && npm run lint -w apps/worker"
   }
