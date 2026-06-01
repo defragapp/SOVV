@@ -1,13 +1,19 @@
-import '../styles/globals.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
+@layer base {
+  body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    padding: 0;
+  }
+
+  * {
+    border-color: #ffffff;
+  }
 }
