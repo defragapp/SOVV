@@ -16,6 +16,14 @@ export function middleware(req: NextRequest) {
   const pathname = url.pathname
 
   if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next()
+  }
+
+  if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
     pathname.startsWith("/assets") ||
@@ -32,10 +40,10 @@ export function middleware(req: NextRequest) {
       url.pathname = "/landing"
       return NextResponse.rewrite(url)
     }
+  }
 
-    if (pathname.startsWith("/settings")) {
-      return NextResponse.redirect(new URL(`https://app.defrag.app${pathname}`))
-    }
+  if (pathname.startsWith("/settings")) {
+    return NextResponse.redirect(new URL(`https://app.defrag.app\${pathname}`))
   }
 
   if (APP_HOSTS.has(host)) {
