@@ -2,5 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: dark; }
-body { background-color: #000; color: #fff; }
+@layer base {
+  body {
+    @apply bg-black text-white font-mono antialiased;
+    margin: 0;
+    padding: 0;
+  }
+
+  * {
+    @apply border-white;
+  }
+}
