@@ -12,6 +12,7 @@ export const footerItems = [
   { href: "/principles", label: "Principles" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export const valuePoints = [
