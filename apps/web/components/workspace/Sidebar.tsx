@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import type { Person, Tier, Relation } from "./types"
 import { UpgradeButton } from "@/components/UpgradeButton"
+import ManageSubscription from "./ManageSubscription"
 
 const RELATION_LABELS: Record<Relation, string> = {
   self: "Self",
@@ -80,23 +81,7 @@ export default function Sidebar({
         ))}
       </div>
 
-      <div className="border-t border-[#F6F5F3]/10 p-2">
-        {tier === "pro" ? (
-          <button
-            type="button"
-            className="w-full px-2 py-1 text-left font-mono text-xs uppercase tracking-widest text-white/40 hover:text-[#F6F5F3]"
-          >
-            + Add Person
-          </button>
-        ) : (
-          <div className="px-2 py-2 flex flex-col gap-1">
-            <span className="block font-mono text-[9px] uppercase tracking-widest text-white/20">
-              Compare With Someone
-            </span>
-            <UpgradeButton label="Upgrade to Pro" className="w-full text-left" />
-          </div>
-        )}
-      </div>
+      
     </aside>
   )
 }

@@ -162,7 +162,48 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
   return new Response("OK");
 }
 
+export async function handlePortal(req: Request, env: Env): Promise<Response> {
+  const authErr = await verifyAccessJWT(req, env);
+  if (authErr) return authErr;
+
+  const { getAuthUser } = await import("./auth.js");
+  const user = await getAuthUser(req, env.DB);
+
+  if (!user) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  if (!user.stripe_customer_id) {
+    return Response.json({ error: "no_billing_account" }, { status: 404 });
+  }
+
+  if (!env.STRIPE_SECRET_KEY || !env.APP_URL) {
+    return Response.json({ error: "billing_not_configured" }, { status: 500 });
+  }
+
+  const params = new URLSearchParams();
+  params.set("customer", user.stripe_customer_id);
+  params.set("return_url", `${env.APP_URL}/app`);
+
+  const res = await fetch("https://api.stripe.com/v1/billing_portal/sessions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params.toString(),
+  });
+
+  const data = await res.json() as Record<string, unknown>;
+  if (!res.ok || typeof data["url"] !== "string") {
+    return Response.json({ error: "portal_failed" }, { status: 400 });
+  }
+
+  return Response.json({ url: data["url"] });
+}
+
 export function registerBillingRoutes(router: any, getEnv: () => Env) {
   router.post("/api/billing/checkout", async (req: Request) => handleCheckout(req, getEnv()));
   router.post("/api/billing/webhook", async (req: Request) => handleWebhook(req, getEnv()));
+  router.post("/api/billing/portal", async (req: Request) => handlePortal(req, getEnv()));
 }
