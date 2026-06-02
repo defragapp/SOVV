@@ -94,30 +94,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <main className="flex-1 pt-[65px]">{children}</main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/8 px-6 py-12">
-        <div className="mx-auto max-w-6xl flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/20 mb-1">
-              DEFRAG
-            </p>
-            <p className="font-mono text-[9px] text-white/15">
-              The clarity layer for real life
-            </p>
-          </div>
-          <nav className="flex flex-wrap gap-6">
-            {footerItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="font-mono text-[9px] uppercase tracking-widest text-white/20 hover:text-white/50 transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </footer>
+      
     </div>
   );
 }

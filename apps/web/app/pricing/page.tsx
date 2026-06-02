@@ -58,17 +58,7 @@ export default function PricingPage() {
             ))}
           </div>
 
-          <div className="mt-16 border-t border-white/8 pt-16 text-center">
-            <p className="font-mono text-[9px] uppercase tracking-widest text-white/20 mb-4">
-              Questions about pricing?
-            </p>
-            <Link
-              href="/faq"
-              className="font-mono text-[9px] uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors"
-            >
-              Read the FAQ →
-            </Link>
-          </div>
+          
         </div>
       </MotionSection>
     </SiteShell>
