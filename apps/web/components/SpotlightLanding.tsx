@@ -8,7 +8,7 @@ const PUBLIC_APP_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
   "https://app.defrag.app"
 
-const APP_ENTRY_ROUTE = `${PUBLIC_APP_URL}/app`
+const APP_ENTRY_ROUTE = `${PUBLIC_APP_URL}/login`
 
 /* ── Animated section wrapper using existing easing tokens ── */
 function RevealSection({
@@ -107,18 +107,18 @@ export default function SpotlightLanding() {
         onMouseLeave={resetSpotlight}
         className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden border-b border-[#F6F5F3]/10"
       >
-        {/* Atmospheric background image with parallax */}
+        {/* Abstract dark water ripple background with parallax */}
         <motion.div
           style={{ y: heroY }}
           className="absolute inset-0 z-0"
         >
           <img
-            src="https://images.pexels.com/photos/9358948/pexels-photo-9358948.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+            src="https://images.pexels.com/photos/23232486/pexels-photo-23232486/free-photo-of-dark-water-with-reflections-and-ripples.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
             alt=""
             aria-hidden="true"
-            className="h-full w-full object-cover opacity-20 grayscale"
+            className="h-full w-full object-cover opacity-25 grayscale scale-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black" />
         </motion.div>
 
         {/* Spotlight radial gradient — tracks mouse */}
@@ -191,13 +191,12 @@ export default function SpotlightLanding() {
             >
               <span className="relative z-10">Get Clarity Now</span>
             </a>
-            <button
-              type="button"
-              disabled
-              className="border border-[#F6F5F3]/20 bg-transparent px-10 py-4 text-sm font-medium uppercase tracking-widest text-[#F6F5F3] opacity-50 cursor-not-allowed"
+            <a
+              href="#demo"
+              className="border border-[#F6F5F3]/20 bg-transparent px-10 py-4 text-sm font-medium uppercase tracking-widest text-[#F6F5F3] opacity-70 transition-colors hover:bg-white/5 text-center"
             >
               Watch Trailer
-            </button>
+            </a>
           </motion.div>
         </motion.div>
 
