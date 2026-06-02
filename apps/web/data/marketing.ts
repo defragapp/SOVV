@@ -16,71 +16,84 @@ export const footerItems = [
 ];
 
 export const valuePoints = [
-  "Understand how you naturally work",
-  "See what may be shaping the moment",
-  "Make better sense of difficult interactions",
-  "Notice drift before it becomes conflict or regret",
-  "Find the response that fits best",
+  "See what got lit up — not just what happened",
+  "Understand where the loop starts before it takes over",
+  "Find the strength underneath the twist",
+  "Know what brings you back to center",
+  "Practice the response before you send it",
+  "Keep the thread grounded across every session",
 ];
 
 export const useCases = [
   "Before you send the message",
-  "When something feels off",
   "When a conversation keeps repeating",
-  "When timing matters as much as what you say",
-  "When you want to be heard",
-  "When you want to move with more self-possession",
+  "When someone pulls away",
+  "When a family loop keeps running",
+  "When you need to understand your part",
+  "When you want to practice a response first",
+  "When you need to see the other side without losing your own",
 ];
 
 export const lenses = [
   {
-    title: "Baseline",
-    summary: "How you naturally work — and what pressure tends to do to you.",
-    useCase: "Use it when you want a clearer understanding of your own patterns.",
-    cta: "Explore Baseline",
+    title: "Your Baseline",
+    summary: "The starting map. How you tend to process, respond, connect, protect, communicate, and return to center.",
+    useCase: "Use it when you want to understand your own patterns before pressure hits.",
+    cta: "Learn more",
     href: "/product",
   },
   {
-    title: "Now",
-    summary: "What may be most active in this moment — and what move fits best.",
+    title: "The sky over you",
+    summary: "The current timing layer. It shows what is louder right now — and why the moment may feel bigger than it should.",
     useCase: "Use it when the moment feels charged, confusing, or time-sensitive.",
-    cta: "Explore Now",
+    cta: "Learn more",
     href: "/product",
   },
   {
-    title: "Relationships",
-    summary:
-      "What may be happening between you and another person — not just what was said.",
+    title: "What got lit up",
+    summary: "The part of your baseline that is active in this moment — and what it means for the people around you.",
     useCase: "Use it when a dynamic feels cyclical, loaded, or hard to name.",
-    cta: "Explore Relationships",
+    cta: "Learn more",
     href: "/product",
   },
 ];
 
 export const faqItems = [
   {
+    q: "What is Sovereign.os?",
+    a: "Sovereign.os is a baseline-aware AI workspace with a living notebook. It keeps a steady AI thread grounded in your baseline, the sky over you, selected people or groups, and saved notebook context.",
+  },
+  {
     q: "What is DEFRAG?",
-    a: "DEFRAG is a personal and relational clarity platform. It helps you understand yourself, read what may be happening in the moment, and navigate relationships with greater clarity.",
+    a: "DEFRAG is the relational intelligence layer inside Sovereign.os. It shows what got lit up, where the loop is forming, and what brings you back to center.",
   },
   {
-    q: "How is DEFRAG different from other AI tools?",
-    a: "Most AI reacts to what you type. DEFRAG is built to help you understand the deeper pattern shaping the moment, so the guidance feels more grounded, more personal, and more useful in real life.",
+    q: "What is Your Baseline?",
+    a: "Your Baseline is the starting map. It helps the AI understand how you tend to process, respond, connect, protect, communicate, and return to center.",
   },
   {
-    q: "What does DEFRAG mean by alignment?",
-    a: "Alignment means responding in a way that is clear, grounded, and true to what is actually happening.",
+    q: "What does 'the sky over you' mean?",
+    a: "It is the current timing layer. Your baseline shows how you are built. The sky over you shows what is active now — what is louder right now.",
   },
   {
-    q: "What is Baseline?",
-    a: "Baseline is a practical understanding of how you tend to work, how pressure affects you, and what helps you return to clarity.",
+    q: "What is The Loop?",
+    a: "The Loop is the repeating pattern that starts when pressure rises. DEFRAG shows where it begins so you can choose a different response before it takes over.",
   },
   {
-    q: "Is DEFRAG diagnostic?",
-    a: "No. DEFRAG is not designed to label or diagnose you. It is designed to help you understand yourself more clearly.",
+    q: "What is The Twist?",
+    a: "The Twist is where a real strength bends under pressure. DEFRAG shows where it twists and how to bring it back into its clean form.",
   },
   {
-    q: "Do I need to understand the systems underneath it?",
-    a: "No. DEFRAG translates deeper patterns into clear, practical language you can use.",
+    q: "Is this therapy?",
+    a: "No. DEFRAG is not therapy, diagnosis, or clinical care. It is a personal and relational intelligence tool for understanding patterns and practicing better responses.",
+  },
+  {
+    q: "Do I need to understand astrology or the deeper systems?",
+    a: "No. Sovereign.os translates the underlying systems into simple language you can use.",
+  },
+  {
+    q: "Can I compare with another person?",
+    a: "Yes, when another person, family member, group, or team overlay is available and permitted.",
   },
 ];
 

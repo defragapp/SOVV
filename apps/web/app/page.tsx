@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, type MouseEvent } from "react";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import { SiteShell } from "@/components/marketing/site-shell";
 import { MotionSection } from "@/components/marketing/motion-section";
@@ -12,23 +12,7 @@ import { valuePoints, lenses, faqItems, pricingTiers } from "@/data/marketing";
 
 const APP_URL = "https://app.defrag.app";
 
-function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
-  const [val, setVal] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true });
-  useEffect(() => {
-    if (!inView) return;
-    let start = 0;
-    const step = to / 40;
-    const t = setInterval(() => {
-      start += step;
-      if (start >= to) { setVal(to); clearInterval(t); }
-      else setVal(Math.floor(start));
-    }, 30);
-    return () => clearInterval(t);
-  }, [inView, to]);
-  return <span ref={ref}>{val}{suffix}</span>;
-}
+
 
 export default function HomePage() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -110,8 +94,8 @@ export default function HomePage() {
             transition={{ duration: 0.9, delay: 0.45 }}
             className="mb-6 max-w-2xl text-lg font-light leading-relaxed text-white/50 md:text-xl"
           >
-            Personal and relational clarity for understanding yourself, reading the moment,
-            and navigating relationships with less confusion.
+            You know what happened.
+            DEFRAG shows what got lit up.
           </motion.p>
 
           <motion.p
@@ -120,8 +104,7 @@ export default function HomePage() {
             transition={{ duration: 0.9, delay: 0.6 }}
             className="mb-12 max-w-xl text-sm font-light leading-relaxed text-white/25"
           >
-            A quiet moment in the chaos. The breath you didn&apos;t know you were holding.
-            The shift that changes everything.
+            It starts with your baseline, checks the sky over you, and helps you understand the loop before it takes over.
           </motion.p>
 
           <motion.div
@@ -134,15 +117,24 @@ export default function HomePage() {
               href={`${APP_URL}/login`}
               className="gradient-border bg-white/8 px-10 py-4 text-sm font-medium uppercase tracking-widest text-white transition-all duration-300 hover:bg-white/12 hover:shadow-[0_0_30px_rgba(255,255,255,0.08)]"
             >
-              Get Clarity Now
+              Start Your Baseline
             </Link>
             <Link
-              href="#how-it-works"
+              href="/how-it-works"
               className="border border-white/15 bg-transparent px-10 py-4 text-sm font-medium uppercase tracking-widest text-white/60 transition-colors hover:bg-white/5 hover:text-white/80 text-center"
             >
-              How It Works
+              See How It Works
             </Link>
           </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.9, delay: 1.1 }}
+            className="mt-8 font-mono text-[9px] uppercase tracking-widest text-white/15"
+          >
+            No labels. No diagnosis. No generic advice.
+          </motion.p>
         </motion.div>
 
         {/* Scroll indicator */}
@@ -161,26 +153,21 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* ── STATS ── */}
+      {/* ── DIFFERENTIATOR ── */}
       <MotionSection className="border-b border-white/8 bg-white/[0.02]">
-        <div className="mx-auto max-w-5xl px-6 py-16">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-            {[
-              { n: 94, suffix: "%", label: "report clarity after first session" },
-              { n: 3, suffix: "min", label: "average time to first insight" },
-              { n: 12, suffix: "k+", label: "conflict loops broken" },
-              { n: 0, suffix: " jargon", label: "no therapy-speak, ever" },
-            ].map((s) => (
-              <div key={s.label} className="text-center">
-                <p className="text-4xl font-light text-white mb-2 tabular-nums">
-                  <Counter to={s.n} suffix={s.suffix} />
-                </p>
-                <p className="font-mono text-[9px] uppercase tracking-widest text-white/25 leading-relaxed">
-                  {s.label}
-                </p>
-              </div>
-            ))}
-          </div>
+        <div className="mx-auto max-w-4xl px-6 py-20 text-center">
+          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/25 mb-6">
+            What makes this different
+          </p>
+          <p className="text-2xl font-light text-white/70 leading-relaxed mb-4 md:text-3xl">
+            Most AI starts from a blank chat.
+          </p>
+          <p className="text-2xl font-light text-white leading-relaxed md:text-3xl">
+            Sovereign.os starts from your baseline.
+          </p>
+          <p className="mt-8 max-w-xl mx-auto text-sm font-light leading-7 text-white/35">
+            The thread stays grounded in who you are, what is active now, and the people or patterns you choose to include.
+          </p>
         </div>
       </MotionSection>
 
@@ -189,10 +176,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-5xl">
           <div className="grid grid-cols-1 gap-16 md:grid-cols-2 items-center">
             <div>
-              <SectionHeader
-                eyebrow="What DEFRAG does"
-                title="Clarity that lands in the body, not just the mind."
-              />
+              
             </div>
             <ul className="space-y-5">
               {valuePoints.map((point, i) => (
@@ -326,18 +310,7 @@ export default function HomePage() {
       {/* ── FINAL CTA ── */}
       <MotionSection className="px-6 py-40 text-center">
         <div className="mx-auto max-w-2xl">
-          <h2 className="hero-glow mb-6 text-4xl font-semibold tracking-tight text-white md:text-5xl leading-tight">
-            Ready to stop holding<br />onto the pain?
-          </h2>
-          <p className="mb-12 text-white/35 text-base font-light max-w-md mx-auto leading-relaxed">
-            No jargon. No stigma. Just the shift you&apos;ve been waiting for.
-          </p>
-          <Link
-            href={`${APP_URL}/login`}
-            className="gradient-border inline-block bg-white/8 px-14 py-5 text-sm font-medium uppercase tracking-widest text-white transition-all hover:bg-white/12 hover:shadow-[0_0_40px_rgba(255,255,255,0.06)]"
-          >
-            Start Your Shift Today
-          </Link>
+          
         </div>
       </MotionSection>
 

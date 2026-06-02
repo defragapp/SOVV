@@ -7,28 +7,23 @@ import Link from "next/link";
 const steps = [
   {
     num: "01",
-    title: "Set your Baseline",
-    body: "Tell DEFRAG how you naturally work. Your patterns, your pressure points, what helps you return to clarity. This becomes the foundation everything else is read against.",
+    title: "Start Your Baseline",
+    body: "Enter your date, time, and place of birth. This becomes the starting map — how you tend to process, respond, connect, protect, communicate, and return to center. The AI uses it to keep every thread grounded in who you actually are.",
   },
   {
     num: "02",
-    title: "Describe the moment",
-    body: "Tell DEFRAG what's happening — a conversation, a decision, a dynamic that keeps repeating. No jargon required. Plain language is enough.",
+    title: "Check what is active now",
+    body: "The sky over you shows what is louder right now. Your baseline shows how you are built. Together they show what got lit up — the part of you that is most active in this moment.",
   },
   {
     num: "03",
-    title: "Receive the map",
-    body: "DEFRAG shows you the structure beneath the surface. What triggered it. What escalated it. What each person may have been defending.",
+    title: "Ask or select people and layers",
+    body: "Tell DEFRAG what is happening. Ask freely. Add another person, a family dynamic, a group, or a team when relevant. The thread stays grounded in your baseline and theirs when permitted.",
   },
   {
     num: "04",
-    title: "Find the shift",
-    body: "See the exact moment where a different response was possible — and what that response could have looked like.",
-  },
-  {
-    num: "05",
-    title: "Make your move",
-    body: "Take a clean step forward. Concrete. Specific. Grounded in what's actually happening rather than what you feared was happening.",
+    title: "Turn the answer into something you can use",
+    body: "DEFRAG shows what got lit up, where the loop is forming, and the Best Next Response. You can save it, practice it, hear it as audio, watch it as a short scene, or return to it as part of Your Story.",
   },
 ];
 
@@ -37,8 +32,8 @@ export default function HowItWorksPage() {
     <SiteShell>
       <PageHero
         eyebrow="How It Works"
-        title="Five steps to clarity."
-        body="DEFRAG is designed to be used in the moment — not after the fact, not in a therapy session, not in a journal. Right now, when it matters."
+        title="Four steps. One grounded thread."
+        body="DEFRAG is designed to be used in the moment — not after the fact, not in a therapy session. Right now, when it matters."
       />
 
       <MotionSection className="px-6 py-24">
@@ -65,15 +60,21 @@ export default function HowItWorksPage() {
       <MotionSection className="border-t border-white/8 px-6 py-24 text-center">
         <SectionHeader
           eyebrow="Ready?"
-          title="Start with one moment."
+          title="Start with your baseline."
           body="You don't need to understand the whole system. You just need one moment you want to see more clearly."
         />
-        <div className="mt-10">
+        <div className="mt-10 flex flex-col gap-4 sm:flex-row justify-center">
           <Link
             href="https://app.defrag.app/login"
             className="inline-block border border-white/20 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-white/5 transition-colors"
           >
-            Get Started Free
+            Start Your Baseline
+          </Link>
+          <Link
+            href="/workspace"
+            className="inline-block border border-white/10 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hover:bg-white/5 hover:text-white/60 transition-colors"
+          >
+            Go to Workspace
           </Link>
         </div>
       </MotionSection>
