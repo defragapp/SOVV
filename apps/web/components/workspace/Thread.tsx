@@ -39,7 +39,31 @@ export default function Thread({
         body: JSON.stringify(body),
       })
 
-      
+      if (res.status === 429) {
+        const limitMsg: ThreadMessage = {
+          id: `l_${Date.now()}`,
+          role: "sovereign",
+          content: "You have reached your daily session limit. Upgrade to Pro for unlimited sessions.",
+          timestamp: Date.now(),
+        }
+        onNewMessage(limitMsg)
+        return
+      }
+
+      const data: ExplainResponse = await res.json()
+
+      if ((data as any).type === "needs_baseline") {
+        const baselineMsg: ThreadMessage = {
+          id: `b_${Date.now()}`,
+          role: "sovereign",
+          content: "Your baseline is not set yet. Go to Settings to add your baseline details.",
+          timestamp: Date.now(),
+        }
+        onNewMessage(baselineMsg)
+        return
+      }
+
+      const sovereignMsg: ThreadMessage = {
         id: `s_${Date.now()}`,
         role: "sovereign",
         content: data.response,

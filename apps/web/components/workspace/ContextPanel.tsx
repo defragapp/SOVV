@@ -104,7 +104,29 @@ function EmptyState() {
   )
 }
 
+export default function ContextPanel({
+  activeMessage,
+  hideHeader = false,
+}: {
+  activeMessage: ThreadMessage | null
+  hideHeader?: boolean
+}) {
+  const hasContent = activeMessage && activeMessage.role === "sovereign"
 
+  return (
+    <aside className="flex h-full flex-col bg-black overflow-y-auto">
+      {!hideHeader && (
+        <div className="flex h-10 shrink-0 items-center justify-between border-b border-[#F6F5F3]/10 px-4">
+          <span className="font-mono text-xs uppercase tracking-widest text-white/40">
+            Right Now
+          </span>
+          {hasContent && (
+            <span className="font-mono text-[9px] uppercase tracking-widest text-white/20">
+              What got lit up
+            </span>
+          )}
+        </div>
+      )}
 
       {!hasContent ? (
         <EmptyState />

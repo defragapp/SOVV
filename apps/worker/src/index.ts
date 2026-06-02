@@ -24,11 +24,7 @@ registerPatternsRoutes(router, getEnv);
 
 router.all("*", () => new Response("Not Found", { status: 404 }));
 
-export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    currentEnv = env;
-    return router.handle(request, env, ctx);
-  },
+
 
   async queue(
     batch: MessageBatch<unknown>,
