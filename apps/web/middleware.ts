@@ -55,18 +55,6 @@ export function middleware(req: NextRequest) {
     }
   }
 
-  // Premium gate: redirect users without active subscription
-  if (pathname.startsWith("/premium")) {
-    const hasSub =
-      req.cookies.get("sovereign-tier")?.value === "pro" ||
-      req.cookies.get("sovereign-tier")?.value === "premium"
-
-    if (!hasSub) {
-      url.pathname = "/billing"
-      return NextResponse.redirect(url)
-    }
-  }
-
   // Legacy settings redirect
   if (pathname.startsWith("/settings")) {
     return NextResponse.redirect(new URL(`https://app.defrag.app${pathname}`))
