@@ -10,8 +10,6 @@ const APP_HOSTS = new Set(["app.defrag.app"])
 
 const PUBLIC_FILE = /\.(.*)$/
 
-const OWNER_EMAIL = "chadowen93@gmail.com"
-
 export function middleware(req: NextRequest) {
   const host = req.headers.get("host")?.toLowerCase() ?? ""
   const url = req.nextUrl.clone()
@@ -32,7 +30,6 @@ export function middleware(req: NextRequest) {
   }
 
   // Public marketing hosts — serve root directly (full marketing site)
-  // All marketing sub-pages are public
   if (PUBLIC_HOSTS.has(host)) {
     return NextResponse.next()
   }
@@ -58,20 +55,8 @@ export function middleware(req: NextRequest) {
     }
   }
 
-  // Owner bypass: skip Stripe gate entirely for owner email
-  // The owner email is embedded in the JWT payload (sub claim is user id,
-  // but we store email in a custom claim or check via API — here we rely
-  // on the AuthGuard client-side check for tier, and use a server-side
-  // header set by the auth API route for the owner flag)
-  const isOwner =
-    req.headers.get("x-sovereign-owner") === "true" ||
-    req.cookies.get("sovereign-owner")?.value === "true"
-
-  // Premium gate: redirect non-owners without active subscription
-  if (
-    pathname.startsWith("/premium") &&
-    !isOwner
-  ) {
+  // Premium gate: redirect users without active subscription
+  if (pathname.startsWith("/premium")) {
     const hasSub =
       req.cookies.get("sovereign-tier")?.value === "pro" ||
       req.cookies.get("sovereign-tier")?.value === "premium"
