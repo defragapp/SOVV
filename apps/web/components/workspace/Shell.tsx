@@ -34,19 +34,7 @@ export default function Shell({ tier }: { tier: Tier }) {
         <span className="font-mono text-xs uppercase tracking-widest text-white/40">
           DEFRAG
         </span>
-        <div className="flex items-center gap-4">
-          <span className="font-mono text-xs uppercase tracking-widest text-white/40">
-            {tier}
-          </span>
-          <form action="/api/auth/logout" method="POST">
-            <button
-              type="submit"
-              className="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-[#F6F5F3]"
-            >
-              Logout
-            </button>
-          </form>
-        </div>
+        
       </header>
 
       <div className="grid flex-1 grid-cols-[240px_1fr_280px] overflow-hidden">
