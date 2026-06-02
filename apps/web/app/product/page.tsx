@@ -1,8 +1,18 @@
+import type { Metadata } from "next";
 import { SiteShell } from "@/components/marketing/site-shell";
 import { PageHero } from "@/components/marketing/page-hero";
 import { MotionSection } from "@/components/marketing/motion-section";
 import { SectionHeader } from "@/components/marketing/section-header";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Product — DEFRAG",
+  description: "A baseline-aware AI workspace with a living notebook. DEFRAG shows what got lit up, where the loop is forming, and what brings you back to center.",
+  openGraph: {
+    title: "Product — DEFRAG",
+    description: "A baseline-aware AI workspace with a living notebook. DEFRAG shows what got lit up, where the loop is forming, and what brings you back to center.",
+  },
+};
 
 const surfaces = [
   {

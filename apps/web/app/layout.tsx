@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import '../styles/globals.css';
 
-export const metadata: Metadata = {
-  title: "DEFRAG — The clarity layer for real life",
-  description:
-    "Personal and relational clarity for understanding yourself, reading the moment, and navigating relationships with less confusion.",
-};
+
 
 export default function RootLayout({
   children,

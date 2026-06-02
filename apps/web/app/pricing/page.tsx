@@ -1,8 +1,18 @@
+import type { Metadata } from "next";
 import { SiteShell } from "@/components/marketing/site-shell";
 import { PageHero } from "@/components/marketing/page-hero";
 import { MotionSection } from "@/components/marketing/motion-section";
 import { pricingTiers } from "@/data/marketing";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Pricing — DEFRAG",
+  description: "Start free. See what got lit up. Upgrade to Pro to work the pattern over time, save what changes, and go deeper with another person.",
+  openGraph: {
+    title: "Pricing — DEFRAG",
+    description: "Start free. See what got lit up. Upgrade to Pro to work the pattern over time.",
+  },
+};
 
 export default function PricingPage() {
   return (

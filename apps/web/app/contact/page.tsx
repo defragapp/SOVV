@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { SiteShell } from "@/components/marketing/site-shell";
 import { PageHero } from "@/components/marketing/page-hero";
 import { MotionSection } from "@/components/marketing/motion-section";
+
+export const metadata: Metadata = {
+  title: "Contact — DEFRAG",
+  description: "For product questions, support, or account help. Reach us at info@defrag.app.",
+};
 
 export default function ContactPage() {
   return (

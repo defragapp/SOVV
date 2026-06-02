@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.defrag.app";
+const API_BASE = process.env.API_BASE || "https://api.defrag.app";
 
 async function proxyAuth(req: Request, pathParts: string[] = []) {
   const suffix = pathParts.join("/");

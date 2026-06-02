@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const body = await req.text();
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "https://api.defrag.app";
+  const apiBase = process.env.API_BASE || "https://api.defrag.app";
   const headers = new Headers(req.headers);
   if (!headers.has("content-type")) {
     headers.set("content-type", "application/json");
