@@ -5,13 +5,10 @@
     background-color: #000000;
     color: #ffffff;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    margin: 0;
-    padding: 0;
   }
 
+  /* Enforce 1px borders and sharp corners */
   * {
-    border-color: #ffffff;
+    border-radius: 0 !important;
   }
 }
