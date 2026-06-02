@@ -1,14 +1,88 @@
 @import "tailwindcss";
 
 @layer base {
-  body {
-    background-color: #000000;
-    color: #ffffff;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  :root {
+    color-scheme: dark;
   }
 
-  /* Enforce 1px borders and sharp corners */
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    overflow-x: hidden;
+    background-color: #05070B;
+    color: #ffffff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   * {
-    border-radius: 0 !important;
+    box-sizing: border-box;
+    border-color: rgba(255,255,255,0.1);
+    border-radius: 0;
+  }
+}
+
+@layer utilities {
+  .safe-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .glass {
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .panel {
+    border: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset, 0 24px 80px rgba(0,0,0,0.35);
+  }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(148,163,184,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148,163,184,0.08) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  .hero-glow {
+    text-shadow:
+      0 0 32px rgba(125,211,252,0.18),
+      0 0 64px rgba(168,85,247,0.12);
+  }
+
+  .gradient-border {
+    position: relative;
+  }
+
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(96,165,250,0.42), rgba(168,85,247,0.46), rgba(255,255,255,0.08));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }

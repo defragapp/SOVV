@@ -31,12 +31,9 @@ export function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // Public marketing hosts → rewrite / to /landing
+  // Public marketing hosts — serve root directly (full marketing site)
+  // All marketing sub-pages are public
   if (PUBLIC_HOSTS.has(host)) {
-    if (pathname === "/") {
-      url.pathname = "/landing"
-      return NextResponse.rewrite(url)
-    }
     return NextResponse.next()
   }
 
