@@ -65,7 +65,7 @@ export default function HomePage() {
         <div
           className="pointer-events-none absolute inset-0 z-0 transition-all duration-75"
           style={{
-            backgroundImage: `radial-gradient(circle at ${spotlight.x}% ${spotlight.y}%, rgba(96,165,250,0.09) 0%, rgba(168,85,247,0.06) 25%, transparent 55%)`,
+            backgroundImage: `radial-gradient(circle at ${spotlight.x}% ${spotlight.y}%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 30%, transparent 55%)`,
           }}
         />
 
@@ -88,7 +88,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="mb-8 font-mono text-[10px] uppercase tracking-[0.35em] text-sky-300/50"
+            className="mb-8 font-mono text-[10px] uppercase tracking-[0.35em] text-white/30"
           >
             DEFRAG — Relational Intelligence
           </motion.p>
@@ -132,7 +132,7 @@ export default function HomePage() {
           >
             <Link
               href={`${APP_URL}/login`}
-              className="gradient-border bg-white/8 px-10 py-4 text-sm font-medium uppercase tracking-widest text-white transition-all duration-300 hover:bg-white/12 hover:shadow-[0_0_30px_rgba(96,165,250,0.15)]"
+              className="gradient-border bg-white/8 px-10 py-4 text-sm font-medium uppercase tracking-widest text-white transition-all duration-300 hover:bg-white/12 hover:shadow-[0_0_30px_rgba(255,255,255,0.08)]"
             >
               Get Clarity Now
             </Link>
@@ -204,7 +204,7 @@ export default function HomePage() {
                   transition={{ delay: i * 0.08, duration: 0.5 }}
                   className="flex items-start gap-4"
                 >
-                  <span className="mt-2 block h-1.5 w-1.5 shrink-0 bg-sky-400/60" />
+                  <span className="mt-2 block h-1.5 w-1.5 shrink-0 bg-white/40" />
                   <span className="text-base font-light text-white/65 leading-relaxed">{point}</span>
                 </motion.li>
               ))}
@@ -224,7 +224,7 @@ export default function HomePage() {
           <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-3">
             {lenses.map((lens, i) => (
               <Card key={lens.title} glow={i === 1}>
-                <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-sky-300/50 mb-4">
+                <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">
                   0{i + 1}
                 </p>
                 <h3 className="text-xl font-light text-white mb-3">{lens.title}</h3>
@@ -232,7 +232,7 @@ export default function HomePage() {
                 <p className="text-xs text-white/25 italic mb-6">{lens.useCase}</p>
                 <Link
                   href={lens.href}
-                  className="font-mono text-[9px] uppercase tracking-widest text-sky-300/60 hover:text-sky-300 transition-colors"
+                  className="font-mono text-[9px] uppercase tracking-widest text-white/40 hover:text-white/60 transition-colors"
                 >
                   {lens.cta} →
                 </Link>
@@ -274,7 +274,7 @@ export default function HomePage() {
                 key={tier.name}
                 className={`p-10 flex flex-col ${
                   tier.highlight
-                    ? "border border-white/25 shadow-[0_0_40px_rgba(96,165,250,0.06)]"
+                    ? "border border-white/25 shadow-[0_0_40px_rgba(255,255,255,0.04)]"
                     : "border border-white/8"
                 } ${i === 1 ? "md:border-l-0" : ""}`}
               >
@@ -334,7 +334,7 @@ export default function HomePage() {
           </p>
           <Link
             href={`${APP_URL}/login`}
-            className="gradient-border inline-block bg-white/8 px-14 py-5 text-sm font-medium uppercase tracking-widest text-white transition-all hover:bg-white/12 hover:shadow-[0_0_40px_rgba(96,165,250,0.12)]"
+            className="gradient-border inline-block bg-white/8 px-14 py-5 text-sm font-medium uppercase tracking-widest text-white transition-all hover:bg-white/12 hover:shadow-[0_0_40px_rgba(255,255,255,0.06)]"
           >
             Start Your Shift Today
           </Link>

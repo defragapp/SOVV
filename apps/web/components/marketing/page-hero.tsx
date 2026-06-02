@@ -16,7 +16,7 @@ export function PageHero({
       <div className="absolute inset-0 bg-gradient-to-b from-[#05070B] via-transparent to-[#05070B] pointer-events-none" />
       <div className="relative mx-auto max-w-3xl">
         {eyebrow && (
-          <p className="mb-4 text-xs uppercase tracking-[0.28em] text-sky-300/60">
+          <p className="mb-4 text-xs uppercase tracking-[0.28em] text-white/40">
             {eyebrow}
           </p>
         )}

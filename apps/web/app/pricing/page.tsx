@@ -21,7 +21,7 @@ export default function PricingPage() {
                 key={tier.name}
                 className={`p-10 flex flex-col ${
                   tier.highlight
-                    ? "border border-white/25 shadow-[0_0_40px_rgba(96,165,250,0.06)]"
+                    ? "border border-white/25 shadow-[0_0_40px_rgba(255,255,255,0.04)]"
                     : "border border-white/8"
                 } ${i === 1 ? "md:border-l-0" : ""}`}
               >
@@ -64,7 +64,7 @@ export default function PricingPage() {
             </p>
             <Link
               href="/faq"
-              className="font-mono text-[9px] uppercase tracking-widest text-sky-300/50 hover:text-sky-300 transition-colors"
+              className="font-mono text-[9px] uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors"
             >
               Read the FAQ →
             </Link>

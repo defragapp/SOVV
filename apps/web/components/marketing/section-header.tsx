@@ -10,7 +10,7 @@ export function SectionHeader({
   return (
     <div className="mx-auto max-w-3xl text-center">
       {eyebrow ? (
-        <p className="mb-3 text-xs uppercase tracking-[0.24em] text-sky-200/70">
+        <p className="mb-3 text-xs uppercase tracking-[0.24em] text-white/30">
           {eyebrow}
         </p>
       ) : null}

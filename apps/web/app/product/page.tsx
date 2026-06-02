@@ -19,13 +19,13 @@ export default function ProductPage() {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             {lenses.map((lens, i) => (
               <Card key={lens.title} glow={i === 1}>
-                <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-sky-300/50 mb-4">0{i + 1}</p>
+                <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">0{i + 1}</p>
                 <h3 className="text-2xl font-light text-white mb-4">{lens.title}</h3>
                 <p className="text-sm leading-7 text-white/45 mb-4">{lens.summary}</p>
                 <p className="text-xs text-white/25 italic mb-8">{lens.useCase}</p>
                 <Link
                   href="https://app.defrag.app/login"
-                  className="font-mono text-[9px] uppercase tracking-widest text-sky-300/60 hover:text-sky-300 transition-colors"
+                  className="font-mono text-[9px] uppercase tracking-widest text-white/40 hover:text-white/60 transition-colors"
                 >
                   {lens.cta} →
                 </Link>
