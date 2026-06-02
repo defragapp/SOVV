@@ -262,23 +262,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   void extractPatterns(env, sid, interactionId);
 
-  const resultRecord = result as unknown as Record<string, unknown>;
-  return jsonResponse(
-    {
-      type: "ok",
-      plan: user.tier,
-      ...resultRecord,
-      result: resultRecord,
-      audio: null,
-      video: { scenes: [] },
-    },
-    200,
-    {
-      ...CORS_HEADERS,
-      "set-cookie": cookieHeader(sid),
-      "cache-control": "no-store",
-    }
-  );
+  
 }
 
 export async function registerExplainRoute(router: any, getEnv: () => Env) {

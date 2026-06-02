@@ -41,7 +41,7 @@ export default {
       const interactionId = body?.interactionId;
 
       if (!sessionId || !interactionId) {
-        console.error("Queue: invalid message body", body);
+        console.error("Queue: invalid message body");
         message.ack(); // don't retry malformed messages
         continue;
       }
