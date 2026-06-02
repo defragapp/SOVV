@@ -107,17 +107,7 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
   if (existing) return new Response("OK (already processed)");
   await env.KV.put(`stripe_event:${eventId}`, "processed", { expirationTtl: 86400 });
 
-  // checkout.session.completed → activate subscription
-  if (event?.type === "checkout.session.completed") {
-    const session = event.data?.object;
-    const userId = session.client_reference_id;
-    const stripeCustomerId = session.customer;
-    const stripeSubscriptionId = session.subscription;
-
-    if (userId) {
-      await env.DB.prepare(
-        "UPDATE users SET tier = 'pro', stripe_customer_id = ?, stripe_subscription_id = ?, subscription_status = 'active' WHERE id = ?"
-      ).bind(stripeCustomerId, stripeSubscriptionId ?? null, userId).run();
+  
 
       if (env.RESEND_API_KEY) {
         const user = await env.DB.prepare("SELECT email FROM users WHERE id = ?")
@@ -129,16 +119,7 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
     }
   }
 
-  // invoice.payment_succeeded → confirm active (renewal only)
-  if (event?.type === "invoice.payment_succeeded") {
-    const invoice = event.data?.object;
-    const stripeCustomerId = invoice.customer;
-    const billingReason = invoice.billing_reason;
-
-    if (stripeCustomerId) {
-      await env.DB.prepare(
-        "UPDATE users SET tier = 'pro', subscription_status = 'active' WHERE stripe_customer_id = ?"
-      ).bind(stripeCustomerId).run();
+  
 
       // Only send renewal email — welcome covers first payment
       if (env.RESEND_API_KEY && billingReason === "subscription_cycle") {
@@ -151,15 +132,7 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
     }
   }
 
-  // invoice.payment_failed → mark past_due, do not immediately downgrade
-  if (event?.type === "invoice.payment_failed") {
-    const invoice = event.data?.object;
-    const stripeCustomerId = invoice.customer;
-
-    if (stripeCustomerId) {
-      await env.DB.prepare(
-        "UPDATE users SET subscription_status = 'past_due' WHERE stripe_customer_id = ?"
-      ).bind(stripeCustomerId).run();
+  
 
       if (env.RESEND_API_KEY) {
         const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
@@ -171,42 +144,9 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
     }
   }
 
-  // customer.subscription.updated → sync tier and status
-  if (event?.type === "customer.subscription.updated") {
-    const subscription = event.data?.object;
-    const stripeCustomerId = subscription.customer;
-    const status = subscription.status;
-    const userId = subscription.metadata?.userId;
+  
 
-    if (stripeCustomerId) {
-      const tier = status === "active" ? "pro" : "free";
-      if (userId) {
-        await env.DB.prepare(
-          "UPDATE users SET tier = ?, subscription_status = ? WHERE id = ?"
-        ).bind(tier, status, userId).run();
-      } else {
-        await env.DB.prepare(
-          "UPDATE users SET tier = ?, subscription_status = ? WHERE stripe_customer_id = ?"
-        ).bind(tier, status, stripeCustomerId).run();
-      }
-    }
-  }
-
-  // customer.subscription.deleted → downgrade to free
-  if (event?.type === "customer.subscription.deleted") {
-    const subscription = event.data?.object;
-    const stripeCustomerId = subscription.customer;
-    const userId = subscription.metadata?.userId;
-
-    if (userId) {
-      await env.DB.prepare(
-        "UPDATE users SET tier = 'free', subscription_status = 'canceled' WHERE id = ?"
-      ).bind(userId).run();
-    } else if (stripeCustomerId) {
-      await env.DB.prepare(
-        "UPDATE users SET tier = 'free', subscription_status = 'canceled' WHERE stripe_customer_id = ?"
-      ).bind(stripeCustomerId).run();
-    }
+  
 
     if (env.RESEND_API_KEY) {
       const lookupVal = userId ?? stripeCustomerId;
