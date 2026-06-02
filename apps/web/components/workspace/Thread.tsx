@@ -78,7 +78,7 @@ export default function Thread({
           <div className="flex h-full items-center justify-center">
             <p className="font-mono text-xs uppercase tracking-widest text-white/20">
               {selectedPerson.relation === "self"
-                ? "What's on your mind?"
+                ? "What's going on right now?"
                 : `What's happening with ${selectedPerson.name}?`}
             </p>
           </div>
@@ -91,13 +91,13 @@ export default function Thread({
             }`}
           >
             <span className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-white/30">
-              {msg.role === "user" ? "You" : "Sovereign"}
+              {msg.role === "user" ? "You" : "DEFRAG"}
             </span>
             <p className="text-sm font-light leading-6">{msg.content}</p>
             {msg.shift && (
               <div className="mt-3 border-l border-[#F6F5F3]/20 pl-4">
                 <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">
-                  Shift
+                  What got lit up
                 </span>
                 <p className="mt-1 text-sm text-white/70">{msg.shift.summary}</p>
               </div>
@@ -107,7 +107,7 @@ export default function Thread({
         {loading && (
           <div className="mb-6">
             <span className="font-mono text-[10px] uppercase tracking-widest text-white/30">
-              Sovereign
+              DEFRAG
             </span>
             <p className="mt-2 text-sm text-white/40">...</p>
           </div>

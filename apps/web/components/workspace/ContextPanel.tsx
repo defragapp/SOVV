@@ -15,14 +15,7 @@ export default function ContextPanel({
     return (
       <aside className="flex h-full flex-col bg-black">
         <div className="flex h-10 shrink-0 items-center border-b border-[#F6F5F3]/10 px-4">
-          <span className="font-mono text-xs uppercase tracking-widest text-white/40">
-            Context
-          </span>
-        </div>
-        <div className="flex flex-1 items-center justify-center">
-          <p className="font-mono text-xs uppercase tracking-widest text-white/20">
-            No context yet
-          </p>
+          
         </div>
       </aside>
     )
@@ -32,7 +25,7 @@ export default function ContextPanel({
     <aside className="flex h-full flex-col overflow-y-auto bg-black">
       <div className="flex h-10 shrink-0 items-center border-b border-[#F6F5F3]/10 px-4">
         <span className="font-mono text-xs uppercase tracking-widest text-white/40">
-          Context
+          What's Happening
         </span>
       </div>
       <div className="flex flex-col divide-y divide-[#F6F5F3]/10">

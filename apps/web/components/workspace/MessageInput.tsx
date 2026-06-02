@@ -34,7 +34,7 @@ export default function MessageInput({
               handleSubmit(e)
             }
           }}
-          placeholder="What's really happening?"
+          placeholder="Tell me what's going on"
           rows={2}
           className="flex-1 resize-none bg-transparent text-sm font-light text-[#F6F5F3] placeholder:text-white/20 focus:outline-none"
         />

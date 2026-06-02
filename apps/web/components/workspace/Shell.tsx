@@ -32,7 +32,7 @@ export default function Shell({ tier }: { tier: Tier }) {
     <div className="flex h-screen w-screen flex-col bg-black text-[#F6F5F3]">
       <header className="flex h-10 shrink-0 items-center justify-between border-b border-[#F6F5F3]/10 px-4">
         <span className="font-mono text-xs uppercase tracking-widest text-white/40">
-          Sovereign
+          DEFRAG
         </span>
         <div className="flex items-center gap-4">
           <span className="font-mono text-xs uppercase tracking-widest text-white/40">
@@ -66,7 +66,7 @@ export default function Shell({ tier }: { tier: Tier }) {
       <footer className="flex h-8 shrink-0 items-center border-t border-[#F6F5F3]/10 px-4">
         <span className="font-mono text-xs uppercase tracking-widest text-white/30">
           {selectedPerson.relation === "self"
-            ? "Self-reflection mode"
+            ? "Just you"
             : `${selectedPerson.name} — ${selectedPerson.relation}`}
         </span>
       </footer>

@@ -1,20 +1,18 @@
 import type { Move } from "./types"
 
-const DIFFICULTY_LABELS = {
-  gentle: "Gentle",
-  moderate: "Moderate",
-  direct: "Direct",
-}
+// difficulty metadata kept for internal use — not rendered to user
+const _DIFFICULTY = {
+  gentle: "gentle",
+  moderate: "moderate",
+  direct: "direct",
+} as const
 
 export default function MoveCard({ move }: { move: Move }) {
   return (
     <div className="px-4 py-4">
       <div className="flex items-center justify-between">
         <span className="font-mono text-[10px] uppercase tracking-widest text-white/30">
-          Move
-        </span>
-        <span className="font-mono text-[10px] uppercase tracking-widest text-white/20">
-          {DIFFICULTY_LABELS[move.difficulty]}
+          Best Next Response
         </span>
       </div>
       <p className="mt-2 text-sm font-light text-[#F6F5F3]">{move.label}</p>
