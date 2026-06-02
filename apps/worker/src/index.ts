@@ -1,12 +1,12 @@
 import { Router } from "itty-router";
-import type { Env } from "./types-env";
-import { registerAuthRoutes } from "./auth";
-import { registerBaselineRoutes } from "./baseline";
-import { registerBillingRoutes } from "./billing";
-import { registerChipsRoute } from "./chips";
-import { registerExplainRoute } from "./explain-extended";
-import { registerHistoryRoute } from "./history";
-import { registerPatternsRoutes } from "./patterns";
+import type { Env } from "./types-env.js";
+import { registerAuthRoutes } from "./auth.js";
+import { registerBaselineRoutes } from "./baseline.js";
+import { registerBillingRoutes } from "./billing.js";
+import { registerChipsRoute } from "./chips.js";
+import { registerExplainRoute } from "./explain-extended.js";
+import { registerHistoryRoute } from "./history.js";
+import { registerPatternsRoutes } from "./patterns.js";
 
 const router = Router();
 let currentEnv: Env;

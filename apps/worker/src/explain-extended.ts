@@ -1,9 +1,9 @@
-import type { Env } from "./types-env.ts";
-import { getAuthUser, jsonResponse } from "./auth.ts";
-import { getSessionId, cookieHeader } from "./plan.ts";
-import { getBaseline, formatBaseline } from "./baseline.ts";
-import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.ts";
-import { extractPatterns } from "./patterns.ts";
+import type { Env } from "./types-env.js";
+import { getAuthUser, jsonResponse } from "./auth.js";
+import { getSessionId, cookieHeader } from "./plan.js";
+import { getBaseline, formatBaseline } from "./baseline.js";
+import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
+import { extractPatterns } from "./patterns.js";
 import type {
   ExplainRequest,
   ExplainResponse,
@@ -12,6 +12,7 @@ import type {
   PressurePoint,
   Shift,
   Confidence,
+  ThreadMeta,
 } from "@sovereign/core";
 
 const CORS_HEADERS = {
@@ -135,7 +136,7 @@ function buildExplainPrompt(args: {
   message: string;
   baselineText: string;
   patternText: string;
-  targetName?: string;
+  targetName?: string | undefined;
   targetBaseline?: unknown;
   relational: boolean;
 }) {
@@ -225,18 +226,22 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const rawText = asText((ai as any).response ?? ai);
   const parsed = parseJsonFromText(rawText);
 
+  const threadMeta: ThreadMeta = {
+    baseline_loaded: true,
+    ...(target?.id !== undefined ? { target_id: target.id } : {}),
+    ...(target?.relation !== undefined ? { target_relation: target.relation } : {}),
+    ...(relational ? { target_baseline_loaded: Boolean(targetBaseline) } : {}),
+  };
+
+  const pressurePoints = normalizePressurePoints(parsed.pressure_points);
+
   const result: ExplainResponse = {
     response: typeof parsed.response === "string" ? parsed.response : rawText,
     shift: normalizeShift(parsed.shift),
-    pressure_points: normalizePressurePoints(parsed.pressure_points),
+    ...(pressurePoints !== undefined ? { pressure_points: pressurePoints } : {}),
     move: normalizeMove(parsed.move),
     insights: normalizeInsights(parsed.insights),
-    thread_meta: {
-      target_id: target?.id,
-      target_relation: target?.relation as ExplainResponse["thread_meta"]["target_relation"],
-      baseline_loaded: true,
-      target_baseline_loaded: relational ? Boolean(targetBaseline) : undefined,
-    },
+    thread_meta: threadMeta,
   };
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
@@ -251,18 +256,19 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     question: message,
     text: message,
     people: target ? [{ id: target.id, relation: target.relation, name: target.relation }] : [],
-    result,
+    result: result as unknown as Record<string, unknown>,
     confidence,
   });
 
   void extractPatterns(env, sid, interactionId);
 
+  const resultRecord = result as unknown as Record<string, unknown>;
   return jsonResponse(
     {
       type: "ok",
       plan: user.tier,
-      ...result,
-      result,
+      ...resultRecord,
+      result: resultRecord,
       audio: null,
       video: { scenes: [] },
     },

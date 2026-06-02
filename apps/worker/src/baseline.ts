@@ -1,8 +1,8 @@
 import type { Env } from "./types-env.js";
 import type { Baseline, BaselineRequest } from "@sovereign/core";
 import { safeJsonParse } from "@sovereign/core";
-import { getSessionId, cookieHeader } from "./plan.ts";
-import { verifyAccessJWT } from "./auth.ts";
+import { getSessionId, cookieHeader } from "./plan.js";
+import { verifyAccessJWT } from "./auth.js";
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const USER_KEY = (sid: string) => `user:${sid}`;
@@ -39,8 +39,9 @@ export async function saveBaseline(env: Env, sid: string, baseline: BaselineRequ
   const now = Date.now();
   const record: Baseline = {
     ...baseline,
+    _version: (existing as any)?._version ?? 1,
     createdAt: existing?.createdAt ?? now,
-    updatedAt: now
+    updatedAt: now,
   };
 
   await env.KV.put(BASELINE_KEY(sid), JSON.stringify(record));
@@ -53,7 +54,7 @@ export async function saveBaseline(env: Env, sid: string, baseline: BaselineRequ
 }
 
 export async function handleGetBaseline(req: Request, env: Env): Promise<Response> {
-  const user = await verifyAccessJWT(req);
+  const user = await verifyAccessJWT(req, env);
   if (!user) {
     return new Response("Unauthorized", { status: 401 });
   }
@@ -72,7 +73,7 @@ export async function handleGetBaseline(req: Request, env: Env): Promise<Respons
 }
 
 export async function handleSaveBaseline(req: Request, env: Env): Promise<Response> {
-  const user = await verifyAccessJWT(req);
+  const user = await verifyAccessJWT(req, env);
   if (!user) {
     return new Response("Unauthorized", { status: 401 });
   }

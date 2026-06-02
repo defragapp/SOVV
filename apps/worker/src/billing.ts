@@ -1,6 +1,6 @@
 import type { Env } from "./types-env.js";
-import { getSessionId, setPlan, cookieHeader } from "./plan.ts";
-import { verifyAccessJWT } from "./auth.ts";
+import { getSessionId, setPlan, cookieHeader } from "./plan.js";
+import { verifyAccessJWT } from "./auth.js";
 
 // Stripe webhook signature verification in Workers (no Stripe SDK):
 // Stripe signs: "t=timestamp,v1=signature"
@@ -38,10 +38,19 @@ async function verifyStripeSignature(rawBody: string, sigHeader: string, secret:
 }
 
 export async function handleCheckout(req: Request, env: Env): Promise<Response> {
-  const user = await verifyAccessJWT(req);
-  if (!user) {
-    return new Response("Unauthorized", { status: 401 });
+  const authErr = await verifyAccessJWT(req, env);
+  if (authErr) {
+    return authErr;
   }
+
+  // Extract user email from CF-Access JWT for Stripe metadata
+  const jwtHeader = req.headers.get("Cf-Access-Jwt-Assertion") ?? "";
+  const jwtPayload = jwtHeader.split(".")[1] ?? "";
+  let userId = "unknown";
+  try {
+    const decoded = JSON.parse(atob(jwtPayload)) as Record<string, unknown>;
+    userId = typeof decoded["sub"] === "string" ? decoded["sub"] : "unknown";
+  } catch { /* ignore */ }
 
   const sid = await getSessionId(req);
 
@@ -57,11 +66,11 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
   params.set("success_url", `${env.APP_URL}/app?upgraded=1`);
   params.set("cancel_url", `${env.APP_URL}/app?canceled=1`);
 
-  // Attach user.id so webhook can map to user in D1
-  params.set("client_reference_id", user.id);
+  // Attach userId so webhook can map to user in D1
+  params.set("client_reference_id", userId);
 
   // Add metadata for cancellation handling.
-  params.set("subscription_data[metadata][userId]", user.id);
+  params.set("subscription_data[metadata][userId]", userId);
 
   const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
@@ -72,13 +81,13 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
     body: params.toString()
   });
 
-  const data = await res.json();
-  if (!res.ok || !data.url) {
+  const data = await res.json() as Record<string, unknown>;
+  if (!res.ok || typeof data["url"] !== "string") {
     return Response.json({ error: "checkout_failed", details: data }, { status: 400 });
   }
 
   return Response.json(
-    { url: data.url },
+    { url: data["url"] },
     { headers: { "set-cookie": cookieHeader(sid) } }
   );
 }

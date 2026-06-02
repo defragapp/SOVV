@@ -29,7 +29,10 @@ export async function hashPassword(password: string): Promise<string> {
 }
 
 export async function verifyPassword(password: string, stored: string): Promise<boolean> {
-  const [iterStr, saltB64, hashB64] = stored.split(":")
+  const parts = stored.split(":")
+  const iterStr = parts[0] ?? "600000"
+  const saltB64 = parts[1] ?? ""
+  const hashB64 = parts[2] ?? ""
   const iterations = parseInt(iterStr, 10)
   const salt = Uint8Array.from(atob(saltB64), (c) => c.charCodeAt(0))
   const expectedHash = Uint8Array.from(atob(hashB64), (c) => c.charCodeAt(0))
@@ -52,7 +55,7 @@ export async function verifyPassword(password: string, stored: string): Promise<
   if (actualHash.length !== expectedHash.length) return false
   let diff = 0
   for (let i = 0; i < actualHash.length; i++) {
-    diff |= actualHash[i] ^ expectedHash[i]
+    diff |= (actualHash[i] ?? 0) ^ (expectedHash[i] ?? 0)
   }
   return diff === 0
 }
@@ -81,7 +84,7 @@ export function getSessionToken(request: Request): string | null {
   const cookie = request.headers.get("Cookie")
   if (!cookie) return null
   const match = cookie.match(/__sov_session=([^;]+)/)
-  return match ? match[1] : null
+  return match ? (match[1] ?? null) : null
 }
 
 export function jsonResponse(data: unknown, status = 200, headers: Record<string, string> = {}): Response {
@@ -94,7 +97,7 @@ export function jsonResponse(data: unknown, status = 200, headers: Record<string
   })
 }
 
-export async function getAuthUser(request: Request, DB: D1Database): Promise<{ id: string; email: string; tier: string; stripe_customer_id: string | null } | null> {
+export async function getAuthUser(request: Request, DB: D1Database): Promise<{ id: string; email: string; tier: string; stripe_customer_id: string | null | undefined } | null> {
   const token = getSessionToken(request)
   if (!token) return null
 
