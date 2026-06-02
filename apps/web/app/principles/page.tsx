@@ -20,8 +20,8 @@ const principles = [
   },
   {
     num: "04",
-    title: "Grounded in the body",
-    body: "Clarity that only lives in the mind is not clarity. DEFRAG is designed to produce insight that lands — the kind you feel, not just understand.",
+    title: "Insight that lands",
+    body: "Clarity that only lives in the mind is not clarity. DEFRAG is designed to produce insight that lands — the kind you recognize as true, not just understand.",
   },
   {
     num: "05",

@@ -7,27 +7,31 @@ import Link from "next/link";
 const cases = [
   {
     title: "Before you send the message",
-    body: "You've written it three times. Something still feels off. DEFRAG helps you see what's actually driving the impulse — and whether sending it will get you what you actually want.",
-  },
-  {
-    title: "When something feels off",
-    body: "You can't name it. The conversation seemed fine but you left feeling unsettled. DEFRAG helps you locate the source of the friction before it becomes a pattern.",
+    body: "You have written it three times. Something still feels off. DEFRAG helps you see what got lit up — and whether sending it will get you what you actually want.",
   },
   {
     title: "When a conversation keeps repeating",
-    body: "The same argument. The same dynamic. The same outcome. DEFRAG maps the loop so you can see where a different move was possible.",
+    body: "The same argument. The same dynamic. The same outcome. DEFRAG shows where the loop starts so you can see where a different response was possible.",
   },
   {
-    title: "When timing matters as much as what you say",
-    body: "Some moments are not about the words. DEFRAG helps you read what's most active right now — in you and in the other person — so you can choose the right moment.",
+    title: "When someone pulls away",
+    body: "They went quiet. You do not know why. DEFRAG helps you see what may be active in the dynamic — without assuming the worst or excusing the pattern.",
   },
   {
-    title: "When you want to be heard",
-    body: "You've said it clearly. They still don't get it. DEFRAG helps you understand what may be blocking reception — and how to reach through it.",
+    title: "When a family loop keeps running",
+    body: "The same tension at every gathering. The same roles. The same pressure. DEFRAG helps you see the structure beneath it so you can choose a different response.",
   },
   {
-    title: "When you want to move with more self-possession",
-    body: "Not reactive. Not shut down. Present, grounded, and clear. DEFRAG helps you find that state — and return to it when you drift.",
+    title: "When you need to understand your part",
+    body: "Not to blame yourself. To see clearly. DEFRAG shows what got lit up in you — and what that means for how the moment landed on the other person.",
+  },
+  {
+    title: "When you want to practice a response first",
+    body: "Before the conversation happens. DEFRAG helps you find the Best Next Response and practice it — so you are not improvising under pressure.",
+  },
+  {
+    title: "When you need to see the other side without losing your own",
+    body: "Conflict makes one explanation feel obvious. DEFRAG helps show what else may be true — without asking you to excuse anyone or abandon your own read.",
   },
 ];
 
@@ -37,7 +41,7 @@ export default function UseCasesPage() {
       <PageHero
         eyebrow="Use Cases"
         title="Built for the moments that matter."
-        body="DEFRAG is not for abstract self-improvement. It is for the specific, real, sometimes difficult moments of actual life."
+        body="Not for abstract self-improvement. For the specific, real, sometimes difficult moments of actual life."
       />
 
       <MotionSection className="px-6 py-24">
@@ -57,12 +61,20 @@ export default function UseCasesPage() {
         <p className="font-mono text-[10px] uppercase tracking-widest text-white/25 mb-6">
           Any of these sound familiar?
         </p>
-        <Link
-          href="https://app.defrag.app/login"
-          className="inline-block border border-white/20 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-white/5 transition-colors"
-        >
-          Start Free
-        </Link>
+        <div className="flex flex-col gap-4 sm:flex-row justify-center">
+          <Link
+            href="https://app.defrag.app/login"
+            className="inline-block border border-white/20 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-white/5 transition-colors"
+          >
+            Start Your Baseline
+          </Link>
+          <Link
+            href="/how-it-works"
+            className="inline-block border border-white/10 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hover:bg-white/5 hover:text-white/60 transition-colors"
+          >
+            See How It Works
+          </Link>
+        </div>
       </MotionSection>
     </SiteShell>
   );

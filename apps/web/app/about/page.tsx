@@ -45,7 +45,7 @@ export default function AboutPage() {
           href="https://app.defrag.app/login"
           className="inline-block border border-white/20 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-white/5 transition-colors"
         >
-          Enter Platform
+          Start Your Baseline
         </Link>
       </MotionSection>
     </SiteShell>
