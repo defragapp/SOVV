@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { Person, Tier, Relation } from "./types"
+import { UpgradeButton } from "@/components/UpgradeButton"
 
 const RELATION_LABELS: Record<Relation, string> = {
   self: "Self",
@@ -88,9 +89,12 @@ export default function Sidebar({
             + Add Person
           </button>
         ) : (
-          <span className="block px-2 py-1 font-mono text-xs uppercase tracking-widest text-white/20">
-            Pro: Add People
-          </span>
+          <div className="px-2 py-2 flex flex-col gap-1">
+            <span className="block font-mono text-[9px] uppercase tracking-widest text-white/20">
+              Compare With Someone
+            </span>
+            <UpgradeButton label="Upgrade to Pro" className="w-full text-left" />
+          </div>
         )}
       </div>
     </aside>

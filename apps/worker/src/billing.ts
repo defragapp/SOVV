@@ -1,8 +1,14 @@
 import type { Env } from "./types-env.js";
-import { getSessionId, setPlan, cookieHeader } from "./plan.js";
+import { getSessionId, cookieHeader } from "./plan.js";
 import { verifyAccessJWT } from "./auth.js";
+import {
+  sendWelcomeEmail,
+  sendPaymentSucceededEmail,
+  sendPaymentFailedEmail,
+  sendCancellationEmail,
+} from "./email.js";
 
-// Stripe webhook signature verification in Workers (no Stripe SDK):
+// Stripe webhook signature verification in Workers (no Stripe SDK)
 // Stripe signs: "t=timestamp,v1=signature"
 // Signed payload: "${timestamp}.${rawBody}"
 // HMAC SHA256 with STRIPE_WEBHOOK_SECRET
@@ -39,18 +45,12 @@ async function verifyStripeSignature(rawBody: string, sigHeader: string, secret:
 
 export async function handleCheckout(req: Request, env: Env): Promise<Response> {
   const authErr = await verifyAccessJWT(req, env);
-  if (authErr) {
-    return authErr;
-  }
+  if (authErr) return authErr;
 
-  // Extract user email from CF-Access JWT for Stripe metadata
-  const jwtHeader = req.headers.get("Cf-Access-Jwt-Assertion") ?? "";
-  const jwtPayload = jwtHeader.split(".")[1] ?? "";
-  let userId = "unknown";
-  try {
-    const decoded = JSON.parse(atob(jwtPayload)) as Record<string, unknown>;
-    userId = typeof decoded["sub"] === "string" ? decoded["sub"] : "unknown";
-  } catch { /* ignore */ }
+  // Get user from session for client_reference_id
+  const { getAuthUser } = await import("./auth.js");
+  const user = await getAuthUser(req, env.DB);
+  const userId = user?.id ?? "unknown";
 
   const sid = await getSessionId(req);
 
@@ -58,32 +58,27 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
     return Response.json({ error: "billing_not_configured" }, { status: 500 });
   }
 
-  // Create Checkout Session (Stripe API) using fetch + form encoding.
   const params = new URLSearchParams();
   params.set("mode", "subscription");
   params.set("line_items[0][price]", env.STRIPE_PRICE_ID);
   params.set("line_items[0][quantity]", "1");
   params.set("success_url", `${env.APP_URL}/app?upgraded=1`);
   params.set("cancel_url", `${env.APP_URL}/app?canceled=1`);
-
-  // Attach userId so webhook can map to user in D1
   params.set("client_reference_id", userId);
-
-  // Add metadata for cancellation handling.
   params.set("subscription_data[metadata][userId]", userId);
 
   const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: params.toString()
+    body: params.toString(),
   });
 
   const data = await res.json() as Record<string, unknown>;
   if (!res.ok || typeof data["url"] !== "string") {
-    return Response.json({ error: "checkout_failed", details: data }, { status: 400 });
+    return Response.json({ error: "checkout_failed" }, { status: 400 });
   }
 
   return Response.json(
@@ -93,9 +88,7 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
 }
 
 export async function handleWebhook(req: Request, env: Env): Promise<Response> {
-  // Stripe webhooks are verified by signature, not JWT.
-  // Do NOT add verifyAccessJWT here.
-
+  // Stripe webhooks verified by signature only — no JWT auth here
   if (!env.STRIPE_WEBHOOK_SECRET) {
     return new Response("Missing webhook secret", { status: 500 });
   }
@@ -108,36 +101,121 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
 
   const event = JSON.parse(raw);
 
-  // Idempotency check - prevent duplicate processing
+  // Idempotency — prevent duplicate processing
   const eventId = event.id;
   const existing = await env.KV.get(`stripe_event:${eventId}`);
   if (existing) return new Response("OK (already processed)");
   await env.KV.put(`stripe_event:${eventId}`, "processed", { expirationTtl: 86400 });
 
-  // Handle checkout.session.completed
+  // checkout.session.completed → activate subscription
   if (event?.type === "checkout.session.completed") {
     const session = event.data?.object;
     const userId = session.client_reference_id;
     const stripeCustomerId = session.customer;
+    const stripeSubscriptionId = session.subscription;
 
     if (userId) {
-      // Update user tier and save customer id in D1
       await env.DB.prepare(
-        "UPDATE users SET tier = 'pro', stripe_customer_id = ? WHERE id = ?"
-      ).bind(stripeCustomerId, userId).run();
+        "UPDATE users SET tier = 'pro', stripe_customer_id = ?, stripe_subscription_id = ?, subscription_status = 'active' WHERE id = ?"
+      ).bind(stripeCustomerId, stripeSubscriptionId ?? null, userId).run();
+
+      if (env.RESEND_API_KEY) {
+        const user = await env.DB.prepare("SELECT email FROM users WHERE id = ?")
+          .bind(userId).first<{ email: string }>();
+        if (user?.email) {
+          await sendWelcomeEmail(env.RESEND_API_KEY, user.email).catch(() => {});
+        }
+      }
     }
   }
 
-  // Handle customer.subscription.deleted
+  // invoice.payment_succeeded → confirm active (renewal only)
+  if (event?.type === "invoice.payment_succeeded") {
+    const invoice = event.data?.object;
+    const stripeCustomerId = invoice.customer;
+    const billingReason = invoice.billing_reason;
+
+    if (stripeCustomerId) {
+      await env.DB.prepare(
+        "UPDATE users SET tier = 'pro', subscription_status = 'active' WHERE stripe_customer_id = ?"
+      ).bind(stripeCustomerId).run();
+
+      // Only send renewal email — welcome covers first payment
+      if (env.RESEND_API_KEY && billingReason === "subscription_cycle") {
+        const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
+          .bind(stripeCustomerId).first<{ email: string }>();
+        if (user?.email) {
+          await sendPaymentSucceededEmail(env.RESEND_API_KEY, user.email).catch(() => {});
+        }
+      }
+    }
+  }
+
+  // invoice.payment_failed → mark past_due, do not immediately downgrade
+  if (event?.type === "invoice.payment_failed") {
+    const invoice = event.data?.object;
+    const stripeCustomerId = invoice.customer;
+
+    if (stripeCustomerId) {
+      await env.DB.prepare(
+        "UPDATE users SET subscription_status = 'past_due' WHERE stripe_customer_id = ?"
+      ).bind(stripeCustomerId).run();
+
+      if (env.RESEND_API_KEY) {
+        const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
+          .bind(stripeCustomerId).first<{ email: string }>();
+        if (user?.email) {
+          await sendPaymentFailedEmail(env.RESEND_API_KEY, user.email).catch(() => {});
+        }
+      }
+    }
+  }
+
+  // customer.subscription.updated → sync tier and status
+  if (event?.type === "customer.subscription.updated") {
+    const subscription = event.data?.object;
+    const stripeCustomerId = subscription.customer;
+    const status = subscription.status;
+    const userId = subscription.metadata?.userId;
+
+    if (stripeCustomerId) {
+      const tier = status === "active" ? "pro" : "free";
+      if (userId) {
+        await env.DB.prepare(
+          "UPDATE users SET tier = ?, subscription_status = ? WHERE id = ?"
+        ).bind(tier, status, userId).run();
+      } else {
+        await env.DB.prepare(
+          "UPDATE users SET tier = ?, subscription_status = ? WHERE stripe_customer_id = ?"
+        ).bind(tier, status, stripeCustomerId).run();
+      }
+    }
+  }
+
+  // customer.subscription.deleted → downgrade to free
   if (event?.type === "customer.subscription.deleted") {
     const subscription = event.data?.object;
+    const stripeCustomerId = subscription.customer;
     const userId = subscription.metadata?.userId;
 
     if (userId) {
-      // Revert user tier to free in D1
       await env.DB.prepare(
-        "UPDATE users SET tier = 'free' WHERE id = ?"
+        "UPDATE users SET tier = 'free', subscription_status = 'canceled' WHERE id = ?"
       ).bind(userId).run();
+    } else if (stripeCustomerId) {
+      await env.DB.prepare(
+        "UPDATE users SET tier = 'free', subscription_status = 'canceled' WHERE stripe_customer_id = ?"
+      ).bind(stripeCustomerId).run();
+    }
+
+    if (env.RESEND_API_KEY) {
+      const lookupVal = userId ?? stripeCustomerId;
+      const col = userId ? "id" : "stripe_customer_id";
+      const user = await env.DB.prepare(`SELECT email FROM users WHERE ${col} = ?`)
+        .bind(lookupVal).first<{ email: string }>();
+      if (user?.email) {
+        await sendCancellationEmail(env.RESEND_API_KEY, user.email).catch(() => {});
+      }
     }
   }
 

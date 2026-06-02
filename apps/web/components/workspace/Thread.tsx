@@ -39,9 +39,7 @@ export default function Thread({
         body: JSON.stringify(body),
       })
 
-      const data: ExplainResponse = await res.json()
-
-      const sovereignMsg: ThreadMessage = {
+      
         id: `s_${Date.now()}`,
         role: "sovereign",
         content: data.response,
