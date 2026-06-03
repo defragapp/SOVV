@@ -26,7 +26,11 @@ export async function handleHistory(req: Request, env: Env) {
     .bind(sid, limit, offset)
     .all<InteractionRow>();
 
-    
+    const interactions = (results ?? []).map(mapInteraction);
+
+    return Response.json({ interactions }, {
+      headers: { "set-cookie": cookieHeader(sid) }
+    });
   } catch (e) {
     console.error("Failed to fetch history", String(e));
     return Response.json({ interactions: [] });

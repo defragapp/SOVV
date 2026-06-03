@@ -1,4 +1,6 @@
+import type { Env } from "./types-env.js";
 
+export type Plan = "free" | "pro";
 
 export async function getSessionId(req: Request): Promise<string> {
   const cookie = req.headers.get("Cookie") || "";

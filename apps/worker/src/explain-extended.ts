@@ -132,13 +132,12 @@ function normalizePressurePoints(input: any): PressurePoint[] | undefined {
   return points.length ? points : undefined;
 }
 
-function buildExplainPrompt(args: {
+function buildUserPrompt(args: {
   message: string;
   baselineText: string;
   patternText: string;
   targetName?: string | undefined;
   targetBaseline?: unknown;
-  relational: boolean;
 }) {
   const targetSection = args.targetName
     ? `\nTarget person: ${args.targetName}${args.targetBaseline ? `\nTarget baseline: ${asText(args.targetBaseline)}` : ""}`
@@ -146,7 +145,7 @@ function buildExplainPrompt(args: {
 
   const contextSection = [args.baselineText, args.patternText].filter(Boolean).join("\n\n");
 
-  return `${args.relational ? SYSTEM_RELATIONAL : SYSTEM_SELF}\n\n${contextSection ? `Context:\n${contextSection}\n\n` : ""}Message:\n${args.message}${targetSection}`;
+  return `${contextSection ? `Context:\n${contextSection}\n\n` : ""}Message:\n${args.message}${targetSection}`;
 }
 
 export async function handleExplain(req: Request, env: Env): Promise<Response> {
@@ -204,20 +203,19 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       ? await env.KV.get(`baseline:${user.id}:person:${target.id}`, "json")
       : null;
 
-  const prompt = buildExplainPrompt({
+  const userPrompt = buildUserPrompt({
     message,
     baselineText,
     patternText,
     targetName: target ? target.relation : undefined,
     targetBaseline,
-    relational,
   });
 
   const modelId = env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
   const ai = await env.AI.run(modelId, {
     messages: [
       { role: "system", content: relational ? SYSTEM_RELATIONAL : SYSTEM_SELF },
-      { role: "user", content: prompt },
+      { role: "user", content: userPrompt },
     ],
     temperature: 0.35,
     max_tokens: 900,
@@ -260,9 +258,19 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     confidence,
   });
 
-  void extractPatterns(env, sid, interactionId);
+  if (env.QUEUE) {
+    // Offload pattern extraction to a queue to avoid delaying the response.
+    await env.QUEUE.send({ sessionId: sid, interactionId });
+  } else {
+    // Fallback for local dev or if queue is not configured.
+    console.warn("QUEUE binding not found. Running pattern extraction in a non-blocking way, but this may be unreliable.");
+    void extractPatterns(env, sid, interactionId);
+  }
 
-  
+  return jsonResponse(result, 200, {
+    ...CORS_HEADERS,
+    "set-cookie": cookieHeader(sid),
+  });
 }
 
 export async function registerExplainRoute(router: any, getEnv: () => Env) {

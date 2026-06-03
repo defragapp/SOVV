@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   },
 };
 
+const SUPPORT_URL = process.env.STRIPE_SUPPORT_LINK_URL;
+
 export default function PricingPage() {
   return (
     <SiteShell>
@@ -68,7 +70,18 @@ export default function PricingPage() {
             ))}
           </div>
 
-          
+          {SUPPORT_URL && (
+          <div className="mt-10 text-center">
+            <a
+              href={SUPPORT_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="font-mono text-[10px] uppercase tracking-widest text-white/70 hover:text-white"
+            >
+              Support DEFRAG development
+            </a>
+          </div>
+          )}
         </div>
       </MotionSection>
     </SiteShell>

@@ -97,17 +97,32 @@ export function jsonResponse(data: unknown, status = 200, headers: Record<string
   })
 }
 
-export async function getAuthUser(request: Request, DB: D1Database): Promise<{ id: string; email: string; tier: string; stripe_customer_id: string | null | undefined } | null> {
+export type AuthUser = {
+  id: string
+  email: string
+  tier: string
+  role: string
+  stripe_customer_id: string | null | undefined
+}
+
+export function generatePromoCode(length = 10): string {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+  const bytes = crypto.getRandomValues(new Uint8Array(length))
+  return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("")
+}
+
+export async function getAuthUser(request: Request, DB: D1Database): Promise<AuthUser | null> {
   const token = getSessionToken(request)
   if (!token) return null
 
   const session = await DB.prepare(
-    "SELECT u.id, u.email, u.tier, u.stripe_customer_id FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
+    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
   )
     .bind(token, Date.now())
-    .first<{ id: string; email: string; tier: string; stripe_customer_id: string | null }>()
+    .first<{ id: string; email: string; tier: string; role: string; stripe_customer_id: string | null }>()
 
-  return session || null
+  if (!session) return null
+  return { ...session, role: session.role || "user" }
 }
 
 const SESSION_TTL = 7 * 24 * 60 * 60
@@ -144,7 +159,7 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
   router.post("/api/auth/login", async (request: Request) => {
     const env = getEnv()
     const { email, password } = await request.json() as any
-    const user = await env.DB.prepare("SELECT * FROM users WHERE email = ?").bind(email).first() as any
+    const user = await env.DB.prepare("SELECT id, email, password_hash, tier, role FROM users WHERE email = ?").bind(email).first() as any
     if (!user) return jsonResponse({ error: "Invalid credentials" }, 401)
 
     const valid = await verifyPassword(password, user.password_hash)
@@ -157,6 +172,72 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
 
     return jsonResponse({ success: true }, 200, {
       "Set-Cookie": sessionCookie(token),
+    })
+  })
+
+  // GET /api/user/me
+  router.get("/api/user/me", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    return jsonResponse({ id: user.id, email: user.email, tier: user.tier, role: user.role })
+  })
+
+  // GET /api/admin/me
+  router.get("/api/admin/me", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    if (user.role !== "owner") return jsonResponse({ error: "Forbidden" }, 403)
+    return jsonResponse({ id: user.id, email: user.email, tier: user.tier, role: user.role })
+  })
+
+    // POST /api/ambassador/promo-codes
+  router.post("/api/ambassador/promo-codes", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    if (user.role !== "ambassador" && user.role !== "owner") return jsonResponse({ error: "Forbidden" }, 403)
+
+    const body = await request.json().catch(() => ({})) as any
+    let discount_percent = typeof body.discount_percent === "number" ? body.discount_percent : 0
+    let max_uses = typeof body.max_uses === "number" ? body.max_uses : 10
+
+    if (user.role === "ambassador" && discount_percent > 50) {
+      discount_percent = 50
+    }
+
+    const code = generatePromoCode(8)
+    const id = crypto.randomUUID()
+    
+    await env.DB.prepare("INSERT INTO promo_codes (id, code, created_by, discount_percent, applicable_tiers, max_uses, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
+      .bind(id, code, user.id, discount_percent, '["pro"]', max_uses, Date.now())
+      .run()
+
+    return jsonResponse({ code })
+  })
+
+  // POST /api/promo/redeem
+  router.post("/api/promo/redeem", async (request: Request) => {
+    const env = getEnv()
+    const body = await request.json().catch(() => ({})) as any
+    const code = typeof body?.code === "string" ? body.code.trim().toUpperCase() : ""
+    if (!code) return jsonResponse({ error: "Missing code" }, 400)
+
+    const promo = await env.DB.prepare("SELECT * FROM promo_codes WHERE code = ? AND active = 1").bind(code).first() as any
+    if (!promo) return jsonResponse({ error: "Invalid or inactive promo code" }, 400)
+    
+    if (promo.max_uses !== null && promo.use_count >= promo.max_uses) {
+      return jsonResponse({ error: "Promo code limit reached" }, 400)
+    }
+
+    await env.DB.prepare("UPDATE promo_codes SET use_count = use_count + 1 WHERE id = ?").bind(promo.id).run()
+
+    return jsonResponse({ 
+      success: true, 
+      code: promo.code,
+      discount_percent: promo.discount_percent,
+      applicable_tiers: promo.applicable_tiers ? JSON.parse(promo.applicable_tiers) : null
     })
   })
 
@@ -199,13 +280,79 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
   })
 }
 
-export async function verifyAccessJWT(request: Request, env: any) {
+/**
+ * Decodes a JWT token without verification.
+ * @param token The JWT token string.
+ * @returns The decoded header and payload, or null if parsing fails.
+ */
+function decodeJwt(token: string): { header: any; payload: any } | null {
+  try {
+    const [headerB64, payloadB64] = token.split('.');
+    if (!headerB64 || !payloadB64) return null;
+    const headerStr = atob(headerB64.replace(/-/g, '+').replace(/_/g, '/'));
+    const payloadStr = atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/'));
+    return {
+      header: JSON.parse(headerStr),
+      payload: JSON.parse(payloadStr),
+    };
+  } catch (e) {
+    console.error("Failed to decode JWT", e);
+    return null;
+  }
+}
+
+/**
+ * Verifies a Cloudflare Access JWT.
+ * This function checks the token's signature against Cloudflare's public keys
+ * and validates the issuer and audience claims.
+ *
+ * @param request The incoming request.
+ * @param env The worker environment, containing TEAM_DOMAIN and POLICY_AUD.
+ * @returns A Response object if validation fails, otherwise null.
+ */
+export async function verifyAccessJWT(request: Request, env: { TEAM_DOMAIN?: string; POLICY_AUD?: string; }) {
   const token = request.headers.get("Cf-Access-Jwt-Assertion");
   if (!token) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" }
-    });
+    return jsonResponse({ error: "Unauthorized: Missing Cloudflare Access JWT." }, 401);
   }
-  return null;
+
+  try {
+    const decoded = decodeJwt(token);
+    if (!decoded) {
+      return jsonResponse({ error: "Invalid JWT format" }, 401);
+    }
+
+    const { header, payload } = decoded;
+    const teamDomain = env.TEAM_DOMAIN;
+    if (!teamDomain || payload.iss !== teamDomain) {
+      return jsonResponse({ error: "Invalid JWT issuer" }, 401);
+    }
+
+    const aud = env.POLICY_AUD;
+    if (!aud || (Array.isArray(payload.aud) ? !payload.aud.includes(aud) : payload.aud !== aud)) {
+      return jsonResponse({ error: "Invalid JWT audience" }, 401);
+    }
+
+    const certsUrl = `${teamDomain}/cdn-cgi/access/certs`;
+    const { keys } = await fetch(certsUrl).then(res => res.json() as Promise<{keys: any[]}>);
+    const jwk = keys.find(key => key.kid === header.kid);
+    if (!jwk) {
+      return jsonResponse({ error: "Matching key not found for JWT" }, 401);
+    }
+
+    const key = await crypto.subtle.importKey("jwk", jwk, { name: "RS256", hash: "SHA-256" }, false, ["verify"]);
+    const [headerB64, payloadB64, signatureB64 = ""] = token.split('.');
+    const signature = Uint8Array.from(atob(signatureB64.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+    const data = new TextEncoder().encode(`${headerB64}.${payloadB64}`);
+    const isValid = await crypto.subtle.verify({ name: "RS256" }, key, data, signature);
+
+    if (!isValid) {
+      return jsonResponse({ error: "Invalid JWT signature" }, 401);
+    }
+
+    return null; // Token is valid
+  } catch (err: any) {
+    console.error("JWT Verification failed:", err.stack);
+    return jsonResponse({ error: "JWT verification failed" }, 500);
+  }
 }

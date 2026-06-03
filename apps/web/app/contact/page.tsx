@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description: "For product questions, support, or account help. Reach us at info@defrag.app.",
 };
 
+const SUPPORT_URL = process.env.STRIPE_SUPPORT_LINK_URL || "mailto:info@defrag.app"
+
 export default function ContactPage() {
   return (
     <SiteShell>
@@ -38,6 +40,14 @@ export default function ContactPage() {
             <p className="text-sm leading-7 text-white/30">
               Do not send sensitive personal details through email.
             </p>
+            <a
+              href={SUPPORT_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="block font-mono text-[10px] uppercase tracking-widest text-white/70 hover:text-white"
+            >
+              Support DEFRAG development
+            </a>
           </div>
         </div>
       </MotionSection>

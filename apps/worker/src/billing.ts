@@ -101,61 +101,67 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
 
   const event = JSON.parse(raw);
 
-  // Idempotency — prevent duplicate processing
+  // Idempotency
   const eventId = event.id;
   const existing = await env.KV.get(`stripe_event:${eventId}`);
   if (existing) return new Response("OK (already processed)");
   await env.KV.put(`stripe_event:${eventId}`, "processed", { expirationTtl: 86400 });
 
-  
-
-      if (env.RESEND_API_KEY) {
-        const user = await env.DB.prepare("SELECT email FROM users WHERE id = ?")
-          .bind(userId).first<{ email: string }>();
-        if (user?.email) {
-          await sendWelcomeEmail(env.RESEND_API_KEY, user.email).catch(() => {});
+  switch (event.type) {
+    case "checkout.session.completed": {
+      const session = event.data.object;
+      const userId = session.client_reference_id;
+      const stripeCustomerId = session.customer;
+      if (userId && stripeCustomerId) {
+        await env.DB.prepare("UPDATE users SET tier = 'pro', stripe_customer_id = ? WHERE id = ?")
+          .bind(stripeCustomerId, userId).run();
+        if (env.RESEND_API_KEY) {
+          const user = await env.DB.prepare("SELECT email FROM users WHERE id = ?")
+            .bind(userId).first<{ email?: string }>();
+          if (user?.email) {
+            await sendWelcomeEmail(env.RESEND_API_KEY, user.email).catch(() => {});
+          }
         }
       }
+      break;
     }
-  }
-
-  
-
-      // Only send renewal email — welcome covers first payment
+    case "invoice.payment_succeeded": {
+      const invoice = event.data.object;
+      const billingReason = invoice.billing_reason;
+      const stripeCustomerId = invoice.customer;
       if (env.RESEND_API_KEY && billingReason === "subscription_cycle") {
         const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
-          .bind(stripeCustomerId).first<{ email: string }>();
+          .bind(stripeCustomerId).first<{ email?: string }>();
         if (user?.email) {
           await sendPaymentSucceededEmail(env.RESEND_API_KEY, user.email).catch(() => {});
         }
       }
+      break;
     }
-  }
-
-  
-
+    case "invoice.payment_failed": {
+      const invoice = event.data.object;
+      const stripeCustomerId = invoice.customer;
       if (env.RESEND_API_KEY) {
         const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
-          .bind(stripeCustomerId).first<{ email: string }>();
+          .bind(stripeCustomerId).first<{ email?: string }>();
         if (user?.email) {
           await sendPaymentFailedEmail(env.RESEND_API_KEY, user.email).catch(() => {});
         }
       }
+      break;
     }
-  }
-
-  
-
-  
-
-    if (env.RESEND_API_KEY) {
-      const lookupVal = userId ?? stripeCustomerId;
-      const col = userId ? "id" : "stripe_customer_id";
-      const user = await env.DB.prepare(`SELECT email FROM users WHERE ${col} = ?`)
-        .bind(lookupVal).first<{ email: string }>();
-      if (user?.email) {
-        await sendCancellationEmail(env.RESEND_API_KEY, user.email).catch(() => {});
+    case "customer.subscription.deleted": {
+      const subscription = event.data.object;
+      const stripeCustomerId = subscription.customer;
+      await env.DB.prepare("UPDATE users SET tier = 'free' WHERE stripe_customer_id = ?").bind(stripeCustomerId).run();
+      if (env.RESEND_API_KEY) {
+        const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
+          .bind(stripeCustomerId).first<{ email?: string }>();
+        if (user?.email) {
+          await sendCancellationEmail(env.RESEND_API_KEY, user.email).catch(() => {});
+        }
       }
+      break;
     }
   }
 

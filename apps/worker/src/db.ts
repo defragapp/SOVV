@@ -47,6 +47,26 @@ export function mapPattern(row: PatternRow): CorePattern {
   };
 }
 
+/** Insert a support ticket record */
+export async function insertSupportTicket(
+  db: D1Database,
+  data: {
+    id: string;
+    sender: string;
+    recipient: string;
+    subject: string;
+    body_preview: string;
+  }
+) {
+  await db
+    .prepare(
+      `INSERT INTO support_tickets (id, sender, recipient, subject, body_preview, status, created_at) 
+       VALUES (?, ?, ?, ?, ?, 'open', ?)`
+    )
+    .bind(data.id, data.sender, data.recipient, data.subject, data.body_preview, Date.now())
+    .run();
+}
+
 /** Insert an interaction record */
 export async function insertInteraction(
   db: D1Database,
