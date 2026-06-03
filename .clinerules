@@ -1,0 +1,33 @@
+# Sovereign.os Platform Build — Cloudflare Context
+# Account: 8b1954d216d65077c6480d62583fe2c2
+
+## Active Workers
+- sovereign-os-api → api.defrag.app/* (wrangler deploy)
+- sovv → workers.dev only (wrangler deploy)
+- sovv-web → workers.dev only, has assets + Durable Objects (wrangler deploy)
+- worker-ai → workers.dev only, AI inference worker (API-deployed, needs wrangler.toml)
+- worker-session → session.defrag.app/*, has ConflictSessionDO Durable Object (API-deployed, needs wrangler.toml)
+
+## AI Gateways
+- vscode-codespace-agent: auth-enabled, 500 req/min, 3 retries, exponential backoff
+- sovereign-ai-gateway: no auth, 100 req/min, no retry
+
+## Deployment Rules
+- Use `wrangler deploy` from each worker's app directory
+- Use `wrangler dev --local` for testing
+- worker-ai and worker-session were historically API-deployed — migrate to wrangler deploy after creating configs
+
+## Coding Patterns
+- Use `env.AI.run()` for Workers AI inline inference
+- Use `env.AI_GATEWAY` for external model routing through gateway
+- Durable Objects: ConflictSessionDO (worker-session), BucketCachePurge, DOQueueHandler, DOShardedTagCache (sovv-web)
+- Compatibility dates: 2024-05-10 (sovereign-os-api, sovv), 2026-05-23 (sovv-web), 2026-04-22 (worker-ai, worker-session)
+- sovv-web uses `nodejs_compat` flag
+
+## Commands
+- Deploy API: cd apps/worker && wrangler deploy
+- Deploy Web: cd apps/web && wrangler deploy
+- Deploy Session: cd apps/worker-session && wrangler deploy
+- Deploy AI: cd apps/worker-ai && wrangler deploy
+- Tail logs: wrangler tail <worker-name>
+- List workers: wrangler worker list

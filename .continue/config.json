@@ -1,0 +1,18 @@
+{
+  "models": [
+    {
+      "title": "Sovereign AI Gateway",
+      "provider": "openai",
+      "apiBase": "https://gateway.ai.cloudflare.com/v1/8b1954d216d65077c6480d62583fe2c2/vscode-codespace-agent/compat",
+      "apiKey": "${env:CF_API_TOKEN}",
+      "model": "workers-ai/@cf/meta/llama-3.3-70b-instruct"
+    },
+    {
+      "title": "Sovereign Gateway (GPT-5-mini fallback)",
+      "provider": "openai",
+      "apiBase": "https://gateway.ai.cloudflare.com/v1/8b1954d216d65077c6480d62583fe2c2/vscode-codespace-agent/openai",
+      "apiKey": "${env:CF_API_TOKEN}",
+      "model": "gpt-5-mini"
+    }
+  ]
+}

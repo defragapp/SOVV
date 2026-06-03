@@ -3,6 +3,7 @@
   "name": "sovv-web",
   "compatibility_date": "2026-05-23",
   "compatibility_flags": ["nodejs_compat"],
+  "account_id": "8b1954d216d65077c6480d62583fe2c2",
   "main": ".open-next/worker.js",
   "assets": {
     "directory": ".open-next/assets",
@@ -36,7 +37,12 @@
     ]
   },
   "ai": {
-    "binding": "AI"
+    "binding": "AI",
+    "gateway": [
+      {
+        "id": "vscode-codespace-agent"
+      }
+    ]
   },
   "vars": {
     "AI_MODEL": "@cf/meta/llama-3.1-8b-instruct-fast",

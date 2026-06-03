@@ -1,0 +1,23 @@
+name = "worker-ai"
+main = "src/index.ts"
+compatibility_date = "2026-04-22"
+compatibility_flags = ["nodejs_compat"]
+account_id = "8b1954d216d65077c6480d62583fe2c2"
+workers_dev = true
+
+# Workers AI binding for inline model inference
+[ai]
+binding = "AI"
+
+# AI Gateway binding for external model routing
+[[ai.gateway]]
+id = "vscode-codespace-agent"
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true

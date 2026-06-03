@@ -1,0 +1,196 @@
+CF AUDIT - Wed Jun  3 16:46:09 UTC 2026
+---KV NAMESPACES---
+{"result":[{"id":"3bd3ff5048a8468e82c574d7d66045c3","title":"SOVV_DATA","supports_url_encoding":true},{"id":"c9155ffd7355462babf222bfabd2588f","title":"BASELINE_KV","supports_url_encoding":true}],"errors":[],"messages":[],"success":true,"result_info":{"count":2,"page":1,"per_page":50,"total_count":2,"total_pages":1}}\n---R2 BUCKETS---
+{"success":true,"errors":[],"messages":[],"result":{"buckets":[{"name":"vibesdk-templates","creation_date":"2026-05-20T08:32:59.029Z"},{"name":"web-opennext-cache","creation_date":"2026-05-21T23:57:36.755Z"}]}}\n---DNS RECORDS---
+{"result":[{"id":"0325f29f26630b776c927c3e14f6e374","name":"session.defrag.app","type":"A","content":"192.0.2.1","proxiable":true,"proxied":true,"ttl":1,"settings":{},"meta":{},"comment":null,"tags":[],"created_on":"2026-05-25T20:36:22.647118Z","modified_on":"2026-05-25T20:36:22.647118Z"},{"id":"5edd7a58b727d978110b78af770d0533","name":"repo.defrag.app","type":"AAAA","content":"100::","proxiable":true,"proxied":true,"ttl":1,"settings":{},"meta":{},"comment":null,"tags":[],"created_on":"2026-05-19T22:54:55.091691Z","modified_on":"2026-05-19T22:54:55.091691Z"},{"id":"3a2421bf148aefd69a8004fc9a0f403d","name":"www.defrag.app","type":"CNAME","content":"defrag.app","proxiable":true,"proxied":true,"ttl":1,"settings":{"flatten_cname":false},"meta":{},"comment":null,"tags":[],"created_on":"2026-05-30T16:48:10.925137Z","modified_on":"2026-05-30T16:48:10.925137Z"},{"id":"0a665a114054aa1bf2f569d5dba81a64","name":"defrag.app","type":"MX","content":"route3.mx.cloudflare.net","priority":45,"proxiable":false,"proxied":false,"ttl":1,"settings":{},"meta":{"email_routing":true,"read_only":true},"comment":null,"tags":[],"created_on":"2026-06-02T19:35:27.827939Z","modified_on":"2026-06-02T19:35:27.827939Z"},{"id":"7b38075ea05229961ff5eb64554aaa48","name":"defrag.app","type":"MX","content":"route2.mx.cloudflare.net","priority":13,"proxiable":false,"proxied":false,"ttl":1,"settings":{},"meta":{"email_routing":true,"read_only":true},"comment":null,"tags":[],"created_on":"2026-06-02T19:35:27.819401Z","modified_on":"2026-06-02T19:35:27.819401Z"},{"id":"17995bf9b7836cd25b8f60b167254388","name":"defrag.app","type":"MX","content":"route1.mx.cloudflare.net","priority":50,"proxiable":false,"proxied":false,"ttl":1,"settings":{},"meta":{"email_routing":true,"read_only":true},"comment":null,"tags":[],"created_on":"2026-06-02T19:35:27.807531Z","modified_on":"2026-06-02T19:35:27.807531Z"},{"id":"84104bd444cf8b3e46f7df4e2297b2fd","name":"cf2024-1._domainkey.defrag.app","type":"TXT","content":"\"v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiweykoi+o48IOGuP7GR3X0MOExCUDY/BCRHoWBnh3rChl7WhdyCxW3jgq1daEjPPqoi7sJvdg5hEQVsgVRQP4DcnQDVjGMbASQtrY4WmB1VebF+RPJB2ECPsEDTpeiI5ZyUAwJaVX7r6bznU67g7LvFq35yIo4sdlmtZGV+i0H4cpYH9+3JJ78k\" \"m4KXwaf9xUJCWF6nxeD+qG6Fyruw1Qlbds2r85U9dkNDVAS3gioCvELryh1TxKGiVTkg4wqHTyHfWsp7KD3WQHYJn0RyfJJu6YEmL77zonn7p2SRMvTMP3ZEXibnC9gz3nnhR6wcYL8Q7zXypKTMD58bTixDSJwIDAQAB\"","proxiable":false,"proxied":false,"ttl":1,"settings":{},"meta":{"email_routing":true,"read_only":true},"comment":null,"tags":[],"created_on":"2026-06-02T19:35:27.846235Z","modified_on":"2026-06-02T19:35:27.846235Z"},{"id":"f22c10b6dc65ea79663af2fa6dee70f8","name":"defrag.app","type":"TXT","content":"\"v=spf1 include:_spf.mx.cloudflare.net ~all\"","proxiable":false,"proxied":false,"ttl":1,"settings":{},"meta":{},"comment":null,"tags":[],"created_on":"2026-06-02T19:35:27.836574Z","modified_on":"2026-06-02T19:35:27.836574Z"},{"id":"a44f5ca83840bad4da3c3e8435d880a4","name":"api.defrag.app","type":"AAAA","content":"100::","proxiable":true,"proxied":true,"ttl":1,"settings":{},"meta":{"origin_worker_id":"05c02444daa798b1f1d114586cd806b191632384","read_only":true},"comment":null,"tags":[],"created_on":"2026-05-31T21:03:33.291962Z","modified_on":"2026-05-31T21:03:33.291962Z"},{"id":"9adf5a7467cb12a7dae32745039b47e3","name":"app.defrag.app","type":"AAAA","content":"100::","proxiable":true,"proxied":true,"ttl":1,"settings":{},"meta":{"origin_worker_id":"7a3339775348c536e30c5fc0da3b35946a58ec9c","read_only":true},"comment":null,"tags":[],"created_on":"2026-05-26T00:52:51.736669Z","modified_on":"2026-05-26T00:52:51.736669Z"},{"id":"a67cdb27449e84ac462cf2eba309e70d","name":"defrag.app","type":"AAAA","content":"100::","proxiable":true,"proxied":true,"ttl":1,"settings":{},"meta":{"origin_worker_id":"ea017102e713ef470ca67426735fc5c250ecba9b","read_only":true},"comment":null,"tags":[],"created_on":"2026-05-26T00:52:50.363671Z","modified_on":"2026-05-26T00:52:50.363671Z"},{"id":"a0427aa9824c3df7c466a432c4f4605d","name":"premium.defrag.app","type":"AAAA","content":"100::","proxiable":true,"proxied":true,"ttl":1,"settings":{},"meta":{"origin_worker_id":"c814d91d9bff75ff25fa884dfbf725ddcf7295c3","read_only":true},"comment":null,"tags":[],"created_on":"2026-05-26T00:52:52.377763Z","modified_on":"2026-05-26T00:52:52.377763Z"},{"id":"290291a3b12279b42d7e6d95d3bfea09","name":"sovereign.defrag.app","type":"AAAA","content":"100::","proxiable":true,"proxied":true,"ttl":1,"settings":{},"meta":{"origin_worker_id":"dca29497f3500502d4b594709e1c4954cbb660c7","read_only":true},"comment":null,"tags":[],"created_on":"2026-05-26T00:52:50.910627Z","modified_on":"2026-05-26T00:52:50.910627Z"}],"success":true,"errors":[],"messages":[],"result_info":{"page":1,"per_page":200,"count":13,"total_count":13,"total_pages":1}}\n---SSL SETTING---
+{"result":{"id":"ssl","value":"strict","modified_on":"2026-05-22T04:45:05.196266Z","certificate_status":"active","validation_errors":[],"editable":true},"success":true,"errors":[],"messages":[]}\n---PAGE RULES---
+{"success":false,"errors":[{"code":1011,"message":"Page Rules endpoint does not support account owned tokens."}],"messages":[],"result":null}\n---WAF PACKAGES---
+{"result":[],"result_info":{"page":1,"per_page":20,"total_pages":0,"count":0,"total_count":0},"success":true,"errors":[],"messages":[]}\n---FIREWALL RULES---
+{
+  "result": [
+    {
+      "id": "14d6ff37c9134ef3baee2aadffc3490d",
+      "paused": false,
+      "description": "Block Next.js middleware bypass (CVE-2025-29927)",
+      "action": "block",
+      "ref": "66dda377638e43b3afacac1fd7ff6155",
+      "filter": {
+        "id": "ceffc661fbd74ab283975dac725967d9",
+        "expression": "(len(http.request.headers[\"x-middleware-subrequest\"]) \u003e 0)",
+        "paused": false
+      },
+      "created_on": "2026-05-25T05:54:11Z",
+      "modified_on": "2026-05-26T01:32:56Z"
+    },
+    {
+      "id": "774da35b29d94f43b521c60670cdf9dd",
+      "paused": false,
+      "description": "Block high threat scores and confirmed bots",
+      "action": "block",
+      "ref": "711184fc2ef8482599ca8a0f24f70051",
+      "filter": {
+        "id": "56be92c39c804bd8addc30322fd50b3b",
+        "expression": "(cf.threat_score \u003e 40) or (cf.client.bot)",
+        "paused": false
+      },
+      "created_on": "2026-05-25T05:54:11Z",
+      "modified_on": "2026-05-26T01:32:56Z"
+    }
+  ],
+  "success": true,
+  "errors": [],
+  "messages": [],
+  "result_info": {
+    "page": 1,
+    "per_page": 200,
+    "count": 2,
+    "total_count": 2,
+    "total_pages": 1
+  }
+}
+\n---RATE LIMITS---
+{
+  "result": [],
+  "success": true,
+  "errors": [],
+  "messages": [
+    {
+      "code": 10035,
+      "message": "This endpoint is deprecated and is only available for legacy purposes. Please see https://developers.cloudflare.com/fundamentals/api/reference/deprecations/#2025-06-15"
+    }
+  ],
+  "result_info": {
+    "page": 1,
+    "per_page": 25,
+    "count": 0,
+    "total_count": 0,
+    "total_pages": 0
+  }
+}
+\n---ACCESS APPS---
+{
+  "result": [],
+  "success": true,
+  "errors": [],
+  "messages": [],
+  "result_info": {
+    "page": 1,
+    "per_page": 1000,
+    "count": 0,
+    "total_count": 0,
+    "total_pages": 0
+  }
+}
+\n---WORKER ROUTES---
+{
+  "result": [
+    {
+      "id": "2e69c5437c0b42edb7dd915cd5e17c06",
+      "pattern": "api.defrag.app/*",
+      "script": "sovereign-os-api",
+      "request_limit_fail_open": false
+    },
+    {
+      "id": "c15955a0b8af4f67922aa728f5a4000b",
+      "pattern": "session.defrag.app/*",
+      "script": "worker-session",
+      "request_limit_fail_open": false
+    }
+  ],
+  "success": true,
+  "errors": [],
+  "messages": []
+}
+\n---SCRIPT BINDINGS sovereign-os-api---
+{
+  "result": [
+    {
+      "name": "AI",
+      "project": "\u003ccatalog\u003e",
+      "type": "ai"
+    },
+    {
+      "name": "AI_MODEL",
+      "text": "@cf/meta/llama-3.1-8b-instruct-fast",
+      "type": "plain_text"
+    },
+    {
+      "name": "APP_URL",
+      "type": "secret_text"
+    },
+    {
+      "name": "CF_API_TOKEN",
+      "type": "secret_text"
+    },
+    {
+      "name": "CLOUDFLARE_ACCOUNT_ID",
+      "type": "secret_text"
+    },
+    {
+      "database_id": "c8c2fd8d-5297-46fc-8594-7629c8bad74d",
+      "id": "c8c2fd8d-5297-46fc-8594-7629c8bad74d",
+      "name": "DB",
+      "type": "d1"
+    },
+    {
+      "name": "FREE_DAILY_LIMIT",
+      "text": "15",
+      "type": "plain_text"
+    },
+    {
+      "name": "KV",
+      "namespace_id": "3bd3ff5048a8468e82c574d7d66045c3",
+      "type": "kv_namespace"
+    },
+    {
+      "name": "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "type": "secret_text"
+    },
+    {
+      "name": "NEXT_PUBLIC_SUPABASE_URL",
+      "type": "secret_text"
+    },
+    {
+      "name": "PAID_USERS_GROUP_ID",
+      "type": "secret_text"
+    },
+    {
+      "name": "PATTERN_QUEUE",
+      "queue_name": "pattern-extraction-tasks",
+      "type": "queue"
+    },
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 15,
+        "period": 60
+      },
+      "type": "ratelimit"
+    },
+    {
+      "name": "STRIPE_PRICE_ID",
+      "type": "secret_text"
+    },
+    {
+      "name": "STRIPE_PUBLISHABLE_KEY",
+      "type": "secret_text"
+    },
+    {
+      "name": "STRIPE_SECRET_KEY",
+      "type": "secret_text"
+    },
+    {
+      "name": "STRIPE_WEBHOOK_SECRET",
+      "type": "secret_text"
+    },
+    {
+      "bucket_name": "vibesdk-templates",
+      "name": "TEMPLATES",
+      "type": "r2_bucket"
+    }
+  ],
+  "success": true,
+  "errors": [],
+  "messages": []
+}

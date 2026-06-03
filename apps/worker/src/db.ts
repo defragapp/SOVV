@@ -1,173 +1,42 @@
-// ─── Relational Memory Layer: D1 Helpers ───
-
-import type { D1Database } from "@cloudflare/workers-types";
-import type { Interaction as CoreInteraction, Pattern as CorePattern } from "@sovereign/core";
-
-export interface InteractionRow {
-  id: string;
+export interface Interaction {
+  id?: number;
   session_id: string;
-  mode: string;
-  question: string;
-  text: string;
-  people: string;
-  result: string;
-  confidence: string;
-  created_at: number;
-}
-
-export interface PatternRow {
-  id: string;
-  session_id: string;
-  pattern_type: string;
+  role: 'user' | 'assistant';
   content: string;
-  source_interaction_ids: string;
-  confidence: string;
-  occurrence_count: number;
-  first_seen: number;
-  last_seen: number;
-  verified: number;
+  created_at?: string;
 }
 
-export function mapInteraction(row: InteractionRow): CoreInteraction {
-  return {
-    ...row,
-    mode: row.mode as any,
-    people: JSON.parse(row.people || "[]"),
-    result: JSON.parse(row.result || "{}"),
-    confidence: row.confidence as any,
-  };
+export interface Pattern {
+  session_id: string;
+  key: string;
+  value: string;
+  updated_at?: string;
 }
 
-export function mapPattern(row: PatternRow): CorePattern {
-  return {
-    ...row,
-    pattern_type: row.pattern_type as any,
-    source_interaction_ids: JSON.parse(row.source_interaction_ids || "[]"),
-    confidence: row.confidence as any,
-  };
+/**
+ * Logs a new interaction to the D1 database.
+ */
+export async function saveInteraction(db: D1Database, interaction: Interaction) {
+  return await db.prepare(
+    "INSERT INTO interactions (session_id, role, content) VALUES (?, ?, ?)"
+  ).bind(interaction.session_id, interaction.role, interaction.content).run();
 }
 
-/** Insert a support ticket record */
-export async function insertSupportTicket(
-  db: D1Database,
-  data: {
-    id: string;
-    sender: string;
-    recipient: string;
-    subject: string;
-    body_preview: string;
-  }
-) {
-  await db
-    .prepare(
-      `INSERT INTO support_tickets (id, sender, recipient, subject, body_preview, status, created_at) 
-       VALUES (?, ?, ?, ?, ?, 'open', ?)`
-    )
-    .bind(data.id, data.sender, data.recipient, data.subject, data.body_preview, Date.now())
-    .run();
+/**
+ * Retrieves all identified patterns for a specific session to be used as context.
+ */
+export async function getPatterns(db: D1Database, session_id: string): Promise<Pattern[]> {
+  const { results } = await db.prepare(
+    "SELECT * FROM patterns WHERE session_id = ?"
+  ).bind(session_id).all<Pattern>();
+  return results || [];
 }
 
-/** Insert an interaction record */
-export async function insertInteraction(
-  db: D1Database,
-  data: Omit<CoreInteraction, "created_at">
-) {
-  await db
-    .prepare(
-      `INSERT INTO interactions (id, session_id, mode, question, text, people, result, confidence, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    )
-    .bind(
-      data.id,
-      data.session_id,
-      data.mode,
-      data.question,
-      data.text,
-      JSON.stringify(data.people),
-      JSON.stringify(data.result),
-      String(data.confidence),
-      Date.now()
-    )
-    .run();
-}
-
-/** Get recent interactions for a session (for pattern extraction) */
-export async function getRecentInteractions(
-  db: D1Database,
-  sessionId: string,
-  limit = 20
-): Promise<CoreInteraction[]> {
-  const { results } = await db
-    .prepare(
-      `SELECT * FROM interactions WHERE session_id = ? ORDER BY created_at DESC LIMIT ?`
-    )
-    .bind(sessionId, limit)
-    .all<InteractionRow>();
-  return (results ?? []).map(mapInteraction);
-}
-
-/** Get active patterns for a session (for context injection) */
-export async function getPatterns(
-  db: D1Database,
-  sessionId: string
-): Promise<CorePattern[]> {
-  const { results } = await db
-    .prepare(
-      `SELECT * FROM patterns WHERE session_id = ? AND occurrence_count >= 1 ORDER BY last_seen DESC LIMIT 10`
-    )
-    .bind(sessionId)
-    .all<PatternRow>();
-  return (results ?? []).map(mapPattern);
-}
-
-/** Upsert a pattern: increment count if similar content exists, otherwise insert */
-export async function upsertPattern(db: D1Database, data: Omit<CorePattern, "occurrence_count" | "first_seen" | "last_seen">) {
-  // Check for existing similar pattern
-  const existing = await db
-    .prepare(
-      `SELECT id, occurrence_count, source_interaction_ids FROM patterns WHERE session_id = ? AND pattern_type = ? AND content = ?`
-    )
-    .bind(data.session_id, data.pattern_type, data.content)
-    .first<{ id: string; occurrence_count: number; source_interaction_ids: string }>();
-
-  const now = Date.now();
-
-  if (existing) {
-    // Merge source IDs and increment count
-    const existingSources: string[] = JSON.parse(existing.source_interaction_ids || "[]");
-    const merged = [...new Set([...existingSources, ...data.source_interaction_ids])];
-    await db
-      .prepare(
-        `UPDATE patterns SET occurrence_count = ?, source_interaction_ids = ?, last_seen = ? WHERE id = ?`
-      )
-      .bind(existing.occurrence_count + 1, JSON.stringify(merged), now, existing.id)
-      .run();
-  } else {
-    await db
-      .prepare(
-        `INSERT INTO patterns (id, session_id, pattern_type, content, source_interaction_ids, confidence, occurrence_count, first_seen, last_seen, verified)
-         VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, ?)`
-      )
-      .bind(
-        data.id,
-        data.session_id,
-        data.pattern_type,
-        data.content,
-        JSON.stringify(data.source_interaction_ids),
-        String(data.confidence),
-        now,
-        now,
-        data.verified ?? 0
-      )
-      .run();
-  }
-}
-
-/** Format patterns for injection into AI prompt */
-export function formatPatternsForPrompt(patterns: CorePattern[]): string {
-  if (!patterns.length) return "";
-  const lines = patterns.map(
-    (p) => `- [${p.pattern_type}, seen ${p.occurrence_count}x] ${p.content}`
-  );
-  return `Known patterns about this user:\n${lines.join("\n")}\n\nUse these patterns to deepen the explanation. Do not repeat them verbatim — weave them in naturally if relevant.`;
+/**
+ * Upserts pattern findings. Uses ON CONFLICT to update existing patterns for a session.
+ */
+export async function upsertPattern(db: D1Database, pattern: Pattern) {
+  return await db.prepare(
+    "INSERT INTO patterns (session_id, key, value, updated_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP) ON CONFLICT(session_id, key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP"
+  ).bind(pattern.session_id, pattern.key, pattern.value).run();
 }

@@ -1,6 +1,7 @@
 name = "sovereign-os-api"
 main = "src/index.ts"
 compatibility_date = "2024-05-10"
+account_id = "8b1954d216d65077c6480d62583fe2c2"
 
 workers_dev = false
 routes = [
@@ -19,6 +20,10 @@ enabled = true
 
 [ai]
 binding = "AI"
+
+# AI Gateway for external model routing through vscode-codespace-agent
+[[ai.gateway]]
+id = "vscode-codespace-agent"
 
 [[d1_databases]]
 binding = "DB"
