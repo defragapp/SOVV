@@ -52,6 +52,14 @@ Birth details, thread content, notebook entries, and relationship data are never
 
 ## 3. Release Discipline
 
+### Recommended release flow
+
+1. Validate the app with `npm run build` and `npm run build -w apps/worker` before pushing.
+2. Use `npm run ship -- "short summary"` to move the current work onto `main` and push it to GitHub.
+3. Let the workflow in `.github/workflows/deploy-live.yml` handle the Cloudflare deploy path after the merge.
+4. If the deploy path requires a token, confirm that the GitHub repository secret `CLOUDFLARE_API_TOKEN` is present before triggering a release.
+
+
 Every patch must:
 - Build successfully (26 pages, 0 errors as of current state)
 - Not expose private engine data to the client

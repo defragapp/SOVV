@@ -1,3 +1,8 @@
 {
-    "recommendations": []
+  "recommendations": [
+    "GitHub.copilot",
+    "cloudflare.cloudflare-workers-bindings-extension",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-next"
+  ]
 }

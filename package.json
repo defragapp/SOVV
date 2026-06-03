@@ -11,6 +11,8 @@
     "dev": "npm run dev:web && npm run dev:worker",
     "build": "npm --workspace=web exec opennextjs-cloudflare build",
     "deploy:worker": "npm run deploy -w apps/worker",
+    "deploy:web": "npm run deploy -w apps/web",
+    "ship": "bash ./scripts/push-live.sh",
     "lint": "npm run lint -w apps/web && npm run lint -w apps/worker"
   }
 }
