@@ -64,7 +64,7 @@ router.all("*", () => new Response("Not Found", { status: 404 }));
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     currentEnv = env;
-    return router.handle(request, env, ctx);
+    try { return await router.fetch(request, env, ctx); } catch (error) { console.error("Worker fetch error:", error); return new Response("Internal Server Error", { status: 500 }); } // 	return router.handle(request, env, ctx);
   },
   async queue(
     batch: MessageBatch<unknown>,
