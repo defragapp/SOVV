@@ -65,7 +65,7 @@ function registerNatalRoutes(router: any, getEnv: () => Env) {
       });
     }
 
-    const body = await request.json().catch(() => null);
+    const body = await request.json().catch(() => null) as Record<string, any> | null;
     if (!body || typeof body !== 'object') {
       return new Response(JSON.stringify({ error: "Invalid body" }), {
         status: 400,
