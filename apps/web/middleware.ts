@@ -7,6 +7,7 @@ export function middleware(request: NextRequest) {
 
   const isHub = host.includes('sovereign.defrag.app')
   const isTool = host === 'defrag.app' || host === 'www.defrag.app'
+  const isApp = host === 'app.defrag.app'
 
   if (isHub) {
     if (url.pathname === '/') {
@@ -22,6 +23,17 @@ export function middleware(request: NextRequest) {
   if (isTool) {
     if (url.pathname === '/') {
       url.pathname = '/tool'
+      return NextResponse.rewrite(url)
+    }
+    if (!url.pathname.startsWith('/tool') && !url.pathname.startsWith('/api')) {
+      url.pathname = `/tool${url.pathname}`
+      return NextResponse.rewrite(url)
+    }
+  }
+
+  if (isApp) {
+    if (url.pathname === '/') {
+      url.pathname = '/tool/workspace'
       return NextResponse.rewrite(url)
     }
     if (!url.pathname.startsWith('/tool') && !url.pathname.startsWith('/api')) {
