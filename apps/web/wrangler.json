@@ -1,14 +1,18 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"main": ".open-next/worker.js",
-	"name": "sovv-web",
-	"compatibility_date": "2026-05-23",
-	"compatibility_flags": ["nodejs_compat"],
-	"assets": {
-		"directory": ".open-next/assets",
-		"binding": "ASSETS"
-	},
-	"observability": {
-		"enabled": true
-	}
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "sovv-web",
+  "main": "./.open-next/worker.js",
+  "compatibility_date": "2026-06-04",
+  "compatibility_flags": ["nodejs_compat"],
+  "account_id": "8b1954d216d65077c6480d62583fe2c2",
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "defrag.app/*", "zone_id": "45a59d754ece9221fc97c92c461eb01f" },
+    { "pattern": "www.defrag.app/*", "zone_id": "45a59d754ece9221fc97c92c461eb01f" },
+    { "pattern": "sovereign.defrag.app/*", "zone_id": "45a59d754ece9221fc97c92c461eb01f" },
+    { "pattern": "app.defrag.app/*", "zone_id": "45a59d754ece9221fc97c92c461eb01f" }
+  ],
+  "assets": {
+    "directory": ".open-next/assets"
+  }
 }
