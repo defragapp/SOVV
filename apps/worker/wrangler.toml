@@ -1,6 +1,6 @@
 name = "sovereign-os-api"
 main = "src/index.ts"
-compatibility_date = "2024-05-10"
+compatibility_date = "2026-06-04"
 account_id = "8b1954d216d65077c6480d62583fe2c2"
 
 workers_dev = false

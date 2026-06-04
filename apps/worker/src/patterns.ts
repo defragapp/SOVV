@@ -7,11 +7,9 @@ import { verifyAccessJWT } from "./auth.js";
 import { getSessionId, cookieHeader } from "./plan.js";
 
 export interface Pattern {
-  id?: string;
-  name?: string;
-  type?: "trigger" | "dynamic" | "defense" | "repetition" | "growth";
+  type: "trigger" | "dynamic" | "defense" | "repetition" | "growth";
   content?: string;
-  confidence?: "High" | "Medium" | "Low";
+  confidence: "High" | "Medium" | "Low";
   matches_known?: string;
 }
 
@@ -43,7 +41,7 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
   // 2. Build model payloads
   const contextText = interactions.map(i => `[${i.role.toUpperCase()}]: ${i.content}`).join("\n");
   const baselineText = existingPatterns.length > 0 
-    ? `Known persistent cycles:\n${existingPatterns.map(p => `- [${p.pattern_type}]: ${p.content}`).join("\n")}`
+    ? `Known persistent cycles:\n${existingPatterns.map(p => `- [${p.key}]: ${p.value}`).join("\n")}`
     : "No persistent behavioral structures logged yet.";
 
   if (!env.AI) {
@@ -60,19 +58,19 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
       response_format: { type: "json_object" }
     });
 
-    const text = (response as any).response || "{}";
+    const text = (response as { response?: string }).response || "{}";
     const ai = JSON.parse(text);
-    const patterns = ai.patterns || [];
+    const patterns: Pattern[] = ai.patterns || [];
 
     // 3. Commit elements atomic to DB
     for (const pattern of patterns) {
       await upsertPattern(env.DB, {
         id: `pat_${crypto.randomUUID().replace(/-/g, "")}`,
         session_id: sessionId,
-        pattern_type: (pattern as Pattern).type ?? "repetition",
-        content: (pattern as Pattern).content ?? "",
+        pattern_type: pattern.type ?? "repetition",
+        content: pattern.content ?? "",
         source_interaction_ids: [newInteractionId],
-        confidence: (pattern as Pattern).confidence ?? "Low",
+        confidence: pattern.confidence ?? "Low",
         verified: 0,
       });
     }
@@ -89,14 +87,14 @@ export function registerPatternsRoutes(router: any, getEnv: () => Env) {
     
     // Check session via cookies first, fallback to Auth header
     const cookie = request.headers.get("Cookie") || "";
-    let sessionId = getSessionId(cookieHeader(cookie));
+    let sessionId = "";
+    const match = cookie.match(/sid=([a-zA-Z0-9_-]+)/);
+    if (match) sessionId = match[1] ?? "";
 
     if (!sessionId) {
-      const auth = request.headers.get("Authorization") || "";
-      if (auth.startsWith("Bearer ")) {
-        const payload = await verifyAccessJWT(auth.substring(7));
-        if (payload) sessionId = payload.sessionId;
-      }
+      const { getAuthUser } = await import("./auth.js");
+      const user = await getAuthUser(request, env.DB);
+      if (user) sessionId = user.id;
     }
 
     if (!sessionId) {
