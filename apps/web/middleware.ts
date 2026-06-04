@@ -1,65 +1,38 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-const PUBLIC_HOSTS = new Set([
-  "defrag.app",
-  "www.defrag.app",
-  "sovereign.defrag.app",
-])
+export function middleware(request: NextRequest) {
+  const host = request.headers.get('host') || ''
+  const url = request.nextUrl.clone()
 
-const APP_HOSTS = new Set(["app.defrag.app"])
+  const isHub = host.includes('sovereign.defrag.app')
+  const isTool = host === 'defrag.app' || host === 'www.defrag.app'
 
-const PUBLIC_FILE = /\.(.*)$/
-
-export function middleware(req: NextRequest) {
-  const host = req.headers.get("host")?.toLowerCase() ?? ""
-  const url = req.nextUrl.clone()
-  const pathname = url.pathname
-
-  // Pass through static assets and API routes immediately
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api") ||
-    pathname.startsWith("/assets") ||
-    pathname === "/favicon.ico" ||
-    pathname === "/robots.txt" ||
-    pathname === "/sitemap.xml" ||
-    pathname.includes(".") ||
-    PUBLIC_FILE.test(pathname)
-  ) {
-    return NextResponse.next()
-  }
-
-  // Public marketing hosts — serve root directly (full marketing site)
-  if (PUBLIC_HOSTS.has(host)) {
-    return NextResponse.next()
-  }
-
-  // App host routing
-  if (APP_HOSTS.has(host)) {
-    if (pathname === "/") {
-      url.pathname = "/app"
+  if (isHub) {
+    if (url.pathname === '/') {
+      url.pathname = '/hub'
+      return NextResponse.rewrite(url)
+    }
+    if (!url.pathname.startsWith('/hub') && !url.pathname.startsWith('/api')) {
+      url.pathname = `/hub${url.pathname}`
       return NextResponse.rewrite(url)
     }
   }
 
-  // Auth check for protected routes
-  if ((pathname.startsWith("/workspace") || pathname.startsWith("/app")) && pathname !== "/app/login") {
-    const sessionCookie = req.cookies.get("__sov_session")?.value
-
-    if (!sessionCookie) {
-      url.pathname = "/app/login"
-      return NextResponse.redirect(url)
+  if (isTool) {
+    if (url.pathname === '/') {
+      url.pathname = '/tool'
+      return NextResponse.rewrite(url)
     }
-  }
-
-  // Legacy settings redirect
-  if (pathname.startsWith("/settings")) {
-    return NextResponse.redirect(new URL(`https://app.defrag.app${pathname}`))
+    if (!url.pathname.startsWith('/tool') && !url.pathname.startsWith('/api')) {
+      url.pathname = `/tool${url.pathname}`
+      return NextResponse.rewrite(url)
+    }
   }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)"],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)'],
 }
