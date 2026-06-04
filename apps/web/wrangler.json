@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "sovv-web",
-  "main": "./.open-next/worker.js",
+  "main": "./src/worker-router.ts",
   "compatibility_date": "2026-06-04",
   "compatibility_flags": ["nodejs_compat"],
   "account_id": "8b1954d216d65077c6480d62583fe2c2",
@@ -14,5 +14,8 @@
   ],
   "assets": {
     "directory": ".open-next/assets"
+  },
+  "observability": {
+    "enabled": true
   }
 }
