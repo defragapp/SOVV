@@ -2,48 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #000000;
-  --foreground: #FFFFFF;
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-white selection:text-black;
+  }
+  
+  /* Strip all default shadows from interactive elements */
+  button, input, textarea {
+    @apply shadow-none outline-none focus:ring-0 focus:outline-none transition-colors duration-200;
+  }
 }
 
-html, body {
-  background-color: #000000;
-  color: #FFFFFF;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  margin: 0;
-  padding: 0;
-}
+@layer components {
+  /* Premium Monochrome Card Structure */
+  .premium-card {
+    @apply bg-background border border-border p-6 rounded-none;
+  }
+  
+  /* The 10px tracked-out metadata label */
+  .meta-label {
+    @apply text-micro tracking-widest uppercase text-zinc-500 font-mono mb-2 block;
+  }
 
-* {
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
-
-a {
-  color: #FFFFFF;
-  text-decoration: underline;
-}
-
-a:hover {
-  color: #A3A3A3;
-}
-
-input, button, textarea, select {
-  background-color: #000000;
-  color: #FFFFFF;
-  border: 1px solid #FFFFFF;
-  padding: 0.5rem;
-  font-family: inherit;
-}
-
-button:hover {
-  background-color: #FFFFFF;
-  color: #000000;
-  cursor: pointer;
-}
-
-hr {
-  border-color: #FFFFFF;
-  border-width: 1px;
+  /* Structural button that fills with white on hover */
+  .btn-premium {
+    @apply border border-border px-4 py-2 text-sm text-foreground bg-transparent hover:bg-foreground hover:text-background rounded-none font-medium transition-all;
+  }
 }

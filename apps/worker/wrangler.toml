@@ -16,6 +16,14 @@ AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
 [observability]
 enabled = true
 
+[observability.logs]
+invocation_logs = true
+head_sampling_rate = 1
+
+[observability.tracing]
+enabled = true
+head_sampling_rate = 1
+
 # --- Bindings ---
 
 [ai]
@@ -65,4 +73,3 @@ environment = "production"
 binding = "SESSION_SERVICE"
 service = "worker-session"
 environment = "production"
-

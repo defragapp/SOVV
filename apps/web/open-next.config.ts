@@ -1,2 +1,10 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare";
-export default defineCloudflareConfig();
+
+export default defineCloudflareConfig({
+  middleware: {
+    external: true,
+    override: {
+      wrapper: "cloudflare-edge"
+    }
+  }
+});

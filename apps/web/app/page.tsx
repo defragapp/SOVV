@@ -1,319 +1,91 @@
 "use client";
 
-import { useRef, useState, useEffect, type MouseEvent } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
-import { SiteShell } from "@/components/marketing/site-shell";
-import { MotionSection } from "@/components/marketing/motion-section";
-import { SectionHeader } from "@/components/marketing/section-header";
-import { Card } from "@/components/marketing/card";
-import { FaqAccordion } from "@/components/marketing/faq-accordion";
-import { valuePoints, lenses, faqItems, pricingTiers } from "@/data/marketing";
+import { lenses, pricingTiers } from "../data/marketing";
 
-const APP_URL = "https://app.defrag.app";
-
-
-
-export default function HomePage() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [spotlight, setSpotlight] = useState({ x: 50, y: 50 });
-  const { scrollY } = useScroll();
-  const heroY = useTransform(scrollY, [0, 600], [0, 100]);
-  const heroOpacity = useTransform(scrollY, [0, 400], [1, 0]);
-
-  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    setSpotlight({
-      x: ((e.clientX - rect.left) / rect.width) * 100,
-      y: ((e.clientY - rect.top) / rect.height) * 100,
-    });
-  };
-
-  useEffect(() => {
-    const t = setTimeout(() => document.body.classList.add("sov-hero-halo"), 1200);
-    return () => { clearTimeout(t); document.body.classList.remove("sov-hero-halo"); };
-  }, []);
-
+export default function LandingPage() {
   return (
-    <SiteShell>
+    <div className="min-h-screen bg-background text-foreground font-sans">
+      {/* Top Navigation */}
+      <nav className="border-b border-border px-6 py-4 flex justify-between items-center max-w-7xl mx-auto w-full">
+        <div className="text-xl font-medium tracking-tighter">Sovereign.os</div>
+        <div className="space-x-6 flex items-center">
+          <Link href="https://app.defrag.app/login" className="text-sm text-zinc-400 hover:text-white transition-colors">Sign In</Link>
+          <Link href="https://app.defrag.app/login" className="btn-premium">Enter Workspace</Link>
+        </div>
+      </nav>
 
-      {/* ── HERO ── */}
-      <section
-        ref={containerRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={() => setSpotlight({ x: 50, y: 50 })}
-        className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden border-b border-white/8 grid-bg"
-      >
-        {/* Spotlight */}
-        <div
-          className="pointer-events-none absolute inset-0 z-0 transition-all duration-75"
-          style={{
-            backgroundImage: `radial-gradient(circle at ${spotlight.x}% ${spotlight.y}%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 30%, transparent 55%)`,
-          }}
-        />
-
-        {/* Hero bg image — dark water ripple */}
-        <motion.div style={{ y: heroY }} className="absolute inset-0 z-0">
-          <img
-            src="https://images.pexels.com/photos/23232486/pexels-photo-23232486/free-photo-of-dark-water-with-reflections-and-ripples.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            alt=""
-            aria-hidden="true"
-            className="h-full w-full object-cover opacity-15 grayscale scale-110"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#05070B]/80 via-[#05070B]/40 to-[#05070B]" />
-        </motion.div>
-
-        <motion.div
-          style={{ opacity: heroOpacity }}
-          className="relative z-10 flex max-w-4xl flex-col items-center px-6 text-center"
-        >
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="mb-8 font-mono text-[10px] uppercase tracking-[0.35em] text-white/30"
-          >
-            DEFRAG — Relational Intelligence
-          </motion.p>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.1, delay: 0.25, ease: [0.0, 0.0, 0.2, 1] }}
-            className="hero-glow mb-6 text-5xl font-semibold tracking-tight text-white md:text-7xl leading-[1.04]"
-          >
-            Healing isn&apos;t optional.
-            <br />
-            <span className="text-white/35 font-light">But the pain is.</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.45 }}
-            className="mb-6 max-w-2xl text-lg font-light leading-relaxed text-white/50 md:text-xl"
-          >
-            You know what happened.
-            DEFRAG shows what got lit up.
-          </motion.p>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.9, delay: 0.6 }}
-            className="mb-12 max-w-xl text-sm font-light leading-relaxed text-white/25"
-          >
-            It starts with your baseline, checks the sky over you, and helps you understand the loop before it takes over.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.85 }}
-            className="flex flex-col gap-4 sm:flex-row"
-          >
-            <Link
-              href={`${APP_URL}/login`}
-              className="gradient-border bg-white/8 px-10 py-4 text-sm font-medium uppercase tracking-widest text-white transition-all duration-300 hover:bg-white/12 hover:shadow-[0_0_30px_rgba(255,255,255,0.08)]"
-            >
-              Start Your Baseline
+      <main className="max-w-7xl mx-auto px-6 py-24 space-y-32">
+        {/* Hero Section */}
+        <section className="space-y-8 text-center max-w-4xl mx-auto">
+          <span className="meta-label mx-auto">The Platform</span>
+          <h1 className="text-5xl md:text-7xl font-light tracking-tighter leading-tight">
+            Your sovereign workspace for <br className="hidden md:block" /> relational intelligence.
+          </h1>
+          <p className="text-xl text-zinc-400 font-light leading-relaxed max-w-2xl mx-auto">
+            Before you repeat this again, understand why it keeps happening. Bring the moment here. Work through what is happening now.
+          </p>
+          <div className="pt-8 flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="https://app.defrag.app/login" className="btn-premium py-3 px-8 text-lg bg-white text-black hover:bg-zinc-200">
+              Start Free
             </Link>
-            <Link
-              href="/how-it-works"
-              className="border border-white/15 bg-transparent px-10 py-4 text-sm font-medium uppercase tracking-widest text-white/60 transition-colors hover:bg-white/5 hover:text-white/80 text-center"
-            >
-              See How It Works
+            <Link href="/covenant" className="btn-premium py-3 px-8 text-lg">
+              Explore Covenant
             </Link>
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.9, delay: 1.1 }}
-            className="mt-8 font-mono text-[9px] uppercase tracking-widest text-white/15"
-          >
-            No labels. No diagnosis. No generic advice.
-          </motion.p>
-        </motion.div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.8, duration: 1 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/15">Scroll</span>
-          <motion.div
-            animate={{ scaleY: [1, 0.4, 1] }}
-            transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-            className="h-8 w-px bg-white/15 origin-top"
-          />
-        </motion.div>
-      </section>
-
-      {/* ── DIFFERENTIATOR ── */}
-      <MotionSection className="border-b border-white/8 bg-white/[0.02]">
-        <div className="mx-auto max-w-4xl px-6 py-20 text-center">
-          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/25 mb-6">
-            What makes this different
-          </p>
-          <p className="text-2xl font-light text-white/70 leading-relaxed mb-4 md:text-3xl">
-            Most AI starts from a blank chat.
-          </p>
-          <p className="text-2xl font-light text-white leading-relaxed md:text-3xl">
-            Sovereign.os starts from your baseline.
-          </p>
-          <p className="mt-8 max-w-xl mx-auto text-sm font-light leading-7 text-white/35">
-            The thread stays grounded in who you are, what is active now, and the people or patterns you choose to include.
-          </p>
-        </div>
-      </MotionSection>
-
-      {/* ── VALUE POINTS ── */}
-      <MotionSection className="border-b border-white/8 px-6 py-28" id="product">
-        <div className="mx-auto max-w-5xl">
-          <div className="grid grid-cols-1 gap-16 md:grid-cols-2 items-center">
-            <div>
-              
-            </div>
-            <ul className="space-y-5">
-              {valuePoints.map((point, i) => (
-                <motion.li
-                  key={point}
-                  initial={{ opacity: 0, x: -12 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08, duration: 0.5 }}
-                  className="flex items-start gap-4"
-                >
-                  <span className="mt-2 block h-1.5 w-1.5 shrink-0 bg-white/40" />
-                  <span className="text-base font-light text-white/65 leading-relaxed">{point}</span>
-                </motion.li>
-              ))}
-            </ul>
           </div>
-        </div>
-      </MotionSection>
+        </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <MotionSection className="border-b border-white/8 px-6 py-28" id="how-it-works">
-        <div className="mx-auto max-w-5xl">
-          <SectionHeader
-            eyebrow="How it works"
-            title="Three lenses. One shift."
-            body="DEFRAG gives you three ways to see what's actually happening — in yourself, in the moment, and between you and others."
-          />
-          <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {lenses.map((lens, i) => (
-              <Card key={lens.title} glow={i === 1}>
-                <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">
-                  0{i + 1}
-                </p>
-                <h3 className="text-xl font-light text-white mb-3">{lens.title}</h3>
-                <p className="text-sm leading-7 text-white/45 mb-6">{lens.summary}</p>
-                <p className="text-xs text-white/25 italic mb-6">{lens.useCase}</p>
-                <Link
-                  href={lens.href}
-                  className="font-mono text-[9px] uppercase tracking-widest text-white/40 hover:text-white/60 transition-colors"
-                >
-                  {lens.cta} →
-                </Link>
-              </Card>
-            ))}
+        {/* Architecture / Lenses */}
+        <section className="space-y-8">
+          <div className="text-center space-y-2 mb-12">
+            <span className="meta-label mx-auto">The Architecture</span>
+            <h2 className="text-3xl font-light tracking-tight">How it interprets the moment</h2>
           </div>
-        </div>
-      </MotionSection>
-
-      {/* ── PULL QUOTE ── */}
-      <MotionSection className="relative border-b border-white/8 overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src="https://images.pexels.com/photos/18820283/pexels-photo-18820283/free-photo-of-sunlight-streaming-into-a-dark-room-through-a-lone-window.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            alt=""
-            aria-hidden="true"
-            className="h-full w-full object-cover opacity-20 grayscale"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#05070B] via-[#05070B]/40 to-[#05070B]" />
-        </div>
-        <div className="relative px-6 py-32 text-center">
-          <blockquote className="mx-auto max-w-2xl text-2xl font-light italic text-white/70 md:text-3xl leading-relaxed">
-            &ldquo;Most of what hurts isn&apos;t the moment itself.<br className="hidden md:block" />
-            It&apos;s the way we hold it.&rdquo;
-          </blockquote>
-        </div>
-      </MotionSection>
-
-      {/* ── PRICING ── */}
-      <MotionSection className="border-b border-white/8 px-6 py-28" id="pricing">
-        <div className="mx-auto max-w-4xl">
-          <SectionHeader
-            eyebrow="Access"
-            title="Simple. No surprises."
-          />
-          <div className="mt-16 grid grid-cols-1 gap-0 md:grid-cols-2">
-            {pricingTiers.map((tier, i) => (
-              <div
-                key={tier.name}
-                className={`p-10 flex flex-col ${
-                  tier.highlight
-                    ? "border border-white/25 shadow-[0_0_40px_rgba(255,255,255,0.04)]"
-                    : "border border-white/8"
-                } ${i === 1 ? "md:border-l-0" : ""}`}
-              >
-                {tier.highlight && (
-                  <div className="mb-6 self-start font-mono text-[9px] uppercase tracking-widest text-black bg-white px-2.5 py-1">
-                    Recommended
-                  </div>
-                )}
-                <p className="font-mono text-[9px] uppercase tracking-widest text-white/25 mb-6">{tier.name}</p>
-                <div className="mb-2">
-                  <span className="text-5xl font-light text-white">{tier.price}</span>
-                  <span className="text-white/30 text-sm ml-2">{tier.period}</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {lenses.map((lens) => (
+              <div key={lens.title} className="premium-card space-y-4 hover:border-zinc-700 transition-colors">
+                <h3 className="text-xl font-medium tracking-tight">{lens.title}</h3>
+                <p className="text-zinc-400 text-sm leading-relaxed">{lens.summary}</p>
+                <div className="pt-4 mt-auto">
+                  <span className="text-xs text-zinc-500 italic block">{lens.useCase}</span>
                 </div>
-                <p className="text-sm text-white/35 mb-8">{tier.description}</p>
-                <ul className="space-y-3 mb-10 flex-1">
-                  {tier.features.map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-white/55">
-                      <span className="block h-px w-4 bg-white/20 shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={tier.href}
-                  className={`block px-6 py-3.5 text-center font-mono text-[10px] uppercase tracking-widest transition-colors ${
-                    tier.highlight
-                      ? "bg-white text-black hover:bg-white/90"
-                      : "border border-white/20 text-white hover:bg-white/5"
-                  }`}
-                >
-                  {tier.cta}
-                </Link>
               </div>
             ))}
           </div>
-        </div>
-      </MotionSection>
+        </section>
 
-      {/* ── FAQ ── */}
-      <MotionSection className="border-b border-white/8 px-6 py-28" id="faq">
-        <div className="mx-auto max-w-3xl">
-          <SectionHeader eyebrow="FAQ" title="Common questions." />
-          <div className="mt-16">
-            <FaqAccordion items={faqItems} />
+        {/* Subscriptions / Stripe Connect */}
+        <section className="space-y-8 border-t border-border pt-24">
+          <div className="text-center space-y-2 mb-12">
+            <span className="meta-label mx-auto">Access</span>
+            <h2 className="text-3xl font-light tracking-tight">Select your workspace tier</h2>
           </div>
-        </div>
-      </MotionSection>
-
-      {/* ── FINAL CTA ── */}
-      <MotionSection className="px-6 py-40 text-center">
-        <div className="mx-auto max-w-2xl">
-          
-        </div>
-      </MotionSection>
-
-    </SiteShell>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {pricingTiers.map((tier) => (
+              <div key={tier.name} className={`premium-card flex flex-col space-y-6 ${tier.highlight ? 'border-zinc-400' : ''}`}>
+                <div>
+                  <h3 className="text-2xl font-light">{tier.name}</h3>
+                  <div className="mt-2 text-4xl font-light">{tier.price} <span className="text-sm text-zinc-500 font-normal">{tier.period}</span></div>
+                </div>
+                <p className="text-zinc-400">{tier.description}</p>
+                <ul className="space-y-3 text-sm text-zinc-300 flex-grow">
+                  {tier.features.map(f => (
+                    <li key={f} className="flex gap-3 items-start">
+                      <span className="text-zinc-600 mt-0.5">―</span> 
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="pt-6">
+                  <Link href={tier.href} className={`block text-center w-full ${tier.highlight ? 'bg-white text-black py-3 font-medium hover:bg-zinc-200 transition-colors' : 'btn-premium'}`}>
+                    {tier.cta}
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }

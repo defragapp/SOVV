@@ -8,6 +8,7 @@ import { registerExplainRoute } from "./explain-extended.js";
 import { registerHistoryRoute } from "./history.js";
 import { registerPatternsRoutes } from "./patterns.js";
 import { extractPatterns } from "./patterns.js";
+import { registerCovenantRoute } from "./covenant.js";
 import { insertSupportTicket } from "./db.js";
 
 const router = Router();
@@ -106,6 +107,7 @@ registerExplainRoute(router, getEnv);
 registerHistoryRoute(router, getEnv);
 registerPatternsRoutes(router, getEnv);
 registerNatalRoutes(router, () => currentEnv);
+registerCovenantRoute(router, getEnv);
 
 // Health check for monitoring and deployment verification
 router.get("/api/health", () => new Response(JSON.stringify({ status: "ok", timestamp: Date.now() }), { status: 200, headers: { "Content-Type": "application/json" } }));
@@ -141,6 +143,18 @@ router.all("*", () => new Response("Not Found", { status: 404 }));
 async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext) {
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: getCorsHeaders(request) });
+  }
+  
+  // Apply Rate Limiting based on IP
+  if (env.RATE_LIMITER) {
+    const ip = request.headers.get('cf-connecting-ip') || 'unknown-ip';
+    const { success } = await env.RATE_LIMITER.limit({ key: ip });
+    if (!success) {
+      return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json', ...getCorsHeaders(request) }
+      });
+    }
   }
   
   const response = await router.fetch(request, env, ctx);

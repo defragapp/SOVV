@@ -209,7 +209,14 @@ function resolveCdnInvalidation(value = "dummy") {
 }
 
 // open-next.config.ts
-var open_next_config_default = defineCloudflareConfig();
+var open_next_config_default = defineCloudflareConfig({
+  middleware: {
+    external: true,
+    override: {
+      wrapper: "cloudflare-edge"
+    }
+  }
+});
 export {
   open_next_config_default as default
 };

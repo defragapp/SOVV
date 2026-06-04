@@ -9,8 +9,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="bg-[#05070B] text-white">
-      <body className="min-h-screen bg-[linear-gradient(180deg,#05070B_0%,#080C12_40%,#05070B_100%)] text-white antialiased overflow-x-hidden">
+    <html lang="en" className="bg-background text-foreground antialiased selection:bg-white selection:text-black">
+      <body className="min-h-screen bg-background text-foreground overflow-x-hidden">
         {children}
       </body>
     </html>
