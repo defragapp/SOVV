@@ -55,3 +55,14 @@ queue = "pattern-extraction-tasks"
 # max_batch_size = 1
 # max_batch_timeout = 5
 
+# Service bindings to internal platform workers
+[[services]]
+binding = "AI_SERVICE"
+service = "worker-ai"
+environment = "production"
+
+[[services]]
+binding = "SESSION_SERVICE"
+service = "worker-session"
+environment = "production"
+

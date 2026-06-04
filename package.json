@@ -1,18 +1,27 @@
 {
-  "name": "sovereign-os",
+  "name": "sovereign-platform",
   "private": true,
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "dev:web": "npm run dev -w apps/web",
-    "dev:worker": "npm run dev -w apps/worker",
-    "dev": "npm run dev:web && npm run dev:worker",
+    "dev:api": "wrangler dev --config apps/worker/wrangler.toml --local",
+    "dev:ai": "wrangler dev --config apps/worker-ai/wrangler.toml --local",
+    "dev:session": "wrangler dev --config apps/worker-session/wrangler.toml --local",
+    "dev:web": "wrangler dev --config apps/web/wrangler.jsonc --local",
+    "dev:all": "concurrently \"npm run dev:api\" \"npm run dev:ai\" \"npm run dev:session\" \"npm run dev:web\"",
     "build": "npm --workspace=web exec opennextjs-cloudflare build",
-    "deploy:worker": "npm run deploy -w apps/worker",
-    "deploy:web": "npm run deploy -w apps/web",
+    "deploy:api": "cd apps/worker && wrangler deploy",
+    "deploy:ai": "cd apps/worker-ai && wrangler deploy",
+    "deploy:session": "cd apps/worker-session && wrangler deploy",
+    "deploy:web": "cd apps/web && wrangler deploy",
+    "deploy:all": "npm run deploy:api && npm run deploy:ai && npm run deploy:session && npm run deploy:web",
     "ship": "bash ./scripts/push-live.sh",
-    "lint": "npm run lint -w apps/web && npm run lint -w apps/worker"
+    "lint": "npm run lint -w apps/web && tsc --noEmit -p apps/worker/tsconfig.json"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "wrangler": "^4.97.0"
   }
 }

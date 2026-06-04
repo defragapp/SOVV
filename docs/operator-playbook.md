@@ -108,7 +108,7 @@ Always use approved terms. Never use rejected terms in UI, marketing, or support
 
 ## 6. Current Stack
 
-- Frontend: Next.js 15, Cloudflare Worker static assets (`sovv-web`)
+- Frontend: Next.js 15, Cloudflare Worker (`sovv-web`) via OpenNext. **Do not use Pages.**
 - Worker: Cloudflare Worker (`api.defrag.app`)
 - Database: D1 (interactions, patterns)
 - Storage: KV (baseline, session)

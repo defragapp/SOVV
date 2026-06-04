@@ -23,6 +23,9 @@ registerExplainRoute(router, getEnv);
 registerHistoryRoute(router, getEnv);
 registerPatternsRoutes(router, getEnv);
 
+// Health check for monitoring and deployment verification
+router.get("/api/health", () => new Response(JSON.stringify({ status: "ok", timestamp: Date.now() }), { status: 200, headers: { "Content-Type": "application/json" } }));
+
 async function sendSupportAutoReply(
   env: Env,
   ticket: { id: string; sender: string; subject: string }

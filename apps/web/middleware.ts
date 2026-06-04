@@ -43,11 +43,8 @@ export function middleware(req: NextRequest) {
   }
 
   // Auth check for protected routes
-  if (pathname.startsWith("/workspace") || pathname.startsWith("/app")) {
-    const sessionCookie =
-      req.cookies.get("sb-access-token")?.value ||
-      req.cookies.get("supabase-auth-token")?.value ||
-      req.cookies.get("__session")?.value
+  if ((pathname.startsWith("/workspace") || pathname.startsWith("/app")) && pathname !== "/app/login") {
+    const sessionCookie = req.cookies.get("__sov_session")?.value
 
     if (!sessionCookie) {
       url.pathname = "/app/login"

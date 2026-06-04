@@ -6,6 +6,18 @@ export interface Interaction {
   created_at?: string;
 }
 
+export interface InteractionRow {
+  id: string;
+  session_id: string;
+  mode?: string;
+  question?: string;
+  text?: string;
+  people?: string;
+  result?: string;
+  confidence?: string;
+  created_at: string;
+}
+
 export interface Pattern {
   session_id: string;
   key: string;
@@ -35,8 +47,99 @@ export async function getPatterns(db: D1Database, session_id: string): Promise<P
 /**
  * Upserts pattern findings. Uses ON CONFLICT to update existing patterns for a session.
  */
-export async function upsertPattern(db: D1Database, pattern: Pattern) {
+export async function upsertPattern(db: D1Database, pattern: {
+  id: string;
+  session_id: string;
+  pattern_type: string;
+  content: string;
+  source_interaction_ids: string[];
+  confidence: string;
+  verified: number;
+}) {
   return await db.prepare(
-    "INSERT INTO patterns (session_id, key, value, updated_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP) ON CONFLICT(session_id, key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP"
-  ).bind(pattern.session_id, pattern.key, pattern.value).run();
+    "INSERT INTO patterns (id, session_id, key, value, updated_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP) ON CONFLICT(session_id, key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP"
+  ).bind(pattern.id, pattern.session_id, pattern.pattern_type, pattern.content).run();
+}
+
+/**
+ * Formats patterns array into a prompt-friendly string.
+ */
+export function formatPatternsForPrompt(patterns: Pattern[]): string {
+  if (!patterns.length) return "";
+  return "Identified patterns:\n" + patterns
+    .map(p => `- ${p.key}: ${p.value}`)
+    .join("\n");
+}
+
+/**
+ * Inserts a new explain interaction record.
+ */
+export async function insertInteraction(
+  db: D1Database,
+  interaction: {
+    id: string;
+    session_id: string;
+    mode: string;
+    question: string;
+    text: string;
+    people: Array<{ id: string; relation: string; name: string }>;
+    result: Record<string, unknown>;
+    confidence: string;
+  }
+) {
+  return await db.prepare(
+    "INSERT INTO interactions (id, session_id, mode, question, text, people, result, confidence, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))"
+  ).bind(
+    interaction.id,
+    interaction.session_id,
+    interaction.mode,
+    interaction.question,
+    interaction.text,
+    JSON.stringify(interaction.people),
+    JSON.stringify(interaction.result),
+    interaction.confidence
+  ).run();
+}
+
+/**
+ * Maps a raw D1 row to an Interaction type.
+ */
+export function mapInteraction(row: InteractionRow) {
+  return {
+    id: row.id,
+    session_id: row.session_id,
+    mode: row.mode,
+    question: row.question,
+    text: row.text,
+    people: row.people ? JSON.parse(row.people) : [],
+    result: row.result ? JSON.parse(row.result) : {},
+    confidence: row.confidence,
+    created_at: row.created_at,
+  };
+}
+
+/**
+ * Retrieves recent interactions for pattern extraction.
+ */
+export async function getRecentInteractions(
+  db: D1Database,
+  session_id: string,
+  limit: number
+): Promise<any[]> {
+  const { results } = await db.prepare(
+    "SELECT * FROM interactions WHERE session_id = ? ORDER BY created_at DESC LIMIT ?"
+  ).bind(session_id, limit).all();
+  return results ?? [];
+}
+
+/**
+ * Creates a support ticket record from an incoming email.
+ */
+export async function insertSupportTicket(
+  db: D1Database,
+  ticket: { id: string; sender: string; recipient: string; subject: string; body_preview: string }
+) {
+  return await db.prepare(
+    "INSERT INTO support_tickets (id, sender, recipient, subject, body_preview, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))"
+  ).bind(ticket.id, ticket.sender, ticket.recipient, ticket.subject, ticket.body_preview).run();
 }

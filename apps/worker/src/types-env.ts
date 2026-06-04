@@ -1,9 +1,11 @@
-import type { D1Database, R2Bucket, Ai, KVNamespace, SendEmail, Queue } from "@cloudflare/workers-types";
+import type { D1Database, R2Bucket, Ai, KVNamespace, SendEmail, Queue, Fetcher } from "@cloudflare/workers-types";
 
 export interface Env {
   DB: D1Database
   KV: KVNamespace
   AI: Ai
+  AI_SERVICE: Fetcher
+  SESSION_SERVICE: Fetcher
   EMAIL?: SendEmail
   QUEUE?: Queue
   FREE_DAILY_LIMIT?: string

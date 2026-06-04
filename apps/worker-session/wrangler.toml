@@ -15,14 +15,16 @@ binding = "AI"
 [[ai.gateway]]
 id = "vscode-codespace-agent"
 
+# Service binding to worker-ai for emotional driver analysis
+[[services]]
+binding = "AI_SERVICE"
+service = "worker-ai"
+environment = "production"
+
 # Durable Object
 [[durable_objects.bindings]]
 name = "CONFLICT_SESSION"
 class_name = "ConflictSessionDO"
-
-[[migrations]]
-tag = "v1"
-new_classes = ["ConflictSessionDO"]
 
 [observability]
 enabled = true

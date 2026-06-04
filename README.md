@@ -41,12 +41,12 @@ To run the app locally:
 
 ## Deployment and release flow
 
-Use the existing Cloudflare + GitHub workflow for releases:
+**Important:** This project uses Cloudflare Workers for both API and Frontend. Do not deploy to Cloudflare Pages.
 
 - Run `npm run build` to validate the current OpenNext/Cloudflare build path.
 - Use Node.js 22+ for the Cloudflare deploy path (the workflow uses Node 24).
 - Run `npm run deploy -w apps/worker` to deploy the Worker API.
-- Run `npm run deploy -w apps/web` to deploy the Next.js/Cloudflare app.
+- Run `npm run deploy -w apps/web` to deploy the Next.js app as a Worker (`sovv-web`).
 - Use `npm run ship -- "short summary"` to switch to `main`, pull latest changes, commit staged work, and push to GitHub.
 
 The helper script lives in `scripts/push-live.sh`, and the live deploy path is triggered by the workflow in `.github/workflows/deploy-live.yml` on pushes to `main`.

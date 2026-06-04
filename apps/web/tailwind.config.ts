@@ -1,16 +1,9 @@
 import type { Config } from "tailwindcss";
 
+// Tailwind v4 handles content detection automatically.
+// Theme extensions should be moved to CSS variables in apps/web/app/globals.css
 const config: Config = {
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
+  content: [],
 };
 
 export default config;
