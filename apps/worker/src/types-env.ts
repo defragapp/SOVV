@@ -19,6 +19,8 @@ export interface Env {
   STRIPE_ACCOUNT_ID?: string
   STRIPE_SUPPORT_LINK_URL?: string
   EMAIL_FORWARD_ADDRESS?: string;
+  TURNSTILE_SECRET_KEY?: string
+  TURNSTILE_SITE_KEY?: string
   TEAM_DOMAIN?: string; // For Cloudflare Access JWT validation, e.g., https://your-team.cloudflareaccess.com
   POLICY_AUD?: string; // For Cloudflare Access JWT validation
 }
