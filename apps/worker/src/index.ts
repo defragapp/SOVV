@@ -178,9 +178,9 @@ async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: stri
       <p>Thanks for reaching out. Your message has been logged as <strong>${ticket.id}</strong>.</p>
       <p>We'll get back to you as soon as possible.</p>
       <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0">
-      <p style="color:#9ca3af;font-size:13px">Sovereign  defrag.app</p>
+      <p style="color:#9ca3af;font-size:13px">Sovereign — defrag.app</p>
     </div>`;
-    const text = `Thanks for reaching out. Your message has been logged as ${ticket.id}. We'll get back to you as soon as possible.\n\n Sovereign (defrag.app)`;
+    const text = `Thanks for reaching out. Your message has been logged as ${ticket.id}. We'll get back to you as soon as possible.\n\n— Sovereign (defrag.app)`;
     await env.EMAIL.send({
       to: ticket.sender,
       from: { email: "noreply@defrag.app", name: "Sovereign" },
