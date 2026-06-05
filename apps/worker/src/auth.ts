@@ -29,35 +29,43 @@ export async function hashPassword(password: string): Promise<string> {
 }
 
 export async function verifyPassword(password: string, stored: string): Promise<boolean> {
+  if (typeof stored !== "string" || !stored.includes(":")) return false
+
   const parts = stored.split(":")
   const iterStr = parts[0] ?? "100000"
   const saltB64 = parts[1] ?? ""
   const hashB64 = parts[2] ?? ""
-  const iterations = parseInt(iterStr, 10)
-  const salt = Uint8Array.from(atob(saltB64), (c) => c.charCodeAt(0))
-  const expectedHash = Uint8Array.from(atob(hashB64), (c) => c.charCodeAt(0))
-  const encoder = new TextEncoder()
+  const parsedIterations = parseInt(iterStr, 10)
+  const iterations = Number.isFinite(parsedIterations) && parsedIterations > 0 ? parsedIterations : PBKDF2_ITERATIONS
 
-  const keyMaterial = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(password),
-    "PBKDF2",
-    false,
-    ["deriveBits"]
-  )
+  try {
+    const salt = Uint8Array.from(atob(saltB64), (c) => c.charCodeAt(0))
+    const expectedHash = Uint8Array.from(atob(hashB64), (c) => c.charCodeAt(0))
+    const encoder = new TextEncoder()
 
-  const actualHash = new Uint8Array(await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt, iterations, hash: "SHA-512" },
-    keyMaterial,
-    KEY_LENGTH * 8
-  ))
+    const keyMaterial = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(password),
+      "PBKDF2",
+      false,
+      ["deriveBits"]
+    )
 
-  if (actualHash.length !== expectedHash.length) return false
-  let diff = 0
-  for (let i = 0; i < actualHash.length; i++) {
-    diff |= (actualHash[i] ?? 0) ^ (expectedHash[i] ?? 0)
+    const actualHash = new Uint8Array(await crypto.subtle.deriveBits(
+      { name: "PBKDF2", salt, iterations, hash: "SHA-512" },
+      keyMaterial,
+      KEY_LENGTH * 8
+    ))
+
+    if (actualHash.length !== expectedHash.length) return false
+    let diff = 0
+    for (let i = 0; i < actualHash.length; i++) {
+      diff |= (actualHash[i] ?? 0) ^ (expectedHash[i] ?? 0)
+    }
+    return diff === 0
+  } catch {
+    return false
   }
-  return diff === 0
 }
 
 export function generateSessionToken(): string {
@@ -116,7 +124,7 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
   if (!token) return null
 
   const session = await DB.prepare(
-    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
+    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires > ?"
   )
     .bind(token, Date.now())
     .first<{ id: string; email: string; tier: string; role: string; stripe_customer_id: string | null }>()
@@ -131,48 +139,64 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
   // POST /api/auth/register
   router.post("/api/auth/register", async (request: Request) => {
     const env = getEnv()
-    const { email, password } = await request.json() as any
-    if (!email || !password) return jsonResponse({ error: "Missing fields" }, 400)
-
     try {
+      const { email, password, turnstileToken } = await request.json() as any
+      if (!email || !password) return jsonResponse({ error: "Missing fields" }, 400)
+
+      if (!env.TURNSTILE_SECRET_KEY) {
+        return jsonResponse({ error: "Bot verification not configured" }, 500)
+      }
+
+      const isHuman = await verifyTurnstile(String(turnstileToken ?? ""), env.TURNSTILE_SECRET_KEY)
+      if (!isHuman) return jsonResponse({ error: "Bot verification failed" }, 403)
+
       const password_hash = await hashPassword(password)
       const userId = crypto.randomUUID()
+      const now = Date.now()
+
       await env.DB.prepare("INSERT INTO users (id, email, password_hash, created_at) VALUES (?, ?, ?, ?)")
-        .bind(userId, email, password_hash, Math.floor(Date.now() / 1000))
+        .bind(userId, email, password_hash, now)
         .run()
 
       const token = generateSessionToken()
       await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
-        .bind(token, userId, Math.floor(Date.now() / 1000) + SESSION_TTL, Math.floor(Date.now() / 1000))
+        .bind(token, userId, now + SESSION_TTL * 1000, now)
         .run()
 
-      return jsonResponse({ success: true }, 200, {
+      return jsonResponse({ success: true, token }, 200, {
         "Set-Cookie": sessionCookie(token),
       })
     } catch (e: any) {
-      if (e.message.includes("UNIQUE")) return jsonResponse({ error: "Email exists" }, 400)
-      return jsonResponse({ error: "Registration failed", details: e.message || String(e) }, 500)
+      if (e?.message?.includes("UNIQUE")) return jsonResponse({ error: "Email exists" }, 400)
+      console.error("Registration failed", e)
+      return jsonResponse({ error: "Registration failed" }, 500)
     }
   })
 
   // POST /api/auth/login
   router.post("/api/auth/login", async (request: Request) => {
     const env = getEnv()
-    const { email, password } = await request.json() as any
-    const user = await env.DB.prepare("SELECT id, email, password_hash, tier, role FROM users WHERE email = ?").bind(email).first() as any
-    if (!user) return jsonResponse({ error: "Invalid credentials" }, 401)
+    try {
+      const { email, password } = await request.json() as any
+      const user = await env.DB.prepare("SELECT id, email, password_hash, tier, role FROM users WHERE email = ?").bind(email).first() as any
+      if (!user) return jsonResponse({ error: "Invalid credentials" }, 401)
 
-    const valid = await verifyPassword(password, user.password_hash)
-    if (!valid) return jsonResponse({ error: "Invalid credentials" }, 401)
+      const valid = await verifyPassword(password, user.password_hash)
+      if (!valid) return jsonResponse({ error: "Invalid credentials" }, 401)
 
-    const token = generateSessionToken()
-    await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
-      .bind(user.id, token, Date.now() + SESSION_TTL * 1000, Math.floor(Date.now() / 1000))
-      .run()
+      const token = generateSessionToken()
+      const now = Date.now()
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
+        .bind(token, user.id, now + SESSION_TTL * 1000, now)
+        .run()
 
-    return jsonResponse({ success: true }, 200, {
-      "Set-Cookie": sessionCookie(token),
-    })
+      return jsonResponse({ success: true, token }, 200, {
+        "Set-Cookie": sessionCookie(token),
+      })
+    } catch (e: any) {
+      console.error("Login failed", e)
+      return jsonResponse({ error: "Login failed" }, 500)
+    }
   })
 
   // GET /api/user/me
