@@ -1,20 +1,21 @@
-# Implementation Plan: Relational Memory Layer
+# Sovereign.os Platform Architecture
 
-## Objective
-Enhance the `/api/explain` endpoint to leverage the newly created D1 tables (`interactions` and `patterns`) for a relational memory layer. This involves logging every interaction and extracting behavioral patterns to build a long-term context that improves subsequent explanations.
+## Core Logic
+The platform operates on a strictly server-side intelligence model. The client layer (Next.js) serves as a thin UI for the data retrieved from the Cloudflare Worker API.
 
-## Implementation Steps
+## Database Layer (Cloudflare D1)
+- **Library Table**: Unified storage for workspace outputs. Strict row-level isolation using `user_id`.
+- **Designs Table**: User baseline configuration.
+- **Users Table**: Authentication state.
 
-### 1. Database Helpers
-Create helper functions for D1 operations in `apps/worker/src/db.ts` to manage inserting interactions and upserting extracted patterns.
+## Security Layer
+- **Authentication**: JWT-based sessions managed by `worker-session`.
+- **Bot Protection**: Silent Turnstile validation on all critical workspace inputs.
+- **Isolation**: All database queries hard-code a `WHERE user_id = ?` clause derived from the verified session.
 
-### 2. Update `handleExplain`
-Modify `apps/worker/src/explain.ts` to:
-- Retrieve existing patterns for the session and inject them into the system prompt.
-- After generating the explanation, save the new interaction to D1.
+## Workspaces
+1. **DEFRAG**: Real-time pattern analysis for relational moments.
+2. **COVENANT**: Long-form structural dynamics for groups.
 
-### 3. Background Pattern Extraction
-Create an asynchronous process (using `ctx.waitUntil` if available, or floating promises) that triggers after an explanation to:
-- Fetch recent interactions for the session.
-- Run a background AI prompt to identify new or recurring patterns.
-- Upsert the findings into the `patterns` table.
+## Design System
+- **Esoteric Brutalism**: Pure black backgrounds, 1px white borders, monospaced typography, zero gradients, zero rounded corners.
