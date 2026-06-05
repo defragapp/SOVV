@@ -1,11 +1,17 @@
 import type { Env } from "./types-env";
 import { getSessionId, cookieHeader } from "./plan";
 import type { Interaction } from "@sovereign/core";
-import { verifyAccessJWT } from "./auth";
+import { getAuthUser, verifyAccessJWT } from "./auth";
 import { mapInteraction, type InteractionRow } from "./db";
 
+async function requireSessionAuth(req: Request, env: Env): Promise<Response | null> {
+  const user = await getAuthUser(req, env.DB);
+  if (user) return null;
+  return verifyAccessJWT(req, env);
+}
+
 export async function handleHistory(req: Request, env: Env) {
-  const authResponse = await verifyAccessJWT(req, env);
+  const authResponse = await requireSessionAuth(req, env);
   if (authResponse) {
     return authResponse;
   }
