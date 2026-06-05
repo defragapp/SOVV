@@ -130,3 +130,28 @@ export interface Pattern {
   last_seen: number;
   verified: number;
 }
+
+export interface DefragPayload {
+  active_now: string;
+  the_repeat: string;
+  old_role: string;
+  what_you_learned_to_carry: string;
+  strain_pattern: string;
+  gift_under_strain: string;
+  alignment: string;
+  best_next_response: string;
+}
+
+export interface CovenantPayload {
+  [key: string]: unknown;
+}
+
+export interface LibraryItem {
+  id: string;
+  user_id: string;
+  workspace_source: "DEFRAG" | "COVENANT";
+  title?: string;
+  payload: DefragPayload | CovenantPayload;
+  is_public: number;
+  created_at: string;
+}
