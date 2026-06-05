@@ -8,34 +8,23 @@ export default function AboutPage() {
     <SiteShell>
       <PageHero
         eyebrow="About"
-        title="Built for the moments that matter."
-        body="DEFRAG exists because most tools built to help people understand themselves are either too abstract, too clinical, or too slow."
+        title="Built for real moments."
+        body="DEFRAG helps people understand repeating patterns without turning the product into therapy, diagnosis, or generic advice."
       />
 
       <MotionSection className="px-6 py-24">
-        <div className="mx-auto max-w-2xl space-y-10 text-base leading-8 text-white/50">
+        <div className="mx-auto max-w-2xl space-y-8 text-base leading-8 text-white/50">
           <p>
-            DEFRAG is a personal and relational clarity platform. It is built on the belief
-            that most confusion — in relationships, in decisions, in difficult conversations —
-            comes not from a lack of intelligence but from a lack of a clear map.
+            DEFRAG is a personal and relational clarity platform. It helps you see the structure beneath a difficult moment so you can respond with more precision.
           </p>
           <p>
-            Most people are smart enough to navigate their lives well. What they lack is
-            a way to see the structure beneath the moment — the pattern that is shaping
-            what is happening right now, before it becomes a regret.
+            Most people do not need more noise. They need a cleaner way to understand what is active, what is repeating, and what response is most likely to keep things grounded.
           </p>
           <p>
-            DEFRAG is that map. It is not therapy. It is not a personality test. It is not
-            a mood tracker. It is a clarity layer — designed to help you understand what
-            is actually happening so you can respond with more precision and less regret.
+            The product is designed to be private, direct, and useful. It is not a personality test, a mood tracker, or a substitute for professional support.
           </p>
-          <blockquote className="border-l-2 border-white/15 pl-6 text-white/70 italic text-lg">
-            &ldquo;The shift that makes your whole system go: Oh… damn. I didn&apos;t see it
-            like that before. But I feel it. So I know it&apos;s true.&rdquo;
-          </blockquote>
           <p>
-            That is what DEFRAG is built to produce. Not insight for its own sake.
-            Insight that lands — and changes what you do next.
+            The goal is simple: show the pattern clearly enough that the next move is easier to make.
           </p>
         </div>
       </MotionSection>
