@@ -2,7 +2,7 @@ import type { Env } from "./types-env.js";
 import type { Baseline, BaselineRequest } from "@sovereign/core";
 import { safeJsonParse } from "@sovereign/core";
 import { getSessionId, cookieHeader } from "./plan.js";
-import { verifyAccessJWT } from "./auth.js";
+import { getAuthUser, verifyAccessJWT } from "./auth.js";
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const USER_KEY = (sid: string) => `user:${sid}`;
@@ -21,6 +21,12 @@ function isValidBaseline(data: unknown): data is BaselineRequest {
     typeof (data as any).tob.value === "string" &&
     (data as any).tob.value.trim().length > 0
   );
+}
+
+async function requireSessionAuth(req: Request, env: Env): Promise<Response | null> {
+  const user = await getAuthUser(req, env.DB);
+  if (user) return null;
+  return verifyAccessJWT(req, env);
 }
 
 export async function getBaseline(env: Env, sid: string): Promise<Baseline | null> {
@@ -54,9 +60,9 @@ export async function saveBaseline(env: Env, sid: string, baseline: BaselineRequ
 }
 
 export async function handleGetBaseline(req: Request, env: Env): Promise<Response> {
-  const user = await verifyAccessJWT(req, env);
-  if (!user) {
-    return new Response("Unauthorized", { status: 401 });
+  const authErr = await requireSessionAuth(req, env);
+  if (authErr) {
+    return authErr;
   }
 
   const sid = await getSessionId(req);
@@ -73,9 +79,9 @@ export async function handleGetBaseline(req: Request, env: Env): Promise<Respons
 }
 
 export async function handleSaveBaseline(req: Request, env: Env): Promise<Response> {
-  const user = await verifyAccessJWT(req, env);
-  if (!user) {
-    return new Response("Unauthorized", { status: 401 });
+  const authErr = await requireSessionAuth(req, env);
+  if (authErr) {
+    return authErr;
   }
 
   const sid = await getSessionId(req);
