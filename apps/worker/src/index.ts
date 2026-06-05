@@ -109,6 +109,55 @@ registerPatternsRoutes(router, getEnv);
 registerNatalRoutes(router, () => currentEnv);
 registerCovenantRoute(router, getEnv);
 
+router.get("/api/stripe/prices", async (request: Request) => {
+  const env = getEnv();
+  if (!env.STRIPE_SECRET_KEY) {
+    return new Response(JSON.stringify([]), {
+      status: 200,
+      headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
+    });
+  }
+
+  try {
+    const response = await fetch("https://api.stripe.com/v1/prices?active=true&expand[]=data.product", {
+      headers: {
+        Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+      },
+    });
+
+    const payload = await response.json() as { data?: Array<Record<string, any>> };
+    const prices = Array.isArray(payload.data)
+      ? payload.data.map((price) => ({
+          id: price.id,
+          active: price.active,
+          currency: price.currency,
+          unit_amount: price.unit_amount,
+          interval: price.recurring?.interval ?? null,
+          interval_count: price.recurring?.interval_count ?? null,
+          nickname: price.nickname ?? null,
+          lookup_key: price.lookup_key ?? null,
+          product: typeof price.product === "object" && price.product !== null
+            ? {
+                id: price.product.id ?? null,
+                name: price.product.name ?? null,
+              }
+            : price.product ?? null,
+        }))
+      : [];
+
+    return new Response(JSON.stringify(prices), {
+      status: 200,
+      headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
+    });
+  } catch (error) {
+    console.error("[STRIPE_PRICES]", error);
+    return new Response(JSON.stringify([]), {
+      status: 200,
+      headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
+    });
+  }
+});
+
 // Health check for monitoring and deployment verification
 router.get('/health', () => {
   return new Response(JSON.stringify({
@@ -129,9 +178,9 @@ async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: stri
       <p>Thanks for reaching out. Your message has been logged as <strong>${ticket.id}</strong>.</p>
       <p>We'll get back to you as soon as possible.</p>
       <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0">
-      <p style="color:#9ca3af;font-size:13px">Sovereign — defrag.app</p>
+      <p style="color:#9ca3af;font-size:13px">Sovereign  defrag.app</p>
     </div>`;
-    const text = `Thanks for reaching out. Your message has been logged as ${ticket.id}. We'll get back to you as soon as possible.\n\n— Sovereign (defrag.app)`;
+    const text = `Thanks for reaching out. Your message has been logged as ${ticket.id}. We'll get back to you as soon as possible.\n\n Sovereign (defrag.app)`;
     await env.EMAIL.send({
       to: ticket.sender,
       from: { email: "noreply@defrag.app", name: "Sovereign" },
@@ -199,7 +248,7 @@ export default {
       return await handleWithCors(request, env, ctx);
     } catch (error) {
       console.error("[INTERNAL]", error);
-      return new Response(JSON.stringify({ error: "Internal server error", details: e.message || String(e) }), { status: 500, headers: { "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: { "Content-Type": "application/json" } });
     }
   },
 
