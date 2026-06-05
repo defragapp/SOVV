@@ -20,7 +20,7 @@ export default {
     // Only intercept defrag.app and www.defrag.app
     if (host === 'defrag.app' || host === 'www.defrag.app') {
       const cookie = request.headers.get('Cookie') || '';
-      const sessionId = getCookieValue(cookie, 'sid');
+      const sessionId = getCookieValue(cookie, '__sov_session') || getCookieValue(cookie, 'sid');
       const hasVisited = getCookieValue(cookie, 'sovv_visit');
 
       // Active session → workspace directly
