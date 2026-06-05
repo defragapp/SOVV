@@ -1,7 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (container: HTMLElement, options: Record<string, unknown>) => string
+      reset?: (widgetId: string) => void
+    }
+  }
+}
 
 type LoginMode = "login" | "register"
 
@@ -9,8 +18,61 @@ export default function LoginScreen() {
   const [mode, setMode] = useState<LoginMode>("login")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [turnstileToken, setTurnstileToken] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""
+  const turnstileRef = useRef<HTMLDivElement | null>(null)
+  const turnstileWidgetId = useRef<string | null>(null)
+
+  useEffect(() => {
+    setTurnstileToken("")
+    setError("")
+
+    if (mode !== "register" || !turnstileSiteKey) return
+    const scriptId = "cf-turnstile-script"
+
+    const renderWidget = () => {
+      if (!turnstileRef.current || !window.turnstile || turnstileWidgetId.current) return
+      turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
+        sitekey: turnstileSiteKey,
+        theme: "dark",
+        callback: (token: string) => setTurnstileToken(token),
+        "expired-callback": () => setTurnstileToken(""),
+        "error-callback": () => setTurnstileToken(""),
+      })
+    }
+
+    const existing = document.getElementById(scriptId) as HTMLScriptElement | null
+    if (existing) {
+      if (window.turnstile) {
+        renderWidget()
+      } else {
+        existing.addEventListener("load", renderWidget, { once: true })
+      }
+      return () => {
+        if (turnstileWidgetId.current && window.turnstile?.reset) {
+          window.turnstile.reset(turnstileWidgetId.current)
+        }
+        turnstileWidgetId.current = null
+      }
+    }
+
+    const script = document.createElement("script")
+    script.id = scriptId
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+    script.async = true
+    script.defer = true
+    script.onload = renderWidget
+    document.head.appendChild(script)
+
+    return () => {
+      if (turnstileWidgetId.current && window.turnstile?.reset) {
+        window.turnstile.reset(turnstileWidgetId.current)
+      }
+      turnstileWidgetId.current = null
+    }
+  }, [mode, turnstileSiteKey])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -18,12 +80,22 @@ export default function LoginScreen() {
     setLoading(true)
 
     try {
+      if (mode === "register" && turnstileSiteKey && !turnstileToken) {
+        setError("Complete bot verification to continue")
+        return
+      }
+
       const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register"
+      const payload =
+        mode === "register"
+          ? { email, password, turnstileToken }
+          : { email, password }
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(payload),
       })
 
       if (!res.ok) {
@@ -45,7 +117,6 @@ export default function LoginScreen() {
       className="flex min-h-screen w-full items-center justify-center bg-black text-[#F6F5F3] selection:bg-white/20"
       style={{ fontFamily: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}
     >
-      {/* Subtle spotlight */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
         style={{
@@ -59,7 +130,6 @@ export default function LoginScreen() {
         transition={{ duration: 0.9, ease: [0.0, 0.0, 0.2, 1] }}
         className="relative z-10 w-full max-w-sm px-6"
       >
-        {/* Wordmark */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -72,13 +142,12 @@ export default function LoginScreen() {
           <div className="h-px w-full bg-[#F6F5F3]/10" />
         </motion.div>
 
-        {/* Mode toggle */}
         <div className="mb-8 flex border-b border-[#F6F5F3]/10">
           {(["login", "register"] as LoginMode[]).map((m) => (
             <button
               key={m}
               type="button"
-              onClick={() => { setMode(m); setError("") }}
+              onClick={() => { setMode(m); setError(""); setTurnstileToken("") }}
               className={`flex-1 border-b pb-3 font-mono text-[10px] uppercase tracking-widest transition-colors duration-200 ${
                 mode === m
                   ? "border-[#F6F5F3] text-[#F6F5F3]"
@@ -90,7 +159,6 @@ export default function LoginScreen() {
           ))}
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div>
             <label className="mb-1.5 block font-mono text-[9px] uppercase tracking-[0.3em] text-white/25">
@@ -123,7 +191,21 @@ export default function LoginScreen() {
             />
           </div>
 
-          {/* Error */}
+          {mode === "register" && (
+            <div className="space-y-2">
+              <label className="block font-mono text-[9px] uppercase tracking-[0.3em] text-white/25">
+                Bot verification
+              </label>
+              {turnstileSiteKey ? (
+                <div ref={turnstileRef} className="min-h-[65px]" />
+              ) : (
+                <p className="text-sm leading-6 text-white/30">
+                  Turnstile is not configured yet. Add a public site key before opening registration.
+                </p>
+              )}
+            </div>
+          )}
+
           <AnimatePresence>
             {error && (
               <motion.p
@@ -137,10 +219,9 @@ export default function LoginScreen() {
             )}
           </AnimatePresence>
 
-          {/* Submit */}
           <motion.button
             type="submit"
-            disabled={loading || !email || !password}
+            disabled={loading || !email || !password || (mode === "register" && turnstileSiteKey && !turnstileToken)}
             whileHover={{ backgroundColor: "rgba(246,245,243,0.08)" }}
             whileTap={{ scale: 0.98 }}
             className="mt-2 border border-[#F6F5F3]/20 px-4 py-3.5 font-mono text-[10px] uppercase tracking-widest text-[#F6F5F3] transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
@@ -158,7 +239,6 @@ export default function LoginScreen() {
           </motion.button>
         </form>
 
-        {/* Footer note */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -170,7 +250,6 @@ export default function LoginScreen() {
             : "Pro unlocks people, groups, unlimited sessions"}
         </motion.p>
 
-        {/* Back to landing */}
         <div className="mt-6 text-center">
           <a
             href="/"
