@@ -16,12 +16,12 @@ export const footerItems = [
 ];
 
 export const valuePoints = [
-  "See what got lit up — not just what happened",
-  "Understand where the loop starts before it takes over",
-  "Find the strength underneath the twist",
-  "Know what brings you back to center",
-  "Practice the response before you send it",
-  "Keep the thread grounded across every session",
+  "See what is active now instead of reacting blind",
+  "Find the repeating loop before it escalates",
+  "Separate useful strength from the strain around it",
+  "Choose a response that fits the moment",
+  "Practice wording before you send it",
+  "Keep useful context across sessions",
 ];
 
 export const useCases = [
@@ -31,27 +31,27 @@ export const useCases = [
   "When a family loop keeps running",
   "When you need to understand your part",
   "When you want to practice a response first",
-  "When you need to see the other side without losing your own",
+  "When you want to compare with consent",
 ];
 
 export const lenses = [
   {
     title: "Your Baseline",
-    summary: "The starting map. How you tend to process, respond, connect, protect, communicate, and return to center.",
+    summary: "Your starting map. It shows how you tend to process, respond, connect, protect, communicate, and return to center.",
     useCase: "Use it when you want to understand your own patterns before pressure hits.",
     cta: "Learn more",
     href: "/product",
   },
   {
     title: "The sky over you",
-    summary: "The current timing layer. It shows what is louder right now — and why the moment may feel bigger than it should.",
+    summary: "The current context layer. It helps explain what is louder right now and why the moment may feel more intense than usual.",
     useCase: "Use it when the moment feels charged, confusing, or time-sensitive.",
     cta: "Learn more",
     href: "/product",
   },
   {
     title: "What got lit up",
-    summary: "The part of your baseline that is active in this moment — and what it means for the people around you.",
+    summary: "The part of your baseline that is active in this moment, and what it means for the people around you.",
     useCase: "Use it when a dynamic feels cyclical, loaded, or hard to name.",
     cta: "Learn more",
     href: "/product",
@@ -61,19 +61,19 @@ export const lenses = [
 export const faqItems = [
   {
     q: "What is Sovereign.os?",
-    a: "Sovereign.os is a baseline-aware AI workspace with a living notebook. It keeps a steady AI thread grounded in your baseline, the sky over you, selected people or groups, and saved notebook context.",
+    a: "Sovereign.os is the private home base for your account, baseline, subscription, saved work, and connected workspaces. It keeps the thread organized across sessions.",
   },
   {
     q: "What is DEFRAG?",
-    a: "DEFRAG is the relational intelligence layer inside Sovereign.os. It shows what got lit up, where the loop is forming, and what brings you back to center.",
+    a: "DEFRAG is the workspace for working through a real moment. It shows what got lit up, where the loop is forming, and what response gives the moment a better chance.",
   },
   {
     q: "What is Your Baseline?",
-    a: "Your Baseline is the starting map. It helps the AI understand how you tend to process, respond, connect, protect, communicate, and return to center.",
+    a: "Your Baseline is the starting map. It helps the system understand how you tend to process, respond, connect, protect, communicate, and return to center.",
   },
   {
     q: "What does 'the sky over you' mean?",
-    a: "It is the current timing layer. Your baseline shows how you are built. The sky over you shows what is active now — what is louder right now.",
+    a: "It is the current timing layer. Your Baseline shows how you are built. The sky over you shows what is active now and why it may feel louder than expected.",
   },
   {
     q: "What is The Loop?",
@@ -81,11 +81,11 @@ export const faqItems = [
   },
   {
     q: "What is The Twist?",
-    a: "The Twist is where a real strength bends under pressure. DEFRAG shows where it twists and how to bring it back into its clean form.",
+    a: "The Twist is where a real strength bends under pressure. DEFRAG shows where it bends and how to bring it back into a cleaner form.",
   },
   {
     q: "Is this therapy?",
-    a: "No. DEFRAG is not therapy, diagnosis, or clinical care. It is a personal and relational intelligence tool for understanding patterns and practicing better responses.",
+    a: "No. DEFRAG is not therapy, diagnosis, or clinical care. It is a personal and relational reflection tool for understanding patterns and practicing better responses.",
   },
   {
     q: "Do I need to understand astrology or the deeper systems?",
@@ -93,7 +93,7 @@ export const faqItems = [
   },
   {
     q: "Can I compare with another person?",
-    a: "Yes, when another person, family member, group, or team overlay is available and permitted.",
+    a: "Yes, when another person, family member, group, or team overlay is available and permitted by consent.",
   },
 ];
 
@@ -102,7 +102,7 @@ export const pricingTiers = [
     name: "Free",
     price: "$0",
     period: "always",
-    description: "See the pattern. Understand what got lit up.",
+    description: "See the pattern and test the core experience.",
     features: [
       "Baseline creation",
       "DEFRAG thread access",
@@ -121,16 +121,16 @@ export const pricingTiers = [
     name: "Pro",
     price: "$12",
     period: "/ month",
-    description: "See the full pattern over time. Work through it.",
+    description: "Keep the history, compare with others, and work over time.",
     features: [
       "Unlimited sessions",
-      "Your Story — full notebook and history",
+      "Your Story  full notebook and history",
       "Saved insights and patterns",
-      "Compare With Someone — people and group threads",
+      "Compare With Someone  people and group threads",
       "Deeper relational analysis",
-      "Try It Out — conversation simulation",
+      "Try It Out  conversation simulation",
       "Audio summaries",
-      "Watch It — short visual scenes",
+      "Watch It  short visual scenes",
       "Priority processing",
     ],
     cta: "Upgrade to Pro",
