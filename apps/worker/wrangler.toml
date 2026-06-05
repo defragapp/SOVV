@@ -4,5 +4,47 @@ compatibility_date = "2026-06-04"
 account_id = "8b1954d216d65077c6480d62583fe2c2"
 workers_dev = false
 
+[[routes]]
+pattern = "api.defrag.app"
+custom_domain = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "vibesdk-db"
+database_id = "c8c2fd8d-5297-46fc-8594-7629c8bad74d"
+
+[[kv_namespaces]]
+binding = "SOVV_DATA"
+id = "3bd3ff5048a8468e82c574d7d66045c3"
+
+[[r2_buckets]]
+binding = "TEMPLATES"
+bucket_name = "vibesdk-templates"
+
+[[queues.producers]]
+binding = "PATTERN_QUEUE"
+queue = "pattern-extraction-tasks"
+
+[ai]
+binding = "AI"
+
+[[services]]
+binding = "AI_SERVICE"
+service = "worker-ai"
+
+[[services]]
+binding = "SESSION_SERVICE"
+service = "worker-session"
+
+[[unsafe.bindings]]
+name = "RATE_LIMITER"
+type = "ratelimit"
+namespace_id = "100"
+simple = { limit = 15, period = 60 }
+
+[vars]
+FREE_DAILY_LIMIT = "15"
+AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
+
 [observability]
 enabled = true

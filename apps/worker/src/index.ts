@@ -199,7 +199,7 @@ export default {
       return await handleWithCors(request, env, ctx);
     } catch (error) {
       console.error("[INTERNAL]", error);
-      return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: { "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: "Internal server error", details: e.message || String(e) }), { status: 500, headers: { "Content-Type": "application/json" } });
     }
   },
 

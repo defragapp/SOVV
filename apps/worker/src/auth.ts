@@ -1,5 +1,5 @@
 // Password hashing - PBKDF2 with SHA-512 via Web Crypto API
-const PBKDF2_ITERATIONS = 600_000
+const PBKDF2_ITERATIONS = 100_000
 const SALT_LENGTH = 32
 const KEY_LENGTH = 64
 
@@ -30,7 +30,7 @@ export async function hashPassword(password: string): Promise<string> {
 
 export async function verifyPassword(password: string, stored: string): Promise<boolean> {
   const parts = stored.split(":")
-  const iterStr = parts[0] ?? "600000"
+  const iterStr = parts[0] ?? "100000"
   const saltB64 = parts[1] ?? ""
   const hashB64 = parts[2] ?? ""
   const iterations = parseInt(iterStr, 10)
@@ -137,13 +137,13 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
     try {
       const password_hash = await hashPassword(password)
       const userId = crypto.randomUUID()
-      await env.DB.prepare("INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)")
-        .bind(userId, email, password_hash)
+      await env.DB.prepare("INSERT INTO users (id, email, password_hash, created_at) VALUES (?, ?, ?, ?)")
+        .bind(userId, email, password_hash, Math.floor(Date.now() / 1000))
         .run()
 
       const token = generateSessionToken()
-      await env.DB.prepare("INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)")
-        .bind(userId, token, Date.now() + SESSION_TTL * 1000)
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
+        .bind(token, userId, Math.floor(Date.now() / 1000) + SESSION_TTL, Math.floor(Date.now() / 1000))
         .run()
 
       return jsonResponse({ success: true }, 200, {
@@ -151,7 +151,7 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
       })
     } catch (e: any) {
       if (e.message.includes("UNIQUE")) return jsonResponse({ error: "Email exists" }, 400)
-      return jsonResponse({ error: "Registration failed" }, 500)
+      return jsonResponse({ error: "Registration failed", details: e.message || String(e) }, 500)
     }
   })
 
@@ -166,8 +166,8 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
     if (!valid) return jsonResponse({ error: "Invalid credentials" }, 401)
 
     const token = generateSessionToken()
-    await env.DB.prepare("INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)")
-      .bind(user.id, token, Date.now() + SESSION_TTL * 1000)
+    await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
+      .bind(user.id, token, Date.now() + SESSION_TTL * 1000, Math.floor(Date.now() / 1000))
       .run()
 
     return jsonResponse({ success: true }, 200, {
