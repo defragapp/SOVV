@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   if ((host === 'defrag.app' || host === 'www.defrag.app') && pathname === '/') {
-    const sessionId = request.cookies.get('sid')?.value;
+    const sessionId = request.cookies.get('__sov_session')?.value || request.cookies.get('sid')?.value;
     const hasVisited = request.cookies.get('sovv_visit')?.value;
 
     if (sessionId) {
