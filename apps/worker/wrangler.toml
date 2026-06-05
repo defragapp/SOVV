@@ -2,74 +2,7 @@ name = "sovereign-os-api"
 main = "src/index.ts"
 compatibility_date = "2026-06-04"
 account_id = "8b1954d216d65077c6480d62583fe2c2"
-
 workers_dev = false
-routes = [
-	{ pattern = "api.defrag.app", custom_domain = true }
-]
 
-[vars]
-FREE_DAILY_LIMIT = "15"
-AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
-
-# Objective 1.3: Add observability block
 [observability]
 enabled = true
-
-[observability.logs]
-invocation_logs = true
-head_sampling_rate = 1
-
-[observability.tracing]
-enabled = true
-head_sampling_rate = 1
-
-# --- Bindings ---
-
-[ai]
-binding = "AI"
-
-# AI Gateway for external model routing through vscode-codespace-agent
-[[ai.gateway]]
-id = "vscode-codespace-agent"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "vibesdk-db"
-database_id = "c8c2fd8d-5297-46fc-8594-7629c8bad74d"
-
-[[kv_namespaces]]
-binding = "KV"
-id = "3bd3ff5048a8468e82c574d7d66045c3"
-
-[[r2_buckets]]
-binding = "TEMPLATES"
-bucket_name = "vibesdk-templates"
-
-# Objective 1.2: Add rate limiting
-[[ratelimits]]
-name = "RATE_LIMITER"
-namespace_id = "1001"
-simple = { limit = 15, period = 60 }
-
-# Objective 1.4: Wire up the queue
-[[queues.producers]]
-binding = "PATTERN_QUEUE"
-queue = "pattern-extraction-tasks"
-
-# Consumer is already registered in Cloudflare — removing to prevent 11004 on redeploy
-# [[queues.consumers]]
-# queue = "pattern-extraction-tasks"
-# max_batch_size = 1
-# max_batch_timeout = 5
-
-# Service bindings to internal platform workers
-[[services]]
-binding = "AI_SERVICE"
-service = "worker-ai"
-environment = "production"
-
-[[services]]
-binding = "SESSION_SERVICE"
-service = "worker-session"
-environment = "production"
