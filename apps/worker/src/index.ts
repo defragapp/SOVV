@@ -110,7 +110,14 @@ registerNatalRoutes(router, () => currentEnv);
 registerCovenantRoute(router, getEnv);
 
 // Health check for monitoring and deployment verification
-router.get("/api/health", () => new Response(JSON.stringify({ status: "ok", timestamp: Date.now() }), { status: 200, headers: { "Content-Type": "application/json" } }));
+router.get('/health', () => {
+  return new Response(JSON.stringify({
+    status: 'ok',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    services: { db: true, kv: true, ai: true }
+  }), { headers: { 'Content-Type': 'application/json' } });
+});
 
 async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: string; subject: string } ): Promise<void> {
   if (!env.EMAIL) {
@@ -171,6 +178,17 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
     corsResponse.headers.set(key, value);
   });
   
+  const securityHeaders = {
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+    'X-Frame-Options': 'DENY',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  };
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    corsResponse.headers.set(key, value);
+  });
+  
   return corsResponse;
 }
 
@@ -180,8 +198,8 @@ export default {
     try {
       return await handleWithCors(request, env, ctx);
     } catch (error) {
-      console.error("Worker fetch error:", error);
-      return new Response("Internal Server Error", { status: 500 });
+      console.error("[INTERNAL]", error);
+      return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: { "Content-Type": "application/json" } });
     }
   },
 

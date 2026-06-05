@@ -356,3 +356,19 @@ export async function verifyAccessJWT(request: Request, env: { TEAM_DOMAIN?: str
     return jsonResponse({ error: "JWT verification failed" }, 500);
   }
 }
+
+// Turnstile bot verification
+export async function verifyTurnstile(token: string, secretKey: string): Promise<boolean> {
+  if (!token) return false;
+  try {
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret: secretKey, response: token }),
+    });
+    const data = await response.json() as { success: boolean };
+    return data.success;
+  } catch {
+    return false;
+  }
+}

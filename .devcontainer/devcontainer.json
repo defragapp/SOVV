@@ -13,7 +13,8 @@
       "extensions": [
         "saoudrizwan.claude-dev",
         "bradlc.vscode-tailwindcss",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "google.geminicodeassist"
       ]
     }
   }

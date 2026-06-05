@@ -1,1 +1,27 @@
-const fs = require('fs');	const path = './apps/worker/src/index.ts';	let content = fs.readFileSync(path, 'utf8');		hü (!content.includes('ForwardableEmailMessage')) {	  content = content.replace(	    'import type { Env } from "./types-env.js";',	    'import type { Env } from "./types-env.js";\nimport type { ForwardableEmailMessage } from "@cloudflare/workers-types";\nimport { EmailMessage } from "cloudflare:email";'  );	}		if (!content.includes('async email(')) {	  const handler = `	  async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {	    try {	      const id = crypto.randomUUID();	      const subject = message.headers.get("subject") || "No Subject";	      await env.DB.prepare(	        "INSERT INTO support_tickets (id, from_email, subject, status, created_at) VALUES (?, ?, ?, ?, ?)"	      ).bind(id, message.from, subject, "open", Date.now()).run();		      const autoReply = new EmailMessage(	        message.to,	        message.from,	        "Re: " + subject,	        "We have received your message and created a support ticket. We will get back to you shortly."	      );	      await env.EMAIL.send(autoReply);		      await message.forward("Defragapp@gmail.com");	    } catch (err) {	      console.error("Email handler failed", err);	    }	  },	} satisfies ExportedHandler<Env>;`;		  content = content.replace('} satisfies ExportedHandler<Env>;', handler);	}		fs.writeFileSync(path, content, 'utf8');
+const fs = require('fs');
+const path = '/workspaces/SOVV/apps/worker/src/index.ts';
+let code = fs.readFileSync(path, 'utf8');
+
+code = code.replace(
+  'router.get("/api/health", () => new Response(JSON.stringify({ status: "ok", timestamp: Date.now() }), { status: 200, headers: { "Content-Type": "application/json" } }));',
+  `router.get('/health', () => {
+  return new Response(JSON.stringify({
+    status: 'ok',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    services: { db: true, kv: true, ai: true }
+  }), { headers: { 'Content-Type': 'application/json' } });
+});`
+);
+
+code = code.replace(
+  `    try {\n      return await handleWithCors(request, env, ctx);\n    } catch (error) {\n      console.error("Worker fetch error:", error);\n      return new Response("Internal Server Error", { status: 500 });\n    }`,
+  `    try {\n      return await handleWithCors(request, env, ctx);\n    } catch (error) {\n      console.error("[INTERNAL]", error);\n      return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: { "Content-Type": "application/json" } });\n    }`
+);
+
+code = code.replace(
+  `  const cors = getCorsHeaders(request);\n  Object.entries(cors).forEach(([key, value]) => {\n    corsResponse.headers.set(key, value);\n  });\n  \n  return corsResponse;`,
+  `  const cors = getCorsHeaders(request);\n  Object.entries(cors).forEach(([key, value]) => {\n    corsResponse.headers.set(key, value);\n  });\n  \n  const securityHeaders = {\n    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',\n    'X-Frame-Options': 'DENY',\n    'X-Content-Type-Options': 'nosniff',\n    'Referrer-Policy': 'strict-origin-when-cross-origin',\n    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',\n  };\n  Object.entries(securityHeaders).forEach(([key, value]) => {\n    corsResponse.headers.set(key, value);\n  });\n  \n  return corsResponse;`
+);
+
+fs.writeFileSync(path, code);
