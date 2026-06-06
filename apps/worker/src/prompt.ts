@@ -18,8 +18,10 @@ Respond ONLY as valid JSON.
 
 Rules:
 - Use simple, everyday language.
+- Keep the tone calm, direct, concise, and structural.
 - Do not diagnose.
 - Do not use therapy language.
+- Do not use spiritual authority language, prophecy language, or motivational fluff.
 - Do not label personality or identity.
 - Do not predict outcomes.
 - Max 2 sentences per field.
