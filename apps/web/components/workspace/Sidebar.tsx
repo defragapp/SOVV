@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import type { Person, Tier, Relation } from "./types"
+import type { Person, Relation } from "./types"
 
 const RELATION_LABELS: Record<Relation, string> = {
   self: "Self",
@@ -14,11 +14,9 @@ const RELATION_LABELS: Record<Relation, string> = {
 export default function Sidebar({
   selectedPerson,
   onSelectPerson,
-  tier,
 }: {
   selectedPerson: Person
   onSelectPerson: (person: Person) => void
-  tier: Tier
 }) {
   const [search, setSearch] = useState("")
   const [people, setPeople] = useState<Person[]>([])
