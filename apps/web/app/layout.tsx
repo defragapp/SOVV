@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://defrag.app"),
   title: {
     default: "Sovereign.os",
-    template: "%s — Sovereign.os",
+    template: "%s - Sovereign.os",
   },
   description: "A private workspace for baseline-aware pattern recognition, response practice, and saved context.",
   openGraph: {
@@ -30,6 +30,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-background text-foreground antialiased selection:bg-white selection:text-black">
       <body className="min-h-screen bg-background text-foreground overflow-x-hidden">
+        <header className="p-6 border-b border-white/10">
+          <span className="font-mono font-bold tracking-widest text-white">SOVEREIGN.OS</span>
+        </header>
         {children}
       </body>
     </html>
