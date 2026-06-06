@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Sovereign.os brand mark</title>
+  <desc id="desc">A minimal geometric brand mark for Sovereign.os and DEFRAG.</desc>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.72"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="96" fill="#05070B"/>
+  <rect x="164" y="164" width="696" height="696" rx="52" fill="none" stroke="url(#g)" stroke-width="22"/>
+  <path d="M316 384h392M316 512h392M316 640h392" stroke="#ffffff" stroke-opacity="0.72" stroke-width="20" stroke-linecap="round"/>
+  <circle cx="512" cy="512" r="62" fill="none" stroke="#ffffff" stroke-width="20"/>
+  <path d="M512 450v124M450 512h124" stroke="#ffffff" stroke-width="20" stroke-linecap="round"/>
+</svg>
