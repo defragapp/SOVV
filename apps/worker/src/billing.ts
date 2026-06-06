@@ -1,6 +1,6 @@
 import type { Env } from "./types-env.js";
 import { getSessionId, cookieHeader } from "./plan.js";
-import { verifyAccessJWT } from "./auth.js";
+import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import {
   sendWelcomeEmail,
   sendPaymentSucceededEmail,
@@ -43,12 +43,17 @@ async function verifyStripeSignature(rawBody: string, sigHeader: string, secret:
   return out === 0;
 }
 
+async function requireSessionAuth(req: Request, env: Env): Promise<Response | null> {
+  const user = await getAuthUser(req, env.DB);
+  if (user) return null;
+  return verifyAccessJWT(req, env);
+}
+
 export async function handleCheckout(req: Request, env: Env): Promise<Response> {
-  const authErr = await verifyAccessJWT(req, env);
+  const authErr = await requireSessionAuth(req, env);
   if (authErr) return authErr;
 
   // Get user from session for client_reference_id
-  const { getAuthUser } = await import("./auth.js");
   const user = await getAuthUser(req, env.DB);
   const userId = user?.id ?? "unknown";
 
@@ -169,10 +174,9 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
 }
 
 export async function handlePortal(req: Request, env: Env): Promise<Response> {
-  const authErr = await verifyAccessJWT(req, env);
+  const authErr = await requireSessionAuth(req, env);
   if (authErr) return authErr;
 
-  const { getAuthUser } = await import("./auth.js");
   const user = await getAuthUser(req, env.DB);
 
   if (!user) {
