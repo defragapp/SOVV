@@ -7,7 +7,7 @@ import Link from "next/link";
 const cases = [
   {
     title: "Before you send the message",
-    body: "You have written it three times. Something still feels off. Defrag helps you see what got lit up — and whether sending it will get you what you actually want.",
+    body: "You have written it three times. Something still feels off. Defrag helps you understand what is active in the moment — and whether sending it will get you what you actually want.",
   },
   {
     title: "When a conversation keeps repeating",
@@ -23,7 +23,7 @@ const cases = [
   },
   {
     title: "When you need to understand your part",
-    body: "Not to blame yourself. To see clearly. Defrag shows what got lit up in you — and what that means for how the moment landed on the other person.",
+    body: "Not to blame yourself. To see clearly. Defrag helps you understand what is active in you — and what that means for how the moment landed on the other person.",
   },
   {
     title: "When you want to practice a response first",

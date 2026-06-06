@@ -25,7 +25,7 @@ curl -I https://ai.defrag.app | grep -E "200|404"
 
 ---
 
-## 2. Naming Compliance Checks
+
 
 ```bash
 cd /path/to/SOVV
@@ -155,6 +155,7 @@ grep -rn "api/auth/tier" apps/web/app/ apps/web/components/ | head -5
 | All four domains served by Worker | No `pages.dev` in response headers |
 | No DEFRAG in body copy | Zero matches outside titles/metadata |
 | No Workbench in user-facing copy | Zero matches |
+| No "got lit up" in body copy | Zero matches in marketing/docs prose |
 | Baseline Design used in user-facing copy | "Baseline Design" appears in settings, components, emails |
 | `/apps/defrag` route exists | File present |
 | `/apps/covenant` route exists | File present |
@@ -166,3 +167,6 @@ grep -rn "api/auth/tier" apps/web/app/ apps/web/components/ | head -5
 | `fix-lockfile.yml` deleted | File absent |
 | No sensitive files committed | Zero matches |
 | Build produces `.open-next/worker.js` | File present after build |
+| No `privacy@defrag.app` or `legal@defrag.app` in user-facing copy | Zero matches |
+| `info@defrag.app` is primary contact | Appears in contact, privacy, terms, email.ts |
+| No `sovereign.os` or `covenant.app` email addresses in docs/UI | Zero matches (except future-state comments) |

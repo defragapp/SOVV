@@ -112,7 +112,7 @@ Current live pages:
 - `/terms` — terms of service
 - `/privacy` — privacy policy
 
-Both pages reference `legal@defrag.app` and `privacy@defrag.app` as contact addresses. These are role addresses. The private forwarding destination must not appear in any public-facing page or committed source code.
+Both pages reference `info@defrag.app` as the public contact address. The private forwarding destination must not appear in any public-facing page or committed source code.
 
 ---
 

@@ -9,7 +9,7 @@ Use these terms exactly as written in all user-facing copy, documentation, onboa
 | Baseline Design | All user-facing copy, docs, prompts, emails, UI labels |
 | Sources | What the AI draws from |
 | Result | AI output |
-| Active Now | What is currently lit up |
+| Active pattern | What is currently active in the moment (replaces "what got lit up" in body copy) |
 | The Repeat | The recurring loop |
 | Old Role | The pattern learned under pressure |
 | What You Learned to Carry | The adaptive behavior |
@@ -35,7 +35,7 @@ Use these terms exactly as written in all user-facing copy, documentation, onboa
 
 | Context | Rule | Example |
 |---|---|---|
-| Defrag in body copy | Title case | "Defrag shows what got lit up." |
+| Defrag in body copy | Title case | "Defrag helps you understand what is active in the moment." |
 | Defrag in logo / header / doc title | All caps | "DEFRAG" |
 | Covenant in body copy | Title case | "Covenant is optional." |
 | Baseline Design | Always capitalized | "Your Baseline Design is the starting map." |
@@ -53,6 +53,7 @@ Use these terms exactly as written in all user-facing copy, documentation, onboa
 | workspace (for spaces) | space |
 | Design (alone, user-facing) | Baseline Design |
 | Your Baseline (as product term) | Your Baseline Design |
+| "got lit up" / "lit up" (body copy) | "what is active in the moment", "active pattern", "Defrag helps surface the pattern" |
 | artifact | result, output, saved item |
 | read | see, show, surface |
 | signal | pattern, activation |
@@ -66,6 +67,18 @@ Use these terms exactly as written in all user-facing copy, documentation, onboa
 | trigger | activation, pattern firing |
 | trauma | — (avoid in product copy) |
 | healing | — (avoid in product copy) |
+
+**Note on "What got lit up":** This phrase may remain as a UI label in the product interface (e.g., section headers, card labels) where it functions as a named product concept. It must not appear in body copy, marketing descriptions, FAQ answers, or documentation prose. Use "active pattern" or "what is active in the moment" in those contexts.
+
+---
+
+## Defrag Scope Statement
+
+When describing what Defrag does, use this framing:
+
+> "Defrag helps you understand what is active in the moment. Defrag supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics."
+
+Do not describe Defrag as only for conflict or relationship problems. It is a broad relational intelligence space.
 
 ---
 
@@ -89,17 +102,23 @@ Defrag and Covenant are **spaces** inside Sovereign.os. They are not:
 
 ---
 
-## Approved Vocabulary (Operator Playbook Supplement)
+## Email Standard
 
-**Approved for use:**
-Your Baseline Design, The sky over you, What got lit up, The Loop, The Twist, Your Strengths, Connection Loop, Pressure Loop, Best Next Response, Alignment, Practice, Your Story, Watch It, Try It Out, Save to Sovereign, Defrag space, Covenant space, Sovereign.os Library
+**Public contact:** `info@defrag.app` — primary public inbox for support, contact, privacy, and legal questions.
 
-**Not approved:**
-Clear Move, Design Points, Stress Distortions, Directional Architecture, Emotional Architecture, Body Signals, Feminine Wound, Masculine Wound, Shadow Work, Inner Child Work, Spiritual Gifts, Somatic Signature, Wound Architecture, Therapy Replacement, Oracle, Frequency, Destiny, Meditate, Breathe
+**Do not create** separate role inboxes (privacy@, legal@, billing@, security@) unless legally required or operationally necessary. Route everything through `info@defrag.app` using Cloudflare Email Routing.
 
----
+**Optional future aliases** (only if Email Routing is configured and destination is verified):
+- `billing@defrag.app` — billing fallback only
+- `security@defrag.app` — security contact only
 
-## Email Subject Line Standard
+**Transactional email standard:**
+- From: `Sovereign.os <info@defrag.app>`
+- Reply-To: `info@defrag.app`
+- Do not use unverified sender addresses.
+- If `sovereign.os` Email Routing becomes active, platform emails may use `From: Sovereign.os <info@sovereign.os>`.
+
+**Email subject line standard:**
 
 | Event | Subject |
 |---|---|
@@ -107,6 +126,16 @@ Clear Move, Design Points, Stress Distortions, Directional Architecture, Emotion
 | Payment succeeded | "Subscription renewed — Sovereign.os" |
 | Payment failed | "Payment failed — action required — Sovereign.os" |
 | Cancellation | "Subscription canceled — Sovereign.os" |
+
+---
+
+## Approved Vocabulary (Operator Playbook Supplement)
+
+**Approved for use:**
+Your Baseline Design, The sky over you, Active pattern, The Loop, The Twist, Your Strengths, Connection Loop, Pressure Loop, Best Next Response, Alignment, Practice, Your Story, Watch It, Try It Out, Save to Sovereign, Defrag space, Covenant space, Sovereign.os Library
+
+**Not approved:**
+Clear Move, Design Points, Stress Distortions, Directional Architecture, Emotional Architecture, Body Signals, Feminine Wound, Masculine Wound, Shadow Work, Inner Child Work, Spiritual Gifts, Somatic Signature, Wound Architecture, Therapy Replacement, Oracle, Frequency, Destiny, Meditate, Breathe, "got lit up" (in body copy), Workbench, DEFRAG (in body copy)
 
 ---
 

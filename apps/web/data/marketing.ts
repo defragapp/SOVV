@@ -16,7 +16,7 @@ export const footerItems = [
 ];
 
 export const valuePoints = [
-  "See what is active now instead of reacting blind",
+  "Understand what is active in the moment instead of reacting blind",
   "Find the repeating loop before it escalates",
   "Separate useful strength from the strain around it",
   "Choose a response that fits the moment",
@@ -50,8 +50,8 @@ export const lenses = [
     href: "/product",
   },
   {
-    title: "What got lit up",
-    summary: "The part of your Baseline Design that is active in this moment, and what it means for the people around you.",
+    title: "What is active in the moment",
+    summary: "The part of your Baseline Design that is most active right now, and what it means for the people around you.",
     useCase: "Use it when a dynamic feels cyclical, loaded, or hard to name.",
     cta: "Learn more",
     href: "/product",
@@ -65,7 +65,7 @@ export const faqItems = [
   },
   {
     q: "What is Defrag?",
-    a: "Defrag is the space inside Sovereign.os for working through a real moment. It shows what got lit up, where the loop is forming, and what response gives the moment a better chance.",
+    a: "Defrag is the space inside Sovereign.os for working through a real moment. It helps you understand what is active in the moment, where the loop is forming, and what response gives the moment a better chance. Defrag supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics.",
   },
   {
     q: "What is Covenant?",
@@ -81,7 +81,7 @@ export const faqItems = [
   },
   {
     q: "What is The Loop?",
-    a: "The Loop is the repeating pattern that starts when pressure rises. Defrag shows where it begins so you can choose a different response before it takes over.",
+    a: "The Loop is the repeating pattern that starts when pressure rises. Defrag helps surface the pattern underneath the moment so you can choose a different response before it takes over.",
   },
   {
     q: "What is The Twist?",
@@ -110,7 +110,7 @@ export const pricingTiers = [
     features: [
       "Baseline Design setup",
       "Defrag space access",
-      "What got lit up",
+      "Active pattern surface",
       "Best Next Response",
       "Basic session history",
       "Why this answer? summary",

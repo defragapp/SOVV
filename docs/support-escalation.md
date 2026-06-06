@@ -11,14 +11,14 @@ How to respond to real users safely, consistently, and without exposing engine i
 **Examples:**
 - "How does this work?"
 - "What is my Baseline Design?"
-- "What does 'what got lit up' mean?"
+- "What does 'active pattern' mean?" or "What is active in the moment?"
 
 **Response style:** Simple, plain, product-language only.
 
 **Use:**
 - "It uses your Baseline Design, what is active now, and the context you provide to organize the pattern and show the next response."
 - "Your Baseline Design is the starting map — how you tend to process, respond, connect, protect, communicate, and return to center."
-- "What got lit up is the part of your Baseline Design that is most active in this moment."
+- "The active pattern is the part of your Baseline Design that is most present in this moment — the pattern Defrag helps you understand and work with."
 
 **Do not explain:**
 - Mapping systems
@@ -126,6 +126,8 @@ Escalate to owner review immediately.
 
 **Use:**
 > "Your data is private by design. We collect what you provide — Baseline Design details, thread content, and notebook entries — and use it only to power your space. You can request deletion at any time by contacting us at info@defrag.app. We process deletion requests within 30 days."
+
+**Contact for data requests:** info@defrag.app
 
 **Do not:**
 - Describe internal data architecture in detail

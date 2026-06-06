@@ -24,6 +24,8 @@ These rules apply to any AI agent, coding assistant, or automated tool working i
 | `DEFRAG` (logo/header/doc title only) | `DEFRAG` (body copy) |
 | `space`, `guided space`, `reflection space` | `Workbench`, `workspace` (for spaces) |
 | `Sovereign.os` | `SOVV` (user-facing) |
+| "what is active in the moment" / "active pattern" | "got lit up" / "lit up" (body copy) |
+| `info@defrag.app` | `privacy@defrag.app`, `legal@defrag.app`, `covenant.app` addresses |
 
 ---
 

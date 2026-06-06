@@ -4,7 +4,7 @@
 
 **Sovereign.os** is the parent platform. It is the private home base for a user's account, Baseline Design, subscription, saved Library, and connected spaces.
 
-**Defrag** is a space inside Sovereign.os. It is the relational intelligence space for working through what is active now — the pattern, the loop, the response that gives the moment a better chance.
+**Defrag** is a space inside Sovereign.os. It is the relational intelligence space for working through what is active in the moment — the pattern, the loop, the response that gives the moment a better chance. Defrag supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics.
 
 **Covenant** is a space inside Sovereign.os. It is an optional faith-context reflection space. User-initiated, plain-language, and private by design.
 

@@ -12,7 +12,7 @@ How to run the platform day-to-day without breaking it, exposing private engine 
 The Baseline Design synthesis logic, pattern extraction, prompt chains, and scoring are server-side only. They are never sent to the client. They are never explained in detail to users.
 
 **The UI shows useful summaries, not raw computation.**
-Users see: what got lit up, the loop, the twist, the strength, the Best Next Response. They do not see: gate weights, transit scores, raw Baseline Design objects, system prompts, or model chain reasoning.
+Users see: what is active in the moment, the loop, the twist, the strength, the Best Next Response. They do not see: gate weights, transit scores, raw Baseline Design objects, system prompts, or model chain reasoning.
 
 **The user is never told what to do — only shown structure and options.**
 Defrag shows patterns and responses. The user decides what to do with them. Never frame output as instruction, prediction, or guarantee.

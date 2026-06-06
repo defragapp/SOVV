@@ -7,10 +7,10 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Product — DEFRAG",
-  description: "A Baseline Design-aware AI space with a living notebook. Defrag shows what got lit up, where the loop is forming, and what brings you back to center.",
+  description: "A Baseline Design-aware AI space with a living notebook. Defrag helps you understand what is active in the moment, surface the pattern underneath, and find the response that brings things back to center.",
   openGraph: {
     title: "Product — DEFRAG",
-    description: "A Baseline Design-aware AI space with a living notebook. Defrag shows what got lit up, where the loop is forming, and what brings you back to center.",
+    description: "A Baseline Design-aware AI space with a living notebook. Defrag helps you understand what is active in the moment, surface the pattern underneath, and find the response that brings things back to center.",
   },
 };
 
@@ -24,12 +24,12 @@ const surfaces = [
     body: "The current timing layer. It shows what is louder right now — and why the moment may feel bigger than it should.",
   },
   {
-    label: "What got lit up",
-    body: "The part of your Baseline Design that is active in this moment. Defrag shows it clearly so you can see the pattern before it takes over.",
+    label: "Active pattern",
+    body: "The part of your Baseline Design that is most active in this moment. Defrag helps you understand what is driving the dynamic before it takes over.",
   },
   {
     label: "The Loop",
-    body: "The repeating pattern that starts when pressure rises. Defrag shows where it begins so you can choose a different response.",
+    body: "The repeating pattern that starts when pressure rises. Defrag helps surface the pattern underneath the moment so you can choose a different response.",
   },
   {
     label: "The Twist",
@@ -45,7 +45,7 @@ const surfaces = [
   },
   {
     label: "Your Story",
-    body: "A saved record of what got lit up, what the loop was, and what response brought you back to center. The AI uses it to keep the thread grounded over time.",
+    body: "A saved record of what was active, what the loop was, and what response brought you back to center. The AI uses it to keep the thread grounded over time.",
   },
 ];
 
@@ -55,7 +55,7 @@ export default function ProductPage() {
       <PageHero
         eyebrow="Product"
         title="A Baseline Design-aware AI space with a living notebook."
-        body="Sovereign.os keeps the thread grounded in your Baseline Design, the sky over you, and the people you choose. Defrag shows what got lit up, where the loop is forming, and what brings you back to center."
+        body="Sovereign.os keeps the thread grounded in your Baseline Design, the sky over you, and the people you choose. Defrag helps you understand what is active in the moment, where the loop is forming, and what brings you back to center."
       />
 
       <MotionSection className="px-6 py-24">
@@ -84,7 +84,7 @@ export default function ProductPage() {
           <SectionHeader
             eyebrow="Defrag"
             title="The relational intelligence space."
-            body="Defrag shows what got lit up between people. It helps you see the loop, the twist, the strength underneath, and the response that brings the moment back to center."
+            body="Defrag helps surface the pattern underneath the moment. It supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics."
           />
           <div className="mt-12 space-y-6 text-sm leading-7 text-white/45">
             <p>

@@ -91,10 +91,10 @@ function EmptyState() {
           Right Now
         </p>
         <p className="text-sm font-light text-white/30 leading-6">
-          Nothing is lit up yet.
+          Nothing is active yet.
         </p>
         <p className="mt-2 text-sm font-light text-white/20 leading-6">
-          Start by telling Defrag what is going on. Once the thread has context, Right Now will show the loop, the twist, and the Best Next Response.
+          Start by telling Defrag what is going on. Once the thread has context, Right Now will show the active pattern, the loop, the twist, and the Best Next Response.
         </p>
       </div>
       <p className="font-mono text-[9px] uppercase tracking-widest text-white/15 mt-2">
@@ -122,7 +122,7 @@ export default function ContextPanel({
           </span>
           {hasContent && (
             <span className="font-mono text-[9px] uppercase tracking-widest text-white/20">
-              What got lit up
+              Active pattern
             </span>
           )}
         </div>
@@ -133,7 +133,7 @@ export default function ContextPanel({
       ) : (
         <div className="flex flex-col divide-y divide-[#F6F5F3]/10">
 
-          {/* What got lit up — Shift */}
+          {/* Active pattern — Shift */}
           {activeMessage.shift && (
             <ShiftCard shift={activeMessage.shift} />
           )}

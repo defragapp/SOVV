@@ -119,7 +119,7 @@ export default function Thread({
             {msg.shift && (
               <div className="mt-3 border-l border-[#F6F5F3]/20 pl-4">
                 <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">
-                  What got lit up
+                  Active pattern
                 </span>
                 <p className="mt-1 text-sm text-white/70">{msg.shift.summary}</p>
               </div>

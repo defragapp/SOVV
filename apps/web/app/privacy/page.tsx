@@ -37,7 +37,7 @@ const sections = [
   },
   {
     title: "Contact",
-    body: "For privacy questions, contact us at privacy@defrag.app.",
+    body: "For privacy questions, contact us at info@defrag.app.",
   },
 ];
 

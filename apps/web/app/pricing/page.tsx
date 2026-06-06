@@ -7,10 +7,10 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Pricing — DEFRAG",
-  description: "Start free. See what got lit up. Upgrade to Pro to work the pattern over time, save what changes, and go deeper with another person.",
+  description: "Start free. Understand what is active in the moment. Upgrade to Pro to work the pattern over time, save what changes, and go deeper with another person.",
   openGraph: {
     title: "Pricing — DEFRAG",
-    description: "Start free. See what got lit up. Upgrade to Pro to work the pattern over time.",
+    description: "Start free. Understand what is active in the moment. Upgrade to Pro to work the pattern over time.",
   },
 };
 

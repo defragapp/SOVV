@@ -26,7 +26,7 @@ Both spaces share one Baseline Design, one Library, one subscription, and one au
 | Helps practice decisions | Allows users to try out responses before acting |
 | Organizes past insight | Saves threads, notes, and patterns in the Sovereign.os Library |
 | Grounds the thread | Uses Baseline Design, timing, and selected people to keep AI context consistent |
-| Shows what got lit up | Identifies which part of the user's Baseline Design is active in the moment |
+| Surfaces the active pattern | Identifies which part of the user's Baseline Design is most active in the moment |
 | Shows the other side | Helps users see what may be active in another person when data is available and permitted |
 | Covenant reflection | Optional faith-context reflection using the same Baseline Design and Library |
 
@@ -72,7 +72,7 @@ When a user asks "how does this work?":
 - Defrag space access (up to 5 sessions/day)
 - Core pattern recognition
 - Best Next Response
-- What got lit up
+- Active pattern surface
 - Your Story (basic)
 
 ### Pro Tier

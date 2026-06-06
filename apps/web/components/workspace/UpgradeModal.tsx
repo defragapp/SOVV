@@ -22,7 +22,7 @@ const COPY: Record<UpgradeScenario, {
 }> = {
   general: {
     title: "See the full pattern",
-    body: "Free helps you see what got lit up. Pro helps you work the pattern over time, save what changes, and go deeper with another person.",
+    body: "Free helps you understand what is active in the moment. Pro helps you work the pattern over time, save what changes, and go deeper with another person.",
     features: [
       "Expanded Defrag space use",
       "Your Space notebook",
@@ -36,7 +36,7 @@ const COPY: Record<UpgradeScenario, {
   },
   session_limit: {
     title: "You've reached today's Free limit",
-    body: "Free gives you a starting view of what got lit up. Pro keeps the thread going so you can work the pattern over time.",
+    body: "Free gives you a starting view of what is active in the moment. Pro keeps the thread going so you can work the pattern over time.",
     primaryLabel: "Upgrade to Pro",
     secondaryLabel: "Come back later",
   },
@@ -72,7 +72,7 @@ const COPY: Record<UpgradeScenario, {
   },
   canceled: {
     title: "Your account is now on Free",
-    body: "Your Pro subscription is no longer active. You can still use Free to see what got lit up and get a basic Best Next Response.",
+    body: "Your Pro subscription is no longer active. You can still use Free to understand what is active in the moment and get a basic Best Next Response.",
     primaryLabel: "Upgrade to Pro",
     secondaryLabel: "Continue with Free",
   },

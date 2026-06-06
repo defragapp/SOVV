@@ -2,10 +2,10 @@ import type { Env } from "./types-env.js";
 import { getSessionId, cookieHeader } from "./plan.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import {
-  sendWelcomeEmail,
-  sendPaymentSucceededEmail,
-  sendPaymentFailedEmail,
-  sendCancellationEmail,
+  sendWelcomeEmailLegacy as sendWelcomeEmail,
+  sendPaymentSucceededEmailLegacy as sendPaymentSucceededEmail,
+  sendPaymentFailedEmailLegacy as sendPaymentFailedEmail,
+  sendCancellationEmailLegacy as sendCancellationEmail,
 } from "./email.js";
 
 // Stripe webhook signature verification in Workers (no Stripe SDK)

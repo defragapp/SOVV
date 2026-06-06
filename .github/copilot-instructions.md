@@ -47,6 +47,12 @@ scripts/           — Developer convenience scripts
 | `DEFRAG` (logo/header/doc title only) | `DEFRAG` (body copy) |
 | `space`, `guided space`, `reflection space` | `Workbench`, `workspace` (for spaces) |
 | `Sovereign.os` | `SOVV` (user-facing) |
+| "what is active in the moment" / "active pattern" | "got lit up" / "lit up" (body copy) |
+| `info@defrag.app` | `privacy@defrag.app`, `legal@defrag.app`, `covenant.app` addresses |
+
+**Defrag scope:** When describing what Defrag does, include: "Defrag supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics."
+
+**Email standard:** All transactional email uses `From: Sovereign.os <info@defrag.app>`. Do not create or reference `privacy@`, `legal@`, `billing@`, or `security@` role inboxes unless explicitly required. `sovereign.os` and `covenant.app` are not in this Cloudflare account — do not reference their email addresses.
 
 ---
 

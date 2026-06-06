@@ -13,7 +13,7 @@ const steps = [
   {
     num: "02",
     title: "Check what is active now",
-    body: "The sky over you shows what is louder right now. Your Baseline Design shows how you are built. Together they show what got lit up — the part of you that is most active in this moment.",
+    body: "The sky over you shows what is louder right now. Your Baseline Design shows how you are built. Together they help you understand what is active in the moment — the part of you most present in this dynamic.",
   },
   {
     num: "03",
@@ -23,7 +23,7 @@ const steps = [
   {
     num: "04",
     title: "Turn the answer into something you can use",
-    body: "Defrag shows what got lit up, where the loop is forming, and the Best Next Response. You can save it, practice it, hear it as audio, watch it as a short scene, or return to it as part of Your Story.",
+    body: "Defrag helps surface the pattern underneath the moment, shows where the loop is forming, and surfaces the Best Next Response. You can save it, practice it, hear it as audio, watch it as a short scene, or return to it as part of Your Story.",
   },
 ];
 

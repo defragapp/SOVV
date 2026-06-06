@@ -45,7 +45,7 @@ export default function LandingPage() {
             <div className="premium-card space-y-4 hover:border-zinc-700 transition-colors">
               <h3 className="text-xl font-medium tracking-tight">Defrag</h3>
               <p className="text-zinc-400 text-sm leading-relaxed">
-                The relational intelligence space. Defrag shows what got lit up, where the loop is forming, and what response gives the moment a better chance.
+                The relational intelligence space. Defrag helps you understand what is active in the moment, where the loop is forming, and what response gives the moment a better chance. Supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics.
               </p>
               <Link href="https://app.defrag.app/apps/defrag" className="inline-block text-xs text-zinc-500 hover:text-white transition-colors">
                 Enter Defrag space →

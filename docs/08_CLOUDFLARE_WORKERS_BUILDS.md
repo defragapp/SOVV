@@ -6,6 +6,8 @@
 
 This replaces `.github/workflows/deploy-live.yml` as the production deployment path.
 
+**Note on sovereign.os:** The `sovereign.os` domain is not currently in this Cloudflare account. Use `sovereign.defrag.app` as the transitional platform entry. When `sovereign.os` is registered and added to Cloudflare, make it the canonical platform landing and update DNS, routes, and email accordingly.
+
 ---
 
 ## Setup Steps
@@ -135,3 +137,41 @@ export default defineCloudflareConfig({
   }
 });
 ```
+
+---
+
+## Email Routing Dashboard Tasks
+
+See `docs/email-routing-standard.md` for full setup steps. Summary:
+
+1. **Cloudflare Dashboard → Email → Email Routing → defrag.app zone**
+   - Enable Email Routing (adds MX + SPF records automatically)
+2. **Destination addresses** → Add and verify private forwarding address
+3. **Routing rules** → Create rule: `info` → verified destination
+4. **After verification** → Add `[[send_email]]` binding to `apps/worker/wrangler.toml`:
+   ```toml
+   [[send_email]]
+   name = "EMAIL"
+   destination_address = "info@defrag.app"
+   ```
+5. Redeploy `sovereign-os-api` after adding binding
+
+---
+
+## Remaining Dashboard Actions Checklist
+
+| Action | Status |
+|---|---|
+| Remove `defrag.app` from Pages project `sovv-platform` | ⏳ Required |
+| Remove `www.defrag.app` from Pages project `sovv-platform` | ⏳ Required |
+| Update DNS: `defrag.app` CNAME → proxied Worker A/AAAA record | ⏳ Required |
+| Update DNS: `www.defrag.app` CNAME → proxied Worker A/AAAA record | ⏳ Required |
+| Connect `sovv-web` to Cloudflare Workers Builds (GitHub main) | ⏳ Required |
+| Delete `sovv-platform` Pages project (after Worker routes verified) | ⏳ Required |
+| Delete `.github/workflows/deploy-live.yml` (after Workers Builds confirmed) | ⏳ Required |
+| Redeploy `sovereign-os-api` (KV binding renamed SOVV_DATA → KV) | ⏳ Required |
+| Delete orphaned `sovv` Worker | ⏳ Required |
+| Investigate/delete orphaned `BASELINE_KV` KV namespace | ⏳ Required |
+| Enable Email Routing on `defrag.app` | ⏳ Required |
+| Add and verify destination address for `info@defrag.app` | ⏳ Required |
+| Add `[[send_email]]` binding to `sovereign-os-api` after verification | ⏳ Required |
