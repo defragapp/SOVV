@@ -38,3 +38,44 @@ apps/worker/src/*.d.ts.map
 
 # Operational files
 apps/web/app/todo.md
+
+# Stale IDE/tool configs
+.clinerules
+.continue/
+
+# Stale web artifacts
+apps/web/config_json.code-search
+apps/web/hero-css-snippets.css
+apps/web/hero.module.css
+apps/web/styles/globals.css
+apps/web/app/landing/page.tsx
+apps/web/public/vercel.svg
+apps/web/public/window.svg
+apps/web/public/globe.svg
+
+# Unused root components (superseded by workspace/ and marketing/ components)
+apps/web/components/AnimatedOverview.tsx
+apps/web/components/ArtifactList.tsx
+apps/web/components/AudioOverview.tsx
+apps/web/components/Chips.tsx
+apps/web/components/Composer.tsx
+apps/web/components/Hero.tsx
+apps/web/components/MemoryInsights.tsx
+apps/web/components/SpotlightLanding.tsx
+apps/web/components/StudioPanel.tsx
+apps/web/components/Thread.tsx
+apps/web/lib/storage.ts
+
+# Misplaced worker files
+apps/worker/src/page.tsx
+
+# Duplicate packages/core root files (canonical versions are in packages/core/src/)
+packages/core/HistoryTimeline.tsx
+packages/core/MemoryPanel.tsx
+packages/core/PatternCard.tsx
+packages/core/memory.ts
+packages/core/page.tsx
+
+# Unused core data files (not exported from packages/core/src/index.ts)
+packages/core/src/geneKeyMeanings.ts
+packages/core/src/geneKeys.ts
