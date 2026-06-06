@@ -2,30 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply bg-background text-foreground antialiased selection:bg-white selection:text-black;
-  }
-  
-  /* Strip all default shadows from interactive elements */
-  button, input, textarea {
-    @apply shadow-none outline-none focus:ring-0 focus:outline-none transition-colors duration-200;
-  }
+@theme {
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+  --color-border: rgba(255, 255, 255, 0.16);
 }
 
-@layer components {
-  /* Premium Monochrome Card Structure */
-  .premium-card {
-    @apply bg-background border border-border p-6 rounded-none;
-  }
-  
-  /* The 10px tracked-out metadata label */
-  .meta-label {
-    @apply text-micro tracking-widest uppercase text-zinc-500 font-mono mb-2 block;
-  }
+:root {
+  color-scheme: dark;
+  --background: #000000;
+  --foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.16);
+}
 
-  /* Structural button that fills with white on hover */
-  .btn-premium {
-    @apply border border-border px-4 py-2 text-sm text-foreground bg-transparent hover:bg-foreground hover:text-background rounded-none font-medium transition-all;
-  }
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+}
+
+body {
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* Shared primitive classes used by older components. */
+.sovv-card {
+  background: var(--background);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  border-radius: 0;
+}
+
+.sovv-button {
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--foreground);
+  background: transparent;
+  border-radius: 0;
+  font-weight: 500;
+  transition: all 150ms ease;
+}
+
+.sovv-button:hover {
+  background: var(--foreground);
+  color: var(--background);
 }
