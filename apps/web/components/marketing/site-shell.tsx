@@ -10,7 +10,6 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Nav */}
       <header className="fixed top-0 z-50 w-full border-b border-white/8 glass">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link
@@ -20,7 +19,6 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             DEFRAG
           </Link>
 
-          {/* Desktop nav */}
           <nav className="hidden items-center gap-8 md:flex">
             {navItems.map((item) => (
               <Link
@@ -48,7 +46,6 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
 
-          {/* Mobile menu button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden font-mono text-[10px] uppercase tracking-widest text-white/40"
@@ -57,7 +54,6 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        {/* Mobile menu */}
         <AnimatePresence>
           {menuOpen && (
             <motion.div
@@ -91,10 +87,26 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         </AnimatePresence>
       </header>
 
-      {/* Main content */}
       <main className="flex-1 pt-[65px]">{children}</main>
 
-      
+      <footer className="border-t border-white/8 px-6 py-10">
+        <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/25">
+            Sovereign.os / DEFRAG
+          </p>
+          <div className="flex flex-wrap items-center gap-5">
+            {footerItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="font-mono text-[10px] uppercase tracking-widest text-white/35 hover:text-white/70 transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
