@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react"
 import type { Person, Tier, Relation } from "./types"
-import { UpgradeButton } from "@/components/UpgradeButton"
-import ManageSubscription from "./ManageSubscription"
 
 const RELATION_LABELS: Record<Relation, string> = {
   self: "Self",
@@ -80,8 +78,6 @@ export default function Sidebar({
           />
         ))}
       </div>
-
-      
     </aside>
   )
 }
