@@ -1,7 +1,7 @@
 // Branded lifecycle email sender via Resend
 // Requires RESEND_API_KEY in Worker environment secrets
 
-const FROM = "DEFRAG <info@defrag.app>";
+const FROM = "Sovereign.os <info@defrag.app>";
 const SUPPORT = "info@defrag.app";
 const APP_URL = "https://app.defrag.app";
 
@@ -47,12 +47,12 @@ function baseTemplate(content: string): string {
 </head>
 <body>
 <div class="wrap">
-  <div class="wordmark">Sovereign OS / DEFRAG</div>
+  <div class="wordmark">Sovereign.os</div>
   ${content}
   <hr class="divider">
   <div class="footer">
     <p style="color:rgba(246,245,243,0.15);font-size:9px;">
-      DEFRAG is a reflection tool — not therapy, diagnosis, or professional advice.<br>
+      Sovereign.os is a reflection space — not therapy, diagnosis, or professional advice.<br>
       Questions? <a href="mailto:${SUPPORT}">${SUPPORT}</a>
     </p>
   </div>
@@ -67,17 +67,17 @@ export async function sendWelcomeEmail(apiKey: string, to: string): Promise<void
     <p style="color:#F6F5F3;font-size:18px;font-weight:300;margin-bottom:24px;">
       Pro is active.
     </p>
-    <p>Your baseline is set. The thread is grounded. You now have access to the full pattern.</p>
+    <p>Your Baseline Design is set. The thread is grounded. You now have access to the full pattern.</p>
     <p>What unlocked:</p>
     <p style="color:rgba(246,245,243,0.4);">
-      Unlimited sessions &nbsp;·&nbsp; Your Story &nbsp;·&nbsp; Compare With Someone &nbsp;·&nbsp; Try It Out &nbsp;·&nbsp; Full history
+      Unlimited sessions &nbsp;·&nbsp; Your Story &nbsp;·&nbsp; Compare With Someone &nbsp;·&nbsp; Try It Out &nbsp;·&nbsp; Covenant space &nbsp;·&nbsp; Full history
     </p>
-    <a href="${APP_URL}" class="cta">Go to Workspace</a>
+    <a href="${APP_URL}" class="cta">Enter your space</a>
   `);
 
   await sendEmail(apiKey, {
     to,
-    subject: "Pro is active — DEFRAG",
+    subject: "Pro is active — Sovereign.os",
     html,
   });
 }
@@ -89,12 +89,12 @@ export async function sendPaymentSucceededEmail(apiKey: string, to: string): Pro
       Your subscription renewed.
     </p>
     <p>Your Pro access continues. The thread stays grounded.</p>
-    <a href="${APP_URL}" class="cta">Go to Workspace</a>
+    <a href="${APP_URL}" class="cta">Enter your space</a>
   `);
 
   await sendEmail(apiKey, {
     to,
-    subject: "Subscription renewed — DEFRAG",
+    subject: "Subscription renewed — Sovereign.os",
     html,
   });
 }
@@ -113,7 +113,7 @@ export async function sendPaymentFailedEmail(apiKey: string, to: string): Promis
 
   await sendEmail(apiKey, {
     to,
-    subject: "Payment failed — action required — DEFRAG",
+    subject: "Payment failed — action required — Sovereign.os",
     html,
   });
 }
@@ -124,15 +124,15 @@ export async function sendCancellationEmail(apiKey: string, to: string): Promise
     <p style="color:#F6F5F3;font-size:18px;font-weight:300;margin-bottom:24px;">
       Your Pro subscription has been canceled.
     </p>
-    <p>Your account has returned to the free tier. Your baseline and saved history remain available.</p>
+    <p>Your account has returned to the free tier. Your Baseline Design and saved history remain available.</p>
     <p>You can resubscribe at any time.</p>
-    <a href="${APP_URL}" class="cta">Return to Workspace</a>
+    <a href="${APP_URL}" class="cta">Return to your space</a>
     <p style="margin-top:24px;">Questions? <a href="mailto:${SUPPORT}" style="color:rgba(246,245,243,0.4);">${SUPPORT}</a></p>
   `);
 
   await sendEmail(apiKey, {
     to,
-    subject: "Subscription canceled — DEFRAG",
+    subject: "Subscription canceled — Sovereign.os",
     html,
   });
 }

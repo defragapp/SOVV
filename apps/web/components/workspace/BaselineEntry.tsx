@@ -81,7 +81,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                 transition={{ repeat: Infinity, duration: 1.4 }}
                 className="font-mono text-xs uppercase tracking-widest text-white/40"
               >
-                Building your baseline...
+                Building your Baseline Design...
               </motion.span>
             </motion.div>
           )}
@@ -96,10 +96,10 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
               className="flex flex-col items-center gap-4 py-16 text-center"
             >
               <p className="font-mono text-xs uppercase tracking-widest text-white/60">
-                Your baseline is ready.
+                Your Baseline Design is ready.
               </p>
               <p className="text-sm font-light text-white/40">
-                Now the workspace can keep the thread grounded.
+                Now your space can keep the thread grounded.
               </p>
             </motion.div>
           )}
@@ -115,10 +115,10 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                 </p>
                 <div className="h-px w-full bg-[#F6F5F3]/10 mb-8" />
                 <h1 className="text-lg font-light text-[#F6F5F3] mb-3">
-                  Start Your Baseline
+                  Start Your Baseline Design
                 </h1>
                 <p className="text-sm font-light leading-6 text-white/40">
-                  Your Baseline is the starting map. It helps the workspace understand how you tend
+                  Your Baseline Design is the starting map. It helps your space understand how you tend
                   to process, respond, connect, protect, communicate, and return to center.
                 </p>
                 <p className="mt-3 text-sm font-light text-white/30">
@@ -176,7 +176,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
                   {precision === "unknown" && (
                     <p className="text-sm font-light leading-6 text-white/30">
-                      Not sure of the exact time? That&apos;s okay. We&apos;ll mark the baseline as
+                      Not sure of the exact time? That&apos;s okay. We&apos;ll mark the Baseline Design as
                       partial and keep the thread grounded in what we can verify.
                     </p>
                   )}
@@ -223,7 +223,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                   whileTap={{ scale: 0.98 }}
                   className="mt-2 border border-[#F6F5F3]/20 px-4 py-3.5 font-mono text-[10px] uppercase tracking-widest text-[#F6F5F3] transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
                 >
-                  Set baseline
+                  Set Baseline Design
                 </motion.button>
 
               </form>

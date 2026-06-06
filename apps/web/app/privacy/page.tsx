@@ -5,23 +5,23 @@ import { MotionSection } from "@/components/marketing/motion-section";
 const sections = [
   {
     title: "Private by design",
-    body: "DEFRAG is designed to be private by design. We store only the information required to provide the service and avoid exposing sensitive internal data in outputs.",
+    body: "Sovereign.os is designed to be private by design. We store only the information required to provide the service and avoid exposing sensitive internal data in outputs.",
   },
   {
     title: "What we collect",
-    body: "We may collect account information (email, login), baseline input data (date, time, and place of birth), conversation inputs, saved notebook entries, and interaction metadata. We do not expose this data publicly.",
+    body: "We may collect account information (email, login), Baseline Design data (date, time, and place of birth), conversation inputs, saved notebook entries, and interaction metadata. We do not expose this data publicly.",
   },
   {
     title: "What we do not expose",
-    body: "DEFRAG does not expose raw baseline computation outputs, underlying symbolic or mapping systems, system prompts or internal instructions, or private notes or unapproved relational data.",
+    body: "Sovereign.os does not expose raw Baseline Design computation outputs, underlying symbolic or mapping systems, system prompts or internal instructions, or private notes or unapproved relational data.",
   },
   {
     title: "How your data is used",
-    body: "Your data is used to generate baseline-aware responses, maintain continuity in your workspace, and improve pattern recognition over time. We do not sell personal data.",
+    body: "Your data is used to generate Baseline Design-aware responses, maintain continuity in your space, and improve pattern recognition over time. We do not sell personal data.",
   },
   {
     title: "Source transparency",
-    body: "DEFRAG may show a summary of what influenced an answer — such as Your Baseline, the sky over you, selected people, notebook context, or prior patterns. This summary does not expose raw system data or proprietary logic.",
+    body: "Defrag may show a summary of what influenced an answer — such as your Baseline Design, the sky over you, selected people, notebook context, or prior patterns. This summary does not expose raw system data or proprietary logic.",
   },
   {
     title: "Your control",

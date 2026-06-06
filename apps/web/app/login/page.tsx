@@ -79,7 +79,7 @@ export default function LoginPage() {
             className="w-full border border-white bg-white py-3 text-xs font-bold uppercase tracking-widest text-black hover:bg-black hover:text-white transition-colors"
             disabled={loading}
           >
-            {loading ? 'VERIFYING...' : 'ENTER WORKBENCH'}
+            {loading ? 'VERIFYING...' : 'ENTER SOVEREIGN.OS'}
           </button>
         </form>
       </div>

@@ -4,7 +4,7 @@ import { PageHero } from "@/components/marketing/page-hero";
 import { MotionSection } from "@/components/marketing/motion-section";
 
 export const metadata: Metadata = {
-  title: "Contact — DEFRAG",
+  title: "Contact — Sovereign.os",
   description: "For product questions, support, or account help. Reach us at info@defrag.app.",
 };
 
@@ -35,19 +35,21 @@ export default function ContactPage() {
 
           <div className="border-t border-white/8 pt-10 space-y-3">
             <p className="text-sm leading-7 text-white/30">
-              This is the public contact address for DEFRAG.
+              This is the public contact address for Sovereign.os.
             </p>
             <p className="text-sm leading-7 text-white/30">
               Do not send sensitive personal details through email.
             </p>
-            <a
-              href={SUPPORT_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="block font-mono text-[10px] uppercase tracking-widest text-white/70 hover:text-white"
-            >
-              Support DEFRAG development
-            </a>
+            {SUPPORT_URL && (
+              <a
+                href={SUPPORT_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="block font-mono text-[10px] uppercase tracking-widest text-white/70 hover:text-white"
+              >
+                Support Defrag development
+              </a>
+            )}
           </div>
         </div>
       </MotionSection>

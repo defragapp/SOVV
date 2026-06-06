@@ -1,4 +1,8 @@
 import type { NextConfig } from "next";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
+// Required for `getCloudflareContext()` to work during local `next dev`
+initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
   eslint: {

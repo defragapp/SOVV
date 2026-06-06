@@ -5,7 +5,7 @@ import AdminPromoPanel from "@/components/marketing/AdminPromoPanel"
 
 export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
-  title: "Admin — DEFRAG",
+  title: "Admin — Sovereign.os",
   description: "Owner admin panel for generating ambassador promo codes.",
 }
 
@@ -34,7 +34,7 @@ export default async function AdminPage() {
         <div className="mx-auto max-w-3xl px-6 py-24 text-white">
           <h1 className="text-3xl font-semibold">Owner access required</h1>
           <p className="mt-4 text-sm text-white/70">
-            This page is only available to DEFRAG owners. Please sign in with an owner account or return to the main site.
+            This page is only available to Sovereign.os owners. Please sign in with an owner account or return to the main site.
           </p>
         </div>
       </SiteShell>

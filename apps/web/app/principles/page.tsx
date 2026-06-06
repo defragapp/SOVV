@@ -6,22 +6,22 @@ const principles = [
   {
     num: "01",
     title: "Clarity over comfort",
-    body: "DEFRAG is not designed to make you feel better. It is designed to help you see more clearly. Sometimes those are the same thing. Often they are not.",
+    body: "Defrag is not designed to make you feel better. It is designed to help you see more clearly. Sometimes those are the same thing. Often they are not.",
   },
   {
     num: "02",
     title: "Structure over story",
-    body: "Most confusion comes from being inside the story. DEFRAG helps you see the structure beneath it — the pattern, the dynamic, the moment where something different was possible.",
+    body: "Most confusion comes from being inside the story. Defrag helps you see the structure beneath it — the pattern, the dynamic, the moment where something different was possible.",
   },
   {
     num: "03",
     title: "No diagnosis, no labels",
-    body: "DEFRAG does not tell you what is wrong with you. It helps you understand how you work — and what tends to happen when you are under pressure.",
+    body: "Defrag does not tell you what is wrong with you. It helps you understand how you work — and what tends to happen when you are under pressure.",
   },
   {
     num: "04",
     title: "Insight that lands",
-    body: "Clarity that only lives in the mind is not clarity. DEFRAG is designed to produce insight that lands — the kind you recognize as true, not just understand.",
+    body: "Clarity that only lives in the mind is not clarity. Defrag is designed to produce insight that lands — the kind you recognize as true, not just understand.",
   },
   {
     num: "05",
@@ -31,7 +31,7 @@ const principles = [
   {
     num: "06",
     title: "No jargon",
-    body: "DEFRAG translates complex patterns into plain language. You do not need to understand the systems underneath it. You just need to understand yourself.",
+    body: "Defrag translates complex patterns into plain language. You do not need to understand the systems underneath it. You just need to understand yourself.",
   },
 ];
 
@@ -41,7 +41,7 @@ export default function PrinciplesPage() {
       <PageHero
         eyebrow="Principles"
         title="What we believe."
-        body="The values that shape how DEFRAG is built and how it works."
+        body="The values that shape how Sovereign.os and Defrag are built and how they work."
       />
 
       <MotionSection className="px-6 py-24">

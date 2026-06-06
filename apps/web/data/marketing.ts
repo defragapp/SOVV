@@ -36,7 +36,7 @@ export const useCases = [
 
 export const lenses = [
   {
-    title: "Your Baseline",
+    title: "Your Baseline Design",
     summary: "Your starting map. It shows how you tend to process, respond, connect, protect, communicate, and return to center.",
     useCase: "Use it when you want to understand your own patterns before pressure hits.",
     cta: "Learn more",
@@ -51,7 +51,7 @@ export const lenses = [
   },
   {
     title: "What got lit up",
-    summary: "The part of your baseline that is active in this moment, and what it means for the people around you.",
+    summary: "The part of your Baseline Design that is active in this moment, and what it means for the people around you.",
     useCase: "Use it when a dynamic feels cyclical, loaded, or hard to name.",
     cta: "Learn more",
     href: "/product",
@@ -61,31 +61,35 @@ export const lenses = [
 export const faqItems = [
   {
     q: "What is Sovereign.os?",
-    a: "Sovereign.os is the private home base for your account, baseline, subscription, saved work, and connected workspaces. It keeps the thread organized across sessions.",
+    a: "Sovereign.os is the private home base for your account, Baseline Design, subscription, saved work, and connected spaces. It keeps the thread organized across sessions.",
   },
   {
-    q: "What is DEFRAG?",
-    a: "DEFRAG is the workspace for working through a real moment. It shows what got lit up, where the loop is forming, and what response gives the moment a better chance.",
+    q: "What is Defrag?",
+    a: "Defrag is the space inside Sovereign.os for working through a real moment. It shows what got lit up, where the loop is forming, and what response gives the moment a better chance.",
   },
   {
-    q: "What is Your Baseline?",
-    a: "Your Baseline is the starting map. It helps the system understand how you tend to process, respond, connect, protect, communicate, and return to center.",
+    q: "What is Covenant?",
+    a: "Covenant is an optional faith-context reflection space inside Sovereign.os. It uses the same Baseline Design and Library as Defrag — the user chooses when to engage it.",
+  },
+  {
+    q: "What is Your Baseline Design?",
+    a: "Your Baseline Design is the starting map. It helps the system understand how you tend to process, respond, connect, protect, communicate, and return to center.",
   },
   {
     q: "What does 'the sky over you' mean?",
-    a: "It is the current timing layer. Your Baseline shows how you are built. The sky over you shows what is active now and why it may feel louder than expected.",
+    a: "It is the current timing layer. Your Baseline Design shows how you are built. The sky over you shows what is active now and why it may feel louder than expected.",
   },
   {
     q: "What is The Loop?",
-    a: "The Loop is the repeating pattern that starts when pressure rises. DEFRAG shows where it begins so you can choose a different response before it takes over.",
+    a: "The Loop is the repeating pattern that starts when pressure rises. Defrag shows where it begins so you can choose a different response before it takes over.",
   },
   {
     q: "What is The Twist?",
-    a: "The Twist is where a real strength bends under pressure. DEFRAG shows where it bends and how to bring it back into a cleaner form.",
+    a: "The Twist is where a real strength bends under pressure. Defrag shows where it bends and how to bring it back into a cleaner form.",
   },
   {
     q: "Is this therapy?",
-    a: "No. DEFRAG is not therapy, diagnosis, or clinical care. It is a personal and relational reflection tool for understanding patterns and practicing better responses.",
+    a: "No. Defrag is not therapy, diagnosis, or clinical care. It is a personal and relational reflection space for understanding patterns and practicing better responses.",
   },
   {
     q: "Do I need to understand astrology or the deeper systems?",
@@ -104,8 +108,8 @@ export const pricingTiers = [
     period: "always",
     description: "See the pattern and test the core experience.",
     features: [
-      "Baseline creation",
-      "DEFRAG thread access",
+      "Baseline Design setup",
+      "Defrag space access",
       "What got lit up",
       "Best Next Response",
       "Basic session history",
@@ -113,7 +117,7 @@ export const pricingTiers = [
       "5 sessions per day",
       "No credit card required",
     ],
-    cta: "Start Your Baseline",
+    cta: "Start Your Baseline Design",
     href: "https://app.defrag.app/login",
     highlight: false,
   },
@@ -124,13 +128,14 @@ export const pricingTiers = [
     description: "Keep the history, compare with others, and work over time.",
     features: [
       "Unlimited sessions",
-      "Your Story - full notebook and history",
+      "Your Story — full notebook and history",
       "Saved insights and patterns",
-      "Compare With Someone - people and group threads",
+      "Compare With Someone — people and group threads",
       "Deeper relational analysis",
-      "Try It Out - conversation simulation",
+      "Try It Out — conversation simulation",
       "Audio summaries",
-      "Watch It - short visual scenes",
+      "Watch It — short visual scenes",
+      "Covenant reflection space",
       "Priority processing",
     ],
     cta: "Upgrade to Pro",

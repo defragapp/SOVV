@@ -56,7 +56,7 @@ export default function Thread({
         const baselineMsg: ThreadMessage = {
           id: `b_${Date.now()}`,
           role: "sovereign",
-          content: "Your baseline is not set yet. Go to Settings to add your baseline details.",
+          content: "Your Baseline Design is not set yet. Go to Settings to add your Baseline Design details.",
           timestamp: Date.now(),
         }
         onNewMessage(baselineMsg)

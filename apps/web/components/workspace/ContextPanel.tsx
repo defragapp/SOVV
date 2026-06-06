@@ -30,7 +30,7 @@ function WhyThisAnswer({ message }: { message: ThreadMessage }) {
 
       {open && (
         <div className="px-4 pb-4 space-y-2">
-          <SourceRow label="Your Baseline" active={meta.baseline_loaded} />
+          <SourceRow label="Your Baseline Design" active={meta.baseline_loaded} />
           <SourceRow label="The sky over you" active={false} note="not available" />
           <SourceRow
             label="Selected people"
@@ -98,7 +98,7 @@ function EmptyState() {
         </p>
       </div>
       <p className="font-mono text-[9px] uppercase tracking-widest text-white/15 mt-2">
-        This view shows what is active from your baseline and current thread.
+        This view shows what is active from your Baseline Design and current thread.
       </p>
     </div>
   )

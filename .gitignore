@@ -7,3 +7,34 @@ dist/
 .DS_Store
 apps/worker/.wrangler/
 logs/
+
+# Sensitive / operational files — never commit
+cookies.txt
+apps/worker/cookies.txt
+apps/worker/login.log
+apps/worker/login.pid
+apps/worker/wrangler.log
+cf_audit.txt
+fix_billing.js
+update_index.js
+tatus
+deploy-worker.yml
+apps/worker/src/deploy.yml
+apps/worker/src/deploy-worker.yml
+
+# Stale build artifacts
+apps/web/wrangler.old.json
+apps/web/tailwind.config.js
+apps/web/.open-next/.build/
+apps/web/src/
+
+# Compiled worker artifacts (built by wrangler at deploy time)
+apps/worker/index.js
+apps/worker/index.js.map
+apps/worker/index.d.ts
+apps/worker/index.d.ts.map
+apps/worker/src/*.js.map
+apps/worker/src/*.d.ts.map
+
+# Operational files
+apps/web/app/todo.md

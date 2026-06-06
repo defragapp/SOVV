@@ -16,7 +16,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             href="/"
             className="font-mono text-xs uppercase tracking-[0.3em] text-white/80 hover:text-white transition-colors"
           >
-            DEFRAG
+            SOVEREIGN.OS
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
@@ -92,7 +92,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <footer className="border-t border-white/8 px-6 py-10">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/25">
-            Sovereign.os / DEFRAG
+            Sovereign.os
           </p>
           <div className="flex flex-wrap items-center gap-5">
             {footerItems.map((item) => (

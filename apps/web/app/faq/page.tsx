@@ -10,7 +10,7 @@ export default function FaqPage() {
       <PageHero
         eyebrow="FAQ"
         title="Common questions."
-        body="Everything you need to know about DEFRAG."
+        body="Everything you need to know about Sovereign.os and Defrag."
       />
 
       <MotionSection className="px-6 py-24">

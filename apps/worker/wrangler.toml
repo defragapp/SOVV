@@ -13,8 +13,10 @@ binding = "DB"
 database_name = "vibesdk-db"
 database_id = "c8c2fd8d-5297-46fc-8594-7629c8bad74d"
 
+# KV namespace for session state, Baseline Design cache, usage counters, and replay protection
+# Internal identifier: SOVV_DATA (KV namespace title in Cloudflare dashboard)
 [[kv_namespaces]]
-binding = "SOVV_DATA"
+binding = "KV"
 id = "3bd3ff5048a8468e82c574d7d66045c3"
 
 [[r2_buckets]]

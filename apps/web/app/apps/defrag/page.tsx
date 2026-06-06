@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import { Suspense } from "react"
 import Shell from "@/components/workspace/Shell"
-// Legacy app shell — redirects authenticated users to /apps/defrag (Defrag space)
 import type { Tier } from "@/components/workspace/types"
 
-function AppPageInner() {
+// Defrag space — the relational intelligence space inside Sovereign.os
+// Shares auth, Baseline Design, Library, and subscription with all spaces.
+
+function DefragSpaceInner() {
   const [tier, setTier] = useState<Tier>("free")
   const [upgraded, setUpgraded] = useState(false)
   const searchParams = useSearchParams()
@@ -41,15 +42,15 @@ function AppPageInner() {
           </button>
         </div>
       )}
-      <Shell tier={tier} />
+      <Shell tier={tier} spaceLabel="Defrag" />
     </>
   )
 }
 
-export default function AppPage() {
+export default function DefragSpacePage() {
   return (
     <Suspense>
-      <AppPageInner />
+      <DefragSpaceInner />
     </Suspense>
   )
 }

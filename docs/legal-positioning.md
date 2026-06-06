@@ -1,4 +1,4 @@
-# Legal Positioning — Sovereign.os / DEFRAG
+# Legal Positioning — Sovereign.os
 
 ## Purpose
 
@@ -8,12 +8,12 @@ Internal guidance for consistent, safe, brand-protective positioning. This is no
 
 ## Product Category
 
-**What DEFRAG is:**
-- AI-assisted personal and relational reflection tool
+**What Sovereign.os is:**
+- AI-assisted personal and relational reflection platform
 - Pattern recognition and response practice platform
-- Baseline-aware AI workspace with a living notebook
+- Baseline Design-aware AI platform with a living notebook and multiple guided spaces
 
-**What DEFRAG is not:**
+**What Sovereign.os is not:**
 - Therapy or therapeutic service
 - Clinical diagnosis or assessment
 - Medical advice or medical device
@@ -35,8 +35,8 @@ Use these consistently in UI, marketing, support, and documentation:
 | "based on available context" | "accurately predicts" |
 | "not a guarantee of outcome" | "will fix your relationship" |
 | "user interpretation required" | "this is the right answer" |
-| "a reflection tool" | "a therapy replacement" |
-| "organized from your baseline" | "clinically validated" |
+| "a reflection space" | "a therapy replacement" |
+| "organized from your Baseline Design" | "clinically validated" |
 | "shows what got lit up" | "diagnoses the situation" |
 
 ---
@@ -63,30 +63,30 @@ The following claims must never appear in UI, marketing, support responses, soci
 ## Sensitive Areas — Handling Guidance
 
 ### Mental health
-DEFRAG is not a mental health service. If a user appears to be in crisis, redirect immediately to emergency services or a crisis line. Do not attempt to analyze or advise. See support-escalation.md Tier 4.
+Sovereign.os is not a mental health service. If a user appears to be in crisis, redirect immediately to emergency services or a crisis line. Do not attempt to analyze or advise. See support-escalation.md Tier 4.
 
 ### Relationship safety
-DEFRAG does not assess whether a relationship is safe. It shows patterns. If a user describes a situation involving safety concerns, redirect to appropriate support. Do not use the product to advise on safety decisions.
+Sovereign.os does not assess whether a relationship is safe. It shows patterns. If a user describes a situation involving safety concerns, redirect to appropriate support. Do not use the product to advise on safety decisions.
 
 ### Children
-DEFRAG is not designed for users under 18. Do not market to minors. Do not allow baseline entry for minors.
+Sovereign.os is not designed for users under 18. Do not market to minors. Do not allow Baseline Design entry for minors.
 
 ### Medical conditions
-DEFRAG does not assess, diagnose, or treat medical or psychological conditions. If a user describes symptoms, redirect to a qualified professional.
+Sovereign.os does not assess, diagnose, or treat medical or psychological conditions. If a user describes symptoms, redirect to a qualified professional.
 
 ### Legal proceedings
-DEFRAG outputs are not expert testimony, clinical assessments, or legal evidence. Do not confirm or deny that outputs could be used in legal proceedings. Escalate to owner review immediately.
+Sovereign.os outputs are not expert testimony, clinical assessments, or legal evidence. Do not confirm or deny that outputs could be used in legal proceedings. Escalate to owner review immediately.
 
 ---
 
 ## Data and Privacy Positioning
 
-- Birth details (DOB, TOB, POB) are used only to generate the user's baseline
+- Birth details (DOB, TOB, POB) are used only to generate the user's Baseline Design
 - Thread content is used only within the user's own session context
 - No data is sold or shared with third parties
 - Users can request deletion at any time
 - Deletion requests are processed within 30 days
-- Private by design — no raw baseline data is exposed in client responses
+- Private by design — no raw Baseline Design data is exposed in client responses
 
 ---
 
@@ -94,7 +94,7 @@ DEFRAG outputs are not expert testimony, clinical assessments, or legal evidence
 
 The following are proprietary and must not be disclosed:
 - System prompt chains
-- Baseline synthesis logic
+- Baseline Design synthesis logic
 - Pattern extraction algorithms
 - Scoring and weighting formulas
 - Internal field mappings

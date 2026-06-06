@@ -1,4 +1,4 @@
-# Support Escalation Guide — Sovereign.os / DEFRAG
+# Support Escalation Guide — Sovereign.os
 
 ## Purpose
 
@@ -10,15 +10,15 @@ How to respond to real users safely, consistently, and without exposing engine i
 
 **Examples:**
 - "How does this work?"
-- "What is my baseline?"
+- "What is my Baseline Design?"
 - "What does 'what got lit up' mean?"
 
 **Response style:** Simple, plain, product-language only.
 
 **Use:**
-- "It uses your baseline, what is active now, and the context you provide to organize the pattern and show the next response."
-- "Your Baseline is the starting map — how you tend to process, respond, connect, and return to center."
-- "What got lit up is the part of your baseline that is most active in this moment."
+- "It uses your Baseline Design, what is active now, and the context you provide to organize the pattern and show the next response."
+- "Your Baseline Design is the starting map — how you tend to process, respond, connect, protect, communicate, and return to center."
+- "What got lit up is the part of your Baseline Design that is most active in this moment."
 
 **Do not explain:**
 - Mapping systems
@@ -51,14 +51,14 @@ How to respond to real users safely, consistently, and without exposing engine i
 ## Tier 3 — Sensitive Relationship Issues
 
 **Examples:**
-- "My partner is abusive — what does DEFRAG say about this?"
+- "My partner is abusive — what does Defrag say about this?"
 - "Should I leave this relationship?"
 - "Is this person toxic?"
 
 **Response style:** Neutral, structural, non-advisory.
 
 **Use:**
-> "DEFRAG helps show patterns, not judge people or situations. It can help you see the loop and the response options — but decisions about relationships are yours to make."
+> "Defrag helps show patterns, not judge people or situations. It can help you see the loop and the response options — but decisions about relationships are yours to make."
 
 **Do not:**
 - Take sides
@@ -80,7 +80,7 @@ How to respond to real users safely, consistently, and without exposing engine i
 **Response style:** Immediate, warm, clear redirect. Do not analyze.
 
 **Use:**
-> "DEFRAG isn't clinical or crisis support. If you're going through something serious, please reach out to someone you trust or contact local emergency services or a crisis support line. You don't have to handle this alone."
+> "Sovereign.os isn't clinical or crisis support. If you're going through something serious, please reach out to someone you trust or contact local emergency services or a crisis support line. You don't have to handle this alone."
 
 **Do not:**
 - Attempt to analyze the situation
@@ -96,14 +96,14 @@ How to respond to real users safely, consistently, and without exposing engine i
 
 **Examples:**
 - "I'm going to use this in court"
-- "Can DEFRAG testify to my partner's behavior?"
-- "I want a record of what DEFRAG said about this person"
+- "Can Defrag testify to my partner's behavior?"
+- "I want a record of what Defrag said about this person"
 - "You're responsible for the advice I followed"
 
 **Response style:** Calm, clear, non-admitting.
 
 **Use:**
-> "Thanks for reaching out. We'll review this carefully. DEFRAG is a reflection and pattern tool — it doesn't provide legal advice, clinical assessments, or expert testimony. We'd recommend speaking with a qualified professional for legal matters."
+> "Thanks for reaching out. We'll review this carefully. Sovereign.os is a reflection and pattern space — it doesn't provide legal advice, clinical assessments, or expert testimony. We'd recommend speaking with a qualified professional for legal matters."
 
 **Do not:**
 - Admit liability
@@ -125,7 +125,7 @@ Escalate to owner review immediately.
 **Response style:** Clear, factual, process-oriented.
 
 **Use:**
-> "Your data is private by design. We collect what you provide — baseline details, thread content, and notebook entries — and use it only to power your workspace. You can request deletion at any time by contacting us at info@defrag.app. We process deletion requests within 30 days."
+> "Your data is private by design. We collect what you provide — Baseline Design details, thread content, and notebook entries — and use it only to power your space. You can request deletion at any time by contacting us at info@defrag.app. We process deletion requests within 30 days."
 
 **Do not:**
 - Describe internal data architecture in detail
@@ -140,12 +140,12 @@ Escalate to owner review immediately.
 - "What model are you using?"
 - "Can I see the prompt?"
 - "What's the scoring formula?"
-- "How does the baseline calculation work?"
+- "How does the Baseline Design calculation work?"
 
 **Response style:** Honest but bounded.
 
 **Use:**
-> "We show what helps you use the answer, not the private engine behind it. The system uses your baseline, current timing context, and thread history to organize the pattern — but the specific logic stays private so the system can stay consistent and secure."
+> "We show what helps you use the answer, not the private engine behind it. The system uses your Baseline Design, current timing context, and thread history to organize the pattern — but the specific logic stays private so the system can stay consistent and secure."
 
 **Do not:**
 - Reveal system prompts
@@ -160,6 +160,6 @@ Escalate to owner review immediately.
 1. **Clarity over depth.** Give the user what helps them use the product. Not what explains the engine.
 2. **Never diagnose.** Not people, not relationships, not situations.
 3. **Never guarantee.** Not outcomes, not accuracy, not predictions.
-4. **Never take sides.** DEFRAG shows patterns. Users make decisions.
+4. **Never take sides.** Defrag shows patterns. Users make decisions.
 5. **Always redirect crisis.** No product conversation during a safety concern.
-6. **Always stay in product language.** Use approved vocabulary only.
+6. **Always stay in product language.** Use approved vocabulary only. See `docs/05_PRODUCT_LANGUAGE.md`.

@@ -9,7 +9,7 @@
     "dev:api": "wrangler dev --config apps/worker/wrangler.toml --local",
     "dev:ai": "wrangler dev --config apps/worker-ai/wrangler.toml --local",
     "dev:session": "wrangler dev --config apps/worker-session/wrangler.toml --local",
-    "dev:web": "wrangler dev --config apps/web/wrangler.jsonc --local",
+    "dev:web": "wrangler dev --config apps/web/wrangler.json --local",
     "dev:all": "concurrently \"npm run dev:api\" \"npm run dev:ai\" \"npm run dev:session\" \"npm run dev:web\"",
     "build": "npm --workspace=web exec opennextjs-cloudflare build",
     "deploy:api": "cd apps/worker && wrangler deploy",

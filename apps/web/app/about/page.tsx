@@ -9,13 +9,13 @@ export default function AboutPage() {
       <PageHero
         eyebrow="About"
         title="Built for real moments."
-        body="DEFRAG helps people understand repeating patterns without turning the product into therapy, diagnosis, or generic advice."
+        body="Defrag helps people understand repeating patterns without turning the product into therapy, diagnosis, or generic advice."
       />
 
       <MotionSection className="px-6 py-24">
         <div className="mx-auto max-w-2xl space-y-8 text-base leading-8 text-white/50">
           <p>
-            DEFRAG is a personal and relational clarity platform. It helps you see the structure beneath a difficult moment so you can respond with more precision.
+            Sovereign.os is a private platform for relational intelligence. Defrag is the space inside it for working through what is active right now — the pattern, the loop, the response that gives the moment a better chance.
           </p>
           <p>
             Most people do not need more noise. They need a cleaner way to understand what is active, what is repeating, and what response is most likely to keep things grounded.
@@ -34,7 +34,7 @@ export default function AboutPage() {
           href="https://app.defrag.app/login"
           className="inline-block border border-white/20 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-white/5 transition-colors"
         >
-          Start Your Baseline
+          Start Your Baseline Design
         </Link>
       </MotionSection>
     </SiteShell>

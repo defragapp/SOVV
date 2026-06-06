@@ -1,39 +1,50 @@
-# Product Boundaries — Sovereign.os / DEFRAG
+# Product Boundaries — Sovereign.os
 
 ## Purpose
 
-Clear definition of what the product does and does not do. Use this to align support responses, marketing copy, feature decisions, and operator judgment.
+Clear definition of what the platform does and does not do. Use this to align support responses, marketing copy, feature decisions, and operator judgment.
 
 ---
 
-## What the Product Does
+## Platform Structure
+
+**Sovereign.os** is the parent platform. It contains:
+- **Defrag** — the relational intelligence space
+- **Covenant** — the optional faith-context reflection space
+
+Both spaces share one Baseline Design, one Library, one subscription, and one auth system.
+
+---
+
+## What the Platform Does
 
 | Capability | Description |
 |---|---|
-| Shows patterns | Identifies recurring loops, dynamics, and responses from baseline and thread context |
+| Shows patterns | Identifies recurring loops, dynamics, and responses from Baseline Design and thread context |
 | Maps loops | Shows where a repeating pattern starts and what drives it |
 | Highlights responses | Surfaces the Best Next Response based on available context |
 | Helps practice decisions | Allows users to try out responses before acting |
-| Organizes past insight | Saves threads, notes, and patterns in Your Space |
-| Grounds the thread | Uses baseline, timing, and selected people to keep AI context consistent |
-| Shows what got lit up | Identifies which part of the user's baseline is active in the moment |
+| Organizes past insight | Saves threads, notes, and patterns in the Sovereign.os Library |
+| Grounds the thread | Uses Baseline Design, timing, and selected people to keep AI context consistent |
+| Shows what got lit up | Identifies which part of the user's Baseline Design is active in the moment |
 | Shows the other side | Helps users see what may be active in another person when data is available and permitted |
+| Covenant reflection | Optional faith-context reflection using the same Baseline Design and Library |
 
 ---
 
-## What the Product Does Not Do
+## What the Platform Does Not Do
 
 | Claim | Reality |
 |---|---|
-| Predict future outcomes with certainty | DEFRAG shows patterns and options — not predictions |
-| Know another person's private internal state | DEFRAG uses available baseline data only — never assumes private knowledge |
-| Replace therapy | DEFRAG is a reflection tool, not clinical care |
-| Make decisions for the user | DEFRAG shows structure — the user decides |
-| Provide emergency help | DEFRAG is not a crisis service |
-| Provide legal guidance | DEFRAG is not a legal tool |
-| Diagnose behavior or conditions | DEFRAG does not label, diagnose, or pathologize |
-| Guarantee relationship outcomes | DEFRAG shows patterns — outcomes depend on the user |
-| Access another person's data without permission | DEFRAG uses only permitted, consented overlays |
+| Predict future outcomes with certainty | Defrag shows patterns and options — not predictions |
+| Know another person's private internal state | Defrag uses available Baseline Design data only — never assumes private knowledge |
+| Replace therapy | Defrag is a reflection space, not clinical care |
+| Make decisions for the user | Defrag shows structure — the user decides |
+| Provide emergency help | Sovereign.os is not a crisis service |
+| Provide legal guidance | Sovereign.os is not a legal tool |
+| Diagnose behavior or conditions | Sovereign.os does not label, diagnose, or pathologize |
+| Guarantee relationship outcomes | Defrag shows patterns — outcomes depend on the user |
+| Access another person's data without permission | Defrag uses only permitted, consented overlays |
 
 ---
 
@@ -42,7 +53,7 @@ Clear definition of what the product does and does not do. Use this to align sup
 When a user asks "how does this work?":
 
 **Use:**
-> "It uses your baseline, what is active now, and the context you provide to organize the pattern and show the next response."
+> "It uses your Baseline Design, what is active now, and the context you provide to organize the pattern and show the next response."
 
 **Do not explain:**
 - Mapping systems or symbolic frameworks
@@ -57,8 +68,8 @@ When a user asks "how does this work?":
 ## Feature Boundary Map
 
 ### Free Tier
-- Baseline entry (DOB, TOB, POB)
-- Self-only threads (up to 5 sessions/day)
+- Baseline Design setup (DOB, TOB, POB)
+- Defrag space access (up to 5 sessions/day)
 - Core pattern recognition
 - Best Next Response
 - What got lit up
@@ -70,6 +81,7 @@ When a user asks "how does this work?":
 - Pattern memory across sessions
 - Audio overview
 - Watch It (when available)
+- Covenant space access
 - Priority processing
 
 ### Not Yet Built (do not promise)
@@ -83,7 +95,7 @@ When a user asks "how does this work?":
 
 ## Confidence and Accuracy
 
-DEFRAG outputs carry a confidence level (`low`, `medium`, `high`) based on available context.
+Defrag outputs carry a confidence level (`low`, `medium`, `high`) based on available context.
 
 **Always communicate:**
 - Confidence is based on available data
@@ -102,16 +114,16 @@ DEFRAG outputs carry a confidence level (`low`, `medium`, `high`) based on avail
 When another person's data is used:
 
 1. Only use data that is available and permitted
-2. Partial baseline = lower confidence, clearly marked
+2. Partial Baseline Design = lower confidence, clearly marked
 3. No unconsented inference about private internal states
 4. Output focuses on the loop between people, not blame
-5. Never expose another person's raw baseline to the requesting user
+5. Never expose another person's raw Baseline Design to the requesting user
 
 ---
 
 ## Content Boundaries
 
-DEFRAG will not generate output that:
+Sovereign.os will not generate output that:
 - Assigns clinical diagnoses to users or others
 - Recommends specific medical or psychiatric treatment
 - Advises on legal matters

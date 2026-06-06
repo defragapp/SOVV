@@ -78,7 +78,7 @@ export default function PricingPage() {
               rel="noreferrer"
               className="font-mono text-[10px] uppercase tracking-widest text-white/70 hover:text-white"
             >
-              Support DEFRAG development
+              Support Defrag development
             </a>
           </div>
           )}

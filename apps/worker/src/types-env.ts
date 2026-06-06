@@ -1,7 +1,10 @@
 import type { D1Database, R2Bucket, Ai, KVNamespace, SendEmail, Queue, Fetcher } from "@cloudflare/workers-types";
 
 export interface Env {
+  // D1 — Sovereign.os platform database (Cloudflare dashboard name: vibesdk-db)
   DB: D1Database
+  // KV — session state, Baseline Design cache, usage counters, replay protection
+  // (Cloudflare dashboard KV namespace title: SOVV_DATA — binding renamed to KV for source consistency)
   KV: KVNamespace
   AI: Ai
   AI_SERVICE: Fetcher

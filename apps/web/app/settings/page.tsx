@@ -35,9 +35,9 @@ export default function SettingsPage() {
     try {
       const result = await apiSaveBaseline(baseline);
       if (result?.baseline) {
-        setMessage("Baseline saved.");
+        setMessage("Baseline Design saved.");
       } else {
-        setMessage("Unable to save baseline.");
+        setMessage("Unable to save Baseline Design.");
       }
     } catch (error) {
       setMessage("Save failed. Try again.");
@@ -51,13 +51,13 @@ export default function SettingsPage() {
       <div className="mx-auto max-w-3xl space-y-6">
         <div className="flex items-center justify-between gap-4 rounded-3xl border border-white/10 bg-white/5 p-6">
           <div>
-            <h1 className="text-3xl font-semibold">Baseline settings</h1>
+            <h1 className="text-3xl font-semibold">Baseline Design</h1>
             <p className="mt-2 text-sm text-white/70">
-              Store a hidden personal baseline that helps answers stay consistent without exposing private details.
+              Your Baseline Design is the starting map — stored privately and used to keep every thread grounded in who you actually are.
             </p>
           </div>
           <Link href="/app" className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/90 hover:bg-white/10">
-            Back to workspace
+            Back to your space
           </Link>
         </div>
 
@@ -106,7 +106,7 @@ export default function SettingsPage() {
 
           <div className="space-y-3 text-sm text-white/70">
             <p>
-              This data is used only as hidden context to keep your explanations consistent. It is not displayed in the workspace, and it is stored only in your worker KV state.
+              This data is used only as hidden context to keep your explanations consistent. It is not displayed in your space, and it is stored privately in your account.
             </p>
           </div>
 
@@ -116,7 +116,7 @@ export default function SettingsPage() {
               disabled={saving}
               className="rounded-2xl bg-white px-5 py-3 text-black font-semibold disabled:opacity-50"
             >
-              {saving ? "Saving…" : "Save baseline"}
+              {saving ? "Saving…" : "Save Baseline Design"}
             </button>
             {message ? <div className="text-sm text-white/80">{message}</div> : null}
           </div>
