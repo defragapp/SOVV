@@ -9,7 +9,7 @@ export default function HubLanding() {
       <section className="max-w-2xl">
         <h2 className="text-2xl mb-4 border-b border-white pb-2">ENTER</h2>
         <div className="space-y-4">
-          <a href="/auth" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
+          <a href="/app/login" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
             AUTH / LOGIN
           </a>
           <a href="/about" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
