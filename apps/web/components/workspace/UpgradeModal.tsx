@@ -24,7 +24,7 @@ const COPY: Record<UpgradeScenario, {
     title: "See the full pattern",
     body: "Free helps you see what got lit up. Pro helps you work the pattern over time, save what changes, and go deeper with another person.",
     features: [
-      "Expanded DEFRAG thread use",
+      "Expanded Defrag space use",
       "Your Space notebook",
       "Try It Out",
       "Compare With Someone",
@@ -42,7 +42,7 @@ const COPY: Record<UpgradeScenario, {
   },
   compare: {
     title: "Compare With Someone is a Pro feature",
-    body: "DEFRAG can show the pattern between you when another person, family member, group, or team layer is available and permitted. Pro unlocks the ability to compare loops, see where the pattern meets, and practice a better response.",
+    body: "Defrag can show the pattern between you when another person, family member, group, or team layer is available and permitted. Pro unlocks the ability to compare loops, see where the pattern meets, and practice a better response.",
     primaryLabel: "Upgrade to Pro",
     secondaryLabel: "Stay with Just You",
   },
@@ -68,7 +68,7 @@ const COPY: Record<UpgradeScenario, {
     title: "Action needed for your Pro subscription",
     body: "We couldn't process your latest payment. Update your payment method to keep Pro access active.",
     primaryLabel: "Update payment method",
-    secondaryLabel: "Go to workspace",
+    secondaryLabel: "Go to your space",
   },
   canceled: {
     title: "Your account is now on Free",

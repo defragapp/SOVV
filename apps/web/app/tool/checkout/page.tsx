@@ -87,8 +87,8 @@ export default function CheckoutPage() {
             disabled={loading}
             className="w-full border border-white p-4 hover:bg-white hover:text-black disabled:opacity-50 text-left"
           >
-            <div className="font-bold">DEFRAG PRO</div>
-            <div className="text-sm text-gray-400">Full workspace access</div>
+            <div className="font-bold">Sovereign.os Pro</div>
+            <div className="text-sm text-gray-400">Full space access</div>
           </button>
 
           <button

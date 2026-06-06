@@ -88,7 +88,7 @@ export default function YourSpace() {
             Nothing saved yet.
           </p>
           <p className="text-sm font-light text-white/20 leading-6">
-            Once you start using DEFRAG, your recent threads and saved work will appear here.
+            Once you start using Defrag, your recent threads and saved work will appear here.
           </p>
           <p className="mt-4 font-mono text-[9px] uppercase tracking-widest text-white/15">
             The AI uses Your Space to keep the thread grounded instead of starting over every time.

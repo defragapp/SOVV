@@ -30,7 +30,7 @@ export default function HubLanding() {
           <h2 className="text-2xl mb-4 border-b border-white pb-2">SPACES</h2>
           <div className="space-y-4">
             <a href="https://app.defrag.app/apps/defrag" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
-              <div className="font-bold">DEFRAG</div>
+              <div className="font-bold">Defrag</div>
               <div className="text-gray-400 text-sm mt-1">Relational intelligence space. Work through what is active now.</div>
             </a>
             <a href="https://app.defrag.app/apps/covenant" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">

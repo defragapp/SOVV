@@ -94,7 +94,7 @@ function EmptyState() {
           Nothing is lit up yet.
         </p>
         <p className="mt-2 text-sm font-light text-white/20 leading-6">
-          Start by telling DEFRAG what is going on. Once the thread has context, Right Now will show the loop, the twist, and the Best Next Response.
+          Start by telling Defrag what is going on. Once the thread has context, Right Now will show the loop, the twist, and the Best Next Response.
         </p>
       </div>
       <p className="font-mono text-[9px] uppercase tracking-widest text-white/15 mt-2">

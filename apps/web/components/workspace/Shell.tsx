@@ -40,7 +40,7 @@ export default function Shell({ tier }: { tier: Tier }) {
     <div className="flex h-screen w-screen flex-col bg-black text-[#F6F5F3]">
       <header className="flex h-10 shrink-0 items-center justify-between border-b border-[#F6F5F3]/10 px-4">
         <span className="font-mono text-xs uppercase tracking-widest text-white/40">
-          DEFRAG
+          Sovereign.os
         </span>
         <div className="flex items-center gap-4">
           {tier === "pro" && (

@@ -7,31 +7,31 @@ import Link from "next/link";
 const cases = [
   {
     title: "Before you send the message",
-    body: "You have written it three times. Something still feels off. DEFRAG helps you see what got lit up — and whether sending it will get you what you actually want.",
+    body: "You have written it three times. Something still feels off. Defrag helps you see what got lit up — and whether sending it will get you what you actually want.",
   },
   {
     title: "When a conversation keeps repeating",
-    body: "The same argument. The same dynamic. The same outcome. DEFRAG shows where the loop starts so you can see where a different response was possible.",
+    body: "The same argument. The same dynamic. The same outcome. Defrag shows where the loop starts so you can see where a different response was possible.",
   },
   {
     title: "When someone pulls away",
-    body: "They went quiet. You do not know why. DEFRAG helps you see what may be active in the dynamic — without assuming the worst or excusing the pattern.",
+    body: "They went quiet. You do not know why. Defrag helps you see what may be active in the dynamic — without assuming the worst or excusing the pattern.",
   },
   {
     title: "When a family loop keeps running",
-    body: "The same tension at every gathering. The same roles. The same pressure. DEFRAG helps you see the structure beneath it so you can choose a different response.",
+    body: "The same tension at every gathering. The same roles. The same pressure. Defrag helps you see the structure beneath it so you can choose a different response.",
   },
   {
     title: "When you need to understand your part",
-    body: "Not to blame yourself. To see clearly. DEFRAG shows what got lit up in you — and what that means for how the moment landed on the other person.",
+    body: "Not to blame yourself. To see clearly. Defrag shows what got lit up in you — and what that means for how the moment landed on the other person.",
   },
   {
     title: "When you want to practice a response first",
-    body: "Before the conversation happens. DEFRAG helps you find the Best Next Response and practice it — so you are not improvising under pressure.",
+    body: "Before the conversation happens. Defrag helps you find the Best Next Response and practice it — so you are not improvising under pressure.",
   },
   {
     title: "When you need to see the other side without losing your own",
-    body: "Conflict makes one explanation feel obvious. DEFRAG helps show what else may be true — without asking you to excuse anyone or abandon your own read.",
+    body: "Conflict makes one explanation feel obvious. Defrag helps show what else may be true — without asking you to excuse anyone or abandon your own read.",
   },
 ];
 
@@ -66,7 +66,7 @@ export default function UseCasesPage() {
             href="https://app.defrag.app/login"
             className="inline-block border border-white/20 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-white/5 transition-colors"
           >
-            Start Your Baseline
+            Start Your Baseline Design
           </Link>
           <Link
             href="/how-it-works"

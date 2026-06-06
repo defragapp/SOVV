@@ -113,7 +113,7 @@ export default function Thread({
             }`}
           >
             <span className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-white/30">
-              {msg.role === "user" ? "You" : "DEFRAG"}
+              {msg.role === "user" ? "You" : "Sovereign.os"}
             </span>
             <p className="text-sm font-light leading-6">{msg.content}</p>
             {msg.shift && (
@@ -129,7 +129,7 @@ export default function Thread({
         {loading && (
           <div className="mb-6">
             <span className="font-mono text-[10px] uppercase tracking-widest text-white/30">
-              DEFRAG
+              Sovereign.os
             </span>
             <p className="mt-2 text-sm text-white/40">...</p>
           </div>
