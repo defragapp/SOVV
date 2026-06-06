@@ -137,3 +137,14 @@ Do not assume services beyond this list without confirming in code or Cloudflare
 Public contact: `info@defrag.app`
 
 Do not expose private forwarding destination in any code, UI, or documentation committed to the repo.
+
+---
+
+## 9. Public Tone and Visual Assets
+
+- Public pages should read calm, direct, restrained, and precise.
+- Avoid therapy language, prophetic language, spiritual authority language, and hype copy.
+- Marketing copy can be warm, but it should stay concrete and product-led.
+- AI output should be short, structural, and practical.
+- Replace starter SVGs and default assets with original brand marks, OG cards, screenshots, and share-safe preview visuals.
+- Keep visual assets simple and consistent with the black/white product system.
