@@ -40,19 +40,7 @@ Future spaces are added under the same Sovereign.os architecture. They do not ge
 
 ---
 
-## Domain Hierarchy
 
-| Domain | Purpose | Served By |
-|---|---|---|
-| `defrag.app` | Sovereign.os platform landing (Defrag highlighted) | `sovv-web` Worker |
-| `www.defrag.app` | Same as `defrag.app` | `sovv-web` Worker |
-| `sovereign.defrag.app` | Transitional Sovereign.os landing host | `sovv-web` Worker |
-| `app.defrag.app` | Authenticated Sovereign.os app shell | `sovv-web` Worker |
-| `api.defrag.app` | API Worker | `sovereign-os-api` Worker |
-| `ai.defrag.app` | AI Worker | `worker-ai` Worker |
-| `session.defrag.app` | Session Worker | `worker-session` Worker |
-
-If `sovereign.os` hostnames are configured, they become canonical alongside `defrag.app`.
 
 ---
 

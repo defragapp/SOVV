@@ -26,7 +26,7 @@ The authenticated app shell at `app.defrag.app` routes to `/apps/defrag` by defa
 
 ## Defrag Space
 
-**Purpose:** Relational intelligence. Shows what got lit up, where the loop is forming, and what response gives the moment a better chance.
+**Purpose:** Relational intelligence. Helps you understand what is active in the moment, where the loop is forming, and what response gives the moment a better chance. Supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics.
 
 **Entry point:** `apps/web/app/apps/defrag/page.tsx`
 
@@ -104,7 +104,7 @@ When adding a new space to Sovereign.os:
 |---|---|---|
 | Defrag space access | ✅ | ✅ |
 | Baseline Design setup | ✅ | ✅ |
-| What got lit up | ✅ | ✅ |
+| Active pattern surface | ✅ | ✅ |
 | Best Next Response | ✅ | ✅ |
 | Basic session history | ✅ | ✅ |
 | 5 sessions/day limit | ✅ | — |

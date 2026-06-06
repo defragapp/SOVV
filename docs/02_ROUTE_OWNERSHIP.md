@@ -1,16 +1,35 @@
 # Route Ownership
 
-## Worker Route Map
+## Canonical Domain Hierarchy
 
-| Domain / Pattern | Worker | Deployment |
+### Preferred Final State (when sovereign.os is registered and in Cloudflare)
+
+| Domain | Purpose | Served By |
 |---|---|---|
-| `defrag.app/*` | `sovv-web` | Cloudflare Workers Builds |
-| `www.defrag.app/*` | `sovv-web` | Cloudflare Workers Builds |
-| `sovereign.defrag.app/*` | `sovv-web` | Cloudflare Workers Builds |
-| `app.defrag.app/*` | `sovv-web` | Cloudflare Workers Builds |
-| `api.defrag.app` | `sovereign-os-api` | Wrangler deploy |
-| `ai.defrag.app/*` | `worker-ai` | Wrangler deploy |
-| `session.defrag.app/*` | `worker-session` | Wrangler deploy |
+| `sovereign.os` | Sovereign.os platform landing | `sovv-web` Worker |
+| `www.sovereign.os` | Same as sovereign.os | `sovv-web` Worker |
+| `app.sovereign.os` | Authenticated Sovereign.os app shell | `sovv-web` Worker |
+| `defrag.app` | Routes to Sovereign.os landing (Defrag highlighted) | `sovv-web` Worker |
+| `app.defrag.app` | Transitional authenticated shell / Defrag-highlighted entry | `sovv-web` Worker |
+| `api.defrag.app` | API Worker | `sovereign-os-api` Worker |
+| `ai.defrag.app` | AI Worker | `worker-ai` Worker |
+| `session.defrag.app` | Session Worker | `worker-session` Worker |
+
+### Current Transition State (sovereign.os NOT yet in Cloudflare account)
+
+| Domain | Purpose | Served By |
+|---|---|---|
+| `defrag.app` | Sovereign.os platform landing (Defrag highlighted) | `sovv-web` Worker |
+| `www.defrag.app` | Same as defrag.app | `sovv-web` Worker |
+| `sovereign.defrag.app` | Temporary Sovereign.os platform entry | `sovv-web` Worker |
+| `app.defrag.app` | Authenticated Sovereign.os app shell | `sovv-web` Worker |
+| `api.defrag.app` | API Worker | `sovereign-os-api` Worker |
+| `ai.defrag.app` | AI Worker | `worker-ai` Worker |
+| `session.defrag.app` | Session Worker | `worker-session` Worker |
+
+**Do not make `sovereign.defrag.app` the long-term canonical platform entry.** It is a transitional host only. When `sovereign.os` is registered and added to Cloudflare, migrate to `sovereign.os` as the canonical platform landing.
+
+---
 
 ## DNS Records (defrag.app zone: `45a59d754ece9221fc97c92c461eb01f`)
 
@@ -22,16 +41,25 @@
 | `ai.defrag.app` | AAAA | `100::` (proxied) | Worker route |
 | `session.defrag.app` | A | `192.0.2.1` (proxied) | Worker route |
 
+**Current problem:** `defrag.app` and `www.defrag.app` are CNAME → `sovv-platform.pages.dev`. This must be changed to proxied A/AAAA Worker records. See dashboard actions below.
+
+---
+
 ## Cloudflare Pages — PROHIBITED for product runtime
 
 The `sovv-platform` Pages project **must be deleted** after Worker routes are confirmed.
 
 **Required dashboard actions:**
-1. Pages → `sovv-platform` → Custom Domains → Remove `defrag.app` and `www.defrag.app`
-2. DNS → Update `defrag.app` CNAME to proxied A/AAAA Worker record
-3. DNS → Update `www.defrag.app` CNAME to proxied A/AAAA Worker record
-4. Verify `sovv-web` Worker serves both domains
-5. Delete `sovv-platform` Pages project
+1. Pages → `sovv-platform` → Custom Domains → Remove `defrag.app`
+2. Pages → `sovv-platform` → Custom Domains → Remove `www.defrag.app`
+3. DNS → Delete CNAME `defrag.app` → `sovv-platform.pages.dev`
+4. DNS → Delete CNAME `www.defrag.app` → `sovv-platform.pages.dev`
+5. DNS → Add proxied A record: `defrag.app` → `192.0.2.1`
+6. DNS → Add proxied A record: `www.defrag.app` → `192.0.2.1`
+7. Verify `sovv-web` Worker serves both domains
+8. Delete `sovv-platform` Pages project
+
+---
 
 ## App Route Map (sovv-web Worker)
 
@@ -47,6 +75,27 @@ The `sovv-platform` Pages project **must be deleted** after Worker routes are co
 | `/covenant` | Covenant marketing page |
 | `/product`, `/pricing`, `/about`, etc. | Marketing pages |
 | `/api/*` | Next.js API proxy routes (forward to `api.defrag.app`) |
+
+---
+
+## Future: sovereign.os Routes
+
+When `sovereign.os` is registered and added to Cloudflare:
+
+1. Add zone to Cloudflare account
+2. Add routes to `apps/web/wrangler.json`:
+   ```json
+   { "pattern": "sovereign.os/*",     "zone_id": "<sovereign-os-zone-id>" },
+   { "pattern": "www.sovereign.os/*", "zone_id": "<sovereign-os-zone-id>" },
+   { "pattern": "app.sovereign.os/*", "zone_id": "<sovereign-os-zone-id>" }
+   ```
+3. Update middleware: `sovereign.os` → platform landing, `app.sovereign.os` → app shell
+4. Update DNS for `sovereign.os` zone: proxied A/AAAA records
+5. Update email: `From: Sovereign.os <info@sovereign.os>` (after Email Routing verified)
+6. Keep `defrag.app` as a valid public entrypoint and brand bridge
+7. Redirect `sovereign.defrag.app` → `sovereign.os`
+
+---
 
 ## Orphaned Workers — Action Required
 

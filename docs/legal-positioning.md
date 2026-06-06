@@ -37,7 +37,7 @@ Use these consistently in UI, marketing, support, and documentation:
 | "user interpretation required" | "this is the right answer" |
 | "a reflection space" | "a therapy replacement" |
 | "organized from your Baseline Design" | "clinically validated" |
-| "shows what got lit up" | "diagnoses the situation" |
+| "helps surface the active pattern" | "diagnoses the situation" |
 
 ---
 

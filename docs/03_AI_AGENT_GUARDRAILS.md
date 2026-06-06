@@ -6,6 +6,22 @@ These rules apply to any AI agent, coding assistant, or automated tool working i
 
 ---
 
+## Contact / Email Naming Rule — Hard Stop
+
+Default public contact is `info@defrag.app`.
+
+Use `info@sovereign.os` **only** when the `sovereign.os` Cloudflare zone and Email Routing are active and verified.
+
+Do **not** create additional public role inboxes unless explicitly approved by the operator.
+
+Do **not** use `privacy@`, `admin@`, `hello@`, `support@`, `billing@`, or `security@` as defaults.
+
+If you generate docs, UI copy, email templates, or API responses that reference an email address, use `info@defrag.app` unless the operator has explicitly approved a different address.
+
+---
+
+---
+
 ## Platform Hierarchy — Never Violate
 
 1. **Sovereign.os is the parent platform.** Defrag and Covenant are spaces inside it.

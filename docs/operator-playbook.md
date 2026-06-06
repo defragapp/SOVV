@@ -104,7 +104,7 @@ Immediately stop and review if a patch:
 
 Always use approved terms. Never use rejected terms in UI, marketing, or support.
 
-**Approved:** Your Baseline Design, The sky over you, What got lit up, The Loop, The Twist, Your Strengths, Connection Loop, Pressure Loop, Best Next Response, Alignment, Practice, Your Story, Watch It, Try It Out, Defrag space, Covenant space, Sovereign.os Library
+**Approved:** Your Baseline Design, The sky over you, Active pattern, The Loop, The Twist, Your Strengths, Connection Loop, Pressure Loop, Best Next Response, Alignment, Practice, Your Story, Watch It, Try It Out, Defrag space, Covenant space, Sovereign.os Library
 
 **Rejected:** Clear Move, Design Points, Stress Distortions, Directional Architecture, Emotional Architecture, Body Signals, Feminine Wound, Masculine Wound, Shadow Work, Inner Child Work, Spiritual Gifts, Somatic Signature, Wound Architecture, Therapy Replacement, Oracle, Frequency, Destiny, Meditate, Breathe, Workbench, DEFRAG (in body copy)
 
