@@ -12,23 +12,22 @@ export function PageHero({
   children?: ReactNode;
 }) {
   return (
-    <div className="relative border-b border-white/8 px-6 py-28 text-center sm:py-36 grid-bg">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#05070B] via-transparent to-[#05070B] pointer-events-none" />
-      <div className="relative mx-auto max-w-3xl">
+    <div style={{ background: "#05070B", borderBottom: "1px solid rgba(246,245,243,0.08)", padding: "7rem 1.5rem", textAlign: "center" }}>
+      <div style={{ maxWidth: "48rem", margin: "0 auto" }}>
         {eyebrow && (
-          <p className="mb-4 text-label mx-auto">
+          <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", marginBottom: "1.5rem" }}>
             {eyebrow}
           </p>
         )}
-        <h1 className="text-headline text-white mt-4">
+        <h1 style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, color: "#F6F5F3", margin: "0 0 1.5rem 0" }}>
           {title}
         </h1>
         {body && (
-          <p className="mt-6 text-body max-w-xl mx-auto">
+          <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.55)", maxWidth: "36rem", margin: "0 auto" }}>
             {body}
           </p>
         )}
-        {children && <div className="mt-10">{children}</div>}
+        {children && <div style={{ marginTop: "2.5rem" }}>{children}</div>}
       </div>
     </div>
   );

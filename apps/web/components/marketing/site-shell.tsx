@@ -8,7 +8,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen flex-col bg-black text-white">
+    <div className="flex min-h-screen flex-col" style={{ background: "#05070B", color: "#F6F5F3" }}>
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <header className="fixed top-0 z-50 w-full border-b border-white/8 glass">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
@@ -77,7 +77,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
         {/* Mobile menu */}
         {menuOpen && (
-            <div className="border-t border-white/8 bg-black md:hidden">
+            <div className="border-t border-white/8 md:hidden" style={{ background: "#05070B" }}>
               <nav className="flex flex-col px-6 py-6 gap-5" aria-label="Mobile navigation">
                 {navItems.map((item) => (
                   <Link
