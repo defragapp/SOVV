@@ -1,15 +1,45 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
-  <title id="title">Sovereign.os brand mark</title>
-  <desc id="desc">A minimal geometric brand mark for Sovereign.os and DEFRAG.</desc>
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.72"/>
-    </linearGradient>
-  </defs>
-  <rect width="1024" height="1024" rx="96" fill="#05070B"/>
-  <rect x="164" y="164" width="696" height="696" rx="52" fill="none" stroke="url(#g)" stroke-width="22"/>
-  <path d="M316 384h392M316 512h392M316 640h392" stroke="#ffffff" stroke-opacity="0.72" stroke-width="20" stroke-linecap="round"/>
-  <circle cx="512" cy="512" r="62" fill="none" stroke="#ffffff" stroke-width="20"/>
-  <path d="M512 450v124M450 512h124" stroke="#ffffff" stroke-width="20" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="bm-title bm-desc">
+  <title id="bm-title">Sovereign.os</title>
+  <desc id="bm-desc">Sovereign.os brand mark — a geometric mark representing structure, clarity, and private intelligence.</desc>
+
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#05070B"/>
+
+  <!-- Outer frame — sharp, no radius -->
+  <rect x="120" y="120" width="784" height="784" fill="none" stroke="#F6F5F3" stroke-opacity="0.12" stroke-width="1"/>
+
+  <!-- Inner structure — three horizontal registers -->
+  <line x1="120" y1="381" x2="904" y2="381" stroke="#F6F5F3" stroke-opacity="0.08" stroke-width="1"/>
+  <line x1="120" y1="643" x2="904" y2="643" stroke="#F6F5F3" stroke-opacity="0.08" stroke-width="1"/>
+
+  <!-- Vertical axis -->
+  <line x1="512" y1="120" x2="512" y2="904" stroke="#F6F5F3" stroke-opacity="0.06" stroke-width="1"/>
+
+  <!-- Central mark — S.os monogram geometry -->
+  <!-- Outer ring -->
+  <circle cx="512" cy="512" r="148" fill="none" stroke="#F6F5F3" stroke-opacity="0.55" stroke-width="1.5"/>
+
+  <!-- Inner ring -->
+  <circle cx="512" cy="512" r="96" fill="none" stroke="#F6F5F3" stroke-opacity="0.25" stroke-width="1"/>
+
+  <!-- Cross — cardinal axes -->
+  <line x1="512" y1="364" x2="512" y2="660" stroke="#F6F5F3" stroke-opacity="0.70" stroke-width="1.5"/>
+  <line x1="364" y1="512" x2="660" y2="512" stroke="#F6F5F3" stroke-opacity="0.70" stroke-width="1.5"/>
+
+  <!-- Diagonal structure — 45° -->
+  <line x1="407" y1="407" x2="617" y2="617" stroke="#F6F5F3" stroke-opacity="0.18" stroke-width="1"/>
+  <line x1="617" y1="407" x2="407" y2="617" stroke="#F6F5F3" stroke-opacity="0.18" stroke-width="1"/>
+
+  <!-- Center point — amber accent -->
+  <circle cx="512" cy="512" r="6" fill="#C8922A" fill-opacity="0.90"/>
+
+  <!-- Corner marks — structural anchors -->
+  <rect x="120" y="120" width="24" height="1" fill="#F6F5F3" fill-opacity="0.40"/>
+  <rect x="120" y="120" width="1" height="24" fill="#F6F5F3" fill-opacity="0.40"/>
+  <rect x="880" y="120" width="24" height="1" fill="#F6F5F3" fill-opacity="0.40"/>
+  <rect x="903" y="120" width="1" height="24" fill="#F6F5F3" fill-opacity="0.40"/>
+  <rect x="120" y="903" width="24" height="1" fill="#F6F5F3" fill-opacity="0.40"/>
+  <rect x="120" y="880" width="1" height="24" fill="#F6F5F3" fill-opacity="0.40"/>
+  <rect x="880" y="903" width="24" height="1" fill="#F6F5F3" fill-opacity="0.40"/>
+  <rect x="903" y="880" width="1" height="24" fill="#F6F5F3" fill-opacity="0.40"/>
 </svg>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { BaselineRequest } from "@sovereign/core";
 import { apiGetBaseline, apiSaveBaseline } from "@/lib/api";
 
@@ -13,8 +14,9 @@ const initialState: BaselineRequest = {
 
 export default function SettingsPage() {
   const [baseline, setBaseline] = useState<BaselineRequest>(initialState);
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [hasBaseline, setHasBaseline] = useState(false);
 
   useEffect(() => {
     apiGetBaseline().then((result) => {
@@ -24,6 +26,7 @@ export default function SettingsPage() {
           tob: { type: result.baseline.tob.type, value: result.baseline.tob.value },
           pob: result.baseline.pob
         });
+        setHasBaseline(true);
       }
     });
   }, []);
@@ -35,93 +38,180 @@ export default function SettingsPage() {
     try {
       const result = await apiSaveBaseline(baseline);
       if (result?.baseline) {
-        setMessage("Baseline Design saved.");
+        setHasBaseline(true);
+        setMessage({ text: "Baseline Design saved.", ok: true });
       } else {
-        setMessage("Unable to save Baseline Design.");
+        setMessage({ text: "Unable to save Baseline Design.", ok: false });
       }
-    } catch (error) {
-      setMessage("Save failed. Try again.");
+    } catch {
+      setMessage({ text: "Save failed. Try again.", ok: false });
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <main className="min-h-screen bg-black text-white p-8">
-      <div className="mx-auto max-w-3xl space-y-6">
-        <div className="flex items-center justify-between gap-4 rounded-3xl border border-white/10 bg-white/5 p-6">
-          <div>
-            <h1 className="text-3xl font-semibold">Baseline Design</h1>
-            <p className="mt-2 text-sm text-white/70">
-              Your Baseline Design is the starting map — stored privately and used to keep every thread grounded in who you actually are.
+    <div className="min-h-screen bg-[#05070B] text-[#F6F5F3]">
+
+      {/* Header */}
+      <header className="border-b border-[#F6F5F3]/8 px-6 py-4 flex items-center justify-between glass sticky top-0 z-40">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="text-micro text-[#F6F5F3]/25 hover:text-[#F6F5F3]/50 transition-colors">
+            Sovereign.os
+          </Link>
+          <span className="text-[#F6F5F3]/15 text-micro">/</span>
+          <span className="text-micro text-[#F6F5F3]/40">Baseline Design</span>
+        </div>
+        <Link href="/apps/defrag" className="text-micro text-[#F6F5F3]/30 hover:text-[#F6F5F3]/60 transition-colors">
+          ← Back to Defrag space
+        </Link>
+      </header>
+
+      <main className="max-w-2xl mx-auto px-6 py-16 space-y-12">
+
+        {/* Title block */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <span className="space-badge-amber">Baseline Design</span>
+            {hasBaseline && (
+              <span className="text-micro text-[#C8922A]/70">Active</span>
+            )}
+          </div>
+          <h1 className="text-headline">Your Baseline Design<br />is the source.</h1>
+          <p className="text-body">
+            Your Baseline Design is the starting map — how you tend to process, respond, connect, protect, communicate, and return to center. It is stored privately and used to keep every thread in Defrag and Covenant grounded. It is never exposed in outputs.
+          </p>
+          <div className="accent-amber">
+            <p className="text-caption text-xs">
+              Shared across Defrag and Covenant. Set once. Works across all sessions.
             </p>
           </div>
-          <Link href="/app" className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/90 hover:bg-white/10">
-            Back to your space
-          </Link>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 space-y-5">
+        {/* Form */}
+        <div className="border border-[#F6F5F3]/8 p-8 space-y-8">
+          <p className="text-label">Enter your birth details</p>
+
+          {/* Date of birth */}
           <div className="space-y-2">
-            <label className="text-sm text-white/70">Date of birth (DOB)</label>
+            <label htmlFor="dob" className="sovv-label">Date of birth</label>
             <input
+              id="dob"
+              type="date"
               value={baseline.dob}
               onChange={(e) => setBaseline((prev) => ({ ...prev, dob: e.target.value }))}
-              placeholder="YYYY-MM-DD"
-              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
+              className="sovv-input"
+              style={{ fontSize: "16px" }}
             />
+            <p className="text-micro">YYYY-MM-DD</p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-sm text-white/70">Time of birth (TOB)</label>
-              <div className="grid gap-2">
+          {/* Time of birth */}
+          <div className="space-y-2">
+            <label className="sovv-label">Time of birth</label>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="tob-type" className="sr-only">Time precision</label>
                 <select
+                  id="tob-type"
                   value={baseline.tob.type}
-                  onChange={(e) => setBaseline((prev) => ({ ...prev, tob: { ...prev.tob, type: e.target.value as "exact" | "approx" } }))}
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
+                  onChange={(e) => setBaseline((prev) => ({
+                    ...prev,
+                    tob: { ...prev.tob, type: e.target.value as "exact" | "approx" }
+                  }))}
+                  className="sovv-input"
+                  style={{ fontSize: "16px" }}
                 >
                   <option value="exact">Exact time</option>
                   <option value="approx">Approximate</option>
                 </select>
+              </div>
+              <div>
+                <label htmlFor="tob-value" className="sr-only">Time value</label>
                 <input
+                  id="tob-value"
+                  type="time"
                   value={baseline.tob.value}
-                  onChange={(e) => setBaseline((prev) => ({ ...prev, tob: { ...prev.tob, value: e.target.value } }))}
-                  placeholder="14:30 or morning"
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
+                  onChange={(e) => setBaseline((prev) => ({
+                    ...prev,
+                    tob: { ...prev.tob, value: e.target.value }
+                  }))}
+                  className="sovv-input"
+                  style={{ fontSize: "16px" }}
                 />
               </div>
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm text-white/70">Place of birth (POB)</label>
-              <input
-                value={baseline.pob}
-                onChange={(e) => setBaseline((prev) => ({ ...prev, pob: e.target.value }))}
-                placeholder="City, state or region"
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
-              />
-            </div>
+            <p className="text-micro">If unknown, use approximate and enter a midpoint.</p>
           </div>
 
-          <div className="space-y-3 text-sm text-white/70">
-            <p>
-              This data is used only as hidden context to keep your explanations consistent. It is not displayed in your space, and it is stored privately in your account.
+          {/* Place of birth */}
+          <div className="space-y-2">
+            <label htmlFor="pob" className="sovv-label">Place of birth</label>
+            <input
+              id="pob"
+              type="text"
+              value={baseline.pob}
+              onChange={(e) => setBaseline((prev) => ({ ...prev, pob: e.target.value }))}
+              placeholder="City, Country"
+              className="sovv-input"
+              style={{ fontSize: "16px" }}
+            />
+          </div>
+
+          {/* Privacy note */}
+          <div className="border-t border-[#F6F5F3]/6 pt-6">
+            <p className="text-caption text-xs leading-6">
+              Your birth details are used only to generate your Baseline Design. They are stored privately and never exposed in outputs, shared with other users, or used outside your own session context.
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          {/* Save */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <button
               onClick={handleSave}
-              disabled={saving}
-              className="rounded-2xl bg-white px-5 py-3 text-black font-semibold disabled:opacity-50"
+              disabled={saving || !baseline.dob || !baseline.pob}
+              className="sovv-button-primary py-3.5 px-8 disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              {saving ? "Saving…" : "Save Baseline Design"}
+              {saving ? "Saving…" : hasBaseline ? "Update Baseline Design" : "Save Baseline Design"}
             </button>
-            {message ? <div className="text-sm text-white/80">{message}</div> : null}
+
+            <AnimatePresence>
+              {message && (
+                <motion.p
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`text-label ${message.ok ? "text-[#C8922A]" : "text-red-400/60"}`}
+                >
+                  {message.text}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
         </div>
-      </div>
-    </main>
+
+        {/* What it unlocks */}
+        <div className="space-y-4">
+          <p className="text-label">What your Baseline Design unlocks</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[
+              "Grounded threads in Defrag",
+              "Grounded reflection in Covenant",
+              "Active pattern identification",
+              "Best Next Response",
+              "Compare With Someone",
+              "Sovereign.os Library continuity",
+            ].map((item) => (
+              <div key={item} className="flex items-center gap-3 py-2 border-b border-[#F6F5F3]/6">
+                <div className="h-px w-3 bg-[#C8922A]/40 shrink-0" />
+                <span className="text-caption text-xs">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </main>
+    </div>
   );
 }

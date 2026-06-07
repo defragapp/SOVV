@@ -1,15 +1,80 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
-  <title id="title">Sovereign.os social card</title>
-  <desc id="desc">A black and white promotional card for Sovereign.os and DEFRAG.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="sc-title sc-desc">
+  <title id="sc-title">Sovereign.os — Understand the pattern underneath the moment.</title>
+  <desc id="sc-desc">Sovereign.os social card. Defrag and Covenant spaces for relational intelligence and reflection.</desc>
+
+  <!-- Background -->
   <rect width="1200" height="630" fill="#05070B"/>
-  <rect x="36" y="36" width="1128" height="558" rx="28" fill="none" stroke="#ffffff" stroke-opacity="0.16"/>
-  <g fill="#ffffff" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
-    <text x="80" y="126" font-size="26" letter-spacing="4" fill-opacity="0.72">SOVEREIGN.OS</text>
-    <text x="80" y="230" font-size="72" font-weight="700">Bring the moment here.</text>
-    <text x="80" y="308" font-size="72" font-weight="700" fill-opacity="0.88">See what keeps repeating.</text>
-    <text x="80" y="392" font-size="28" fill-opacity="0.62">A private workspace for pattern recognition, response practice, and saved context.</text>
-    <text x="80" y="492" font-size="22" letter-spacing="2" fill-opacity="0.5">DEFRAG · YOUR BASELINE · YOUR STORY</text>
+
+  <!-- Structural grid lines -->
+  <line x1="0" y1="210" x2="1200" y2="210" stroke="#F6F5F3" stroke-opacity="0.04" stroke-width="1"/>
+  <line x1="0" y1="420" x2="1200" y2="420" stroke="#F6F5F3" stroke-opacity="0.04" stroke-width="1"/>
+  <line x1="800" y1="0" x2="800" y2="630" stroke="#F6F5F3" stroke-opacity="0.04" stroke-width="1"/>
+
+  <!-- Outer border -->
+  <rect x="1" y="1" width="1198" height="628" fill="none" stroke="#F6F5F3" stroke-opacity="0.10" stroke-width="1"/>
+
+  <!-- Brand mark — right panel -->
+  <!-- Outer ring -->
+  <circle cx="1000" cy="315" r="140" fill="none" stroke="#F6F5F3" stroke-opacity="0.12" stroke-width="1"/>
+  <!-- Inner ring -->
+  <circle cx="1000" cy="315" r="90" fill="none" stroke="#F6F5F3" stroke-opacity="0.08" stroke-width="1"/>
+  <!-- Cross -->
+  <line x1="1000" y1="175" x2="1000" y2="455" stroke="#F6F5F3" stroke-opacity="0.20" stroke-width="1"/>
+  <line x1="860" y1="315" x2="1140" y2="315" stroke="#F6F5F3" stroke-opacity="0.20" stroke-width="1"/>
+  <!-- Diagonals -->
+  <line x1="901" y1="216" x2="1099" y2="414" stroke="#F6F5F3" stroke-opacity="0.07" stroke-width="1"/>
+  <line x1="1099" y1="216" x2="901" y2="414" stroke="#F6F5F3" stroke-opacity="0.07" stroke-width="1"/>
+  <!-- Center amber -->
+  <circle cx="1000" cy="315" r="5" fill="#C8922A" fill-opacity="0.85"/>
+
+  <!-- Left content panel -->
+  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" fill="#F6F5F3">
+
+    <!-- Platform label -->
+    <text x="72" y="108" font-size="11" letter-spacing="4" fill-opacity="0.30"
+      font-family="'JetBrains Mono', 'Cascadia Code', 'Source Code Pro', ui-monospace, Menlo, monospace"
+      text-transform="uppercase">SOVEREIGN.OS</text>
+
+    <!-- Divider -->
+    <line x1="72" y1="128" x2="480" y2="128" stroke="#F6F5F3" stroke-opacity="0.10" stroke-width="1"/>
+
+    <!-- Headline -->
+    <text x="72" y="220" font-size="58" font-weight="300" letter-spacing="-2" fill-opacity="0.95">Understand the</text>
+    <text x="72" y="290" font-size="58" font-weight="300" letter-spacing="-2" fill-opacity="0.95">pattern underneath</text>
+    <text x="72" y="360" font-size="58" font-weight="300" letter-spacing="-2" fill-opacity="0.95">the moment.</text>
+
+    <!-- Support copy -->
+    <text x="72" y="420" font-size="18" fill-opacity="0.42" font-weight="300">
+      Your Baseline Design is the source.
+    </text>
+    <text x="72" y="446" font-size="18" fill-opacity="0.42" font-weight="300">
+      Sovereign.os is where the work becomes yours.
+    </text>
+
+    <!-- Space labels -->
+    <text x="72" y="510" font-size="11" letter-spacing="3" fill-opacity="0.28"
+      font-family="'JetBrains Mono', 'Cascadia Code', ui-monospace, Menlo, monospace">
+      DEFRAG SPACE
+    </text>
+    <text x="72" y="510" font-size="11" letter-spacing="3" fill-opacity="0.10"
+      font-family="'JetBrains Mono', 'Cascadia Code', ui-monospace, Menlo, monospace"
+      x="220">·</text>
+    <text x="240" y="510" font-size="11" letter-spacing="3" fill-opacity="0.28"
+      font-family="'JetBrains Mono', 'Cascadia Code', ui-monospace, Menlo, monospace">
+      COVENANT SPACE
+    </text>
+    <text x="430" y="510" font-size="11" letter-spacing="3" fill-opacity="0.28"
+      font-family="'JetBrains Mono', 'Cascadia Code', ui-monospace, Menlo, monospace">
+      · BASELINE DESIGN · LIBRARY
+    </text>
+
+    <!-- Amber accent line -->
+    <rect x="72" y="540" width="60" height="1" fill="#C8922A" fill-opacity="0.60"/>
+
+    <!-- URL -->
+    <text x="72" y="570" font-size="13" letter-spacing="2" fill-opacity="0.22"
+      font-family="'JetBrains Mono', 'Cascadia Code', ui-monospace, Menlo, monospace">
+      defrag.app
+    </text>
   </g>
-  <circle cx="1038" cy="158" r="74" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="14"/>
-  <path d="M1038 110v96M990 158h96" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
 </svg>

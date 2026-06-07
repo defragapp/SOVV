@@ -55,7 +55,7 @@ export default function MessageInput({
           value={value}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
-          placeholder="Bring the moment here."
+          placeholder="Start with what is happening now."
           rows={2}
           disabled={disabled}
           aria-disabled={disabled}
