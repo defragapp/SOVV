@@ -28,11 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="bg-background text-foreground antialiased selection:bg-white selection:text-black">
-      <body className="min-h-screen bg-background text-foreground overflow-x-hidden">
-        <header className="p-6 border-b border-white/10">
-          <span className="font-mono font-bold tracking-widest text-white">SOVEREIGN.OS</span>
-        </header>
+    <html lang="en" className="antialiased" style={{ background: "#05070B", color: "#F6F5F3" }}>
+      <body className="min-h-screen overflow-x-hidden" style={{ background: "#05070B", color: "#F6F5F3" }}>
         {children}
       </body>
     </html>
