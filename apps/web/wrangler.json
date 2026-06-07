@@ -1,5 +1,4 @@
 {
-  "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "sovv-web",
   "main": "./.open-next/worker.js",
   "compatibility_date": "2026-06-04",

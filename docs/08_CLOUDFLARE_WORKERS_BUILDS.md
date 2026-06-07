@@ -82,9 +82,11 @@ Source code uses `env.KV` — consistent ✅
 | Repository | `SOVV` |
 | Branch | `main` |
 | Root directory | `apps/web` |
-| Build command | `npm install && npm run build:worker` |
+| Build command | `npm install` |
 | Deploy command | `npm run deploy` |
 | Node version | `22` |
+
+**Note:** `npm run deploy` in `apps/web/package.json` runs `opennextjs-cloudflare build && opennextjs-cloudflare deploy` — it builds AND deploys in one command. The build command only needs `npm install` to prepare dependencies.
 
 ### Key config (`apps/web/wrangler.json`)
 
