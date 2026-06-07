@@ -114,7 +114,7 @@ export default function CovenantPage() {
       {/* CTA */}
       <MotionSection className="border-t border-white/8 px-6 py-24 text-center">
         <div className="mx-auto max-w-xl space-y-6">
-          <span className="space-badge-oxblood mx-auto">Covenant space</span>
+          <span className="space-badge-covenant mx-auto">Covenant space</span>
           <h2 className="text-headline mt-4">Available on Pro.</h2>
           <p className="text-body">
             Covenant is included in the Sovereign.os Pro plan alongside Defrag. One subscription. Both spaces. Your Baseline Design and Library shared across everything.

@@ -42,12 +42,12 @@ export default function PricingPage() {
                 key={tier.name}
                 className={`p-10 flex flex-col ${
                   tier.highlight
-                    ? "border border-[#B8960C]/30 shadow-[0_0_60px_rgba(184,150,12,0.04)]"
+                    ? "border border-white/22 "
                     : "border border-white/10"
                 } ${i === 1 ? "md:border-l-0" : ""}`}
               >
                 {tier.highlight && (
-                  <div className="mb-6 self-start font-mono text-[9px] uppercase tracking-widest text-[#05070B] bg-[#B8960C] px-2.5 py-1">
+                  <div className="mb-6 self-start font-mono text-[9px] uppercase tracking-widest text-[#05070B] bg-[#F6F5F3] px-2.5 py-1">
                     Recommended
                   </div>
                 )}
@@ -69,7 +69,7 @@ export default function PricingPage() {
                   href={tier.href}
                   className={`block px-6 py-3.5 text-center font-mono text-[9px] uppercase tracking-widest transition-colors ${
                     tier.highlight
-                      ? "bg-[#B8960C] text-[#05070B] hover:bg-[#C8A020]"
+                      ? "bg-[#F6F5F3] text-[#05070B] hover:bg-[#F6F5F3]/88"
                       : "border border-white/18 text-[#F6F5F3]/70 hover:bg-white/5"
                   }`}
                 >
@@ -105,7 +105,7 @@ export default function PricingPage() {
             {proReasons.map((r, i) => (
               <div key={r.label} className={`py-8 flex gap-8 ${i < proReasons.length - 1 ? "border-b border-white/8" : ""}`}>
                 <div className="shrink-0 pt-1">
-                  <span className="space-badge-amber">Pro</span>
+                  <span className="space-badge-defrag">Pro</span>
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-sm font-light text-[#F6F5F3]/80">{r.label}</h3>

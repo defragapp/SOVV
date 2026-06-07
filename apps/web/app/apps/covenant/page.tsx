@@ -116,7 +116,7 @@ export default function CovenantSpacePage() {
 
           {/* Space intro */}
           <div className="space-y-4">
-            <span className="space-badge-oxblood">Covenant space</span>
+            <span className="space-badge-covenant">Covenant space</span>
             <h1 className="text-headline mt-3">
               Faith-context reflection<br />for what you are walking through.
             </h1>
@@ -132,8 +132,8 @@ export default function CovenantSpacePage() {
 
           {/* Pro gate */}
           {tier === "free" && (
-            <div className="border border-[#7A2020]/30 bg-[#7A2020]/06 p-6 space-y-4">
-              <p className="text-label text-[#C05050]">Pro feature</p>
+            <div className="border border-white/12 bg-white/3 p-6 space-y-4">
+              <p className="text-label text-[#F6F5F3]/55">Pro feature</p>
               <p className="text-body text-sm">
                 Covenant is available on the Pro plan. Upgrade to access faith-context reflection alongside Defrag.
               </p>

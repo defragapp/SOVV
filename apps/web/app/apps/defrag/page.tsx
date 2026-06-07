@@ -38,9 +38,9 @@ function DefragSpaceInner() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-[#B8960C]/10 border-b border-[#B8960C]/25 px-6 py-3"
+            className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-white/5 border-b border-white/12 px-6 py-3"
           >
-            <p className="text-micro text-[#B8960C]">
+            <p className="text-micro text-[#F6F5F3]/60">
               Pro is active. Your full pattern is now available.
             </p>
             <button

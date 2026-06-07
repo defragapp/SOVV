@@ -9,37 +9,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ── Foundation ──────────────────────────────────────────────────
-        background: "#05070B",
-        foreground: "#F6F5F3",
-        border: "rgba(255,255,255,0.10)",
+        // ── Monochrome foundation ────────────────────────────────────────
+        ink: "#05070B",          // deepest black
+        smoke: "#0D0F14",        // near-black with blue undertone
+        graphite: "#1A1D24",     // dark panel
+        silver: "#8A8F9A",       // mid-grey
+        ash: "#C4C7CE",          // light grey
+        bone: "#F0EEE9",         // warm off-white
+        foreground: "#F6F5F3",   // primary text
 
-        // ── Accent system ───────────────────────────────────────────────
-        // Warm ivory — human warmth, Baseline Design
-        ivory: "#F0EDE6",
-        // Muted amber — active pattern, attention
-        amber: {
-          DEFAULT: "#C8922A",
-          muted: "#8A6420",
-          subtle: "rgba(200,146,42,0.12)",
-        },
-        // Oxblood — strain, repair, Covenant
-        oxblood: {
-          DEFAULT: "#7A2020",
-          muted: "#5A1818",
-          subtle: "rgba(122,32,32,0.12)",
-        },
-        // Steel — calm, grounding, Library
-        steel: {
-          DEFAULT: "#4A5568",
-          light: "#718096",
-          subtle: "rgba(74,85,104,0.15)",
-        },
-        // Brass — premium markers, Pro
-        brass: {
-          DEFAULT: "#B8960C",
-          subtle: "rgba(184,150,12,0.10)",
-        },
+        // ── Structural ──────────────────────────────────────────────────
+        border: "rgba(246,245,243,0.10)",
+        "border-strong": "rgba(246,245,243,0.20)",
+        "border-subtle": "rgba(246,245,243,0.06)",
+
+        // ── Legacy aliases ───────────────────────────────────────────────
+        background: "#05070B",
       },
       fontFamily: {
         sans: [
@@ -73,8 +58,10 @@ const config: Config = {
       animation: {
         "fade-in": "fadeIn 0.6s ease forwards",
         "fade-up": "fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) forwards",
-        "pulse-slow": "pulse 3s ease-in-out infinite",
+        "fragment-resolve": "fragmentResolve 1.2s cubic-bezier(0.16,1,0.3,1) forwards",
         "shimmer": "shimmer 2s linear infinite",
+        "pulse-slow": "pulse 3s ease-in-out infinite",
+        "scan": "scan 3s linear infinite",
       },
       keyframes: {
         fadeIn: {
@@ -85,9 +72,18 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(16px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        fragmentResolve: {
+          "0%": { opacity: "0", letterSpacing: "0.4em", filter: "blur(4px)" },
+          "60%": { opacity: "0.7", letterSpacing: "0.05em", filter: "blur(1px)" },
+          "100%": { opacity: "1", letterSpacing: "-0.02em", filter: "blur(0)" },
+        },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
+        },
+        scan: {
+          "0%": { transform: "translateY(-100%)" },
+          "100%": { transform: "translateY(100vh)" },
         },
       },
       transitionTimingFunction: {

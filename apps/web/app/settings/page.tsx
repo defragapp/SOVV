@@ -72,16 +72,16 @@ export default function SettingsPage() {
         {/* Title block */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <span className="space-badge-amber">Baseline Design</span>
+            <span className="space-badge-defrag">Baseline Design</span>
             {hasBaseline && (
-              <span className="text-micro text-[#C8922A]/70">Active</span>
+              <span className="text-micro text-[#F6F5F3]/60/70">Active</span>
             )}
           </div>
           <h1 className="text-headline">Your Baseline Design<br />is the source.</h1>
           <p className="text-body">
             Your Baseline Design is the starting map — how you tend to process, respond, connect, protect, communicate, and return to center. It is stored privately and used to keep every thread in Defrag and Covenant grounded. It is never exposed in outputs.
           </p>
-          <div className="accent-amber">
+          <div className="border-l border-white/15 pl-4">
             <p className="text-caption text-xs">
               Shared across Defrag and Covenant. Set once. Works across all sessions.
             </p>
@@ -182,7 +182,7 @@ export default function SettingsPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className={`text-label ${message.ok ? "text-[#C8922A]" : "text-red-400/60"}`}
+                  className={`text-label ${message.ok ? "text-[#F6F5F3]/60" : "text-red-400/60"}`}
                 >
                   {message.text}
                 </motion.p>
@@ -204,7 +204,7 @@ export default function SettingsPage() {
               "Sovereign.os Library continuity",
             ].map((item) => (
               <div key={item} className="flex items-center gap-3 py-2 border-b border-[#F6F5F3]/6">
-                <div className="h-px w-3 bg-[#C8922A]/40 shrink-0" />
+                <div className="h-px w-3 bg-[#F6F5F3]/18 shrink-0" />
                 <span className="text-caption text-xs">{item}</span>
               </div>
             ))}

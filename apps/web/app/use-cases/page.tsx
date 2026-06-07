@@ -52,13 +52,13 @@ const cases = [
 ];
 
 const tagColors: Record<string, string> = {
-  Message: "space-badge-amber",
+  Message: "space-badge-defrag",
   Relationship: "space-badge",
   Family: "space-badge",
   Self: "space-badge",
-  Preparation: "space-badge-amber",
-  Boundary: "space-badge-oxblood",
-  Grief: "space-badge-oxblood",
+  Preparation: "space-badge-defrag",
+  Boundary: "space-badge-covenant",
+  Grief: "space-badge-covenant",
   "Invite Privately": "space-badge",
 };
 

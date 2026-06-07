@@ -17,49 +17,46 @@ const surfaces = [
   {
     label: "Your Baseline Design",
     body: "The starting map. How you tend to process, respond, connect, protect, communicate, and return to center. Every thread is grounded here. Private, never exposed in outputs.",
-    accent: "amber" as const,
+    accent: true,
   },
   {
     label: "The sky over you",
     body: "The current timing layer. It shows what is louder right now — and why the moment may feel bigger than it should.",
-    accent: null,
+    accent: false,
   },
   {
     label: "Active pattern",
     body: "The part of your Baseline Design that is most active in this moment. Defrag helps you understand what is driving the dynamic before it takes over.",
-    accent: "amber" as const,
+    accent: true,
   },
   {
     label: "The Loop",
     body: "The repeating pattern that starts when pressure rises. What happened matters. What repeats matters more. Defrag shows where it begins so you can choose a different response.",
-    accent: null,
+    accent: false,
   },
   {
     label: "The Twist",
     body: "Where a real strength bends under pressure. Some pain becomes a role. Some roles can be put down. Defrag shows where it twists and how to bring it back.",
-    accent: "oxblood" as const,
+    accent: true,
   },
   {
     label: "Best Next Response",
     body: "The thing you can say, do, wait on, or practice that gives the moment the best chance to stay clear. Your next response can change the pattern.",
-    accent: "amber" as const,
+    accent: true,
   },
   {
     label: "Your Story",
     body: "A saved record of what was active, what the loop was, and what response brought you back to center. Save what you learn before the moment disappears.",
-    accent: null,
+    accent: false,
   },
   {
     label: "Invite Privately",
     body: "When both sides matter, invite privately. Defrag can work with your side of this. To compare both Baseline Designs, invite them privately — with consent, not assumption.",
-    accent: null,
+    accent: false,
   },
 ];
 
-const accentClass = {
-  amber: "border-l-2 border-[#C8922A] pl-4",
-  oxblood: "border-l-2 border-[#7A2020] pl-4",
-};
+
 
 export default function ProductPage() {
   return (
@@ -82,7 +79,7 @@ export default function ProductPage() {
                 <div className="shrink-0 w-6 mt-1">
                   <span className="block h-1.5 w-1.5 bg-[#F6F5F3]/25" />
                 </div>
-                <div className={s.accent ? accentClass[s.accent] : ""}>
+                <div className={s.accent ? "border-l border-white/15 pl-4" : ""}>
                   <h3 className="text-sm font-light text-[#F6F5F3]/80 mb-2">{s.label}</h3>
                   <p className="text-caption text-xs leading-7">{s.body}</p>
                 </div>
@@ -96,7 +93,7 @@ export default function ProductPage() {
       <MotionSection className="border-t border-white/8 px-6 py-24">
         <div className="mx-auto max-w-3xl space-y-8">
           <div className="space-y-3">
-            <span className="space-badge-amber">Defrag space</span>
+            <span className="space-badge-defrag">Defrag space</span>
             <h2 className="text-headline mt-3">The relational intelligence space.</h2>
             <p className="text-body">
               Defrag helps you work through the moment without losing the larger pattern. Use it for messages, conflict, grief, family roles, boundaries, parenting, and team dynamics.
@@ -120,7 +117,7 @@ export default function ProductPage() {
       <MotionSection className="border-t border-white/8 px-6 py-24">
         <div className="mx-auto max-w-3xl space-y-8">
           <div className="space-y-3">
-            <span className="space-badge-oxblood">Covenant space</span>
+            <span className="space-badge-covenant">Covenant space</span>
             <h2 className="text-headline mt-3">Faith-context reflection.</h2>
             <p className="text-body">
               Covenant helps you bring faith, reflection, and grounded discernment into what you are walking through. For users who want faith connected to repair — without becoming vague, performative, or certain where certainty does not belong.
