@@ -79,11 +79,21 @@ Primary deployment is via **Cloudflare Workers Builds** (Git integration on `mai
 # Ship to production (commit + push → triggers Cloudflare Builds)
 npm run ship -- "short description"
 
-# Manual deploy (fallback)
-npm run deploy:all
+# Manual deploy (fallback — requires Node 22)
+cd apps/web && npm run deploy        # sovv-web
+cd apps/worker && npx wrangler deploy # sovereign-os-api
 ```
 
-See `docs/01_BUILD_AND_DEPLOY_STANDARD.md` for full deployment standard.
+**Workers Builds configuration:**
+
+| Worker | Root | Build | Deploy | Node |
+|---|---|---|---|---|
+| sovv-web | apps/web | npm install | npm run deploy | 22 |
+| sovereign-os-api | apps/worker | npm install | npx wrangler deploy | 22 |
+
+`npm run deploy` in `apps/web` runs `opennextjs-cloudflare build && opennextjs-cloudflare deploy`.
+
+See `docs/CLOUDFLARE_BUILDS_FINAL_STANDARD.md` for the canonical configuration.
 
 ## Documentation
 

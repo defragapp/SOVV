@@ -32,6 +32,30 @@ node --version | grep -E "^v2[2-9]"
 # Expected: v22.x.x or higher
 ```
 
+## 1b. Build Verification (local)
+
+```bash
+# From repo root
+npm install
+
+# Build sovv-web
+cd apps/web
+npm install
+npm run build:worker
+test -f .open-next/worker.js && echo "worker.js OK"
+test -d .open-next/assets && echo "assets OK"
+
+# Dry-run sovereign-os-api
+cd ../worker
+npm install
+npx wrangler deploy --dry-run
+
+# Workers Builds commands (what Cloudflare runs)
+# sovv-web:        build=npm install  deploy=npm run deploy
+# sovereign-os-api: build=npm install  deploy=npx wrangler deploy
+# See docs/CLOUDFLARE_BUILDS_FINAL_STANDARD.md
+```
+
 ---
 
 

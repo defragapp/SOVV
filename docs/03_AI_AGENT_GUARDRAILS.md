@@ -64,6 +64,22 @@ If you generate docs, UI copy, email templates, or API responses that reference 
 4. **Never add GitHub Actions as a production deploy path.** Cloudflare Workers Builds is the primary path.
 5. **Never create a second app root.** `apps/web/app/` is the sole Next.js app root. `apps/web/src/` must not exist.
 
+## Workers Builds Commands — Do Not Change Without Inspecting Package Scripts
+
+**Do NOT change Workers Builds commands unless you inspect `apps/web/package.json` scripts first.**
+
+For `sovv-web`:
+- Workers Builds **build command** is `npm install`
+- Workers Builds **deploy command** is `npm run deploy`
+- Reason: `apps/web/package.json` deploy script runs `opennextjs-cloudflare build && opennextjs-cloudflare deploy` — it builds AND deploys in one step.
+- Do NOT use `npm install && npm run build:worker` as build command — this runs OpenNext build twice.
+
+For `sovereign-os-api`:
+- Workers Builds **build command** is `npm install`
+- Workers Builds **deploy command** is `npx wrangler deploy`
+
+See `docs/CLOUDFLARE_BUILDS_FINAL_STANDARD.md` for the canonical configuration.
+
 ---
 
 ## Code Generation Rules
