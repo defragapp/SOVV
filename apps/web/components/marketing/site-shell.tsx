@@ -2,140 +2,146 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { navItems, footerItems } from "@/data/marketing";
+
+const NAV_LINKS = [
+  { href: "/product", label: "Product" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/covenant", label: "Covenant" },
+];
+
+const FOOTER_LINKS = [
+  { href: "/about", label: "About" },
+  { href: "/product", label: "Product" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/covenant", label: "Covenant" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+  { href: "/contact", label: "Contact" },
+];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen flex-col" style={{ background: "#05070B", color: "#F6F5F3" }}>
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <header className="fixed top-0 z-50 w-full border-b border-white/8 glass">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <div style={{ minHeight: "100vh", background: "#05070B", color: "#F6F5F3", display: "flex", flexDirection: "column" }}>
 
-          {/* Platform brand */}
-          <Link
-            href="/"
-            className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/80 hover:text-white transition-colors"
-            aria-label="Sovereign.os — home"
-          >
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <header style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
+        borderBottom: "1px solid rgba(246,245,243,0.10)",
+        background: "rgba(5,7,11,0.92)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+      }}>
+        <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 2rem", display: "flex", height: "60px", alignItems: "center", justifyContent: "space-between" }}>
+
+          {/* Brand */}
+          <Link href="/" style={{
+            fontFamily: "'JetBrains Mono', 'Cascadia Code', ui-monospace, Menlo, monospace",
+            fontSize: "0.6875rem", letterSpacing: "0.25em", textTransform: "uppercase",
+            color: "rgba(246,245,243,0.90)", textDecoration: "none", fontWeight: 500,
+          }}>
             SOVEREIGN.OS
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-8 md:flex" aria-label="Main navigation">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-white/80 transition-colors duration-200"
+          <nav style={{ display: "flex", alignItems: "center", gap: "2.5rem" }} className="hidden md:flex">
+            {NAV_LINKS.map(item => (
+              <Link key={item.href} href={item.href} style={{
+                fontFamily: "'JetBrains Mono', ui-monospace, Menlo, monospace",
+                fontSize: "0.6875rem", letterSpacing: "0.15em", textTransform: "uppercase",
+                color: "rgba(246,245,243,0.45)", textDecoration: "none",
+                transition: "color 150ms",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = "rgba(246,245,243,0.85)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(246,245,243,0.45)")}
               >
                 {item.label}
               </Link>
             ))}
-            {/* Space links */}
-            <Link
-              href="https://app.defrag.app/apps/defrag"
-              className="font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-white/80 transition-colors duration-200"
-            >
-              Defrag
-            </Link>
-            <Link
-              href="/covenant"
-              className="font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-white/80 transition-colors duration-200"
-            >
-              Covenant
-            </Link>
           </nav>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-4">
-            <Link
-              href="https://app.defrag.app/app/login"
-              className="font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-white/70 transition-colors"
-            >
-              Sign In
+          {/* CTA */}
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <Link href="https://app.defrag.app/app/login" className="hidden sm:block" style={{
+              fontFamily: "'JetBrains Mono', ui-monospace, Menlo, monospace",
+              fontSize: "0.6875rem", letterSpacing: "0.15em", textTransform: "uppercase",
+              color: "rgba(246,245,243,0.40)", textDecoration: "none",
+            }}>
+              Sign in
             </Link>
-            <Link
-              href="https://app.defrag.app/app/login"
-              className="border border-white/20 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-white/5 transition-colors"
-            >
-              Enter Sovereign.os
+            <Link href="https://app.defrag.app/app/login" style={{
+              fontFamily: "'JetBrains Mono', ui-monospace, Menlo, monospace",
+              fontSize: "0.6875rem", letterSpacing: "0.15em", textTransform: "uppercase",
+              background: "#F6F5F3", color: "#05070B", border: "1px solid #F6F5F3",
+              padding: "0.625rem 1.25rem", textDecoration: "none", fontWeight: 500,
+              display: "inline-block",
+            }}>
+              Enter
             </Link>
-          </div>
 
-          {/* Mobile menu toggle */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-white transition-colors"
-            aria-expanded={menuOpen}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-          >
-            {menuOpen ? "Close" : "Menu"}
-          </button>
+            {/* Mobile toggle */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden"
+              style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(246,245,243,0.50)", fontFamily: "'JetBrains Mono', ui-monospace, Menlo, monospace", fontSize: "0.6875rem", letterSpacing: "0.15em", textTransform: "uppercase" }}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+            >
+              {menuOpen ? "Close" : "Menu"}
+            </button>
+          </div>
         </div>
 
         {/* Mobile menu */}
         {menuOpen && (
-            <div className="border-t border-white/8 md:hidden" style={{ background: "#05070B" }}>
-              <nav className="flex flex-col px-6 py-6 gap-5" aria-label="Mobile navigation">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMenuOpen(false)}
-                    className="font-mono text-[10px] uppercase tracking-widest text-white/50 hover:text-white transition-colors"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                <Link
-                  href="https://app.defrag.app/apps/defrag"
-                  onClick={() => setMenuOpen(false)}
-                  className="font-mono text-[10px] uppercase tracking-widest text-white/50 hover:text-white transition-colors"
-                >
-                  Defrag space
+          <div style={{ borderTop: "1px solid rgba(246,245,243,0.10)", background: "#05070B", padding: "1.5rem 2rem 2rem" }} className="md:hidden">
+            <nav style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+              {NAV_LINKS.map(item => (
+                <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)} style={{
+                  fontFamily: "'JetBrains Mono', ui-monospace, Menlo, monospace",
+                  fontSize: "0.6875rem", letterSpacing: "0.15em", textTransform: "uppercase",
+                  color: "rgba(246,245,243,0.55)", textDecoration: "none",
+                }}>
+                  {item.label}
                 </Link>
-                <Link
-                  href="/covenant"
-                  onClick={() => setMenuOpen(false)}
-                  className="font-mono text-[10px] uppercase tracking-widest text-white/50 hover:text-white transition-colors"
-                >
-                  Covenant space
-                </Link>
-                <Link
-                  href="https://app.defrag.app/app/login"
-                  onClick={() => setMenuOpen(false)}
-                  className="mt-2 border border-white/20 px-4 py-3 font-mono text-[10px] uppercase tracking-widest text-white text-center hover:bg-white/5 transition-colors"
-                >
-                  Enter Sovereign.os
-                </Link>
-              </nav>
-            </div>
+              ))}
+              <Link href="https://app.defrag.app/app/login" onClick={() => setMenuOpen(false)} style={{
+                fontFamily: "'JetBrains Mono', ui-monospace, Menlo, monospace",
+                fontSize: "0.6875rem", letterSpacing: "0.15em", textTransform: "uppercase",
+                background: "#F6F5F3", color: "#05070B", padding: "0.875rem 1.5rem",
+                textDecoration: "none", fontWeight: 500, display: "block", textAlign: "center", marginTop: "0.5rem",
+              }}>
+                Enter Sovereign.os
+              </Link>
+            </nav>
+          </div>
         )}
       </header>
 
-      {/* ── Page content ────────────────────────────────────────────────── */}
-      <main className="flex-1 pt-[65px]">{children}</main>
+      {/* ── Content ─────────────────────────────────────────────────────── */}
+      <main style={{ flex: 1, paddingTop: "60px" }}>
+        {children}
+      </main>
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
-      <footer className="border-t border-white/8 px-6 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-1">
-            <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/25">
+      <footer style={{ borderTop: "1px solid rgba(246,245,243,0.10)", padding: "3rem 2rem" }}>
+        <div style={{ maxWidth: "72rem", margin: "0 auto", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: "2rem" }}>
+          <div>
+            <p style={{ fontFamily: "'JetBrains Mono', ui-monospace, Menlo, monospace", fontSize: "0.6875rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.40)", marginBottom: "0.375rem" }}>
               Sovereign.os
             </p>
-            <p className="font-mono text-[9px] text-white/15">
+            <p style={{ fontFamily: "'JetBrains Mono', ui-monospace, Menlo, monospace", fontSize: "0.625rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(246,245,243,0.22)" }}>
               Defrag · Covenant · Baseline Design · Library
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-5">
-            {footerItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="font-mono text-[10px] uppercase tracking-widest text-white/35 hover:text-white/70 transition-colors"
-              >
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem" }}>
+            {FOOTER_LINKS.map(item => (
+              <Link key={item.href} href={item.href} style={{
+                fontFamily: "'JetBrains Mono', ui-monospace, Menlo, monospace",
+                fontSize: "0.6875rem", letterSpacing: "0.15em", textTransform: "uppercase",
+                color: "rgba(246,245,243,0.35)", textDecoration: "none",
+              }}>
                 {item.label}
               </Link>
             ))}
