@@ -2,141 +2,135 @@
 
 ## Status
 
-**Required action:** Connect `sovv-web` Worker to Cloudflare Workers Builds (Git integration).
+**Primary deploy path:** Cloudflare Workers Builds (Git integration) from GitHub `main`.
 
-This replaces `.github/workflows/deploy-live.yml` as the production deployment path.
+GitHub Actions (`deploy-live.yml`) has been **deleted**. Do not restore it as a production deploy path.
 
 **Note on sovereign.os:** The `sovereign.os` domain is not currently in this Cloudflare account. Use `sovereign.defrag.app` as the transitional platform entry. When `sovereign.os` is registered and added to Cloudflare, make it the canonical platform landing and update DNS, routes, and email accordingly.
 
 ---
 
-## Setup Steps
+## Node Version Requirement
 
-### 1. Remove defrag.app from Pages project
+**Node 22+ is required** for all build and deploy operations.
 
-1. Cloudflare Dashboard → Workers & Pages → Pages → `sovv-platform`
-2. Custom Domains → Remove `defrag.app`
-3. Custom Domains → Remove `www.defrag.app`
+- `.nvmrc` in repo root specifies `22`
+- `package.json` engines: `"node": ">=22"`
+- Cloudflare Workers Builds: set Node version to 22 in build image settings if available
+- Codespaces: `nvm use 22` before running wrangler commands
 
-### 2. Update DNS records
+---
 
-In the `defrag.app` zone (`45a59d754ece9221fc97c92c461eb01f`):
+## Workers: sovereign-os-api (API Worker)
 
-1. Delete the CNAME record for `defrag.app` pointing to `sovv-platform.pages.dev`
-2. Delete the CNAME record for `www.defrag.app` pointing to `sovv-platform.pages.dev`
-3. Add proxied A record: `defrag.app` → `192.0.2.1` (or AAAA `100::`)
-4. Add proxied A record: `www.defrag.app` → `192.0.2.1` (or AAAA `100::`)
-
-### 3. Deploy sovv-web Worker with full routes
-
-```bash
-cd apps/web
-CLOUDFLARE_API_TOKEN=<token> wrangler deploy
-```
-
-Verify routes are active:
-- `defrag.app/*` → `sovv-web`
-- `www.defrag.app/*` → `sovv-web`
-- `sovereign.defrag.app/*` → `sovv-web`
-- `app.defrag.app/*` → `sovv-web`
-
-### 4. Connect Cloudflare Workers Builds
-
-1. Cloudflare Dashboard → Workers & Pages → `sovv-web`
-2. Settings → Build & Deployments → Connect Git
-3. Configure:
+### Cloudflare Workers Builds Configuration
 
 | Setting | Value |
 |---|---|
 | GitHub account | `defragapp` |
 | Repository | `SOVV` |
 | Branch | `main` |
-| Build command | `cd apps/web && npx opennextjs-cloudflare build` |
-| Output directory | `apps/web/.open-next` |
-| Root directory | (leave empty) |
+| Root directory | `apps/worker` |
+| Build command | `npm install` |
+| Deploy command | `npx wrangler deploy` |
+| Node version | `22` |
 
-4. Add environment variables:
+### Key config (`apps/worker/wrangler.toml`)
 
-| Variable | Value |
+```toml
+name = "sovereign-os-api"
+main = "src/index.ts"
+compatibility_date = "2026-06-04"
+```
+
+### Dependencies
+
+- `itty-router: ^5.0.23` — in `apps/worker/package.json` dependencies ✅
+- `@sovereign/core: 0.0.1` — local workspace package ✅
+- All committed in `package-lock.json` ✅
+
+### Validation
+
+After deploy, verify:
+```
+GET https://api.defrag.app/health
+→ { "ok": true, "service": "sovereign-os-api", "timestamp": "..." }
+
+GET https://api.defrag.app/
+→ { "service": "sovereign-os-api", "status": "ok" }
+```
+
+### KV Binding
+
+`wrangler.toml` binds the `SOVV_DATA` KV namespace as `KV`:
+```toml
+[[kv_namespaces]]
+binding = "KV"
+id = "3bd3ff5048a8468e82c574d7d66045c3"
+```
+Source code uses `env.KV` — consistent ✅
+
+---
+
+## Workers: sovv-web (Next.js App Router)
+
+### Cloudflare Workers Builds Configuration
+
+| Setting | Value |
 |---|---|
-| `JWT_SECRET` | (from Worker secrets) |
-| `NEXT_PUBLIC_API_URL` | `https://api.defrag.app` |
-| `NEXT_PUBLIC_AI_URL` | `https://ai.defrag.app` |
+| GitHub account | `defragapp` |
+| Repository | `SOVV` |
+| Branch | `main` |
+| Root directory | `apps/web` |
+| Build command | `npm install && npm run build:worker` |
+| Deploy command | `npm run deploy` |
+| Node version | `22` |
 
-5. Save and trigger first build.
+### Key config (`apps/web/wrangler.json`)
 
-### 5. Verify deployment
-
-- Visit `defrag.app` — should serve Sovereign.os platform landing
-- Visit `app.defrag.app` — should serve authenticated app shell
-- Visit `app.defrag.app/apps/defrag` — should serve Defrag space
-- Check middleware is executing (test session redirect behavior)
-
-### 6. Delete GitHub Actions deploy workflow
-
-After Cloudflare Workers Builds is confirmed active:
-
-```bash
-git rm .github/workflows/deploy-live.yml
-git commit -m "chore: remove deprecated GitHub Actions deploy workflow"
-git push
-```
-
-### 7. Delete sovv-platform Pages project
-
-After Worker routes are confirmed:
-
-1. Cloudflare Dashboard → Workers & Pages → Pages → `sovv-platform`
-2. Settings → Delete project
-
----
-
-## Wrangler Manual Deploy (Fallback)
-
-If Cloudflare Workers Builds is unavailable, deploy manually:
-
-```bash
-cd apps/web
-npx opennextjs-cloudflare build
-CLOUDFLARE_API_TOKEN=<token> wrangler deploy
-```
-
----
-
-## Worker Build Configuration Reference
-
-`apps/web/wrangler.json`:
 ```json
 {
   "name": "sovv-web",
   "main": "./.open-next/worker.js",
-  "compatibility_date": "2026-06-04",
-  "compatibility_flags": ["nodejs_compat"],
-  "account_id": "8b1954d216d65077c6480d62583fe2c2",
-  "workers_dev": false,
-  "routes": [
-    { "pattern": "defrag.app/*", "zone_id": "45a59d754ece9221fc97c92c461eb01f" },
-    { "pattern": "www.defrag.app/*", "zone_id": "45a59d754ece9221fc97c92c461eb01f" },
-    { "pattern": "sovereign.defrag.app/*", "zone_id": "45a59d754ece9221fc97c92c461eb01f" },
-    { "pattern": "app.defrag.app/*", "zone_id": "45a59d754ece9221fc97c92c461eb01f" }
-  ],
-  "assets": {
-    "directory": ".open-next/assets"
-  }
+  "assets": { "directory": ".open-next/assets" }
 }
 ```
 
-`apps/web/open-next.config.ts`:
-```ts
-import { defineCloudflareConfig } from "@opennextjs/cloudflare";
+### Production artifact
 
-export default defineCloudflareConfig({
-  middleware: {
-    external: true,
-    override: { wrapper: "cloudflare-edge" }
-  }
-});
 ```
+apps/web/.open-next/worker.js   ← Worker entry point
+apps/web/.open-next/assets/     ← Static assets
+```
+
+These are built by `npm run build:worker` (`opennextjs-cloudflare build`) and are gitignored — built fresh on each deploy.
+
+### Environment variables (set in Workers Builds dashboard)
+
+| Variable | Value |
+|---|---|
+| `JWT_SECRET` | (secret) |
+| `NEXT_PUBLIC_API_URL` | `https://api.defrag.app` |
+| `NEXT_PUBLIC_AI_URL` | `https://ai.defrag.app` |
+
+---
+
+## Cloudflare Dashboard Tasks (still required)
+
+These cannot be done from the repo. See `docs/CLOUDFLARE_DASHBOARD_HANDOFF.md` for full click-by-click detail.
+
+| # | Task | Priority |
+|---|---|---|
+| 1 | Remove `defrag.app`/`www.defrag.app` from Pages project `sovv-platform` | 🔴 Blocking |
+| 2 | Update DNS: CNAME → proxied Worker A/AAAA records | 🔴 Blocking |
+| 3 | Connect `sovv-web` to Cloudflare Workers Builds (GitHub main) | 🔴 Blocking |
+| 4 | Connect `sovereign-os-api` to Cloudflare Workers Builds (GitHub main) | 🔴 Blocking |
+| 5 | Delete `sovv-platform` Pages project (after Worker routes verified) | 🔴 After 1–3 |
+| 6 | Redeploy `sovereign-os-api` (KV binding rename SOVV_DATA → KV) | 🟡 High |
+| 7 | Delete orphaned `sovv` Worker | 🟡 High |
+| 8 | Enable Email Routing on `defrag.app` + verify `info@defrag.app` | 🟡 High |
+| 9 | Add `[[send_email]]` binding after Email Routing verified | 🟡 After 8 |
+| 10 | Investigate/delete orphaned `BASELINE_KV` KV namespace | 🟢 Medium |
 
 ---
 
@@ -144,8 +138,7 @@ export default defineCloudflareConfig({
 
 See `docs/email-routing-standard.md` for full setup steps. Summary:
 
-1. **Cloudflare Dashboard → Email → Email Routing → defrag.app zone**
-   - Enable Email Routing (adds MX + SPF records automatically)
+1. **Email → Email Routing → defrag.app** → Enable Email Routing
 2. **Destination addresses** → Add and verify private forwarding address
 3. **Routing rules** → Create rule: `info` → verified destination
 4. **After verification** → Add `[[send_email]]` binding to `apps/worker/wrangler.toml`:
@@ -158,20 +151,22 @@ See `docs/email-routing-standard.md` for full setup steps. Summary:
 
 ---
 
-## Remaining Dashboard Actions Checklist
+## Wrangler Manual Deploy (Fallback)
 
-| Action | Status |
-|---|---|
-| Remove `defrag.app` from Pages project `sovv-platform` | ⏳ Required |
-| Remove `www.defrag.app` from Pages project `sovv-platform` | ⏳ Required |
-| Update DNS: `defrag.app` CNAME → proxied Worker A/AAAA record | ⏳ Required |
-| Update DNS: `www.defrag.app` CNAME → proxied Worker A/AAAA record | ⏳ Required |
-| Connect `sovv-web` to Cloudflare Workers Builds (GitHub main) | ⏳ Required |
-| Delete `sovv-platform` Pages project (after Worker routes verified) | ⏳ Required |
-| Delete `.github/workflows/deploy-live.yml` (after Workers Builds confirmed) | ⏳ Required |
-| Redeploy `sovereign-os-api` (KV binding renamed SOVV_DATA → KV) | ⏳ Required |
-| Delete orphaned `sovv` Worker | ⏳ Required |
-| Investigate/delete orphaned `BASELINE_KV` KV namespace | ⏳ Required |
-| Enable Email Routing on `defrag.app` | ⏳ Required |
-| Add and verify destination address for `info@defrag.app` | ⏳ Required |
-| Add `[[send_email]]` binding to `sovereign-os-api` after verification | ⏳ Required |
+If Cloudflare Workers Builds is unavailable:
+
+```bash
+# Requires Node 22+
+nvm use 22
+
+# API Worker
+cd apps/worker
+npm install
+CLOUDFLARE_API_TOKEN=<token> npx wrangler deploy
+
+# Web Worker
+cd apps/web
+npm install
+npm run build:worker
+CLOUDFLARE_API_TOKEN=<token> wrangler deploy
+```

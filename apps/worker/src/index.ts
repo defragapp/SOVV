@@ -158,13 +158,21 @@ router.get("/api/stripe/prices", async (request: Request) => {
   }
 });
 
-// Health check for monitoring and deployment verification
+// Root route — deployment validation
+router.get('/', () => {
+  return new Response(JSON.stringify({
+    service: 'sovereign-os-api',
+    status: 'ok',
+  }), { headers: { 'Content-Type': 'application/json' } });
+});
+
+// Health check — monitoring and Cloudflare Workers Builds verification
+// GET https://api.defrag.app/health → { "ok": true, "service": "sovereign-os-api" }
 router.get('/health', () => {
   return new Response(JSON.stringify({
-    status: 'ok',
-    version: '1.0.0',
+    ok: true,
+    service: 'sovereign-os-api',
     timestamp: new Date().toISOString(),
-    services: { db: true, kv: true, ai: true }
   }), { headers: { 'Content-Type': 'application/json' } });
 });
 

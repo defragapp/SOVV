@@ -1,6 +1,9 @@
 {
   "name": "sovereign-platform",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"

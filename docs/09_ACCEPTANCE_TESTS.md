@@ -16,11 +16,20 @@ curl -I https://app.defrag.app | grep -E "cf-worker|server"
 # Verify Pages project is NOT serving defrag.app
 curl -I https://defrag.app | grep -v "pages.dev"
 
-# Verify API Worker is reachable
-curl -s https://api.defrag.app/health | head -5
+# Verify API Worker health route
+curl -s https://api.defrag.app/health
+# Expected: { "ok": true, "service": "sovereign-os-api", "timestamp": "..." }
+
+# Verify API Worker root route
+curl -s https://api.defrag.app/
+# Expected: { "service": "sovereign-os-api", "status": "ok" }
 
 # Verify AI Worker is reachable
 curl -I https://ai.defrag.app | grep -E "200|404"
+
+# Verify Node version
+node --version | grep -E "^v2[2-9]"
+# Expected: v22.x.x or higher
 ```
 
 ---
@@ -165,8 +174,14 @@ grep -rn "api/auth/tier" apps/web/app/ apps/web/components/ | head -5
 | KV binding consistent | `binding = "KV"` in toml, `env.KV` in source |
 | No `src/` directory | Directory absent |
 | `fix-lockfile.yml` deleted | File absent |
+| `deploy-live.yml` deleted | File absent |
 | No sensitive files committed | Zero matches |
 | Build produces `.open-next/worker.js` | File present after build |
 | No `privacy@defrag.app` or `legal@defrag.app` in user-facing copy | Zero matches |
 | `info@defrag.app` is primary contact | Appears in contact, privacy, terms, email.ts |
 | No `sovereign.os` or `covenant.app` email addresses in docs/UI | Zero matches (except future-state comments) |
+| API health route | `GET /health` returns `{ "ok": true, "service": "sovereign-os-api" }` |
+| API root route | `GET /` returns `{ "service": "sovereign-os-api", "status": "ok" }` |
+| Node version | `>=22` in `.nvmrc` and `package.json` engines |
+| `itty-router` in lockfile | Present in `package-lock.json` |
+| No GitHub Actions production deploy | `deploy-live.yml` absent |

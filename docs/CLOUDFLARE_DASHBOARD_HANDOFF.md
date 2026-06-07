@@ -46,6 +46,21 @@ This document lists every task that cannot be completed from the repository or v
 
 ---
 
+## TASK 3b — Connect sovereign-os-api to Cloudflare Workers Builds
+
+| Field | Value |
+|---|---|
+| **Task name** | Enable Cloudflare Workers Builds (Git integration) for sovereign-os-api |
+| **Cloudflare area** | Workers & Pages → Workers → sovereign-os-api → Settings → Build & Deployments |
+| **Current state** | `sovereign-os-api` is deployed manually via Wrangler from Codespaces. No Cloudflare Workers Builds connection exists. |
+| **Desired state** | `sovereign-os-api` builds and deploys automatically from GitHub `main` branch via Cloudflare Workers Builds. No Codespaces terminal required. |
+| **Click-by-click** | 1. Dashboard → Workers & Pages → sovereign-os-api → Settings → Build & Deployments<br>2. Click **Connect Git**<br>3. Authorize GitHub → select `defragapp/SOVV`<br>4. Branch: `main`<br>5. Root directory: `apps/worker`<br>6. Build command: `npm install`<br>7. Deploy command: `npx wrangler deploy`<br>8. Node version: `22`<br>9. Save and trigger first build |
+| **Validation** | `GET https://api.defrag.app/health` returns `{ "ok": true, "service": "sovereign-os-api" }` |
+| **Notes** | Node 22+ required. `itty-router` and all dependencies are committed in `package-lock.json`. KV binding is `KV` (maps to SOVV_DATA namespace). |
+| **Manual?** | ✅ Yes — must be done in dashboard |
+
+---
+
 ## TASK 4 — Delete sovv-platform Pages project
 
 | Field | Value |
@@ -166,8 +181,9 @@ This document lists every task that cannot be completed from the repository or v
 | 1 | Remove defrag.app from Pages project | Pages → sovv-platform | 🔴 Blocking | ✅ |
 | 2 | Update DNS records (CNAME → Worker A/AAAA) | DNS → defrag.app | 🔴 Blocking | ✅ |
 | 3 | Connect sovv-web to Workers Builds | Workers → sovv-web | 🔴 Blocking | ✅ |
+| 3b | Connect sovereign-os-api to Workers Builds | Workers → sovereign-os-api | 🔴 Blocking | ✅ |
 | 4 | Delete sovv-platform Pages project | Pages | 🔴 After 1–3 | ✅ |
-| 5 | Redeploy sovereign-os-api (KV binding) | Terminal/Wrangler | 🟡 High | ✅ |
+| 5 | Redeploy sovereign-os-api (KV binding rename) | Terminal/Wrangler | 🟡 High | ✅ |
 | 6 | Delete orphaned sovv Worker | Workers | 🟡 High | ✅ |
 | 7 | Enable Email Routing on defrag.app | Email Routing | 🟡 High | ✅ |
 | 8 | Add send_email binding | wrangler.toml + deploy | 🟡 After 7 | Partial |
