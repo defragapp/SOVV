@@ -104,7 +104,7 @@ export default function LoginScreen() {
         return
       }
 
-      window.location.href = "/app"
+      window.location.href = "/apps/defrag"
     } catch {
       setError("Connection failed")
     } finally {
@@ -137,7 +137,7 @@ export default function LoginScreen() {
           className="mb-12 text-center"
         >
           <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-white/20 mb-3">
-            Sovereign OS
+            Sovereign.os
           </p>
           <div className="h-px w-full bg-[#F6F5F3]/10" />
         </motion.div>
@@ -255,7 +255,7 @@ export default function LoginScreen() {
             href="/"
             className="font-mono text-[9px] uppercase tracking-widest text-white/15 hover:text-white/35 transition-colors duration-200"
           >
-            ← Back to defrag.app
+            ← Back to Sovereign.os
           </a>
         </div>
       </motion.div>

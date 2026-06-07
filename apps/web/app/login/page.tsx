@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -19,69 +20,98 @@ export default function LoginPage() {
       const res = await fetch('https://api.defrag.app/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'ACCESS DENIED');
+      if (!res.ok) throw new Error(data.error || 'Sign in failed.');
 
       if (data.token) {
         document.cookie = `sovv_session=${data.token}; path=/; max-age=86400; SameSite=Strict; Secure`;
-        router.push('/workspace');
       }
-    } catch (err: any) {
-      setError(err.message || 'SYSTEM AUTHENTICATION FAILURE.');
+      router.push('/apps/defrag');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Sign in failed. Try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black font-mono text-white p-4">
-      <div className="w-full max-w-md border border-white p-8 bg-black">
-        <div className="mb-8 text-center">
-          <h1 className="text-xl font-bold tracking-widest text-white">SOVEREIGN.OS</h1>
-          <p className="mt-2 text-xs text-neutral-500">SYSTEM ACCESS REQUIRED</p>
+    <div className="flex min-h-screen items-center justify-center bg-black px-4">
+      <div className="w-full max-w-sm space-y-8">
+
+        {/* Brand */}
+        <div className="text-center space-y-2">
+          <Link href="/" className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-white/70 transition-colors">
+            Sovereign.os
+          </Link>
+          <h1 className="text-2xl font-light text-white mt-4">Sign in to continue.</h1>
+          <p className="text-sm text-white/35">Enter your Sovereign.os account.</p>
         </div>
 
+        {/* Error */}
         {error && (
-          <div className="mb-6 border border-white bg-black p-3 text-xs text-white uppercase tracking-wider">
+          <div className="border border-white/20 bg-white/5 px-4 py-3 text-sm text-white/70" role="alert">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-5" noValidate>
           <div>
-            <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-2">IDENTITY</label>
+            <label htmlFor="email" className="sovv-label">Email</label>
             <input
+              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-black border border-white p-3 text-white text-xs focus:outline-none placeholder-neutral-700"
-              placeholder="OWNER@DEFRAG.APP"
+              className="sovv-input"
+              placeholder="you@example.com"
+              autoComplete="email"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs uppercase tracking-widest text-neutral-400 mb-2">ACCESS KEY</label>
+            <label htmlFor="password" className="sovv-label">Password</label>
             <input
+              id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-black border border-white p-3 text-white text-xs focus:outline-none"
+              className="sovv-input"
+              placeholder="••••••••"
+              autoComplete="current-password"
               required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full border border-white bg-white py-3 text-xs font-bold uppercase tracking-widest text-black hover:bg-black hover:text-white transition-colors"
             disabled={loading}
+            className="w-full sovv-button-primary py-3.5 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {loading ? 'VERIFYING...' : 'ENTER SOVEREIGN.OS'}
+            {loading ? 'Signing in…' : 'Enter Sovereign.os'}
           </button>
         </form>
+
+        {/* Footer links */}
+        <div className="text-center space-y-3">
+          <p className="text-xs text-white/25">
+            New to Sovereign.os?{' '}
+            <Link href="https://app.defrag.app/app/login" className="text-white/50 hover:text-white transition-colors underline underline-offset-2">
+              Create account
+            </Link>
+          </p>
+          <p className="text-xs text-white/20">
+            <Link href="/" className="hover:text-white/40 transition-colors">
+              ← Back to Sovereign.os
+            </Link>
+          </p>
+        </div>
+
       </div>
     </div>
   );

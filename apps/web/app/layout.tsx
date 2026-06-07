@@ -7,10 +7,10 @@ export const metadata: Metadata = {
     default: "Sovereign.os",
     template: "%s - Sovereign.os",
   },
-  description: "A private workspace for baseline-aware pattern recognition, response practice, and saved context.",
+  description: "Your Baseline Design is the source. Sovereign.os is where the work becomes yours. Defrag and Covenant are spaces for relational intelligence and reflection.",
   openGraph: {
     title: "Sovereign.os",
-    description: "A private workspace for baseline-aware pattern recognition, response practice, and saved context.",
+    description: "Your Baseline Design is the source. Sovereign.os is where the work becomes yours.",
     images: ["/social-card.svg"],
   },
   twitter: {

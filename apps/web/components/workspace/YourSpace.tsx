@@ -48,11 +48,12 @@ export default function YourSpace() {
   }, [])
 
   return (
-    <aside className="flex h-full flex-col bg-black overflow-y-auto">
+    <aside className="flex h-full flex-col bg-black overflow-y-auto" aria-label="Sovereign.os Library">
+
       {/* Header */}
       <div className="flex h-10 shrink-0 items-center border-b border-[#F6F5F3]/10 px-4">
-        <span className="font-mono text-xs uppercase tracking-widest text-white/40">
-          Your Space
+        <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">
+          Sovereign.os Library
         </span>
       </div>
 
@@ -73,7 +74,7 @@ export default function YourSpace() {
       {state === "error" && (
         <div className="flex flex-1 items-center justify-center px-4">
           <p className="font-mono text-[9px] uppercase tracking-widest text-white/20 text-center">
-            We couldn&apos;t load Your Space right now.
+            Library unavailable right now.
           </p>
         </div>
       )}
@@ -82,16 +83,16 @@ export default function YourSpace() {
       {state === "empty" && (
         <div className="flex flex-1 flex-col px-4 py-8 gap-3">
           <p className="font-mono text-[9px] uppercase tracking-widest text-white/20 mb-1">
-            Your Space
+            Library
           </p>
           <p className="text-sm font-light text-white/30 leading-6">
             Nothing saved yet.
           </p>
           <p className="text-sm font-light text-white/20 leading-6">
-            Once you start using Defrag, your recent threads and saved work will appear here.
+            Defrag results, Covenant Briefs, and saved responses all appear here. The AI uses your Library to keep the thread grounded over time.
           </p>
           <p className="mt-4 font-mono text-[9px] uppercase tracking-widest text-white/15">
-            The AI uses Your Space to keep the thread grounded instead of starting over every time.
+            Save to Sovereign to build your Library.
           </p>
         </div>
       )}
@@ -99,10 +100,9 @@ export default function YourSpace() {
       {/* Loaded */}
       {state === "loaded" && (
         <div className="flex flex-col">
-          {/* Recent threads */}
           <div className="px-4 pt-4 pb-2">
             <span className="font-mono text-[9px] uppercase tracking-widest text-white/25">
-              Recent threads
+              Recent sessions
             </span>
           </div>
 
@@ -129,11 +129,11 @@ export default function YourSpace() {
             ))}
           </div>
 
-          {/* Future sections — quiet placeholders */}
+          {/* Library sections */}
           <div className="mt-4 border-t border-[#F6F5F3]/10">
             {[
-              "Saved Best Next Responses",
-              "Practices",
+              "Best Next Responses",
+              "Covenant Briefs",
               "Watch It",
               "Compare With Someone",
             ].map((label) => (
@@ -145,7 +145,7 @@ export default function YourSpace() {
                   {label}
                 </span>
                 <span className="font-mono text-[8px] uppercase tracking-widest text-white/10">
-                  Saved here when available
+                  Saves here
                 </span>
               </div>
             ))}

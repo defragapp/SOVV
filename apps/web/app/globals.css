@@ -5,14 +5,18 @@
 @theme {
   --color-background: #000000;
   --color-foreground: #ffffff;
-  --color-border: rgba(255, 255, 255, 0.16);
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-muted: rgba(255, 255, 255, 0.4);
+  --color-subtle: rgba(255, 255, 255, 0.2);
 }
 
 :root {
   color-scheme: dark;
   --background: #000000;
   --foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.16);
+  --border: rgba(255, 255, 255, 0.12);
+  --muted: rgba(255, 255, 255, 0.4);
+  --subtle: rgba(255, 255, 255, 0.2);
 }
 
 html,
@@ -55,7 +59,15 @@ select {
   color: #000000;
 }
 
-/* Shared primitive classes used by older components. */
+/* Focus visible — accessible keyboard navigation */
+:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+/* ─── Shared primitive classes ─────────────────────────────────────────── */
+
+/* Card — sharp 1px border, no radius, no gradient */
 .sovv-card {
   background: var(--background);
   border: 1px solid var(--border);
@@ -63,18 +75,150 @@ select {
   border-radius: 0;
 }
 
+/* Button — sharp, high contrast on hover */
 .sovv-button {
+  display: inline-block;
   border: 1px solid var(--border);
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+  padding: 0.625rem 1.25rem;
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
   color: var(--foreground);
   background: transparent;
   border-radius: 0;
-  font-weight: 500;
-  transition: all 150ms ease;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+  text-decoration: none;
 }
 
 .sovv-button:hover {
   background: var(--foreground);
   color: var(--background);
+}
+
+.sovv-button:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+/* Button primary — white fill */
+.sovv-button-primary {
+  display: inline-block;
+  border: 1px solid #ffffff;
+  padding: 0.75rem 1.5rem;
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #000000;
+  background: #ffffff;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+  text-decoration: none;
+}
+
+.sovv-button-primary:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.sovv-button-primary:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+/* Legacy aliases used by older components */
+.btn-premium {
+  display: inline-block;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.625rem 1.25rem;
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--foreground);
+  background: transparent;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+  text-decoration: none;
+}
+
+.btn-premium:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.premium-card {
+  background: var(--background);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: 0;
+}
+
+.meta-label {
+  display: block;
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  font-size: 0.5625rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Glass header */
+.glass {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Input — sharp, dark */
+.sovv-input {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.75rem 1rem;
+  color: #ffffff;
+  font-size: 0.875rem;
+  border-radius: 0;
+  outline: none;
+  transition: border-color 120ms ease;
+}
+
+.sovv-input:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.sovv-input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* Label */
+.sovv-label {
+  display: block;
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  font-size: 0.5625rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 0.5rem;
+}
+
+/* Divider */
+.sovv-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 2rem 0;
+}
+
+/* Space badge */
+.space-badge {
+  display: inline-block;
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.5rem;
 }
