@@ -81,18 +81,26 @@ export default function LandingPage() {
             <motion.h1
               variants={fadeUp}
               custom={1}
-              className="text-display mb-8"
+              className="text-display mb-6"
             >
-              Understand the pattern<br className="hidden md:block" />
-              <span className="text-[#F6F5F3]/55"> underneath the moment.</span>
+              Healing isn't optional.<br />
+              <span className="text-[#F6F5F3]/50">Holding the pain is.</span>
             </motion.h1>
 
             <motion.p
               variants={fadeUp}
               custom={2}
-              className="text-body max-w-2xl mb-10 text-[17px]"
+              className="text-body max-w-2xl mb-4 text-[17px]"
             >
-              Sovereign.os gives your Baseline Design, saved work, and application spaces one private place to become useful. Work through what is active. Find the response that changes the pattern. Save what you learn.
+              Sovereign.os helps you work through the patterns that keep showing up in your relationships, family, messages, grief, and boundaries — then save what you learn before the moment disappears.
+            </motion.p>
+
+            <motion.p
+              variants={fadeUp}
+              custom={2.5}
+              className="text-caption max-w-xl mb-10"
+            >
+              The pattern keeps moving until you see it. Your next response can change it.
             </motion.p>
 
             <motion.div

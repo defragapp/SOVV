@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "For product questions, support, or account help. Reach us at info@defrag.app.",
 };
 
-const SUPPORT_URL = process.env.STRIPE_SUPPORT_LINK_URL || "mailto:info@defrag.app"
+const SUPPORT_URL = process.env.STRIPE_SUPPORT_LINK_URL || "mailto:info@defrag.app";
 
 export default function ContactPage() {
   return (
@@ -20,37 +20,65 @@ export default function ContactPage() {
       />
 
       <MotionSection className="px-6 py-24">
-        <div className="mx-auto max-w-2xl space-y-10">
+        <div className="mx-auto max-w-xl space-y-12">
+
+          {/* Primary contact */}
           <div className="space-y-4">
-            <p className="text-base leading-8 text-white/50">
-              Reach us at:
-            </p>
+            <p className="text-label">Primary contact</p>
             <a
               href="mailto:info@defrag.app"
-              className="block font-mono text-sm uppercase tracking-widest text-white/80 hover:text-white transition-colors duration-200"
+              className="block text-lg font-light text-[#F6F5F3]/80 hover:text-[#F6F5F3] transition-colors"
             >
               info@defrag.app
             </a>
+            <p className="text-caption text-xs leading-6">
+              This is the public contact address for Sovereign.os. For product questions, support, account help, privacy requests, and general inquiries.
+            </p>
           </div>
 
-          <div className="border-t border-white/8 pt-10 space-y-3">
-            <p className="text-sm leading-7 text-white/30">
-              This is the public contact address for Sovereign.os.
+          <div className="divider" />
+
+          {/* What to include */}
+          <div className="space-y-4">
+            <p className="text-label">What to include</p>
+            <div className="space-y-3">
+              {[
+                "Your account email",
+                "What you were trying to do",
+                "What happened instead",
+                "Any error message you saw",
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-3">
+                  <div className="h-px w-3 bg-[#F6F5F3]/20 shrink-0" />
+                  <span className="text-caption text-xs">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="divider" />
+
+          {/* Privacy */}
+          <div className="space-y-3">
+            <p className="text-label">Privacy and data requests</p>
+            <p className="text-caption text-xs leading-6">
+              To request deletion of your account and all associated data, email info@defrag.app. We process deletion requests within 30 days.
             </p>
-            <p className="text-sm leading-7 text-white/30">
-              Do not send sensitive personal details through email.
-            </p>
-            {SUPPORT_URL && (
+          </div>
+
+          {/* Support link */}
+          {SUPPORT_URL && (
+            <div className="pt-4">
               <a
                 href={SUPPORT_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="block font-mono text-[10px] uppercase tracking-widest text-white/70 hover:text-white"
+                className="text-label hover:text-[#F6F5F3]/60 transition-colors"
               >
-                Support Defrag development
+                Support Defrag development →
               </a>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </MotionSection>
     </SiteShell>

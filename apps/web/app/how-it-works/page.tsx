@@ -1,30 +1,38 @@
 import { SiteShell } from "@/components/marketing/site-shell";
 import { PageHero } from "@/components/marketing/page-hero";
 import { MotionSection } from "@/components/marketing/motion-section";
-import { SectionHeader } from "@/components/marketing/section-header";
 import Link from "next/link";
 
 const steps = [
   {
     num: "01",
-    title: "Start Your Baseline Design",
-    body: "Enter your date, time, and place of birth. This becomes the starting map — how you tend to process, respond, connect, protect, communicate, and return to center. The AI uses it to keep every thread grounded in who you actually are.",
+    title: "Set your Baseline Design",
+    body: "Enter your date, time, and place of birth. This becomes the private source — how you tend to process, respond, connect, protect, communicate, and return to center. The AI uses it to keep every thread grounded in who you actually are, not who the moment is making you.",
   },
   {
     num: "02",
-    title: "Check what is active now",
-    body: "The sky over you shows what is louder right now. Your Baseline Design shows how you are built. Together they help you understand what is active in the moment — the part of you most present in this dynamic.",
+    title: "Work through what is active",
+    body: "Tell Defrag what is happening. A message you haven't sent. A conversation that keeps repeating. A family role that still runs. A boundary you can't hold. Defrag helps surface the pattern underneath — not a verdict, a way through.",
   },
   {
     num: "03",
-    title: "Ask or select people and layers",
-    body: "Tell Defrag what is happening. Ask freely. Add another person, a family dynamic, a group, or a team when relevant. The thread stays grounded in your Baseline Design and theirs when permitted.",
+    title: "Find the response that changes the pattern",
+    body: "See the Best Next Response. Understand what is driving the dynamic. Practice the response before you use it. Some pain becomes a role. Some roles can be put down. Defrag shows you where.",
   },
   {
     num: "04",
-    title: "Turn the answer into something you can use",
-    body: "Defrag helps surface the pattern underneath the moment, shows where the loop is forming, and surfaces the Best Next Response. You can save it, practice it, hear it as audio, watch it as a short scene, or return to it as part of Your Story.",
+    title: "Save what you learn",
+    body: "Save the result, the response, or the reflection to your Sovereign.os Library before the pressure of the moment erases it. The AI uses your Library to keep future threads grounded — not starting over every time.",
   },
+];
+
+const truthLines = [
+  "What happened matters. What repeats matters more.",
+  "Not every reaction is the truth.",
+  "The conversation is not just about the words.",
+  "A boundary is not a punishment. It is a return to alignment.",
+  "You do not need a verdict. You need a way through.",
+  "Save what you learn before the moment disappears.",
 ];
 
 export default function HowItWorksPage() {
@@ -32,10 +40,11 @@ export default function HowItWorksPage() {
     <SiteShell>
       <PageHero
         eyebrow="How It Works"
-        title="Four steps. One grounded thread."
+        title="The pattern keeps moving until you see it."
         body="Defrag is designed to be used in the moment — not after the fact, not in a therapy session. Right now, when it matters."
       />
 
+      {/* Steps */}
       <MotionSection className="px-6 py-24">
         <div className="mx-auto max-w-3xl">
           <div className="space-y-0">
@@ -45,11 +54,11 @@ export default function HowItWorksPage() {
                 className={`flex gap-8 py-10 ${i < steps.length - 1 ? "border-b border-white/8" : ""}`}
               >
                 <div className="shrink-0">
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-white/20">{step.num}</span>
+                  <span className="text-micro">{step.num}</span>
                 </div>
-                <div>
-                  <h3 className="text-xl font-light text-white mb-3">{step.title}</h3>
-                  <p className="text-sm leading-7 text-white/45">{step.body}</p>
+                <div className="space-y-3">
+                  <h3 className="text-base font-light text-[#F6F5F3]/85 leading-snug">{step.title}</h3>
+                  <p className="text-caption text-sm leading-7">{step.body}</p>
                 </div>
               </div>
             ))}
@@ -57,25 +66,41 @@ export default function HowItWorksPage() {
         </div>
       </MotionSection>
 
+      {/* Truth lines */}
+      <MotionSection className="border-t border-white/8 px-6 py-24">
+        <div className="mx-auto max-w-3xl space-y-10">
+          <div className="space-y-3">
+            <span className="meta-label">What Defrag is built on</span>
+            <h2 className="text-headline">Sharp truths about how patterns work.</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+            {truthLines.map((line, i) => (
+              <div
+                key={line}
+                className={`py-6 px-4 border-b border-white/8 ${i % 2 === 1 ? "md:border-l md:border-l-white/8" : ""}`}
+              >
+                <p className="text-sm font-light text-[#F6F5F3]/65 leading-7 italic">{line}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </MotionSection>
+
+      {/* CTA */}
       <MotionSection className="border-t border-white/8 px-6 py-24 text-center">
-        <SectionHeader
-          eyebrow="Ready?"
-          title="Start with your Baseline Design."
-          body="You don't need to understand the whole system. You just need one moment you want to see more clearly."
-        />
-        <div className="mt-10 flex flex-col gap-4 sm:flex-row justify-center">
-          <Link
-            href="https://app.defrag.app/login"
-            className="inline-block border border-white/20 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-white/5 transition-colors"
-          >
-            Start Your Baseline Design
-          </Link>
-          <Link
-            href="https://app.defrag.app/login"
-            className="inline-block border border-white/10 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hover:bg-white/5 hover:text-white/60 transition-colors"
-          >
-            Enter your space
-          </Link>
+        <div className="space-y-6 max-w-xl mx-auto">
+          <h2 className="text-headline">Start with your Baseline Design.</h2>
+          <p className="text-body">
+            You don't need to understand the whole system. You just need one moment you want to see more clearly.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="https://app.defrag.app/app/login" className="sovv-button-primary inline-flex py-4 px-10">
+              Start Baseline Design
+            </Link>
+            <Link href="https://app.defrag.app/apps/defrag" className="sovv-button inline-flex py-4 px-10">
+              Enter Defrag space
+            </Link>
+          </div>
         </div>
       </MotionSection>
     </SiteShell>
