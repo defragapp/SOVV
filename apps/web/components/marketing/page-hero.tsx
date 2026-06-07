@@ -31,7 +31,7 @@ export function PageHero({
           </p>
         )}
         <h1 style={{
-          fontSize: "clamp(2rem, 4.5vw, 3.5rem)",
+          fontSize: "clamp(2rem, 4vw, 3.25rem)",
           fontWeight: 300,
           letterSpacing: "-0.03em",
           lineHeight: 1.1,

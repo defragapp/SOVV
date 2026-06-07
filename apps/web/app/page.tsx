@@ -30,14 +30,14 @@ export default function LandingPage() {
         WebkitBackdropFilter: "blur(20px)",
       }}>
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem", display: "flex", height: "56px", alignItems: "center", justifyContent: "space-between" }}>
-          <Link href="/" style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.80)", textDecoration: "none" }}>
+          <Link href="/" style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.80)", textDecoration: "none" }}>
             SOVEREIGN.OS
           </Link>
           <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
-            <Link href="/product" style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.35)", textDecoration: "none" }}>Product</Link>
-            <Link href="/pricing" style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.35)", textDecoration: "none" }}>Pricing</Link>
-            <Link href="/covenant" style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.35)", textDecoration: "none" }}>Covenant</Link>
-            <Link href="https://app.defrag.app/app/login" style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#05070B", background: "#F6F5F3", border: "1px solid #F6F5F3", padding: "0.625rem 1.25rem", textDecoration: "none", display: "inline-block" }}>
+            <Link href="/product" style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.35)", textDecoration: "none" }}>Product</Link>
+            <Link href="/pricing" style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.35)", textDecoration: "none" }}>Pricing</Link>
+            <Link href="/covenant" style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.35)", textDecoration: "none" }}>Covenant</Link>
+            <Link href="https://app.defrag.app/app/login" style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#05070B", background: "#F6F5F3", border: "1px solid #F6F5F3", padding: "0.625rem 1.25rem", textDecoration: "none", display: "inline-block" }}>
               Enter Sovereign.os
             </Link>
           </div>
@@ -53,10 +53,10 @@ export default function LandingPage() {
       }}>
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
           <div style={{ maxWidth: "56rem" }}>
-            <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "2rem", display: "block" }}>
+            <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "2rem", display: "block" }}>
               The Platform
             </p>
-            <h1 style={{ fontSize: "clamp(2.75rem, 7vw, 5.5rem)", fontWeight: 300, letterSpacing: "-0.04em", lineHeight: 1.04, marginBottom: "1.5rem", margin: "0 0 1.5rem 0" }}>
+            <h1 style={{ fontSize: "clamp(3rem, 8vw, 6rem)", fontWeight: 300, letterSpacing: "-0.04em", lineHeight: 1.04, marginBottom: "1.5rem", margin: "0 0 1.5rem 0" }}>
               Healing isn't optional.
               <br />
               <span style={{ color: "rgba(246,245,243,0.38)" }}>Holding the pain is.</span>
@@ -64,26 +64,26 @@ export default function LandingPage() {
             <p style={{ fontSize: "1.0625rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", maxWidth: "40rem", marginBottom: "1rem", margin: "0 0 1rem 0" }}>
               Sovereign.os is a private place to work through the patterns that keep showing up in your life.
             </p>
-            <p style={{ fontSize: "0.8125rem", lineHeight: 1.65, color: "rgba(246,245,243,0.35)", maxWidth: "36rem", marginBottom: "3rem", margin: "0 0 3rem 0" }}>
+            <p style={{ fontSize: "0.875rem", lineHeight: 1.65, color: "rgba(246,245,243,0.35)", maxWidth: "36rem", marginBottom: "3rem", margin: "0 0 3rem 0" }}>
               For the moments you keep replaying, the patterns you keep meeting, and the responses you are ready to change.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginBottom: "3rem" }}>
               <Link href="https://app.defrag.app/app/login" style={{
-                fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.18em", textTransform: "uppercase",
+                fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.18em", textTransform: "uppercase",
                 color: "#05070B", background: "#F6F5F3", border: "1px solid #F6F5F3",
                 padding: "0.875rem 2rem", textDecoration: "none", display: "inline-block",
               }}>
                 Start Baseline Design
               </Link>
               <Link href="https://app.defrag.app/apps/defrag" style={{
-                fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.18em", textTransform: "uppercase",
+                fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.18em", textTransform: "uppercase",
                 color: "rgba(246,245,243,0.75)", background: "transparent", border: "1px solid rgba(246,245,243,0.18)",
                 padding: "0.875rem 2rem", textDecoration: "none", display: "inline-block",
               }}>
                 Enter Defrag space
               </Link>
               <Link href="/product" style={{
-                fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.18em", textTransform: "uppercase",
+                fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.18em", textTransform: "uppercase",
                 color: "rgba(246,245,243,0.30)", background: "transparent", border: "none",
                 padding: "0.875rem 0", textDecoration: "none", display: "inline-block",
               }}>
@@ -93,7 +93,7 @@ export default function LandingPage() {
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
               {USE_CASES.map((uc) => (
                 <span key={uc} style={{
-                  fontFamily: "monospace", fontSize: "0.5rem", letterSpacing: "0.22em", textTransform: "uppercase",
+                  fontFamily: "monospace", fontSize: "0.625rem", letterSpacing: "0.22em", textTransform: "uppercase",
                   color: "rgba(246,245,243,0.30)", border: "1px solid rgba(246,245,243,0.10)",
                   padding: "0.2rem 0.6rem", display: "inline-block",
                 }}>{uc}</span>
@@ -106,8 +106,8 @@ export default function LandingPage() {
       {/* ── Real moments ───────────────────────────────────────────────── */}
       <section style={{ padding: "6rem 0", borderTop: "1px solid rgba(246,245,243,0.08)" }}>
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
-          <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1rem" }}>The real moments</p>
-          <h2 style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "3rem", maxWidth: "40rem" }}>
+          <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1rem" }}>The real moments</p>
+          <h2 style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "3rem", maxWidth: "40rem" }}>
             The moment happened once.<br />The pattern keeps happening until you can see it.
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 0 }}>
@@ -119,7 +119,7 @@ export default function LandingPage() {
                 padding: "2rem",
               }}>
                 <h3 style={{ fontSize: "0.875rem", fontWeight: 300, color: "rgba(246,245,243,0.75)", marginBottom: "0.75rem", margin: "0 0 0.75rem 0" }}>{m.label}</h3>
-                <p style={{ fontSize: "0.8125rem", lineHeight: 1.7, color: "rgba(246,245,243,0.38)", margin: 0 }}>{m.body}</p>
+                <p style={{ fontSize: "0.875rem", lineHeight: 1.7, color: "rgba(246,245,243,0.38)", margin: 0 }}>{m.body}</p>
               </div>
             ))}
           </div>
@@ -131,21 +131,21 @@ export default function LandingPage() {
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
             <div>
-              <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1rem" }}>The Source</p>
-              <h2 style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "1.5rem" }}>
+              <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1rem" }}>The Source</p>
+              <h2 style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "1.5rem" }}>
                 Your Baseline Design<br />is the source.
               </h2>
-              <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "1rem" }}>
+              <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "1rem" }}>
                 It gives the system a starting point for how you tend to process pressure, conflict, connection, timing, repair, and alignment.
               </p>
-              <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.28)", marginBottom: "1rem" }}>
+              <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.28)", marginBottom: "1rem" }}>
                 Not as a label. Not as an excuse. As context.
               </p>
-              <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "2rem" }}>
+              <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "2rem" }}>
                 So the work does not begin with "what is wrong with me?" It begins with "what pattern is active, and what response would actually change it?"
               </p>
               <Link href="https://app.defrag.app/settings" style={{
-                fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.18em", textTransform: "uppercase",
+                fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.18em", textTransform: "uppercase",
                 color: "rgba(246,245,243,0.75)", border: "1px solid rgba(246,245,243,0.18)",
                 padding: "0.875rem 1.5rem", textDecoration: "none", display: "inline-block",
               }}>
@@ -153,7 +153,7 @@ export default function LandingPage() {
               </Link>
             </div>
             <div style={{ background: "#0D0F14", border: "1px solid rgba(246,245,243,0.08)", padding: "2rem" }}>
-              <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", marginBottom: "1.5rem" }}>Active in this moment</p>
+              <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", marginBottom: "1.5rem" }}>Active in this moment</p>
               {[
                 { label: "Pattern", value: "Repeating loop — boundary negotiation" },
                 { label: "Active role", value: "Fixer / carrier / peacekeeper" },
@@ -161,8 +161,8 @@ export default function LandingPage() {
                 { label: "Next response", value: "Name the pattern before the conversation" },
               ].map((row) => (
                 <div key={row.label} style={{ display: "flex", gap: "1rem", padding: "0.75rem 0", borderBottom: "1px solid rgba(246,245,243,0.06)" }}>
-                  <span style={{ fontFamily: "monospace", fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.18)", width: "6rem", flexShrink: 0 }}>{row.label}</span>
-                  <span style={{ fontSize: "0.8125rem", color: "rgba(246,245,243,0.38)" }}>{row.value}</span>
+                  <span style={{ fontFamily: "monospace", fontSize: "0.625rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.18)", width: "6rem", flexShrink: 0 }}>{row.label}</span>
+                  <span style={{ fontSize: "0.875rem", color: "rgba(246,245,243,0.38)" }}>{row.value}</span>
                 </div>
               ))}
             </div>
@@ -175,18 +175,18 @@ export default function LandingPage() {
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem" }}>
             <div>
-              <span style={{ fontFamily: "monospace", fontSize: "0.5rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.55)", border: "1px solid rgba(246,245,243,0.22)", padding: "0.2rem 0.6rem", display: "inline-block", marginBottom: "1.5rem" }}>Defrag space</span>
-              <h2 style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "1.5rem" }}>
+              <span style={{ fontFamily: "monospace", fontSize: "0.625rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.55)", border: "1px solid rgba(246,245,243,0.22)", padding: "0.2rem 0.6rem", display: "inline-block", marginBottom: "1.5rem" }}>Defrag space</span>
+              <h2 style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "1.5rem" }}>
                 The moment that will not<br />leave you alone.
               </h2>
-              <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "1rem" }}>
+              <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "1rem" }}>
                 A conversation. A message. A family pattern. A boundary. A loss. A role you keep carrying. A reaction that felt bigger than the situation.
               </p>
-              <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "2rem" }}>
+              <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "2rem" }}>
                 Defrag helps you slow the moment down, separate what happened from what repeated, and find the next response that does not keep feeding the same pattern.
               </p>
               <Link href="https://app.defrag.app/apps/defrag" style={{
-                fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.18em", textTransform: "uppercase",
+                fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.18em", textTransform: "uppercase",
                 color: "rgba(246,245,243,0.75)", border: "1px solid rgba(246,245,243,0.18)",
                 padding: "0.875rem 1.5rem", textDecoration: "none", display: "inline-block",
               }}>
@@ -194,7 +194,7 @@ export default function LandingPage() {
               </Link>
             </div>
             <div>
-              <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", marginBottom: "1rem" }}>Use Defrag when</p>
+              <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", marginBottom: "1rem" }}>Use Defrag when</p>
               {[
                 "You are about to send the message.",
                 "You cannot tell if you are reacting or responding.",
@@ -207,7 +207,7 @@ export default function LandingPage() {
               ].map((item) => (
                 <div key={item} style={{ display: "flex", gap: "0.75rem", padding: "0.625rem 0", borderBottom: "1px solid rgba(246,245,243,0.06)" }}>
                   <div style={{ width: "0.75rem", height: "1px", background: "rgba(246,245,243,0.18)", flexShrink: 0, marginTop: "0.6rem" }} />
-                  <span style={{ fontSize: "0.8125rem", color: "rgba(246,245,243,0.38)", lineHeight: 1.6 }}>{item}</span>
+                  <span style={{ fontSize: "0.875rem", color: "rgba(246,245,243,0.38)", lineHeight: 1.6 }}>{item}</span>
                 </div>
               ))}
             </div>
@@ -219,14 +219,14 @@ export default function LandingPage() {
       <section style={{ padding: "6rem 0", borderTop: "1px solid rgba(246,245,243,0.08)" }}>
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
           <div style={{ maxWidth: "48rem" }}>
-            <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1rem" }}>What you learned to carry</p>
-            <h2 style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "1.5rem" }}>
+            <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1rem" }}>What you learned to carry</p>
+            <h2 style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "1.5rem" }}>
               What you learned to carry<br />does not have to lead.
             </h2>
-            <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "1rem" }}>
+            <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "1rem" }}>
               Some reactions are not only about the present. They come from the part of you that learned to stay ready. The part that learned to please, prove, defend, disappear, fix, perform, or carry the room.
             </p>
-            <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)" }}>
+            <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)" }}>
               Defrag does not turn that into a label. It helps you see when an old survival role is running a new moment — so you can choose a response that belongs to who you are becoming.
             </p>
           </div>
@@ -238,18 +238,18 @@ export default function LandingPage() {
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "start" }}>
             <div>
-              <span style={{ fontFamily: "monospace", fontSize: "0.5rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.35)", border: "1px solid rgba(246,245,243,0.12)", padding: "0.2rem 0.6rem", display: "inline-block", marginBottom: "1.5rem" }}>Covenant space</span>
-              <h2 style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "1.5rem" }}>
+              <span style={{ fontFamily: "monospace", fontSize: "0.625rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.35)", border: "1px solid rgba(246,245,243,0.12)", padding: "0.2rem 0.6rem", display: "inline-block", marginBottom: "1.5rem" }}>Covenant space</span>
+              <h2 style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "1.5rem" }}>
                 Faith connected<br />to the work.
               </h2>
-              <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "1rem" }}>
+              <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "1rem" }}>
                 Covenant is for the user who wants faith to stay connected to the work. Not as certainty. Not as performance. Not as a spiritual shortcut.
               </p>
-              <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "2rem" }}>
+              <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "2rem" }}>
                 Covenant helps bring faith, reflection, responsibility, repair, and grounded discernment into what you are walking through — so the next step can be honest, not just emotional.
               </p>
               <Link href="/covenant" style={{
-                fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.18em", textTransform: "uppercase",
+                fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.18em", textTransform: "uppercase",
                 color: "rgba(246,245,243,0.75)", border: "1px solid rgba(246,245,243,0.18)",
                 padding: "0.875rem 1.5rem", textDecoration: "none", display: "inline-block",
               }}>
@@ -257,18 +257,18 @@ export default function LandingPage() {
               </Link>
             </div>
             <div style={{ border: "1px solid rgba(246,245,243,0.08)", padding: "2rem" }}>
-              <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", marginBottom: "1rem" }}>Covenant is not</p>
+              <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", marginBottom: "1rem" }}>Covenant is not</p>
               {["Certainty", "Performance", "A spiritual shortcut", "A sermon", "A verdict"].map((item) => (
                 <div key={item} style={{ display: "flex", gap: "0.75rem", padding: "0.5rem 0", borderBottom: "1px solid rgba(246,245,243,0.06)" }}>
-                  <span style={{ fontFamily: "monospace", fontSize: "0.5rem", color: "rgba(246,245,243,0.20)" }}>✕</span>
-                  <span style={{ fontSize: "0.8125rem", color: "rgba(246,245,243,0.38)" }}>{item}</span>
+                  <span style={{ fontFamily: "monospace", fontSize: "0.625rem", color: "rgba(246,245,243,0.20)" }}>✕</span>
+                  <span style={{ fontSize: "0.875rem", color: "rgba(246,245,243,0.38)" }}>{item}</span>
                 </div>
               ))}
-              <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", margin: "1.5rem 0 1rem 0" }}>Covenant is</p>
+              <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", margin: "1.5rem 0 1rem 0" }}>Covenant is</p>
               {["Faith connected to repair", "Grounded discernment", "Honest next steps", "Reflection without performance"].map((item) => (
                 <div key={item} style={{ display: "flex", gap: "0.75rem", padding: "0.5rem 0", borderBottom: "1px solid rgba(246,245,243,0.06)" }}>
                   <div style={{ width: "0.75rem", height: "1px", background: "rgba(246,245,243,0.18)", flexShrink: 0, marginTop: "0.6rem" }} />
-                  <span style={{ fontSize: "0.8125rem", color: "rgba(246,245,243,0.38)" }}>{item}</span>
+                  <span style={{ fontSize: "0.875rem", color: "rgba(246,245,243,0.38)" }}>{item}</span>
                 </div>
               ))}
             </div>
@@ -280,14 +280,14 @@ export default function LandingPage() {
       <section style={{ padding: "6rem 0", borderTop: "1px solid rgba(246,245,243,0.08)" }}>
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
           <div style={{ maxWidth: "48rem" }}>
-            <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1rem" }}>When both sides matter</p>
-            <h2 style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "1.5rem" }}>
+            <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1rem" }}>When both sides matter</p>
+            <h2 style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "1.5rem" }}>
               The other side may not be lying.<br />They may be living from another map.
             </h2>
-            <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "1rem" }}>
+            <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "1rem" }}>
               Two people can live through the same conversation and leave with completely different truths. With permission, Sovereign.os can help compare two Baseline Designs — not to decide who is right, not to score compatibility, and not to diagnose the relationship.
             </p>
-            <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.28)" }}>
+            <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.28)" }}>
               When both sides matter, invite privately.
             </p>
           </div>
@@ -299,21 +299,21 @@ export default function LandingPage() {
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
             <div>
-              <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1rem" }}>The Library</p>
-              <h2 style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "1.5rem" }}>
+              <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1rem" }}>The Library</p>
+              <h2 style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "1.5rem" }}>
                 Your Library keeps what<br />the moment taught you.
               </h2>
-              <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "1rem" }}>
+              <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", marginBottom: "1rem" }}>
                 The response you found. The pattern you finally saw. The boundary that became clear. The reflection you do not want to lose.
               </p>
-              <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.28)" }}>
+              <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.28)" }}>
                 Save to Sovereign before the moment disappears.
               </p>
             </div>
             <div style={{ background: "#0D0F14", border: "1px solid rgba(246,245,243,0.08)", padding: "2rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1.5rem" }}>
-                <span style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)" }}>Sovereign.os Library</span>
-                <span style={{ fontFamily: "monospace", fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.18)" }}>Private</span>
+                <span style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)" }}>Sovereign.os Library</span>
+                <span style={{ fontFamily: "monospace", fontSize: "0.625rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.18)" }}>Private</span>
               </div>
               {[
                 { space: "Defrag", label: "Boundary — what I keep negotiating with myself", date: "Jun 6" },
@@ -323,10 +323,10 @@ export default function LandingPage() {
               ].map((item, i) => (
                 <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.75rem 0", borderBottom: "1px solid rgba(246,245,243,0.06)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                    <span style={{ fontFamily: "monospace", fontSize: "0.5rem", letterSpacing: "0.22em", textTransform: "uppercase", color: item.space === "Covenant" ? "rgba(246,245,243,0.35)" : "rgba(246,245,243,0.55)", border: `1px solid ${item.space === "Covenant" ? "rgba(246,245,243,0.12)" : "rgba(246,245,243,0.22)"}`, padding: "0.2rem 0.5rem" }}>{item.space}</span>
+                    <span style={{ fontFamily: "monospace", fontSize: "0.625rem", letterSpacing: "0.22em", textTransform: "uppercase", color: item.space === "Covenant" ? "rgba(246,245,243,0.35)" : "rgba(246,245,243,0.55)", border: `1px solid ${item.space === "Covenant" ? "rgba(246,245,243,0.12)" : "rgba(246,245,243,0.22)"}`, padding: "0.2rem 0.5rem" }}>{item.space}</span>
                     <span style={{ fontSize: "0.75rem", color: "rgba(246,245,243,0.38)" }}>{item.label}</span>
                   </div>
-                  <span style={{ fontFamily: "monospace", fontSize: "0.5rem", color: "rgba(246,245,243,0.18)", flexShrink: 0, marginLeft: "1rem" }}>{item.date}</span>
+                  <span style={{ fontFamily: "monospace", fontSize: "0.625rem", color: "rgba(246,245,243,0.18)", flexShrink: 0, marginLeft: "1rem" }}>{item.date}</span>
                 </div>
               ))}
             </div>
@@ -337,8 +337,8 @@ export default function LandingPage() {
       {/* ── Pricing ────────────────────────────────────────────────────── */}
       <section style={{ padding: "6rem 0", borderTop: "1px solid rgba(246,245,243,0.08)" }}>
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
-          <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1rem" }}>Pro</p>
-          <h2 style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "3rem", maxWidth: "40rem" }}>
+          <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1rem" }}>Pro</p>
+          <h2 style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)", fontWeight: 300, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "3rem", maxWidth: "40rem" }}>
             Free is for beginning the work.<br />Pro is for the patterns that need more than one pass.
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", maxWidth: "48rem", gap: 0 }}>
@@ -350,17 +350,17 @@ export default function LandingPage() {
                 display: "flex", flexDirection: "column", gap: "1.5rem",
               }}>
                 {tier.highlight && (
-                  <div style={{ fontFamily: "monospace", fontSize: "0.5rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "#05070B", background: "#F6F5F3", padding: "0.2rem 0.6rem", display: "inline-block", alignSelf: "flex-start" }}>
+                  <div style={{ fontFamily: "monospace", fontSize: "0.625rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "#05070B", background: "#F6F5F3", padding: "0.2rem 0.6rem", display: "inline-block", alignSelf: "flex-start" }}>
                     Recommended
                   </div>
                 )}
                 <div>
-                  <p style={{ fontFamily: "monospace", fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.18)", marginBottom: "1rem" }}>{tier.name}</p>
+                  <p style={{ fontFamily: "monospace", fontSize: "0.625rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.18)", marginBottom: "1rem" }}>{tier.name}</p>
                   <div style={{ fontSize: "3rem", fontWeight: 300, letterSpacing: "-0.02em" }}>
                     {tier.price}<span style={{ fontSize: "0.875rem", color: "rgba(246,245,243,0.28)", fontWeight: 400, marginLeft: "0.5rem" }}>{tier.period}</span>
                   </div>
                 </div>
-                <p style={{ fontSize: "0.8125rem", color: "rgba(246,245,243,0.38)" }}>{tier.description}</p>
+                <p style={{ fontSize: "0.875rem", color: "rgba(246,245,243,0.38)" }}>{tier.description}</p>
                 <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.75rem", flex: 1 }}>
                   {tier.features.map((f) => (
                     <li key={f} style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
@@ -371,7 +371,7 @@ export default function LandingPage() {
                 </ul>
                 <Link href={tier.href} style={{
                   display: "block", textAlign: "center",
-                  fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.18em", textTransform: "uppercase",
+                  fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.18em", textTransform: "uppercase",
                   padding: "0.875rem",
                   textDecoration: "none",
                   background: tier.highlight ? "#F6F5F3" : "transparent",
@@ -389,32 +389,32 @@ export default function LandingPage() {
       {/* ── Final CTA ──────────────────────────────────────────────────── */}
       <section style={{ padding: "8rem 0", borderTop: "1px solid rgba(246,245,243,0.08)", textAlign: "center" }}>
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
-          <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1.5rem" }}>Start here</p>
-          <h2 style={{ fontSize: "clamp(2.75rem, 7vw, 5.5rem)", fontWeight: 300, letterSpacing: "-0.04em", lineHeight: 1.04, marginBottom: "1.5rem" }}>
+          <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(246,245,243,0.25)", marginBottom: "1.5rem" }}>Start here</p>
+          <h2 style={{ fontSize: "clamp(3rem, 8vw, 6rem)", fontWeight: 300, letterSpacing: "-0.04em", lineHeight: 1.04, marginBottom: "1.5rem" }}>
             Healing isn't optional.
             <br />
             <span style={{ color: "rgba(246,245,243,0.38)" }}>Holding the pain is.</span>
           </h2>
-          <p style={{ fontSize: "0.9375rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", maxWidth: "32rem", margin: "0 auto 2.5rem auto" }}>
+          <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "rgba(246,245,243,0.50)", maxWidth: "32rem", margin: "0 auto 2.5rem auto" }}>
             Enter Sovereign.os. Set your Baseline Design. Work through what is active. Save what changes.
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap" }}>
             <Link href="https://app.defrag.app/app/login" style={{
-              fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.18em", textTransform: "uppercase",
+              fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.18em", textTransform: "uppercase",
               color: "#05070B", background: "#F6F5F3", border: "1px solid #F6F5F3",
               padding: "0.875rem 2.5rem", textDecoration: "none", display: "inline-block",
             }}>
               Enter Sovereign.os
             </Link>
             <Link href="https://app.defrag.app/app/login" style={{
-              fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.18em", textTransform: "uppercase",
+              fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.18em", textTransform: "uppercase",
               color: "rgba(246,245,243,0.75)", border: "1px solid rgba(246,245,243,0.18)",
               padding: "0.875rem 2.5rem", textDecoration: "none", display: "inline-block",
             }}>
               Start Baseline Design
             </Link>
           </div>
-          <p style={{ fontFamily: "monospace", fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.18)", marginTop: "1.5rem" }}>
+          <p style={{ fontFamily: "monospace", fontSize: "0.625rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.18)", marginTop: "1.5rem" }}>
             Free tier · No credit card required · 5 sessions/day
           </p>
         </div>
@@ -424,8 +424,8 @@ export default function LandingPage() {
       <footer style={{ borderTop: "1px solid rgba(246,245,243,0.08)", padding: "2.5rem 0" }}>
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1.5rem" }}>
           <div>
-            <p style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", margin: "0 0 0.25rem 0" }}>Sovereign.os</p>
-            <p style={{ fontFamily: "monospace", fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.18)", margin: 0 }}>Defrag · Covenant · Baseline Design · Library</p>
+            <p style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", margin: "0 0 0.25rem 0" }}>Sovereign.os</p>
+            <p style={{ fontFamily: "monospace", fontSize: "0.625rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.18)", margin: 0 }}>Defrag · Covenant · Baseline Design · Library</p>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem" }}>
             {[
@@ -437,7 +437,7 @@ export default function LandingPage() {
               { href: "/terms", label: "Terms" },
               { href: "/contact", label: "Contact" },
             ].map((item) => (
-              <Link key={item.href} href={item.href} style={{ fontFamily: "monospace", fontSize: "0.5625rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", textDecoration: "none" }}>
+              <Link key={item.href} href={item.href} style={{ fontFamily: "monospace", fontSize: "0.6875rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(246,245,243,0.28)", textDecoration: "none" }}>
                 {item.label}
               </Link>
             ))}
