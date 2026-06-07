@@ -10,15 +10,15 @@ export function SectionHeader({
   return (
     <div className="mx-auto max-w-3xl text-center">
       {eyebrow ? (
-        <p className="mb-3 text-xs uppercase tracking-[0.24em] text-white/30">
+        <p className="mb-3 text-label mx-auto">
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl leading-tight">
+      <h2 className="text-headline text-white">
         {title}
       </h2>
       {body ? (
-        <p className="mt-4 text-base leading-relaxed text-white/55 sm:text-lg">
+        <p className="mt-4 text-body">
           {body}
         </p>
       ) : null}

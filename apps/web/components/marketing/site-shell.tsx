@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import { navItems, footerItems } from "@/data/marketing";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
@@ -77,15 +76,8 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Mobile menu */}
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden border-t border-white/8 bg-black md:hidden"
-            >
+        {menuOpen && (
+            <div className="border-t border-white/8 bg-black md:hidden">
               <nav className="flex flex-col px-6 py-6 gap-5" aria-label="Mobile navigation">
                 {navItems.map((item) => (
                   <Link
@@ -119,9 +111,8 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                   Enter Sovereign.os
                 </Link>
               </nav>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+        )}
       </header>
 
       {/* ── Page content ────────────────────────────────────────────────── */}

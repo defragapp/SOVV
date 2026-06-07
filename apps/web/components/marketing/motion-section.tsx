@@ -1,12 +1,15 @@
-"use client";
-
-import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+
+// MotionSection — renders as a plain section with no animation dependency.
+// framer-motion whileInView animations were causing content to remain
+// permanently hidden (opacity:0) in the Cloudflare Workers SSR environment
+// because JS hydration was not completing before first paint.
+// All content must be visible on first server-side render.
 
 export function MotionSection({
   children,
   className = "",
-  delay = 0,
+  delay: _delay = 0,
   id,
 }: {
   children: ReactNode;
@@ -15,15 +18,8 @@ export function MotionSection({
   id?: string;
 }) {
   return (
-    <motion.section
-      id={id}
-      className={className}
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.6, delay, ease: "easeOut" }}
-    >
+    <section id={id} className={className}>
       {children}
-    </motion.section>
+    </section>
   );
 }
