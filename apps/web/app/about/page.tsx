@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About — Sovereign.os",
-  description: "Sovereign.os helps people understand relational dynamics, family patterns, communication, grief, boundaries, and the patterns underneath what is active in the moment.",
+  description: "Sovereign.os is a private place to work through the patterns that keep showing up in your relationships, family, messages, grief, and boundaries.",
 };
 
 export default function AboutPage() {
@@ -14,27 +14,27 @@ export default function AboutPage() {
     <SiteShell>
       <PageHero
         eyebrow="About"
-        title="Built for real moments."
-        body="Sovereign.os helps people understand the pattern underneath what is active — without turning the product into therapy, diagnosis, or generic advice."
+        title="Built for the moments that will not leave you alone."
+        body="Not for abstract self-improvement. For the specific, real, sometimes difficult moments of actual life."
       />
 
       <MotionSection className="px-6 py-24">
-        <div className="mx-auto max-w-2xl space-y-10 text-body leading-8">
+        <div className="mx-auto max-w-2xl space-y-8 text-body leading-8">
           <p>
-            Sovereign.os is a private platform for relational intelligence. Defrag is the space inside it for working through what is active in the moment — the pattern, the loop, the response that gives the moment a better chance.
+            Sovereign.os is a private place to work through the patterns that keep showing up in your life. The message that unsettled you. The family role you keep falling back into. The boundary you keep negotiating with yourself. The grief that changes the room. The relationship dynamic you can feel, but cannot fully name.
           </p>
           <p>
-            Defrag helps you work through relational dynamics, family dynamics, boundaries, messages, grief, parenting, and team dynamics. Put the moment into context. See the pattern underneath. Find the next response that changes the pattern.
+            It gives those moments structure — without turning them into a diagnosis, a score, or a verdict.
           </p>
           <p>
-            Covenant is an optional faith-context reflection space inside Sovereign.os. It helps you bring faith, reflection, and grounded discernment into what you are walking through — without preaching, certainty, or performance.
+            Defrag is the space for working through what is active in the moment. Covenant is the space for users who want faith to stay connected to the work. Both spaces share your Baseline Design, Library, auth, and subscription.
           </p>
           <p>
             The product is designed to be private, direct, and useful. It is not a personality test, a mood tracker, or a substitute for professional support. It does not diagnose, predict, or guarantee outcomes.
           </p>
-          <div className="border-t border-white/8 pt-8 space-y-4">
-            <p className="text-caption">
-              Your Baseline Design is the source. Sovereign.os is where the work becomes yours.
+          <div className="border-t border-white/8 pt-8 space-y-3">
+            <p className="text-caption italic">
+              The wound is real. So is the choice after it.
             </p>
           </div>
         </div>
