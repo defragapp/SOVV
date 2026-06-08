@@ -1,6 +1,6 @@
-import type { Env } from "./types-env.js";
+iutodeployment on mport type { Env } from "./types-env.js";
 import { getAuthUser, jsonResponse } from "./auth.js";
-import { getSessionId, cookieHeader } from "./plan.js";
+import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
 import { getBaseline, formatBaseline } from "./baseline.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
@@ -164,6 +164,19 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   if (subGate) return subGate;
 
   const sid = await getSessionId(req);
+
+  // Free tier daily usage limit check
+  const isPro = user.subscription_status === "active" || user.tier === "pro";
+  if (!isPro) {
+    const limit = await checkFreeLimit(env, sid);
+    if (!limit.allowed) {
+      return jsonResponse({
+        error: "daily_limit_reached",
+        message: "You've reached your free daily limit. Upgrade to Pro for unlimited usage.",
+        remaining: 0,
+      }, 429, { ...CORS_HEADERS, "set-cookie": cookieHeader(sid) });
+    }
+  }
   const body = (await req.json().catch(() => ({}))) as Partial<ExplainRequest> & {
     question?: string;
     text?: string;

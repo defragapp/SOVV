@@ -1,17 +1,34 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function UpgradeBanner() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [promoCode, setPromoCode] = useState("")
+  const [showPromo, setShowPromo] = useState(false)
 
   const handleUpgrade = async () => {
     setLoading(true)
     setError("")
 
     try {
+      if (promoCode.trim()) {
+        // First redeem the promo code, then proceed to checkout
+        const promoRes = await fetch("/api/promo/redeem", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: promoCode.trim().toUpperCase() }),
+        })
+        const promoData = await promoRes.json() as { discount_percent?: number; error?: string }
+        if (!promoRes.ok && promoData.error !== "Invalid or inactive promo code") {
+          setError(promoData.error || "Invalid promo code")
+          return
+        }
+      }
+
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
         credentials: "include",
@@ -98,15 +115,46 @@ export default function UpgradeBanner() {
           )}
         </motion.button>
 
-        {error && (
-          <motion.p
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 font-mono text-[9px] uppercase tracking-widest text-red-400/70"
-          >
-            {error}
-          </motion.p>
-        )}
+        {/* Promo code toggle */}
+        <motion.button
+          type="button"
+          onClick={() => setShowPromo(!showPromo)}
+          className="mt-4 font-mono text-[9px] uppercase tracking-widest text-white/20 hover:text-white/40 transition-colors"
+        >
+          {showPromo ? "Hide promo code" : "Have a promo code?"}
+        </motion.button>
+
+        <AnimatePresence>
+          {showPromo && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-3 overflow-hidden"
+            >
+              <input
+                type="text"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value)}
+                placeholder="ENTER CODE"
+                className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-2.5 font-mono text-[10px] uppercase tracking-widest text-[#F6F5F3] placeholder-white/15 focus:border-[#F6F5F3]/30 focus:outline-none transition-colors text-center"
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {error && (
+            <motion.p
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="mt-4 font-mono text-[9px] uppercase tracking-widest text-red-400/70"
+            >
+              {error}
+            </motion.p>
+          )}
+        </AnimatePresence>
 
         <motion.p
           initial={{ opacity: 0 }}
