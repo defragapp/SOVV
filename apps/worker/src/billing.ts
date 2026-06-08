@@ -2,10 +2,10 @@ import type { Env } from "./types-env.js";
 import { getSessionId, cookieHeader } from "./plan.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import {
-  sendWelcomeEmailLegacy as sendWelcomeEmail,
-  sendPaymentSucceededEmailLegacy as sendPaymentSucceededEmail,
-  sendPaymentFailedEmailLegacy as sendPaymentFailedEmail,
-  sendCancellationEmailLegacy as sendCancellationEmail,
+  sendWelcomeEmail,
+  sendPaymentSucceededEmail,
+  sendPaymentFailedEmail,
+  sendCancellationEmail,
 } from "./email.js";
 
 // Stripe webhook signature verification in Workers (no Stripe SDK)
@@ -152,6 +152,10 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
   if (existing) return new Response("OK (already processed)");
   await env.KV.put(`stripe_event:${eventId}`, "processed", { expirationTtl: 86400 });
 
+  const emailOpts: { emailBinding?: typeof env.EMAIL; resendApiKey?: string } = {};
+  if (env.EMAIL) emailOpts.emailBinding = env.EMAIL;
+  if (env.RESEND_API_KEY) emailOpts.resendApiKey = env.RESEND_API_KEY;
+
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object;
@@ -163,11 +167,11 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
           "UPDATE users SET tier = 'pro', subscription_status = 'active', stripe_customer_id = ?, subscription_updated_at = ? WHERE id = ?"
         )
           .bind(stripeCustomerId, Date.now(), userId).run();
-        if (env.RESEND_API_KEY) {
+        if (emailOpts.emailBinding || emailOpts.resendApiKey) {
           const user = await env.DB.prepare("SELECT email FROM users WHERE id = ?")
             .bind(userId).first<{ email?: string }>();
           if (user?.email) {
-            await sendWelcomeEmail(env.RESEND_API_KEY, user.email).catch(() => {});
+            await sendWelcomeEmail(user.email, emailOpts).catch(() => {});
           }
         }
       }
@@ -204,11 +208,11 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
         ).bind(...params).run();
       }
 
-      if (env.RESEND_API_KEY && billingReason === "subscription_cycle") {
+      if ((emailOpts.emailBinding || emailOpts.resendApiKey) && billingReason === "subscription_cycle") {
         const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
           .bind(stripeCustomerId).first<{ email?: string }>();
         if (user?.email) {
-          await sendPaymentSucceededEmail(env.RESEND_API_KEY, user.email).catch(() => {});
+          await sendPaymentSucceededEmail(user.email, emailOpts).catch(() => {});
         }
       }
       break;
@@ -223,11 +227,11 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
         )
           .bind(Date.now(), stripeCustomerId).run();
       }
-      if (env.RESEND_API_KEY) {
+      if (emailOpts.emailBinding || emailOpts.resendApiKey) {
         const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
           .bind(stripeCustomerId).first<{ email?: string }>();
         if (user?.email) {
-          await sendPaymentFailedEmail(env.RESEND_API_KEY, user.email).catch(() => {});
+          await sendPaymentFailedEmail(user.email, emailOpts).catch(() => {});
         }
       }
       break;
@@ -240,11 +244,11 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
         "UPDATE users SET tier = 'free', subscription_status = 'canceled', stripe_subscription_id = NULL, subscription_updated_at = ? WHERE stripe_customer_id = ?"
       )
         .bind(Date.now(), stripeCustomerId).run();
-      if (env.RESEND_API_KEY) {
+      if (emailOpts.emailBinding || emailOpts.resendApiKey) {
         const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
           .bind(stripeCustomerId).first<{ email?: string }>();
         if (user?.email) {
-          await sendCancellationEmail(env.RESEND_API_KEY, user.email).catch(() => {});
+          await sendCancellationEmail(user.email, emailOpts).catch(() => {});
         }
       }
       break;
