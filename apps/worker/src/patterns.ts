@@ -3,8 +3,9 @@
 import type { D1Database, Ai } from "@cloudflare/workers-types";
 import type { Env } from "./types-env.js";
 import { getRecentInteractions, upsertPattern, getPatterns } from "./db.js";
-import { verifyAccessJWT } from "./auth.js";
+import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import { getSessionId, cookieHeader } from "./plan.js";
+import { requireActiveSubscription } from "./billing.js";
 
 export interface Pattern {
   type: "trigger" | "dynamic" | "defense" | "repetition" | "growth";
@@ -85,7 +86,13 @@ export function registerPatternsRoutes(router: any, getEnv: () => Env) {
   router.get("/api/patterns", async (request: Request) => {
     const env = getEnv();
     
-    // Check session via cookies first, fallback to Auth header
+    // Check session via cookies first
+    const user = await getAuthUser(request, env.DB);
+
+    // Subscription gate for workspace route
+    const subGate = await requireActiveSubscription(user, request);
+    if (subGate) return subGate;
+
     const cookie = request.headers.get("Cookie") || "";
     let sessionId = "";
     const match = cookie.match(/sid=([a-zA-Z0-9_-]+)/);

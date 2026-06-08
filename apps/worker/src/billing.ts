@@ -49,6 +49,46 @@ async function requireSessionAuth(req: Request, env: Env): Promise<Response | nu
   return verifyAccessJWT(req, env);
 }
 
+/**
+ * Checks if the authenticated user has an active subscription.
+ * Returns a 402 Payment Required response if the subscription is not active
+ * and the route is a workspace-protected route.
+ */
+export async function requireActiveSubscription(user: { subscription_status: string; tier: string } | null, request: Request): Promise<Response | null> {
+  if (!user) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const url = new URL(request.url);
+
+  // Workspace-protected routes — the apps/defrag and apps/covenant workbenches
+  const isWorkspaceRoute = url.pathname === "/api/explain" ||
+    url.pathname.startsWith("/api/baseline") ||
+    url.pathname.startsWith("/api/patterns") ||
+    url.pathname.startsWith("/api/history") ||
+    url.pathname.startsWith("/api/chips");
+
+  if (!isWorkspaceRoute) {
+    return null; // Not a protected route — let it through
+  }
+
+  const hasActive = user.subscription_status === "active" || user.tier === "pro";
+  if (!hasActive) {
+    return new Response(JSON.stringify({
+      error: "payment_required",
+      message: "An active subscription is required to use the workbench. Please upgrade to Pro.",
+    }), {
+      status: 402,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  return null; // Subscription is active — proceed
+}
+
 export async function handleCheckout(req: Request, env: Env): Promise<Response> {
   const authErr = await requireSessionAuth(req, env);
   if (authErr) return authErr;
@@ -118,8 +158,11 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
       const userId = session.client_reference_id;
       const stripeCustomerId = session.customer;
       if (userId && stripeCustomerId) {
-        await env.DB.prepare("UPDATE users SET tier = 'pro', stripe_customer_id = ? WHERE id = ?")
-          .bind(stripeCustomerId, userId).run();
+        // Set tier to 'pro' AND subscription_status to 'active' on checkout
+        await env.DB.prepare(
+          "UPDATE users SET tier = 'pro', subscription_status = 'active', stripe_customer_id = ?, subscription_updated_at = ? WHERE id = ?"
+        )
+          .bind(stripeCustomerId, Date.now(), userId).run();
         if (env.RESEND_API_KEY) {
           const user = await env.DB.prepare("SELECT email FROM users WHERE id = ?")
             .bind(userId).first<{ email?: string }>();
@@ -134,6 +177,33 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
       const invoice = event.data.object;
       const billingReason = invoice.billing_reason;
       const stripeCustomerId = invoice.customer;
+      const subscriptionId = invoice.subscription;
+      const periodEnd = invoice.period_end;
+
+      // Update subscription status to 'active' on successful payment
+      if (stripeCustomerId) {
+        const updates = [
+          "subscription_status = 'active'",
+          "tier = 'pro'",
+          "subscription_updated_at = ?",
+        ];
+        const params: any[] = [Date.now()];
+
+        if (subscriptionId) {
+          updates.push("stripe_subscription_id = ?");
+          params.push(subscriptionId);
+        }
+        if (periodEnd) {
+          updates.push("subscription_current_period_end = ?");
+          params.push(periodEnd);
+        }
+
+        params.push(stripeCustomerId);
+        await env.DB.prepare(
+          `UPDATE users SET ${updates.join(", ")} WHERE stripe_customer_id = ?`
+        ).bind(...params).run();
+      }
+
       if (env.RESEND_API_KEY && billingReason === "subscription_cycle") {
         const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
           .bind(stripeCustomerId).first<{ email?: string }>();
@@ -146,6 +216,13 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
     case "invoice.payment_failed": {
       const invoice = event.data.object;
       const stripeCustomerId = invoice.customer;
+      // Set subscription_status to 'past_due' on payment failure
+      if (stripeCustomerId) {
+        await env.DB.prepare(
+          "UPDATE users SET subscription_status = 'past_due', subscription_updated_at = ? WHERE stripe_customer_id = ?"
+        )
+          .bind(Date.now(), stripeCustomerId).run();
+      }
       if (env.RESEND_API_KEY) {
         const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
           .bind(stripeCustomerId).first<{ email?: string }>();
@@ -158,13 +235,44 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
     case "customer.subscription.deleted": {
       const subscription = event.data.object;
       const stripeCustomerId = subscription.customer;
-      await env.DB.prepare("UPDATE users SET tier = 'free' WHERE stripe_customer_id = ?").bind(stripeCustomerId).run();
+      // Set subscription_status to 'canceled' and tier to 'free' on deletion
+      await env.DB.prepare(
+        "UPDATE users SET tier = 'free', subscription_status = 'canceled', stripe_subscription_id = NULL, subscription_updated_at = ? WHERE stripe_customer_id = ?"
+      )
+        .bind(Date.now(), stripeCustomerId).run();
       if (env.RESEND_API_KEY) {
         const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
           .bind(stripeCustomerId).first<{ email?: string }>();
         if (user?.email) {
           await sendCancellationEmail(env.RESEND_API_KEY, user.email).catch(() => {});
         }
+      }
+      break;
+    }
+    case "customer.subscription.updated": {
+      const subscription = event.data.object;
+      const stripeCustomerId = subscription.customer;
+      const status = subscription.status; // 'active', 'past_due', 'canceled', 'incomplete', etc.
+      const periodEnd = subscription.current_period_end;
+
+      if (stripeCustomerId && status) {
+        const updates = ["subscription_status = ?", "subscription_updated_at = ?"];
+        const params: any[] = [status, Date.now()];
+
+        if (periodEnd) {
+          updates.push("subscription_current_period_end = ?");
+          params.push(periodEnd);
+        }
+
+        // If subscription becomes active again, ensure tier is 'pro'
+        if (status === "active") {
+          updates.push("tier = 'pro'");
+        }
+
+        params.push(stripeCustomerId);
+        await env.DB.prepare(
+          `UPDATE users SET ${updates.join(", ")} WHERE stripe_customer_id = ?`
+        ).bind(...params).run();
       }
       break;
     }

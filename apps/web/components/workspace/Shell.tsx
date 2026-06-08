@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { motion } from "framer-motion"
+import { FadeUp } from "@/components/ui/fade-up"
 import type { Person, Tier, ThreadMessage } from "./types"
 import Sidebar from "./Sidebar"
 import Thread from "./Thread"
@@ -19,6 +21,17 @@ type RightPanel = "right-now" | "your-space"
 interface ShellProps {
   tier: Tier
   spaceLabel?: string
+}
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
 }
 
 export default function Shell({ tier, spaceLabel = "Defrag" }: ShellProps) {
@@ -43,111 +56,145 @@ export default function Shell({ tier, spaceLabel = "Defrag" }: ShellProps) {
   }
 
   return (
-    <div className="flex h-screen w-screen flex-col bg-black text-[#F6F5F3]">
-
-      {/* ── App header ──────────────────────────────────────────────────── */}
-      <header className="flex h-10 shrink-0 items-center justify-between border-b border-[#F6F5F3]/10 px-4">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/"
-            className="font-mono text-[9px] uppercase tracking-widest text-white/25 hover:text-white/50 transition-colors"
-            aria-label="Sovereign.os home"
-          >
-            Sovereign.os
-          </Link>
-          <span className="text-white/15 font-mono text-[9px]">/</span>
-          <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">
-            {spaceLabel} space
-          </span>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {tier === "pro" && (
-            <span className="font-mono text-[9px] uppercase tracking-widest text-white/25 border border-white/10 px-2 py-0.5">
-              Pro
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="flex h-screen w-screen flex-col bg-black text-[#F6F5F3]"
+    >
+      {/* ── Sticky top-bar with 1px bottom border ─────────────────────── */}
+      <FadeUp className="shrink-0">
+        <header className="flex h-10 items-center justify-between border-b border-[rgba(255,255,255,0.08)] px-8 bg-black/60 backdrop-blur-xl sticky top-0 z-40">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="font-mono text-[9px] uppercase tracking-widest text-white/25 hover:text-white/50 transition-colors duration-200"
+              aria-label="Sovereign.os home"
+            >
+              Sovereign.os
+            </Link>
+            <span className="text-white/15 font-mono text-[9px]">/</span>
+            <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">
+              {spaceLabel} space
             </span>
-          )}
-          <Link
-            href="/settings"
-            className="font-mono text-[9px] uppercase tracking-widest text-white/30 hover:text-[#F6F5F3] transition-colors"
-          >
-            Baseline Design
-          </Link>
-          <form action="/api/auth/logout" method="POST">
-            <button
-              type="submit"
-              className="font-mono text-[9px] uppercase tracking-widest text-white/30 hover:text-[#F6F5F3] transition-colors"
-            >
-              Sign out
-            </button>
-          </form>
-        </div>
-      </header>
-
-      {/* ── Main grid ───────────────────────────────────────────────────── */}
-      <div className="grid flex-1 grid-cols-[220px_1fr_280px] overflow-hidden">
-        <Sidebar
-          selectedPerson={selectedPerson}
-          onSelectPerson={handleSelectPerson}
-          tier={tier}
-        />
-        <Thread
-          selectedPerson={selectedPerson}
-          messages={messages}
-          onNewMessage={handleNewMessage}
-        />
-
-        {/* Right panel */}
-        <div className="flex h-full flex-col overflow-hidden border-l border-[#F6F5F3]/10">
-          {/* Panel tabs */}
-          <div className="flex h-10 shrink-0 border-b border-[#F6F5F3]/10">
-            <button
-              type="button"
-              onClick={() => setRightPanel("right-now")}
-              className={`flex-1 font-mono text-[9px] uppercase tracking-widest transition-colors ${
-                rightPanel === "right-now"
-                  ? "text-[#F6F5F3] border-b border-[#F6F5F3]/40"
-                  : "text-white/25 hover:text-white/50"
-              }`}
-              aria-pressed={rightPanel === "right-now"}
-            >
-              Right Now
-            </button>
-            <button
-              type="button"
-              onClick={() => setRightPanel("your-space")}
-              className={`flex-1 font-mono text-[9px] uppercase tracking-widest transition-colors ${
-                rightPanel === "your-space"
-                  ? "text-[#F6F5F3] border-b border-[#F6F5F3]/40"
-                  : "text-white/25 hover:text-white/50"
-              }`}
-              aria-pressed={rightPanel === "your-space"}
-            >
-              Library
-            </button>
           </div>
 
-          <div className="flex-1 overflow-hidden">
-            {rightPanel === "right-now" ? (
-              <ContextPanel activeMessage={activeMessage} hideHeader />
-            ) : (
-              <YourSpace />
+          <div className="flex items-center gap-4">
+            {tier === "pro" && (
+              <span className="font-mono text-[9px] uppercase tracking-widest text-white/25 border border-[rgba(255,255,255,0.1)] px-2 py-0.5 rounded-iOS">
+                Pro
+              </span>
             )}
+            <Link
+              href="/settings"
+              className="font-mono text-[9px] uppercase tracking-widest text-white/30 hover:text-[#F6F5F3] transition-colors duration-200"
+            >
+              Baseline Design
+            </Link>
+            <form action="/api/auth/logout" method="POST">
+              <motion.button
+                type="submit"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2 }}
+                className="font-mono text-[9px] uppercase tracking-widest text-white/30 hover:text-[#F6F5F3] transition-colors duration-200"
+              >
+                Sign out
+              </motion.button>
+            </form>
           </div>
-        </div>
+        </header>
+      </FadeUp>
+
+      {/* ── Main bento grid ──────────────────────────────────────────── */}
+      <div className="grid flex-1 grid-cols-[220px_1fr_280px] overflow-hidden gap-0">
+        {/* Sidebar — left column */}
+        <FadeUp delay={0.05} className="h-full overflow-hidden border-r border-[rgba(255,255,255,0.06)]">
+          <div className="h-full bg-black/30 backdrop-blur-sm">
+            <Sidebar
+              selectedPerson={selectedPerson}
+              onSelectPerson={handleSelectPerson}
+            />
+          </div>
+        </FadeUp>
+
+        {/* Thread — center column (main content area) */}
+        <FadeUp delay={0.1} className="h-full overflow-hidden relative">
+          {/* Subtle ambient glow */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0"
+            style={{
+              backgroundImage: "radial-gradient(circle at 50% 30%, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0) 60%)",
+            }}
+          />
+          <div className="relative z-10 h-full bg-black/20 backdrop-blur-sm">
+            <Thread
+              selectedPerson={selectedPerson}
+              messages={messages}
+              onNewMessage={handleNewMessage}
+            />
+          </div>
+        </FadeUp>
+
+        {/* Right panel — right column */}
+        <FadeUp delay={0.15} className="h-full overflow-hidden border-l border-[rgba(255,255,255,0.06)]">
+          <div className="flex h-full flex-col bg-black/30 backdrop-blur-sm">
+            {/* Panel tabs */}
+            <div className="flex h-10 shrink-0 border-b border-[rgba(255,255,255,0.08)]">
+              <motion.button
+                type="button"
+                onClick={() => setRightPanel("right-now")}
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+                className={`flex-1 font-mono text-[9px] uppercase tracking-widest transition-colors duration-200 ${
+                  rightPanel === "right-now"
+                    ? "text-[#F6F5F3] border-b border-[#F6F5F3]/40"
+                    : "text-white/25 hover:text-white/50"
+                }`}
+                aria-pressed={rightPanel === "right-now"}
+              >
+                Right Now
+              </motion.button>
+              <motion.button
+                type="button"
+                onClick={() => setRightPanel("your-space")}
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+                className={`flex-1 font-mono text-[9px] uppercase tracking-widest transition-colors duration-200 ${
+                  rightPanel === "your-space"
+                    ? "text-[#F6F5F3] border-b border-[#F6F5F3]/40"
+                    : "text-white/25 hover:text-white/50"
+                }`}
+                aria-pressed={rightPanel === "your-space"}
+              >
+                Library
+              </motion.button>
+            </div>
+
+            <div className="flex-1 overflow-hidden">
+              {rightPanel === "right-now" ? (
+                <ContextPanel activeMessage={activeMessage} hideHeader />
+              ) : (
+                <YourSpace />
+              )}
+            </div>
+          </div>
+        </FadeUp>
       </div>
 
       {/* ── Status bar ──────────────────────────────────────────────────── */}
-      <footer className="flex h-8 shrink-0 items-center justify-between border-t border-[#F6F5F3]/10 px-4">
-        <span className="font-mono text-[9px] uppercase tracking-widest text-white/25">
-          {selectedPerson.relation === "self"
-            ? "Just you"
-            : `${selectedPerson.name} — ${selectedPerson.relation}`}
-        </span>
-        <span className="font-mono text-[9px] uppercase tracking-widest text-white/15">
-          Sovereign.os Library
-        </span>
-      </footer>
-    </div>
+      <FadeUp delay={0.2}>
+        <footer className="flex h-8 shrink-0 items-center justify-between border-t border-[rgba(255,255,255,0.08)] px-8">
+          <span className="font-mono text-[9px] uppercase tracking-widest text-white/25">
+            {selectedPerson.relation === "self"
+              ? "Just you"
+              : `${selectedPerson.name} — ${selectedPerson.relation}`}
+          </span>
+          <span className="font-mono text-[9px] uppercase tracking-widest text-white/15">
+            Sovereign.os Library
+          </span>
+        </footer>
+      </FadeUp>
+    </motion.div>
   )
 }

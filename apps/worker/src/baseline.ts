@@ -3,6 +3,7 @@ import type { Baseline, BaselineRequest } from "@sovereign/core";
 import { safeJsonParse } from "@sovereign/core";
 import { getSessionId, cookieHeader } from "./plan.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
+import { requireActiveSubscription } from "./billing.js";
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const USER_KEY = (sid: string) => `user:${sid}`;
@@ -65,6 +66,12 @@ export async function handleGetBaseline(req: Request, env: Env): Promise<Respons
     return authErr;
   }
 
+  const user = await getAuthUser(req, env.DB);
+
+  // Subscription gate for workspace baseline access
+  const subGate = await requireActiveSubscription(user, req);
+  if (subGate) return subGate;
+
   const sid = await getSessionId(req);
   const baseline = await getBaseline(env, sid);
   return Response.json(
@@ -83,6 +90,12 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
   if (authErr) {
     return authErr;
   }
+
+  const user = await getAuthUser(req, env.DB);
+
+  // Subscription gate for workspace baseline access
+  const subGate = await requireActiveSubscription(user, req);
+  if (subGate) return subGate;
 
   const sid = await getSessionId(req);
   const body = (await req.json().catch(() => null)) as unknown;

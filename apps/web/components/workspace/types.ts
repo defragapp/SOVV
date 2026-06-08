@@ -70,3 +70,4 @@ export interface ThreadMessage {
 }
 
 export type Tier = "free" | "pro"
+export type SubscriptionStatus = "free" | "active" | "past_due" | "canceled" | "incomplete"

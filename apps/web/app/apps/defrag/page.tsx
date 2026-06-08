@@ -4,21 +4,37 @@ import { useEffect, useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import Shell from "@/components/workspace/Shell"
-import type { Tier } from "@/components/workspace/types"
+import UpgradeBanner from "@/components/workspace/UpgradeBanner"
+import type { Tier, SubscriptionStatus } from "@/components/workspace/types"
 
 // Defrag space — the relational intelligence space inside Sovereign.os
 // Shares auth, Baseline Design, Library, and subscription with all spaces.
 
 function DefragSpaceInner() {
   const [tier, setTier] = useState<Tier>("free")
+  const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus>("free")
   const [upgraded, setUpgraded] = useState(false)
+  const [gateStatus, setGateStatus] = useState<"loading" | "passed" | "blocked">("loading")
   const searchParams = useSearchParams()
 
   useEffect(() => {
     fetch("/api/auth/tier", { credentials: "include" })
-      .then((res) => (res.ok ? res.json() : { tier: "free" }))
-      .then((data) => setTier(data.tier))
-      .catch(() => setTier("free"))
+      .then((res) => (res.ok ? res.json() : { tier: "free", subscription_status: "free" }))
+      .then((data) => {
+        setTier(data.tier)
+        setSubscriptionStatus(data.subscription_status || "free")
+        // Gate: allow through if pro tier or active subscription
+        if (data.tier === "pro" || data.subscription_status === "active") {
+          setGateStatus("passed")
+        } else {
+          setGateStatus("blocked")
+        }
+      })
+      .catch(() => {
+        setTier("free")
+        setSubscriptionStatus("free")
+        setGateStatus("blocked")
+      })
 
     if (searchParams.get("upgraded") === "1") {
       setUpgraded(true)
@@ -27,6 +43,25 @@ function DefragSpaceInner() {
       window.history.replaceState({}, "", url.toString())
     }
   }, [searchParams])
+
+  // Payment-required gate
+  if (gateStatus === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#05070B]">
+        <motion.div
+          animate={{ opacity: [0.3, 0.7, 0.3] }}
+          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+          className="text-micro text-[#F6F5F3]/30"
+        >
+          Loading Defrag space…
+        </motion.div>
+      </div>
+    )
+  }
+
+  if (gateStatus === "blocked") {
+    return <UpgradeBanner />
+  }
 
   return (
     <>

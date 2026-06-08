@@ -4,6 +4,7 @@ import { getSessionId, cookieHeader } from "./plan.js";
 import { getBaseline, formatBaseline } from "./baseline.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
+import { requireActiveSubscription } from "./billing.js";
 import type {
   ExplainRequest,
   ExplainResponse,
@@ -157,6 +158,10 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   if (!user) {
     return jsonResponse({ error: "Unauthorized" }, 401, CORS_HEADERS);
   }
+
+  // Subscription gate: require active subscription for workspace access
+  const subGate = await requireActiveSubscription(user, req);
+  if (subGate) return subGate;
 
   const sid = await getSessionId(req);
   const body = (await req.json().catch(() => ({}))) as Partial<ExplainRequest> & {

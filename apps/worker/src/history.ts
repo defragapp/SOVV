@@ -3,6 +3,7 @@ import { getSessionId, cookieHeader } from "./plan";
 import type { Interaction } from "@sovereign/core";
 import { getAuthUser, verifyAccessJWT } from "./auth";
 import { mapInteraction, type InteractionRow } from "./db";
+import { requireActiveSubscription } from "./billing";
 
 async function requireSessionAuth(req: Request, env: Env): Promise<Response | null> {
   const user = await getAuthUser(req, env.DB);
@@ -15,6 +16,12 @@ export async function handleHistory(req: Request, env: Env) {
   if (authResponse) {
     return authResponse;
   }
+
+  const user = await getAuthUser(req, env.DB);
+
+  // Subscription gate for workspace route
+  const subGate = await requireActiveSubscription(user, req);
+  if (subGate) return subGate;
 
   const sid = await getSessionId(req);
   if (!sid) {

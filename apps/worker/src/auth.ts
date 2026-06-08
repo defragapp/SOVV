@@ -95,6 +95,8 @@ export function getSessionToken(request: Request): string | null {
   return match ? (match[1] ?? null) : null
 }
 
+import type { D1Database } from "@cloudflare/workers-types";
+
 export function jsonResponse(data: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(data), {
     status,
@@ -111,6 +113,7 @@ export type AuthUser = {
   tier: string
   role: string
   stripe_customer_id: string | null | undefined
+  subscription_status: string
 }
 
 export function generatePromoCode(length = 10): string {
@@ -124,13 +127,13 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
   if (!token) return null
 
   const session = await DB.prepare(
-    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires > ?"
+    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires > ?"
   )
     .bind(token, Date.now())
-    .first<{ id: string; email: string; tier: string; role: string; stripe_customer_id: string | null }>()
+    .first<{ id: string; email: string; tier: string; role: string; stripe_customer_id: string | null; subscription_status: string }>()
 
   if (!session) return null
-  return { ...session, role: session.role || "user" }
+  return { ...session, role: session.role || "user", subscription_status: session.subscription_status || "free" }
 }
 
 const SESSION_TTL = 7 * 24 * 60 * 60
@@ -204,7 +207,7 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
-    return jsonResponse({ id: user.id, email: user.email, tier: user.tier, role: user.role })
+    return jsonResponse({ id: user.id, email: user.email, tier: user.tier, role: user.role, subscription_status: user.subscription_status })
   })
 
   // GET /api/admin/me
@@ -277,8 +280,20 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
   router.get("/api/auth/tier", async (request: Request) => {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
-    if (!user) return jsonResponse({ tier: "free" })
-    return jsonResponse({ tier: user.tier })
+    if (!user) return jsonResponse({ tier: "free", subscription_status: "free" })
+    return jsonResponse({ tier: user.tier, subscription_status: user.subscription_status })
+  })
+
+  // GET /api/auth/subscription — detailed subscription status for payment gating
+  router.get("/api/auth/subscription", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    return jsonResponse({
+      tier: user.tier,
+      subscription_status: user.subscription_status,
+      has_active_subscription: user.subscription_status === "active" || user.tier === "pro",
+    })
   })
 
   // POST /api/auth/logout
