@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import './globals.css';
+import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://defrag.app"),
@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     default: "Sovereign.os",
     template: "%s - Sovereign.os",
   },
-  description: "Your Baseline Design is the source. Sovereign.os is where the work becomes yours. Defrag and Covenant are spaces for relational intelligence and reflection.",
+  description: "Sovereign.os helps you work through the patterns that keep showing up in your relationships, family, messages, grief, and boundaries — then save what you learn before the moment disappears.",
   openGraph: {
     title: "Sovereign.os",
     description: "Your Baseline Design is the source. Sovereign.os is where the work becomes yours.",
@@ -22,14 +22,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="antialiased" style={{ background: "#05070B", color: "#F6F5F3" }}>
-      <body className="min-h-screen overflow-x-hidden" style={{ background: "#05070B", color: "#F6F5F3" }}>
+    <html lang="en" className="antialiased" style={{ background: "#000000", color: "#EDEDED" }}>
+      <body className="min-h-screen overflow-x-hidden" style={{ background: "#000000", color: "#EDEDED" }}>
         {children}
       </body>
     </html>
