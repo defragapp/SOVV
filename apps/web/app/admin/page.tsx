@@ -10,11 +10,12 @@ export const metadata: Metadata = {
 }
 
 async function getAdminUser() {
-  const cookieHeader = cookies().toString()
+  const cookieStore = await cookies()
+  const cookieHeader = cookieStore.toString()
   const headers = new Headers()
   if (cookieHeader) headers.set("cookie", cookieHeader)
 
-  const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "http://localhost:3000"
+  const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://app.defrag.app"
   const res = await fetch(`${base}/api/admin/me`, {
     method: "GET",
     headers,
