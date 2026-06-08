@@ -75,7 +75,7 @@ export default function LandingPage() {
             Holding the pain is.
           </h1>
           <p className="text-body text-foreground-muted max-w-2xl mx-auto mb-10">
-            For the moments you keep replaying, the patterns you keep meeting, and the responses you are ready to change.
+            Sovereign.os gives you a clear understanding of the patterns shaping your relationships, family dynamics, boundaries, and decisions — and the response that changes them.<br/><br/>See what is actually happening. Understand your role in it. Respond differently.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="https://app.defrag.app/app/login" className="btn-primary">

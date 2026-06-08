@@ -63,7 +63,7 @@ export default function YourSpace() {
           <motion.span
             animate={{ opacity: [1, 0.3, 1] }}
             transition={{ repeat: Infinity, duration: 1.4 }}
-            className="font-mono text-[9px] uppercase tracking-widest text-white/20"
+            className="text-micro text-foreground-disabled"
           >
             Loading
           </motion.span>
@@ -73,7 +73,7 @@ export default function YourSpace() {
       {/* Error */}
       {state === "error" && (
         <div className="flex flex-1 items-center justify-center px-4">
-          <p className="font-mono text-[9px] uppercase tracking-widest text-white/20 text-center">
+          <p className="text-micro text-foreground-disabled text-center">
             Library unavailable right now.
           </p>
         </div>
@@ -82,16 +82,16 @@ export default function YourSpace() {
       {/* Empty */}
       {state === "empty" && (
         <div className="flex flex-1 flex-col px-4 py-8 gap-3">
-          <p className="font-mono text-[9px] uppercase tracking-widest text-white/20 mb-1">
+          <p className="text-micro text-foreground-disabled mb-2">
             Library
           </p>
-          <p className="text-sm font-light text-white/30 leading-6">
+          <p className="text-body-sm text-foreground-disabled">
             Nothing saved yet.
           </p>
-          <p className="text-sm font-light text-white/20 leading-6">
+          <p className="text-caption text-foreground-disabled">
             Defrag results, Covenant Briefs, and saved responses all appear here. The AI uses your Library to keep the thread grounded over time.
           </p>
-          <p className="mt-4 font-mono text-[9px] uppercase tracking-widest text-white/15">
+          <p className="mt-6 text-micro text-foreground-disabled opacity-60">
             Save to Sovereign to build your Library.
           </p>
         </div>
@@ -101,16 +101,16 @@ export default function YourSpace() {
       {state === "loaded" && (
         <div className="flex flex-col">
           <div className="px-4 pt-4 pb-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest text-white/25">
+            <span className="text-micro text-foreground-disabled">
               Recent sessions
             </span>
           </div>
 
-          <div className="flex flex-col divide-y divide-[#F6F5F3]/10">
+          <div className="flex flex-col divide-y divide-border">
             {items.map((item) => (
               <div key={item.id} className="px-4 py-3">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-mono text-[9px] uppercase tracking-widest text-white/25">
+                  <span className="text-micro text-foreground-disabled">
                     {MODE_LABELS[item.mode] ?? item.mode}
                   </span>
                   <span className="font-mono text-[9px] uppercase tracking-widest text-white/15">

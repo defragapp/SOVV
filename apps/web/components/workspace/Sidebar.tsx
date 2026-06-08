@@ -38,19 +38,19 @@ export default function Sidebar({
   const peopleList = filtered.filter((p) => p.relation !== "self")
 
   return (
-    <aside className="flex h-full flex-col border-r border-[#F6F5F3]/10 bg-black">
-      <div className="border-b border-[#F6F5F3]/10 p-2">
+    <aside className="flex h-full flex-col border-r border-border bg-background">
+      <div className="border-b border-border p-2">
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search"
-          className="w-full bg-transparent px-2 py-1 font-mono text-xs text-[#F6F5F3] placeholder:text-white/20 focus:outline-none"
+          className="w-full bg-transparent px-2 py-1 text-body-sm text-foreground placeholder:text-foreground-disabled focus:outline-none"
         />
       </div>
 
-      <div className="border-b border-[#F6F5F3]/10 py-2">
-        <span className="block px-4 py-1 font-mono text-[10px] uppercase tracking-widest text-white/30">
+      <div className="border-b border-border py-2">
+        <span className="block px-4 py-1 text-micro text-foreground-disabled">
           Self
         </span>
         {selfList.map((person) => (
@@ -64,7 +64,7 @@ export default function Sidebar({
       </div>
 
       <div className="flex-1 overflow-y-auto py-2">
-        <span className="block px-4 py-1 font-mono text-[10px] uppercase tracking-widest text-white/30">
+        <span className="block px-4 py-1 text-micro text-foreground-disabled">
           People
         </span>
         {peopleList.map((person) => (

@@ -101,27 +101,27 @@ export default function CovenantSpacePage() {
   const subscriptionActive = tier === "pro" || subscriptionStatus === "active"
 
   return (
-    <div className="min-h-screen bg-black text-[#F6F5F3] flex flex-col">
+    <div className="min-h-[100dvh] bg-background text-foreground flex flex-col safe-bottom">
 
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <motion.header
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="flex h-12 shrink-0 items-center justify-between border-b border-[rgba(255,255,255,0.08)] px-8 bg-black/80 backdrop-blur-xl sticky top-0 z-40"
+        className="flex h-12 shrink-0 items-center justify-between border-b border-border px-4 sm:px-8 surface-glass sticky top-0 z-40 safe-top"
       >
         <div className="flex items-center gap-3">
-          <Link href="/" className="text-micro text-[#F6F5F3]/25 hover:text-[#F6F5F3]/50 transition-colors">
+          <Link href="/" className="text-micro text-foreground-disabled hover:text-white transition-colors">
             Sovereign.os
           </Link>
-          <span className="text-[#F6F5F3]/15 text-micro">/</span>
-          <span className="text-micro text-[#F6F5F3]/40">Covenant space</span>
+          <span className="text-foreground-disabled text-micro">/</span>
+          <span className="text-micro text-foreground-muted">Covenant space</span>
         </div>
         <div className="flex items-center gap-4">
           {tier === "pro" && (
             <span className="text-micro text-[#F6F5F3]/25 border border-[rgba(255,255,255,0.1)] px-2 py-0.5 rounded-iOS">Pro</span>
           )}
-          <Link href="/apps/defrag" className="text-micro text-[#F6F5F3]/30 hover:text-[#F6F5F3]/60 transition-colors">
+          <Link href="/apps/defrag" className="text-micro text-foreground-disabled hover:text-white transition-colors">
             Defrag space
           </Link>
           <form action="/api/auth/logout" method="POST">

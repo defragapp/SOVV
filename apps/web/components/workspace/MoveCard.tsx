@@ -9,14 +9,14 @@ const _DIFFICULTY = {
 
 export default function MoveCard({ move }: { move: Move }) {
   return (
-    <div className="px-4 py-4">
+    <div className="card-flat px-5 py-4 mb-4">
       <div className="flex items-center justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-white/30">
+        <span className="text-micro text-foreground-disabled">
           Best Next Response
         </span>
       </div>
-      <p className="mt-2 text-sm font-light text-[#F6F5F3]">{move.label}</p>
-      <p className="mt-1 text-sm font-light leading-6 text-white/60">
+      <p className="mt-3 text-body-sm text-foreground">{move.label}</p>
+      <p className="mt-1.5 text-caption">
         {move.description}
       </p>
     </div>

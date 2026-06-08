@@ -14,16 +14,16 @@ function WhyThisAnswer({ message }: { message: ThreadMessage }) {
   if (!meta) return null
 
   return (
-    <div className="border-t border-[#F6F5F3]/10">
+    <div className="border-t border-border">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between px-4 py-3 text-left"
       >
-        <span className="font-mono text-[9px] uppercase tracking-widest text-white/25">
+        <span className="text-micro text-foreground-disabled">
           Why this answer?
         </span>
-        <span className="font-mono text-[9px] text-white/20">
+        <span className="text-micro text-foreground-disabled">
           {open ? "−" : "+"}
         </span>
       </button>
@@ -44,10 +44,10 @@ function WhyThisAnswer({ message }: { message: ThreadMessage }) {
           />
           {message.insights && message.insights.length > 0 && (
             <div className="pt-1">
-              <span className="font-mono text-[9px] uppercase tracking-widest text-white/20">
+              <span className="text-micro text-foreground-disabled">
                 Confidence
               </span>
-              <span className="ml-2 font-mono text-[9px] uppercase tracking-widest text-white/35">
+              <span className="ml-2 text-micro text-foreground-muted">
                 {message.insights.length >= 3 ? "High" : message.insights.length >= 1 ? "Medium" : "Low"}
               </span>
             </div>
@@ -69,7 +69,7 @@ function SourceRow({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="font-mono text-[9px] uppercase tracking-widest text-white/25">
+      <span className="text-micro text-foreground-disabled">
         {label}
       </span>
       <span
@@ -121,7 +121,7 @@ export default function ContextPanel({
             Right Now
           </span>
           {hasContent && (
-            <span className="font-mono text-[9px] uppercase tracking-widest text-white/20">
+            <span className="text-micro text-foreground-disabled">
               Active pattern
             </span>
           )}

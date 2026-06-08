@@ -20,15 +20,15 @@ function FragmentLoader() {
       {Array.from({ length: 12 }, (_, i) => (
         <motion.span
           key={i}
-          className="fragment-char"
-          animate={{ opacity: [0.05, 0.35, 0.05] }}
+          className="text-foreground-disabled"
+          animate={{ opacity: [0.1, 0.4, 0.1] }}
           transition={{ duration: 1.2, delay: i * 0.08, repeat: Infinity, ease: "easeInOut" }}
-          style={{ fontSize: "0.55rem" }}
+          style={{ fontSize: "0.55rem", fontFamily: "monospace" }}
         >
           {chars[i % chars.length]}
         </motion.span>
       ))}
-      <span className="text-micro ml-2 text-[#F6F5F3]/25">Processing</span>
+      <span className="text-micro ml-2 text-foreground-disabled">Processing</span>
     </div>
   );
 }
@@ -127,14 +127,14 @@ export default function Thread({
     <div className="flex h-full flex-col border-r border-[#F6F5F3]/8">
 
       {/* ── Category selector ─────────────────────────────────────────── */}
-      <div className="shrink-0 border-b border-[#F6F5F3]/8 px-4 py-2">
+      <div className="shrink-0 border-b border-border px-4 py-2">
         <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
-              className={`shrink-0 font-mono text-[8px] uppercase tracking-widest px-2.5 py-1.5 border transition-colors touch-target min-h-[36px] ${
+              className={`shrink-0 text-micro px-3 py-1.5 border transition-colors touch-target min-h-[36px] ${
                 activeCategory === cat
                   ? "border-[#F6F5F3]/35 text-[#F6F5F3]/80 bg-[#F6F5F3]/05"
                   : "border-[#F6F5F3]/10 text-[#F6F5F3]/28 hover:border-[#F6F5F3]/22 hover:text-[#F6F5F3]/50"
@@ -147,10 +147,10 @@ export default function Thread({
           <button
             type="button"
             onClick={() => setShowUpload(!showUpload)}
-            className={`shrink-0 font-mono text-[8px] uppercase tracking-widest px-2.5 py-1.5 border transition-colors touch-target min-h-[36px] ${
+            className={`shrink-0 text-micro px-3 py-1.5 border transition-colors touch-target min-h-[36px] ${
               showUpload
-                ? "border-[#F6F5F3]/35 text-[#F6F5F3]/80"
-                : "border-[#F6F5F3]/10 text-[#F6F5F3]/28 hover:border-[#F6F5F3]/22"
+                ? "border-focus text-foreground"
+                : "border-border text-foreground-disabled hover:border-focus"
             }`}
             aria-label="Upload screenshot"
           >
@@ -167,14 +167,14 @@ export default function Thread({
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden border-b border-[#F6F5F3]/8"
+            className="overflow-hidden border-b border-border"
           >
             <div className="px-4 py-4 space-y-3">
               <p className="text-label">Screenshot or image</p>
 
               {/* Honest gate — OCR not yet available */}
-              <div className="border border-[#F6F5F3]/10 bg-[#F6F5F3]/02 p-4 space-y-2">
-                <p className="text-micro text-[#F6F5F3]/35">Image review not yet available</p>
+              <div className="border border-border bg-surface p-4 space-y-2">
+                <p className="text-micro text-foreground-muted">Image review not yet available</p>
                 <p className="text-caption text-xs leading-6">
                   Image review is not fully available yet. Paste the message text here for now.
                 </p>
@@ -193,7 +193,7 @@ export default function Thread({
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="sovv-button py-2.5 px-4 text-[9px] w-full"
+                  className="btn-secondary py-2.5 px-4 text-[9px] w-full"
                   disabled
                 >
                   Choose image (PNG, JPG, WebP)
