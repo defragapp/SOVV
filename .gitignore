@@ -81,3 +81,4 @@ packages/core/src/geneKeyMeanings.ts
 packages/core/src/geneKeys.ts
 packages/core/src/geneKeyMeanings.ts
 .wrangler/
+.dev.vars
