@@ -2,54 +2,43 @@
   <title id="bm-title">Sovereign.os</title>
   <desc id="bm-desc">Sovereign.os brand mark — geometric structure representing pattern, clarity, and private intelligence.</desc>
 
-  <!-- Background -->
-  <rect width="1024" height="1024" fill="#05070B"/>
+  <rect width="1024" height="1024" fill="#020202"/>
 
-  <!-- Scan lines texture -->
-  <rect width="1024" height="1024" fill="url(#scanlines)" opacity="0.3"/>
+  <!-- Subtle gradient glow -->
+  <circle cx="512" cy="512" r="400" fill="url(#core-glow)" opacity="0.4" />
   <defs>
-    <pattern id="scanlines" x="0" y="0" width="1" height="4" patternUnits="userSpaceOnUse">
-      <rect x="0" y="0" width="1" height="1" fill="rgba(246,245,243,0.04)"/>
+    <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <pattern id="scanlines" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="10" cy="10" r="1" fill="#FFFFFF" fill-opacity="0.08"/>
     </pattern>
   </defs>
 
-  <!-- Outer frame — sharp corners -->
-  <rect x="96" y="96" width="832" height="832" fill="none" stroke="#F6F5F3" stroke-opacity="0.10" stroke-width="1"/>
+  <!-- Point grid texture -->
+  <rect width="1024" height="1024" fill="url(#scanlines)"/>
 
-  <!-- Grid structure -->
-  <line x1="96" y1="373" x2="928" y2="373" stroke="#F6F5F3" stroke-opacity="0.05" stroke-width="1"/>
-  <line x1="96" y1="651" x2="928" y2="651" stroke="#F6F5F3" stroke-opacity="0.05" stroke-width="1"/>
-  <line x1="373" y1="96" x2="373" y2="928" stroke="#F6F5F3" stroke-opacity="0.05" stroke-width="1"/>
-  <line x1="651" y1="96" x2="651" y2="928" stroke="#F6F5F3" stroke-opacity="0.05" stroke-width="1"/>
+  <!-- Geometric frame -->
+  <rect x="128" y="128" width="768" height="768" rx="32" fill="none" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="2"/>
+  <rect x="160" y="160" width="704" height="704" rx="24" fill="none" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="1"/>
 
-  <!-- Concentric rings — structural map -->
-  <circle cx="512" cy="512" r="200" fill="none" stroke="#F6F5F3" stroke-opacity="0.12" stroke-width="1"/>
-  <circle cx="512" cy="512" r="140" fill="none" stroke="#F6F5F3" stroke-opacity="0.08" stroke-width="1"/>
-  <circle cx="512" cy="512" r="80" fill="none" stroke="#F6F5F3" stroke-opacity="0.06" stroke-width="1"/>
+  <!-- Inner core rings -->
+  <circle cx="512" cy="512" r="240" fill="none" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="2"/>
+  <circle cx="512" cy="512" r="160" fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="8 8"/>
+  <circle cx="512" cy="512" r="80" fill="none" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="2"/>
 
-  <!-- Cardinal axes -->
-  <line x1="512" y1="312" x2="512" y2="712" stroke="#F6F5F3" stroke-opacity="0.22" stroke-width="1"/>
-  <line x1="312" y1="512" x2="712" y2="512" stroke="#F6F5F3" stroke-opacity="0.22" stroke-width="1"/>
+  <!-- Axis intersections -->
+  <line x1="512" y1="272" x2="512" y2="752" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="1"/>
+  <line x1="272" y1="512" x2="752" y2="512" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="1"/>
 
-  <!-- Diagonal structure -->
-  <line x1="370" y1="370" x2="654" y2="654" stroke="#F6F5F3" stroke-opacity="0.07" stroke-width="1"/>
-  <line x1="654" y1="370" x2="370" y2="654" stroke="#F6F5F3" stroke-opacity="0.07" stroke-width="1"/>
+  <!-- Center impact -->
+  <circle cx="512" cy="512" r="8" fill="#FFFFFF" fill-opacity="0.9"/>
+  <circle cx="512" cy="512" r="24" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1"/>
 
-  <!-- Center point — white -->
-  <circle cx="512" cy="512" r="5" fill="#F6F5F3" fill-opacity="0.70"/>
-  <circle cx="512" cy="512" r="12" fill="none" stroke="#F6F5F3" stroke-opacity="0.20" stroke-width="1"/>
-
-  <!-- Corner registration marks -->
-  <rect x="96" y="96" width="20" height="1" fill="#F6F5F3" fill-opacity="0.35"/>
-  <rect x="96" y="96" width="1" height="20" fill="#F6F5F3" fill-opacity="0.35"/>
-  <rect x="908" y="96" width="20" height="1" fill="#F6F5F3" fill-opacity="0.35"/>
-  <rect x="927" y="96" width="1" height="20" fill="#F6F5F3" fill-opacity="0.35"/>
-  <rect x="96" y="927" width="20" height="1" fill="#F6F5F3" fill-opacity="0.35"/>
-  <rect x="96" y="908" width="1" height="20" fill="#F6F5F3" fill-opacity="0.35"/>
-  <rect x="908" y="927" width="20" height="1" fill="#F6F5F3" fill-opacity="0.35"/>
-  <rect x="927" y="908" width="1" height="20" fill="#F6F5F3" fill-opacity="0.35"/>
-
-  <!-- Fragment chars — subtle texture -->
-  <text x="140" y="180" font-family="monospace" font-size="14" fill="#F6F5F3" fill-opacity="0.06">01·—/\|_░▒</text>
-  <text x="700" y="880" font-family="monospace" font-size="14" fill="#F6F5F3" fill-opacity="0.06">▓█▄▀■□▪▫◆</text>
+  <!-- High-end accents -->
+  <path d="M512 80 L520 128 L504 128 Z" fill="#FFFFFF" opacity="0.3" />
+  <path d="M512 944 L520 896 L504 896 Z" fill="#FFFFFF" opacity="0.3" />
+  <path d="M80 512 L128 504 L128 520 Z" fill="#FFFFFF" opacity="0.3" />
+  <path d="M944 512 L896 504 L896 520 Z" fill="#FFFFFF" opacity="0.3" />
 </svg>

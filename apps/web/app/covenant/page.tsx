@@ -3,6 +3,8 @@ import Link from "next/link";
 import { SiteShell } from "@/components/marketing/site-shell";
 import { PageHero } from "@/components/marketing/page-hero";
 import { MotionSection } from "@/components/marketing/motion-section";
+import { FadeUp } from "@/components/ui/fade-up";
+import { Card } from "@/components/marketing/card";
 
 export const metadata: Metadata = {
   title: "Covenant — Sovereign.os",
@@ -11,20 +13,16 @@ export const metadata: Metadata = {
 
 const points = [
   {
-    title: "Structured, not sentimental",
-    body: "Covenant gives spiritual reflection a structured place inside Sovereign.os. It translates the moment into reflection, repair, and a grounded next step — without preaching, certainty, or performance.",
+    title: "Grounded discernment, not certainty.",
+    body: "Covenant gives faith-context reflection a structured place in the work. It translates the moment into reflection, repair, and a grounded next step — without preaching or spiritual shortcuts.",
   },
   {
-    title: "Faith and inner work, connected",
-    body: "Covenant is built for people who want their inner work, relationships, and faith to stay connected. It helps you bring discernment into what you are walking through without turning the platform into a sermon.",
+    title: "Faith and repair, connected.",
+    body: "For users who want faith connected to repair, Covenant helps turn the moment toward reflection and responsibility. It keeps faith and relationships connected without becoming vague or performative.",
   },
   {
-    title: "Private by design",
+    title: "Private by design.",
     body: "Covenant uses the same private space model as Defrag. Covenant Briefs save to your Sovereign.os Library — private, organized, and yours.",
-  },
-  {
-    title: "User-initiated, not default",
-    body: "Covenant only appears when you choose it. It is not the default voice of the platform. Defrag remains the primary relational intelligence space.",
   },
 ];
 
@@ -33,7 +31,6 @@ const useCases = [
   "A grief you are carrying",
   "A decision that involves your values",
   "A pattern you keep returning to",
-  "A moment where faith and relationships intersect",
   "A boundary you are trying to hold with integrity",
 ];
 
@@ -41,92 +38,79 @@ export default function CovenantPage() {
   return (
     <SiteShell>
       <PageHero
-        eyebrow="Covenant space"
-        title="Faith-context reflection for what you are walking through."
-        body="Covenant helps you bring faith, reflection, and grounded discernment into what you are walking through — without turning the platform into performance or certainty."
-      />
+        eyebrow="Covenant Space"
+        title="Faith, reflection, responsibility, and grounded discernment."
+        body="Covenant helps you bring faith, reflection, and grounded discernment into what you are walking through."
+      >
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link href="https://app.defrag.app/apps/covenant" className="btn-primary">
+            Explore Covenant
+          </Link>
+          <Link href="/pricing" className="btn-ghost">
+            View Pro Requirements
+          </Link>
+        </div>
+      </PageHero>
 
-      {/* What Covenant does */}
-      <MotionSection className="px-6 py-24">
-        <div className="mx-auto max-w-5xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-            {points.map((point, i) => (
-              <div
-                key={point.title}
-                className={`border border-white/8 p-8 space-y-3 ${
-                  i % 2 === 1 ? "md:border-l-0" : ""
-                } ${i >= 2 ? "border-t-0" : ""}`}
-              >
-                <h2 className="text-sm font-light text-[#F6F5F3]/80 leading-snug">{point.title}</h2>
-                <p className="text-caption text-xs leading-7">{point.body}</p>
+      <MotionSection className="section-gap container-narrow">
+        <FadeUp>
+          <div className="text-center mb-16 space-y-6">
+             <h2 className="text-headline">Not as certainty. Not as performance. Not as a spiritual shortcut.</h2>
+             <p className="text-body text-foreground-muted">
+                Covenant is for the user who wants faith to stay connected to the work. It helps bring faith, reflection, responsibility, repair, and grounded discernment into what you are walking through — so the next step can be honest, not just emotional.
+             </p>
+          </div>
+        </FadeUp>
+        <div className="space-y-12">
+          {points.map((pt, i) => (
+            <FadeUp key={i} delay={0.1 * i}>
+              <div className="flex flex-col md:flex-row gap-6 items-start border-t border-border pt-12">
+                <div className="w-full md:w-1/3">
+                  <h3 className="text-title">{pt.title}</h3>
+                </div>
+                <div className="w-full md:w-2/3">
+                  <p className="text-body text-foreground-muted">{pt.body}</p>
+                </div>
               </div>
+            </FadeUp>
+          ))}
+        </div>
+      </MotionSection>
+
+      <MotionSection className="section-gap border-y border-border bg-surface">
+        <div className="container-platform max-w-4xl mx-auto">
+          <FadeUp>
+            <div className="text-center mb-12">
+              <h2 className="text-headline mb-6">When to use Covenant</h2>
+              <p className="text-body text-foreground-muted">
+                Covenant is a space to pause and seek context before you react.
+              </p>
+            </div>
+          </FadeUp>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {useCases.map((uc, i) => (
+              <FadeUp key={i} delay={i * 0.05}>
+                <Card className="h-full">
+                   <p className="text-body-sm text-foreground">{uc}</p>
+                </Card>
+              </FadeUp>
             ))}
           </div>
         </div>
       </MotionSection>
 
-      {/* Use cases */}
-      <MotionSection className="border-t border-white/8 px-6 py-24">
-        <div className="mx-auto max-w-3xl space-y-10">
-          <div className="space-y-3">
-            <span className="meta-label">When to use Covenant</span>
-            <h2 className="text-headline">For the moments where faith and life intersect.</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {useCases.map((uc) => (
-              <div key={uc} className="flex items-start gap-3 py-3 border-b border-white/6">
-                <div className="mt-2 h-px w-4 bg-[#7A2020]/50 shrink-0" />
-                <span className="text-caption text-sm">{uc}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </MotionSection>
-
-      {/* Relationship to Defrag */}
-      <MotionSection className="border-t border-white/8 px-6 py-24">
-        <div className="mx-auto max-w-3xl space-y-6">
-          <span className="meta-label">Inside Sovereign.os</span>
-          <h2 className="text-headline">Covenant and Defrag share everything.</h2>
-          <p className="text-body">
-            Covenant and Defrag are spaces inside Sovereign.os. They share your Baseline Design, Library, auth, and subscription. A Covenant Brief and a Defrag result both save to the same Sovereign.os Library. You do not need a separate account, subscription, or Baseline Design for Covenant.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-0 mt-8">
-            {[
-              { label: "Shared", items: ["Baseline Design", "Library", "Auth", "Subscription"] },
-              { label: "Defrag saves", items: ["Relational results", "Best Next Responses", "Patterns", "Watch It"] },
-              { label: "Covenant saves", items: ["Covenant Briefs", "Reflection prompts", "Story connections", "Grounded steps"] },
-            ].map((col, i) => (
-              <div key={col.label} className={`border border-white/8 p-6 space-y-3 ${i > 0 ? "border-l-0" : ""}`}>
-                <p className="text-label">{col.label}</p>
-                {col.items.map((item) => (
-                  <div key={item} className="flex items-center gap-2">
-                    <div className="h-px w-3 bg-[#F6F5F3]/15 shrink-0" />
-                    <span className="text-caption text-xs">{item}</span>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </MotionSection>
-
-      {/* CTA */}
-      <MotionSection className="border-t border-white/8 px-6 py-24 text-center">
-        <div className="mx-auto max-w-xl space-y-6">
-          <span className="space-badge-covenant mx-auto">Covenant space</span>
-          <h2 className="text-headline mt-4">Available on Pro.</h2>
-          <p className="text-body">
-            Covenant is included in the Sovereign.os Pro plan alongside Defrag. One subscription. Both spaces. Your Baseline Design and Library shared across everything.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 pt-2">
-            <Link href="https://app.defrag.app/apps/covenant" className="sovv-button py-4 px-8">
-              Enter Covenant space
-            </Link>
-            <Link href="/pricing" className="sovv-button-ghost py-4">
-              View pricing →
-            </Link>
-          </div>
+      <MotionSection className="section-gap bg-hero-glow">
+        <div className="container-platform text-center max-w-2xl mx-auto">
+          <FadeUp>
+            <h2 className="text-headline mb-8">
+              Keep faith and repair connected.
+            </h2>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="https://app.defrag.app/apps/covenant" className="btn-primary">
+                Enter Covenant
+              </Link>
+            </div>
+          </FadeUp>
         </div>
       </MotionSection>
     </SiteShell>

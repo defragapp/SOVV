@@ -2,145 +2,96 @@ import type { Metadata } from "next";
 import { SiteShell } from "@/components/marketing/site-shell";
 import { PageHero } from "@/components/marketing/page-hero";
 import { MotionSection } from "@/components/marketing/motion-section";
+import { FadeUp } from "@/components/ui/fade-up";
+import { Card } from "@/components/marketing/card";
 import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Product — Sovereign.os",
-  description: "Defrag helps you work through the patterns that keep showing up in your relationships, family, messages, grief, and boundaries. Your Baseline Design is the source.",
+  description: "Sovereign.os helps you work through the patterns that keep showing up in your relationships, family, messages, grief, and boundaries. Your Baseline Design is the source.",
   openGraph: {
     title: "Product — Sovereign.os",
-    description: "Defrag helps you work through the patterns that keep showing up. Your Baseline Design is the source.",
+    description: "Sovereign.os helps you work through the patterns that keep showing up. Your Baseline Design is the source.",
   },
 };
 
 const surfaces = [
   {
-    label: "Your Baseline Design",
+    title: "Your Baseline Design",
     body: "The starting map. How you tend to process, respond, connect, protect, communicate, and return to center. Every thread is grounded here. Private, never exposed in outputs.",
     accent: true,
   },
   {
-    label: "The sky over you",
-    body: "The current timing layer. It shows what is louder right now — and why the moment may feel bigger than it should.",
+    title: "Defrag",
+    body: "For the moment that will not leave you alone. Defrag helps you slow the moment down, separate what happened from what repeated, and find the next response that does not keep feeding the same pattern.",
     accent: false,
   },
   {
-    label: "Active pattern",
-    body: "The part of your Baseline Design that is most active in this moment. Defrag helps you understand what is driving the dynamic before it takes over.",
-    accent: true,
-  },
-  {
-    label: "The Loop",
-    body: "The repeating pattern that starts when pressure rises. What happened matters. What repeats matters more. Defrag shows where it begins so you can choose a different response.",
+    title: "Covenant",
+    body: "For the user who wants faith to stay connected to the work. Covenant helps bring faith, reflection, responsibility, repair, and grounded discernment into what you are walking through — so the next step can be honest, not just emotional.",
     accent: false,
   },
   {
-    label: "The Twist",
-    body: "Where a real strength bends under pressure. Some pain becomes a role. Some roles can be put down. Defrag shows where it twists and how to bring it back.",
+    title: "The Library",
+    body: "Your Library keeps what the moment taught you. The response you found. The pattern you finally saw. The boundary that became clear. Save to Sovereign before the moment disappears.",
     accent: true,
   },
   {
-    label: "Best Next Response",
-    body: "The thing you can say, do, wait on, or practice that gives the moment the best chance to stay clear. Your next response can change the pattern.",
-    accent: true,
-  },
-  {
-    label: "Your Story",
-    body: "A saved record of what was active, what the loop was, and what response brought you back to center. Save what you learn before the moment disappears.",
-    accent: false,
-  },
-  {
-    label: "Invite Privately",
-    body: "When both sides matter, invite privately. Defrag can work with your side of this. To compare both Baseline Designs, invite them privately — with consent, not assumption.",
+    title: "Invite Privately",
+    body: "Two people can live through the same conversation and leave with completely different truths. The other side is not always the enemy. Sometimes it is another nervous system, another history, another map. When both sides matter, invite privately.",
     accent: false,
   },
 ];
-
-
 
 export default function ProductPage() {
   return (
     <SiteShell>
       <PageHero
-        eyebrow="Product"
-        title="What repeats matters more than what happened."
-        body="Defrag helps you work through the patterns that keep showing up in your relationships, family, messages, grief, and boundaries. Your Baseline Design is the source."
-      />
+        eyebrow="The System"
+        title="Turn charged conversations into something you can actually work with."
+        body="Sovereign.os helps you work through the moments that keep replaying — the message, the conflict, the family role, the grief, the boundary — and save what you learn before the pattern takes over again."
+      >
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link href="https://app.defrag.app/app/login" className="btn-primary">
+            Enter Sovereign.os
+          </Link>
+        </div>
+      </PageHero>
 
-      {/* Surfaces */}
-      <MotionSection className="px-6 py-24">
-        <div className="mx-auto max-w-3xl">
-          <div className="space-y-0">
+      <MotionSection className="section-gap container-platform">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          <FadeUp>
+             <h2 className="text-headline mb-6">You do not need a verdict.<br/>You need a way through.</h2>
+             <p className="text-body text-foreground-muted">
+                The conversation ended. Your body did not. Some messages do not need a reply yet. They need context. 
+                Sovereign.os gives those moments structure — without turning them into a diagnosis, a score, or a verdict.
+             </p>
+          </FadeUp>
+          <div className="space-y-6">
             {surfaces.map((s, i) => (
-              <div
-                key={s.label}
-                className={`flex gap-8 py-10 ${i < surfaces.length - 1 ? "border-b border-white/8" : ""}`}
-              >
-                <div className="shrink-0 w-6 mt-1">
-                  <span className="block h-1.5 w-1.5 bg-[#F6F5F3]/25" />
-                </div>
-                <div className={s.accent ? "border-l border-white/15 pl-4" : ""}>
-                  <h3 className="text-sm font-light text-[#F6F5F3]/80 mb-2">{s.label}</h3>
-                  <p className="text-caption text-xs leading-7">{s.body}</p>
-                </div>
-              </div>
+              <FadeUp key={i} delay={i * 0.1}>
+                 <Card glow={s.accent} className="h-full">
+                    <h3 className="text-title mb-4">{s.title}</h3>
+                    <p className="text-body-sm text-foreground-muted">{s.body}</p>
+                 </Card>
+              </FadeUp>
             ))}
           </div>
         </div>
       </MotionSection>
 
-      {/* Defrag section */}
-      <MotionSection className="border-t border-white/8 px-6 py-24">
-        <div className="mx-auto max-w-3xl space-y-8">
-          <div className="space-y-3">
-            <span className="space-badge-defrag">Defrag space</span>
-            <h2 className="text-headline mt-3">The relational intelligence space.</h2>
-            <p className="text-body">
-              Defrag helps you work through the moment without losing the larger pattern. Use it for messages, conflict, grief, family roles, boundaries, parenting, and team dynamics.
-            </p>
-          </div>
-          <div className="space-y-4 text-body text-sm">
-            <p>
-              Conflict often makes one explanation feel obvious. They hate me. They do not care. They are avoiding me. They are trying to control me.
-            </p>
-            <p>
-              Defrag helps show what else may be true. Maybe they shut down. Maybe they need more time. Maybe pushing makes them pull away. Maybe their loop is active too.
-            </p>
-            <p className="text-[#F6F5F3]/30">
-              The goal is not to excuse anyone. The goal is to see the pattern clearly enough to choose a better response.
-            </p>
-          </div>
-        </div>
-      </MotionSection>
-
-      {/* Covenant section */}
-      <MotionSection className="border-t border-white/8 px-6 py-24">
-        <div className="mx-auto max-w-3xl space-y-8">
-          <div className="space-y-3">
-            <span className="space-badge-covenant">Covenant space</span>
-            <h2 className="text-headline mt-3">Faith-context reflection.</h2>
-            <p className="text-body">
-              Covenant helps you bring faith, reflection, and grounded discernment into what you are walking through. For users who want faith connected to repair — without becoming vague, performative, or certain where certainty does not belong.
-            </p>
-          </div>
-        </div>
-      </MotionSection>
-
-      {/* CTA */}
-      <MotionSection className="border-t border-white/8 px-6 py-24 text-center">
-        <div className="mx-auto max-w-2xl space-y-6">
-          <p className="text-[#F6F5F3]/35 text-sm font-light">
-            Not therapy. Not diagnosis. Not generic advice.
-          </p>
-          <h2 className="text-headline">Start with your Baseline Design.</h2>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="https://app.defrag.app/app/login" className="sovv-button-primary inline-flex py-4 px-10">
-              Start Baseline Design
-            </Link>
-            <Link href="https://app.defrag.app/apps/defrag" className="sovv-button inline-flex py-4 px-10">
-              Enter Defrag space
-            </Link>
-          </div>
+      <MotionSection className="section-gap border-t border-border bg-hero-glow">
+        <div className="container-platform text-center max-w-2xl mx-auto">
+          <FadeUp>
+            <h2 className="text-headline mb-8">
+              Your next response can change the pattern.
+            </h2>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="https://app.defrag.app/settings" className="btn-primary">
+                Start your Baseline Design
+              </Link>
+            </div>
+          </FadeUp>
         </div>
       </MotionSection>
     </SiteShell>

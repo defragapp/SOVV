@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,13 +19,23 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/brand-mark.svg",
+    apple: "/brand-mark.svg",
   },
+  manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#020202",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="antialiased" style={{ background: "#05070B", color: "#F6F5F3" }}>
-      <body className="min-h-screen overflow-x-hidden" style={{ background: "#05070B", color: "#F6F5F3" }}>
+    <html lang="en" className="antialiased">
+      <body className="min-h-screen overflow-x-hidden bg-background text-foreground overscroll-none safe-top safe-bottom">
         {children}
       </body>
     </html>

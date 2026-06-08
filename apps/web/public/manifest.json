@@ -1,0 +1,16 @@
+{
+  "name": "Sovereign.os",
+  "short_name": "Sovereign",
+  "description": "Sovereign.os helps you work through the patterns that keep showing up.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020202",
+  "theme_color": "#020202",
+  "icons": [
+    {
+      "src": "/brand-mark.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

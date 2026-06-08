@@ -60,21 +60,21 @@ export default function Shell({ tier, spaceLabel = "Defrag" }: ShellProps) {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="flex h-screen w-screen flex-col bg-background text-foreground"
+      className="flex h-[100dvh] w-screen flex-col bg-background text-foreground"
     >
       {/* ── Sticky top-bar with 1px bottom border ─────────────────────── */}
       <FadeUp className="shrink-0">
-        <header className="flex h-10 items-center justify-between border-b border-[rgba(255,255,255,0.08)] px-8 bg-black/60 backdrop-blur-xl sticky top-0 z-40">
+        <header className="flex h-12 items-center justify-between border-b border-border px-4 sm:px-8 surface-glass sticky top-0 z-40 safe-top">
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="font-mono text-[9px] uppercase tracking-widest text-white/25 hover:text-white/50 transition-colors duration-200"
+              className="text-micro hover:text-white transition-colors duration-200"
               aria-label="Sovereign.os home"
             >
               Sovereign.os
             </Link>
-            <span className="text-white/15 font-mono text-[9px]">/</span>
-            <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">
+            <span className="text-foreground-disabled text-micro">/</span>
+            <span className="text-micro text-foreground-muted">
               {spaceLabel} space
             </span>
           </div>
