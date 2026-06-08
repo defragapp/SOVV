@@ -33,7 +33,7 @@ interface EmailPayload {
  * Binding name: EMAIL (declared in wrangler.toml [[send_email]] once configured).
  */
 async function sendViaBinding(emailBinding: SendEmail, payload: EmailPayload): Promise<void> {
-  const message = new EmailMessage(FROM, payload.to, {
+  const message = new (globalThis as any).EmailMessage(FROM, payload.to, {
     headers: {
       "Subject": payload.subject,
       "Reply-To": REPLY_TO,

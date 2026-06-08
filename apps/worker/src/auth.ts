@@ -78,6 +78,7 @@ export function sessionCookie(token: string, maxAge = 7 * 24 * 60 * 60): string 
     `__sov_session=${token}`,
     `Max-Age=${maxAge}`,
     "Path=/",
+    "Domain=.defrag.app",
     "HttpOnly",
     "Secure",
     "SameSite=Lax",
@@ -85,7 +86,7 @@ export function sessionCookie(token: string, maxAge = 7 * 24 * 60 * 60): string 
 }
 
 export function clearCookie(): string {
-  return "__sov_session=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax"
+  return "__sov_session=; Max-Age=0; Path=/; Domain=.defrag.app; HttpOnly; Secure; SameSite=Lax"
 }
 
 export function getSessionToken(request: Request): string | null {
