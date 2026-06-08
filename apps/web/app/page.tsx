@@ -38,7 +38,7 @@ const BENTO_ITEMS = [
 
 export default function LandingPage() {
   return (
-    <div style={{ minHeight: "100vh", background: "#000000", color: "#EDEDED", fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}>
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
 
       {/* ── Navbar ─────────────────────────────────────────────────────── */}
       <nav style={{

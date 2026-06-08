@@ -24,16 +24,11 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#000000", color: "#EDEDED", display: "flex", flexDirection: "column", fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
       {/* ── iOS-style Navbar ─────────────────────────────────────────── */}
       <header style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
-        height: "64px",
-        background: "rgba(0,0,0,0.6)",
-        backdropFilter: "blur(20px) saturate(180%)",
-        WebkitBackdropFilter: "blur(20px) saturate(180%)",
-        borderBottom: "1px solid rgba(255,255,255,0.08)",
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, height: "64px", background: "rgba(2, 2, 2, 0.6)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", borderBottom: "1px solid var(--border-light)"
       }}>
         <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 2rem", height: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 

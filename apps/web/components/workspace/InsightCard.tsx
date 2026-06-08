@@ -14,20 +14,20 @@ const SOURCE_LABELS = {
 
 export default function InsightCard({ insight }: { insight: Insight }) {
   return (
-    <div className="px-4 py-4">
-      <div className="flex items-center justify-between">
+    <div className="card-flat px-5 py-4 mb-4">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="block h-1.5 w-1.5 bg-[#F6F5F3]/40" />
-          <span className="font-mono text-[10px] uppercase tracking-widest text-white/30">
+          <span className="block h-[5px] w-[5px] rounded-full bg-white/40" />
+          <span className="text-micro">
             {TYPE_LABELS[insight.type]}
           </span>
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-widest text-white/20">
+        <span className="text-micro text-white/20">
           {SOURCE_LABELS[insight.source]}
         </span>
       </div>
-      <p className="mt-2 text-sm font-light text-[#F6F5F3]">{insight.title}</p>
-      <p className="mt-1 text-sm font-light leading-6 text-white/60">
+      <p className="text-body-sm text-foreground">{insight.title}</p>
+      <p className="mt-1.5 text-caption">
         {insight.detail}
       </p>
     </div>

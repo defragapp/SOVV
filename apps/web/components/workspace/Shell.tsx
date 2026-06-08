@@ -60,7 +60,7 @@ export default function Shell({ tier, spaceLabel = "Defrag" }: ShellProps) {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="flex h-screen w-screen flex-col bg-black text-[#F6F5F3]"
+      className="flex h-screen w-screen flex-col bg-background text-foreground"
     >
       {/* ── Sticky top-bar with 1px bottom border ─────────────────────── */}
       <FadeUp className="shrink-0">

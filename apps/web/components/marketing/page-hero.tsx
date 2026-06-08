@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { motion } from "framer-motion";
 
 export function PageHero({
   eyebrow,
@@ -12,46 +15,61 @@ export function PageHero({
   children?: ReactNode;
 }) {
   return (
-    <div style={{
-      background: "#05070B",
-      borderBottom: "1px solid rgba(246,245,243,0.10)",
-      padding: "6rem 2rem 5rem",
-      textAlign: "center",
-      backgroundImage: "linear-gradient(rgba(246,245,243,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(246,245,243,0.025) 1px, transparent 1px)",
-      backgroundSize: "64px 64px",
-    }}>
-      <div style={{ maxWidth: "52rem", margin: "0 auto" }}>
+    <div className="relative overflow-hidden section-gap border-b border-white/5 bg-background">
+      {/* Background Subtle Gradient */}
+      <div className="absolute inset-0 z-0 bg-hero-glow opacity-50" />
+      
+      {/* Background Grid Pattern */}
+      <div 
+        className="absolute inset-0 z-0 opacity-20 pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+      
+      <div className="relative z-10 container-narrow text-center">
         {eyebrow && (
-          <p style={{
-            fontFamily: "'JetBrains Mono', 'Cascadia Code', ui-monospace, Menlo, monospace",
-            fontSize: "0.6875rem", letterSpacing: "0.25em", textTransform: "uppercase",
-            color: "rgba(246,245,243,0.40)", marginBottom: "1.5rem",
-          }}>
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="text-label mb-6"
+          >
             {eyebrow}
-          </p>
+          </motion.p>
         )}
-        <h1 style={{
-          fontSize: "clamp(2rem, 4vw, 3.25rem)",
-          fontWeight: 300,
-          letterSpacing: "-0.03em",
-          lineHeight: 1.1,
-          color: "#F6F5F3",
-          marginBottom: body ? "1.5rem" : 0,
-        }}>
+        
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="text-headline mb-6"
+        >
           {title}
-        </h1>
+        </motion.h1>
+        
         {body && (
-          <p style={{
-            fontSize: "1.0625rem",
-            lineHeight: 1.75,
-            color: "rgba(246,245,243,0.55)",
-            maxWidth: "38rem",
-            margin: "0 auto",
-          }}>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="text-body max-w-2xl mx-auto"
+          >
             {body}
-          </p>
+          </motion.p>
         )}
-        {children && <div style={{ marginTop: "2.5rem" }}>{children}</div>}
+        
+        {children && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-10"
+          >
+            {children}
+          </motion.div>
+        )}
       </div>
     </div>
   );
