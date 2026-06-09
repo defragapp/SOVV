@@ -107,10 +107,23 @@ export default function Shell({ tier, spaceLabel = "Defrag" }: ShellProps) {
       </FadeUp>
 
       {/* ── Main bento grid ──────────────────────────────────────────── */}
-      <div className="grid flex-1 grid-cols-[220px_1fr_280px] overflow-hidden gap-0">
+      {/* Mobile segmented control */}
+      <div className="md:hidden flex items-center justify-around border-b border-border bg-surface shrink-0">
+        {(["right-now", "your-space", "sidebar"] as const).map(panel => (
+          <button
+            key={panel}
+            onClick={() => setRightPanel(panel as RightPanel)}
+            className={`flex-1 py-3 text-micro transition-colors ${rightPanel === panel || (panel === "sidebar" && rightPanel !== "right-now" && rightPanel !== "your-space") ? "text-foreground border-b-2 border-foreground" : "text-foreground-muted"}`}
+          >
+            {panel === "right-now" ? "Thread" : panel === "your-space" ? "Library" : "People"}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex-1 flex flex-col md:grid md:grid-cols-[220px_1fr_280px] overflow-hidden gap-0 relative">
         {/* Sidebar — left column */}
-        <FadeUp delay={0.05} className="h-full overflow-hidden border-r border-[rgba(255,255,255,0.06)]">
-          <div className="h-full bg-black/30 backdrop-blur-sm">
+        <FadeUp delay={0.05} className={`${rightPanel !== "right-now" && rightPanel !== "your-space" ? "flex" : "hidden"} md:block h-full overflow-hidden border-r border-border absolute md:relative inset-0 z-20 md:z-0 bg-background`}>
+          <div className="h-full bg-surface">
             <Sidebar
               selectedPerson={selectedPerson}
               onSelectPerson={handleSelectPerson}
@@ -119,7 +132,7 @@ export default function Shell({ tier, spaceLabel = "Defrag" }: ShellProps) {
         </FadeUp>
 
         {/* Thread — center column (main content area) */}
-        <FadeUp delay={0.1} className="h-full overflow-hidden relative">
+        <FadeUp delay={0.1} className={`${rightPanel === "right-now" ? "flex" : "hidden"} md:block h-full overflow-hidden relative`}>
           {/* Subtle ambient glow */}
           <div
             className="pointer-events-none absolute inset-0 z-0"
@@ -127,7 +140,7 @@ export default function Shell({ tier, spaceLabel = "Defrag" }: ShellProps) {
               backgroundImage: "radial-gradient(circle at 50% 30%, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0) 60%)",
             }}
           />
-          <div className="relative z-10 h-full bg-black/20 backdrop-blur-sm">
+          <div className="relative z-10 h-full bg-background w-full">
             <Thread
               selectedPerson={selectedPerson}
               messages={messages}
