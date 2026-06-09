@@ -1,4 +1,4 @@
-# Product Language Standard
+# Product Language
 
 ## Canonical Terms
 
@@ -44,33 +44,6 @@ Use these terms exactly as written in all user-facing copy, documentation, onboa
 
 ---
 
-## Forbidden Terms in User-Facing Copy
-
-| Forbidden | Use Instead |
-|---|---|
-| DEFRAG (in body copy) | Defrag |
-| Workbench | space, guided space, reflection space |
-| workspace (for spaces) | space |
-| Design (alone, user-facing) | Baseline Design |
-| Your Baseline (as product term) | Your Baseline Design |
-| "got lit up" / "lit up" (body copy) | "what is active in the moment", "active pattern", "Defrag helps surface the pattern" |
-| artifact | result, output, saved item |
-| read | see, show, surface |
-| signal | pattern, activation |
-| mirror | reflect, show |
-| field | — (avoid) |
-| rings | — (avoid) |
-| cards | — (avoid) |
-| therapy replacement | — (never use) |
-| diagnosis | — (never use) |
-| compatibility score | — (never use) |
-| trigger | activation, pattern firing |
-| trauma | — (avoid in product copy) |
-| healing | — (avoid in product copy) |
-
-**Note on "What got lit up":** This phrase may remain as a UI label in the product interface (e.g., section headers, card labels) where it functions as a named product concept. It must not appear in body copy, marketing descriptions, FAQ answers, or documentation prose. Use "active pattern" or "what is active in the moment" in those contexts.
-
----
 
 ## Defrag Scope Statement
 
