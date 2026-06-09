@@ -33,37 +33,13 @@ const BENTO_ITEMS = [
   },
 ];
 
+import { SiteShell } from "@/components/marketing/site-shell";
+
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+    <SiteShell>
       
-      {/* ── Navbar ─────────────────────────────────────────────────────── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 h-16 surface-glass border-b border-border flex items-center">
-        <div className="container-platform w-full flex items-center justify-between">
-          <Link href="/" className="text-label text-foreground hover:text-white transition-colors">
-            SOVEREIGN.OS
-          </Link>
-          <div className="hidden md:flex items-center gap-8">
-            {[
-              { href: "/product", label: "Product" },
-              { href: "/pricing", label: "Pricing" },
-              { href: "/covenant", label: "Covenant" },
-            ].map(item => (
-              <Link key={item.href} href={item.href} className="text-body-sm text-foreground-muted hover:text-white transition-colors">
-                {item.label}
-              </Link>
-            ))}
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="https://app.defrag.app/app/login" className="hidden md:block text-body-sm text-foreground-disabled hover:text-white transition-colors">
-              Sign in
-            </Link>
-            <Link href="https://app.defrag.app/app/login" className="btn-primary py-2 px-5 text-sm">
-              Enter
-            </Link>
-          </div>
-        </div>
-      </nav>
+      
 
       {/* ── 1. Hero ───────────────────────────────────────────────────────── */}
       <MotionSection className="relative min-h-[90vh] flex flex-col items-center justify-center text-center section-gap px-6 border-b border-border overflow-hidden">
@@ -275,21 +251,7 @@ export default function LandingPage() {
         </div>
       </MotionSection>
 
-      {/* ── Footer ─────────────────────────────────────────────────────── */}
-      <footer className="border-t border-border bg-black py-16">
-        <div className="container-platform flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-foreground-disabled">
-          <div className="flex items-center gap-6">
-            <span className="text-label">SOVEREIGN.OS</span>
-            <span>© {new Date().getFullYear()}</span>
-          </div>
-          <div className="flex gap-6">
-            <Link href="/about" className="hover:text-foreground transition-colors">About</Link>
-            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
-            <Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link>
-          </div>
-        </div>
-      </footer>
-    </div>
+      
+    </SiteShell>
   );
 }
