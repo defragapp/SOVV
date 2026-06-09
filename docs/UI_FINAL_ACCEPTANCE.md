@@ -11,7 +11,6 @@
 - The `UpgradeBanner` and the Pricing page draw from the single true source (`PRICING_CONFIG`).
 - Pro entitlements enforce the `$12` monthly text string uniformly. 
 
-<<<<<<< Updated upstream
 ### Global Copy
 - [x] Replaced "Bring the moment here" with sharper alternatives ("Start with what is happening now").
 - [x] Replaced vague Covenant definitions with specific faith-context reflection copy.
@@ -36,14 +35,9 @@
 - [x] Turnstile Verification keys dynamically load and fallback locally without generating unhandled execution blocks on login states.
 - [x] Pushed and committed the current working state to `main` via the provided GitHub Pat token.
 
-=======
-## Required Commit Action
-All system upgrades pass validation. Ready for branch commit with hash reference: `product: implement full v0 premium platform ui system`.
-
 ## Final Production Status
 - Deployment verified live on Cloudflare Workers (Commit: `33cd469d58129848b8db31ca19e1525424bf6a9e`).
 - Homepage copy (`SOVEREIGN.OS`, `Healing isn’t optional.`, `Holding the pain is.`) confirmed live on https://defrag.app.
 - `WorkspaceShell` confirmed active on https://app.defrag.app.
 
 **Phase Complete: Premium UI System + Homepage + WorkspaceShell Live Deployment**
->>>>>>> Stashed changes
