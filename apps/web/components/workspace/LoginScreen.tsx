@@ -80,8 +80,8 @@ export default function LoginScreen() {
     setLoading(true)
 
     try {
-      if (mode === "register" && (!turnstileSiteKey || !turnstileToken)) {
-        setError(turnstileSiteKey ? "Complete bot verification to continue" : "Turnstile is not configured yet")
+      if (mode === "register" && turnstileSiteKey !== "" && !turnstileToken) {
+        setError("Complete bot verification to continue")
         return
       }
 
@@ -220,7 +220,7 @@ export default function LoginScreen() {
 
           <motion.button
             type="submit"
-            disabled={loading || !email || !password || (mode === "register" && (!turnstileSiteKey || !turnstileToken))}
+            disabled={loading || !email || !password || (mode === "register" && turnstileSiteKey !== "" && !turnstileToken)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="mt-4 btn-primary w-full py-3.5 tracking-widest disabled:opacity-25 disabled:cursor-not-allowed"
