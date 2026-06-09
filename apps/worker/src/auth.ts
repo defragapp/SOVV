@@ -227,7 +227,10 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
-    if (user.role !== "ambassador" && user.role !== "owner") return jsonResponse({ error: "Forbidden" }, 403)
+    if (user.role !== "ambassador" && user.role !== "owner") {
+      console.warn("Attempted ambassador access blocked for role: " + user.role);
+      return jsonResponse({ error: "Forbidden" }, 403)
+    }
 
     const body = await request.json().catch(() => ({})) as any
     let discount_percent = typeof body.discount_percent === "number" ? body.discount_percent : 0
