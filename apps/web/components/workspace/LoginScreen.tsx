@@ -114,8 +114,7 @@ export default function LoginScreen() {
 
   return (
     <div
-      className="flex min-h-screen w-full items-center justify-center bg-black text-[#F6F5F3] selection:bg-white/20"
-      style={{ fontFamily: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}
+      className="flex min-h-[100dvh] w-full items-center justify-center bg-background text-foreground safe-bottom"
     >
       <div
         className="pointer-events-none fixed inset-0 z-0"
@@ -136,22 +135,22 @@ export default function LoginScreen() {
           transition={{ delay: 0.2, duration: 0.8 }}
           className="mb-12 text-center"
         >
-          <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-white/20 mb-3">
+          <p className="text-label tracking-widest text-foreground-disabled mb-3">
             Sovereign.os
           </p>
-          <div className="h-px w-full bg-[#F6F5F3]/10" />
+          <div className="h-px w-full bg-border" />
         </motion.div>
 
-        <div className="mb-8 flex border-b border-[#F6F5F3]/10">
+        <div className="mb-8 flex border-b border-border">
           {(["login", "register"] as LoginMode[]).map((m) => (
             <button
               key={m}
               type="button"
               onClick={() => { setMode(m); setError(""); setTurnstileToken("") }}
-              className={`flex-1 border-b pb-3 font-mono text-[10px] uppercase tracking-widest transition-colors duration-200 ${
+              className={`flex-1 border-b pb-3 text-micro transition-colors duration-200 ${
                 mode === m
-                  ? "border-[#F6F5F3] text-[#F6F5F3]"
-                  : "border-transparent text-white/25 hover:text-white/50"
+                  ? "border-foreground text-foreground"
+                  : "border-transparent text-foreground-disabled hover:text-white"
               }`}
             >
               {m === "login" ? "Sign In" : "Create Account"}
@@ -161,7 +160,7 @@ export default function LoginScreen() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div>
-            <label className="mb-1.5 block font-mono text-[9px] uppercase tracking-[0.3em] text-white/25">
+            <label className="mb-1.5 block text-micro text-foreground-disabled">
               Email
             </label>
             <input
@@ -170,13 +169,13 @@ export default function LoginScreen() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
-              className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-3 text-sm font-light text-[#F6F5F3] placeholder-white/15 focus:border-[#F6F5F3]/30 focus:outline-none transition-colors duration-200"
+              className="sovv-input w-full"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block font-mono text-[9px] uppercase tracking-[0.3em] text-white/25">
+            <label className="mb-1.5 block text-micro text-foreground-disabled">
               Password
             </label>
             <input
@@ -186,20 +185,20 @@ export default function LoginScreen() {
               required
               minLength={8}
               autoComplete={mode === "login" ? "current-password" : "new-password"}
-              className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-3 text-sm font-light text-[#F6F5F3] placeholder-white/15 focus:border-[#F6F5F3]/30 focus:outline-none transition-colors duration-200"
+              className="sovv-input w-full"
               placeholder="••••••••"
             />
           </div>
 
           {mode === "register" && (
             <div className="space-y-2">
-              <label className="block font-mono text-[9px] uppercase tracking-[0.3em] text-white/25">
+              <label className="block text-micro text-foreground-disabled">
                 Bot verification
               </label>
               {turnstileSiteKey ? (
                 <div ref={turnstileRef} className="min-h-[65px]" />
               ) : (
-                <p className="text-sm leading-6 text-white/30">
+                <p className="text-caption text-foreground-disabled">
                   Turnstile is not configured yet. Add a public site key before opening registration.
                 </p>
               )}
@@ -212,7 +211,7 @@ export default function LoginScreen() {
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="font-mono text-[9px] uppercase tracking-widest text-red-400/70"
+                className="text-micro text-red-400/70 mt-2"
               >
                 {error}
               </motion.p>
@@ -222,9 +221,9 @@ export default function LoginScreen() {
           <motion.button
             type="submit"
             disabled={loading || !email || !password || (mode === "register" && (!turnstileSiteKey || !turnstileToken))}
-            whileHover={{ backgroundColor: "rgba(246,245,243,0.08)" }}
+            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="mt-2 border border-[#F6F5F3]/20 px-4 py-3.5 font-mono text-[10px] uppercase tracking-widest text-[#F6F5F3] transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
+            className="mt-4 btn-primary w-full py-3.5 tracking-widest disabled:opacity-25 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -243,7 +242,7 @@ export default function LoginScreen() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-10 text-center font-mono text-[9px] uppercase tracking-widest text-white/15"
+          className="mt-10 text-center text-micro text-foreground-disabled opacity-40"
         >
           {mode === "register"
             ? "Free tier · 5 sessions/day · self only"
@@ -253,7 +252,7 @@ export default function LoginScreen() {
         <div className="mt-6 text-center">
           <a
             href="/"
-            className="font-mono text-[9px] uppercase tracking-widest text-white/15 hover:text-white/35 transition-colors duration-200"
+            className="text-micro text-foreground-disabled hover:text-white transition-colors duration-200"
           >
             ← Back to Sovereign.os
           </a>
