@@ -495,3 +495,34 @@ button, input, textarea, select { font: inherit; }
   50% { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
 }
+
+/* Safe Fallbacks and missing classes requested in instructions */
+.glass {
+  background: rgba(17, 17, 17, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
+}
+
+.surface-glass {
+  background: rgba(17, 17, 17, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
+}
+
+.bg-elevated {
+  background-color: var(--bg-elevated);
+}
+
+.accent-oxblood {
+  color: var(--text-primary); /* Mapping to primary to avoid color drift */
+}
+
+.bg-accent-oxblood {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.border-accent-oxblood {
+  border-color: var(--border-medium);
+}

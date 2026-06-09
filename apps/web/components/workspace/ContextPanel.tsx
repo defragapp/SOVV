@@ -9,7 +9,7 @@ import MoveCard from "./MoveCard"
 
 function WhyThisAnswer({ message }: { message: ThreadMessage }) {
   const [open, setOpen] = useState(false)
-  const meta = message.thread_meta
+  const meta = (message as any).thread_meta
 
   if (!meta) return null
 

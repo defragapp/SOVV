@@ -11,15 +11,15 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Sovereign.os",
     description: "Your Baseline Design is the source. Sovereign.os is where the work becomes yours.",
-    images: ["/social-card.svg"],
+    images: ["/social-card.png", "/social-card.svg"],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/social-card.svg"],
+    images: ["/social-card.png", "/social-card.svg"],
   },
   icons: {
-    icon: "/brand-mark.svg",
-    apple: "/brand-mark.svg",
+    icon: ["/favicon.ico", "/favicon.png", "/brand-mark.svg"],
+    apple: ["/apple-touch-icon.png", "/brand-mark.svg"],
   },
   manifest: "/manifest.json",
 };
@@ -35,7 +35,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="antialiased">
-      <body className="min-h-screen overflow-x-hidden bg-background text-foreground overscroll-none safe-top safe-bottom">
+      <body className="min-h-screen overflow-x-hidden bg-[#020202] text-[#FDFDFD] bg-background text-foreground overscroll-none safe-top safe-bottom selection:bg-white/20 selection:text-white">
         {children}
       </body>
     </html>

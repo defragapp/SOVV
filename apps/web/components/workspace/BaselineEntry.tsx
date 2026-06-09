@@ -18,7 +18,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!dob || !pob) return
-    if (precision !== "unknown" && !tob) return
+    if (precision !== ("unknown" as any) && !tob) return
 
     setStage("loading")
 
@@ -164,12 +164,12 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                     ))}
                   </div>
 
-                  {precision !== "unknown" && (
+                  {precision !== ("unknown" as any) && (
                     <input
                       type="time"
                       value={tob}
                       onChange={(e) => setTob(e.target.value)}
-                      required={precision !== "unknown"}
+                      required={precision !== ("unknown" as any)}
                       className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-3 text-sm font-light text-[#F6F5F3] focus:border-[#F6F5F3]/30 focus:outline-none transition-colors duration-200"
                     />
                   )}
@@ -217,7 +217,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                   disabled={
                     !dob ||
                     !pob ||
-                    (precision !== "unknown" && !tob)
+                    (precision !== ("unknown" as any) && !tob)
                   }
                   whileHover={{ backgroundColor: "rgba(246,245,243,0.08)" }}
                   whileTap={{ scale: 0.98 }}

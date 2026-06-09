@@ -1,304 +1,279 @@
+import { Button } from "@/components/ui/button"
+import { Container, Section } from "@/components/ui/layout-primitives"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
 
-"use client";
-
-import Link from "next/link";
-import { FadeUp, FadeIn } from "@/components/ui/fade-up";
-import { Card } from "@/components/marketing/card";
-import { MotionSection } from "@/components/marketing/motion-section";
-import { SiteShell } from "@/components/marketing/site-shell";
-
-export default function LandingPage() {
+export default function HomePage() {
   return (
-    <SiteShell>
-      {/* ── 1. Hero ───────────────────────────────────────────────────────── */}
-      <MotionSection className="relative min-h-[90vh] flex flex-col items-center justify-center text-center px-6 border-b border-border overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-hero-glow opacity-30" />
-        <FadeIn className="relative z-10 w-full max-w-[760px] mx-auto flex flex-col items-center">
-          <p className="text-label text-foreground-disabled mb-12 tracking-[0.25em]">Sovereign.os</p>
-          <h1 className="text-display mb-10">
-            Healing isn’t optional.<br/>
-            Holding the pain is.
-          </h1>
-          <div className="text-title text-foreground-muted space-y-4 mb-16">
-            <p>
-              Understand what is shaping your relationships, family dynamics, grief, boundaries, and decisions — and get a clearer way forward.
-            </p>
-            <p className="text-foreground pt-4">
-              See what is actually happening.<br/>
-              Understand your role in it.<br/>
-              Respond differently.
-            </p>
+    <main className="flex min-h-screen flex-col items-center selection:bg-white/20 selection:text-white pb-20">
+      
+      {/* 1. Hero Section */}
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[90vh] pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_center,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none" />
+        <Container className="relative z-10 flex flex-col items-center text-center max-w-4xl space-y-10">
+          <Badge variant="outline" className="mb-6">SOVEREIGN.OS</Badge>
+          
+          <div className="space-y-4">
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-[#FDFDFD] leading-[1.1]">
+              Healing isn’t optional.<br className="hidden md:block" />
+              <span className="text-[#A1A1AA]">Holding the pain is.</span>
+            </h1>
           </div>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-            <Link href="https://app.defrag.app/app/login" className="btn-primary w-full sm:w-auto text-center">
-              Enter Sovereign.os
+          
+          <p className="text-lg md:text-xl text-[#A1A1AA] max-w-2xl leading-relaxed balance-text">
+            Understand what is shaping your relationships, family dynamics, grief, boundaries, and decisions — and get a clearer way forward.
+          </p>
+          
+          <div className="text-[#A1A1AA] font-medium space-y-1">
+            <p>See what is actually happening.</p>
+            <p>Understand your role in it.</p>
+            <p className="text-[#FDFDFD]">Respond differently.</p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row items-center gap-4 pt-8 w-full sm:w-auto">
+            <Link href="/login" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full">Enter Sovereign.os</Button>
             </Link>
-            <Link href="https://app.defrag.app/settings" className="btn-secondary w-full sm:w-auto text-center">
-              Start Baseline Design
+            <Link href="/settings" className="w-full sm:w-auto">
+              <Button variant="secondary" size="lg" className="w-full">Start Baseline Design</Button>
             </Link>
           </div>
-        </FadeIn>
-      </MotionSection>
+        </Container>
+      </Section>
 
-      {/* ── 2. What this helps with ──────────────────────────────────────────────── */}
-      <MotionSection className="section-gap container-platform">
-        <div className="max-w-[760px] mx-auto text-center mb-16">
-          <FadeUp>
-            <h2 className="text-headline mb-6">
-              For the situations that keep repeating.
-            </h2>
-            <p className="text-body text-foreground-muted">
-              Sovereign.os is built for the patterns that do not stay contained to a single moment.
-            </p>
-          </FadeUp>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
-          {[
-            { title: "Relationships", body: "The conversation is not just about the words." },
-            { title: "Family dynamics", body: "Some roles survive long after childhood." },
-            { title: "Boundaries", body: "Clear in your body. Impossible in your mouth." },
-            { title: "Grief", body: "Grief changes how everything lands." },
-            { title: "Communication", body: "You have reread it too many times." },
-            { title: "Parenting", body: "When the reaction belongs to an older story." },
-            { title: "Team dynamics", body: "The same tension. The same outcome." },
-            { title: "Faith-context reflection", body: "Discernment without performative certainty." }
-          ].map((item, i) => (
-            <FadeUp key={i} delay={i * 0.05} className="h-full">
-              <Card className="h-full p-6 text-center lg:text-left bg-surface border-border/50">
-                <h3 className="text-body font-medium text-foreground mb-2">{item.title}</h3>
-                <p className="text-caption text-foreground-muted">{item.body}</p>
-              </Card>
-            </FadeUp>
-          ))}
-        </div>
-      </MotionSection>
-
-      {/* ── 3. What Sovereign.os does ──────────────────────────────────────────────── */}
-      <MotionSection className="section-gap border-y border-border bg-surface/30">
-        <div className="container-platform max-w-[760px] mx-auto">
-          <FadeUp>
-            <h2 className="text-headline mb-8 text-center md:text-left">Clarity that changes what happens next.</h2>
-            <div className="text-body text-foreground-muted space-y-6">
-              <p>Sovereign.os gives structure to what usually stays tangled.</p>
-              <p>It helps you see:</p>
-              <ul className="space-y-3 pl-4 border-l border-border/50">
-                <li><span className="text-foreground-disabled mr-3">/</span>what is actually driving the situation</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>what part of it keeps repeating</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>how you tend to respond under pressure</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>where the pattern holds in place</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>what kind of next response could change it</li>
-              </ul>
-              
-              <div className="pt-8 mt-8 border-t border-border/50 flex flex-col md:flex-row gap-8 justify-between text-caption font-mono uppercase tracking-widest text-foreground-disabled">
-                <span>No diagnosis.</span>
-                <span>No compatibility score.</span>
-                <span>No verdict.</span>
-              </div>
-              <p className="text-body pt-6 text-foreground text-center md:text-left">
-                Just a clearer understanding — and a better next move.
-              </p>
+      {/* 2. What this helps with */}
+      <Section className="w-full bg-[#0A0A0A] border-t border-white/5">
+        <Container>
+          <div className="flex flex-col space-y-12">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl font-semibold tracking-tight text-[#FDFDFD]">What this helps with</h2>
             </div>
-          </FadeUp>
-        </div>
-      </MotionSection>
-
-      {/* ── 4. Baseline Design ─────────────────────────────────────────── */}
-      <MotionSection className="section-gap border-b border-border bg-surface">
-        <div className="container-platform max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <FadeUp>
-              <h2 className="text-headline mb-6">Your Baseline Design is the source.</h2>
-              <div className="space-y-6 text-body text-foreground-muted">
-                <p>
-                  Your Baseline Design gives Sovereign.os context for how you process pressure, conflict, connection, repair, timing, and alignment.
-                </p>
-                <div className="py-4 space-y-2 font-mono text-caption uppercase tracking-widest text-foreground">
-                  <p>Not as a label.</p>
-                  <p>Not as an excuse.</p>
-                  <p>As context.</p>
-                </div>
-                <p>
-                  It gives the platform a starting point for how you move through pressure, protection, repair, and response — so the output is more personal, more relevant, and more useful.
-                </p>
-              </div>
-              <div className="mt-10">
-                <Link href="https://app.defrag.app/settings" className="btn-secondary w-full sm:w-auto">
-                  Start Baseline Design
-                </Link>
-              </div>
-            </FadeUp>
-            <FadeUp delay={0.2} className="relative h-[400px] w-full rounded-2xl border border-border bg-gradient-to-br from-white/[0.02] to-transparent overflow-hidden flex items-center justify-center glow-sm">
-              <div className="text-center p-8">
-                 <p className="text-label text-foreground-disabled mb-8">Active Context</p>
-                 <div className="flex gap-4 justify-center">
-                   <div className="w-16 h-px bg-white/20" />
-                   <div className="w-8 h-px bg-white/40" />
-                   <div className="w-24 h-px bg-white/10" />
-                 </div>
-              </div>
-            </FadeUp>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { title: "Relationships", desc: "Understand repeating conflicts." },
+                { title: "Family dynamics", desc: "See the roles you step into." },
+                { title: "Boundaries", desc: "Hold lines without the guilt." },
+                { title: "Grief", desc: "Process the space left behind." },
+                { title: "Communication", desc: "Say what actually needs saying." },
+                { title: "Parenting", desc: "Respond instead of reacting." },
+                { title: "Team dynamics", desc: "Clear the friction at work." },
+                { title: "Faith context", desc: "Reflect with responsibility." }
+              ].map((item, i) => (
+                <Card key={i} variant="elevated" className="border-white/5 hover:border-white/10 transition-colors">
+                  <CardHeader>
+                    <CardTitle className="text-lg">{item.title}</CardTitle>
+                    <CardDescription className="text-[#A1A1AA] mt-2">{item.desc}</CardDescription>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
-      </MotionSection>
+        </Container>
+      </Section>
 
-      {/* ── 5. Defrag ──────────────────────────────────────────────────── */}
-      <MotionSection className="section-gap container-platform max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          <FadeUp className="order-2 md:order-1 relative h-[400px] w-full rounded-2xl border border-border bg-gradient-to-tr from-white/[0.02] to-transparent overflow-hidden flex items-center justify-center glow-sm">
-             <div className="space-y-6 w-full max-w-[280px] px-6">
-                <div className="w-full h-px bg-white/10" />
-                <div className="w-3/4 h-px bg-white/20" />
-                <div className="w-1/2 h-px bg-white/5" />
+      {/* 3. What Sovereign.os does */}
+      <Section className="w-full">
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-[#FDFDFD] leading-tight">
+                Clarity that changes what happens next.
+              </h2>
+              <div className="space-y-6 text-lg text-[#A1A1AA] leading-relaxed">
+                <p>Sovereign.os gives structure to what usually stays tangled.</p>
+                <p>It helps you see:</p>
+                <ul className="space-y-3 list-none pl-4 border-l border-white/10">
+                  <li>what is actually driving the situation</li>
+                  <li>what part of it keeps repeating</li>
+                  <li>how you tend to respond under pressure</li>
+                  <li>where the pattern holds in place</li>
+                  <li>what kind of next response could change it</li>
+                </ul>
+              </div>
+            </div>
+            
+            <Card variant="premium" className="p-8 md:p-12 space-y-6">
+              <Badge variant="outline">Trust Block</Badge>
+              <div className="space-y-4 text-xl font-medium text-[#A1A1AA]">
+                <p className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-white/20" /> No diagnosis.</p>
+                <p className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-white/20" /> No compatibility score.</p>
+                <p className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-white/20" /> No verdict.</p>
+              </div>
+              <div className="pt-6 border-t border-white/10">
+                <p className="text-lg text-[#FDFDFD]">Just a clearer understanding — and a better next move.</p>
+              </div>
+            </Card>
+          </div>
+        </Container>
+      </Section>
+
+      {/* 4. Baseline Design */}
+      <Section className="w-full bg-[#0A0A0A] border-y border-white/5">
+        <Container className="max-w-4xl text-center space-y-8">
+          <Badge>Baseline Design</Badge>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Your Baseline Design is the source.</h2>
+          <p className="text-lg text-[#A1A1AA] leading-relaxed max-w-2xl mx-auto">
+            Your Baseline Design gives Sovereign.os context for how you process pressure, conflict, connection, repair, timing, and alignment.
+          </p>
+          <div className="flex justify-center gap-8 text-[#A1A1AA] font-medium py-4">
+            <span className="line-through decoration-white/20">Not as a label.</span>
+            <span className="line-through decoration-white/20">Not as an excuse.</span>
+            <span className="text-[#FDFDFD]">As context.</span>
+          </div>
+          <Link href="/settings" className="inline-block mt-8">
+            <Button variant="secondary">Start Baseline Design</Button>
+          </Link>
+        </Container>
+      </Section>
+
+      {/* 5. Defrag */}
+      <Section className="w-full">
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8 order-2 lg:order-1">
+              <Badge variant="defrag">Defrag Space</Badge>
+              <h2 className="text-3xl md:text-4xl font-semibold tracking-tight leading-tight">
+                Defrag is where the pattern becomes workable.
+              </h2>
+              <div className="space-y-6 text-lg text-[#A1A1AA] leading-relaxed">
+                <p>Defrag helps you make sense of conflict, family roles, grief, boundaries, communication breakdowns, parenting pressure, team dynamics, and relationship patterns.</p>
+                <p>It separates what is happening right now from what has been repeating underneath it — so you can choose a response with more clarity instead of feeding the same outcome again.</p>
+              </div>
+              <Link href="/apps/defrag" className="inline-block pt-4">
+                <Button>Explore Defrag</Button>
+              </Link>
+            </div>
+            <div className="order-1 lg:order-2">
+               <Card className="bg-[#111111] p-8 space-y-4">
+                  {[
+                    "See what is active.",
+                    "Spot what is repeating.",
+                    "Notice the role you step into under pressure.",
+                    "Get a clearer next response.",
+                    "Save what helped."
+                  ].map((val, i) => (
+                    <div key={i} className="flex items-start gap-4">
+                      <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#FDFDFD]" />
+                      <p className="text-[#FDFDFD]">{val}</p>
+                    </div>
+                  ))}
+               </Card>
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      {/* 6. Covenant */}
+      <Section className="w-full bg-[#0A0A0A] border-t border-white/5">
+        <Container className="max-w-4xl text-center space-y-8">
+          <Badge variant="covenant">Covenant Space</Badge>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Faith connected to repair, responsibility, and the next honest step.</h2>
+          <p className="text-lg text-[#A1A1AA] leading-relaxed mx-auto max-w-2xl">
+            Covenant is for users who want faith connected to the work.
+          </p>
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-[#A1A1AA] font-medium py-4">
+            <span className="line-through decoration-white/20">Not as certainty.</span>
+            <span className="line-through decoration-white/20">Not as performance.</span>
+            <span className="text-[#FDFDFD]">Not as a shortcut around responsibility.</span>
+          </div>
+          <Link href="/apps/covenant" className="inline-block mt-4">
+            <Button variant="secondary">Explore Covenant</Button>
+          </Link>
+        </Container>
+      </Section>
+
+      {/* 7. When both sides matter */}
+      <Section className="w-full">
+        <Container className="max-w-4xl text-center space-y-8">
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Some patterns need both sides.</h2>
+          <p className="text-lg text-[#A1A1AA] leading-relaxed">
+            With consent, Sovereign.os can compare two Baseline Designs — not to decide who is right, not to score the relationship, and not to diagnose anyone.
+          </p>
+          <p className="text-lg text-[#FDFDFD]">
+            It helps show how the same dynamic may be experienced differently from each side.
+          </p>
+          <div className="pt-8">
+            <Button variant="secondary">Invite Privately</Button>
+          </div>
+        </Container>
+      </Section>
+
+      {/* 8. Library */}
+      <Section className="w-full bg-[#0A0A0A] border-y border-white/5">
+        <Container className="max-w-4xl text-center space-y-8">
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Your Library keeps the work worth returning to.</h2>
+          <p className="text-lg text-[#A1A1AA] leading-relaxed mx-auto max-w-2xl">
+            Save Results, reflections, next responses, Covenant Briefs, and the patterns you do not want to lose once the pressure passes.
+          </p>
+          <Link href="/app" className="inline-block pt-8">
+            <Button variant="secondary">Open Library</Button>
+          </Link>
+        </Container>
+      </Section>
+
+      {/* 9. Pro Pricing */}
+      <Section className="w-full">
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+             <div className="space-y-8">
+                <Badge variant="pro">Pro Plan</Badge>
+                <h2 className="text-4xl md:text-5xl font-semibold tracking-tight leading-tight">
+                  Free helps you begin.<br />
+                  <span className="text-[#A1A1AA]">Pro helps you stay with it.</span>
+                </h2>
+                <p className="text-xl text-[#FDFDFD]">Pro is for the patterns that need continuity.</p>
+                <Link href="/pricing" className="inline-block pt-4">
+                  <Button variant="premium" size="lg">Upgrade to Pro</Button>
+                </Link>
              </div>
-          </FadeUp>
-          <FadeUp delay={0.2} className="order-1 md:order-2">
-            <h2 className="text-headline mb-6">Defrag is where the pattern becomes workable.</h2>
-            <div className="space-y-6 text-body text-foreground-muted">
-              <p>
-                Defrag helps you make sense of conflict, family roles, grief, boundaries, communication breakdowns, parenting pressure, team dynamics, and relationship patterns.
-              </p>
-              <p>
-                It separates what is happening right now from what has been repeating underneath it — so you can choose a response with more clarity instead of feeding the same outcome again.
-              </p>
-              <ul className="space-y-3 pl-4 border-l border-border/50 pt-4">
-                <li><span className="text-foreground-disabled mr-3">/</span>See what is active.</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>Spot what is repeating.</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>Notice the role you step into under pressure.</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>Get a clearer next response.</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>Save what helped.</li>
-              </ul>
-            </div>
-            <div className="mt-10">
-              <Link href="https://app.defrag.app/apps/defrag" className="btn-secondary w-full sm:w-auto">
-                Explore Defrag
-              </Link>
-            </div>
-          </FadeUp>
-        </div>
-      </MotionSection>
-
-      {/* ── 6. Covenant ────────────────────────────────────────────────── */}
-      <MotionSection className="section-gap border-y border-border bg-surface">
-        <div className="container-platform max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <FadeUp>
-              <h2 className="text-headline mb-6">Faith connected to repair, responsibility, and the next honest step.</h2>
-              <div className="space-y-6 text-body text-foreground-muted">
-                <p>
-                  Covenant is for users who want faith connected to the work.
-                </p>
-                <div className="py-4 space-y-2 font-mono text-caption uppercase tracking-widest text-foreground">
-                  <p>Not as certainty.</p>
-                  <p>Not as performance.</p>
-                  <p>Not as a shortcut around responsibility.</p>
-                </div>
-                <p>
-                  Covenant helps bring reflection and grounded discernment into what you are walking through, so the next step can stay honest, practical, and aligned with what you believe.
-                </p>
-              </div>
-              <div className="mt-10">
-                <Link href="/covenant" className="btn-secondary w-full sm:w-auto">
-                  Explore Covenant
-                </Link>
-              </div>
-            </FadeUp>
-            <FadeUp delay={0.2} className="relative h-[400px] w-full rounded-2xl border border-border bg-gradient-to-br from-white/[0.02] to-transparent overflow-hidden flex items-center justify-center glow-sm">
-               <div className="w-16 h-16 rounded-full border border-white/10" />
-            </FadeUp>
+             <div>
+               <Card variant="premium" className="p-8">
+                  <ul className="space-y-6">
+                    {[
+                      "Save Results",
+                      "Return to your Library",
+                      "Use deeper context",
+                      "Invite privately",
+                      "Work across Defrag and Covenant",
+                      "Keep continuity instead of starting over every time something repeats"
+                    ].map((val, i) => (
+                      <li key={i} className="flex items-start gap-4 text-[#A1A1AA]">
+                        <svg className="w-6 h-6 text-[#FDFDFD] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>{val}</span>
+                      </li>
+                    ))}
+                  </ul>
+               </Card>
+             </div>
           </div>
-        </div>
-      </MotionSection>
+        </Container>
+      </Section>
 
-      {/* ── 7. When both sides matter ────────────────────────────────────────── */}
-      <MotionSection className="section-gap border-b border-border bg-background">
-        <div className="container-platform max-w-[760px] mx-auto text-center md:text-left">
-          <FadeUp>
-            <h2 className="text-headline mb-6">Some patterns need both sides.</h2>
-            <div className="space-y-6 text-body text-foreground-muted">
-              <p>
-                Two people can move through the same situation and leave with completely different truths.
-              </p>
-              <p>
-                With consent, Sovereign.os can compare two Baseline Designs — not to decide who is right, not to score the relationship, and not to diagnose anyone.
-              </p>
-              <p>
-                It helps show how the same dynamic may be received, protected against, assumed about, feared, or interpreted differently from each side.
-              </p>
-              <div className="pt-8">
-                <Link href="https://app.defrag.app/app/login" className="btn-secondary w-full sm:w-auto">
-                  Invite Privately
-                </Link>
-              </div>
-            </div>
-          </FadeUp>
-        </div>
-      </MotionSection>
-
-      {/* ── 8. Library & 9. Pro ───────────────────────────────────────────── */}
-      <MotionSection className="section-gap border-b border-border bg-surface/50">
-        <div className="container-platform grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          <FadeUp>
-            <Card className="h-full bg-surface border-border/50">
-              <h3 className="text-headline mb-6">Your Library keeps the work worth returning to.</h3>
-              <p className="text-body text-foreground-muted mb-6">
-                Save Results, reflections, next responses, Covenant Briefs, and the patterns you do not want to lose once the pressure passes.
-              </p>
-              <p className="text-body text-foreground-muted mb-10">
-                The work should not disappear when the moment changes. Library gives you one private place to return to what actually helped.
-              </p>
-              <div className="mt-auto">
-                <Link href="https://app.defrag.app/app/login" className="btn-secondary w-full sm:w-auto">
-                  Open Library
-                </Link>
-              </div>
-            </Card>
-          </FadeUp>
-          <FadeUp delay={0.1}>
-            <Card className="h-full bg-elevated border-border glow-sm flex flex-col">
-              <h3 className="text-headline mb-6">Free helps you begin.<br/>Pro helps you stay with it.</h3>
-              <p className="text-body text-foreground-muted mb-8">
-                Pro is for the patterns that need continuity.
-              </p>
-              <ul className="space-y-3 pl-4 border-l border-border/50 mb-10 text-body text-foreground-muted">
-                <li><span className="text-foreground-disabled mr-3">/</span>Save Results</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>Return to your Library</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>Use deeper context</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>Invite privately</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>Work across Defrag and Covenant</li>
-                <li><span className="text-foreground-disabled mr-3">/</span>Keep continuity instead of starting over</li>
-              </ul>
-              <div className="mt-auto">
-                <Link href="/pricing" className="btn-primary w-full sm:w-auto">
-                  Upgrade to Pro
-                </Link>
-              </div>
-            </Card>
-          </FadeUp>
-        </div>
-      </MotionSection>
-
-      {/* ── 10. Final CTA ──────────────────────────────────────────────── */}
-      <MotionSection className="section-gap bg-hero-glow">
-        <div className="container-platform text-center max-w-[760px] mx-auto">
-          <FadeUp>
-            <p className="text-label text-foreground-disabled mb-8 tracking-[0.25em]">Sovereign.os</p>
-            <h2 className="text-display mb-10">
-              Healing isn’t optional.<br/>
-              Holding the pain is.
+      {/* 10. Final CTA */}
+      <Section className="w-full bg-[#0A0A0A] border-t border-white/5 py-32">
+        <Container className="text-center space-y-10 max-w-3xl">
+          <Badge variant="outline">SOVEREIGN.OS</Badge>
+          <div className="space-y-4">
+            <h2 className="text-5xl font-bold tracking-tighter">
+              Healing isn’t optional.<br />
+              <span className="text-[#A1A1AA]">Holding the pain is.</span>
             </h2>
-            <p className="text-title text-foreground-muted mb-12">
-              See what is shaping the pattern.<br/>
-              Choose what changes next.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="https://app.defrag.app/app/login" className="btn-primary w-full sm:w-auto">
-                Enter Sovereign.os
-              </Link>
-            </div>
-          </FadeUp>
-        </div>
-      </MotionSection>
-    </SiteShell>
-  );
+          </div>
+          <div className="text-xl text-[#A1A1AA] font-medium space-y-2">
+            <p>See what is shaping the pattern.</p>
+            <p className="text-[#FDFDFD]">Choose what changes next.</p>
+          </div>
+          <div className="pt-8">
+            <Link href="/login">
+              <Button size="lg">Enter Sovereign.os</Button>
+            </Link>
+          </div>
+        </Container>
+      </Section>
+    </main>
+  )
 }
