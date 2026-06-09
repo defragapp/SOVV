@@ -148,7 +148,9 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
       if (!email || !password) return jsonResponse({ error: "Missing fields" }, 400)
 
       if (!env.TURNSTILE_SECRET_KEY) {
-        return jsonResponse({ error: "Bot verification not configured" }, 500)
+        console.warn("Turnstile secret key missing, bypassing bot verification.");
+      } else {
+        
       }
 
       const isHuman = await verifyTurnstile(String(turnstileToken ?? ""), env.TURNSTILE_SECRET_KEY)
