@@ -19,7 +19,7 @@ export default function ContactPage() {
         body="For product questions, support, or account help."
       />
 
-      <MotionSection className="px-6 py-24">
+      <MotionSection className="section-gap container-narrow">
         <div className="mx-auto max-w-xl space-y-12">
 
           {/* Primary contact */}
@@ -27,11 +27,11 @@ export default function ContactPage() {
             <p className="text-label">Primary contact</p>
             <a
               href="mailto:info@defrag.app"
-              className="block text-lg font-light text-[#F6F5F3]/80 hover:text-[#F6F5F3] transition-colors"
+              className="block text-title text-foreground hover:text-white transition-colors"
             >
               info@defrag.app
             </a>
-            <p className="text-caption text-xs leading-6">
+            <p className="text-body-sm text-foreground-muted">
               This is the public contact address for Sovereign.os. For product questions, support, account help, privacy requests, and general inquiries.
             </p>
           </div>
@@ -49,8 +49,8 @@ export default function ContactPage() {
                 "Any error message you saw",
               ].map((item) => (
                 <div key={item} className="flex items-center gap-3">
-                  <div className="h-px w-3 bg-[#F6F5F3]/20 shrink-0" />
-                  <span className="text-caption text-xs">{item}</span>
+                  <div className="h-px w-3 bg-border shrink-0" />
+                  <span className="text-body-sm text-foreground-muted">{item}</span>
                 </div>
               ))}
             </div>
@@ -61,7 +61,7 @@ export default function ContactPage() {
           {/* Privacy */}
           <div className="space-y-3">
             <p className="text-label">Privacy and data requests</p>
-            <p className="text-caption text-xs leading-6">
+            <p className="text-body-sm text-foreground-muted">
               To request deletion of your account and all associated data, email info@defrag.app. We process deletion requests within 30 days.
             </p>
           </div>
@@ -73,7 +73,7 @@ export default function ContactPage() {
                 href={SUPPORT_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="text-label hover:text-[#F6F5F3]/60 transition-colors"
+                className="text-body-sm text-foreground hover:text-white transition-colors underline underline-offset-4"
               >
                 Support Defrag development →
               </a>
