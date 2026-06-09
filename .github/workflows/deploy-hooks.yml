@@ -1,0 +1,31 @@
+name: Trigger Workers Build
+on:
+  push:
+    branches: [main]
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger sovv-web Build
+        if: env.CF_DEPLOY_HOOK_SOVV_WEB != ''
+        run: curl -X POST "${{ secrets.CF_DEPLOY_HOOK_SOVV_WEB }}"
+        env:
+          CF_DEPLOY_HOOK_SOVV_WEB: ${{ secrets.CF_DEPLOY_HOOK_SOVV_WEB }}
+          
+      - name: Trigger sovereign-os-api Build
+        if: env.CF_DEPLOY_HOOK_SOVEREIGN_API != ''
+        run: curl -X POST "${{ secrets.CF_DEPLOY_HOOK_SOVEREIGN_API }}"
+        env:
+          CF_DEPLOY_HOOK_SOVEREIGN_API: ${{ secrets.CF_DEPLOY_HOOK_SOVEREIGN_API }}
+
+      - name: Trigger worker-session Build
+        if: env.CF_DEPLOY_HOOK_WORKER_SESSION != ''
+        run: curl -X POST "${{ secrets.CF_DEPLOY_HOOK_WORKER_SESSION }}"
+        env:
+          CF_DEPLOY_HOOK_WORKER_SESSION: ${{ secrets.CF_DEPLOY_HOOK_WORKER_SESSION }}
+
+      - name: Trigger worker-ai Build
+        if: env.CF_DEPLOY_HOOK_WORKER_AI != ''
+        run: curl -X POST "${{ secrets.CF_DEPLOY_HOOK_WORKER_AI }}"
+        env:
+          CF_DEPLOY_HOOK_WORKER_AI: ${{ secrets.CF_DEPLOY_HOOK_WORKER_AI }}
