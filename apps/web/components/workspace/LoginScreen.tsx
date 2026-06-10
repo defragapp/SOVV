@@ -1,6 +1,6 @@
-import Link from "next/link"
 "use client"
 
+import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -114,44 +114,47 @@ export default function LoginScreen() {
   }
 
   return (
-    <div
-      className="flex min-h-[100dvh] w-full items-center justify-center bg-background text-foreground safe-bottom"
-    >
+    <div className="flex min-h-[100dvh] w-full items-center justify-center bg-[#050505] text-[#FAFAFA] safe-bottom">
+
+      {/* Subtle center glow — no bright gradients */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
         style={{
-          backgroundImage: "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0) 60%)",
+          backgroundImage:
+            "radial-gradient(ellipse 60% 40% at 50% 40%, rgba(255,255,255,0.025) 0%, transparent 70%)",
         }}
       />
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: [0.0, 0.0, 0.2, 1] }}
+        transition={{ duration: 0.7, ease: [0.0, 0.0, 0.2, 1] }}
         className="relative z-10 w-full max-w-sm px-6"
       >
+        {/* Wordmark */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.8 }}
-          className="mb-12 text-center"
+          transition={{ delay: 0.15, duration: 0.7 }}
+          className="mb-14 text-center"
         >
-          <p className="text-label tracking-widest text-foreground-disabled mb-3">
+          <p className="text-[10px] font-mono tracking-[0.3em] text-[#3F3F46] uppercase mb-4">
             Sovereign.os
           </p>
-          <div className="h-px w-full bg-border" />
+          <div className="h-px w-full bg-white/[0.06]" />
         </motion.div>
 
-        <div className="mb-8 flex border-b border-border">
+        {/* Mode tabs */}
+        <div className="mb-8 flex border-b border-white/[0.08]">
           {(["login", "register"] as LoginMode[]).map((m) => (
             <button
               key={m}
               type="button"
               onClick={() => { setMode(m); setError(""); setTurnstileToken("") }}
-              className={`flex-1 border-b pb-3 text-micro transition-colors duration-200 ${
+              className={`flex-1 pb-3 text-[10px] font-mono tracking-[0.15em] uppercase transition-colors duration-200 border-b ${
                 mode === m
-                  ? "border-foreground text-foreground"
-                  : "border-transparent text-foreground-disabled hover:text-white"
+                  ? "border-[#FAFAFA] text-[#FAFAFA]"
+                  : "border-transparent text-[#3F3F46] hover:text-[#71717A]"
               }`}
             >
               {m === "login" ? "Sign In" : "Create Account"}
@@ -160,8 +163,9 @@ export default function LoginScreen() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div>
-            <label className="mb-1.5 block text-micro text-foreground-disabled">
+          {/* Email */}
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-mono tracking-[0.15em] uppercase text-[#3F3F46]">
               Email
             </label>
             <input
@@ -170,13 +174,14 @@ export default function LoginScreen() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
-              className="sovv-input w-full"
               placeholder="you@example.com"
+              className="sovv-input w-full bg-[#080808] border border-white/[0.08] text-[#FAFAFA] placeholder:text-[#3F3F46] text-sm font-mono px-4 py-3 outline-none focus:border-white/20 transition-colors duration-200"
             />
           </div>
 
-          <div>
-            <label className="mb-1.5 block text-micro text-foreground-disabled">
+          {/* Password */}
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-mono tracking-[0.15em] uppercase text-[#3F3F46]">
               Password
             </label>
             <input
@@ -186,51 +191,60 @@ export default function LoginScreen() {
               required
               minLength={8}
               autoComplete={mode === "login" ? "current-password" : "new-password"}
-              className="sovv-input w-full"
               placeholder="••••••••"
+              className="sovv-input w-full bg-[#080808] border border-white/[0.08] text-[#FAFAFA] placeholder:text-[#3F3F46] text-sm font-mono px-4 py-3 outline-none focus:border-white/20 transition-colors duration-200"
             />
           </div>
 
+          {/* Turnstile */}
           {mode === "register" && (
-            <div className="space-y-2">
-              <label className="block text-micro text-foreground-disabled">
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-mono tracking-[0.15em] uppercase text-[#3F3F46]">
                 Bot verification
               </label>
               {turnstileSiteKey ? (
                 <div ref={turnstileRef} className="min-h-[65px]" />
               ) : (
-                <p className="text-caption text-foreground-disabled">
+                <p className="text-[10px] font-mono text-[#3F3F46] leading-relaxed">
                   Turnstile is not configured yet. Add a public site key before opening registration.
                 </p>
               )}
             </div>
           )}
 
+          {/* Error */}
           <AnimatePresence>
             {error && (
               <motion.p
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="text-micro text-red-400/70 mt-2"
+                className="text-[10px] font-mono text-red-400/60 tracking-wide"
               >
                 {error}
               </motion.p>
             )}
           </AnimatePresence>
 
+          {/* Submit */}
           <motion.button
             type="submit"
-            disabled={loading || !email || !password || (mode === "register" && turnstileSiteKey !== "" && !turnstileToken)}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="mt-4 btn-primary w-full py-3.5 tracking-widest disabled:opacity-25 disabled:cursor-not-allowed"
+            disabled={
+              loading ||
+              !email ||
+              !password ||
+              (mode === "register" && turnstileSiteKey !== "" && !turnstileToken)
+            }
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            className="btn-primary mt-3 w-full h-12 border border-white/[0.15] bg-white text-black font-mono text-[10px] tracking-[0.2em] uppercase transition-colors hover:bg-white/90 disabled:opacity-20 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <motion.span
                   animate={{ opacity: [1, 0.3, 1] }}
                   transition={{ repeat: Infinity, duration: 1.2 }}
+                  className="font-mono"
                 >
                   ···
                 </motion.span>
@@ -239,24 +253,26 @@ export default function LoginScreen() {
           </motion.button>
         </form>
 
+        {/* Tier note */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-10 text-center text-micro text-foreground-disabled opacity-40"
+          transition={{ delay: 0.5, duration: 0.7 }}
+          className="mt-10 text-center text-[10px] font-mono text-[#3F3F46] tracking-wide"
         >
           {mode === "register"
             ? "Free tier · 5 sessions/day · self only"
             : "Pro unlocks people, groups, unlimited sessions"}
         </motion.p>
 
-        <div className="mt-6 text-center">
-          <a
+        {/* Back link */}
+        <div className="mt-5 text-center">
+          <Link
             href="/"
-            className="text-micro text-foreground-disabled hover:text-white transition-colors duration-200"
+            className="text-[10px] font-mono text-[#3F3F46] hover:text-[#71717A] tracking-wide transition-colors duration-200"
           >
             ← Back to Sovereign.os
-          </a>
+          </Link>
         </div>
       </motion.div>
     </div>
