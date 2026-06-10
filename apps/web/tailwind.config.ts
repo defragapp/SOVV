@@ -49,7 +49,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["Inter", "SF Pro Display", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
-        mono: ["JetBrains Mono", "SF Mono", "ui-monospace", "Menlo", "monospace"],
+        mono: ["var(--font-jetbrains-mono)", "SF Mono", "ui-monospace", "Menlo", "monospace"],
       },
       transitionTimingFunction: {
         apple: "cubic-bezier(0.16, 1, 0.3, 1)",

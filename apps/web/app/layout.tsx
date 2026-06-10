@@ -1,5 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { JetBrains_Mono } from "next/font/google";
+
 import "./globals.css";
+
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://defrag.app"),
@@ -34,7 +41,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="antialiased">
+    <html lang="en" className={`antialiased ${jetBrainsMono.variable}`}>
       <body className="min-h-screen overflow-x-hidden bg-[#020202] text-[#FDFDFD] bg-background text-foreground overscroll-none safe-top safe-bottom selection:bg-white/20 selection:text-white">
         {children}
       </body>
