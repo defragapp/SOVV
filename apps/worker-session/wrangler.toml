@@ -19,7 +19,7 @@ id = "vscode-codespace-agent"
 [[services]]
 binding = "AI_SERVICE"
 service = "worker-ai"
-environment = "production"
+# environment = "production"
 
 # Durable Object
 [[durable_objects.bindings]]

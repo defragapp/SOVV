@@ -64,7 +64,7 @@ export async function requireActiveSubscription(user: { subscription_status: str
 
   const url = new URL(request.url);
 
-  // Workspace-protected routes — the apps/defrag and apps/covenant workbenches
+  // Workspace-protected routes — the apps/defrag and apps/covenant spaces
   const isWorkspaceRoute = url.pathname === "/api/explain" ||
     url.pathname.startsWith("/api/baseline") ||
     url.pathname.startsWith("/api/patterns") ||
@@ -79,7 +79,7 @@ export async function requireActiveSubscription(user: { subscription_status: str
   if (!hasActive) {
     return new Response(JSON.stringify({
       error: "payment_required",
-      message: "An active subscription is required to use the workbench. Please upgrade to Pro.",
+      message: "An active subscription is required to use the space. Please upgrade to Pro.",
     }), {
       status: 402,
       headers: { "Content-Type": "application/json" },
