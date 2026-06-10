@@ -12,7 +12,7 @@ export interface Env {
   KV: KVNamespace
 
   // R2 — media, exports, templates (bucket: vibesdk-templates)
-  TEMPLATES?: R2Bucket
+  R2?: R2Bucket
 
   // ── AI ───────────────────────────────────────────────────────────────────
   AI: Ai

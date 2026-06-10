@@ -20,7 +20,7 @@ binding = "KV"
 id = "3bd3ff5048a8468e82c574d7d66045c3"
 
 [[r2_buckets]]
-binding = "TEMPLATES"
+binding = "R2"
 bucket_name = "vibesdk-templates"
 
 [[queues.producers]]

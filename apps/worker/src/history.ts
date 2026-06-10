@@ -19,7 +19,7 @@ export async function handleHistory(req: Request, env: Env) {
 
   const user = await getAuthUser(req, env.DB);
 
-  // Subscription gate for workspace route
+  // Subscription gate for space route
   const subGate = await requireActiveSubscription(user, req);
   if (subGate) return subGate;
 
@@ -50,9 +50,51 @@ export async function handleHistory(req: Request, env: Env) {
   }
 }
 
+export async function handleSaveToLibrary(req: Request, env: Env) {
+  const user = await getAuthUser(req, env.DB);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  // Subscription gate for space route
+  const subGate = await requireActiveSubscription(user, req);
+  if (subGate) return subGate;
+
+  try {
+    const body = await req.json().catch(() => ({})) as any;
+    const { title, content, workspace_source } = body;
+
+    if (!title || !content || !workspace_source) {
+       return new Response("Missing required fields", { status: 400 });
+    }
+    if (workspace_source !== "DEFRAG" && workspace_source !== "COVENANT") {
+       return new Response("Invalid workspace source", { status: 400 });
+    }
+
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+
+    await env.DB.prepare(
+      "INSERT INTO library (id, user_id, title, content, workspace_source, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    )
+    .bind(id, user.id, title, content, workspace_source, now, now)
+    .run();
+
+    return Response.json({ success: true, id });
+  } catch (e) {
+    console.error("Failed to save to library", String(e));
+    return new Response("Internal Server Error", { status: 500 });
+  }
+}
+
 export function registerHistoryRoute(router: any, getEnv: () => Env) {
   router.get("/api/history", async (req: Request) => {
     const env = getEnv();
     return handleHistory(req, env);
+  });
+
+  router.post("/api/history", async (req: Request) => {
+    const env = getEnv();
+    return handleSaveToLibrary(req, env);
   });
 }
