@@ -29,10 +29,10 @@ export function CheckoutButton({ priceId, cta }: { priceId: string; cta: string 
   }
 
   return (
-    <Button
-      variant="premium"
-      className="w-full rounded-none border border-white bg-white text-black hover:bg-white/90 font-mono text-xs tracking-[0.15em] uppercase h-12 px-8 transition-colors disabled:opacity-50"
-      onClick={handleCheckout}
+    <Button 
+      variant="premium" 
+      className="w-full rounded-none border border-white bg-white text-black hover:bg-white/90 font-mono text-xs tracking-[0.15em] uppercase h-12 px-8 transition-colors disabled:opacity-50" 
+      onClick={handleCheckout} 
       disabled={loading}
     >
       {loading ? "..." : cta}
