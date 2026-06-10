@@ -25,10 +25,14 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/brand-mark') ||
     pathname.startsWith('/social-card');
 
+  // If no session and route is not public, immediately redirect to login to intercept
+  // before client-side rendering or AuthGuard
+  if (!sessionId && !isPublicPath) {
+    // If not already on the app shell login page, go there
+    return NextResponse.redirect(new URL('https://app.defrag.app/app/login'));
+  }
+
   if (isAppShell) {
-    if (!sessionId && !isPublicPath) {
-      return NextResponse.redirect(new URL('/app/login', request.url));
-    }
     if (pathname === '/') {
       url.pathname = '/apps/defrag';
       return NextResponse.rewrite(url);
