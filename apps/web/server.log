@@ -1,0 +1,28 @@
+
+> web@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.19
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.2:3000
+
+ ✓ Starting...
+ ✓ Ready in 3s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1309ms (115 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 8.7s (612 modules)
+ GET / 200 in 11132ms
+ ○ Compiling /apps/defrag ...
+ ✓ Compiled /apps/defrag in 796ms (618 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /apps/defrag 200 in 1460ms
+ ✓ Compiled /apps/covenant in 399ms (611 modules)
+ GET /apps/covenant 200 in 874ms
+ ✓ Compiled /login in 408ms (624 modules)
+ GET /login 307 in 1044ms
+ ○ Compiling /app/login ...
+ ✓ Compiled /app/login in 3.6s (1355 modules)
+ GET /app/login 200 in 4404ms
+ ○ Compiling /api/auth/[...path] ...
+ ✓ Compiled /api/auth/[...path] in 861ms (1372 modules)
