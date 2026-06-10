@@ -5,30 +5,31 @@
 
 export default function ToolLanding() {
   return (
-    <main className="min-h-screen bg-black text-white p-8">
-      <header className="mb-16 border-b border-white pb-4">
-        <h1 className="text-4xl font-bold tracking-tighter">SOVEREIGN.OS</h1>
-        <p className="text-gray-400 mt-2">Your private space for relational intelligence.</p>
-      </header>
+    <main className="min-h-screen bg-[#050505] text-[#FAFAFA] flex flex-col items-center justify-center p-8 selection:bg-white/10 selection:text-white">
+      <div className="w-full max-w-sm border border-white/[0.08] bg-[#080808] p-10 flex flex-col gap-10">
+        <header className="text-center">
+          <p className="text-[10px] font-mono text-[#3F3F46] tracking-[0.3em] uppercase mb-4">Sovereign.os</p>
+          <div className="h-px w-full bg-white/[0.06] mb-6" />
+          <h1 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">Choose a space</h1>
+          <p className="text-[10px] font-mono text-[#71717A] uppercase tracking-widest mt-2">Your private platform for relational intelligence.</p>
+        </header>
 
-      <section className="max-w-2xl">
-        <h2 className="text-2xl mb-4 border-b border-white pb-2">BEGIN</h2>
-        <div className="space-y-4">
-          <a href="/app/login" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
+        <section className="space-y-4">
+          <a href="/login" className="flex items-center justify-center w-full border border-white/[0.15] bg-white text-black hover:bg-white/90 transition-colors h-10 text-[10px] font-mono uppercase tracking-[0.15em]">
             Sign In
           </a>
-          <a href="/apps/defrag" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
+          <a href="/apps/defrag" className="flex items-center justify-center w-full border border-white/[0.08] bg-transparent text-[#A1A1AA] hover:text-white hover:border-white/20 transition-colors h-10 text-[10px] font-mono uppercase tracking-[0.15em]">
             Defrag Space
           </a>
-          <a href="/apps/covenant" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
+          <a href="/apps/covenant" className="flex items-center justify-center w-full border border-white/[0.08] bg-transparent text-[#A1A1AA] hover:text-white hover:border-white/20 transition-colors h-10 text-[10px] font-mono uppercase tracking-[0.15em]">
             Covenant Space
           </a>
-        </div>
-      </section>
+        </section>
 
-      <footer className="mt-16 pt-4 border-t border-white text-gray-500 text-sm">
-        Sovereign.os / defrag.app
-      </footer>
+        <footer className="pt-6 border-t border-white/[0.06] text-center">
+          <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-widest">Sovereign.os / defrag.app</p>
+        </footer>
+      </div>
     </main>
   )
 }
