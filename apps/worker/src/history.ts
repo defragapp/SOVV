@@ -64,8 +64,8 @@ export async function handleSaveToLibrary(req: Request, env: Env) {
     const body = await req.json().catch(() => ({})) as any;
     const { title, content, workspace_source } = body;
 
-    if (!title || !content || !workspace_source) {
-       return new Response("Missing required fields", { status: 400 });
+    if (typeof title !== "string" || typeof content !== "string" || typeof workspace_source !== "string") {
+       return new Response("Invalid or missing required fields", { status: 400 });
     }
     if (workspace_source !== "DEFRAG" && workspace_source !== "COVENANT") {
        return new Response("Invalid workspace source", { status: 400 });
