@@ -37,7 +37,7 @@ export default {
     }
 
     if (url.pathname === "/emotional-drivers" && request.method === "POST") {
-      const response = await handleEmotionalDrivers(request);
+      const response = await handleEmotionalDrivers(request, env);
       return withHeaders(response);
     }
 

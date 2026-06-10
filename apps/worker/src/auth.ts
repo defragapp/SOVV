@@ -389,7 +389,7 @@ export async function verifyAccessJWT(request: Request, env: { TEAM_DOMAIN?: str
     const [headerB64, payloadB64, signatureB64 = ""] = token.split('.');
     const signature = Uint8Array.from(atob(signatureB64.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
     const data = new TextEncoder().encode(`${headerB64}.${payloadB64}`);
-    const isValid = await crypto.subtle.verify({ name: "RS256" }, key, data, signature);
+    const isValid = await crypto.subtle.verify({ name: "RS256" }, key, signature, data);
 
     if (!isValid) {
       return jsonResponse({ error: "Invalid JWT signature" }, 401);

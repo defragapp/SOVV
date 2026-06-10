@@ -42,8 +42,8 @@ export class ConflictSessionDO extends DurableObject<Env> {
       }
 
       const pair = new WebSocketPair();
-      const client = Object.values(pair)[0] as WebSocket;
-      const server = Object.values(pair)[1] as WebSocket;
+      const client = pair[0] as WebSocket;
+      const server = pair[1] as WebSocket;
 
       this.ctx.acceptWebSocket(server, [userId]);
       server.serializeAttachment({ userId } as WebSocketAttachment);
