@@ -15,13 +15,13 @@ export default function ToolLanding() {
         <h2 className="text-2xl mb-4 border-b border-white pb-2">BEGIN</h2>
         <div className="space-y-4">
           <a href="/app/login" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
-            SIGN IN
+            Sign In
           </a>
           <a href="/apps/defrag" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
-            DEFRAG SPACE
+            Defrag Space
           </a>
           <a href="/apps/covenant" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
-            COVENANT SPACE
+            Covenant Space
           </a>
         </div>
       </section>

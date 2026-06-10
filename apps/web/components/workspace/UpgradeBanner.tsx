@@ -85,10 +85,10 @@ export default function UpgradeBanner() {
           className="mb-8"
         >
           <h1 className="font-mono text-[11px] uppercase tracking-[0.3em] text-white/40 mb-4">
-            Workbench requires Pro
+            Space requires Pro
           </h1>
           <p className="text-sm leading-relaxed text-white/30 max-w-xs mx-auto">
-            An active subscription is required to use the Defrag workbench.
+            An active subscription is required to use the Defrag space.
             Upgrade to Pro for unlimited sessions, relational analysis, and
             pattern tracking.
           </p>

@@ -15,7 +15,7 @@ export default function HubLanding() {
           <h2 className="text-2xl mb-4 border-b border-white pb-2">ENTER</h2>
           <div className="space-y-4">
             <a href="https://app.defrag.app/app/login" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
-              SIGN IN
+              Sign In
             </a>
             <a href="/about" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
               ABOUT
@@ -34,7 +34,7 @@ export default function HubLanding() {
               <div className="text-gray-400 text-sm mt-1">Relational intelligence space. Work through what is active now.</div>
             </a>
             <a href="https://app.defrag.app/apps/covenant" className="block border border-white p-4 hover:bg-white hover:text-black transition-colors">
-              <div className="font-bold">COVENANT</div>
+              <div className="font-bold">Covenant</div>
               <div className="text-gray-400 text-sm mt-1">Optional faith-context reflection space. User-initiated.</div>
             </a>
           </div>

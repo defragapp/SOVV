@@ -26,5 +26,8 @@
   "devDependencies": {
     "concurrently": "^8.2.2",
     "wrangler": "^4.97.0"
+  },
+  "dependencies": {
+    "playwright": "^1.60.0"
   }
 }
