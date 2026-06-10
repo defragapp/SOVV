@@ -17,7 +17,8 @@ export interface EmotionalDriversResponse {
 }
 
 export async function handleEmotionalDrivers(
-  request: Request
+  request: Request,
+  env: { AI: any }
 ): Promise<Response> {
   let body: Partial<EmotionalDriversRequest>;
 
@@ -39,11 +40,17 @@ export async function handleEmotionalDrivers(
     );
   }
 
+  const aiResponse = await env.AI.run("@cf/meta/llama-3.1-8b-instruct-fast", {
+    messages: [
+      { role: "system", content: "You are an emotional dynamics analyst..." },
+      { role: "user", content: transcriptChunk }
+    ]
+  });
+
   const payload: EmotionalDriversResponse = {
     privateView: {
-      headline: "What may be getting touched here",
-      summary:
-        "This moment may relate to wanting to feel seen or understood.",
+      headline: "Emotional driver detected",
+      summary: aiResponse.response ?? "This moment may relate to wanting to feel seen or understood.",
       suggestions: [
         "Try expressing what you needed in that moment.",
         "Name what the moment represented emotionally before defending your position.",
@@ -51,9 +58,8 @@ export async function handleEmotionalDrivers(
       ],
     },
     sharedView: {
-      headline: "There may be deeper meaning here",
-      summary:
-        "It may help to explain what this moment represents emotionally, not only what happened.",
+      headline: "Shared perspective",
+      summary: aiResponse.response ?? "It may help to explain what this moment represents emotionally, not only what happened.",
     },
   };
 
