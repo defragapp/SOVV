@@ -7,27 +7,27 @@ const TYPE_LABELS = {
 }
 
 const SOURCE_LABELS = {
-  baseline: "Your data",
-  comparison: "Comparison",
-  conversation: "This thread",
+  baseline: "System Memory",
+  comparison: "Matrix Diff",
+  conversation: "Local Buffer",
 }
 
 export default function InsightCard({ insight }: { insight: Insight }) {
   return (
-    <div className="card-flat px-5 py-4 mb-4">
-      <div className="flex items-center justify-between mb-3">
+    <div className="border border-border bg-surface p-4 mb-4 font-mono">
+      <div className="flex items-center justify-between mb-3 border-b border-border pb-2">
         <div className="flex items-center gap-2">
-          <span className="block h-[5px] w-[5px] rounded-full bg-white/40" />
-          <span className="text-micro">
+          <span className="block h-1.5 w-1.5 bg-foreground-muted" />
+          <span className="text-xs text-foreground-muted uppercase tracking-widest">
             {TYPE_LABELS[insight.type]}
           </span>
         </div>
-        <span className="text-micro text-white/20">
+        <span className="text-xs text-foreground-disabled uppercase tracking-widest">
           {SOURCE_LABELS[insight.source]}
         </span>
       </div>
-      <p className="text-body-sm text-foreground">{insight.title}</p>
-      <p className="mt-1.5 text-caption">
+      <p className="text-sm text-foreground">{insight.title}</p>
+      <p className="mt-2 text-sm text-foreground-disabled leading-relaxed">
         {insight.detail}
       </p>
     </div>

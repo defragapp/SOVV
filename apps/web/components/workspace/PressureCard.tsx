@@ -1,38 +1,38 @@
 import type { PressurePoint } from "./types"
 
 const TYPE_LABELS = {
-  emotional: "Emotional",
-  structural: "Structural",
-  communication: "Communication",
+  emotional: "Emotional Vector",
+  structural: "Structural Fault",
+  communication: "Comm. Breakdown",
 }
 
 export default function PressureCard({ pressure }: { pressure: PressurePoint }) {
   return (
-    <div className="px-4 py-4">
-      <div className="flex items-center gap-2">
-        <span className="block h-1.5 w-1.5 bg-[#F6F5F3]/40" />
-        <span className="font-mono text-[10px] uppercase tracking-widest text-white/30">
+    <div className="border border-border bg-background p-4 font-mono">
+      <div className="flex items-center gap-2 mb-3 border-b border-border pb-2">
+        <span className="block h-1.5 w-1.5 bg-foreground-muted" />
+        <span className="text-xs uppercase tracking-widest text-foreground-muted">
           {TYPE_LABELS[pressure.type]}
         </span>
       </div>
-      <p className="mt-2 text-sm font-light text-[#F6F5F3]">{pressure.label}</p>
-      <p className="mt-1 text-sm font-light leading-6 text-white/60">
+      <p className="text-sm text-foreground">{pressure.label}</p>
+      <p className="mt-2 text-sm text-foreground-disabled leading-relaxed">
         {pressure.description}
       </p>
       {pressure.yours && (
-        <div className="mt-2 border-l border-[#F6F5F3]/10 pl-3">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-white/30">
-            Yours
+        <div className="mt-4 border-l-2 border-border pl-3">
+          <span className="text-[10px] uppercase tracking-widest text-foreground-muted">
+            Internal Output
           </span>
-          <p className="mt-1 text-sm font-light text-white/50">{pressure.yours}</p>
+          <p className="mt-1 text-sm text-foreground-disabled">{pressure.yours}</p>
         </div>
       )}
       {pressure.theirs && (
-        <div className="mt-2 border-l border-[#F6F5F3]/10 pl-3">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-white/30">
-            Theirs
+        <div className="mt-4 border-l-2 border-border pl-3">
+          <span className="text-[10px] uppercase tracking-widest text-foreground-muted">
+            External Input
           </span>
-          <p className="mt-1 text-sm font-light text-white/50">{pressure.theirs}</p>
+          <p className="mt-1 text-sm text-foreground-disabled">{pressure.theirs}</p>
         </div>
       )}
     </div>

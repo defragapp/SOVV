@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react"
 import type { Person, Relation } from "./types"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 const RELATION_LABELS: Record<Relation, string> = {
   self: "Self",
@@ -15,11 +17,11 @@ export default function Sidebar({
   selectedPerson,
   onSelectPerson,
 }: {
-  selectedPerson: Person
-  onSelectPerson: (person: Person) => void
+  selectedPerson?: Person
+  onSelectPerson?: (person: Person) => void
 }) {
-  const [search, setSearch] = useState("")
   const [people, setPeople] = useState<Person[]>([])
+  const pathname = usePathname()
 
   useEffect(() => {
     fetch("/api/auth/people", { credentials: "include" })
@@ -30,53 +32,56 @@ export default function Sidebar({
       .catch(() => {})
   }, [])
 
-  const filtered = people.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  )
-
-  const selfList = filtered.filter((p) => p.relation === "self")
-  const peopleList = filtered.filter((p) => p.relation !== "self")
+  const selfList = people.filter((p) => p.relation === "self")
+  const peopleList = people.filter((p) => p.relation !== "self")
 
   return (
-    <aside className="flex h-full flex-col border-r border-border bg-background">
-      <div className="border-b border-border p-2">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search"
-          className="w-full bg-transparent px-2 py-1 text-body-sm text-foreground placeholder:text-foreground-disabled focus:outline-none"
-        />
+    <div className="flex h-full flex-col font-mono text-sm">
+      <div className="border-b border-border py-4">
+        <span className="block px-6 mb-2 text-xs text-foreground-muted uppercase tracking-widest">
+          Active Engines
+        </span>
+        <nav className="flex flex-col">
+          <Link href="/app" className={`px-6 py-2 border-l-2 transition-colors ${pathname === '/app' ? 'border-foreground text-foreground bg-surface' : 'border-transparent text-foreground-muted hover:text-foreground hover:bg-surface'}`}>
+            Defrag
+          </Link>
+          <Link href="/apps/alignment" className={`px-6 py-2 border-l-2 transition-colors ${pathname === '/apps/alignment' ? 'border-foreground text-foreground bg-surface' : 'border-transparent text-foreground-muted hover:text-foreground hover:bg-surface'}`}>
+            Alignment
+          </Link>
+          <Link href="/apps/covenant" className={`px-6 py-2 border-l-2 transition-colors ${pathname === '/apps/covenant' ? 'border-foreground text-foreground bg-surface' : 'border-transparent text-foreground-muted hover:text-foreground hover:bg-surface'}`}>
+            Covenant
+          </Link>
+        </nav>
       </div>
 
-      <div className="border-b border-border py-2">
-        <span className="block px-4 py-1 text-micro text-foreground-disabled">
-          Self
-        </span>
-        {selfList.map((person) => (
-          <PersonRow
-            key={person.id}
-            person={person}
-            isSelected={selectedPerson.id === person.id}
-            onSelect={onSelectPerson}
-          />
-        ))}
+      <div className="flex-1 overflow-y-auto py-4">
+        {onSelectPerson && selectedPerson && (
+           <>
+            <span className="block px-6 mb-2 text-xs text-foreground-muted uppercase tracking-widest">
+              Relational Matrix
+            </span>
+            <div className="flex flex-col">
+              {selfList.map((person) => (
+                <PersonRow
+                  key={person.id}
+                  person={person}
+                  isSelected={selectedPerson.id === person.id}
+                  onSelect={onSelectPerson}
+                />
+              ))}
+              {peopleList.map((person) => (
+                <PersonRow
+                  key={person.id}
+                  person={person}
+                  isSelected={selectedPerson.id === person.id}
+                  onSelect={onSelectPerson}
+                />
+              ))}
+            </div>
+           </>
+        )}
       </div>
-
-      <div className="flex-1 overflow-y-auto py-2">
-        <span className="block px-4 py-1 text-micro text-foreground-disabled">
-          People
-        </span>
-        {peopleList.map((person) => (
-          <PersonRow
-            key={person.id}
-            person={person}
-            isSelected={selectedPerson.id === person.id}
-            onSelect={onSelectPerson}
-          />
-        ))}
-      </div>
-    </aside>
+    </div>
   )
 }
 
@@ -93,15 +98,14 @@ function PersonRow({
     <button
       type="button"
       onClick={() => onSelect(person)}
-      className={`flex w-full items-center gap-3 px-4 py-2 text-left ${
+      className={`flex w-full items-center gap-3 px-6 py-2 text-left border-l-2 transition-colors ${
         isSelected
-          ? "bg-[#F6F5F3]/5 text-[#F6F5F3]"
-          : "text-white/60 hover:bg-[#F6F5F3]/5 hover:text-[#F6F5F3]"
+          ? "border-foreground text-foreground bg-surface"
+          : "border-transparent text-foreground-muted hover:text-foreground hover:bg-surface"
       }`}
     >
-      <span className="block h-1.5 w-1.5 shrink-0 bg-[#F6F5F3]/40" />
-      <span className="text-sm font-light">{person.name}</span>
-      <span className="ml-auto font-mono text-[10px] uppercase tracking-widest text-white/30">
+      <span className="truncate">{person.name}</span>
+      <span className="ml-auto text-[10px] uppercase tracking-widest text-foreground-disabled">
         {RELATION_LABELS[person.relation]}
       </span>
     </button>
