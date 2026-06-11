@@ -17,6 +17,31 @@ const router = Router();
 let currentEnv: Env;
 const getEnv = () => currentEnv;
 
+// === CORS CONFIGURATION ===
+const ALLOWED_ORIGINS = [
+  'https://defrag.app',
+  'https://www.defrag.app',
+  'https://app.defrag.app',
+  'https://sovereign.defrag.app',
+  'https://premium.defrag.app',
+];
+
+function getCorsHeaders(request: Request): Record<string, string> {
+  const origin = request.headers.get('Origin') || '';
+  const headers: Record<string, string> = {
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Vary': 'Origin',
+  };
+
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    headers['Access-Control-Allow-Origin'] = origin;
+  }
+
+  return headers;
+}
+
 // === NATAL ROUTES ===
 function registerNatalRoutes(router: any, getEnv: () => Env) {
   // GET /api/natal - fetch existing natal data

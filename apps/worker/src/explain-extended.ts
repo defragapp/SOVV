@@ -293,7 +293,6 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       structured: true
     },
 
-  const anotherInteractionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
 
   const confidence: Confidence = "Medium";
 
