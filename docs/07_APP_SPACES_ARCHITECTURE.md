@@ -1,8 +1,8 @@
-# App Spaces — Defrag and Covenant
+# App Spaces — Defrag, Covenant, and Alignment
 
 ## Architecture
 
-Both Defrag and Covenant are spaces inside Sovereign.os. They share:
+The Sovereign.os platform consists of a 3-space hierarchy: Defrag, Covenant, and Alignment. All three spaces share:
 - One user account
 - One auth/session system (`sovereign-os-api`)
 - One Baseline Design (stored in KV)
@@ -19,6 +19,7 @@ Both Defrag and Covenant are spaces inside Sovereign.os. They share:
 |---|---|---|
 | `/apps/defrag` | Defrag space | `apps/web/app/apps/defrag/page.tsx` |
 | `/apps/covenant` | Covenant space | `apps/web/app/apps/covenant/page.tsx` |
+| `/apps/alignment` | Alignment space | `apps/web/app/apps/alignment/page.tsx` |
 
 The authenticated app shell at `app.defrag.app` routes to `/apps/defrag` by default.
 
@@ -63,13 +64,35 @@ The authenticated app shell at `app.defrag.app` routes to `/apps/defrag` by defa
 
 ---
 
+## Alignment Space
+
+**Purpose:** Response integration and action choice. Helps turn insights into actionable responses.
+
+**Target User/Need:** Users needing to move from understanding to concrete action and conversational steering.
+
+**Canonical Output Object:** Alignment Brief
+
+**Entry point:** `apps/web/app/apps/alignment/page.tsx`
+
+**API routes used:**
+- `GET /api/baseline` — load shared Baseline Design
+- `POST /api/alignment` — Alignment AI analysis
+- `POST /api/history` — save to Library with `workspace_source: "ALIGNMENT"`
+- `GET /api/auth/tier` — subscription tier check
+
+**Library save:** `workspace_source: "ALIGNMENT"`
+
+**AI system prompt:** `apps/worker/src/alignment.ts` — `SYSTEM_ALIGNMENT`
+
+---
+
 ## Library Schema
 
 ```sql
 CREATE TABLE library (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL,
-    workspace_source TEXT NOT NULL CHECK(workspace_source IN ('DEFRAG', 'COVENANT')),
+    workspace_source TEXT NOT NULL CHECK(workspace_source IN ('DEFRAG', 'COVENANT', 'ALIGNMENT')),
     title TEXT,
     payload JSON,
     is_public INTEGER DEFAULT 0,
@@ -78,7 +101,7 @@ CREATE TABLE library (
 );
 ```
 
-The `workspace_source` column is an internal identifier. In user-facing copy, use "Defrag space" and "Covenant space" — not "DEFRAG" or "COVENANT".
+The `workspace_source` column is an internal identifier. In user-facing copy, use "Defrag space", "Covenant space", and "Alignment space" — not "DEFRAG", "COVENANT", or "ALIGNMENT".
 
 ---
 
@@ -93,7 +116,7 @@ When adding a new space to Sovereign.os:
 5. Add `workspace_source` value to D1 `library` table CHECK constraint via migration
 6. Add space route to middleware if host-based routing is needed
 7. Add space to the Sovereign.os landing page (`apps/web/app/page.tsx`)
-8. Document the space in `docs/07_APP_SPACES_DEFRAG_COVENANT.md`
+8. Document the space in `docs/07_APP_SPACES_ARCHITECTURE.md`
 9. Do NOT create separate auth, subscription, Baseline Design, Library, or invite systems
 
 ---
