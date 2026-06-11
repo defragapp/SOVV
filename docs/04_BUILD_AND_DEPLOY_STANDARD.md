@@ -55,7 +55,7 @@ Do NOT use `npm install && npm run build:worker` — this runs OpenNext build tw
 
 | Setting | Value |
 |---|---|
-| Root directory | `/` |
+| Root directory | (Leave blank) |
 | Build command | `npm install` |
 | Deploy command | `cd apps/worker-ai && npx wrangler deploy` |
 | Node version | `22` |
