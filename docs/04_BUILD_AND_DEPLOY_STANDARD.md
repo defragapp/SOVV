@@ -51,6 +51,24 @@ Do NOT use `npm install && npm run build:worker` — this runs OpenNext build tw
 | Deploy command | `npx wrangler deploy` |
 | Node version | `22` |
 
+### worker-ai
+
+| Setting | Value |
+|---|---|
+| Root directory | `apps/worker-ai` |
+| Build command | `npm install` |
+| Deploy command | `npx wrangler deploy` |
+| Node version | `22` |
+
+### worker-session
+
+| Setting | Value |
+|---|---|
+| Root directory | `apps/worker-session` |
+| Build command | `npm install` |
+| Deploy command | `npx wrangler deploy` |
+| Node version | `22` |
+
 ---
 
 ## Runtime Stack
@@ -232,6 +250,28 @@ No Codespaces terminal required. No GitHub Actions required.
 | Deploy command | npx wrangler deploy |
 | Node version | 22 |
 | Health | api.defrag.app/ and api.defrag.app/health |
+
+### worker-ai
+
+| Setting | Value |
+|---|---|
+| Worker name | worker-ai |
+| Root directory | apps/worker-ai |
+| Config file | apps/worker-ai/wrangler.toml |
+| Build command | npm install |
+| Deploy command | npx wrangler deploy |
+| Node version | 22 |
+
+### worker-session
+
+| Setting | Value |
+|---|---|
+| Worker name | worker-session |
+| Root directory | apps/worker-session |
+| Config file | apps/worker-session/wrangler.toml |
+| Build command | npm install |
+| Deploy command | npx wrangler deploy |
+| Node version | 22 |
 
 ---
 
