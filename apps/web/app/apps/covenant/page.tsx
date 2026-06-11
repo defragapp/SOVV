@@ -1,11 +1,37 @@
 "use client"
 import * as React from "react"
-import { WorkspaceShell } from "@/components/workspace/workspace-shell"
+import { SpaceShell } from "@/components/workspace/space-shell"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
 export default function CovenantPage() {
   const [input, setInput] = React.useState("")
+  const [result, setResult] = React.useState<any>(null)
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [error, setError] = React.useState("")
+
+  const handleCovenant = async () => {
+    if (!input.trim()) return
+    setIsLoading(true)
+    setError("")
+    setResult(null)
+    try {
+      const res = await fetch("/api/covenant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ moment: input })
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || data.message || "Failed to process")
+      }
+      setResult(data)
+    } catch (err: any) {
+      setError(err.message || "An error occurred.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -13,7 +39,7 @@ export default function CovenantPage() {
         <h3 className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.2em]">Covenant Briefs</h3>
       </div>
       <div className="flex-1 px-5 py-6">
-        <p className="text-xs font-mono text-[#3F3F46]">No saved briefs.</p>
+        <p className="text-xs font-mono text-[#3F3F46] leading-relaxed">Save useful Results here so you can return before the old pattern takes over again.</p>
       </div>
     </div>
   )
@@ -22,10 +48,10 @@ export default function CovenantPage() {
     <div className="flex flex-col gap-px">
       <div className="border border-white/[0.06] bg-[#080808] p-4 flex flex-col gap-1.5">
         <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.15em]">Baseline Design</p>
-        <p className="text-xs text-[#71717A]">Context active.</p>
+        <p className="text-xs text-[#71717A]">Your Baseline Design gives the system context before you describe this moment.</p>
       </div>
       <div className="border border-white/[0.04] bg-[#050505] p-4 flex flex-col gap-1.5 opacity-40">
-        <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.15em]">Save to Library</p>
+        <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.15em]">Save to Sovereign</p>
         <p className="text-xs text-[#52525B]">Requires Pro</p>
       </div>
     </div>
@@ -40,37 +66,73 @@ export default function CovenantPage() {
           </svg>
         </div>
         <div className="gap-2 flex flex-col">
-          <h2 className="text-base font-medium text-[#FAFAFA] tracking-tight">Faith connected to repair.</h2>
+          <h2 className="text-base font-medium text-[#FAFAFA] tracking-tight">Faith-context reflection</h2>
           <p className="text-xs text-[#52525B] font-mono leading-relaxed">
-            Reflect on responsibility<br />and the next honest step.
+            Connect your current moment to grounded reflection.
           </p>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 mb-4 font-mono">
+          {error}
+        </div>
+      )}
 
       <div className="border border-white/[0.08] bg-[#080808] focus-within:border-white/[0.18] transition-colors duration-200">
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Share the situation here..."
+          placeholder="Describe the moment or pressure..."
           className="w-full bg-transparent text-[#FAFAFA] placeholder:text-[#3F3F46] resize-none outline-none min-h-[120px] text-sm p-4 leading-relaxed font-mono"
         />
         <div className="flex justify-between items-center px-4 py-3 border-t border-white/[0.06]">
           <span className="text-[10px] text-[#3F3F46] font-mono tracking-wide">ENTER TO REFLECT</span>
           <Button
             size="sm"
-            variant="secondary"
-            disabled={!input}
-            className="rounded-none border border-white/[0.08] bg-transparent text-[#A1A1AA] hover:text-white hover:border-white/20 font-mono text-[10px] tracking-[0.15em] uppercase h-8 px-4 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+            onClick={handleCovenant}
+            disabled={!input.trim() || isLoading}
+            className="rounded-none border border-white/[0.15] bg-white text-black hover:bg-white/90 font-mono text-[10px] tracking-[0.15em] uppercase h-8 px-4 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
           >
-            Generate Brief
+            {isLoading ? "Running..." : "Reflect"}
           </Button>
         </div>
       </div>
     </div>
   )
 
+  const renderSection = (title: string, content: any) => {
+    if (!content) return null;
+    return (
+      <div className="border-b border-white/[0.06] pb-6 mb-6 last:border-0 last:pb-0 last:mb-0">
+        <h4 className="text-[10px] font-mono text-[#71717A] uppercase tracking-[0.15em] mb-3">{title}</h4>
+        <p className="text-sm text-[#FAFAFA] font-mono leading-relaxed whitespace-pre-wrap">{String(content)}</p>
+      </div>
+    )
+  }
+
+  const mainResultArea = (
+    <div className="h-full flex flex-col">
+      {!result ? (
+        <div className="flex-1 flex items-center justify-center border border-white/[0.06] bg-[#080808] p-6 text-center">
+          <p className="text-sm text-[#52525B] font-mono leading-relaxed max-w-sm">
+            The Covenant space is ready visually, but its backend route is not connected yet.
+          </p>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto border border-white/[0.06] bg-[#080808] p-8">
+           {renderSection("Moment feels like", result.moment_feels_like)}
+           {renderSection("Story Connection", result.story_connection)}
+           {renderSection("Reflection Prompt", result.reflection_prompt)}
+           {renderSection("Next Step", result.next_step)}
+        </div>
+      )}
+    </div>
+  )
+
   const mobileTabs = [
     { id: "input", label: "Input", content: mainInputArea },
+<<<<<<< HEAD
     {
       id: "result",
       label: "Brief",
@@ -93,14 +155,24 @@ export default function CovenantPage() {
 
       )
     },
+=======
+    { id: "result", label: "Result", content: mainResultArea },
+>>>>>>> 0d32d2b (feat: complete platform implementation (defrag, library, spaces, api normalization))
     { id: "context", label: "Context", content: contextContent }
   ]
 
+  const desktopMain = (
+    <div className="flex flex-col h-full gap-6">
+       <div className="flex-none">{mainInputArea}</div>
+       <div className="flex-1 min-h-0">{mainResultArea}</div>
+    </div>
+  )
+
   return (
-    <WorkspaceShell
+    <SpaceShell
       spaceName="Covenant"
       sidebar={sidebarContent}
-      main={mainInputArea}
+      main={desktopMain}
       contextPanel={contextContent}
       mobileTabs={mobileTabs}
     />

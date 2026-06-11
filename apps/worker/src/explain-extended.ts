@@ -36,10 +36,22 @@ Rules:
 
 Respond in this exact JSON format only, no markdown, no code fences:
 {
-  "response": "2-4 sentences reframing what they described",
-  "shift": { "label": "Short shift name", "summary": "One sentence explaining the shift" },
-  "move": { "label": "Short action name", "description": "Specific concrete next step", "difficulty": "gentle|moderate|direct" },
-  "insights": [{ "id": "ins_001", "type": "pattern", "title": "Short title", "detail": "What the pattern is", "source": "baseline" }]
+  "summary": "1-2 sentence high level summary of the situation",
+  "activePattern": "Name the active pattern in a few words",
+  "theRepeat": "1-2 sentences on what is repeating here",
+  "oldRole": "What role the user is defaulting to",
+  "whatYouLearnedToCarry": "What they learned to carry that fuels this",
+  "strainPattern": "How this pattern shows up under strain",
+  "giftUnderStrain": "The positive intent or gift hidden in the strain",
+  "alignment": "What needs to align now",
+  "bestNextResponse": {
+    "summary": "Context for the response",
+    "phrasing": ["phrase 1", "phrase 2"]
+  },
+  "conversationalSteering": {
+    "do": ["do this 1", "do this 2"],
+    "avoid": ["avoid this 1", "avoid this 2"]
+  }
 }`;
 
 const SYSTEM_RELATIONAL = `You are Sovereign — a perspective-shift engine for relational dynamics.
@@ -282,8 +294,44 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     }
   };
 
+<<<<<<< HEAD
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
+=======
+  const pressurePoints = normalizePressurePoints(parsed.pressure_points);
+
+  const now = new Date().toISOString();
+  
+  const result = {
+    id: interactionId,
+    workspaceSource: "DEFRAG",
+    createdAt: now,
+    title: parsed.activePattern || "Unclear pattern",
+    summary: parsed.summary || "This section needs more context.",
+    activePattern: parsed.activePattern || "Unclear pattern",
+    theRepeat: parsed.theRepeat || "This section needs more context.",
+    oldRole: parsed.oldRole || "This section needs more context.",
+    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || "This section needs more context.",
+    strainPattern: parsed.strainPattern || "This section needs more context.",
+    giftUnderStrain: parsed.giftUnderStrain || "This section needs more context.",
+    alignment: parsed.alignment || "This section needs more context.",
+    bestNextResponse: parsed.bestNextResponse || { summary: "This section needs more context.", phrasing: [] },
+    conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] },
+    sourcesUsed: {
+      baseline: !!baseline,
+      history: patterns.length > 0
+    },
+    media: {
+      audioOverviewAvailable: false,
+      watchPreviewAvailable: false
+    },
+    metadata: {
+      structured: true
+    },
+    thread_meta: threadMeta,
+  };
+
+>>>>>>> 0d32d2b (feat: complete platform implementation (defrag, library, spaces, api normalization))
   const confidence: Confidence = "Medium";
 
   await insertInteraction(env.DB, {
