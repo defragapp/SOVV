@@ -67,7 +67,7 @@ export async function handleSaveToLibrary(req: Request, env: Env) {
     if (typeof title !== "string" || typeof content !== "string" || typeof workspace_source !== "string") {
        return new Response("Invalid or missing required fields", { status: 400 });
     }
-    if (workspace_source !== "DEFRAG" && workspace_source !== "COVENANT") {
+    if (!["DEFRAG", "COVENANT", "ALIGNMENT"].includes(workspace_source)) {
        return new Response("Invalid workspace source", { status: 400 });
     }
 
