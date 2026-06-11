@@ -124,7 +124,7 @@ function normalizeMove(input: any): Move {
   };
 }
 
-function normalizeInsights(input: any): Insight[] {
+export function normalizeInsights(input: any): Insight[] {
   if (!Array.isArray(input)) return [];
   return input
     .filter((item) => item && typeof item.id === "string")
