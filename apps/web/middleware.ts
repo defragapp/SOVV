@@ -27,9 +27,9 @@ export function middleware(request: NextRequest) {
 
   // If no session and route is not public, immediately redirect to login to intercept
   // before client-side rendering or AuthGuard
-  if (!sessionId && !isPublicPath) {
+  if (isAppShell && !sessionId && !isPublicPath) {
     // If not already on the app shell login page, go there
-    return NextResponse.redirect(new URL('https://app.defrag.app/app/login'));
+    return NextResponse.redirect(new URL('/app/login', request.url));
   }
 
   if (isAppShell) {
