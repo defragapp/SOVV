@@ -132,32 +132,7 @@ export default function CovenantPage() {
 
   const mobileTabs = [
     { id: "input", label: "Input", content: mainInputArea },
-<<<<<<< HEAD
-    {
-      id: "result",
-      label: "Brief",
-      content: (
-
-        <div className="flex flex-col gap-6 p-4">
-          <div className="border-b border-white/[0.04] pb-6">
-            <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.2em] mb-4">The Story in Plain Language</p>
-            <p className="text-sm text-[#FAFAFA] font-mono leading-relaxed">The desire to fix it immediately is bypassing the need for actual repair. True repair requires waiting for the other person to be ready to hear it.</p>
-          </div>
-          <div className="border-b border-white/[0.04] pb-6">
-            <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.2em] mb-4">The Scripture Connection</p>
-            <p className="text-sm text-[#FAFAFA] font-mono leading-relaxed opacity-80">&quot;Let every person be quick to hear, slow to speak, slow to anger.&quot;<br/>— James 1:19</p>
-          </div>
-          <div>
-            <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.2em] mb-4">One Grounded Response</p>
-            <p className="text-sm text-[#FAFAFA] font-mono leading-relaxed">Wait. When the time is right, take responsibility for your part without expecting them to fix theirs.</p>
-          </div>
-        </div>
-
-      )
-    },
-=======
     { id: "result", label: "Result", content: mainResultArea },
->>>>>>> 0d32d2b (feat: complete platform implementation (defrag, library, spaces, api normalization))
     { id: "context", label: "Context", content: contextContent }
   ]
 
