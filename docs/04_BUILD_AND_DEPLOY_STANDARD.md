@@ -46,27 +46,27 @@ Do NOT use `npm install && npm run build:worker` — this runs OpenNext build tw
 
 | Setting | Value |
 |---|---|
-| Root directory | `apps/worker` |
+| Root directory | (Leave blank) |
 | Build command | `npm install` |
-| Deploy command | `npx wrangler deploy` |
+| Deploy command | `cd apps/worker && npx wrangler deploy` |
 | Node version | `22` |
 
 ### worker-ai
 
 | Setting | Value |
 |---|---|
-| Root directory | `apps/worker-ai` |
+| Root directory | (Leave blank) |
 | Build command | `npm install` |
-| Deploy command | `npx wrangler deploy` |
+| Deploy command | `cd apps/worker-ai && npx wrangler deploy` |
 | Node version | `22` |
 
 ### worker-session
 
 | Setting | Value |
 |---|---|
-| Root directory | `apps/worker-session` |
+| Root directory | (Leave blank) |
 | Build command | `npm install` |
-| Deploy command | `npx wrangler deploy` |
+| Deploy command | `cd apps/worker-session && npx wrangler deploy` |
 | Node version | `22` |
 
 ---
@@ -244,10 +244,10 @@ No Codespaces terminal required. No GitHub Actions required.
 | Setting | Value |
 |---|---|
 | Worker name | sovereign-os-api |
-| Root directory | apps/worker |
+| Root directory | (Leave blank) |
 | Config file | apps/worker/wrangler.toml |
 | Build command | npm install |
-| Deploy command | npx wrangler deploy |
+| Deploy command | cd apps/worker && npx wrangler deploy |
 | Node version | 22 |
 | Health | api.defrag.app/ and api.defrag.app/health |
 
@@ -256,10 +256,10 @@ No Codespaces terminal required. No GitHub Actions required.
 | Setting | Value |
 |---|---|
 | Worker name | worker-ai |
-| Root directory | apps/worker-ai |
+| Root directory | (Leave blank) |
 | Config file | apps/worker-ai/wrangler.toml |
 | Build command | npm install |
-| Deploy command | npx wrangler deploy |
+| Deploy command | cd apps/worker-ai && npx wrangler deploy |
 | Node version | 22 |
 
 ### worker-session
@@ -267,10 +267,10 @@ No Codespaces terminal required. No GitHub Actions required.
 | Setting | Value |
 |---|---|
 | Worker name | worker-session |
-| Root directory | apps/worker-session |
+| Root directory | (Leave blank) |
 | Config file | apps/worker-session/wrangler.toml |
 | Build command | npm install |
-| Deploy command | npx wrangler deploy |
+| Deploy command | cd apps/worker-session && npx wrangler deploy |
 | Node version | 22 |
 
 ---
@@ -309,7 +309,7 @@ build:worker only builds, does not deploy.
 
 1. dash.cloudflare.com → Workers and Pages → sovereign-os-api → Settings → Build and Deployments
 2. Click Connect Git → defragapp/SOVV
-3. Branch: main | Root: apps/worker | Build: npm install | Deploy: npx wrangler deploy | Node: 22
+3. Branch: main | Root: (leave blank) | Build: npm install | Deploy: cd apps/worker && npx wrangler deploy | Node: 22
 4. Save and Deploy
 
 ---
