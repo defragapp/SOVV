@@ -154,8 +154,9 @@ export default function DefragPage() {
             </div>
 
             <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <span className="rounded-full border border-[#2A2A31] px-3 py-1 text-xs text-[#B1B1BA]">
-                {baselineLoaded ? "Baseline active" : "Baseline incomplete"}
+                {baselineLoaded ? "Baseline Design active" : "Baseline Design incomplete"}
               </span>
               <span className="rounded-full border border-[#2A2A31] px-3 py-1 text-xs text-[#B1B1BA]">
                 {tier}
