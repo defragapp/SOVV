@@ -10,7 +10,6 @@ import { registerPatternsRoutes, extractPatterns } from "./patterns.js";
 import { registerCovenantRoute } from "./covenant.js";
 import { registerAlignmentRoute } from "./alignment.js";
 import { registerAudioRoute } from "./audio.js";
-import { getCorsHeaders } from "./cors.js";
 import { insertSupportTicket } from "./db.js";
 
 const router = Router();

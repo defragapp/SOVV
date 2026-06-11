@@ -48,10 +48,10 @@ export default function LibraryView() {
   }, [])
 
   return (
-    <aside className="flex h-full flex-col bg-black overflow-y-auto" aria-label="Sovereign.os Library">
+    <aside className="flex h-full flex-col bg-background overflow-y-auto" aria-label="Sovereign.os Library">
 
       {/* Header */}
-      <div className="flex h-10 shrink-0 items-center border-b border-[#F6F5F3]/10 px-4">
+      <div className="flex h-10 shrink-0 items-center border-b border-border px-4">
         <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">
           Sovereign.os Library
         </span>
@@ -130,7 +130,7 @@ export default function LibraryView() {
           </div>
 
           {/* Library sections */}
-          <div className="mt-4 border-t border-[#F6F5F3]/10">
+          <div className="mt-4 border-t border-border">
             {[
               "Best Next Responses",
               "Covenant Briefs",
@@ -139,7 +139,7 @@ export default function LibraryView() {
             ].map((label) => (
               <div
                 key={label}
-                className="flex items-center justify-between px-4 py-3 border-b border-[#F6F5F3]/5"
+                className="flex items-center justify-between px-4 py-3 border-b border-border"
               >
                 <span className="font-mono text-[9px] uppercase tracking-widest text-white/15">
                   {label}

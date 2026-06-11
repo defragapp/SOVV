@@ -48,7 +48,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
   return (
     <div
-      className="flex min-h-screen w-full items-center justify-center bg-black text-[#F6F5F3]"
+      className="flex min-h-screen w-full items-center justify-center bg-background text-foreground"
       style={{ fontFamily: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}
     >
       <div
@@ -114,7 +114,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                   Sovereign OS
                 </p>
                 <div className="h-px w-full bg-[#F6F5F3]/10 mb-8" />
-                <h1 className="text-lg font-light text-[#F6F5F3] mb-3">
+                <h1 className="text-lg font-light text-foreground mb-3">
                   Start Your Baseline Design
                 </h1>
                 <p className="text-sm font-light leading-6 text-white/40">
@@ -138,7 +138,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                     value={dob}
                     onChange={(e) => setDob(e.target.value)}
                     required
-                    className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-3 text-sm font-light text-[#F6F5F3] focus:border-[#F6F5F3]/30 focus:outline-none transition-colors duration-200"
+                    className="w-full border border-border bg-transparent px-4 py-3 text-sm font-light text-foreground focus:border-border-focus focus:outline-none transition-colors duration-200"
                   />
                 </div>
 
@@ -155,8 +155,8 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                         onClick={() => setPrecision(p)}
                         className={`flex-1 border py-2 font-mono text-[9px] uppercase tracking-widest transition-colors duration-200 ${
                           precision === p
-                            ? "border-[#F6F5F3]/40 text-[#F6F5F3]"
-                            : "border-[#F6F5F3]/10 text-white/25 hover:text-white/50"
+                            ? "border-border-focus text-foreground"
+                            : "border-border text-white/25 hover:text-white/50"
                         }`}
                       >
                         {p === "exact" ? "Exact" : p === "approximate" ? "Approx" : "Unknown"}
@@ -170,7 +170,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                       value={tob}
                       onChange={(e) => setTob(e.target.value)}
                       required={precision !== ("unknown" as any)}
-                      className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-3 text-sm font-light text-[#F6F5F3] focus:border-[#F6F5F3]/30 focus:outline-none transition-colors duration-200"
+                      className="w-full border border-border bg-transparent px-4 py-3 text-sm font-light text-foreground focus:border-border-focus focus:outline-none transition-colors duration-200"
                     />
                   )}
 
@@ -193,7 +193,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                     onChange={(e) => setPob(e.target.value)}
                     required
                     placeholder="City, Country"
-                    className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-3 text-sm font-light text-[#F6F5F3] placeholder-white/15 focus:border-[#F6F5F3]/30 focus:outline-none transition-colors duration-200"
+                    className="w-full border border-border bg-transparent px-4 py-3 text-sm font-light text-foreground placeholder-white/15 focus:border-border-focus focus:outline-none transition-colors duration-200"
                   />
                 </div>
 
@@ -221,7 +221,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                   }
                   whileHover={{ backgroundColor: "rgba(246,245,243,0.08)" }}
                   whileTap={{ scale: 0.98 }}
-                  className="mt-2 border border-[#F6F5F3]/20 px-4 py-3.5 font-mono text-[10px] uppercase tracking-widest text-[#F6F5F3] transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
+                  className="mt-2 border border-border-hover px-4 py-3.5 font-mono text-[10px] uppercase tracking-widest text-foreground transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
                 >
                   Set Baseline Design
                 </motion.button>

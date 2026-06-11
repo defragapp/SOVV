@@ -22,14 +22,14 @@ export default function HubDashboardPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-black text-white p-8 flex items-center justify-center">
+      <main className="min-h-screen bg-background text-white p-8 flex items-center justify-center">
         <div className="font-mono">AUTHENTICATING...</div>
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-black text-white p-8">
+    <main className="min-h-screen bg-background text-white p-8">
       <header className="mb-8 border-b border-white pb-4">
         <h1 className="text-2xl font-bold">DASHBOARD</h1>
         {user && <p className="text-gray-400 text-sm mt-1">{user.email}</p>}

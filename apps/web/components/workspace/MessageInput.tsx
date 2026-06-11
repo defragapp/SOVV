@@ -42,7 +42,7 @@ export default function MessageInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className="shrink-0 border-t border-[#F6F5F3]/10 p-4"
+      className="shrink-0 border-t border-border p-4"
       aria-label="Send a message"
     >
       <div className="flex items-end gap-3">
@@ -59,14 +59,14 @@ export default function MessageInput({
           rows={2}
           disabled={disabled}
           aria-disabled={disabled}
-          className="flex-1 resize-none bg-transparent text-sm font-light text-[#F6F5F3] placeholder:text-white/20 focus:outline-none disabled:opacity-40 leading-6"
+          className="flex-1 resize-none bg-transparent text-sm font-light text-foreground placeholder:text-white/20 focus:outline-none disabled:opacity-40 leading-6"
           style={{ minHeight: "3rem", maxHeight: "10rem" }}
         />
         <button
           type="submit"
           disabled={disabled || !value.trim()}
           aria-label="Send message"
-          className="shrink-0 border border-[#F6F5F3]/20 px-4 py-2 font-mono text-[9px] uppercase tracking-widest text-[#F6F5F3] transition-colors hover:bg-[#F6F5F3]/5 disabled:opacity-25 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-1 focus-visible:outline-white/40"
+          className="shrink-0 border border-border-hover px-4 py-2 font-mono text-[9px] uppercase tracking-widest text-foreground transition-colors hover:bg-[#F6F5F3]/5 disabled:opacity-25 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-1 focus-visible:outline-white/40"
         >
           Send
         </button>

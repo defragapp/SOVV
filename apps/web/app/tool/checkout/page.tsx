@@ -69,12 +69,12 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#050505] text-[#FAFAFA] flex items-center justify-center p-6">
-      <div className="w-full max-w-sm border border-white/[0.08] bg-[#080808] p-8 flex flex-col gap-8">
+    <main className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
+      <div className="w-full max-w-sm border border-border bg-surface p-8 flex flex-col gap-8">
         <div className="text-center">
-          <p className="text-[10px] font-mono text-[#3F3F46] tracking-[0.3em] uppercase mb-4">Sovereign.os</p>
+          <p className="text-[10px] font-mono text-foreground-disabled tracking-[0.3em] uppercase mb-4">Sovereign.os</p>
           <div className="h-px w-full bg-white/[0.06] mb-6" />
-          <h1 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">Subscribe</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Subscribe</h1>
         </div>
 
         {error && (
@@ -87,16 +87,16 @@ export default function CheckoutPage() {
           <button
             onClick={startCheckout}
             disabled={loading}
-            className="w-full border border-white/[0.15] bg-white text-black p-4 transition-colors hover:bg-white/90 disabled:opacity-20 text-left flex flex-col gap-1"
+            className="w-full border border-border-hover bg-white text-black p-4 transition-colors hover:bg-white/90 disabled:opacity-20 text-left flex flex-col gap-1"
           >
             <div className="text-xs font-mono uppercase tracking-[0.1em] font-semibold">Sovereign.os Pro</div>
-            <div className="text-[10px] font-mono text-[#52525B]">Full space access</div>
+            <div className="text-[10px] font-mono text-foreground-disabled">Full space access</div>
           </button>
 
           <button
             onClick={openPortal}
             disabled={portalLoading}
-            className="w-full border border-white/[0.08] bg-transparent text-[#71717A] p-3 transition-colors hover:text-white hover:border-white/20 disabled:opacity-20 text-[10px] font-mono uppercase tracking-widest text-center"
+            className="w-full border border-border bg-transparent text-foreground-muted p-3 transition-colors hover:text-white hover:border-border-hover disabled:opacity-20 text-[10px] font-mono uppercase tracking-widest text-center"
           >
             {portalLoading ? '...' : 'Manage existing subscription'}
           </button>

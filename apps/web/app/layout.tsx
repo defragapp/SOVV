@@ -1,7 +1,7 @@
+import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
-import "./globals.css";
 
 const jetBrainsMono = localFont({
   src: "../public/fonts/JetBrainsMono-VariableFont.woff2",
@@ -42,7 +42,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`antialiased ${jetBrainsMono.variable}`}>
-      <body className="min-h-screen overflow-x-hidden bg-[#020202] text-[#FDFDFD] bg-background text-foreground overscroll-none safe-top safe-bottom selection:bg-white/20 selection:text-white">
+      <body className="min-h-screen overflow-x-hidden bg-background text-foreground bg-background text-foreground overscroll-none safe-top safe-bottom selection:bg-white/20 selection:text-white">
         {children}
       </body>
     </html>

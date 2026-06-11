@@ -51,18 +51,18 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#05070B] text-[#F6F5F3]">
+    <div className="min-h-screen bg-[#05070B] text-foreground">
 
       {/* Header */}
       <header className="border-b border-[#F6F5F3]/8 px-6 py-4 flex items-center justify-between glass sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <Link href="/" className="text-micro text-[#F6F5F3]/25 hover:text-[#F6F5F3]/50 transition-colors">
+          <Link href="/" className="text-micro text-foreground/25 hover:text-foreground/50 transition-colors">
             Sovereign.os
           </Link>
-          <span className="text-[#F6F5F3]/15 text-micro">/</span>
-          <span className="text-micro text-[#F6F5F3]/40">Baseline Design</span>
+          <span className="text-foreground/15 text-micro">/</span>
+          <span className="text-micro text-foreground/40">Baseline Design</span>
         </div>
-        <Link href="/apps/defrag" className="text-micro text-[#F6F5F3]/30 hover:text-[#F6F5F3]/60 transition-colors">
+        <Link href="/apps/defrag" className="text-micro text-foreground/30 hover:text-foreground/60 transition-colors">
           ← Back to Defrag space
         </Link>
       </header>
@@ -74,7 +74,7 @@ export default function SettingsPage() {
           <div className="flex items-center gap-3">
             <span className="space-badge-defrag">Baseline Design</span>
             {hasBaseline && (
-              <span className="text-micro text-[#F6F5F3]/60/70">Active</span>
+              <span className="text-micro text-foreground/60/70">Active</span>
             )}
           </div>
           <h1 className="text-headline">Your Baseline Design<br />is the source.</h1>
@@ -182,7 +182,7 @@ export default function SettingsPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className={`text-label ${message.ok ? "text-[#F6F5F3]/60" : "text-red-400/60"}`}
+                  className={`text-label ${message.ok ? "text-foreground/60" : "text-red-400/60"}`}
                 >
                   {message.text}
                 </motion.p>

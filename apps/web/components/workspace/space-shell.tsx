@@ -27,7 +27,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
           </div>
           <div className="flex items-center font-mono text-xs text-foreground-muted">
             <span className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
               Secure Data Vault
             </span>
           </div>

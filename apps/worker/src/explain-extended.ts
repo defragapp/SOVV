@@ -296,7 +296,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const confidence: Confidence = "Medium";
 
   await insertInteraction(env.DB, {
-    id: anotherInteractionId,
+    id: interactionId,
     session_id: sid,
     mode,
     question: message,
@@ -308,11 +308,11 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   if (env.QUEUE) {
     // Offload pattern extraction to a queue to avoid delaying the response.
-    await env.QUEUE.send({ sessionId: sid, interactionId: anotherInteractionId });
+    await env.QUEUE.send({ sessionId: sid, interactionId: interactionId });
   } else {
     // Fallback for local dev or if queue is not configured.
     console.warn("QUEUE binding not found. Running pattern extraction in a non-blocking way, but this may be unreliable.");
-    void extractPatterns(env, sid, anotherInteractionId);
+    void extractPatterns(env, sid, interactionId);
   }
 
   return jsonResponse(result, 200, {

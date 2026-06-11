@@ -72,7 +72,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (auth.loading) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-black">
+      <div className="flex h-screen w-screen items-center justify-center bg-background">
         <span className="font-mono text-xs uppercase tracking-widest text-white/30">
           Verifying
         </span>

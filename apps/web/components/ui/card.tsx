@@ -5,10 +5,10 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variantClasses = {
-  default: "bg-[#111111] border border-white/5",
-  elevated: "bg-[#161616] border border-white/10 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)]",
-  premium: "bg-gradient-to-br from-[#141414] to-[#0A0A0A] border border-white/5 backdrop-blur-xl shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.05)]",
-  ghost: "bg-transparent border border-white/5 hover:bg-white/5 transition-colors",
+  default: "bg-surface border border-border",
+  elevated: "bg-surface-hover border border-border shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)]",
+  premium: "bg-gradient-to-br from-surface-hover to-background border border-border backdrop-blur-xl shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.05)]",
+  ghost: "bg-transparent border border-border hover:bg-white/5 transition-colors",
 }
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
@@ -16,7 +16,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
-        className={`rounded-2xl overflow-hidden text-[#FDFDFD] ${variantClasses[variant]} ${className}`}
+        className={`rounded-2xl overflow-hidden text-foreground ${variantClasses[variant]} ${className}`}
         {...props}
       >
         {children}
@@ -31,11 +31,11 @@ export const CardHeader = ({ className = "", ...props }: React.HTMLAttributes<HT
 )
 
 export const CardTitle = ({ className = "", ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-  <h3 className={`font-semibold leading-none tracking-tight text-[#FDFDFD] ${className}`} {...props} />
+  <h3 className={`font-semibold leading-none tracking-tight text-foreground ${className}`} {...props} />
 )
 
 export const CardDescription = ({ className = "", ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-  <p className={`text-sm text-[#A1A1AA] ${className}`} {...props} />
+  <p className={`text-sm text-foreground-muted ${className}`} {...props} />
 )
 
 export const CardContent = ({ className = "", ...props }: React.HTMLAttributes<HTMLDivElement>) => (
