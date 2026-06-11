@@ -62,10 +62,11 @@ export default function DefragPage() {
     }
   }
 
-  const handleGenerateAudio = async () => {
+  async function handleSave() {
     if (!result) return
-    setIsGeneratingAudio(true)
-    setAudioError("")
+    setSaving(true)
+    setError(null)
+
     try {
       const payload = {
          activePattern: result.activePattern,
@@ -77,10 +78,11 @@ export default function DefragPage() {
       
       const res = await fetch("/api/generate-audio", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ result: payload })
       })
-      
+
       if (!res.ok) {
         const data = await res.json()
         throw new Error(data.error || data.message || "Failed to generate audio")
@@ -92,7 +94,7 @@ export default function DefragPage() {
     } catch (err: any) {
       setAudioError(err.message || "Audio generation failed.")
     } finally {
-      setIsGeneratingAudio(false)
+      setSaving(false)
     }
   }
 
@@ -180,11 +182,12 @@ export default function DefragPage() {
         </div>
       </div>
 
-      {error && (
-        <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 mb-4 font-mono">
-          {error}
-        </div>
-      )}
+            <section className="rounded-2xl border border-[#2A2A31] bg-[#16161C] p-5">
+              <h2 className="text-sm font-medium text-[#F5F5F6]">Library</h2>
+              <p className="mt-2 text-sm text-[#B1B1BA]">
+                Save useful Results so you can return before the old pattern takes over again.
+              </p>
+            </section>
 
       <div className="border border-white/[0.08] bg-[#080808] focus-within:border-white/[0.22] transition-colors duration-200 shadow-2xl">
         <textarea
@@ -301,11 +304,27 @@ export default function DefragPage() {
     </div>
   )
 
-  const mobileTabs = [
-    { id: "input", label: "Input", content: mainInputArea },
-    { id: "result", label: "Result", content: mainResultArea },
-    { id: "context", label: "Context", content: contextContent }
-  ]
+                <section className="rounded-2xl border border-[#2A2A31] bg-[#16161C] p-5">
+                  <h2 className="text-lg font-semibold text-[#F5F5F6]">Conversational Steering</h2>
+                  <div className="mt-3 grid gap-4 md:grid-cols-2">
+                    <div>
+                      <h3 className="text-sm font-medium text-[#F5F5F6]">Do</h3>
+                      <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[#B1B1BA]">
+                        {result.conversationalSteering?.do?.map((item, idx) => (
+                          <li key={idx}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-[#F5F5F6]">Avoid</h3>
+                      <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[#B1B1BA]">
+                        {result.conversationalSteering?.avoid?.map((item, idx) => (
+                          <li key={idx}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </section>
 
   const desktopMain = (
     <div className="flex flex-col h-full gap-8">
@@ -313,14 +332,13 @@ export default function DefragPage() {
        <div className="flex-1 min-h-0">{mainResultArea}</div>
     </div>
   )
+}
 
+function ResultCard({ title, body }: { title: string; body: string }) {
   return (
-    <SpaceShell
-      spaceName="Defrag"
-      sidebar={sidebarContent}
-      main={desktopMain}
-      contextPanel={contextContent}
-      mobileTabs={mobileTabs}
-    />
+    <section className="rounded-2xl border border-[#2A2A31] bg-[#16161C] p-5">
+      <h2 className="text-lg font-semibold text-[#F5F5F6]">{title}</h2>
+      <p className="mt-2 text-sm leading-6 text-[#B1B1BA]">{body}</p>
+    </section>
   )
 }
