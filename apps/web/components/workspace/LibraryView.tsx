@@ -32,7 +32,7 @@ function formatDate(ts: number): string {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
 }
 
-export default function YourSpace() {
+export default function LibraryView() {
   const [state, setState] = useState<LoadState>("loading")
   const [items, setItems] = useState<HistoryItem[]>([])
 
