@@ -294,44 +294,10 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     }
   };
 
-<<<<<<< HEAD
+
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
-=======
-  const pressurePoints = normalizePressurePoints(parsed.pressure_points);
 
-  const now = new Date().toISOString();
-  
-  const result = {
-    id: interactionId,
-    workspaceSource: "DEFRAG",
-    createdAt: now,
-    title: parsed.activePattern || "Unclear pattern",
-    summary: parsed.summary || "This section needs more context.",
-    activePattern: parsed.activePattern || "Unclear pattern",
-    theRepeat: parsed.theRepeat || "This section needs more context.",
-    oldRole: parsed.oldRole || "This section needs more context.",
-    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || "This section needs more context.",
-    strainPattern: parsed.strainPattern || "This section needs more context.",
-    giftUnderStrain: parsed.giftUnderStrain || "This section needs more context.",
-    alignment: parsed.alignment || "This section needs more context.",
-    bestNextResponse: parsed.bestNextResponse || { summary: "This section needs more context.", phrasing: [] },
-    conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] },
-    sourcesUsed: {
-      baseline: !!baseline,
-      history: patterns.length > 0
-    },
-    media: {
-      audioOverviewAvailable: false,
-      watchPreviewAvailable: false
-    },
-    metadata: {
-      structured: true
-    },
-    thread_meta: threadMeta,
-  };
-
->>>>>>> 0d32d2b (feat: complete platform implementation (defrag, library, spaces, api normalization))
   const confidence: Confidence = "Medium";
 
   await insertInteraction(env.DB, {

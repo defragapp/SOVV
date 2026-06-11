@@ -21,7 +21,7 @@ describe('normalizeInsights', () => {
     ];
     const result = normalizeInsights(input);
     expect(result).toHaveLength(1);
-    expect(result[0].id).toBe('valid-id');
+    expect(result[0]!.id).toBe('valid-id');
   });
 
   it('should normalize valid insight objects', () => {
@@ -75,8 +75,8 @@ describe('normalizeInsights', () => {
     ];
 
     const result = normalizeInsights(input);
-    expect(result[0].type).toBe('pattern');
-    expect(result[1].type).toBe('baseline');
+    expect(result[0]!.type).toBe('pattern');
+    expect(result[1]!.type).toBe('baseline');
   });
 
   it('should fallback invalid sources to "conversation"', () => {
@@ -87,8 +87,8 @@ describe('normalizeInsights', () => {
     ];
 
     const result = normalizeInsights(input);
-    expect(result[0].source).toBe('conversation');
-    expect(result[1].source).toBe('comparison');
-    expect(result[2].source).toBe('baseline');
+    expect(result[0]!.source).toBe('conversation');
+    expect(result[1]!.source).toBe('comparison');
+    expect(result[2]!.source).toBe('baseline');
   });
 });
