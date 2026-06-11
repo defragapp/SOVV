@@ -122,7 +122,7 @@ export default function DefragItemPage() {
                 <Button 
                   onClick={handleGenerateAudio}
                   disabled={isGeneratingAudio}
-                  variant="outline" 
+                  variant="secondary" 
                   className="rounded-none border border-white/[0.15] bg-transparent text-[#FAFAFA] hover:bg-white/5 font-mono text-[10px] tracking-[0.15em] uppercase h-8 w-full"
                 >
                   {isGeneratingAudio ? "Generating..." : "Generate Audio"}
