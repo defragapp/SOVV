@@ -16,7 +16,7 @@
     "wrangler": "^4.93.0"
   },
   "dependencies": {
-    "@sovereign/core": "0.0.1",
+    "@sovereign/core": "file:../../packages/core",
     "itty-router": "^5.0.23"
   }
 }
