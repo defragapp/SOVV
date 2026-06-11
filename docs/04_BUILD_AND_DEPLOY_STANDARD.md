@@ -309,7 +309,7 @@ build:worker only builds, does not deploy.
 
 1. dash.cloudflare.com → Workers and Pages → sovereign-os-api → Settings → Build and Deployments
 2. Click Connect Git → defragapp/SOVV
-3. Branch: main | Root: / | Build: npm install | Deploy: cd apps/worker && npx wrangler deploy | Node: 22
+3. Branch: main | Root: (leave blank) | Build: npm install | Deploy: cd apps/worker && npx wrangler deploy | Node: 22
 4. Save and Deploy
 
 ---
