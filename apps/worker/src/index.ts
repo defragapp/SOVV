@@ -301,7 +301,7 @@ export default {
       } catch {
         bodyPreview = "(unable to read body)";
       }
-      const ticketId = `SV-${Date.now().toString(36).toUpperCase()}`;
+      const ticketId = `SV-${crypto.randomUUID()}`;
       await insertSupportTicket(env.DB, {
         id: ticketId,
         sender,
