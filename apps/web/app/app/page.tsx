@@ -3,6 +3,7 @@ import * as React from "react"
 import { SpaceShell } from "@/components/workspace/space-shell"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
 
 export default function LibraryPage() {
   const [items, setItems] = React.useState<any[]>([])
@@ -58,7 +59,7 @@ export default function LibraryPage() {
              </div>
           ) : (
              items.map(item => (
-                <div key={item.id} className="border border-white/[0.08] bg-[#080808] p-6 flex flex-col gap-4 hover:border-white/[0.18] transition-colors cursor-pointer">
+                <Link href={`/apps/defrag/${item.id}`} key={item.id} className="block border border-white/[0.08] bg-[#080808] p-6 flex flex-col gap-4 hover:border-white/[0.18] transition-colors cursor-pointer">
                    <div className="flex justify-between items-start">
                       <div className="flex flex-col gap-1">
                          <span className="text-[10px] font-mono text-[#71717A] uppercase tracking-[0.15em]">
@@ -75,7 +76,7 @@ export default function LibraryPage() {
                          {typeof item.payload === "string" ? (() => { try { return JSON.parse(item.payload).summary || "Result data" } catch { return item.payload }})() : "Result data"}
                       </p>
                    )}
-                </div>
+                </Link>
              ))
           )}
        </div>
