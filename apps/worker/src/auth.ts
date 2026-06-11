@@ -264,7 +264,10 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
       return jsonResponse({ error: "Promo code limit reached" }, 400)
     }
 
-    await env.DB.prepare("UPDATE promo_codes SET use_count = use_count + 1 WHERE id = ?").bind(promo.id).run()
+    const result = await env.DB.prepare("UPDATE promo_codes SET use_count = use_count + 1 WHERE id = ? AND (max_uses IS NULL OR use_count < max_uses)").bind(promo.id).run()
+    if (result.meta.changes === 0) {
+      return jsonResponse({ error: "Promo code limit reached" }, 400)
+    }
 
     return jsonResponse({ 
       success: true, 
