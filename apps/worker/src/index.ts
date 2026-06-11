@@ -262,7 +262,7 @@ export default {
   },
 
   async queue(batch: MessageBatch<unknown>, env: Env, _ctx: ExecutionContext): Promise<void> {
-    await Promise.allSettled(batch.messages.map(async (message) => {
+    await Promise.all(batch.messages.map(async (message) => {
       const body = message.body as { sessionId?: string; interactionId?: string };
       const sessionId = body?.sessionId;
       const interactionId = body?.interactionId;
