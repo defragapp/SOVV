@@ -25,7 +25,7 @@ All three spaces share one auth system, one Baseline Design, one Library, and on
 
 ## Core Principle
 
-One user. One Baseline Design. One Library. Multiple guided spaces.
+One user. One Baseline Design. One Library. Three guided spaces.
 
 ## Domains
 

@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS library (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL,
-    workspace_source TEXT NOT NULL CHECK(workspace_source IN ('DEFRAG', 'COVENANT')),
+    workspace_source TEXT NOT NULL CHECK(workspace_source IN ('DEFRAG', 'COVENANT', 'ALIGNMENT')),
     title TEXT,
     payload JSON,
     is_public INTEGER DEFAULT 0,
