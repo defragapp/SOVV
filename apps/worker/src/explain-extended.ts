@@ -101,7 +101,7 @@ function parseJsonFromText(text: string): Record<string, any> {
   }
 }
 
-function normalizeShift(input: any): Shift {
+export function normalizeShift(input: any): Shift {
   if (input && typeof input.label === "string" && typeof input.summary === "string") {
     return input;
   }
@@ -264,42 +264,39 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const rawText = asText((ai as any).response ?? ai);
   const parsed = parseJsonFromText(rawText);
 
-
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
   const pressurePoints = normalizePressurePoints(parsed.pressure_points);
 
+  const now = new Date().toISOString();
+  
   const result = {
     id: interactionId,
     workspaceSource: "DEFRAG",
-    createdAt: new Date().toISOString(),
-    title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
-    summary: parsed.response || "",
-    activePattern: parsed.activePattern || "No active pattern identified.",
-    theRepeat: parsed.theRepeat || "No repeating pattern identified.",
-    oldRole: parsed.oldRole || "Unknown role.",
-    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || "Unknown.",
-    strainPattern: parsed.strainPattern || "Unknown strain.",
-    giftUnderStrain: parsed.giftUnderStrain || "Unknown strength.",
-    alignment: parsed.alignment || "Unknown alignment.",
-    bestNextResponse: parsed.bestNextResponse || { summary: "No specific response.", phrasing: [] },
+    createdAt: now,
+    title: parsed.activePattern || "Unclear pattern",
+    summary: parsed.summary || "This section needs more context.",
+    activePattern: parsed.activePattern || "Unclear pattern",
+    theRepeat: parsed.theRepeat || "This section needs more context.",
+    oldRole: parsed.oldRole || "This section needs more context.",
+    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || "This section needs more context.",
+    strainPattern: parsed.strainPattern || "This section needs more context.",
+    giftUnderStrain: parsed.giftUnderStrain || "This section needs more context.",
+    alignment: parsed.alignment || "This section needs more context.",
+    bestNextResponse: parsed.bestNextResponse || { summary: "This section needs more context.", phrasing: [] },
     conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] },
     sourcesUsed: {
-      baseline: true,
-      history: Boolean(patternText),
-      invitedUsers: Boolean(relational)
+      baseline: !!baseline,
+      history: patterns.length > 0
     },
     media: {
-      audioOverviewAvailable: isPro,
+      audioOverviewAvailable: false,
       watchPreviewAvailable: false
     },
     metadata: {
       structured: true
-    }
+    },
+
   };
-
-
-
-  const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
 
   const confidence: Confidence = "Medium";
 
