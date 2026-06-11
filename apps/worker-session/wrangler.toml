@@ -33,4 +33,4 @@ head_sampling_rate = 1
 invocation_logs = true
 [[migrations]]
 tag = "v1"
-new_classes = [ \"ConflictSessionDO\" ]
+new_classes = [ "ConflictSessionDO" ]
