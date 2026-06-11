@@ -13,9 +13,6 @@ zone_id = "45a59d754ece9221fc97c92c461eb01f"
 [ai]
 binding = "AI"
 
-# AI Gateway binding for external model routing
-[[ai.gateway]]
-id = "vscode-codespace-agent"
 
 [observability]
 enabled = true

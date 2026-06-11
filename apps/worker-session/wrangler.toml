@@ -11,9 +11,6 @@ route = { pattern = "session.defrag.app/*", custom_domain = false }
 [ai]
 binding = "AI"
 
-# AI Gateway binding for external model routing
-[[ai.gateway]]
-id = "vscode-codespace-agent"
 
 # Service binding to worker-ai for emotional driver analysis
 [[services]]
