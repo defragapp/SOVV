@@ -4,81 +4,208 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+const WHAT_HELPS = [
+  {
+    title: "Repeating Conflicts",
+    desc: "Understand why the same arguments happen with different people.",
+  },
+  {
+    title: "Boundary Ruptures",
+    desc: "Identify when a boundary is yours to hold versus theirs to respect.",
+  },
+  {
+    title: "Grief & Stagnation",
+    desc: "See where you are holding onto old roles that no longer serve you.",
+  },
+  {
+    title: "Decision Paralysis",
+    desc: "Clarify what is yours to decide and what is not yours to carry.",
+  },
+]
+
+const HOW_IT_WORKS = [
+  {
+    step: "01",
+    title: "Baseline Design",
+    desc: "The context exists before you type. Sovereign.os understands your core patterns.",
+  },
+  {
+    step: "02",
+    title: "Current Situation",
+    desc: "Enter what is happening right now, without needing to explain the history.",
+  },
+  {
+    step: "03",
+    title: "Structured Result",
+    desc: "Receive a structural breakdown of the pattern, the old role, and the gift under strain.",
+  },
+  {
+    step: "04",
+    title: "Library Return",
+    desc: "Save useful Results. Return to them before the old pattern takes over again.",
+  },
+]
+
+const FREE_FEATURES = [
+  "Baseline Design access",
+  "Defrag space (limited sessions)",
+  "Library saving",
+]
+
+const PRO_FEATURES = [
+  "Unlimited Defrag sessions",
+  "Covenant Space access",
+  "Deep Library continuity",
+  "Audio Overview & Watch Preview (when available)",
+  "Private Invites",
+]
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Badge
+      variant="outline"
+      className="rounded-none border-white/[0.12] bg-transparent text-[#71717A] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
+    >
+      {children}
+    </Badge>
+  )
+}
+
+function Rule() {
+  return <div className="h-px w-full bg-white/[0.06]" />
+}
+
+function Dot({ dim }: { dim?: boolean }) {
+  return (
+    <div
+      className={`mt-[6px] w-1 h-1 shrink-0 rounded-full ${dim ? "bg-white/[0.15]" : "bg-white/30"}`}
+    />
+  )
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col items-center selection:bg-white/10 selection:text-white bg-[#050505]">
 
-      {/* 1. Hero Section */}
-      <Section className="w-full relative flex flex-col items-center justify-center min-h-[100svh] pt-32 pb-24 overflow-hidden border-b border-white/[0.06]">
-        <Container className="relative z-10 flex flex-col items-center text-center max-w-4xl">
+      {/* ── 1. Hero ─────────────────────────────────────────────────────────── */}
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[100svh] pt-28 pb-20 overflow-hidden border-b border-white/[0.06]">
 
-          <div className="mb-10 flex items-center gap-3">
-            <div className="h-px w-8 bg-white/20" />
-            <Badge variant="outline" className="rounded-none border-white/[0.12] bg-transparent text-[#71717A] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1">
-              SOVEREIGN.OS
-            </Badge>
-            <div className="h-px w-8 bg-white/20" />
+        {/* Grid texture */}
+        <div
+          aria-hidden
+          className="absolute inset-0 z-0 pointer-events-none opacity-[0.025]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)",
+            backgroundSize: "72px 72px",
+          }}
+        />
+
+        <Container className="relative z-10 flex flex-col items-center text-center max-w-[900px]">
+
+          {/* Wordmark pill */}
+          <div className="mb-12 flex items-center gap-3">
+            <div className="h-px w-10 bg-white/[0.14]" />
+            <SectionLabel>SOVEREIGN.OS</SectionLabel>
+            <div className="h-px w-10 bg-white/[0.14]" />
           </div>
 
-          <div className="space-y-5 mb-10">
-            <h1 className="text-5xl md:text-[72px] font-semibold tracking-[-0.03em] text-[#FAFAFA] leading-[1.05] text-balance">
+          {/* Primary headline */}
+          <div className="mb-8 space-y-2">
+            <h1 className="text-[clamp(2.6rem,7vw,5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance">
               Healing isn&apos;t optional.
             </h1>
-            <h1 className="text-5xl md:text-[72px] font-semibold tracking-[-0.03em] text-[#3F3F46] leading-[1.05] text-balance">
+            <h1 className="text-[clamp(2.6rem,7vw,5rem)] font-semibold tracking-[-0.035em] text-[#3F3F46] leading-[1.04] text-balance">
               Holding the pain is.
             </h1>
           </div>
 
-          <p className="text-base md:text-lg text-[#71717A] max-w-xl leading-relaxed text-pretty mb-10">
+          {/* Support copy */}
+          <p className="text-[#A1A1AA] text-base md:text-lg font-normal tracking-[-0.01em] max-w-[640px] mb-3 text-balance leading-[1.65]">
             Understand what is shaping your relationships, family dynamics, grief, boundaries, and decisions — and get a clearer way forward.
           </p>
 
-          <div className="w-full max-w-xs border border-white/[0.06] divide-y divide-white/[0.06] mb-12 text-left">
-            <p className="text-sm text-[#71717A] px-4 py-3 font-mono tracking-wide">See what is actually happening.</p>
-            <p className="text-sm text-[#71717A] px-4 py-3 font-mono tracking-wide">Understand your role in it.</p>
-            <p className="text-sm text-[#FAFAFA] px-4 py-3 font-mono tracking-wide">Respond differently.</p>
+          {/* Three-line sub-statement */}
+          <div className="mb-12 flex flex-col sm:flex-row items-center gap-x-5 gap-y-1 text-[#71717A] font-mono text-[10px] tracking-[0.12em] uppercase">
+            <span>See what is actually happening</span>
+            <span className="hidden sm:block text-white/[0.12]">·</span>
+            <span>Understand your role in it</span>
+            <span className="hidden sm:block text-white/[0.12]">·</span>
+            <span>Respond differently</span>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          {/* Primary CTAs */}
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto items-center">
             <Link href="/login" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full rounded-none border border-white/[0.15] bg-white text-black hover:bg-white/90 font-mono text-xs tracking-[0.15em] uppercase h-12 px-8 transition-colors">
-                Start Your Baseline Design
+              <Button
+                size="lg"
+                className="w-full sm:w-auto rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-8 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+              >
+                Enter Sovereign.os
               </Button>
             </Link>
-            <Link href="/settings" className="w-full sm:w-auto">
-              <Button variant="secondary" size="lg" className="w-full rounded-none border border-white/[0.08] bg-transparent text-[#A1A1AA] hover:text-white hover:border-white/20 font-mono text-xs tracking-[0.15em] uppercase h-12 px-8 transition-colors">
+            <Link href="/login" className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                variant="ghost"
+                className="w-full sm:w-auto rounded-none border-white/[0.12] bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] hover:text-white h-12 px-8 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+              >
                 Start Baseline Design
               </Button>
+            </Link>
+          </div>
+
+          {/* Secondary CTAs */}
+          <div className="mt-8 flex gap-7 text-[#71717A] font-mono text-[10px] tracking-[0.1em] uppercase">
+            <Link href="#defrag" className="hover:text-[#A1A1AA] transition-colors">
+              Explore Defrag →
+            </Link>
+            <Link href="#covenant" className="hover:text-[#A1A1AA] transition-colors">
+              Explore Covenant →
             </Link>
           </div>
         </Container>
       </Section>
 
-      {/* 2. What this helps with — Bento Grid */}
-      <Section className="w-full border-b border-white/[0.06]">
+      {/* ── 2. What this helps with ─────────────────────────────────────────── */}
+      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
         <Container>
-          <div className="flex flex-col gap-12">
-            <div className="flex flex-col gap-1 border-l-2 border-white/[0.08] pl-5">
-              <p className="text-[10px] font-mono text-[#52525B] tracking-[0.2em] uppercase mb-2">01 / SCOPE</p>
-              <h2 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">What this helps with</h2>
-              <p className="text-sm text-[#71717A] mt-1 leading-relaxed max-w-sm">
-                Most platforms track tasks. Sovereign.os helps you track the undercurrents.
-              </p>
+          <div className="max-w-3xl mx-auto">
+
+            {/* Cascade headline */}
+            <div className="mb-16 space-y-1">
+              <h2 className="text-[clamp(1.6rem,4vw,2.25rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
+                See what is actually happening.
+              </h2>
+              <h2 className="text-[clamp(1.6rem,4vw,2.25rem)] font-semibold tracking-[-0.025em] text-[#A1A1AA] leading-tight">
+                Understand your role in it.
+              </h2>
+              <h2 className="text-[clamp(1.6rem,4vw,2.25rem)] font-semibold tracking-[-0.025em] text-[#3F3F46] leading-tight">
+                Respond differently.
+              </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.05]">
-              {[
-                { title: "Relational Dynamics", desc: "Understand repeating conflicts and connection patterns." },
-                { title: "Family Roles", desc: "See the part you learned to play under pressure." },
-                { title: "Boundaries", desc: "Clarify where you end and others begin." },
-                { title: "Grief", desc: "Hold space for loss without forcing a fix." },
-                { title: "Communication Breakdowns", desc: "Decode what is actually being said when wires cross." },
-                { title: "Team Dynamics", desc: "Navigate unspoken tension and alignment issues." }
-              ].map((item, i) => (
-                <div key={i} className="bg-[#050505] p-6 flex flex-col gap-3 group hover:bg-[#0C0C0C] transition-colors">
-                  <div className="w-1 h-1 bg-white/20 mb-1" />
-                  <h3 className="text-sm font-medium text-[#FAFAFA] tracking-tight">{item.title}</h3>
-                  <p className="text-xs text-[#52525B] leading-relaxed">{item.desc}</p>
+            {/* Help grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 border border-white/[0.07]">
+              {WHAT_HELPS.map((item, i) => (
+                <div
+                  key={i}
+                  className={[
+                    "p-7 md:p-8 space-y-2",
+                    i % 2 === 0 && i < WHAT_HELPS.length - 1 ? "border-r border-white/[0.07]" : "",
+                    i < 2 ? "border-b border-white/[0.07]" : "",
+                  ].join(" ")}
+                >
+                  <h3 className="text-[#FAFAFA] text-[15px] font-medium tracking-tight">
+                    {item.title}
+                  </h3>
+                  <p className="text-[#71717A] text-sm leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -86,80 +213,91 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      {/* 3. The Problem */}
-      <Section className="w-full border-b border-white/[0.06]">
+      {/* ── 3. What Sovereign.os does ───────────────────────────────────────── */}
+      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#050505]">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-white/[0.05]">
-            <div className="bg-[#050505] p-10 lg:p-14 flex flex-col gap-8">
-              <p className="text-[10px] font-mono text-[#52525B] tracking-[0.2em] uppercase">02 / APPROACH</p>
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight leading-snug text-[#FAFAFA] text-balance">
-                Most advice tries to fix the symptom.<br className="hidden md:block" /> We look at the source.
+          <div className="flex flex-col lg:flex-row gap-16 xl:gap-24 justify-between items-start">
+
+            {/* Sticky label column */}
+            <div className="lg:w-[280px] shrink-0 space-y-5 lg:sticky lg:top-24">
+              <SectionLabel>The Loop</SectionLabel>
+              <h2 className="text-2xl font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-snug">
+                How the platform works
               </h2>
-              <div className="space-y-5 text-sm text-[#71717A] leading-relaxed">
-                <p>Sovereign.os gives structure to what usually stays tangled.</p>
-                <p className="text-[#52525B]">It helps you see:</p>
-                <ul className="space-y-0 border-l border-white/[0.08]">
-                  {[
-                    "what is actually driving the situation",
-                    "what part of it keeps repeating",
-                    "how you tend to respond under pressure",
-                    "where the pattern holds in place",
-                    "what kind of next response could change it",
-                  ].map((line, i) => (
-                    <li key={i} className="px-4 py-2.5 text-xs text-[#71717A] border-b border-white/[0.04] last:border-0 font-mono">
-                      {line}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <p className="text-[#A1A1AA] text-sm leading-relaxed">
+                Sovereign.os does not chat with you. It provides structured architectural insight into your situations, allowing you to interrupt old patterns.
+              </p>
             </div>
 
-            <div className="bg-[#080808] p-10 lg:p-14 flex flex-col gap-8 border-l border-white/[0.05]">
-              <Badge variant="outline" className="self-start rounded-none border-white/[0.1] bg-transparent text-[#52525B] font-mono text-[10px] tracking-[0.15em] uppercase px-3 py-1">
-                Trust Block
-              </Badge>
-              <div className="flex flex-col gap-5 flex-1">
-                {["No diagnosis.", "No compatibility score.", "No verdict."].map((text, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <div className="w-px h-6 bg-white/10 shrink-0" />
-                    <p className="text-lg font-medium text-[#3F3F46] tracking-tight">{text}</p>
+            {/* Step cards */}
+            <div className="flex-1 flex flex-col gap-0 border border-white/[0.07]">
+              {HOW_IT_WORKS.map((item, i) => (
+                <div
+                  key={i}
+                  className={[
+                    "flex items-start gap-6 p-7 md:p-8 group",
+                    i < HOW_IT_WORKS.length - 1 ? "border-b border-white/[0.07]" : "",
+                  ].join(" ")}
+                >
+                  <span className="text-[#3F3F46] font-mono text-xs mt-[3px] shrink-0 w-6">
+                    {item.step}
+                  </span>
+                  <div className="space-y-1.5">
+                    <h3 className="text-[#FAFAFA] text-[15px] font-medium tracking-tight">
+                      {item.title}
+                    </h3>
+                    <p className="text-[#71717A] text-sm leading-relaxed">{item.desc}</p>
                   </div>
-                ))}
-              </div>
-              <div className="pt-8 border-t border-white/[0.06]">
-                <p className="text-base text-[#FAFAFA] leading-relaxed text-pretty">
-                  Just a clearer understanding — and a better next move.
-                </p>
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         </Container>
       </Section>
 
-      {/* 4. Baseline Design */}
-      <Section className="w-full border-b border-white/[0.06] bg-[#030303]">
-        <Container className="max-w-3xl">
-          <div className="flex flex-col items-center text-center gap-8 py-4">
-            <div className="flex items-center gap-3">
-              <div className="h-px w-6 bg-white/10" />
-              <Badge className="rounded-none border border-white/[0.1] bg-transparent text-[#71717A] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1">
+      {/* ── 4. Baseline Design ──────────────────────────────────────────────── */}
+      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
+        <Container>
+          <div className="max-w-3xl mx-auto space-y-10">
+            <div className="space-y-4">
+              <SectionLabel>Foundation</SectionLabel>
+              <h2 className="text-[clamp(1.8rem,4vw,2.5rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
                 Baseline Design
-              </Badge>
-              <div className="h-px w-6 bg-white/10" />
+              </h2>
+              <p className="text-[#A1A1AA] text-base leading-relaxed max-w-xl">
+                The context that exists before you type. Your core attachment patterns, relational history, and default responses — established once, applied to every session.
+              </p>
             </div>
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-[#FAFAFA] text-balance">
-              Your Baseline Design is the source.
-            </h2>
-            <p className="text-sm text-[#71717A] leading-relaxed max-w-md text-pretty">
-              Your Baseline Design gives Sovereign.os context for how you process pressure, conflict, connection, repair, timing, and alignment.
-            </p>
-            <div className="w-full max-w-sm border border-white/[0.06] divide-y divide-white/[0.04]">
-              <p className="py-3 px-4 text-xs font-mono text-[#3F3F46] line-through decoration-white/10">Not as a label.</p>
-              <p className="py-3 px-4 text-xs font-mono text-[#3F3F46] line-through decoration-white/10">Not as an excuse.</p>
-              <p className="py-3 px-4 text-xs font-mono text-[#FAFAFA]">As context.</p>
+
+            <div className="border border-white/[0.07] divide-y divide-white/[0.07]">
+              {[
+                {
+                  label: "Core Pattern",
+                  desc: "Your primary relational architecture — how you learned to connect and protect yourself.",
+                },
+                {
+                  label: "Default Roles",
+                  desc: "The recurring positions you step into without choosing them: caretaker, mediator, exile.",
+                },
+                {
+                  label: "Threshold Markers",
+                  desc: "The specific situations that reliably trigger your oldest protective responses.",
+                },
+              ].map((row, i) => (
+                <div key={i} className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-8 px-7 py-5">
+                  <span className="text-[#FAFAFA] text-[13px] font-medium font-mono tracking-tight shrink-0 sm:w-40">
+                    {row.label}
+                  </span>
+                  <p className="text-[#71717A] text-sm leading-relaxed">{row.desc}</p>
+                </div>
+              ))}
             </div>
-            <Link href="/settings">
-              <Button variant="secondary" className="rounded-none border border-white/[0.08] bg-transparent text-[#A1A1AA] hover:text-white hover:border-white/20 font-mono text-xs tracking-[0.15em] uppercase h-10 px-6 transition-colors">
+
+            <Link href="/login">
+              <Button
+                size="lg"
+                className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-11 px-7 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+              >
                 Start Baseline Design
               </Button>
             </Link>
@@ -167,163 +305,216 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      {/* 5. Defrag */}
-      <Section className="w-full border-b border-white/[0.06]">
+      {/* ── 5. Defrag Space ─────────────────────────────────────────────────── */}
+      <Section id="defrag" className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#050505]">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-white/[0.05]">
-            <div className="bg-[#080808] p-10 lg:p-14 flex flex-col gap-8 order-2 lg:order-1 border-r border-white/[0.05]">
-              <Badge variant="defrag" className="self-start rounded-none border border-white/[0.1] bg-transparent text-[#71717A] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1">
-                Defrag Space
-              </Badge>
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight leading-snug text-[#FAFAFA] text-balance">
-                Defrag is where the pattern becomes workable.
+          <div className="max-w-4xl mx-auto space-y-12">
+
+            <div className="space-y-4">
+              <SectionLabel>Primary Action</SectionLabel>
+              <h2 className="text-[clamp(1.8rem,4vw,2.5rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
+                The Defrag Space
               </h2>
-              <div className="space-y-4 text-sm text-[#71717A] leading-relaxed">
-                <p>Defrag helps you make sense of conflict, family roles, grief, boundaries, communication breakdowns, parenting pressure, team dynamics, and relationship patterns.</p>
-                <p>It separates what is happening right now from what has been repeating underneath — so you can choose a response with more clarity.</p>
-              </div>
-              <Link href="/apps/defrag" className="mt-2">
-                <Button className="rounded-none border border-white/[0.15] bg-white text-black hover:bg-white/90 font-mono text-xs tracking-[0.15em] uppercase h-10 px-6 transition-colors">
-                  Explore Defrag
-                </Button>
-              </Link>
+              <p className="text-[#A1A1AA] text-base leading-relaxed max-w-xl">
+                Bring what feels active, unresolved, or repeating. Receive a structured breakdown of the dynamic — not a paragraph of advice.
+              </p>
             </div>
-            <div className="bg-[#050505] p-10 lg:p-14 order-1 lg:order-2">
-              <div className="space-y-0 border border-white/[0.06]">
-                {[
-                  "See what is active in your relational dynamics.",
-                  "Spot what is repeating.",
-                  "Notice the role you step into under pressure.",
-                  "Get a clearer next response.",
-                  "Save what helped.",
-                ].map((val, i) => (
-                  <div key={i} className="flex items-start gap-4 px-5 py-4 border-b border-white/[0.05] last:border-0">
-                    <span className="text-[10px] font-mono text-[#3F3F46] mt-0.5 shrink-0 w-4">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <p className="text-sm text-[#FAFAFA] leading-snug">{val}</p>
+
+            {/* Feature tiles */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 border border-white/[0.07]">
+              {[
+                {
+                  tag: "A",
+                  title: "Structured Results",
+                  desc: "Defrag breaks the situation into: Active Pattern · The Repeat · The Old Role · What You Learned to Carry.",
+                },
+                {
+                  tag: "B",
+                  title: "Clear Direction",
+                  desc: "Move from insight to action with a Best Next Response and Conversational Steering for every situation.",
+                },
+                {
+                  tag: "C",
+                  title: "No Chat Interface",
+                  desc: "This is not a dialogue. It is a structured reading of a dynamic — returned to you, not discussed with you.",
+                },
+                {
+                  tag: "D",
+                  title: "Baseline-Aware",
+                  desc: "Every Defrag result is filtered through your Baseline Design, so the output is always contextually yours.",
+                },
+              ].map((tile, i) => (
+                <div
+                  key={i}
+                  className={[
+                    "p-8 md:p-10 space-y-4",
+                    i % 2 === 0 ? "sm:border-r border-white/[0.07]" : "",
+                    i < 2 ? "border-b border-white/[0.07]" : "",
+                  ].join(" ")}
+                >
+                  <div className="w-8 h-8 border border-white/[0.12] flex items-center justify-center text-[#FAFAFA] font-mono text-[10px] tracking-widest">
+                    {tile.tag}
                   </div>
-                ))}
-              </div>
+                  <h3 className="text-[#FAFAFA] text-[15px] font-medium tracking-tight">
+                    {tile.title}
+                  </h3>
+                  <p className="text-[#71717A] text-sm leading-relaxed">{tile.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </Container>
       </Section>
 
-      {/* 6. Covenant */}
-      <Section className="w-full border-b border-white/[0.06] bg-[#030303]">
-        <Container className="max-w-3xl">
-          <div className="flex flex-col items-center text-center gap-8 py-4">
-            <div className="flex items-center gap-3">
-              <div className="h-px w-6 bg-white/10" />
-              <Badge variant="covenant" className="rounded-none border border-white/[0.1] bg-transparent text-[#71717A] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1">
-                Covenant Space
-              </Badge>
-              <div className="h-px w-6 bg-white/10" />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-[#FAFAFA] text-balance">
-              Faith connected to repair, responsibility, and the next honest step.
-            </h2>
-            <p className="text-sm text-[#71717A] leading-relaxed max-w-md text-pretty">
-              Covenant is for users who want faith connected to the work.
-            </p>
-            <div className="w-full max-w-sm border border-white/[0.06] divide-y divide-white/[0.04]">
-              <p className="py-3 px-4 text-xs font-mono text-[#3F3F46] line-through decoration-white/10">Not as certainty.</p>
-              <p className="py-3 px-4 text-xs font-mono text-[#3F3F46] line-through decoration-white/10">Not as performance.</p>
-              <p className="py-3 px-4 text-xs font-mono text-[#FAFAFA]">Not as a shortcut around responsibility.</p>
-            </div>
-            <Link href="/apps/covenant">
-              <Button variant="secondary" className="rounded-none border border-white/[0.08] bg-transparent text-[#A1A1AA] hover:text-white hover:border-white/20 font-mono text-xs tracking-[0.15em] uppercase h-10 px-6 transition-colors">
-                Explore Covenant
-              </Button>
-            </Link>
-          </div>
-        </Container>
-      </Section>
-
-      {/* 7. When both sides matter */}
-      <Section className="w-full border-b border-white/[0.06]">
-        <Container className="max-w-3xl">
-          <div className="flex flex-col items-center text-center gap-8 py-4">
-            <p className="text-[10px] font-mono text-[#52525B] tracking-[0.2em] uppercase">03 / SHARED CONTEXT</p>
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-[#FAFAFA] text-balance">
-              Some patterns need both sides.
-            </h2>
-            <div className="space-y-4 max-w-lg">
-              <p className="text-sm text-[#71717A] leading-relaxed text-pretty">
-                With consent, Sovereign.os can compare two Baseline Designs — not to decide who is right, not to score the relationship, and not to diagnose anyone.
-              </p>
-              <p className="text-sm text-[#FAFAFA] leading-relaxed">
-                It helps show how the same dynamic may be experienced differently from each side.
-              </p>
-            </div>
-            <Button variant="secondary" className="rounded-none border border-white/[0.08] bg-transparent text-[#A1A1AA] hover:text-white hover:border-white/20 font-mono text-xs tracking-[0.15em] uppercase h-10 px-6 transition-colors">
-              Invite Privately
-            </Button>
-          </div>
-        </Container>
-      </Section>
-
-      {/* 8. Library */}
-      <Section className="w-full border-b border-white/[0.06] bg-[#030303]">
-        <Container className="max-w-3xl">
-          <div className="flex flex-col items-center text-center gap-8 py-4">
-            <p className="text-[10px] font-mono text-[#52525B] tracking-[0.2em] uppercase">04 / LIBRARY</p>
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-[#FAFAFA] text-balance">
-              Your Library keeps the work worth returning to.
-            </h2>
-            <p className="text-sm text-[#71717A] leading-relaxed max-w-md text-pretty">
-              Save Results, reflections, next responses, Covenant Briefs, and the patterns you do not want to lose once the pressure passes.
-            </p>
-            <Link href="/app">
-              <Button variant="secondary" className="rounded-none border border-white/[0.08] bg-transparent text-[#A1A1AA] hover:text-white hover:border-white/20 font-mono text-xs tracking-[0.15em] uppercase h-10 px-6 transition-colors">
-                Open Library
-              </Button>
-            </Link>
-          </div>
-        </Container>
-      </Section>
-
-      {/* 9. Pro Pricing */}
-      <Section className="w-full border-b border-white/[0.06]">
+      {/* ── 6. Covenant Space ───────────────────────────────────────────────── */}
+      <Section id="covenant" className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-white/[0.05]">
-            <div className="bg-[#050505] p-10 lg:p-14 flex flex-col gap-8">
-              <Badge variant="pro" className="self-start rounded-none border border-white/[0.1] bg-transparent text-[#71717A] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1">
-                Pro Plan
-              </Badge>
-              <div>
-                <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.03em] leading-tight text-[#FAFAFA]">
-                  Free helps you begin.
-                </h2>
-                <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.03em] leading-tight text-[#3F3F46]">
-                  Pro helps you stay with it.
-                </h2>
-              </div>
-              <p className="text-sm text-[#FAFAFA] leading-relaxed">
-                Pro is for the patterns that need continuity.
+          <div className="flex flex-col lg:flex-row gap-14 xl:gap-20 items-start">
+
+            {/* Copy */}
+            <div className="lg:w-[44%] space-y-7">
+              <SectionLabel>Optional Module</SectionLabel>
+              <h2 className="text-[clamp(1.8rem,4vw,2.5rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
+                The Covenant Space
+              </h2>
+              <p className="text-[#A1A1AA] text-base leading-relaxed">
+                A grounded reflection space for faith context. Connect real-life situations to Scripture, responsibility, repair, and discernment.
               </p>
-              <Link href="/pricing" className="mt-2">
-                <Button variant="premium" className="rounded-none border border-white bg-white text-black hover:bg-white/90 font-mono text-xs tracking-[0.15em] uppercase h-12 px-8 transition-colors">
-                  Upgrade to Pro
-                </Button>
-              </Link>
-            </div>
-            <div className="bg-[#080808] p-10 lg:p-14 border-l border-white/[0.05]">
-              <div className="border border-white/[0.06] divide-y divide-white/[0.05]">
+              <ul className="space-y-3 pt-2">
                 {[
-                  "Save Results",
-                  "Return to your Library",
-                  "Use deeper context",
-                  "Invite privately",
-                  "Work across Defrag and Covenant",
-                  "Keep continuity instead of starting over every time something repeats",
-                ].map((val, i) => (
-                  <div key={i} className="flex items-start gap-4 px-5 py-4">
-                    <svg className="w-3.5 h-3.5 text-[#FAFAFA] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-sm text-[#A1A1AA] leading-snug">{val}</span>
+                  "No preachy conclusions.",
+                  "Focus on responsibility and repair.",
+                  "Connects to the same Sovereign Library.",
+                ].map((text, i) => (
+                  <li key={i} className="flex items-start gap-3 text-[#A1A1AA] text-sm leading-relaxed">
+                    <Dot />
+                    {text}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Mock card */}
+            <div className="lg:w-[56%] w-full">
+              <div className="border border-white/[0.08] bg-[#0A0A0A] p-8 md:p-10 relative overflow-hidden">
+                <div
+                  aria-hidden
+                  className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.025)_0,transparent_60%)]"
+                />
+                <div className="relative z-10 border border-white/[0.07] bg-[#070707] p-6 space-y-5 shadow-2xl">
+                  <div className="flex items-center justify-between">
+                    <div className="h-1.5 w-16 bg-white/[0.08]" />
+                    <SectionLabel>Covenant Brief</SectionLabel>
+                  </div>
+                  <div className="space-y-2.5 pt-1">
+                    <div className="h-3 w-3/4 bg-white/[0.05] rounded-sm" />
+                    <div className="h-3 w-full bg-white/[0.05] rounded-sm" />
+                    <div className="h-3 w-5/6 bg-white/[0.05] rounded-sm" />
+                  </div>
+                  <div className="pt-4 mt-2 border-t border-white/[0.06] space-y-2">
+                    <div className="h-2.5 w-full bg-white/[0.03] rounded-sm" />
+                    <div className="h-2.5 w-4/5 bg-white/[0.03] rounded-sm" />
+                    <div className="h-2.5 w-2/3 bg-white/[0.03] rounded-sm" />
+                  </div>
+                  <div className="pt-2 flex gap-2">
+                    <div className="h-7 w-20 bg-white/[0.06] rounded-sm" />
+                    <div className="h-7 w-14 bg-white/[0.03] rounded-sm" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      {/* ── 7. Alignment Space ──────────────────────────────────────────────── */}
+      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#050505]">
+        <Container>
+          <div className="max-w-3xl mx-auto space-y-10">
+            <div className="space-y-4">
+              <SectionLabel>Response Layer</SectionLabel>
+              <h2 className="text-[clamp(1.8rem,4vw,2.5rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
+                The Alignment Space
+              </h2>
+              <p className="text-[#A1A1AA] text-base leading-relaxed max-w-xl">
+                Turn insight into usable response. Understand what is active in you, what is yours to hold, and what is not yours to carry. Find the response that fits who you are now — not who you were in the old pattern.
+              </p>
+            </div>
+
+            <div className="border border-white/[0.07] divide-y divide-white/[0.07]">
+              {[
+                {
+                  label: "What is Active",
+                  desc: "Identify the emotional charge that is present right now, separate from the story.",
+                },
+                {
+                  label: "What is Yours",
+                  desc: "Distinguish between your responsibility in this moment and what you have been conditioned to carry.",
+                },
+                {
+                  label: "How to Respond",
+                  desc: "A specific, grounded response — calibrated to your Baseline and the current situation.",
+                },
+              ].map((row, i) => (
+                <div key={i} className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-8 px-7 py-5">
+                  <span className="text-[#FAFAFA] text-[13px] font-medium font-mono tracking-tight shrink-0 sm:w-40">
+                    {row.label}
+                  </span>
+                  <p className="text-[#71717A] text-sm leading-relaxed">{row.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      {/* ── 8. When Both Sides Matter ───────────────────────────────────────── */}
+      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
+        <Container>
+          <div className="max-w-3xl mx-auto space-y-10">
+            <div className="space-y-4">
+              <SectionLabel>Consent-Based</SectionLabel>
+              <h2 className="text-[clamp(1.8rem,4vw,2.5rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
+                Invite Privately
+              </h2>
+              <p className="text-[#A1A1AA] text-base leading-relaxed max-w-xl">
+                When both sides matter. A consent-based comparison of patterns to see where the collision is happening — not to determine who is wrong.
+              </p>
+            </div>
+
+            {/* What it is not */}
+            <div className="border border-white/[0.07]">
+              <div className="px-7 py-4 border-b border-white/[0.07]">
+                <span className="text-[#71717A] font-mono text-[10px] tracking-[0.15em] uppercase">
+                  What it is not
+                </span>
+              </div>
+              <div className="divide-y divide-white/[0.07]">
+                {["No diagnosis.", "No compatibility score.", "No verdict."].map((text, i) => (
+                  <div key={i} className="flex items-center gap-4 px-7 py-4">
+                    <span className="font-mono text-[10px] text-[#3F3F46]">×</span>
+                    <span className="text-[#71717A] text-sm">{text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* What it does */}
+            <div className="border border-white/[0.07]">
+              <div className="px-7 py-4 border-b border-white/[0.07]">
+                <span className="text-[#71717A] font-mono text-[10px] tracking-[0.15em] uppercase">
+                  What it does
+                </span>
+              </div>
+              <div className="divide-y divide-white/[0.07]">
+                {[
+                  "Shows where patterns collide.",
+                  "Surfaces what each person is protecting.",
+                  "Suggests where repair is possible.",
+                ].map((text, i) => (
+                  <div key={i} className="flex items-center gap-4 px-7 py-4">
+                    <span className="font-mono text-[10px] text-[#A1A1AA]">→</span>
+                    <span className="text-[#A1A1AA] text-sm">{text}</span>
                   </div>
                 ))}
               </div>
@@ -332,31 +523,170 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      {/* 10. Final CTA */}
-      <Section className="w-full py-36 bg-[#030303]">
-        <Container className="text-center max-w-2xl">
-          <div className="flex items-center justify-center gap-3 mb-12">
-            <div className="h-px w-8 bg-white/10" />
-            <Badge variant="outline" className="rounded-none border-white/[0.1] bg-transparent text-[#52525B] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1">
-              SOVEREIGN.OS
-            </Badge>
-            <div className="h-px w-8 bg-white/10" />
+      {/* ── 9. Sovereign.os Library ─────────────────────────────────────────── */}
+      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#050505]">
+        <Container>
+          <div className="max-w-3xl mx-auto space-y-10">
+            <div className="text-center space-y-4">
+              <SectionLabel>Continuity Layer</SectionLabel>
+              <h2 className="text-[clamp(1.8rem,4vw,2.5rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
+                Sovereign.os Library
+              </h2>
+              <p className="text-[#A1A1AA] text-base leading-relaxed max-w-xl mx-auto">
+                Not just storage. The private record of what helped. Save Defrag Results, Covenant Briefs, and Best Next Responses — and return to them before the old pattern takes over again.
+              </p>
+            </div>
+
+            {/* Mock library rows */}
+            <div className="border border-white/[0.07] divide-y divide-white/[0.07]">
+              {[
+                { type: "Defrag", label: "The argument that won't resolve", date: "Saved" },
+                { type: "Covenant", label: "Where repair is mine to initiate", date: "Saved" },
+                { type: "Alignment", label: "What I am carrying that isn't mine", date: "Saved" },
+              ].map((entry, i) => (
+                <div key={i} className="flex items-center justify-between gap-4 px-7 py-5">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <span className="text-[#3F3F46] font-mono text-[10px] tracking-widest uppercase shrink-0 w-16">
+                      {entry.type}
+                    </span>
+                    <span className="text-[#A1A1AA] text-sm truncate">{entry.label}</span>
+                  </div>
+                  <span className="text-[#3F3F46] font-mono text-[10px] shrink-0">{entry.date}</span>
+                </div>
+              ))}
+              <div className="px-7 py-4 text-center">
+                <span className="text-[#3F3F46] font-mono text-[10px] tracking-[0.1em] uppercase">
+                  Your entries will appear here
+                </span>
+              </div>
+            </div>
           </div>
-          <h2 className="text-5xl font-semibold tracking-[-0.03em] text-[#FAFAFA] leading-tight text-balance mb-4">
-            Healing isn&apos;t optional.
-          </h2>
-          <h2 className="text-5xl font-semibold tracking-[-0.03em] text-[#3F3F46] leading-tight text-balance mb-12">
-            Holding the pain is.
-          </h2>
-          <div className="w-full max-w-xs mx-auto border border-white/[0.06] divide-y divide-white/[0.04] mb-12 text-left">
-            <p className="text-xs text-[#71717A] px-4 py-3 font-mono">See what is shaping the pattern.</p>
-            <p className="text-xs text-[#FAFAFA] px-4 py-3 font-mono">Choose what changes next.</p>
+        </Container>
+      </Section>
+
+      {/* ── 10. Free vs Pro ─────────────────────────────────────────────────── */}
+      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
+        <Container>
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-14">
+              <h2 className="text-[clamp(1.6rem,3.5vw,2.25rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA]">
+                Choose your depth
+              </h2>
+              <p className="mt-3 text-[#71717A] text-sm">Start free. Go deeper when you&apos;re ready.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border border-white/[0.07]">
+
+              {/* Free */}
+              <div className="p-8 md:p-10 space-y-7 border-b md:border-b-0 md:border-r border-white/[0.07]">
+                <div className="space-y-2">
+                  <h3 className="text-[#FAFAFA] text-xl font-medium">Free</h3>
+                  <p className="text-[#71717A] text-sm">Understand a moment.</p>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[#FAFAFA] text-3xl font-semibold tracking-tight">$0</span>
+                  <span className="text-[#71717A] text-sm">/forever</span>
+                </div>
+                <ul className="space-y-3">
+                  {FREE_FEATURES.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3 text-[#A1A1AA] text-sm leading-relaxed">
+                      <Dot dim />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/login" className="block">
+                  <Button
+                    variant="ghost"
+                    className="w-full rounded-none border-white/[0.12] bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] h-11 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+                  >
+                    Get Started Free
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Pro */}
+              <div className="p-8 md:p-10 space-y-7 bg-[#0A0A0A] relative">
+                <div className="absolute top-6 right-7">
+                  <Badge className="bg-white text-[#050505] hover:bg-white/90 rounded-none font-mono text-[9px] uppercase tracking-[0.12em] px-2 py-0.5">
+                    Pro
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-[#FAFAFA] text-xl font-medium">Sovereign Pro</h3>
+                  <p className="text-[#71717A] text-sm">
+                    Return, remember, compare, and interrupt the pattern.
+                  </p>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[#FAFAFA] text-3xl font-semibold tracking-tight">$20</span>
+                  <span className="text-[#71717A] text-sm">/mo</span>
+                </div>
+                <ul className="space-y-3">
+                  {PRO_FEATURES.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3 text-[#FAFAFA] text-sm leading-relaxed">
+                      <Dot />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/login" className="block">
+                  <Button
+                    className="w-full rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-11 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+                  >
+                    Start Sovereign Pro
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
-          <Link href="/login">
-            <Button size="lg" className="rounded-none border border-white/[0.15] bg-white text-black hover:bg-white/90 font-mono text-xs tracking-[0.15em] uppercase h-12 px-10 transition-colors">
-              Enter Sovereign.os
-            </Button>
-          </Link>
+        </Container>
+      </Section>
+
+      {/* ── 11. Final CTA ───────────────────────────────────────────────────── */}
+      <Section className="w-full py-32 md:py-48 bg-[#050505] relative overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 z-0 pointer-events-none opacity-[0.018]"
+          style={{
+            backgroundImage: "radial-gradient(circle at center, #ffffff 1px, transparent 1px)",
+            backgroundSize: "36px 36px",
+          }}
+        />
+
+        <Container className="relative z-10 text-center max-w-[780px]">
+          <div className="space-y-2 mb-10">
+            <h2 className="text-[clamp(2.4rem,6.5vw,4.5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance">
+              Healing isn&apos;t optional.
+            </h2>
+            <h2 className="text-[clamp(2.4rem,6.5vw,4.5rem)] font-semibold tracking-[-0.035em] text-[#3F3F46] leading-[1.04] text-balance">
+              Holding the pain is.
+            </h2>
+          </div>
+
+          <p className="text-[#71717A] text-sm font-mono tracking-[0.12em] uppercase mb-10">
+            The platform is ready when you are.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link href="/login">
+              <Button
+                size="lg"
+                className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-10 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+              >
+                Enter Sovereign.os
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button
+                size="lg"
+                variant="ghost"
+                className="rounded-none border-white/[0.12] bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] hover:text-white h-12 px-8 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+              >
+                Start Baseline Design
+              </Button>
+            </Link>
+          </div>
         </Container>
       </Section>
 

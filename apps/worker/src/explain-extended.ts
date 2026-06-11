@@ -291,7 +291,8 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     },
     metadata: {
       structured: true
-    },
+    }
+  };
 
   const anotherInteractionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
 
