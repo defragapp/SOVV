@@ -2,7 +2,7 @@
 import * as React from "react"
 import { Badge } from "@/components/ui/badge"
 
-interface WorkspaceShellProps {
+interface SpaceShellProps {
   sidebar?: React.ReactNode
   main: React.ReactNode
   contextPanel?: React.ReactNode
@@ -10,7 +10,7 @@ interface WorkspaceShellProps {
   spaceName: "Defrag" | "Covenant" | "Library" | string
 }
 
-export function WorkspaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName }: WorkspaceShellProps) {
+export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName }: SpaceShellProps) {
   const [activeTab, setActiveTab] = React.useState(mobileTabs[0].id)
 
   return (
