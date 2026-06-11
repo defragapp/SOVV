@@ -281,7 +281,7 @@ export default function DefragPage() {
                       disabled={saving}
                       className="rounded-xl bg-[#F5F5F6] px-4 py-2 text-sm font-medium text-[#0B0B0D] disabled:opacity-50"
                     >
-                      {saving ? "Saving..." : "Save to Sovereign"}
+                      {saving ? "Saving..." : "Save to Sovereign.os Library"}
                     </button>
                     <button
                       disabled={!result.media.audioOverviewAvailable}
