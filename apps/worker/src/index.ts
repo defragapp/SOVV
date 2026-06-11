@@ -246,14 +246,14 @@ export default {
   },
 
   async queue(batch: MessageBatch<unknown>, env: Env, _ctx: ExecutionContext): Promise<void> {
-    for (const message of batch.messages) {
+    await Promise.all(batch.messages.map(async (message) => {
       const body = message.body as { sessionId?: string; interactionId?: string };
       const sessionId = body?.sessionId;
       const interactionId = body?.interactionId;
       if (!sessionId || !interactionId) {
         console.error("Queue: invalid message body");
         message.ack();
-        continue;
+        return;
       }
       try {
         await extractPatterns(env, sessionId, interactionId);
@@ -262,7 +262,7 @@ export default {
         console.error("Queue: pattern extraction failed for", interactionId, err);
         message.retry();
       }
-    }
+    }));
   },
 
   async email(message: any, env: Env, _ctx: ExecutionContext): Promise<void> {
