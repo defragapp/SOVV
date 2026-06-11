@@ -26,13 +26,17 @@ const ALLOWED_ORIGINS = [
 
 function getCorsHeaders(request: Request): Record<string, string> {
   const origin = request.headers.get('Origin') || '';
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : 'https://defrag.app';
-  return {
-    'Access-Control-Allow-Origin': allowed,
+  const headers: Record<string, string> = {
     'Access-Control-Allow-Credentials': 'true',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
+
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    headers['Access-Control-Allow-Origin'] = origin;
+  }
+
+  return headers;
 }
 
 // === NATAL ROUTES ===
@@ -48,8 +52,14 @@ function registerNatalRoutes(router: any, getEnv: () => Env) {
       });
     }
     
-    const raw = await env.KV.get(`natal:${user.id}`);
-    return new Response(JSON.stringify({ natal: raw ? JSON.parse(raw) : null }), {
+    const record = await env.KV.get(`natal:${user.id}`);
+    if (record) {
+      return new Response(JSON.stringify({ success: true, natal: JSON.parse(record) }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', ...getCorsHeaders(request) },
+      });
+    }
+    return new Response(JSON.stringify({ success: true, natal: null }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', ...getCorsHeaders(request) },
     });
