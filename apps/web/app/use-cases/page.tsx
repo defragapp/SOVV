@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { SiteShell } from "@/components/marketing/site-shell";
-import { PageHero } from "@/components/marketing/page-hero";
-import { MotionSection } from "@/components/marketing/motion-section";
-import { FadeUp } from "@/components/ui/fade-up";
-import { Card } from "@/components/marketing/card";
+import { Button } from "@/components/ui/button"
+import { Container, Section } from "@/components/ui/layout-primitives"
+import { Badge } from "@/components/ui/badge"
 import Link from "next/link";
+import { SiteShell } from "@/components/marketing/site-shell";
 
 export const metadata: Metadata = {
   title: "Use Cases — Sovereign.os",
   description: "Work through the message, the family role, the boundary, the grief, and the relationship dynamic you can feel but cannot fully name.",
 };
 
-const cases = [
+const CASES = [
   {
     title: "Before you send the message",
     body: "You have written it three times. Something still feels off. Defrag helps you understand what is active in the moment — and whether sending it will get you what you actually want.",
@@ -44,43 +43,94 @@ const cases = [
   },
 ];
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Badge
+      variant="outline"
+      className="rounded-none border-white/[0.12] bg-transparent text-[#71717A] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
+    >
+      {children}
+    </Badge>
+  )
+}
+
 export default function UseCasesPage() {
   return (
     <SiteShell>
-      <PageHero
-        eyebrow="Use Cases"
-        title="Stop carrying what keeps repeating."
-        body="Work through the message, the family role, the boundary, the grief, and the relationship dynamic you can feel but cannot fully name."
-      />
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[70svh] pt-32 pb-24 overflow-hidden border-b border-white/[0.06] bg-[#050505]">
+        <Container className="relative z-10 flex flex-col items-center text-center max-w-[800px]">
+          <div className="mb-12 flex items-center gap-3">
+            <div className="h-px w-10 bg-white/[0.14]" />
+            <SectionLabel>USE CASES</SectionLabel>
+            <div className="h-px w-10 bg-white/[0.14]" />
+          </div>
 
-      <MotionSection className="section-gap container-platform">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cases.map((c, i) => (
-            <FadeUp key={i} delay={i * 0.1} className="h-full">
-               <Card className="h-full">
-                 <span className="space-badge mb-4">{c.tag}</span>
-                 <h3 className="text-title mb-4">{c.title}</h3>
-                 <p className="text-body-sm text-foreground-muted">{c.body}</p>
-               </Card>
-            </FadeUp>
-          ))}
-        </div>
-      </MotionSection>
+          <h1 className="text-[clamp(2.6rem,6vw,4.5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance mb-8">
+            Stop carrying what keeps repeating.
+          </h1>
 
-      <MotionSection className="section-gap border-t border-border bg-hero-glow">
-        <div className="container-platform text-center max-w-2xl mx-auto">
-          <FadeUp>
-            <h2 className="text-headline mb-8">
-              Healing isn’t optional.<br/>Holding the pain is.
+          <p className="text-[#A1A1AA] text-base md:text-lg font-normal tracking-[-0.01em] max-w-[560px] text-balance leading-[1.65]">
+            Work through the message, the family role, the boundary, the grief, and the relationship dynamic you can feel but cannot fully name.
+          </p>
+        </Container>
+      </Section>
+
+      {/* ── Cases Grid ────────────────────────────────────────────────────── */}
+      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
+        <Container>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border border-white/[0.07]">
+            {CASES.map((c, i) => (
+              <div
+                key={i}
+                className={[
+                  "p-8 space-y-6 bg-[#050505]",
+                  i % 3 !== 2 ? "lg:border-r border-white/[0.07]" : "",
+                  i % 2 !== 1 ? "md:border-r lg:border-r-0 border-white/[0.07]" : "",
+                  i < CASES.length - 3 ? "lg:border-b border-white/[0.07]" : "",
+                  i < CASES.length - 2 ? "md:border-b lg:border-b-0 border-white/[0.07]" : "",
+                  i < CASES.length - 1 ? "border-b md:border-b-0 border-white/[0.07]" : "",
+                ].join(" ")}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-1 h-1 bg-white/30 rounded-full" />
+                  <span className="text-[#71717A] font-mono text-[10px] tracking-[0.15em] uppercase">
+                    {c.tag}
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-[#FAFAFA] text-[17px] font-medium tracking-tight">
+                    {c.title}
+                  </h3>
+                  <p className="text-[#A1A1AA] text-sm leading-relaxed">{c.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      {/* ── CTA ───────────────────────────────────────────────────────────── */}
+      <Section className="w-full py-32 md:py-48 bg-[#050505] relative overflow-hidden">
+        <Container className="relative z-10 text-center max-w-[780px]">
+          <div className="space-y-2 mb-12">
+            <h2 className="text-[clamp(2.4rem,5vw,3.5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance">
+              Healing isn&apos;t optional.
             </h2>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="https://app.defrag.app/app/login" className="btn-primary">
-                Enter Sovereign.os
-              </Link>
-            </div>
-          </FadeUp>
-        </div>
-      </MotionSection>
+            <h2 className="text-[clamp(2.4rem,5vw,3.5rem)] font-semibold tracking-[-0.035em] text-[#3F3F46] leading-[1.04] text-balance">
+              Holding the pain is.
+            </h2>
+          </div>
+          <Link href="/login" className="inline-block">
+            <Button
+              size="lg"
+              className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-10 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+            >
+              Enter Sovereign.os
+            </Button>
+          </Link>
+        </Container>
+      </Section>
     </SiteShell>
   );
 }

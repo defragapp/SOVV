@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { SiteShell } from "@/components/marketing/site-shell";
-import { PageHero } from "@/components/marketing/page-hero";
-import { MotionSection } from "@/components/marketing/motion-section";
-import { FadeUp } from "@/components/ui/fade-up";
-import { Card } from "@/components/marketing/card";
+import { Button } from "@/components/ui/button"
+import { Container, Section } from "@/components/ui/layout-primitives"
+import { Badge } from "@/components/ui/badge"
 import Link from "next/link";
+import { SiteShell } from "@/components/marketing/site-shell";
 
 export const metadata: Metadata = {
   title: "How it works — Sovereign.os",
   description: "Set your Baseline Design. Work through what is active. Find the response that changes the pattern. Save what you learn.",
 };
 
-const steps = [
+const STEPS = [
   {
     num: "01",
     title: "Set your Baseline Design",
@@ -34,47 +33,86 @@ const steps = [
   },
 ];
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Badge
+      variant="outline"
+      className="rounded-none border-white/[0.12] bg-transparent text-[#71717A] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
+    >
+      {children}
+    </Badge>
+  )
+}
+
 export default function HowItWorksPage() {
   return (
     <SiteShell>
-      <PageHero
-        eyebrow="How it works"
-        title="Start with what is happening now."
-        body="Put the moment into context. Understand the pattern underneath it. Find the next response that changes it."
-      />
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[70svh] pt-32 pb-24 overflow-hidden border-b border-white/[0.06] bg-[#050505]">
+        <Container className="relative z-10 flex flex-col items-center text-center max-w-[800px]">
+          <div className="mb-12 flex items-center gap-3">
+            <div className="h-px w-10 bg-white/[0.14]" />
+            <SectionLabel>HOW IT WORKS</SectionLabel>
+            <div className="h-px w-10 bg-white/[0.14]" />
+          </div>
 
-      <MotionSection className="section-gap container-narrow">
-        <div className="space-y-16">
-          {steps.map((step, i) => (
-            <FadeUp key={i} delay={i * 0.1}>
-              <div className="flex flex-col md:flex-row gap-8 items-start border-t border-border pt-12">
-                <div className="w-full md:w-1/4">
-                  <span className="text-display text-foreground-disabled opacity-30">{step.num}</span>
+          <h1 className="text-[clamp(2.6rem,6vw,4.5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance mb-8">
+            Start with what is happening now.
+          </h1>
+
+          <p className="text-[#A1A1AA] text-base md:text-lg font-normal tracking-[-0.01em] max-w-[560px] text-balance leading-[1.65]">
+            Put the moment into context. Understand the pattern underneath it. Find the next response that changes it.
+          </p>
+        </Container>
+      </Section>
+
+      {/* ── Steps ─────────────────────────────────────────────────────────── */}
+      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
+        <Container className="max-w-4xl">
+          <div className="space-y-0 border border-white/[0.07]">
+            {STEPS.map((step, i) => (
+              <div
+                key={i}
+                className={[
+                  "flex flex-col md:flex-row gap-8 items-start p-8 md:p-12 bg-[#050505]",
+                  i < STEPS.length - 1 ? "border-b border-white/[0.07]" : "",
+                ].join(" ")}
+              >
+                <div className="w-full md:w-[120px] shrink-0">
+                  <span className="text-[#3F3F46] font-mono text-3xl tracking-tighter">
+                    {step.num}
+                  </span>
                 </div>
-                <div className="w-full md:w-3/4">
-                  <h3 className="text-headline mb-4">{step.title}</h3>
-                  <p className="text-body text-foreground-muted">{step.body}</p>
+                <div className="flex-1 space-y-4 pt-1">
+                  <h3 className="text-[#FAFAFA] text-[22px] font-medium tracking-tight">
+                    {step.title}
+                  </h3>
+                  <p className="text-[#A1A1AA] text-[15px] leading-relaxed max-w-xl">
+                    {step.body}
+                  </p>
                 </div>
               </div>
-            </FadeUp>
-          ))}
-        </div>
-      </MotionSection>
+            ))}
+          </div>
+        </Container>
+      </Section>
 
-      <MotionSection className="section-gap border-t border-border bg-hero-glow">
-        <div className="container-platform text-center max-w-2xl mx-auto">
-          <FadeUp>
-            <h2 className="text-headline mb-8">
-              The wound is real. So is the choice after it.
-            </h2>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="https://app.defrag.app/app/login" className="btn-primary">
-                Enter Sovereign.os
-              </Link>
-            </div>
-          </FadeUp>
-        </div>
-      </MotionSection>
+      {/* ── CTA ───────────────────────────────────────────────────────────── */}
+      <Section className="w-full py-32 md:py-48 bg-[#050505] relative overflow-hidden">
+        <Container className="relative z-10 text-center max-w-[780px]">
+          <h2 className="text-[clamp(2.4rem,5vw,3.5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance mb-12">
+            The wound is real. So is the choice after it.
+          </h2>
+          <Link href="/login" className="inline-block">
+            <Button
+              size="lg"
+              className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-10 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+            >
+              Enter Sovereign.os
+            </Button>
+          </Link>
+        </Container>
+      </Section>
     </SiteShell>
   );
 }

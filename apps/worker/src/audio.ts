@@ -35,7 +35,7 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
       });
 
       // It returns a Uint8Array containing the audio data.
-      return new Response(response, {
+      return new Response(response as any, {
         headers: {
           "Content-Type": "audio/mpeg",
         },
