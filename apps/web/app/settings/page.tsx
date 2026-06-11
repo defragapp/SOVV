@@ -9,12 +9,64 @@ import { apiGetBaseline, apiSaveBaseline } from "@/lib/api";
 const initialState: BaselineRequest = {
   dob: "",
   tob: { type: "exact", value: "" },
-  pob: ""
+  pob: "",
 };
+
+/* ─────────────────────────────────────────────
+   Micro-components — purely presentational,
+   all business logic lives in the parent
+───────────────────────────────────────────── */
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[10px] tracking-[0.1em] uppercase text-[#F6F5F3]/30 font-mono">
+      {children}
+    </p>
+  );
+}
+
+function FieldLabel({
+  htmlFor,
+  children,
+}: {
+  htmlFor?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label
+      htmlFor={htmlFor}
+      className="block text-[10px] tracking-[0.1em] uppercase text-[#F6F5F3]/40 font-mono mb-2"
+    >
+      {children}
+    </label>
+  );
+}
+
+function HintText({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="mt-1.5 text-[11px] leading-relaxed text-[#F6F5F3]/25 font-mono tracking-wide">
+      {children}
+    </p>
+  );
+}
+
+const inputBase =
+  "w-full bg-[#080808] border border-white/[0.08] text-[#F6F5F3]/85 text-[13px] font-mono " +
+  "px-3.5 py-3 rounded-none outline-none transition-all duration-200 " +
+  "placeholder:text-[#F6F5F3]/18 " +
+  "focus:border-white/[0.22] focus:bg-[#0A0A0A] " +
+  "disabled:opacity-30 disabled:cursor-not-allowed " +
+  "[color-scheme:dark]";
+
+/* ─────────────────────────────────────────────
+   Main page
+───────────────────────────────────────────── */
 
 export default function SettingsPage() {
   const [baseline, setBaseline] = useState<BaselineRequest>(initialState);
-  const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
+  const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(
+    null
+  );
   const [saving, setSaving] = useState(false);
   const [hasBaseline, setHasBaseline] = useState(false);
 
@@ -23,8 +75,11 @@ export default function SettingsPage() {
       if (result?.baseline) {
         setBaseline({
           dob: result.baseline.dob,
-          tob: { type: result.baseline.tob.type, value: result.baseline.tob.value },
-          pob: result.baseline.pob
+          tob: {
+            type: result.baseline.tob.type,
+            value: result.baseline.tob.value,
+          },
+          pob: result.baseline.pob,
         });
         setHasBaseline(true);
       }
@@ -51,138 +106,231 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#05070B] text-[#F6F5F3]">
+    <div className="min-h-screen bg-[#050505] text-[#FAFAFA]">
 
-      {/* Header */}
-      <header className="border-b border-[#F6F5F3]/8 px-6 py-4 flex items-center justify-between glass sticky top-0 z-40">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="text-micro text-[#F6F5F3]/25 hover:text-[#F6F5F3]/50 transition-colors">
-            Sovereign.os
+      {/* ── Sticky header ── */}
+      <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#050505]/90 backdrop-blur-md">
+        <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between">
+          <nav className="flex items-center gap-2.5" aria-label="Breadcrumb">
+            <Link
+              href="/"
+              className="text-[11px] font-mono tracking-widest uppercase text-[#FAFAFA]/40 hover:text-[#FAFAFA]/70 transition-colors duration-200"
+            >
+              Sovereign.os
+            </Link>
+            <span className="text-[#FAFAFA]/20 text-[11px] font-mono" aria-hidden>
+              /
+            </span>
+            <span className="text-[11px] font-mono tracking-widest uppercase text-[#FAFAFA]/60">
+              Baseline Design
+            </span>
+          </nav>
+
+          <Link
+            href="/apps/defrag"
+            className="text-[11px] font-mono tracking-wide text-[#FAFAFA]/40 hover:text-[#FAFAFA]/80 transition-colors duration-200"
+          >
+            ← Defrag
           </Link>
-          <span className="text-[#F6F5F3]/15 text-micro">/</span>
-          <span className="text-micro text-[#F6F5F3]/40">Baseline Design</span>
         </div>
-        <Link href="/apps/defrag" className="text-micro text-[#F6F5F3]/30 hover:text-[#F6F5F3]/60 transition-colors">
-          ← Back to Defrag space
-        </Link>
       </header>
 
-      <main className="max-w-2xl mx-auto px-6 py-16 space-y-12">
+      <main className="max-w-2xl mx-auto px-6 py-16 md:py-24">
 
-        {/* Title block */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <span className="space-badge-defrag">Baseline Design</span>
-            {hasBaseline && (
-              <span className="text-micro text-[#F6F5F3]/60/70">Active</span>
-            )}
+        {/* ── Title block ── */}
+        <div className="mb-14">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-[10px] tracking-[0.1em] uppercase font-mono text-[#71717A] border border-white/[0.12] px-2.5 py-1 bg-transparent">
+              Baseline Design
+            </span>
+            <AnimatePresence>
+              {hasBaseline && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="flex items-center gap-1.5 text-[10px] font-mono tracking-[0.1em] uppercase text-[#A1A1AA]"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#A1A1AA] inline-block" />
+                  Active
+                </motion.span>
+              )}
+            </AnimatePresence>
           </div>
-          <h1 className="text-headline">Your Baseline Design<br />is the source.</h1>
-          <p className="text-body">
-            Your Baseline Design is the starting map — how you tend to process, respond, connect, protect, communicate, and return to center. It is stored privately and used to keep every thread in Defrag and Covenant grounded. It is never exposed in outputs.
+
+          <h1 className="text-[28px] md:text-[34px] font-semibold leading-[1.2] tracking-[-0.02em] text-[#FAFAFA] mb-5 text-balance">
+            Your Baseline Design<br className="hidden sm:block" /> is the source.
+          </h1>
+
+          <p className="text-[14px] leading-[1.7] text-[#A1A1AA] max-w-prose mb-6">
+            Your Baseline Design is the starting map — how you tend to process,
+            respond, connect, protect, communicate, and return to center. It is
+            stored privately and used to keep every thread in Defrag and
+            Covenant grounded. It is never exposed in outputs.
           </p>
-          <div className="border-l border-white/15 pl-4">
-            <p className="text-caption text-xs">
+
+          <div className="flex items-start gap-3 pl-4 border-l border-white/[0.12]">
+            <p className="text-[11px] leading-relaxed text-[#71717A] font-mono tracking-wide">
               Shared across Defrag and Covenant. Set once. Works across all sessions.
             </p>
           </div>
         </div>
 
-        {/* Form */}
-        <div className="border border-[#F6F5F3]/8 p-8 space-y-8">
-          <p className="text-label">Enter your birth details</p>
+        {/* ── Form card ── */}
+        <div className="bg-[#0A0A0A] border border-white/[0.08] p-8 md:p-10 mb-14">
 
-          {/* Date of birth */}
-          <div className="space-y-2">
-            <label htmlFor="dob" className="sovv-label">Date of birth</label>
-            <input
-              id="dob"
-              type="date"
-              value={baseline.dob}
-              onChange={(e) => setBaseline((prev) => ({ ...prev, dob: e.target.value }))}
-              className="sovv-input"
-              style={{ fontSize: "16px" }}
-            />
-            <p className="text-micro">YYYY-MM-DD</p>
-          </div>
+          <SectionLabel>Enter your birth details</SectionLabel>
 
-          {/* Time of birth */}
-          <div className="space-y-2">
-            <label className="sovv-label">Time of birth</label>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label htmlFor="tob-type" className="sr-only">Time precision</label>
-                <select
-                  id="tob-type"
-                  value={baseline.tob.type}
-                  onChange={(e) => setBaseline((prev) => ({
-                    ...prev,
-                    tob: { ...prev.tob, type: e.target.value as "exact" | "approx" }
-                  }))}
-                  className="sovv-input"
-                  style={{ fontSize: "16px" }}
-                >
-                  <option value="exact">Exact time</option>
-                  <option value="approx">Approximate</option>
-                </select>
-              </div>
-              <div>
-                <label htmlFor="tob-value" className="sr-only">Time value</label>
-                <input
-                  id="tob-value"
-                  type="time"
-                  value={baseline.tob.value}
-                  onChange={(e) => setBaseline((prev) => ({
-                    ...prev,
-                    tob: { ...prev.tob, value: e.target.value }
-                  }))}
-                  className="sovv-input"
-                  style={{ fontSize: "16px" }}
-                />
-              </div>
+          <div className="mt-8 space-y-8">
+
+            {/* Date of birth */}
+            <div>
+              <FieldLabel htmlFor="dob">Date of birth</FieldLabel>
+              <input
+                id="dob"
+                type="date"
+                value={baseline.dob}
+                onChange={(e) =>
+                  setBaseline((prev) => ({ ...prev, dob: e.target.value }))
+                }
+                className={inputBase}
+                style={{ fontSize: "16px" }}
+                aria-describedby="dob-hint"
+              />
+              <HintText>
+                <span id="dob-hint">YYYY-MM-DD</span>
+              </HintText>
             </div>
-            <p className="text-micro">If unknown, use approximate and enter a midpoint.</p>
-          </div>
 
-          {/* Place of birth */}
-          <div className="space-y-2">
-            <label htmlFor="pob" className="sovv-label">Place of birth</label>
-            <input
-              id="pob"
-              type="text"
-              value={baseline.pob}
-              onChange={(e) => setBaseline((prev) => ({ ...prev, pob: e.target.value }))}
-              placeholder="City, Country"
-              className="sovv-input"
-              style={{ fontSize: "16px" }}
-            />
+            {/* Time of birth */}
+            <div>
+              <FieldLabel>Time of birth</FieldLabel>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="tob-type" className="sr-only">
+                    Time precision
+                  </label>
+                  <select
+                    id="tob-type"
+                    value={baseline.tob.type}
+                    onChange={(e) =>
+                      setBaseline((prev) => ({
+                        ...prev,
+                        tob: {
+                          ...prev.tob,
+                          type: e.target.value as "exact" | "approx",
+                        },
+                      }))
+                    }
+                    className={inputBase}
+                    style={{ fontSize: "16px" }}
+                  >
+                    <option value="exact">Exact time</option>
+                    <option value="approx">Approximate</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="tob-value" className="sr-only">
+                    Time value
+                  </label>
+                  <input
+                    id="tob-value"
+                    type="time"
+                    value={baseline.tob.value}
+                    onChange={(e) =>
+                      setBaseline((prev) => ({
+                        ...prev,
+                        tob: { ...prev.tob, value: e.target.value },
+                      }))
+                    }
+                    className={inputBase}
+                    style={{ fontSize: "16px" }}
+                    aria-describedby="tob-hint"
+                  />
+                </div>
+              </div>
+              <HintText>
+                <span id="tob-hint">
+                  If unknown, use approximate and enter a midpoint.
+                </span>
+              </HintText>
+            </div>
+
+            {/* Place of birth */}
+            <div>
+              <FieldLabel htmlFor="pob">Place of birth</FieldLabel>
+              <input
+                id="pob"
+                type="text"
+                value={baseline.pob}
+                onChange={(e) =>
+                  setBaseline((prev) => ({ ...prev, pob: e.target.value }))
+                }
+                placeholder="City, Country"
+                className={inputBase}
+                style={{ fontSize: "16px" }}
+              />
+            </div>
+
           </div>
 
           {/* Privacy note */}
-          <div className="border-t border-[#F6F5F3]/6 pt-6">
-            <p className="text-caption text-xs leading-6">
-              Your birth details are used only to generate your Baseline Design. They are stored privately and never exposed in outputs, shared with other users, or used outside your own session context.
+          <div className="mt-8 pt-7 border-t border-white/[0.06]">
+            <p className="text-[11px] leading-[1.75] text-[#71717A] font-mono tracking-wide">
+              Your birth details are used only to generate your Baseline Design.
+              They are stored privately and never exposed in outputs, shared with
+              other users, or used outside your own session context.
             </p>
           </div>
 
-          {/* Save */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          {/* Save row */}
+          <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
             <button
               onClick={handleSave}
               disabled={saving || !baseline.dob || !baseline.pob}
-              className="sovv-button-primary py-3.5 px-8 disabled:opacity-30 disabled:cursor-not-allowed"
+              className={[
+                "inline-flex items-center justify-center gap-2",
+                "text-[11px] font-mono tracking-[0.1em] uppercase",
+                "bg-[#FAFAFA] text-[#050505] px-7 py-3.5",
+                "border border-transparent",
+                "transition-all duration-200",
+                "hover:bg-[#E4E4E7] active:scale-[0.98]",
+                "disabled:opacity-25 disabled:cursor-not-allowed disabled:active:scale-100",
+                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40",
+              ].join(" ")}
             >
-              {saving ? "Saving…" : hasBaseline ? "Update Baseline Design" : "Save Baseline Design"}
+              {saving ? (
+                <>
+                  <span
+                    className="w-3 h-3 border border-[#050505]/30 border-t-[#050505]/70 rounded-full animate-spin"
+                    aria-hidden
+                  />
+                  Saving
+                </>
+              ) : hasBaseline ? (
+                "Update Baseline Design"
+              ) : (
+                "Save Baseline Design"
+              )}
             </button>
 
             <AnimatePresence>
               {message && (
                 <motion.p
-                  initial={{ opacity: 0, x: -8 }}
+                  initial={{ opacity: 0, x: -6 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className={`text-label ${message.ok ? "text-[#F6F5F3]/60" : "text-red-400/60"}`}
+                  transition={{ duration: 0.25 }}
+                  className={[
+                    "text-[11px] font-mono tracking-wide",
+                    message.ok
+                      ? "text-[#A1A1AA]"
+                      : "text-red-400/80",
+                  ].join(" ")}
+                  role="status"
+                  aria-live="polite"
                 >
                   {message.text}
                 </motion.p>
@@ -191,10 +339,14 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* What it unlocks */}
-        <div className="space-y-4">
-          <p className="text-label">What your Baseline Design unlocks</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {/* ── Unlocks section ── */}
+        <div>
+          <SectionLabel>What your Baseline Design unlocks</SectionLabel>
+
+          <ul
+            className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-0"
+            aria-label="Features unlocked by Baseline Design"
+          >
             {[
               "Grounded threads in Defrag",
               "Grounded reflection in Covenant",
@@ -203,12 +355,20 @@ export default function SettingsPage() {
               "Compare With Someone",
               "Sovereign.os Library continuity",
             ].map((item) => (
-              <div key={item} className="flex items-center gap-3 py-2 border-b border-[#F6F5F3]/6">
-                <div className="h-px w-3 bg-[#F6F5F3]/18 shrink-0" />
-                <span className="text-caption text-xs">{item}</span>
-              </div>
+              <li
+                key={item}
+                className="flex items-center gap-3.5 py-3.5 border-b border-white/[0.06] group"
+              >
+                <span
+                  className="w-[18px] h-px bg-white/[0.12] shrink-0 transition-all duration-300 group-hover:bg-white/[0.3] group-hover:w-[24px]"
+                  aria-hidden
+                />
+                <span className="text-[12px] leading-relaxed text-[#A1A1AA] font-mono tracking-wide group-hover:text-[#FAFAFA] transition-colors duration-200">
+                  {item}
+                </span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
 
       </main>

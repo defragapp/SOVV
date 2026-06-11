@@ -81,6 +81,16 @@ Every patch must:
 
 ---
 
+
+### Workers Builds Configuration for Monorepo (worker-ai & worker-session)
+When configuring Cloudflare Workers Builds for workers within an npm workspace (like `worker-ai` and `worker-session`), you must set the root directory to the repository root so `npm install` can resolve the workspace packages (e.g., `@sovereign/core`).
+
+| Setting | Value |
+|---|---|
+| Root directory | `.` (repo root) |
+| Build command | `npm install` |
+| Deploy command | `cd apps/worker-ai && npx wrangler deploy` (or worker-session) |
+
 ## 4. Red Flags — STOP Conditions
 
 Immediately stop and review if a patch:

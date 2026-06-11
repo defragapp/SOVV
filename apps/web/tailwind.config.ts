@@ -7,7 +7,7 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./ui/**/*.{js,ts,jsx,tsx,mdx}",
     "./marketing/**/*.{js,ts,jsx,tsx,mdx}",
-    "./workspace/**/*.{js,ts,jsx,tsx,mdx}",
+    "./spaces/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {

@@ -1,6 +1,6 @@
 name = "worker-ai"
 main = "src/index.ts"
-compatibility_date = "2026-06-04"
+compatibility_date = "2024-06-04"
 compatibility_flags = ["nodejs_compat"]
 account_id = "8b1954d216d65077c6480d62583fe2c2"
 workers_dev = false
@@ -22,3 +22,6 @@ head_sampling_rate = 1
 enabled = true
 head_sampling_rate = 1
 invocation_logs = true
+
+[build]
+command = "npm install && npm run build"

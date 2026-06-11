@@ -112,6 +112,39 @@ export async function handleGetLibrary(req: Request, env: Env) {
   }
 }
 
+
+export async function handleGetLibraryItem(req: Request, env: Env) {
+  const user = await getAuthUser(req, env.DB);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const url = new URL(req.url);
+  const segments = url.pathname.split('/');
+  const id = segments[segments.length - 1]; // /api/library/:id
+
+  if (!id) {
+    return new Response("Missing ID", { status: 400 });
+  }
+
+  try {
+    const item = await env.DB.prepare(
+      "SELECT * FROM library WHERE id = ? AND user_id = ?"
+    )
+    .bind(id, user.id)
+    .first();
+
+    if (!item) {
+      return new Response("Not found", { status: 404 });
+    }
+
+    return Response.json(item);
+  } catch (e) {
+    console.error("Failed to fetch library item", String(e));
+    return new Response("Internal error", { status: 500 });
+  }
+}
+
 export function registerHistoryRoute(router: any, getEnv: () => Env) {
   router.get("/api/history", async (req: Request) => {
     const env = getEnv();
@@ -121,6 +154,11 @@ export function registerHistoryRoute(router: any, getEnv: () => Env) {
   router.get("/api/library", async (req: Request) => {
     const env = getEnv();
     return handleGetLibrary(req, env);
+  });
+
+  router.get("/api/library/:id", async (req: Request) => {
+    const env = getEnv();
+    return handleGetLibraryItem(req, env);
   });
 
   router.post("/api/history", async (req: Request) => {

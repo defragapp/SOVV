@@ -23,6 +23,31 @@ service = "worker-ai"
 name = "CONFLICT_SESSION"
 class_name = "ConflictSessionDO"
 
+[observability]name = "worker-session"
+main = "src/index.ts"
+compatibility_date = "2026-06-04"
+compatibility_flags = ["nodejs_compat"]
+account_id = "8b1954d216d65077c6480d62583fe2c2"
+
+# Route already configured in Cloudflare
+route = { pattern = "session.defrag.app/*", custom_domain = false }
+
+# Workers AI binding
+[ai]
+binding = "AI"
+
+
+# Service binding to worker-ai for emotional driver analysis
+[[services]]
+binding = "AI_SERVICE"
+service = "worker-ai"
+# environment = "production"
+
+# Durable Object
+[[durable_objects.bindings]]
+name = "CONFLICT_SESSION"
+class_name = "ConflictSessionDO"
+
 [observability]
 enabled = true
 head_sampling_rate = 1
@@ -33,4 +58,18 @@ head_sampling_rate = 1
 invocation_logs = true
 [[migrations]]
 tag = "v1"
-new_classes = [ "ConflictSessionDO" ]
+# new_sqlite_classes = [ "ConflictSessionDO" ]
+
+[build]
+command = "npm install && npm run build"
+
+enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+[[migrations]]
+tag = "v1"
+# new_sqlite_classes = [ "ConflictSessionDO" ]

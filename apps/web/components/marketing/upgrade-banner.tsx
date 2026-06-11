@@ -9,7 +9,7 @@ export function UpgradeBanner() {
       <div className="space-y-2">
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-semibold text-[#FDFDFD]">Sovereign.os Pro</h3>
-          <Badge variant="pro">{PRICING_CONFIG.pro.price}/{PRICING_CONFIG.pro.interval}</Badge>
+          <Badge variant="pro">{PRICING_CONFIG.pro.price}/{PRICING_CONFIG.pro.period}</Badge>
         </div>
         <p className="text-sm text-[#A1A1AA]">
           Unlock saved Results, your private Library, and deeper context across Defrag and Covenant.
