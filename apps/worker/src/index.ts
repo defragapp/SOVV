@@ -9,6 +9,7 @@ import { registerHistoryRoute } from "./history.js";
 import { registerPatternsRoutes, extractPatterns } from "./patterns.js";
 import { registerCovenantRoute } from "./covenant.js";
 import { registerAlignmentRoute } from "./alignment.js";
+import { registerAudioRoute } from "./audio.js";
 import { insertSupportTicket } from "./db.js";
 
 const router = Router();
@@ -109,6 +110,7 @@ registerPatternsRoutes(router, getEnv);
 registerNatalRoutes(router, () => currentEnv);
 registerCovenantRoute(router, getEnv);
 registerAlignmentRoute(router, getEnv);
+registerAudioRoute(router, getEnv);
 
 router.get("/api/stripe/prices", async (request: Request) => {
   const env = getEnv();
