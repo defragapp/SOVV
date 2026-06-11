@@ -3,7 +3,6 @@ import * as React from "react"
 import { SpaceShell } from "@/components/workspace/space-shell"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
 
 export default function AlignmentPage() {
   const [input, setInput] = React.useState("")
@@ -130,7 +129,7 @@ export default function AlignmentPage() {
            {renderSection("Alignment", result.alignment)}
            {renderSection("Best Next Response", result.best_next_response)}
            {renderSection("Stop Repeating", result.stop_repeating)}
-        </motion.div>
+        </div>
       )}
     </div>
   )

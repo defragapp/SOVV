@@ -3,7 +3,6 @@ import * as React from "react"
 import { SpaceShell } from "@/components/workspace/space-shell"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { motion, AnimatePresence } from "framer-motion"
 
 export default function DefragPage() {
   const [input, setInput] = React.useState("")
@@ -12,9 +11,6 @@ export default function DefragPage() {
   const [error, setError] = React.useState("")
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
-  const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
-  const [isGeneratingAudio, setIsGeneratingAudio] = React.useState(false)
-  const [audioError, setAudioError] = React.useState("")
 
   const handleExplain = async () => {
     if (!input.trim()) return
@@ -22,8 +18,6 @@ export default function DefragPage() {
     setError("")
     setResult(null)
     setSaveSuccess(false)
-    setAudioUrl(null)
-    setAudioError("")
     try {
       const res = await fetch("/api/explain", {
         method: "POST",
@@ -69,44 +63,6 @@ export default function DefragPage() {
     }
   }
 
-  const handleGenerateAudio = async () => {
-    if (!result) return
-    setIsGeneratingAudio(true)
-    setAudioError("")
-    try {
-      // Craft a summary text for the audio
-      const audioText = `Active Pattern: ${result.activePattern}. Here is what is repeating: ${result.theRepeat}. The alignment needed is: ${result.alignment}. Your best next response is: ${result.bestNextResponse?.summary || "to pause."}`
-      
-      const res = await fetch("/api/audio", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: audioText })
-      })
-      
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}))
-        throw new Error(errData.error || "Audio generation failed.")
-      }
-      
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      setAudioUrl(url)
-      
-      // Update result state to show audio is available
-      setResult((prev: any) => ({
-        ...prev,
-        media: {
-          ...prev.media,
-          audioOverviewAvailable: true
-        }
-      }))
-    } catch (err: any) {
-      setAudioError(err.message)
-    } finally {
-      setIsGeneratingAudio(false)
-    }
-  }
-
   const sidebarContent = (
     <div className="flex flex-col h-full">
       <div className="px-5 py-4 border-b border-white/[0.06]">
@@ -136,27 +92,10 @@ export default function DefragPage() {
                 {isSaving ? "Saving..." : saveSuccess ? "Saved to Library" : "Save to Sovereign"}
               </Button>
           </div>
-          
-          <div className="border border-white/[0.04] bg-[#050505] p-4 flex flex-col gap-2">
+          <div className="border border-white/[0.04] bg-[#050505] p-4 flex flex-col gap-1.5">
             <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.15em]">Audio Overview</p>
-            {audioUrl ? (
-              <audio controls src={audioUrl} className="w-full h-8 outline-none filter grayscale sepia opacity-80 mt-1" />
-            ) : (
-              <div className="flex flex-col gap-2 mt-1">
-                <Button 
-                  onClick={handleGenerateAudio}
-                  disabled={isGeneratingAudio}
-                  variant="outline" 
-                  className="rounded-none border border-white/[0.15] bg-transparent text-[#FAFAFA] hover:bg-white/5 font-mono text-[10px] tracking-[0.15em] uppercase h-8 w-full"
-                >
-                  {isGeneratingAudio ? "Generating..." : "Generate Audio"}
-                </Button>
-                {audioError && <p className="text-red-400 text-[10px] font-mono leading-tight">{audioError}</p>}
-                {!audioError && !isGeneratingAudio && <p className="text-[10px] text-[#52525B] font-mono leading-tight">Requires Pro</p>}
-              </div>
-            )}
+            <p className="text-xs text-[#52525B]">Audio Overview is not available for this Result yet.</p>
           </div>
-
           <div className="border border-white/[0.04] bg-[#050505] p-4 flex flex-col gap-1.5">
             <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.15em]">Watch Preview</p>
             <p className="text-xs text-[#52525B]">Watch Preview is not available for this Result yet.</p>
@@ -243,12 +182,7 @@ export default function DefragPage() {
           </p>
         </div>
       ) : (
-        <motion.div 
-           initial={{ opacity: 0, y: 10 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-           className="flex-1 overflow-y-auto border border-white/[0.06] bg-[#080808] p-8"
-        >
+        <div className="flex-1 overflow-y-auto border border-white/[0.06] bg-[#080808] p-8">
            {renderSection("Active pattern", result.activePattern)}
            {renderSection("The Repeat", result.theRepeat)}
            {renderSection("Old Role", result.oldRole)}
@@ -300,7 +234,7 @@ export default function DefragPage() {
                 </div>
              </div>
            )}
-        </motion.div>
+        </div>
       )}
     </div>
   )
@@ -311,6 +245,8 @@ export default function DefragPage() {
     { id: "context", label: "Context", content: contextContent }
   ]
 
+  // On Desktop we can show Input and Result side by side, or adapt SpaceShell.
+  // SpaceShell expects one "main" node. We'll compose them.
   const desktopMain = (
     <div className="flex flex-col h-full gap-6">
        <div className="flex-none">{mainInputArea}</div>
