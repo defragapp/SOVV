@@ -24,10 +24,9 @@
     "lint": "npm run lint -w apps/web && tsc --noEmit -p apps/worker/tsconfig.json"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "concurrently": "^8.2.2",
-    "wrangler": "^4.97.0"
-  },
-  "dependencies": {
+    "wrangler": "^4.97.0",
     "playwright": "^1.60.0"
   }
 }

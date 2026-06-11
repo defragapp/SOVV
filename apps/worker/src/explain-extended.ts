@@ -55,11 +55,21 @@ Rules:
 
 Respond in this exact JSON format only, no markdown, no code fences:
 {
-  "response": "2-4 sentences about the dynamic",
-  "shift": { "label": "Short shift name", "summary": "One sentence explaining the shift" },
-  "pressure_points": [{ "type": "emotional|structural|communication", "label": "Short name", "description": "What the tension is", "yours": "Your side", "theirs": "Their side" }],
-  "move": { "label": "Short action name", "description": "Specific concrete next step", "difficulty": "gentle|moderate|direct" },
-  "insights": [{ "id": "ins_001", "type": "pattern|dynamic|baseline", "title": "Short title", "detail": "What this reveals", "source": "baseline|comparison|conversation" }]
+  "activePattern": "1-2 sentences on what is active between both sides",
+  "theRepeat": "1 sentence on the recurring relational loop",
+  "oldRole": "The pattern learned under pressure",
+  "whatYouLearnedToCarry": "The adaptive behavior for both sides",
+  "strainPattern": "Where the relationship bends under pressure",
+  "giftUnderStrain": "The strength underneath the tension",
+  "alignment": "What brings the interaction back to proportion",
+  "bestNextResponse": {
+    "summary": "The concrete next move",
+    "phrasing": ["phrase 1", "phrase 2"]
+  },
+  "conversationalSteering": {
+    "do": ["do this"],
+    "avoid": ["avoid this"]
+  }
 }`;
 
 function asText(value: unknown): string {
@@ -242,28 +252,39 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const rawText = asText((ai as any).response ?? ai);
   const parsed = parseJsonFromText(rawText);
 
-  const threadMeta: ThreadMeta = {
-    baseline_loaded: true,
-    ...(target?.id !== undefined ? { target_id: target.id } : {}),
-    ...(target?.relation !== undefined ? { target_relation: target.relation } : {}),
-    ...(relational ? { target_baseline_loaded: Boolean(targetBaseline) } : {}),
+
+  const result = {
+    id: crypto.randomUUID(),
+    workspaceSource: "DEFRAG",
+    createdAt: new Date().toISOString(),
+    title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
+    summary: parsed.response || "",
+    activePattern: parsed.activePattern || "No active pattern identified.",
+    theRepeat: parsed.theRepeat || "No repeating pattern identified.",
+    oldRole: parsed.oldRole || "Unknown role.",
+    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || "Unknown.",
+    strainPattern: parsed.strainPattern || "Unknown strain.",
+    giftUnderStrain: parsed.giftUnderStrain || "Unknown strength.",
+    alignment: parsed.alignment || "Unknown alignment.",
+    bestNextResponse: parsed.bestNextResponse || { summary: "No specific response.", phrasing: [] },
+    conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] },
+    sourcesUsed: {
+      baseline: true,
+      history: Boolean(patternText),
+      invitedUsers: Boolean(relational)
+    },
+    media: {
+      audioOverviewAvailable: isPro,
+      watchPreviewAvailable: false
+    },
+    metadata: {
+      structured: true
+    }
   };
 
-  const pressurePoints = normalizePressurePoints(parsed.pressure_points);
-
-  const result: ExplainResponse = {
-    response: typeof parsed.response === "string" ? parsed.response : rawText,
-    shift: normalizeShift(parsed.shift),
-    ...(pressurePoints !== undefined ? { pressure_points: pressurePoints } : {}),
-    move: normalizeMove(parsed.move),
-    insights: normalizeInsights(parsed.insights),
-    thread_meta: threadMeta,
-  };
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
-  const confidence: Confidence = result.insights.length
-    ? "Medium"
-    : "Not enough information";
+  const confidence: Confidence = "Medium";
 
   await insertInteraction(env.DB, {
     id: interactionId,
