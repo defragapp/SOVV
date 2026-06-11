@@ -66,7 +66,10 @@ function registerNatalRoutes(router: any, getEnv: () => Env) {
     }
 
     const record = {
-      ...body,
+      name: body.name,
+      birthDate: body.birthDate,
+      birthTime: body.birthTime,
+      birthLocation: body.birthLocation,
       userId: user.id,
       updatedAt: Date.now(),
     };
@@ -282,7 +285,7 @@ export default {
       } catch {
         bodyPreview = "(unable to read body)";
       }
-      const ticketId = `SV-${Date.now().toString(36).toUpperCase()}`;
+      const ticketId = `SV-${crypto.randomUUID()}`;
       await insertSupportTicket(env.DB, {
         id: ticketId,
         sender,
