@@ -3,6 +3,7 @@ import * as React from "react"
 import { SpaceShell } from "@/components/workspace/space-shell"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function DefragPage() {
   const [input, setInput] = React.useState("")
@@ -242,7 +243,12 @@ export default function DefragPage() {
           </p>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto border border-white/[0.06] bg-[#080808] p-8">
+        <motion.div 
+           initial={{ opacity: 0, y: 10 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+           className="flex-1 overflow-y-auto border border-white/[0.06] bg-[#080808] p-8"
+        >
            {renderSection("Active pattern", result.activePattern)}
            {renderSection("The Repeat", result.theRepeat)}
            {renderSection("Old Role", result.oldRole)}
@@ -294,7 +300,7 @@ export default function DefragPage() {
                 </div>
              </div>
            )}
-        </div>
+        </motion.div>
       )}
     </div>
   )
