@@ -42,7 +42,7 @@ export default function Sidebar({
           Active Engines
         </span>
         <nav className="flex flex-col">
-          <Link href="/app" className={`px-6 py-2 border-l-2 transition-colors ${pathname === '/app' ? 'border-foreground text-foreground bg-surface' : 'border-transparent text-foreground-muted hover:text-foreground hover:bg-surface'}`}>
+          <Link href="/apps/defrag" className={`px-6 py-2 border-l-2 transition-colors ${pathname === '/apps/defrag' || pathname === '/app' ? 'border-foreground text-foreground bg-surface' : 'border-transparent text-foreground-muted hover:text-foreground hover:bg-surface'}`}>
             Defrag
           </Link>
           <Link href="/apps/alignment" className={`px-6 py-2 border-l-2 transition-colors ${pathname === '/apps/alignment' ? 'border-foreground text-foreground bg-surface' : 'border-transparent text-foreground-muted hover:text-foreground hover:bg-surface'}`}>
@@ -50,6 +50,9 @@ export default function Sidebar({
           </Link>
           <Link href="/apps/covenant" className={`px-6 py-2 border-l-2 transition-colors ${pathname === '/apps/covenant' ? 'border-foreground text-foreground bg-surface' : 'border-transparent text-foreground-muted hover:text-foreground hover:bg-surface'}`}>
             Covenant
+          </Link>
+          <Link href="/app" className={`px-6 py-2 border-l-2 transition-colors ${pathname === '/app' && !pathname.startsWith('/apps/') ? 'border-foreground text-foreground bg-surface' : 'border-transparent text-foreground-muted hover:text-foreground hover:bg-surface'}`}>
+            Library
           </Link>
         </nav>
       </div>
