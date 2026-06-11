@@ -258,7 +258,7 @@ export default function DefragPage() {
                     <div>
                       <h3 className="text-sm font-medium text-[#F5F5F6]">Do</h3>
                       <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[#B1B1BA]">
-                        {result.conversationalSteering.do.map((item, idx) => (
+                        {result.conversationalSteering?.do?.map((item, idx) => (
                           <li key={idx}>{item}</li>
                         ))}
                       </ul>
@@ -266,7 +266,7 @@ export default function DefragPage() {
                     <div>
                       <h3 className="text-sm font-medium text-[#F5F5F6]">Avoid</h3>
                       <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[#B1B1BA]">
-                        {result.conversationalSteering.avoid.map((item, idx) => (
+                        {result.conversationalSteering?.avoid?.map((item, idx) => (
                           <li key={idx}>{item}</li>
                         ))}
                       </ul>
