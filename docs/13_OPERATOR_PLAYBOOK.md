@@ -421,3 +421,22 @@ grep -rn "ENTER WORKBENCH\|Enter Workspace\|Open Workspace\|Go to Workspace" app
 - `feat/api-wireup` — contains API wireup work. Review for naming compliance before merge.
 - `codespace-expert-umbrella-*` — emergency saves. Cherry-pick useful commits only.
 - `codespace-symmetrical-meme-*` — emergency saves. Cherry-pick useful commits only.
+## Emergency Protocol: Systemic Drift Reset
+
+If any output, copy, or UI uses:
+- diagnostic language (anxious, avoidant, attachment style)
+- identity-based labeling
+- therapy framing
+- spiritual authority tone
+- vague abstraction
+
+Then:
+
+1. HALT execution
+2. IDENTIFY violating term
+3. REPLACE with system-neutral wording
+4. APPEND:
+   "This explains a pattern — not who you are."
+5. REVALIDATE against docs/01_PRODUCT_LANGUAGE.md
+
+This rule overrides all others.

@@ -261,8 +261,8 @@ export default function LoginScreen() {
           className="mt-10 text-center text-[10px] font-mono text-[#3F3F46] tracking-wide"
         >
           {mode === "register"
-            ? "Free tier · 5 sessions/day · self only"
-            : "Pro unlocks people, groups, unlimited sessions"}
+            ? "Protects your Baseline Design and Library. Free tier · 5 sessions/day"
+            : "Protects your Baseline Design and Library. Pro unlocks continuity and deep context"}
         </motion.p>
 
         {/* Back link */}
