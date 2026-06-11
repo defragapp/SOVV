@@ -256,7 +256,7 @@ No Codespaces terminal required. No GitHub Actions required.
 | Setting | Value |
 |---|---|
 | Worker name | worker-ai |
-| Root directory | / |
+| Root directory | (Leave blank) |
 | Config file | apps/worker-ai/wrangler.toml |
 | Build command | npm install |
 | Deploy command | cd apps/worker-ai && npx wrangler deploy |
