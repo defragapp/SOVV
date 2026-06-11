@@ -244,7 +244,7 @@ No Codespaces terminal required. No GitHub Actions required.
 | Setting | Value |
 |---|---|
 | Worker name | sovereign-os-api |
-| Root directory | / |
+| Root directory | (Leave blank) |
 | Config file | apps/worker/wrangler.toml |
 | Build command | npm install |
 | Deploy command | cd apps/worker && npx wrangler deploy |
