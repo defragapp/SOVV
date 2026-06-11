@@ -16,11 +16,8 @@ import type {
   ThreadMeta,
 } from "@sovereign/core";
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import { getCorsHeaders } from "./cors.js";
+
 
 const SYSTEM_SELF = `You are Sovereign — a perspective-shift engine, not a therapist.
 
@@ -173,12 +170,12 @@ function buildUserPrompt(args: {
 
 export async function handleExplain(req: Request, env: Env): Promise<Response> {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: CORS_HEADERS });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   const user = await getAuthUser(req, env.DB);
   if (!user) {
-    return jsonResponse({ error: "Unauthorized" }, 401, CORS_HEADERS);
+    return jsonResponse({ error: "Unauthorized" }, 401, getCorsHeaders(req));
   }
 
   // Subscription gate: require active subscription for workspace access
@@ -196,7 +193,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
         error: "daily_limit_reached",
         message: "You've reached your free daily limit. Upgrade to Pro for unlimited usage.",
         remaining: 0,
-      }, 429, { ...CORS_HEADERS, "set-cookie": cookieHeader(sid) });
+      }, 429, { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) });
     }
   }
   const body = (await req.json().catch(() => ({}))) as Partial<ExplainRequest> & {
@@ -209,7 +206,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const message = String(body.message ?? body.question ?? body.text ?? "").trim();
   if (!message) {
     return jsonResponse({ error: "message_required" }, 400, {
-      ...CORS_HEADERS,
+      ...getCorsHeaders(req),
       "set-cookie": cookieHeader(sid),
     });
   }
@@ -222,7 +219,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     return jsonResponse(
       { error: "Relational analysis requires Pro" },
       403,
-      { ...CORS_HEADERS, "set-cookie": cookieHeader(sid) }
+      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
     );
   }
 
@@ -231,7 +228,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     return jsonResponse(
       { type: "needs_baseline" },
       200,
-      { ...CORS_HEADERS, "set-cookie": cookieHeader(sid) }
+      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
     );
   }
 
@@ -296,7 +293,6 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       structured: true
     },
 
-  };
 
   const confidence: Confidence = "Medium";
 
@@ -321,7 +317,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   }
 
   return jsonResponse(result, 200, {
-    ...CORS_HEADERS,
+    ...getCorsHeaders(req),
     "set-cookie": cookieHeader(sid),
   });
 }
