@@ -92,7 +92,7 @@ export default function DefragPage() {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt,
+          message: prompt,
           mode: "self",
           baselineLoaded,
         }),
