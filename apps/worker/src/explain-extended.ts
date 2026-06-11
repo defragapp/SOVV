@@ -101,7 +101,7 @@ function parseJsonFromText(text: string): Record<string, any> {
   }
 }
 
-function normalizeShift(input: any): Shift {
+export function normalizeShift(input: any): Shift {
   if (input && typeof input.label === "string" && typeof input.summary === "string") {
     return input;
   }
@@ -264,40 +264,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const rawText = asText((ai as any).response ?? ai);
   const parsed = parseJsonFromText(rawText);
 
-
-  const result = {
-    id: crypto.randomUUID(),
-    workspaceSource: "DEFRAG",
-    createdAt: new Date().toISOString(),
-    title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
-    summary: parsed.response || "",
-    activePattern: parsed.activePattern || "No active pattern identified.",
-    theRepeat: parsed.theRepeat || "No repeating pattern identified.",
-    oldRole: parsed.oldRole || "Unknown role.",
-    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || "Unknown.",
-    strainPattern: parsed.strainPattern || "Unknown strain.",
-    giftUnderStrain: parsed.giftUnderStrain || "Unknown strength.",
-    alignment: parsed.alignment || "Unknown alignment.",
-    bestNextResponse: parsed.bestNextResponse || { summary: "No specific response.", phrasing: [] },
-    conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] },
-    sourcesUsed: {
-      baseline: true,
-      history: Boolean(patternText),
-      invitedUsers: Boolean(relational)
-    },
-    media: {
-      audioOverviewAvailable: isPro,
-      watchPreviewAvailable: false
-    },
-    metadata: {
-      structured: true
-    }
-  };
-
-<<<<<<< HEAD
-
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
-=======
   const pressurePoints = normalizePressurePoints(parsed.pressure_points);
 
   const now = new Date().toISOString();
@@ -328,10 +295,9 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     metadata: {
       structured: true
     },
-    thread_meta: threadMeta,
+
   };
 
->>>>>>> 0d32d2b (feat: complete platform implementation (defrag, library, spaces, api normalization))
   const confidence: Confidence = "Medium";
 
   await insertInteraction(env.DB, {
