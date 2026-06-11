@@ -9,6 +9,8 @@ import { registerHistoryRoute } from "./history.js";
 import { registerPatternsRoutes, extractPatterns } from "./patterns.js";
 import { registerCovenantRoute } from "./covenant.js";
 import { registerAlignmentRoute } from "./alignment.js";
+import { registerAudioRoute } from "./audio.js";
+import { getCorsHeaders } from "./cors.js";
 import { insertSupportTicket } from "./db.js";
 
 const router = Router();
@@ -96,7 +98,10 @@ function registerNatalRoutes(router: any, getEnv: () => Env) {
     }
 
     const record = {
-      ...body,
+      name: body.name,
+      birthDate: body.birthDate,
+      birthTime: body.birthTime,
+      birthLocation: body.birthLocation,
       userId: user.id,
       updatedAt: Date.now(),
     };
@@ -120,6 +125,7 @@ registerPatternsRoutes(router, getEnv);
 registerNatalRoutes(router, () => currentEnv);
 registerCovenantRoute(router, getEnv);
 registerAlignmentRoute(router, getEnv);
+registerAudioRoute(router, getEnv);
 
 router.get("/api/stripe/prices", async (request: Request) => {
   const env = getEnv();
@@ -273,14 +279,14 @@ export default {
   },
 
   async queue(batch: MessageBatch<unknown>, env: Env, _ctx: ExecutionContext): Promise<void> {
-    for (const message of batch.messages) {
+    await Promise.all(batch.messages.map(async (message) => {
       const body = message.body as { sessionId?: string; interactionId?: string };
       const sessionId = body?.sessionId;
       const interactionId = body?.interactionId;
       if (!sessionId || !interactionId) {
         console.error("Queue: invalid message body");
         message.ack();
-        continue;
+        return;
       }
       try {
         await extractPatterns(env, sessionId, interactionId);
@@ -289,7 +295,7 @@ export default {
         console.error("Queue: pattern extraction failed for", interactionId, err);
         message.retry();
       }
-    }
+    }));
   },
 
   async email(message: any, env: Env, _ctx: ExecutionContext): Promise<void> {
@@ -312,7 +318,7 @@ export default {
       } catch {
         bodyPreview = "(unable to read body)";
       }
-      const ticketId = `SV-${Date.now().toString(36).toUpperCase()}`;
+      const ticketId = `SV-${crypto.randomUUID()}`;
       await insertSupportTicket(env.DB, {
         id: ticketId,
         sender,

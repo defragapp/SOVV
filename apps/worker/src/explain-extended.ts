@@ -16,11 +16,8 @@ import type {
   ThreadMeta,
 } from "@sovereign/core";
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import { getCorsHeaders } from "./cors.js";
+
 
 const SYSTEM_SELF = `You are Sovereign — a perspective-shift engine, not a therapist.
 
@@ -101,7 +98,7 @@ function parseJsonFromText(text: string): Record<string, any> {
   }
 }
 
-function normalizeShift(input: any): Shift {
+export function normalizeShift(input: any): Shift {
   if (input && typeof input.label === "string" && typeof input.summary === "string") {
     return input;
   }
@@ -173,12 +170,12 @@ function buildUserPrompt(args: {
 
 export async function handleExplain(req: Request, env: Env): Promise<Response> {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: CORS_HEADERS });
+    return new Response(null, { headers: getCorsHeaders(req) });
   }
 
   const user = await getAuthUser(req, env.DB);
   if (!user) {
-    return jsonResponse({ error: "Unauthorized" }, 401, CORS_HEADERS);
+    return jsonResponse({ error: "Unauthorized" }, 401, getCorsHeaders(req));
   }
 
   // Subscription gate: require active subscription for workspace access
@@ -196,7 +193,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
         error: "daily_limit_reached",
         message: "You've reached your free daily limit. Upgrade to Pro for unlimited usage.",
         remaining: 0,
-      }, 429, { ...CORS_HEADERS, "set-cookie": cookieHeader(sid) });
+      }, 429, { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) });
     }
   }
   const body = (await req.json().catch(() => ({}))) as Partial<ExplainRequest> & {
@@ -209,7 +206,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const message = String(body.message ?? body.question ?? body.text ?? "").trim();
   if (!message) {
     return jsonResponse({ error: "message_required" }, 400, {
-      ...CORS_HEADERS,
+      ...getCorsHeaders(req),
       "set-cookie": cookieHeader(sid),
     });
   }
@@ -222,7 +219,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     return jsonResponse(
       { error: "Relational analysis requires Pro" },
       403,
-      { ...CORS_HEADERS, "set-cookie": cookieHeader(sid) }
+      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
     );
   }
 
@@ -231,7 +228,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     return jsonResponse(
       { type: "needs_baseline" },
       200,
-      { ...CORS_HEADERS, "set-cookie": cookieHeader(sid) }
+      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
     );
   }
 
@@ -265,11 +262,8 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const parsed = parseJsonFromText(rawText);
 
 
-  const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
-  const pressurePoints = normalizePressurePoints(parsed.pressure_points);
-
   const result = {
-    id: interactionId,
+    id: crypto.randomUUID(),
     workspaceSource: "DEFRAG",
     createdAt: new Date().toISOString(),
     title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
@@ -298,13 +292,11 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   };
 
 
-
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
-
   const confidence: Confidence = "Medium";
 
   await insertInteraction(env.DB, {
-    id: interactionId,
+    id: anotherInteractionId,
     session_id: sid,
     mode,
     question: message,
@@ -316,15 +308,15 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   if (env.QUEUE) {
     // Offload pattern extraction to a queue to avoid delaying the response.
-    await env.QUEUE.send({ sessionId: sid, interactionId });
+    await env.QUEUE.send({ sessionId: sid, interactionId: anotherInteractionId });
   } else {
     // Fallback for local dev or if queue is not configured.
     console.warn("QUEUE binding not found. Running pattern extraction in a non-blocking way, but this may be unreliable.");
-    void extractPatterns(env, sid, interactionId);
+    void extractPatterns(env, sid, anotherInteractionId);
   }
 
   return jsonResponse(result, 200, {
-    ...CORS_HEADERS,
+    ...getCorsHeaders(req),
     "set-cookie": cookieHeader(sid),
   });
 }

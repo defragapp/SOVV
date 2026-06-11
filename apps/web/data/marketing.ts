@@ -2,7 +2,7 @@ export const PRICING_CONFIG = {
   free: {
     name: "Free",
     price: "$0",
-    interval: "forever",
+    period: "forever",
     description: "Start understanding the pattern.",
     features: [
       "Baseline Design",
@@ -16,7 +16,8 @@ export const PRICING_CONFIG = {
   pro: {
     name: "Pro",
     price: "$12",
-    interval: "month",
+    period: "month",
+    highlight: "Recommended",
     description: "For patterns that need continuity.",
     features: [
       "Save Results",
