@@ -267,7 +267,7 @@ No Codespaces terminal required. No GitHub Actions required.
 | Setting | Value |
 |---|---|
 | Worker name | worker-session |
-| Root directory | / |
+| Root directory | (Leave blank) |
 | Config file | apps/worker-session/wrangler.toml |
 | Build command | npm install |
 | Deploy command | cd apps/worker-session && npx wrangler deploy |
