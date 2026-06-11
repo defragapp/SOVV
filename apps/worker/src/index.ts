@@ -85,7 +85,10 @@ function registerNatalRoutes(router: any, getEnv: () => Env) {
     }
 
     const record = {
-      ...body,
+      name: body.name,
+      birthDate: body.birthDate,
+      birthTime: body.birthTime,
+      birthLocation: body.birthLocation,
       userId: user.id,
       updatedAt: Date.now(),
     };
