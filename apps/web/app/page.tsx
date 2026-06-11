@@ -42,7 +42,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
             <Link href="/login" className="w-full sm:w-auto">
               <Button size="lg" className="w-full rounded-none border border-white/[0.15] bg-white text-black hover:bg-white/90 font-mono text-xs tracking-[0.15em] uppercase h-12 px-8 transition-colors">
-                Enter Sovereign.os
+                Start Your Baseline Design
               </Button>
             </Link>
             <Link href="/settings" className="w-full sm:w-auto">
@@ -191,7 +191,7 @@ export default function HomePage() {
             <div className="bg-[#050505] p-10 lg:p-14 order-1 lg:order-2">
               <div className="space-y-0 border border-white/[0.06]">
                 {[
-                  "See what is active.",
+                  "See what is active in your relational dynamics.",
                   "Spot what is repeating.",
                   "Notice the role you step into under pressure.",
                   "Get a clearer next response.",
