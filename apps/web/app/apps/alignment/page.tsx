@@ -116,13 +116,19 @@ export default function AlignmentPage() {
       {!result ? (
         <div className="flex-1 flex items-center justify-center border border-white/[0.06] bg-[#080808] p-6 text-center">
           <p className="text-sm text-[#52525B] font-mono leading-relaxed max-w-sm">
-            The Alignment space is ready visually, but its backend route is not connected yet.
+            Your Alignment Brief will appear here in structured sections you can use, save, and return to later.
           </p>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto border border-white/[0.06] bg-[#080808] p-8">
-           {/* If backend comes online, map its fields here */}
-           {renderSection("Result", result.summary || JSON.stringify(result))}
+           {renderSection("Active Now", result.active_now)}
+           {renderSection("What is Yours", result.what_is_yours)}
+           {renderSection("What is Not Yours", result.what_is_not_yours)}
+           {renderSection("Strain Pattern", result.strain_pattern)}
+           {renderSection("Gift Under Strain", result.gift_under_strain)}
+           {renderSection("Alignment", result.alignment)}
+           {renderSection("Best Next Response", result.best_next_response)}
+           {renderSection("Stop Repeating", result.stop_repeating)}
         </div>
       )}
     </div>
