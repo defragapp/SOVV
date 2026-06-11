@@ -28,7 +28,7 @@ const ALLOWED_ORIGINS = [
 export function getCorsHeaders(request: Request): Record<string, string> {
   const origin = request.headers.get('Origin') || '';
   const headers: Record<string, string> = {
-    'Access-Control-Allow-Credentials': 'true',
+  const headers: Record<string, string> = {
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Vary': 'Origin',
