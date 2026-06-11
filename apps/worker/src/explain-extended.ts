@@ -265,8 +265,11 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const parsed = parseJsonFromText(rawText);
 
 
+  const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
+  const pressurePoints = normalizePressurePoints(parsed.pressure_points);
+
   const result = {
-    id: crypto.randomUUID(),
+    id: interactionId,
     workspaceSource: "DEFRAG",
     createdAt: new Date().toISOString(),
     title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
