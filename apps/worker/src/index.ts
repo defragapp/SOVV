@@ -10,7 +10,6 @@ import { registerPatternsRoutes, extractPatterns } from "./patterns.js";
 import { registerCovenantRoute } from "./covenant.js";
 import { registerAlignmentRoute } from "./alignment.js";
 import { registerAudioRoute } from "./audio.js";
-import { getCorsHeaders } from "./cors.js";
 import { insertSupportTicket } from "./db.js";
 
 const router = Router();
@@ -26,9 +25,8 @@ const ALLOWED_ORIGINS = [
   'https://premium.defrag.app',
 ];
 
-function getCorsHeaders(request: Request): Record<string, string> {
+export function getCorsHeaders(request: Request): Record<string, string> {
   const origin = request.headers.get('Origin') || '';
-  const headers: Record<string, string> = {
   const headers: Record<string, string> = {
     'Access-Control-Allow-Credentials': 'true',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',

@@ -1,6 +1,6 @@
 name = "worker-ai"
-main = "src/index.ts"
-compatibility_date = "2024-06-04"
+main = "./src/index.ts"
+compatibility_date = "2026-06-01"
 compatibility_flags = ["nodejs_compat"]
 account_id = "8b1954d216d65077c6480d62583fe2c2"
 workers_dev = false
@@ -12,7 +12,6 @@ zone_id = "45a59d754ece9221fc97c92c461eb01f"
 # Workers AI binding for inline model inference
 [ai]
 binding = "AI"
-
 
 [observability]
 enabled = true
