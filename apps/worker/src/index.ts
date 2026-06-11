@@ -9,31 +9,12 @@ import { registerHistoryRoute } from "./history.js";
 import { registerPatternsRoutes, extractPatterns } from "./patterns.js";
 import { registerCovenantRoute } from "./covenant.js";
 import { registerAlignmentRoute } from "./alignment.js";
+import { getCorsHeaders } from "./cors.js";
 import { insertSupportTicket } from "./db.js";
 
 const router = Router();
 let currentEnv: Env;
 const getEnv = () => currentEnv;
-
-// === CORS CONFIGURATION ===
-const ALLOWED_ORIGINS = [
-  'https://defrag.app',
-  'https://www.defrag.app',
-  'https://app.defrag.app',
-  'https://sovereign.defrag.app',
-  'https://premium.defrag.app',
-];
-
-function getCorsHeaders(request: Request): Record<string, string> {
-  const origin = request.headers.get('Origin') || '';
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : 'https://defrag.app';
-  return {
-    'Access-Control-Allow-Origin': allowed,
-    'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  };
-}
 
 // === NATAL ROUTES ===
 function registerNatalRoutes(router: any, getEnv: () => Env) {
@@ -85,7 +66,10 @@ function registerNatalRoutes(router: any, getEnv: () => Env) {
     }
 
     const record = {
-      ...body,
+      name: body.name,
+      birthDate: body.birthDate,
+      birthTime: body.birthTime,
+      birthLocation: body.birthLocation,
       userId: user.id,
       updatedAt: Date.now(),
     };
@@ -301,7 +285,7 @@ export default {
       } catch {
         bodyPreview = "(unable to read body)";
       }
-      const ticketId = `SV-${Date.now().toString(36).toUpperCase()}`;
+      const ticketId = `SV-${crypto.randomUUID()}`;
       await insertSupportTicket(env.DB, {
         id: ticketId,
         sender,
