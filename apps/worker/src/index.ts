@@ -25,7 +25,7 @@ const ALLOWED_ORIGINS = [
   'https://premium.defrag.app',
 ];
 
-function getCorsHeaders(request: Request): Record<string, string> {
+export function getCorsHeaders(request: Request): Record<string, string> {
   const origin = request.headers.get('Origin') || '';
   const headers: Record<string, string> = {
   const headers: Record<string, string> = {
