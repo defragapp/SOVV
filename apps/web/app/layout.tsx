@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
+import { JetBrains_Mono } from "next/font/google";
 
 import "./globals.css";
 
-const jetBrainsMono = localFont({
-  src: "../public/fonts/JetBrainsMono-VariableFont.woff2",
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
   variable: "--font-jetbrains-mono",
 });
 

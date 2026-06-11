@@ -7,9 +7,8 @@ Sovereign.os is a privacy-first relational intelligence platform. It is the priv
 - **Sovereign.os** — the parent platform
 - **Defrag** — the relational intelligence space inside Sovereign.os
 - **Covenant** — the optional faith-context reflection space inside Sovereign.os
-- **Alignment** — the response integration and action choice space inside Sovereign.os
 
-All three spaces share one auth system, one Baseline Design, one Library, and one subscription.
+Both spaces share one auth system, one Baseline Design, one Library, and one subscription.
 
 ## Architecture
 
@@ -25,7 +24,7 @@ All three spaces share one auth system, one Baseline Design, one Library, and on
 
 ## Core Principle
 
-One user. One Baseline Design. One Library. Three guided spaces.
+One user. One Baseline Design. One Library. Multiple guided spaces.
 
 ## Domains
 
@@ -44,7 +43,6 @@ One user. One Baseline Design. One Library. Three guided spaces.
 |---|---|
 | `/apps/defrag` | Defrag space (relational intelligence) |
 | `/apps/covenant` | Covenant space (faith-context reflection) |
-| `/apps/alignment` | Alignment space (response integration and action choice) |
 
 ## Database Schema
 
@@ -108,7 +106,7 @@ See `docs/CLOUDFLARE_BUILDS_FINAL_STANDARD.md` for the canonical configuration.
 | `docs/04_REPO_CLEANUP_AND_DRIFT_CONTROL.md` | Cleanup history and drift prevention |
 | `docs/05_PRODUCT_LANGUAGE.md` | Canonical terms, naming rules, forbidden terms |
 | `docs/06_BASELINE_DESIGN_ENGINE.md` | Baseline Design storage, API, and AI injection |
-| `docs/07_APP_SPACES_ARCHITECTURE.md` | Space architecture, routes, Library schema (Defrag, Covenant, Alignment) |
+| `docs/07_APP_SPACES_DEFRAG_COVENANT.md` | Space architecture, routes, Library schema |
 | `docs/08_CLOUDFLARE_WORKERS_BUILDS.md` | Workers Builds setup steps |
 | `docs/09_ACCEPTANCE_TESTS.md` | Pre-release compliance checks |
 | `docs/operator-playbook.md` | Day-to-day operational guidance |

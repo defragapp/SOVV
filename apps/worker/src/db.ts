@@ -45,9 +45,9 @@ export async function getPatterns(db: D1Database, session_id: string): Promise<P
 }
 
 /**
- * Upserts pattern findings in batch. Uses ON CONFLICT to update existing patterns for a session.
+ * Upserts pattern findings. Uses ON CONFLICT to update existing patterns for a session.
  */
-export async function upsertPatterns(db: D1Database, patterns: Array<{
+export async function upsertPattern(db: D1Database, pattern: {
   id: string;
   session_id: string;
   pattern_type: string;
@@ -55,14 +55,10 @@ export async function upsertPatterns(db: D1Database, patterns: Array<{
   source_interaction_ids: string[];
   confidence: string;
   verified: number;
-}>) {
-  if (patterns.length === 0) return [];
-  const stmt = db.prepare(
+}) {
+  return await db.prepare(
     "INSERT INTO patterns (id, session_id, key, value, updated_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP) ON CONFLICT(session_id, key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP"
-  );
-  return await db.batch(patterns.map(pattern =>
-    stmt.bind(pattern.id, pattern.session_id, pattern.pattern_type, pattern.content)
-  ));
+  ).bind(pattern.id, pattern.session_id, pattern.pattern_type, pattern.content).run();
 }
 
 /**

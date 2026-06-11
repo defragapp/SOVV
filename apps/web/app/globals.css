@@ -93,7 +93,7 @@ button, input, textarea, select { font: inherit; }
 }
 
 .text-label {
-  font-family: var(--font-jetbrains-mono);
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.6875rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -101,7 +101,7 @@ button, input, textarea, select { font: inherit; }
 }
 
 .text-micro {
-  font-family: var(--font-jetbrains-mono);
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.625rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -378,7 +378,7 @@ button, input, textarea, select { font: inherit; }
 
 .sovv-label {
   display: block;
-  font-family: var(--font-jetbrains-mono);
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.6875rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -390,7 +390,7 @@ button, input, textarea, select { font: inherit; }
 .badge {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-jetbrains-mono);
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.625rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -402,7 +402,7 @@ button, input, textarea, select { font: inherit; }
 .space-badge {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-jetbrains-mono);
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.625rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -417,7 +417,7 @@ button, input, textarea, select { font: inherit; }
 .space-badge-defrag {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-jetbrains-mono);
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.625rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -432,7 +432,7 @@ button, input, textarea, select { font: inherit; }
 .space-badge-covenant {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-jetbrains-mono);
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.625rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -446,7 +446,7 @@ button, input, textarea, select { font: inherit; }
 .badge-pro {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-jetbrains-mono);
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.625rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;

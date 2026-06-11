@@ -1,5 +1,6 @@
 import type { Env } from "./types-env.js";
-import { type ChipsResponse, type Mode, CHIP_GROUPS } from "@sovereign/core";
+import type { ChipsResponse, Mode } from "@sovereign/core";
+import { CHIP_GROUPS } from "@sovereign/core";
 
 export async function handleChips(req: Request, _env: Env): Promise<Response> {
   const url = new URL(req.url);

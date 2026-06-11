@@ -62,12 +62,12 @@ export async function handleSaveToLibrary(req: Request, env: Env) {
 
   try {
     const body = await req.json().catch(() => ({})) as any;
-    const { title, content, payload, workspace_source } = body;
+    const { title, content, workspace_source } = body;
 
-    if (typeof title !== "string" || typeof workspace_source !== "string") {
+    if (typeof title !== "string" || typeof content !== "string" || typeof workspace_source !== "string") {
        return new Response("Invalid or missing required fields", { status: 400 });
     }
-    if (!["DEFRAG", "COVENANT", "ALIGNMENT"].includes(workspace_source)) {
+    if (workspace_source !== "DEFRAG" && workspace_source !== "COVENANT") {
        return new Response("Invalid workspace source", { status: 400 });
     }
 
@@ -75,9 +75,9 @@ export async function handleSaveToLibrary(req: Request, env: Env) {
     const now = new Date().toISOString();
 
     await env.DB.prepare(
-      "INSERT INTO library (id, user_id, title, payload, workspace_source, created_at) VALUES (?, ?, ?, ?, ?, ?)"
+      "INSERT INTO library (id, user_id, title, content, workspace_source, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)"
     )
-    .bind(id, user.id, title, payload ? JSON.stringify(payload) : null, workspace_source, now)
+    .bind(id, user.id, title, content, workspace_source, now, now)
     .run();
 
     return Response.json({ success: true, id });
@@ -87,40 +87,10 @@ export async function handleSaveToLibrary(req: Request, env: Env) {
   }
 }
 
-
-export async function handleGetLibrary(req: Request, env: Env) {
-  const user = await getAuthUser(req, env.DB);
-  if (!user) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
-  const url = new URL(req.url);
-  const limit = Math.min(parseInt(url.searchParams.get("limit") || "20", 10), 50);
-  const offset = parseInt(url.searchParams.get("offset") || "0", 10);
-
-  try {
-    const { results } = await env.DB.prepare(
-      "SELECT * FROM library WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?"
-    )
-    .bind(user.id, limit, offset)
-    .all();
-
-    return Response.json({ items: results || [] });
-  } catch (e) {
-    console.error("Failed to fetch library", String(e));
-    return Response.json({ items: [] });
-  }
-}
-
 export function registerHistoryRoute(router: any, getEnv: () => Env) {
   router.get("/api/history", async (req: Request) => {
     const env = getEnv();
     return handleHistory(req, env);
-  });
-
-  router.get("/api/library", async (req: Request) => {
-    const env = getEnv();
-    return handleGetLibrary(req, env);
   });
 
   router.post("/api/history", async (req: Request) => {

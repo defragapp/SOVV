@@ -40,7 +40,7 @@ export default function PricingPage() {
                 <h2 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">{PRICING_CONFIG.free.name}</h2>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-bold text-[#FAFAFA]">{PRICING_CONFIG.free.price}</span>
-                  <span className="text-[#71717A] font-mono text-[10px] tracking-wide uppercase">/{PRICING_CONFIG.free.period}</span>
+                  <span className="text-[#71717A] font-mono text-[10px] tracking-wide uppercase">/{PRICING_CONFIG.free.interval}</span>
                 </div>
                 <p className="text-sm text-[#71717A] mt-2 leading-relaxed">{PRICING_CONFIG.free.description}</p>
               </div>
@@ -69,14 +69,14 @@ export default function PricingPage() {
 
             {/* Pro Plan */}
             <div className="bg-[#080808] p-10 lg:p-14 flex flex-col gap-8 border-l border-white/[0.05] relative">
-              {PRICING_CONFIG.pro.highlight && <div className="absolute top-0 right-10 -translate-y-1/2">
-                 <Badge className="rounded-none border border-white/[0.12] bg-white text-black font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1">{PRICING_CONFIG.pro.highlight}</Badge>
-              </div>}
+              <div className="absolute top-0 right-10 -translate-y-1/2">
+                 <Badge className="rounded-none border border-white/[0.12] bg-white text-black font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1">Recommended</Badge>
+              </div>
               <div className="flex flex-col gap-2">
                 <h2 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">{PRICING_CONFIG.pro.name}</h2>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-bold text-[#FAFAFA]">{PRICING_CONFIG.pro.price}</span>
-                  <span className="text-[#71717A] font-mono text-[10px] tracking-wide uppercase">/{PRICING_CONFIG.pro.period}</span>
+                  <span className="text-[#71717A] font-mono text-[10px] tracking-wide uppercase">/{PRICING_CONFIG.pro.interval}</span>
                 </div>
                 <p className="text-sm text-[#FAFAFA] mt-2 leading-relaxed">{PRICING_CONFIG.pro.description}</p>
               </div>

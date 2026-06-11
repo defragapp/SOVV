@@ -26,9 +26,6 @@ Use these terms exactly as written in all user-facing copy, documentation, onboa
 | Covenant Brief | Covenant space output |
 | Defrag space | The relational intelligence space |
 | Covenant space | The faith-context reflection space |
-| Alignment space | The response integration and action choice space |
-| Alignment Brief | Alignment space output |
-| Alignment Result | Alignment space output |
 | Sovereign.os platform | The parent platform |
 | Sovereign.os Library | The shared saved-work layer |
 
@@ -60,7 +57,7 @@ Do not describe Defrag as only for conflict or relationship problems. It is a br
 
 ## Space Language
 
-Defrag, Covenant, and Alignment are **spaces** inside Sovereign.os. They are not:
+Defrag and Covenant are **spaces** inside Sovereign.os. They are not:
 - Workbenches
 - Workspaces (when referring to the space itself)
 - Standalone products

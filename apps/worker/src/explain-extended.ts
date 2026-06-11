@@ -16,8 +16,11 @@ import type {
   ThreadMeta,
 } from "@sovereign/core";
 
-import { getCorsHeaders } from "./cors.js";
-
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
 
 const SYSTEM_SELF = `You are Sovereign — a perspective-shift engine, not a therapist.
 
@@ -33,22 +36,10 @@ Rules:
 
 Respond in this exact JSON format only, no markdown, no code fences:
 {
-  "summary": "1-2 sentence high level summary of the situation",
-  "activePattern": "Name the active pattern in a few words",
-  "theRepeat": "1-2 sentences on what is repeating here",
-  "oldRole": "What role the user is defaulting to",
-  "whatYouLearnedToCarry": "What they learned to carry that fuels this",
-  "strainPattern": "How this pattern shows up under strain",
-  "giftUnderStrain": "The positive intent or gift hidden in the strain",
-  "alignment": "What needs to align now",
-  "bestNextResponse": {
-    "summary": "Context for the response",
-    "phrasing": ["phrase 1", "phrase 2"]
-  },
-  "conversationalSteering": {
-    "do": ["do this 1", "do this 2"],
-    "avoid": ["avoid this 1", "avoid this 2"]
-  }
+  "response": "2-4 sentences reframing what they described",
+  "shift": { "label": "Short shift name", "summary": "One sentence explaining the shift" },
+  "move": { "label": "Short action name", "description": "Specific concrete next step", "difficulty": "gentle|moderate|direct" },
+  "insights": [{ "id": "ins_001", "type": "pattern", "title": "Short title", "detail": "What the pattern is", "source": "baseline" }]
 }`;
 
 const SYSTEM_RELATIONAL = `You are Sovereign — a perspective-shift engine for relational dynamics.
@@ -98,7 +89,7 @@ function parseJsonFromText(text: string): Record<string, any> {
   }
 }
 
-export function normalizeShift(input: any): Shift {
+function normalizeShift(input: any): Shift {
   if (input && typeof input.label === "string" && typeof input.summary === "string") {
     return input;
   }
@@ -121,7 +112,7 @@ function normalizeMove(input: any): Move {
   };
 }
 
-export function normalizeInsights(input: any): Insight[] {
+function normalizeInsights(input: any): Insight[] {
   if (!Array.isArray(input)) return [];
   return input
     .filter((item) => item && typeof item.id === "string")
@@ -170,12 +161,12 @@ function buildUserPrompt(args: {
 
 export async function handleExplain(req: Request, env: Env): Promise<Response> {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: getCorsHeaders(req) });
+    return new Response(null, { headers: CORS_HEADERS });
   }
 
   const user = await getAuthUser(req, env.DB);
   if (!user) {
-    return jsonResponse({ error: "Unauthorized" }, 401, getCorsHeaders(req));
+    return jsonResponse({ error: "Unauthorized" }, 401, CORS_HEADERS);
   }
 
   // Subscription gate: require active subscription for workspace access
@@ -193,7 +184,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
         error: "daily_limit_reached",
         message: "You've reached your free daily limit. Upgrade to Pro for unlimited usage.",
         remaining: 0,
-      }, 429, { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) });
+      }, 429, { ...CORS_HEADERS, "set-cookie": cookieHeader(sid) });
     }
   }
   const body = (await req.json().catch(() => ({}))) as Partial<ExplainRequest> & {
@@ -206,7 +197,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const message = String(body.message ?? body.question ?? body.text ?? "").trim();
   if (!message) {
     return jsonResponse({ error: "message_required" }, 400, {
-      ...getCorsHeaders(req),
+      ...CORS_HEADERS,
       "set-cookie": cookieHeader(sid),
     });
   }
@@ -219,7 +210,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     return jsonResponse(
       { error: "Relational analysis requires Pro" },
       403,
-      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
+      { ...CORS_HEADERS, "set-cookie": cookieHeader(sid) }
     );
   }
 
@@ -228,7 +219,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     return jsonResponse(
       { type: "needs_baseline" },
       200,
-      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
+      { ...CORS_HEADERS, "set-cookie": cookieHeader(sid) }
     );
   }
 
@@ -296,7 +287,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const confidence: Confidence = "Medium";
 
   await insertInteraction(env.DB, {
-    id: anotherInteractionId,
+    id: interactionId,
     session_id: sid,
     mode,
     question: message,
@@ -308,15 +299,15 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   if (env.QUEUE) {
     // Offload pattern extraction to a queue to avoid delaying the response.
-    await env.QUEUE.send({ sessionId: sid, interactionId: anotherInteractionId });
+    await env.QUEUE.send({ sessionId: sid, interactionId });
   } else {
     // Fallback for local dev or if queue is not configured.
     console.warn("QUEUE binding not found. Running pattern extraction in a non-blocking way, but this may be unreliable.");
-    void extractPatterns(env, sid, anotherInteractionId);
+    void extractPatterns(env, sid, interactionId);
   }
 
   return jsonResponse(result, 200, {
-    ...getCorsHeaders(req),
+    ...CORS_HEADERS,
     "set-cookie": cookieHeader(sid),
   });
 }

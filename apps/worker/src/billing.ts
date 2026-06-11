@@ -100,9 +100,6 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
   const sid = await getSessionId(req);
 
   if (!env.STRIPE_SECRET_KEY || !env.STRIPE_PRICE_ID || !env.APP_URL) {
-      return Response.json({ error: "Checkout is not configured in this environment (STRIPE_SECRET_KEY, STRIPE_PRICE_ID, or APP_URL missing)" }, { status: 400 });
-    }
-    if (false) {
     return Response.json({ error: "billing_not_configured" }, { status: 500 });
   }
 
