@@ -124,7 +124,7 @@ function normalizeMove(input: any): Move {
   };
 }
 
-function normalizeInsights(input: any): Insight[] {
+export function normalizeInsights(input: any): Insight[] {
   if (!Array.isArray(input)) return [];
   return input
     .filter((item) => item && typeof item.id === "string")
@@ -296,6 +296,11 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       structured: true
     }
   };
+
+
+
+  const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
+
   const confidence: Confidence = "Medium";
 
   await insertInteraction(env.DB, {
