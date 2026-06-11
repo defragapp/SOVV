@@ -69,7 +69,7 @@ export default function PricingPage() {
 
             {/* Pro Plan */}
             <div className="bg-[#080808] p-10 lg:p-14 flex flex-col gap-8 border-l border-white/[0.05] relative">
-              {'highlight' in PRICING_CONFIG.pro && <div className="absolute top-0 right-10 -translate-y-1/2">
+              {PRICING_CONFIG.pro.highlight && <div className="absolute top-0 right-10 -translate-y-1/2">
                  <Badge className="rounded-none border border-white/[0.12] bg-white text-black font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1">{PRICING_CONFIG.pro.highlight}</Badge>
               </div>}
               <div className="flex flex-col gap-2">
