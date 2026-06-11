@@ -83,28 +83,5 @@ export async function handleInboundEmail(
   // - Destination address verified
   // - [[send_email]] binding in wrangler.toml
   //
-  // When ready, uncomment and implement:
   //
-  // if (env.EMAIL) {
-  //   const reply = new EmailMessage(
-  //     "info@defrag.app",
-  //     message.from,
-  //     {
-  //       headers: {
-  //         "Subject": "Re: Your message to Sovereign.os",
-  //         "Reply-To": "info@defrag.app",
-  //         "Content-Type": "text/plain; charset=utf-8",
-  //       },
-  //       body: [
-  //         "Thanks for reaching out.",
-  //         "",
-  //         "We received your message and will get back to you as soon as possible.",
-  //         "",
-  //         "— Sovereign.os",
-  //         "info@defrag.app",
-  //       ].join("\n"),
-  //     }
-  //   );
-  //   await env.EMAIL.send(reply);
-  // }
 }
