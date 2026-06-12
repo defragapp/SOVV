@@ -3,24 +3,26 @@ main = "./src/index.ts"
 compatibility_date = "2026-06-01"
 compatibility_flags = ["nodejs_compat"]
 account_id = "8b1954d216d65077c6480d62583fe2c2"
+workers_dev = false
 
-# Route already configured in Cloudflare
-route = { pattern = "session.defrag.app/*", custom_domain = false }
+[[routes]]
+pattern = "session.defrag.app"
+custom_domain = true
 
-# Workers AI binding
 [ai]
 binding = "AI"
 
-# Service binding to worker-ai for emotional driver analysis
 [[services]]
 binding = "AI_SERVICE"
 service = "worker-ai"
-# environment = "production"
 
-# Durable Object
 [[durable_objects.bindings]]
 name = "CONFLICT_SESSION"
 class_name = "ConflictSessionDO"
+
+[[migrations]]
+tag = "v1"
+new_classes = [ "ConflictSessionDO" ]
 
 [observability]
 enabled = true
@@ -31,9 +33,33 @@ enabled = true
 head_sampling_rate = 1
 invocation_logs = true
 
-[[migrations]]
-tag = "v1"
-new_classes = [ "ConflictSessionDO" ]
-
 [build]
 command = "npm install && npm run build"
+
+[env.production]
+name = "worker-session"
+workers_dev = false
+
+[[env.production.routes]]
+pattern = "session.defrag.app"
+custom_domain = true
+
+[env.production.ai]
+binding = "AI"
+
+[[env.production.services]]
+binding = "AI_SERVICE"
+service = "worker-ai"
+
+[[env.production.durable_objects.bindings]]
+name = "CONFLICT_SESSION"
+class_name = "ConflictSessionDO"
+
+[env.production.observability]
+enabled = true
+head_sampling_rate = 1
+
+[env.production.observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true

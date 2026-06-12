@@ -6,10 +6,9 @@ account_id = "8b1954d216d65077c6480d62583fe2c2"
 workers_dev = false
 
 [[routes]]
-pattern = "ai.defrag.app/*"
-zone_id = "45a59d754ece9221fc97c92c461eb01f"
+pattern = "ai.defrag.app"
+custom_domain = true
 
-# Workers AI binding for inline model inference
 [ai]
 binding = "AI"
 
@@ -24,3 +23,23 @@ invocation_logs = true
 
 [build]
 command = "npm install && npm run build"
+
+[env.production]
+name = "worker-ai"
+workers_dev = false
+
+[[env.production.routes]]
+pattern = "ai.defrag.app"
+custom_domain = true
+
+[env.production.ai]
+binding = "AI"
+
+[env.production.observability]
+enabled = true
+head_sampling_rate = 1
+
+[env.production.observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
