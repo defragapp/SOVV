@@ -123,6 +123,10 @@ export default function DefragItemPage() {
                   onClick={handleGenerateAudio}
                   disabled={isGeneratingAudio}
                   variant="secondary" 
+<<<<<<< HEAD
+=======
+                  className="rounded-none border border-white/[0.15] bg-transparent text-[#FAFAFA] hover:bg-white/5 font-mono text-[10px] tracking-[0.15em] uppercase h-8 w-full"
+>>>>>>> origin/main
                 >
                   {isGeneratingAudio ? "Generating..." : "Generate Audio"}
                 </Button>
