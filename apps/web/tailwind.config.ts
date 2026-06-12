@@ -22,27 +22,26 @@ const config: Config = {
           hover: "var(--border-medium)",
           focus: "var(--border-focus)",
         },
-        primary: "var(--text-primary)",
-        secondary: "var(--text-secondary)",
-        tertiary: "var(--text-tertiary)",
         foreground: {
           DEFAULT: "var(--text-primary)",
           muted: "var(--text-secondary)",
           disabled: "var(--text-disabled)",
         },
-      },
-      fontFamily: {
-        sans: ["Inter", "SF Pro Display", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
-        mono: ["var(--font-jetbrains-mono)", "SF Mono", "ui-monospace", "Menlo", "monospace"],
-      },
-      keyframes: {
-        "fade-in-up": {
-          "0%": { opacity: "0", transform: "translateY(10px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
+        brand: {
+          DEFAULT: "#FFFFFF",
+          glow: "rgba(255, 255, 255, 0.2)",
         },
       },
-      animation: {
-        "fade-in-up": "fade-in-up 0.5s ease-out forwards",
+      fontFamily: {
+        sans: ["Geist", "Inter", "SF Pro Display", "-apple-system", "sans-serif"],
+        mono: ["var(--font-jetbrains-mono)", "SF Mono", "ui-monospace", "Menlo", "monospace"],
+      },
+      transitionTimingFunction: {
+        apple: "cubic-bezier(0.16, 1, 0.3, 1)",
+        smooth: "cubic-bezier(0.25, 1, 0.5, 1)",
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
       },
     },
   },
