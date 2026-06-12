@@ -256,6 +256,8 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     ],
     temperature: 0.35,
     max_tokens: 900,
+  }, {
+    gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" }
   });
 
   const rawText = asText((ai as any).response ?? ai);

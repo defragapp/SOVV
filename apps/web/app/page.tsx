@@ -1,176 +1,315 @@
+import { SiteShell } from "@/components/marketing/site-shell"
+import { Container, Section } from "@/components/ui/layout-primitives"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { Badge } from "@/components/ui/badge"
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Badge
+      variant="outline"
+      className="rounded-none border-border bg-transparent text-[#71717A] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit mb-6"
+    >
+      {children}
+    </Badge>
+  )
+}
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen bg-black overflow-hidden selection:bg-white/20 selection:text-white">
-      {/* Background Ambient Glow */}
-      <div 
-        aria-hidden="true"
-        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/3 w-[800px] h-[800px] opacity-50"
-        style={{
-          background: "radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 70%)"
-        }}
-      />
+    <SiteShell>
+      {/* 1. Hero */}
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[90svh] pt-32 pb-24 overflow-hidden bg-black">
+        <div
+          aria-hidden
+          className="absolute inset-0 z-0 pointer-events-none opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)",
+            backgroundSize: "72px 72px",
+          }}
+        />
 
-      {/* Nav */}
-      <nav className="fixed top-0 w-full z-50 flex items-center justify-between px-8 py-6 mix-blend-difference">
-        <div className="flex items-center gap-12">
-          <Link href="/" className="text-sm font-medium tracking-tight text-white hover:opacity-80 transition-opacity">
-            Sovereign.os
-          </Link>
-          <div className="hidden md:flex gap-8 text-[13px] text-white/50">
-            <Link href="/apps/defrag" className="hover:text-white transition-colors">Defrag</Link>
-            <Link href="/apps/covenant" className="hover:text-white transition-colors">Covenant</Link>
-            <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
-          </div>
-        </div>
-        <div>
-          <Link href="/login" className="text-[13px] px-5 py-2.5 rounded-full border border-white/10 text-white hover:bg-white hover:text-black transition-all duration-300">
-            Sign In
-          </Link>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex flex-col items-center justify-center pt-32 pb-20 z-10 px-6">
-        <div className="text-center max-w-5xl flex flex-col items-center">
-          <div className="animate-fade-up px-4 py-1.5 rounded-full border border-white/10 bg-white/5 mb-10">
-            <span className="text-[11px] font-medium tracking-widest uppercase text-white/60">Platform 2.0 Live</span>
-          </div>
-
-          <h1 className="animate-fade-up delay-100 text-[clamp(3rem,8vw,7rem)] leading-[0.95] tracking-[-0.04em] font-medium gradient-text mb-8 text-balance">
+        <Container className="relative z-10 flex flex-col items-center text-center max-w-[900px]">
+          <h1 className="text-[clamp(3.5rem,8vw,7rem)] font-medium tracking-[-0.04em] text-[#FAFAFA] leading-[0.95] text-balance mb-8 animate-fade-up">
             Healing isn&apos;t optional.<br/>
             Holding the pain is.
           </h1>
-          
-          <p className="animate-fade-up delay-200 text-lg md:text-xl text-white/40 max-w-2xl leading-relaxed tracking-tight text-balance mb-12">
+
+          <p className="text-[#A1A1AA] text-lg md:text-xl font-normal tracking-[-0.01em] max-w-[680px] mb-12 text-balance leading-[1.6] animate-fade-up delay-100">
             Understand what is shaping your relationships, family dynamics, grief, boundaries, and decisions — and get a clearer way forward.
           </p>
 
-          <div className="animate-fade-up delay-300 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <Link href="/login" className="px-8 py-4 rounded-full bg-white text-black text-sm font-medium hover:scale-[1.02] transition-transform text-center">
-              Enter Sovereign.os
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center animate-fade-up delay-200">
+            <Link href="/login" className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                className="w-full sm:w-auto rounded-full bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-14 px-10 font-sans font-medium text-[13px] tracking-wide transition-transform hover:scale-[1.02]"
+              >
+                Enter Sovereign.os
+              </Button>
             </Link>
-            <Link href="/login" className="px-8 py-4 rounded-full bg-transparent border border-white/10 text-white/70 text-sm font-medium hover:bg-white/5 transition-colors text-center">
-              Start Baseline Design
+            <Link href="/login" className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto rounded-full border border-white/10 bg-transparent text-white/70 hover:bg-white/5 hover:text-white h-14 px-10 font-sans font-medium text-[13px] tracking-wide transition-colors"
+              >
+                Start Baseline Design
+              </Button>
             </Link>
           </div>
-        </div>
-      </section>
+          
+          <div className="flex gap-6 mt-12 animate-fade-up delay-300">
+            <Link href="/product" className="text-[13px] text-white/40 hover:text-white transition-colors">Explore Defrag →</Link>
+            <Link href="/covenant" className="text-[13px] text-white/40 hover:text-white transition-colors">Explore Covenant →</Link>
+          </div>
+        </Container>
+      </Section>
 
-      {/* Abstract Wireframe Divider */}
-      <div className="w-full flex justify-center pb-32">
-        <div className="w-px h-32 bg-gradient-to-b from-white/20 to-transparent"></div>
-      </div>
-
-      {/* Cinematic Row 1: Defrag */}
-      <section className="relative py-32 border-t border-white/5">
-        <div className="max-w-[1400px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-          <div className="order-2 lg:order-1">
-            <div className="ui-fragment">
-              <div className="ui-line top-1/4"></div>
-              <div className="ui-line top-2/4"></div>
-              <div className="ui-line top-3/4"></div>
-              <div className="absolute inset-x-12 inset-y-12 border border-white/5 rounded-xl bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                <span className="text-[10px] text-white/20 tracking-widest uppercase font-mono">Active Pattern Detected</span>
+      {/* 2. What this helps with & 3. What Sovereign.os does */}
+      <Section className="w-full py-24 md:py-32 border-t border-border bg-[#0A0A0A]">
+        <Container>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24">
+              <div>
+                 <SectionLabel>THE PROBLEM</SectionLabel>
+                 <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-white mb-6 leading-tight">See what is actually happening.</h2>
+                 <p className="text-[#A1A1AA] text-base leading-relaxed max-w-md">
+                   The conversation ended, but your body did not. The pattern keeps repeating in your family, your relationship, or your grief. The real problem isn&apos;t the argument; it&apos;s the unseen active pattern beneath it.
+                 </p>
               </div>
-            </div>
-          </div>
-          <div className="order-1 lg:order-2 flex flex-col items-start">
-            <span className="text-[11px] font-medium tracking-widest uppercase text-white/40 mb-6 font-mono">01 // The Defrag Space</span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-[-0.03em] mb-8 leading-tight text-white">Separate the moment <br/>from the pattern.</h2>
-            <p className="text-lg text-white/40 leading-relaxed mb-10 max-w-md">
-              The conversation ended. Your body did not. Defrag slows the moment down, surfacing exactly what was activated so you can choose a response that doesn&apos;t feed the loop.
-            </p>
-            <Link href="/login" className="text-sm font-medium tracking-tight text-white/80 hover:text-white transition-colors flex items-center gap-2">
-              Explore Defrag Space <span className="text-white/40">→</span>
-            </Link>
-          </div>
-        </div>
-      </section>
+              <div>
+                 <SectionLabel>THE PLATFORM</SectionLabel>
+                 <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-white mb-6 leading-tight">Understand your role in it.<br/>Respond differently.</h2>
+                 <p className="text-[#A1A1AA] text-base leading-relaxed max-w-md">
+                   Sovereign.os helps you slow the moment down, separate what happened from what repeated, and find the next response that does not keep feeding the same loop. You don&apos;t need a verdict. You need a way through.
+                 </p>
+              </div>
+           </div>
+        </Container>
+      </Section>
 
-      {/* Cinematic Row 2: Covenant */}
-      <section className="relative py-32 border-t border-white/5">
-        <div className="max-w-[1400px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-          <div className="flex flex-col items-start">
-            <span className="text-[11px] font-medium tracking-widest uppercase text-white/40 mb-6 font-mono">02 // The Covenant Space</span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-[-0.03em] mb-8 leading-tight text-white">Reflection anchored <br/>in responsibility.</h2>
-            <p className="text-lg text-white/40 leading-relaxed mb-10 max-w-md">
-              For the user who wants faith to stay connected to the work. Covenant brings plain-language reflection, repair, and grounded discernment into what you are walking through.
-            </p>
-            <Link href="/login" className="text-sm font-medium tracking-tight text-white/80 hover:text-white transition-colors flex items-center gap-2">
-              Explore Covenant Space <span className="text-white/40">→</span>
-            </Link>
-          </div>
-          <div>
-            <div className="ui-fragment flex justify-center items-center">
-              <div className="w-64 h-64 border border-white/5 rounded-full flex items-center justify-center">
-                <div className="w-48 h-48 border border-white/10 rounded-full flex items-center justify-center">
-                  <div className="w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+      {/* 4. Baseline Design */}
+      <Section className="w-full py-24 md:py-32 border-t border-border bg-black">
+        <Container className="flex flex-col lg:flex-row gap-16 items-center">
+          <div className="flex-1 w-full">
+             <div className="ui-fragment flex items-center justify-center bg-[#050505]">
+                <div className="w-48 h-48 rounded-full border border-white/10 flex items-center justify-center">
+                   <div className="w-32 h-32 rounded-full border border-white/20"></div>
                 </div>
-              </div>
-            </div>
+                <span className="absolute bottom-6 left-6 text-[10px] text-white/30 uppercase tracking-[0.2em] font-mono">Core Context Engine</span>
+             </div>
           </div>
-        </div>
-      </section>
+          <div className="flex-1 space-y-6">
+            <SectionLabel>01 // BASELINE DESIGN</SectionLabel>
+            <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-white leading-tight">
+              The starting map.
+            </h2>
+            <p className="text-lg text-[#A1A1AA] leading-relaxed max-w-md">
+              How you tend to process, respond, connect, protect, communicate, and return to center. Every thread is grounded here. Private, never exposed in outputs, always active before you type.
+            </p>
+          </div>
+        </Container>
+      </Section>
 
-      {/* Typographic List: The Library */}
-      <section className="relative py-40 border-t border-white/5">
-        <div className="max-w-5xl mx-auto px-8">
-          <div className="mb-24 text-center flex flex-col items-center">
-            <span className="text-[11px] font-medium tracking-widest uppercase text-white/40 mb-6 block font-mono">03 // The Library</span>
+      {/* 5. Defrag space */}
+      <Section className="w-full py-24 md:py-32 border-t border-border bg-[#0A0A0A]">
+        <Container className="flex flex-col lg:flex-row-reverse gap-16 items-center">
+          <div className="flex-1 w-full">
+             <div className="ui-fragment p-8 flex flex-col justify-end bg-[#050505]">
+                <div className="space-y-4 w-full">
+                  <div className="h-4 bg-white/10 w-1/3 rounded"></div>
+                  <div className="h-4 bg-white/5 w-3/4 rounded"></div>
+                  <div className="h-4 bg-white/5 w-2/3 rounded"></div>
+                </div>
+                <span className="absolute top-6 left-6 text-[10px] text-white/30 uppercase tracking-[0.2em] font-mono">Structured Result</span>
+             </div>
+          </div>
+          <div className="flex-1 space-y-6">
+            <SectionLabel>02 // DEFRAG SPACE</SectionLabel>
+            <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-white leading-tight">
+              Separate the moment from the pattern.
+            </h2>
+            <p className="text-lg text-[#A1A1AA] leading-relaxed max-w-md">
+              For the moment that will not leave you alone. Defrag helps you understand what is active in the moment. Defrag supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics.
+            </p>
+          </div>
+        </Container>
+      </Section>
+
+      {/* 6. Covenant space */}
+      <Section className="w-full py-24 md:py-32 border-t border-border bg-black">
+        <Container className="flex flex-col lg:flex-row gap-16 items-center">
+          <div className="flex-1 w-full">
+             <div className="ui-fragment flex items-center justify-center bg-[#050505]">
+                <div className="w-64 h-64 border border-white/5 rounded-full flex items-center justify-center">
+                   <div className="w-48 h-48 border border-white/10 rounded-full flex items-center justify-center">
+                      <div className="w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+                   </div>
+                </div>
+             </div>
+          </div>
+          <div className="flex-1 space-y-6">
+            <SectionLabel>03 // COVENANT SPACE</SectionLabel>
+            <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-white leading-tight">
+              Reflection anchored in responsibility.
+            </h2>
+            <p className="text-lg text-[#A1A1AA] leading-relaxed max-w-md">
+              For the user who wants faith to stay connected to the work. Covenant brings plain-language reflection, repair, and grounded discernment into what you are walking through — so the next step can be honest, not just emotional.
+            </p>
+          </div>
+        </Container>
+      </Section>
+
+      {/* 7. Alignment space */}
+      <Section className="w-full py-24 md:py-32 border-t border-border bg-[#0A0A0A]">
+        <Container className="flex flex-col lg:flex-row-reverse gap-16 items-center">
+          <div className="flex-1 w-full">
+             <div className="ui-fragment p-8 flex flex-col justify-between bg-[#050505]">
+                <div className="flex justify-between border-b border-white/10 pb-4">
+                  <span className="text-[10px] text-white/50 uppercase">What is Yours</span>
+                  <span className="text-[10px] text-white/50 uppercase">What is Not Yours</span>
+                </div>
+                <span className="absolute bottom-6 left-6 text-[10px] text-white/30 uppercase tracking-[0.2em] font-mono">Response Integration</span>
+             </div>
+          </div>
+          <div className="flex-1 space-y-6">
+            <SectionLabel>04 // ALIGNMENT SPACE</SectionLabel>
+            <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-white leading-tight">
+              Turn insight into a usable response.
+            </h2>
+            <p className="text-lg text-[#A1A1AA] leading-relaxed max-w-md">
+              Integration and action choice. It helps turn insights into actionable responses, showing you what is yours to carry and what belongs to the other side.
+            </p>
+          </div>
+        </Container>
+      </Section>
+
+      {/* 8. When both sides matter */}
+      <Section className="w-full py-24 md:py-32 border-t border-border bg-black">
+        <Container className="text-center max-w-3xl space-y-8 flex flex-col items-center">
+           <SectionLabel>05 // INVITE PRIVATELY</SectionLabel>
+           <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-white leading-tight">When both sides matter.</h2>
+           <p className="text-lg text-[#A1A1AA] leading-relaxed">
+              Two people can live through the same conversation and leave with completely different truths. The other side is not always the enemy. Sometimes it is another nervous system, another history, another map. When both sides matter, invite privately to understand the shared loop without keeping score.
+           </p>
+        </Container>
+      </Section>
+
+      {/* 9. Sovereign.os Library */}
+      <Section className="w-full py-32 border-t border-border bg-[#0A0A0A]">
+        <Container>
+          <div className="mb-20 text-center flex flex-col items-center">
+            <SectionLabel>06 // THE LIBRARY</SectionLabel>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-[-0.03em] leading-tight text-white">The private record <br/>of what helped.</h2>
           </div>
           
-          <div className="w-full flex flex-col border-t border-white/10">
-            <div className="flex items-center justify-between py-8 border-b border-white/10 group hover:bg-white/[0.02] transition-colors cursor-pointer px-4 -mx-4 rounded-lg">
+          <div className="w-full max-w-4xl mx-auto flex flex-col border-t border-white/10">
+            <div className="flex items-center justify-between py-8 border-b border-white/10 group hover:bg-white/[0.02] transition-colors cursor-pointer px-6 -mx-6 rounded-xl">
               <div className="flex items-center gap-12">
-                <span className="text-[11px] text-white/30 uppercase tracking-widest font-mono w-24">Defrag</span>
+                <span className="text-[11px] text-white/30 uppercase tracking-[0.2em] font-mono w-32 hidden sm:block">Defrag</span>
                 <span className="text-lg tracking-tight text-white/90">The boundary setting conversation</span>
               </div>
               <span className="text-sm text-white/40 group-hover:text-white transition-colors">→</span>
             </div>
-            <div className="flex items-center justify-between py-8 border-b border-white/10 group hover:bg-white/[0.02] transition-colors cursor-pointer px-4 -mx-4 rounded-lg">
+            <div className="flex items-center justify-between py-8 border-b border-white/10 group hover:bg-white/[0.02] transition-colors cursor-pointer px-6 -mx-6 rounded-xl">
               <div className="flex items-center gap-12">
-                <span className="text-[11px] text-white/30 uppercase tracking-widest font-mono w-24">Alignment</span>
+                <span className="text-[11px] text-white/30 uppercase tracking-[0.2em] font-mono w-32 hidden sm:block">Alignment</span>
                 <span className="text-lg tracking-tight text-white/90">What is mine vs what is theirs</span>
               </div>
               <span className="text-sm text-white/40 group-hover:text-white transition-colors">→</span>
             </div>
-            <div className="flex items-center justify-between py-8 border-b border-white/10 group hover:bg-white/[0.02] transition-colors cursor-pointer px-4 -mx-4 rounded-lg">
+            <div className="flex items-center justify-between py-8 border-b border-white/10 group hover:bg-white/[0.02] transition-colors cursor-pointer px-6 -mx-6 rounded-xl">
               <div className="flex items-center gap-12">
-                <span className="text-[11px] text-white/30 uppercase tracking-widest font-mono w-24">Covenant</span>
+                <span className="text-[11px] text-white/30 uppercase tracking-[0.2em] font-mono w-32 hidden sm:block">Covenant</span>
                 <span className="text-lg tracking-tight text-white/90">Responsibility in family conflict</span>
               </div>
               <span className="text-sm text-white/40 group-hover:text-white transition-colors">→</span>
             </div>
           </div>
-        </div>
-      </section>
+        </Container>
+      </Section>
 
-      {/* Bottom CTA */}
-      <section className="relative py-40 border-t border-white/5 overflow-hidden flex justify-center items-center text-center">
-        <div className="ambient-glow bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"></div>
-        <div className="z-10 px-8 flex flex-col items-center">
-          <h2 className="text-5xl md:text-7xl font-medium tracking-[-0.04em] mb-12 text-white">Return before the <br/>pattern takes over.</h2>
-          <Link href="/login" className="px-10 py-5 rounded-full bg-white text-black text-base font-medium hover:scale-[1.02] transition-transform">
-            Start Baseline Design
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-12 border-t border-white/5 text-center px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <span className="text-sm font-medium tracking-tight text-white/80">Sovereign.os</span>
-          <div className="flex gap-6 text-[13px] text-white/40">
-            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-            <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+      {/* 10. Free vs Pro */}
+      <Section className="w-full py-32 border-t border-border bg-black">
+        <Container>
+          <div className="mb-20 text-center flex flex-col items-center">
+            <SectionLabel>PRICING</SectionLabel>
+            <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-white">Choose your progression.</h2>
           </div>
-        </div>
-      </footer>
-    </main>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+             <div className="border border-white/10 bg-[#0A0A0A] p-10 flex flex-col">
+                <h3 className="text-2xl font-medium text-white mb-2">Free</h3>
+                <p className="text-[#A1A1AA] mb-8">Begin the work and understand a moment.</p>
+                <ul className="space-y-4 mb-12 flex-1">
+                  <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
+                    <span className="text-white">✓</span> Baseline Design setup
+                  </li>
+                  <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
+                    <span className="text-white">✓</span> Defrag space access
+                  </li>
+                  <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
+                    <span className="text-white">✓</span> Basic session history
+                  </li>
+                  <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
+                    <span className="text-white">✓</span> Limited daily sessions
+                  </li>
+                </ul>
+                <Link href="/login">
+                  <Button className="w-full bg-white/5 hover:bg-white/10 text-white rounded-full h-12">Start for Free</Button>
+                </Link>
+             </div>
+             
+             <div className="border border-white/20 bg-[#111] p-10 flex flex-col relative">
+                <div className="absolute top-0 right-10 -translate-y-1/2 bg-white text-black text-[10px] uppercase tracking-widest px-3 py-1 font-medium">
+                  Recommended
+                </div>
+                <h3 className="text-2xl font-medium text-white mb-2">Pro</h3>
+                <p className="text-[#A1A1AA] mb-8">Stay with it. Deep continuity and all spaces.</p>
+                <ul className="space-y-4 mb-12 flex-1">
+                  <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
+                    <span className="text-white">✓</span> Everything in Free
+                  </li>
+                  <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
+                    <span className="text-white">✓</span> Covenant space
+                  </li>
+                  <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
+                    <span className="text-white">✓</span> Unlimited sessions
+                  </li>
+                  <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
+                    <span className="text-white">✓</span> Full Sovereign.os Library depth
+                  </li>
+                  <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
+                    <span className="text-white">✓</span> Invite Privately
+                  </li>
+                  <li className="flex items-start gap-3 text-sm text-[#A1A1AA]">
+                    <span className="text-white">✓</span> Audio Overview
+                  </li>
+                </ul>
+                <Link href="/login">
+                  <Button className="w-full bg-white text-black hover:bg-white/90 rounded-full h-12">Upgrade to Pro</Button>
+                </Link>
+             </div>
+          </div>
+        </Container>
+      </Section>
+
+      {/* 11. Final CTA */}
+      <Section className="w-full py-40 border-t border-border bg-[#0A0A0A] relative overflow-hidden flex justify-center items-center text-center">
+        <div className="ambient-glow bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"></div>
+        <Container className="z-10 flex flex-col items-center">
+          <h2 className="text-5xl md:text-7xl font-medium tracking-[-0.04em] mb-12 text-white">Return before the <br/>pattern takes over.</h2>
+          <Link href="/login">
+             <Button
+                size="lg"
+                className="rounded-full bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-14 px-12 font-sans font-medium text-[13px] tracking-wide transition-transform hover:scale-[1.02]"
+              >
+                Enter Sovereign.os
+              </Button>
+          </Link>
+        </Container>
+      </Section>
+    </SiteShell>
   )
 }
