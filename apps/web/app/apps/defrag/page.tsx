@@ -61,12 +61,10 @@ export default function DefragPage() {
        setIsSaving(false)
     }
   }
-
-  async function handleSave() {
+  async function handleGenerateAudio() {
     if (!result) return
-    setSaving(true)
-    setError(null)
-
+    setIsGeneratingAudio(true)
+    setAudioError("")
     try {
       const payload = {
          activePattern: result.activePattern,
@@ -75,28 +73,27 @@ export default function DefragPage() {
          giftUnderStrain: result.giftUnderStrain,
          bestNextResponse: result.bestNextResponse?.summary || String(result.bestNextResponse)
       }
-      
       const res = await fetch("/api/generate-audio", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ result: payload })
       })
-
       if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || data.message || "Failed to generate audio")
+         const data = await res.json().catch(() => ({}))
+         throw new Error(data.error || "Failed to generate audio")
       }
-      
       const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      setAudioUrl(url)
+      setAudioUrl(URL.createObjectURL(blob))
     } catch (err: any) {
-      setAudioError(err.message || "Audio generation failed.")
+      console.error("Audio generation error:", err)
+      setAudioError(err.message || "Failed to generate audio")
     } finally {
-      setSaving(false)
+      setIsGeneratingAudio(false)
     }
   }
+
+
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-[#050505]">
@@ -304,29 +301,7 @@ export default function DefragPage() {
     </div>
   )
 
-                <section className="rounded-2xl border border-[#2A2A31] bg-[#16161C] p-5">
-                  <h2 className="text-lg font-semibold text-[#F5F5F6]">Conversational Steering</h2>
-                  <div className="mt-3 grid gap-4 md:grid-cols-2">
-                    <div>
-                      <h3 className="text-sm font-medium text-[#F5F5F6]">Do</h3>
-                      <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[#B1B1BA]">
-                        {result.conversationalSteering?.do?.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-[#F5F5F6]">Avoid</h3>
-                      <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-[#B1B1BA]">
-                        {result.conversationalSteering?.avoid?.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </section>
-
-  const desktopMain = (
+  return (
     <div className="flex flex-col h-full gap-8">
        <div className="flex-none">{mainInputArea}</div>
        <div className="flex-1 min-h-0">{mainResultArea}</div>
