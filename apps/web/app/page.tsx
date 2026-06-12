@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <main className="relative min-h-screen bg-black overflow-hidden selection:bg-white/20 selection:text-white">
       {/* Background Ambient Glow */}
-      <div 
+      <div
         aria-hidden="true"
         className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/3 w-[800px] h-[800px] opacity-50"
         style={{
@@ -43,7 +43,7 @@ export default function Home() {
             Healing isn&apos;t optional.<br/>
             Holding the pain is.
           </h1>
-          
+
           <p className="animate-fade-up delay-200 text-lg md:text-xl text-white/40 max-w-2xl leading-relaxed tracking-tight text-balance mb-12">
             Understand what is shaping your relationships, family dynamics, grief, boundaries, and decisions — and get a clearer way forward.
           </p>
@@ -122,7 +122,7 @@ export default function Home() {
             <span className="text-[11px] font-medium tracking-widest uppercase text-white/40 mb-6 block font-mono">03 // The Library</span>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-[-0.03em] leading-tight text-white">The private record <br/>of what helped.</h2>
           </div>
-          
+
           <div className="w-full flex flex-col border-t border-white/10">
             <div className="flex items-center justify-between py-8 border-b border-white/10 group hover:bg-white/[0.02] transition-colors cursor-pointer px-4 -mx-4 rounded-lg">
               <div className="flex items-center gap-12">

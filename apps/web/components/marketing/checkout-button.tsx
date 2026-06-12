@@ -39,7 +39,7 @@ export function CheckoutButton({ priceId, cta }: { priceId: string; cta: string 
     <div className="flex flex-col gap-2">
       <Button 
         variant="premium" 
-        className="w-full rounded-none border border-border bg-white text-black hover:bg-white/90 font-sans font-medium text-xs tracking-[0.15em] uppercase h-12 px-8 transition-colors disabled:opacity-50" 
+        className="w-full rounded-none border border-border bg-white text-black hover:bg-white/90 font-sans font-medium text-xs tracking-[0.15em] uppercase h-12 px-8 transition-colors disabled:opacity-50"
         onClick={handleCheckout} 
         disabled={loading}
       >

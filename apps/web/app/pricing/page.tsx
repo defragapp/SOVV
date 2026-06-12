@@ -5,7 +5,7 @@ export default function PricingPage() {
   return (
     <main className="relative min-h-screen bg-black overflow-hidden selection:bg-white/20 selection:text-white">
       {/* Background Ambient Glow */}
-      <div 
+      <div
         aria-hidden="true"
         className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/3 w-[800px] h-[800px] opacity-40"
         style={{
@@ -48,7 +48,7 @@ export default function PricingPage() {
       {/* Pricing Grid */}
       <section className="relative py-32 z-10 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-px bg-white/5 rounded-3xl overflow-hidden border border-white/5">
-          
+
           {/* Free Tier */}
           <div className="bg-black p-12 lg:p-16 flex flex-col">
             <div className="mb-10">
@@ -61,7 +61,7 @@ export default function PricingPage() {
                 Understand a moment. The essentials to begin mapping your patterns.
               </p>
             </div>
-            
+
             <div className="flex-1 mb-12">
               <ul className="space-y-6">
                 {["Baseline Design setup", "Active pattern surface", "Best Next Response", "Basic session history"].map((feature, i) => (
@@ -72,7 +72,7 @@ export default function PricingPage() {
                 ))}
               </ul>
             </div>
-            
+
             <Link href="/login" className="w-full">
               <Button variant="secondary" className="w-full rounded-full border border-white/10 bg-transparent text-white hover:bg-white/5 hover:text-white font-medium tracking-tight h-14">
                 Get Started Free
@@ -85,7 +85,7 @@ export default function PricingPage() {
             <div className="absolute top-12 right-12">
               <span className="text-[10px] font-mono tracking-widest uppercase px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-white/80">Pro</span>
             </div>
-            
+
             <div className="mb-10">
               <h2 className="text-2xl font-medium tracking-[-0.02em] text-white mb-2">Sovereign Pro</h2>
               <div className="flex items-baseline gap-1 mb-4">
@@ -96,7 +96,7 @@ export default function PricingPage() {
                 Return, remember, compare, and interrupt the pattern.
               </p>
             </div>
-            
+
             <div className="flex-1 mb-12">
               <ul className="space-y-6">
                 {["Unlimited sessions", "Your Story (full history)", "Compare With Someone", "Try It Out (Audio summaries)", "Covenant space access"].map((feature, i) => (
@@ -107,7 +107,7 @@ export default function PricingPage() {
                 ))}
               </ul>
             </div>
-            
+
             <Link href="/login" className="w-full">
               <Button className="w-full rounded-full bg-white text-black hover:bg-white/90 font-medium tracking-tight h-14">
                 Start Sovereign Pro

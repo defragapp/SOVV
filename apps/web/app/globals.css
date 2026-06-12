@@ -8,16 +8,16 @@
     --bg-primary: #000000;
     --bg-secondary: #0A0A0A;
     --bg-elevated: #111111;
-    
+
     --text-primary: #FFFFFF;
     --text-secondary: #A1A1AA;
     --text-tertiary: #71717A;
     --text-disabled: #52525B;
-    
+
     --border-light: rgba(255, 255, 255, 0.05);
     --border-medium: rgba(255, 255, 255, 0.1);
     --border-focus: rgba(255, 255, 255, 0.25);
-    
+
     --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
@@ -41,7 +41,7 @@
   .hairline-b {
     border-bottom: 1px solid var(--border-light);
   }
-  
+
   .hairline-t {
     border-top: 1px solid var(--border-light);
   }
