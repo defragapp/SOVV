@@ -248,15 +248,33 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     targetBaseline,
   });
 
-  const modelId = env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
-  const ai = await env.AI.run(modelId, {
-    messages: [
-      { role: "system", content: relational ? SYSTEM_RELATIONAL : SYSTEM_SELF },
-      { role: "user", content: userPrompt },
-    ],
-    temperature: 0.35,
-    max_tokens: 900,
-  });
+  if (!env.AI) {
+    return jsonResponse(
+      { error: "AI_CONFIG_MISSING", message: "AI configuration is missing or gateway failed." },
+      500,
+      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
+    );
+  }
+
+  let ai;
+  try {
+    const modelId = env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
+    ai = await env.AI.run(modelId, {
+      messages: [
+        { role: "system", content: relational ? SYSTEM_RELATIONAL : SYSTEM_SELF },
+        { role: "user", content: userPrompt },
+      ],
+      temperature: 0.35,
+      max_tokens: 900,
+    });
+  } catch (err: any) {
+    console.error("AI gateway failed:", err);
+    return jsonResponse(
+      { error: "AI_GATEWAY_FAILED", message: "AI gateway failed to process the request." },
+      500,
+      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
+    );
+  }
 
   const rawText = asText((ai as any).response ?? ai);
   const parsed = parseJsonFromText(rawText);
@@ -268,14 +286,14 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     createdAt: new Date().toISOString(),
     title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
     summary: parsed.response || "",
-    activePattern: parsed.activePattern || "No active pattern identified.",
-    theRepeat: parsed.theRepeat || "No repeating pattern identified.",
-    oldRole: parsed.oldRole || "Unknown role.",
-    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || "Unknown.",
-    strainPattern: parsed.strainPattern || "Unknown strain.",
-    giftUnderStrain: parsed.giftUnderStrain || "Unknown strength.",
-    alignment: parsed.alignment || "Unknown alignment.",
-    bestNextResponse: parsed.bestNextResponse || { summary: "No specific response.", phrasing: [] },
+    activePattern: parsed.activePattern || "This section needs more context.",
+    theRepeat: parsed.theRepeat || "This section needs more context.",
+    oldRole: parsed.oldRole || "This section needs more context.",
+    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || "This section needs more context.",
+    strainPattern: parsed.strainPattern || "This section needs more context.",
+    giftUnderStrain: parsed.giftUnderStrain || "This section needs more context.",
+    alignment: parsed.alignment || "This section needs more context.",
+    bestNextResponse: parsed.bestNextResponse || { summary: "This section needs more context.", phrasing: [] },
     conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] },
     sourcesUsed: {
       baseline: true,
