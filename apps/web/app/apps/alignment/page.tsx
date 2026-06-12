@@ -138,7 +138,7 @@ export default function AlignmentPage() {
            {renderSection("Alignment", result.alignment)}
            {renderSection("Best Next Response", result.best_next_response)}
            {renderSection("Stop Repeating", result.stop_repeating)}
-        </div>
+        </motion.div>
       )}
     </div>
   )
