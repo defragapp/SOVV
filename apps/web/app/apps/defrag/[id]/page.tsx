@@ -95,26 +95,26 @@ export default function DefragItemPage() {
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
-      <div className="px-5 py-4 border-b border-white/[0.06]">
-        <h3 className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.2em]">Library</h3>
+      <div className="px-5 py-4 border-b border-border">
+        <h3 className="text-[10px] font-sans font-medium text-[#3F3F46] uppercase tracking-[0.2em]">Library</h3>
       </div>
       <div className="flex-1 px-5 py-6">
-        <p className="text-xs font-mono text-[#3F3F46] leading-relaxed">You are viewing a saved session. Provide updates to shift the pattern.</p>
+        <p className="text-xs font-sans font-medium text-[#3F3F46] leading-relaxed">You are viewing a saved session. Provide updates to shift the pattern.</p>
       </div>
     </div>
   )
 
   const contextContent = (
     <div className="flex flex-col gap-px">
-      <div className="border border-white/[0.06] bg-[#080808] p-4 flex flex-col gap-1.5">
-        <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.15em]">Baseline Design</p>
+      <div className="border border-border bg-surface p-4 flex flex-col gap-1.5">
+        <p className="text-[10px] font-sans font-medium text-[#3F3F46] uppercase tracking-[0.15em]">Baseline Design</p>
         <p className="text-xs text-[#71717A]">Your Baseline Design gives the system context before you describe this moment.</p>
       </div>
       
       {result && (
         <>
-          <div className="border border-white/[0.04] bg-[#050505] p-4 flex flex-col gap-2">
-            <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.15em]">Audio Overview</p>
+          <div className="border border-border bg-surface p-4 flex flex-col gap-2">
+            <p className="text-[10px] font-sans font-medium text-[#3F3F46] uppercase tracking-[0.15em]">Audio Overview</p>
             {audioUrl ? (
               <audio controls src={audioUrl} className="w-full h-8 outline-none filter grayscale sepia opacity-80 mt-1" />
             ) : (
@@ -122,19 +122,19 @@ export default function DefragItemPage() {
                 <Button 
                   onClick={handleGenerateAudio}
                   disabled={isGeneratingAudio}
-                  variant="secondary"
-                  className="rounded-none border border-white/[0.15] bg-transparent text-[#FAFAFA] hover:bg-white/5 font-mono text-[10px] tracking-[0.15em] uppercase h-8 w-full"
+                  variant="secondary" 
+                  className="rounded-none border border-border bg-transparent text-[#FAFAFA] hover:bg-white/5 font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-8 w-full"
                 >
                   {isGeneratingAudio ? "Generating..." : "Generate Audio"}
                 </Button>
-                {audioError && <p className="text-red-400 text-[10px] font-mono leading-tight">{audioError}</p>}
-                {!audioError && !isGeneratingAudio && <p className="text-[10px] text-[#52525B] font-mono leading-tight">Requires Pro</p>}
+                {audioError && <p className="text-red-400 text-[10px] font-sans font-medium leading-tight">{audioError}</p>}
+                {!audioError && !isGeneratingAudio && <p className="text-[10px] text-[#52525B] font-sans font-medium leading-tight">Requires Pro</p>}
               </div>
             )}
           </div>
 
-          <div className="border border-white/[0.04] bg-[#050505] p-4 flex flex-col gap-1.5">
-            <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.15em]">Watch Preview</p>
+          <div className="border border-border bg-surface p-4 flex flex-col gap-1.5">
+            <p className="text-[10px] font-sans font-medium text-[#3F3F46] uppercase tracking-[0.15em]">Watch Preview</p>
             <p className="text-xs text-[#52525B]">Watch Preview is not available for this Result yet.</p>
           </div>
         </>
@@ -145,16 +145,16 @@ export default function DefragItemPage() {
   const renderSection = (title: string, content: any, isArray: boolean = false) => {
     if (!content) return null;
     return (
-      <div className="border-b border-white/[0.06] pb-6 mb-6 last:border-0 last:pb-0 last:mb-0">
-        <h4 className="text-[10px] font-mono text-[#71717A] uppercase tracking-[0.15em] mb-3">{title}</h4>
+      <div className="border-b border-border pb-6 mb-6 last:border-0 last:pb-0 last:mb-0">
+        <h4 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em] mb-3">{title}</h4>
         {isArray ? (
           <ul className="list-disc pl-4 space-y-2">
             {Array.isArray(content) ? content.map((item: string, i: number) => (
-              <li key={i} className="text-sm text-[#FAFAFA] font-mono leading-relaxed">{item}</li>
-            )) : <li className="text-sm text-[#FAFAFA] font-mono leading-relaxed">{String(content)}</li>}
+              <li key={i} className="text-sm text-[#FAFAFA] font-sans font-medium leading-relaxed">{item}</li>
+            )) : <li className="text-sm text-[#FAFAFA] font-sans font-medium leading-relaxed">{String(content)}</li>}
           </ul>
         ) : (
-          <p className="text-sm text-[#FAFAFA] font-mono leading-relaxed whitespace-pre-wrap">{String(content)}</p>
+          <p className="text-sm text-[#FAFAFA] font-sans font-medium leading-relaxed whitespace-pre-wrap">{String(content)}</p>
         )}
       </div>
     )
@@ -163,14 +163,14 @@ export default function DefragItemPage() {
   const mainResultArea = (
     <div className="h-full flex flex-col">
       {initialLoading ? (
-        <div className="flex-1 flex items-center justify-center border border-white/[0.06] bg-[#080808] p-6 text-center">
-          <p className="text-sm text-[#52525B] font-mono leading-relaxed max-w-sm">
+        <div className="flex-1 flex items-center justify-center border border-border bg-surface p-6 text-center">
+          <p className="text-sm text-[#52525B] font-sans font-medium leading-relaxed max-w-sm">
             Loading...
           </p>
         </div>
       ) : !result ? (
-        <div className="flex-1 flex items-center justify-center border border-white/[0.06] bg-[#080808] p-6 text-center">
-          <p className="text-sm text-red-400 font-mono leading-relaxed max-w-sm">
+        <div className="flex-1 flex items-center justify-center border border-border bg-surface p-6 text-center">
+          <p className="text-sm text-red-400 font-sans font-medium leading-relaxed max-w-sm">
             {error || "Item not found."}
           </p>
         </div>
@@ -179,7 +179,7 @@ export default function DefragItemPage() {
            initial={{ opacity: 0, y: 10 }}
            animate={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-           className="flex-1 overflow-y-auto border border-white/[0.06] bg-[#080808] p-8"
+           className="flex-1 overflow-y-auto border border-border bg-surface p-8"
         >
            {renderSection("Active pattern", result.activePattern)}
            {renderSection("The Repeat", result.theRepeat)}
@@ -190,13 +190,13 @@ export default function DefragItemPage() {
            {renderSection("Alignment", result.alignment)}
            
            {result.bestNextResponse && (
-             <div className="border-b border-white/[0.06] pb-6 mb-6">
-                <h4 className="text-[10px] font-mono text-[#71717A] uppercase tracking-[0.15em] mb-3">Best Next Response</h4>
-                <p className="text-sm text-[#FAFAFA] font-mono leading-relaxed mb-4">{result.bestNextResponse.summary || String(result.bestNextResponse)}</p>
+             <div className="border-b border-border pb-6 mb-6">
+                <h4 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em] mb-3">Best Next Response</h4>
+                <p className="text-sm text-[#FAFAFA] font-sans font-medium leading-relaxed mb-4">{result.bestNextResponse.summary || String(result.bestNextResponse)}</p>
                 {Array.isArray(result.bestNextResponse.phrasing) && result.bestNextResponse.phrasing.length > 0 && (
-                   <div className="bg-white/[0.02] border border-white/[0.04] p-4 flex flex-col gap-2">
+                   <div className="bg-white/[0.02] border border-border p-4 flex flex-col gap-2">
                       {result.bestNextResponse.phrasing.map((phrase: string, i: number) => (
-                        <div key={i} className="text-sm text-[#E4E4E7] font-mono leading-relaxed flex items-start gap-3">
+                        <div key={i} className="text-sm text-[#E4E4E7] font-sans font-medium leading-relaxed flex items-start gap-3">
                            <span className="text-[#3F3F46] mt-0.5">↳</span>
                            <span>{phrase}</span>
                         </div>
@@ -209,21 +209,21 @@ export default function DefragItemPage() {
            {result.conversationalSteering && (
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="text-[10px] font-mono text-[#71717A] uppercase tracking-[0.15em] mb-3">Steer Toward</h4>
+                  <h4 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em] mb-3">Steer Toward</h4>
                   <ul className="space-y-2">
                     {Array.isArray(result.conversationalSteering.do) ? result.conversationalSteering.do.map((item: string, i: number) => (
-                      <li key={i} className="text-sm text-[#E4E4E7] font-mono flex items-start gap-2">
+                      <li key={i} className="text-sm text-[#E4E4E7] font-sans font-medium flex items-start gap-2">
                         <span className="text-[#10B981]">+</span>
                         <span>{item}</span>
                       </li>
-                    )) : <li className="text-sm text-[#E4E4E7] font-mono">{String(result.conversationalSteering)}</li>}
+                    )) : <li className="text-sm text-[#E4E4E7] font-sans font-medium">{String(result.conversationalSteering)}</li>}
                   </ul>
                 </div>
                 <div>
-                  <h4 className="text-[10px] font-mono text-[#71717A] uppercase tracking-[0.15em] mb-3">Avoid</h4>
+                  <h4 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em] mb-3">Avoid</h4>
                   <ul className="space-y-2">
                     {Array.isArray(result.conversationalSteering.avoid) ? result.conversationalSteering.avoid.map((item: string, i: number) => (
-                      <li key={i} className="text-sm text-[#E4E4E7] font-mono flex items-start gap-2">
+                      <li key={i} className="text-sm text-[#E4E4E7] font-sans font-medium flex items-start gap-2">
                         <span className="text-[#EF4444]">-</span>
                         <span>{item}</span>
                       </li>
@@ -240,17 +240,17 @@ export default function DefragItemPage() {
   const mainInputArea = (
     <div className="flex flex-col h-full justify-end gap-8">
       {error && !initialLoading && (
-        <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 mb-4 font-mono">
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 mb-4 font-sans font-medium">
           {error}
         </div>
       )}
 
-      <div className="border border-white/[0.08] bg-[#080808] focus-within:border-white/[0.18] transition-colors duration-200">
+      <div className="border border-border bg-surface focus-within:border-border transition-colors duration-200">
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Update the situation... What happened next?"
-          className="w-full bg-transparent text-[#FAFAFA] placeholder:text-[#3F3F46] resize-none outline-none min-h-[120px] text-sm p-4 leading-relaxed font-mono"
+          className="w-full bg-transparent text-[#FAFAFA] placeholder:text-[#3F3F46] resize-none outline-none min-h-[120px] text-sm p-4 leading-relaxed font-sans font-medium"
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
@@ -258,13 +258,13 @@ export default function DefragItemPage() {
             }
           }}
         />
-        <div className="flex justify-between items-center px-4 py-3 border-t border-white/[0.06]">
-          <span className="text-[10px] text-[#3F3F46] font-mono tracking-wide">ENTER TO UPDATE</span>
+        <div className="flex justify-between items-center px-4 py-3 border-t border-border">
+          <span className="text-[10px] text-[#3F3F46] font-sans font-medium tracking-wide">ENTER TO UPDATE</span>
           <Button
             size="sm"
             onClick={handleUpdate}
             disabled={!input.trim() || isLoading}
-            className="rounded-none border border-white/[0.15] bg-white text-black hover:bg-white/90 font-mono text-[10px] tracking-[0.15em] uppercase h-8 px-4 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+            className="rounded-none border border-border bg-white text-black hover:bg-white/90 font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-8 px-4 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? "Running..." : "Update Pattern"}
           </Button>

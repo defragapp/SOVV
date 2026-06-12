@@ -15,7 +15,7 @@ export function PageHero({
   children?: ReactNode;
 }) {
   return (
-    <div className="relative overflow-hidden section-gap border-b border-white/5 bg-background">
+    <div className="relative overflow-hidden section-gap border-b border-border bg-background">
       {/* Background Subtle Gradient */}
       <div className="absolute inset-0 z-0 bg-hero-glow opacity-50" />
       

@@ -51,7 +51,7 @@ export default function UpgradeBanner() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black text-[#F6F5F3]">
+    <div className="flex min-h-screen items-center justify-center bg-background text-[#F6F5F3]">
       {/* Ambient glow */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
@@ -72,7 +72,7 @@ export default function UpgradeBanner() {
           transition={{ delay: 0.2, duration: 0.8 }}
           className="mb-12"
         >
-          <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-white/20 mb-3">
+          <p className="font-sans font-medium text-[10px] uppercase tracking-[0.4em] text-white/20 mb-3">
             Sovereign.os
           </p>
           <div className="h-px w-full bg-[#F6F5F3]/10" />
@@ -84,7 +84,7 @@ export default function UpgradeBanner() {
           transition={{ delay: 0.3, duration: 0.6 }}
           className="mb-8"
         >
-          <h1 className="font-mono text-[11px] uppercase tracking-[0.3em] text-white/40 mb-4">
+          <h1 className="font-sans font-medium text-[11px] uppercase tracking-[0.3em] text-white/40 mb-4">
             Space requires Pro
           </h1>
           <p className="text-sm leading-relaxed text-white/30 max-w-xs mx-auto">
@@ -100,7 +100,7 @@ export default function UpgradeBanner() {
           disabled={loading}
           whileHover={{ backgroundColor: "rgba(246,245,243,0.08)" }}
           whileTap={{ scale: 0.98 }}
-          className="w-full border border-[#F6F5F3]/20 px-4 py-3.5 font-mono text-[10px] uppercase tracking-widest text-[#F6F5F3] transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
+          className="w-full border border-[#F6F5F3]/20 px-4 py-3.5 font-sans font-medium text-[10px] uppercase tracking-widest text-[#F6F5F3] transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -120,7 +120,7 @@ export default function UpgradeBanner() {
         <motion.button
           type="button"
           onClick={() => setShowPromo(!showPromo)}
-          className="mt-4 font-mono text-[9px] uppercase tracking-widest text-white/20 hover:text-white/40 transition-colors"
+          className="mt-4 font-sans font-medium text-[9px] uppercase tracking-widest text-white/20 hover:text-white/40 transition-colors"
         >
           {showPromo ? "Hide promo code" : "Have a promo code?"}
         </motion.button>
@@ -138,7 +138,7 @@ export default function UpgradeBanner() {
                 value={promoCode}
                 onChange={(e) => setPromoCode(e.target.value)}
                 placeholder="ENTER CODE"
-                className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-2.5 font-mono text-[10px] uppercase tracking-widest text-[#F6F5F3] placeholder-white/15 focus:border-[#F6F5F3]/30 focus:outline-none transition-colors text-center"
+                className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-2.5 font-sans font-medium text-[10px] uppercase tracking-widest text-[#F6F5F3] placeholder-white/15 focus:border-[#F6F5F3]/30 focus:outline-none transition-colors text-center"
               />
             </motion.div>
           )}
@@ -150,7 +150,7 @@ export default function UpgradeBanner() {
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="mt-4 font-mono text-[9px] uppercase tracking-widest text-red-400/70"
+              className="mt-4 font-sans font-medium text-[9px] uppercase tracking-widest text-red-400/70"
             >
               {error}
             </motion.p>
@@ -161,7 +161,7 @@ export default function UpgradeBanner() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-10 font-mono text-[9px] uppercase tracking-widest text-white/15"
+          className="mt-10 font-sans font-medium text-[9px] uppercase tracking-widest text-white/15"
         >
           Pro unlocks people, groups, unlimited sessions
         </motion.p>
@@ -169,7 +169,7 @@ export default function UpgradeBanner() {
         <div className="mt-6">
           <a
             href="/"
-            className="font-mono text-[9px] uppercase tracking-widest text-white/15 hover:text-white/35 transition-colors duration-200"
+            className="font-sans font-medium text-[9px] uppercase tracking-widest text-white/15 hover:text-white/35 transition-colors duration-200"
           >
             ← Back to Sovereign.os
           </a>

@@ -66,12 +66,12 @@ export default function MessageInput({
           type="submit"
           disabled={disabled || !value.trim()}
           aria-label="Send message"
-          className="shrink-0 border border-[#F6F5F3]/20 px-4 py-2 font-mono text-[9px] uppercase tracking-widest text-[#F6F5F3] transition-colors hover:bg-[#F6F5F3]/5 disabled:opacity-25 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-1 focus-visible:outline-white/40"
+          className="shrink-0 border border-[#F6F5F3]/20 px-4 py-2 font-sans font-medium text-[9px] uppercase tracking-widest text-[#F6F5F3] transition-colors hover:bg-[#F6F5F3]/5 disabled:opacity-25 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-1 focus-visible:outline-white/40"
         >
           Send
         </button>
       </div>
-      <p className="mt-2 font-mono text-[8px] uppercase tracking-widest text-white/15">
+      <p className="mt-2 font-sans font-medium text-[8px] uppercase tracking-widest text-white/15">
         Enter to send · Shift+Enter for new line
       </p>
     </form>

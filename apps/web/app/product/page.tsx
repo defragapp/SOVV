@@ -46,7 +46,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <Badge
       variant="outline"
-      className="rounded-none border-white/[0.12] bg-transparent text-[#71717A] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
+      className="rounded-none border-border bg-transparent text-[#71717A] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
     >
       {children}
     </Badge>
@@ -57,7 +57,7 @@ export default function ProductPage() {
   return (
     <SiteShell>
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <Section className="w-full relative flex flex-col items-center justify-center min-h-[80svh] pt-32 pb-24 overflow-hidden border-b border-white/[0.06] bg-[#050505]">
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[80svh] pt-32 pb-24 overflow-hidden border-b border-border bg-surface">
         <div
           aria-hidden
           className="absolute inset-0 z-0 pointer-events-none opacity-[0.025]"
@@ -87,7 +87,7 @@ export default function ProductPage() {
             <Link href="/login" className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="w-full sm:w-auto rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-8 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+                className="w-full sm:w-auto rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-8 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
               >
                 Enter Sovereign.os
               </Button>
@@ -97,7 +97,7 @@ export default function ProductPage() {
       </Section>
 
       {/* ── Product Surfaces ──────────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#050505]">
+      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container>
           <div className="flex flex-col lg:flex-row gap-16 xl:gap-24 items-start">
             
@@ -113,16 +113,16 @@ export default function ProductPage() {
               </p>
             </div>
 
-            <div className="flex-1 flex flex-col gap-0 border border-white/[0.07]">
+            <div className="flex-1 flex flex-col gap-0 border border-border">
               {SURFACES.map((s, i) => (
                 <div
                   key={i}
                   className={[
-                    "flex items-start gap-6 p-7 md:p-10 group bg-[#080808]",
-                    i < SURFACES.length - 1 ? "border-b border-white/[0.07]" : "",
+                    "flex items-start gap-6 p-7 md:p-10 group bg-surface",
+                    i < SURFACES.length - 1 ? "border-b border-border" : "",
                   ].join(" ")}
                 >
-                  <span className="text-[#3F3F46] font-mono text-xs mt-1 shrink-0 w-6">
+                  <span className="text-[#3F3F46] font-sans font-medium text-xs mt-1 shrink-0 w-6">
                     {s.tag}
                   </span>
                   <div className="space-y-3">
@@ -140,7 +140,7 @@ export default function ProductPage() {
       </Section>
 
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
-      <Section className="w-full py-32 md:py-48 bg-[#080808] relative overflow-hidden">
+      <Section className="w-full py-32 md:py-48 bg-surface relative overflow-hidden">
         <Container className="relative z-10 text-center max-w-[780px]">
           <h2 className="text-[clamp(2.4rem,5vw,3.5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance mb-12">
             Your next response can change the pattern.
@@ -148,7 +148,7 @@ export default function ProductPage() {
           <Link href="/login" className="inline-block">
             <Button
               size="lg"
-              className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-10 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+              className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-10 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
             >
               Start Baseline Design
             </Button>

@@ -8,9 +8,9 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantClasses = {
   primary: "bg-[#FDFDFD] text-[#020202] hover:bg-[#E5E5E5] active:scale-[0.97] shadow-[0_4px_12px_rgba(255,255,255,0.15)] hover:shadow-[0_6px_16px_rgba(255,255,255,0.25)] border border-transparent rounded-full",
-  secondary: "bg-white/5 text-[#FDFDFD] border border-white/10 hover:bg-white/10 hover:border-white/25 active:scale-[0.98] backdrop-blur-md rounded-xl",
+  secondary: "bg-white/5 text-[#FDFDFD] border border-border hover:bg-white/10 hover:border-border active:scale-[0.98] backdrop-blur-md rounded-xl",
   ghost: "bg-transparent text-[#A1A1AA] hover:text-[#FDFDFD] hover:bg-white/5 border border-transparent rounded-lg",
-  premium: "bg-white/5 text-[#FDFDFD] border border-white/10 hover:bg-white/10 hover:border-white/25 active:scale-[0.98] backdrop-blur-md rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.05)]",
+  premium: "bg-white/5 text-[#FDFDFD] border border-border hover:bg-white/10 hover:border-border active:scale-[0.98] backdrop-blur-md rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.05)]",
 }
 
 const sizeClasses = {

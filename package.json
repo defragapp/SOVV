@@ -26,6 +26,7 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "concurrently": "^8.2.2",
+    "geist": "^1.7.2",
     "wrangler": "^4.97.0"
   },
   "dependencies": {

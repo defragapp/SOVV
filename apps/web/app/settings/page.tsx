@@ -19,7 +19,7 @@ const initialState: BaselineRequest = {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] tracking-[0.1em] uppercase text-[#F6F5F3]/30 font-mono">
+    <p className="text-[10px] tracking-[0.1em] uppercase text-[#F6F5F3]/30 font-sans font-medium">
       {children}
     </p>
   );
@@ -35,7 +35,7 @@ function FieldLabel({
   return (
     <label
       htmlFor={htmlFor}
-      className="block text-[10px] tracking-[0.1em] uppercase text-[#F6F5F3]/40 font-mono mb-2"
+      className="block text-[10px] tracking-[0.1em] uppercase text-[#F6F5F3]/40 font-sans font-medium mb-2"
     >
       {children}
     </label>
@@ -44,17 +44,17 @@ function FieldLabel({
 
 function HintText({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mt-1.5 text-[11px] leading-relaxed text-[#F6F5F3]/25 font-mono tracking-wide">
+    <p className="mt-1.5 text-[11px] leading-relaxed text-[#F6F5F3]/25 font-sans font-medium tracking-wide">
       {children}
     </p>
   );
 }
 
 const inputBase =
-  "w-full bg-[#080808] border border-white/[0.08] text-[#F6F5F3]/85 text-[13px] font-mono " +
+  "w-full bg-surface border border-border text-[#F6F5F3]/85 text-[13px] font-sans font-medium " +
   "px-3.5 py-3 rounded-none outline-none transition-all duration-200 " +
   "placeholder:text-[#F6F5F3]/18 " +
-  "focus:border-white/[0.22] focus:bg-[#0A0A0A] " +
+  "focus:border-border focus:bg-surface " +
   "disabled:opacity-30 disabled:cursor-not-allowed " +
   "[color-scheme:dark]";
 
@@ -106,29 +106,29 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#FAFAFA]">
+    <div className="min-h-screen bg-surface text-[#FAFAFA]">
 
       {/* ── Sticky header ── */}
-      <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#050505]/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur-md">
         <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between">
           <nav className="flex items-center gap-2.5" aria-label="Breadcrumb">
             <Link
               href="/"
-              className="text-[11px] font-mono tracking-widest uppercase text-[#FAFAFA]/40 hover:text-[#FAFAFA]/70 transition-colors duration-200"
+              className="text-[11px] font-sans font-medium tracking-widest uppercase text-[#FAFAFA]/40 hover:text-[#FAFAFA]/70 transition-colors duration-200"
             >
               Sovereign.os
             </Link>
-            <span className="text-[#FAFAFA]/20 text-[11px] font-mono" aria-hidden>
+            <span className="text-[#FAFAFA]/20 text-[11px] font-sans font-medium" aria-hidden>
               /
             </span>
-            <span className="text-[11px] font-mono tracking-widest uppercase text-[#FAFAFA]/60">
+            <span className="text-[11px] font-sans font-medium tracking-widest uppercase text-[#FAFAFA]/60">
               Baseline Design
             </span>
           </nav>
 
           <Link
             href="/apps/defrag"
-            className="text-[11px] font-mono tracking-wide text-[#FAFAFA]/40 hover:text-[#FAFAFA]/80 transition-colors duration-200"
+            className="text-[11px] font-sans font-medium tracking-wide text-[#FAFAFA]/40 hover:text-[#FAFAFA]/80 transition-colors duration-200"
           >
             ← Defrag
           </Link>
@@ -140,7 +140,7 @@ export default function SettingsPage() {
         {/* ── Title block ── */}
         <div className="mb-14">
           <div className="flex items-center gap-3 mb-6">
-            <span className="text-[10px] tracking-[0.1em] uppercase font-mono text-[#71717A] border border-white/[0.12] px-2.5 py-1 bg-transparent">
+            <span className="text-[10px] tracking-[0.1em] uppercase font-sans font-medium text-[#71717A] border border-border px-2.5 py-1 bg-transparent">
               Baseline Design
             </span>
             <AnimatePresence>
@@ -150,7 +150,7 @@ export default function SettingsPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.25 }}
-                  className="flex items-center gap-1.5 text-[10px] font-mono tracking-[0.1em] uppercase text-[#A1A1AA]"
+                  className="flex items-center gap-1.5 text-[10px] font-sans font-medium tracking-[0.1em] uppercase text-[#A1A1AA]"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-[#A1A1AA] inline-block" />
                   Active
@@ -170,15 +170,15 @@ export default function SettingsPage() {
             Covenant grounded. It is never exposed in outputs.
           </p>
 
-          <div className="flex items-start gap-3 pl-4 border-l border-white/[0.12]">
-            <p className="text-[11px] leading-relaxed text-[#71717A] font-mono tracking-wide">
+          <div className="flex items-start gap-3 pl-4 border-l border-border">
+            <p className="text-[11px] leading-relaxed text-[#71717A] font-sans font-medium tracking-wide">
               Shared across Defrag and Covenant. Set once. Works across all sessions.
             </p>
           </div>
         </div>
 
         {/* ── Form card ── */}
-        <div className="bg-[#0A0A0A] border border-white/[0.08] p-8 md:p-10 mb-14">
+        <div className="bg-surface border border-border p-8 md:p-10 mb-14">
 
           <SectionLabel>Enter your birth details</SectionLabel>
 
@@ -277,8 +277,8 @@ export default function SettingsPage() {
           </div>
 
           {/* Privacy note */}
-          <div className="mt-8 pt-7 border-t border-white/[0.06]">
-            <p className="text-[11px] leading-[1.75] text-[#71717A] font-mono tracking-wide">
+          <div className="mt-8 pt-7 border-t border-border">
+            <p className="text-[11px] leading-[1.75] text-[#71717A] font-sans font-medium tracking-wide">
               Your birth details are used only to generate your Baseline Design.
               They are stored privately and never exposed in outputs, shared with
               other users, or used outside your own session context.
@@ -292,7 +292,7 @@ export default function SettingsPage() {
               disabled={saving || !baseline.dob || !baseline.pob}
               className={[
                 "inline-flex items-center justify-center gap-2",
-                "text-[11px] font-mono tracking-[0.1em] uppercase",
+                "text-[11px] font-sans font-medium tracking-[0.1em] uppercase",
                 "bg-[#FAFAFA] text-[#050505] px-7 py-3.5",
                 "border border-transparent",
                 "transition-all duration-200",
@@ -324,7 +324,7 @@ export default function SettingsPage() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.25 }}
                   className={[
-                    "text-[11px] font-mono tracking-wide",
+                    "text-[11px] font-sans font-medium tracking-wide",
                     message.ok
                       ? "text-[#A1A1AA]"
                       : "text-red-400/80",
@@ -357,13 +357,13 @@ export default function SettingsPage() {
             ].map((item) => (
               <li
                 key={item}
-                className="flex items-center gap-3.5 py-3.5 border-b border-white/[0.06] group"
+                className="flex items-center gap-3.5 py-3.5 border-b border-border group"
               >
                 <span
                   className="w-[18px] h-px bg-white/[0.12] shrink-0 transition-all duration-300 group-hover:bg-white/[0.3] group-hover:w-[24px]"
                   aria-hidden
                 />
-                <span className="text-[12px] leading-relaxed text-[#A1A1AA] font-mono tracking-wide group-hover:text-[#FAFAFA] transition-colors duration-200">
+                <span className="text-[12px] leading-relaxed text-[#A1A1AA] font-sans font-medium tracking-wide group-hover:text-[#FAFAFA] transition-colors duration-200">
                   {item}
                 </span>
               </li>

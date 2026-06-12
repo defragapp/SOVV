@@ -33,12 +33,12 @@ export default function CovenantPage() {
   }
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#050505]">
-      <div className="px-6 py-5 border-b border-white/[0.06]">
-        <h3 className="text-[10px] font-mono text-[#71717A] uppercase tracking-[0.2em]">Covenant Briefs</h3>
+    <div className="flex flex-col h-full bg-surface">
+      <div className="px-6 py-5 border-b border-border">
+        <h3 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em]">Covenant Briefs</h3>
       </div>
       <div className="flex-1 px-6 py-8">
-        <p className="text-xs font-mono text-[#71717A] leading-relaxed max-w-[180px]">
+        <p className="text-xs font-sans font-medium text-[#71717A] leading-relaxed max-w-[180px]">
           Save useful Results here so you can return before the old pattern takes over again.
         </p>
       </div>
@@ -46,19 +46,19 @@ export default function CovenantPage() {
   )
 
   const contextContent = (
-    <div className="flex flex-col gap-0 h-full bg-[#050505] border-l border-white/[0.06]">
-      <div className="px-6 py-5 border-b border-white/[0.06]">
-        <h3 className="text-[10px] font-mono text-[#71717A] uppercase tracking-[0.2em]">Context</h3>
+    <div className="flex flex-col gap-0 h-full bg-surface border-l border-border">
+      <div className="px-6 py-5 border-b border-border">
+        <h3 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em]">Context</h3>
       </div>
       <div className="p-6 flex flex-col gap-6">
-        <div className="border border-white/[0.08] bg-[#080808] p-5 flex flex-col gap-2">
-          <p className="text-[10px] font-mono text-[#71717A] uppercase tracking-[0.15em]">Baseline Design</p>
+        <div className="border border-border bg-surface p-5 flex flex-col gap-2">
+          <p className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em]">Baseline Design</p>
           <p className="text-xs text-[#A1A1AA] leading-relaxed">
             Your Baseline Design gives the system context before you describe this moment.
           </p>
         </div>
-        <div className="border border-white/[0.04] bg-[#050505] p-5 flex flex-col gap-2 opacity-40">
-          <p className="text-[10px] font-mono text-[#71717A] uppercase tracking-[0.15em]">Save to Sovereign</p>
+        <div className="border border-border bg-surface p-5 flex flex-col gap-2 opacity-40">
+          <p className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em]">Save to Sovereign</p>
           <p className="text-xs text-[#A1A1AA]">Requires Pro</p>
         </div>
       </div>
@@ -68,39 +68,39 @@ export default function CovenantPage() {
   const mainInputArea = (
     <div className="flex flex-col h-full justify-end gap-8 pt-4 pb-0 max-w-4xl mx-auto w-full">
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 max-w-md mx-auto opacity-50">
-        <div className="w-12 h-12 border border-white/[0.12] flex items-center justify-center">
+        <div className="w-12 h-12 border border-border flex items-center justify-center">
           <svg className="w-5 h-5 text-[#A1A1AA]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
         </div>
         <div className="gap-3 flex flex-col">
           <h2 className="text-[20px] font-medium text-[#FAFAFA] tracking-tight">Faith-context reflection</h2>
-          <p className="text-[13px] text-[#A1A1AA] font-mono leading-relaxed">
+          <p className="text-[13px] text-[#A1A1AA] font-sans font-medium leading-relaxed">
             Connect your current moment to grounded reflection.
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 mb-4 font-mono">
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 mb-4 font-sans font-medium">
           {error}
         </div>
       )}
 
-      <div className="border border-white/[0.08] bg-[#080808] focus-within:border-white/[0.22] transition-colors duration-200 shadow-2xl">
+      <div className="border border-border bg-surface focus-within:border-border transition-colors duration-200 shadow-2xl">
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Describe the moment or pressure..."
-          className="w-full bg-transparent text-[#FAFAFA] placeholder:text-[#3F3F46] resize-none outline-none min-h-[140px] text-sm p-5 leading-[1.75] font-mono"
+          className="w-full bg-transparent text-[#FAFAFA] placeholder:text-[#3F3F46] resize-none outline-none min-h-[140px] text-sm p-5 leading-[1.75] font-sans font-medium"
         />
-        <div className="flex justify-between items-center px-5 py-4 border-t border-white/[0.06] bg-[#050505]">
-          <span className="text-[10px] text-[#71717A] font-mono tracking-[0.15em] uppercase">ENTER TO REFLECT</span>
+        <div className="flex justify-between items-center px-5 py-4 border-t border-border bg-surface">
+          <span className="text-[10px] text-[#71717A] font-sans font-medium tracking-[0.15em] uppercase">ENTER TO REFLECT</span>
           <Button
             size="sm"
             onClick={handleCovenant}
             disabled={!input.trim() || isLoading}
-            className="rounded-none border border-white/[0.15] bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] font-mono text-[10px] tracking-[0.15em] uppercase h-9 px-6 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+            className="rounded-none border border-border bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9 px-6 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? "Running..." : "Reflect"}
           </Button>
@@ -112,9 +112,9 @@ export default function CovenantPage() {
   const renderSection = (title: string, content: any) => {
     if (!content) return null;
     return (
-      <div className="border-b border-white/[0.06] pb-8 mb-8 last:border-0 last:pb-0 last:mb-0">
-        <h4 className="text-[10px] font-mono text-[#71717A] uppercase tracking-[0.2em] mb-4">{title}</h4>
-        <p className="text-[14px] text-[#FAFAFA] font-mono leading-[1.75] whitespace-pre-wrap">{String(content)}</p>
+      <div className="border-b border-border pb-8 mb-8 last:border-0 last:pb-0 last:mb-0">
+        <h4 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em] mb-4">{title}</h4>
+        <p className="text-[14px] text-[#FAFAFA] font-sans font-medium leading-[1.75] whitespace-pre-wrap">{String(content)}</p>
       </div>
     )
   }
@@ -122,13 +122,13 @@ export default function CovenantPage() {
   const mainResultArea = (
     <div className="h-full flex flex-col max-w-4xl mx-auto w-full">
       {!result ? (
-        <div className="flex-1 flex items-center justify-center border border-white/[0.08] bg-[#0A0A0A] p-8 text-center min-h-[240px]">
-          <p className="text-[13px] text-[#A1A1AA] font-mono leading-relaxed max-w-[280px]">
+        <div className="flex-1 flex items-center justify-center border border-border bg-surface p-8 text-center min-h-[240px]">
+          <p className="text-[13px] text-[#A1A1AA] font-sans font-medium leading-relaxed max-w-[280px]">
             The Covenant space is ready visually, but its backend route is not connected yet.
           </p>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto border border-white/[0.08] bg-[#0A0A0A] p-8 md:p-12 shadow-xl">
+        <div className="flex-1 overflow-y-auto border border-border bg-surface p-8 md:p-12 shadow-xl">
            {renderSection("Moment feels like", result.moment_feels_like)}
            {renderSection("Story Connection", result.story_connection)}
            {renderSection("Reflection Prompt", result.reflection_prompt)}
@@ -146,17 +146,17 @@ export default function CovenantPage() {
       content: (
 
         <div className="flex flex-col gap-6 p-4">
-          <div className="border-b border-white/[0.04] pb-6">
-            <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.2em] mb-4">The Story in Plain Language</p>
-            <p className="text-sm text-[#FAFAFA] font-mono leading-relaxed">The desire to fix it immediately is bypassing the need for actual repair. True repair requires waiting for the other person to be ready to hear it.</p>
+          <div className="border-b border-border pb-6">
+            <p className="text-[10px] font-sans font-medium text-[#3F3F46] uppercase tracking-[0.2em] mb-4">The Story in Plain Language</p>
+            <p className="text-sm text-[#FAFAFA] font-sans font-medium leading-relaxed">The desire to fix it immediately is bypassing the need for actual repair. True repair requires waiting for the other person to be ready to hear it.</p>
           </div>
-          <div className="border-b border-white/[0.04] pb-6">
-            <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.2em] mb-4">The Scripture Connection</p>
-            <p className="text-sm text-[#FAFAFA] font-mono leading-relaxed opacity-80">&quot;Let every person be quick to hear, slow to speak, slow to anger.&quot;<br/>— James 1:19</p>
+          <div className="border-b border-border pb-6">
+            <p className="text-[10px] font-sans font-medium text-[#3F3F46] uppercase tracking-[0.2em] mb-4">The Scripture Connection</p>
+            <p className="text-sm text-[#FAFAFA] font-sans font-medium leading-relaxed opacity-80">&quot;Let every person be quick to hear, slow to speak, slow to anger.&quot;<br/>— James 1:19</p>
           </div>
           <div>
-            <p className="text-[10px] font-mono text-[#3F3F46] uppercase tracking-[0.2em] mb-4">One Grounded Response</p>
-            <p className="text-sm text-[#FAFAFA] font-mono leading-relaxed">Wait. When the time is right, take responsibility for your part without expecting them to fix theirs.</p>
+            <p className="text-[10px] font-sans font-medium text-[#3F3F46] uppercase tracking-[0.2em] mb-4">One Grounded Response</p>
+            <p className="text-sm text-[#FAFAFA] font-sans font-medium leading-relaxed">Wait. When the time is right, take responsibility for your part without expecting them to fix theirs.</p>
           </div>
         </div>
 

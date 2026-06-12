@@ -1,106 +1,134 @@
 import { Button } from "@/components/ui/button"
-import { Container, Section } from "@/components/ui/layout-primitives"
-import { Badge } from "@/components/ui/badge"
-import { PRICING_CONFIG } from "@/data/marketing"
-import { CheckoutButton } from "@/components/marketing/checkout-button"
 import Link from "next/link"
 
 export default function PricingPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center selection:bg-white/10 selection:text-white bg-[#050505]">
-      <Section className="w-full relative flex flex-col items-center justify-center min-h-[50svh] pt-32 pb-24 overflow-hidden border-b border-white/[0.06]">
-        <Container className="relative z-10 flex flex-col items-center text-center max-w-4xl">
-          <div className="mb-10 flex items-center gap-3">
-            <div className="h-px w-8 bg-white/20" />
-            <Badge variant="outline" className="rounded-none border-white/[0.12] bg-transparent text-[#71717A] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1">
-              PRICING
-            </Badge>
-            <div className="h-px w-8 bg-white/20" />
-          </div>
+    <main className="relative min-h-screen bg-black overflow-hidden selection:bg-white/20 selection:text-white">
+      {/* Background Ambient Glow */}
+      <div 
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/3 w-[800px] h-[800px] opacity-40"
+        style={{
+          background: "radial-gradient(circle, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0) 70%)"
+        }}
+      />
 
-          <div className="space-y-5 mb-10">
-            <h1 className="text-4xl md:text-[56px] font-semibold tracking-[-0.03em] text-[#FAFAFA] leading-[1.05] text-balance">
-              Clear pricing.<br className="hidden md:block" />
-              <span className="text-[#3F3F46]">No surprises.</span>
-            </h1>
+      {/* Nav */}
+      <nav className="fixed top-0 w-full z-50 flex items-center justify-between px-8 py-6 mix-blend-difference">
+        <div className="flex items-center gap-12">
+          <Link href="/" className="text-sm font-medium tracking-tight text-white hover:opacity-80 transition-opacity">
+            Sovereign.os
+          </Link>
+          <div className="hidden md:flex gap-8 text-[13px] text-white/50">
+            <Link href="/apps/defrag" className="hover:text-white transition-colors">Defrag</Link>
+            <Link href="/apps/covenant" className="hover:text-white transition-colors">Covenant</Link>
+            <Link href="/pricing" className="text-white transition-colors">Pricing</Link>
           </div>
+        </div>
+        <div>
+          <Link href="/login" className="text-[13px] px-5 py-2.5 rounded-full border border-white/10 text-white hover:bg-white hover:text-black transition-all duration-300">
+            Sign In
+          </Link>
+        </div>
+      </nav>
 
-          <p className="text-base md:text-lg text-[#71717A] max-w-xl leading-relaxed text-pretty">
+      {/* Hero Section */}
+      <section className="relative flex flex-col items-center justify-center pt-48 pb-32 z-10 px-6 border-b border-white/5">
+        <div className="text-center max-w-3xl flex flex-col items-center">
+          <h1 className="animate-fade-up text-[clamp(2.5rem,6vw,5rem)] leading-[1] tracking-[-0.04em] font-medium gradient-text mb-6 text-balance">
+            Clear pricing.<br/>
+            No surprises.
+          </h1>
+          <p className="animate-fade-up delay-100 text-lg md:text-xl text-white/40 max-w-xl leading-relaxed tracking-tight text-balance">
             Choose the plan that fits how you want to work through the patterns.
           </p>
-        </Container>
-      </Section>
+        </div>
+      </section>
 
-      <Section className="w-full border-b border-white/[0.06]">
-        <Container>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/[0.05]">
-            {/* Free Plan */}
-            <div className="bg-[#050505] p-10 lg:p-14 flex flex-col gap-8">
-              <div className="flex flex-col gap-2">
-                <h2 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">{PRICING_CONFIG.free.name}</h2>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-[#FAFAFA]">{PRICING_CONFIG.free.price}</span>
-                  <span className="text-[#71717A] font-mono text-[10px] tracking-wide uppercase">/{PRICING_CONFIG.free.period}</span>
-                </div>
-                <p className="text-sm text-[#71717A] mt-2 leading-relaxed">{PRICING_CONFIG.free.description}</p>
+      {/* Pricing Grid */}
+      <section className="relative py-32 z-10 px-6">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-px bg-white/5 rounded-3xl overflow-hidden border border-white/5">
+          
+          {/* Free Tier */}
+          <div className="bg-black p-12 lg:p-16 flex flex-col">
+            <div className="mb-10">
+              <h2 className="text-2xl font-medium tracking-[-0.02em] text-white mb-2">Free</h2>
+              <div className="flex items-baseline gap-1 mb-4">
+                <span className="text-5xl font-medium tracking-[-0.04em] text-white">$0</span>
+                <span className="text-white/40 font-mono text-[11px] tracking-widest uppercase">/ forever</span>
               </div>
-
-              <div className="flex-1">
-                <ul className="space-y-0 border border-white/[0.06] divide-y divide-white/[0.04]">
-                  {PRICING_CONFIG.free.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-4 px-4 py-3 font-mono text-xs text-[#71717A]">
-                      <svg className="w-4 h-4 text-[#52525B] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="pt-6">
-                <Link href={PRICING_CONFIG.free.href} className="w-full block">
-                  <Button variant="secondary" className="w-full rounded-none border border-white/[0.08] bg-transparent text-[#A1A1AA] hover:text-white hover:border-white/20 font-mono text-xs tracking-[0.15em] uppercase h-12 px-8 transition-colors">
-                    {PRICING_CONFIG.free.cta}
-                  </Button>
-                </Link>
-              </div>
+              <p className="text-white/50 text-sm leading-relaxed max-w-[280px]">
+                Understand a moment. The essentials to begin mapping your patterns.
+              </p>
             </div>
-
-            {/* Pro Plan */}
-            <div className="bg-[#080808] p-10 lg:p-14 flex flex-col gap-8 border-l border-white/[0.05] relative">
-              {PRICING_CONFIG.pro.highlight && <div className="absolute top-0 right-10 -translate-y-1/2">
-                 <Badge className="rounded-none border border-white/[0.12] bg-white text-black font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1">{PRICING_CONFIG.pro.highlight}</Badge>
-              </div>}
-              <div className="flex flex-col gap-2">
-                <h2 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">{PRICING_CONFIG.pro.name}</h2>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-[#FAFAFA]">{PRICING_CONFIG.pro.price}</span>
-                  <span className="text-[#71717A] font-mono text-[10px] tracking-wide uppercase">/{PRICING_CONFIG.pro.period}</span>
-                </div>
-                <p className="text-sm text-[#FAFAFA] mt-2 leading-relaxed">{PRICING_CONFIG.pro.description}</p>
-              </div>
-
-              <div className="flex-1">
-                <ul className="space-y-0 border border-white/[0.06] divide-y divide-white/[0.04]">
-                  {PRICING_CONFIG.pro.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-4 px-4 py-3 font-mono text-xs text-[#FAFAFA]">
-                      <svg className="w-4 h-4 text-[#FAFAFA] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="pt-6">
-                <CheckoutButton priceId={PRICING_CONFIG.pro.priceId} cta={PRICING_CONFIG.pro.cta} />
-              </div>
+            
+            <div className="flex-1 mb-12">
+              <ul className="space-y-6">
+                {["Baseline Design setup", "Active pattern surface", "Best Next Response", "Basic session history"].map((feature, i) => (
+                  <li key={i} className="flex items-start gap-4 text-sm text-white/70 tracking-tight">
+                    <span className="text-white/20 mt-0.5">✦</span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
             </div>
+            
+            <Link href="/login" className="w-full">
+              <Button variant="secondary" className="w-full rounded-full border border-white/10 bg-transparent text-white hover:bg-white/5 hover:text-white font-medium tracking-tight h-14">
+                Get Started Free
+              </Button>
+            </Link>
           </div>
-        </Container>
-      </Section>
+
+          {/* Pro Tier */}
+          <div className="bg-[#050505] p-12 lg:p-16 flex flex-col relative">
+            <div className="absolute top-12 right-12">
+              <span className="text-[10px] font-mono tracking-widest uppercase px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-white/80">Pro</span>
+            </div>
+            
+            <div className="mb-10">
+              <h2 className="text-2xl font-medium tracking-[-0.02em] text-white mb-2">Sovereign Pro</h2>
+              <div className="flex items-baseline gap-1 mb-4">
+                <span className="text-5xl font-medium tracking-[-0.04em] text-white">$20</span>
+                <span className="text-white/40 font-mono text-[11px] tracking-widest uppercase">/ mo</span>
+              </div>
+              <p className="text-white/50 text-sm leading-relaxed max-w-[280px]">
+                Return, remember, compare, and interrupt the pattern.
+              </p>
+            </div>
+            
+            <div className="flex-1 mb-12">
+              <ul className="space-y-6">
+                {["Unlimited sessions", "Your Story (full history)", "Compare With Someone", "Try It Out (Audio summaries)", "Covenant space access"].map((feature, i) => (
+                  <li key={i} className="flex items-start gap-4 text-sm text-white/90 tracking-tight font-medium">
+                    <span className="text-white mt-0.5">✦</span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <Link href="/login" className="w-full">
+              <Button className="w-full rounded-full bg-white text-black hover:bg-white/90 font-medium tracking-tight h-14">
+                Start Sovereign Pro
+              </Button>
+            </Link>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 border-t border-white/5 text-center px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <span className="text-sm font-medium tracking-tight text-white/80">Sovereign.os</span>
+          <div className="flex gap-6 text-[13px] text-white/40">
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+          </div>
+        </div>
+      </footer>
     </main>
   )
 }

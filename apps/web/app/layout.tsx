@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { GeistSans } from "geist/font/sans";
 
 import "./globals.css";
 
@@ -36,13 +37,13 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#020202",
+  themeColor: "#000000",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`antialiased ${jetBrainsMono.variable}`}>
-      <body className="min-h-screen overflow-x-hidden bg-[#020202] text-[#FDFDFD] bg-background text-foreground overscroll-none safe-top safe-bottom selection:bg-white/20 selection:text-white">
+    <html lang="en" className={`antialiased ${jetBrainsMono.variable} ${GeistSans.variable}`}>
+      <body className="min-h-screen overflow-x-hidden bg-black text-white overscroll-none selection:bg-white/20 selection:text-white">
         {children}
       </body>
     </html>
