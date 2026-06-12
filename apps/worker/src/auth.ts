@@ -73,20 +73,41 @@ export function generateSessionToken(): string {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")
 }
 
-export function sessionCookie(token: string, maxAge = 7 * 24 * 60 * 60): string {
+function cookieDomain(envCookieDomain?: string): string | null {
+  const d = (envCookieDomain ?? "").trim()
+  return d ? d : null
+}
+
+export function sessionCookie(
+  token: string,
+  maxAge = 7 * 24 * 60 * 60,
+  cookieDomainValue?: string,
+): string {
+  const domain = cookieDomain(cookieDomainValue)
   return [
     `__sov_session=${token}`,
     `Max-Age=${maxAge}`,
     "Path=/",
+    ...(domain ? [`Domain=${domain}`] : []),
     "HttpOnly",
     "Secure",
     "SameSite=Lax",
   ].join("; ")
 }
 
-export function clearCookie(): string {
-  return "__sov_session=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax"
+export function clearCookie(cookieDomainValue?: string): string {
+  const domain = cookieDomain(cookieDomainValue)
+  return [
+    "__sov_session=",
+    "Max-Age=0",
+    "Path=/",
+    ...(domain ? [`Domain=${domain}`] : []),
+    "HttpOnly",
+    "Secure",
+    "SameSite=Lax",
+  ].join("; ")
 }
+
 
 export function getSessionToken(request: Request): string | null {
   const cookie = request.headers.get("Cookie")
@@ -164,7 +185,7 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
         .run()
 
       return jsonResponse({ success: true, token }, 200, {
-        "Set-Cookie": sessionCookie(token),
+        "Set-Cookie": sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN),
       })
     } catch (e: any) {
       if (e?.message?.includes("UNIQUE")) return jsonResponse({ error: "Email exists" }, 400)
@@ -191,7 +212,7 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
         .run()
 
       return jsonResponse({ success: true, token }, 200, {
-        "Set-Cookie": sessionCookie(token),
+        "Set-Cookie": sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN),
       })
     } catch (e: any) {
       console.error("Login failed", e)

@@ -32,15 +32,23 @@ interface EmailPayload {
  * Requires Email Routing destination to be verified in Cloudflare dashboard.
  * Binding name: EMAIL (declared in wrangler.toml [[send_email]] once configured).
  */
-async function sendViaBinding(emailBinding: SendEmail, payload: EmailPayload): Promise<void> {
-  const message = new EmailMessage(FROM, payload.to, {
+async function sendViaBinding(
+  emailBinding: SendEmail,
+  payload: EmailPayload,
+): Promise<void> {
+  // workers-types may not expose the Message constructor as a runtime value depending on
+  // the installed @types version. Build a minimal payload and cast to the binding input type.
+  const message = {
+    from: FROM,
+    to: payload.to,
     headers: {
-      "Subject": payload.subject,
+      Subject: payload.subject,
       "Reply-To": REPLY_TO,
       "Content-Type": "text/html; charset=utf-8",
     },
     body: payload.html,
-  });
+  } as any;
+
   await emailBinding.send(message);
 }
 
@@ -48,11 +56,14 @@ async function sendViaBinding(emailBinding: SendEmail, payload: EmailPayload): P
  * Send via Resend API (fallback).
  * Requires RESEND_API_KEY in Worker secrets.
  */
-async function sendViaResend(apiKey: string, payload: EmailPayload): Promise<void> {
-  await fetch("https://api.resend.com/emails", {
+async function sendViaResend(
+  apiKey: string,
+  payload: EmailPayload,
+): Promise<void> {
+  const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -63,6 +74,13 @@ async function sendViaResend(apiKey: string, payload: EmailPayload): Promise<voi
       html: payload.html,
     }),
   });
+
+  if (!response.ok) {
+    const bodyText = await response.text().catch(() => "");
+    throw new Error(
+      `[email] Resend rejected request: ${response.status} ${response.statusText} — ${bodyText.slice(0, 500)}`,
+    );
+  }
 }
 
 /**
@@ -70,19 +88,38 @@ async function sendViaResend(apiKey: string, payload: EmailPayload): Promise<voi
  */
 async function sendEmail(
   payload: EmailPayload,
-  opts: { emailBinding?: SendEmail; resendApiKey?: string }
+  opts: { emailBinding?: SendEmail; resendApiKey?: string },
 ): Promise<void> {
+  const hasBinding = Boolean(opts.emailBinding);
+  const hasResend = Boolean(opts.resendApiKey);
+
+  if (!hasBinding && !hasResend) {
+    // Fail loudly so missing bindings are visible immediately.
+    throw new Error(
+      "[email] No provider configured: both EMAIL binding and RESEND_API_KEY are missing",
+    );
+  }
+
   if (opts.emailBinding) {
     try {
       await sendViaBinding(opts.emailBinding, payload);
       return;
-    } catch {
-      // Fall through to Resend if binding fails
+    } catch (err) {
+      // Fall through to Resend if binding fails, but log the underlying error.
+      console.warn(
+        "[email] EMAIL binding failed; falling back to Resend:",
+        err,
+      );
     }
   }
+
   if (opts.resendApiKey) {
     await sendViaResend(opts.resendApiKey, payload);
+    return;
   }
+
+  // Defensive: should be unreachable due to the hasBinding/hasResend guard.
+  throw new Error("[email] No email provider available after fallback");
 }
 
 function baseTemplate(content: string): string {
@@ -121,7 +158,7 @@ function baseTemplate(content: string): string {
 
 export async function sendWelcomeEmail(
   to: string,
-  opts: { emailBinding?: SendEmail; resendApiKey?: string }
+  opts: { emailBinding?: SendEmail; resendApiKey?: string },
 ): Promise<void> {
   const html = baseTemplate(`
     <p class="label">Welcome</p>
@@ -141,7 +178,7 @@ export async function sendWelcomeEmail(
 
 export async function sendPaymentSucceededEmail(
   to: string,
-  opts: { emailBinding?: SendEmail; resendApiKey?: string }
+  opts: { emailBinding?: SendEmail; resendApiKey?: string },
 ): Promise<void> {
   const html = baseTemplate(`
     <p class="label">Payment confirmed</p>
@@ -152,12 +189,15 @@ export async function sendPaymentSucceededEmail(
     <a href="${APP_URL}" class="cta">Enter your space</a>
   `);
 
-  await sendEmail({ to, subject: "Subscription renewed — Sovereign.os", html }, opts);
+  await sendEmail(
+    { to, subject: "Subscription renewed — Sovereign.os", html },
+    opts,
+  );
 }
 
 export async function sendPaymentFailedEmail(
   to: string,
-  opts: { emailBinding?: SendEmail; resendApiKey?: string }
+  opts: { emailBinding?: SendEmail; resendApiKey?: string },
 ): Promise<void> {
   const html = baseTemplate(`
     <p class="label">Action required</p>
@@ -170,12 +210,15 @@ export async function sendPaymentFailedEmail(
     <p style="margin-top:24px;">If you have questions, reach us at <a href="mailto:${SUPPORT}" style="color:rgba(246,245,243,0.4);">${SUPPORT}</a>.</p>
   `);
 
-  await sendEmail({ to, subject: "Payment failed — action required — Sovereign.os", html }, opts);
+  await sendEmail(
+    { to, subject: "Payment failed — action required — Sovereign.os", html },
+    opts,
+  );
 }
 
 export async function sendCancellationEmail(
   to: string,
-  opts: { emailBinding?: SendEmail; resendApiKey?: string }
+  opts: { emailBinding?: SendEmail; resendApiKey?: string },
 ): Promise<void> {
   const html = baseTemplate(`
     <p class="label">Subscription ended</p>
@@ -188,22 +231,37 @@ export async function sendCancellationEmail(
     <p style="margin-top:24px;">Questions? <a href="mailto:${SUPPORT}" style="color:rgba(246,245,243,0.4);">${SUPPORT}</a></p>
   `);
 
-  await sendEmail({ to, subject: "Subscription canceled — Sovereign.os", html }, opts);
+  await sendEmail(
+    { to, subject: "Subscription canceled — Sovereign.os", html },
+    opts,
+  );
 }
 
 /**
  * Legacy compatibility shims — these maintain the old (apiKey: string, to: string) signature
  * used by billing.ts callers. Update callers to use the new opts pattern when convenient.
  */
-export async function sendWelcomeEmailLegacy(apiKey: string, to: string): Promise<void> {
+export async function sendWelcomeEmailLegacy(
+  apiKey: string,
+  to: string,
+): Promise<void> {
   await sendWelcomeEmail(to, { resendApiKey: apiKey });
 }
-export async function sendPaymentSucceededEmailLegacy(apiKey: string, to: string): Promise<void> {
+export async function sendPaymentSucceededEmailLegacy(
+  apiKey: string,
+  to: string,
+): Promise<void> {
   await sendPaymentSucceededEmail(to, { resendApiKey: apiKey });
 }
-export async function sendPaymentFailedEmailLegacy(apiKey: string, to: string): Promise<void> {
+export async function sendPaymentFailedEmailLegacy(
+  apiKey: string,
+  to: string,
+): Promise<void> {
   await sendPaymentFailedEmail(to, { resendApiKey: apiKey });
 }
-export async function sendCancellationEmailLegacy(apiKey: string, to: string): Promise<void> {
+export async function sendCancellationEmailLegacy(
+  apiKey: string,
+  to: string,
+): Promise<void> {
   await sendCancellationEmail(to, { resendApiKey: apiKey });
 }

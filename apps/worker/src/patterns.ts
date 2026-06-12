@@ -55,7 +55,9 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
         { role: "system", content: PATTERN_SYSTEM_PROMPT },
         { role: "user", content: `${baselineText}\n\nRecent Timeline Data:\n${contextText}` }
       ],
-      response_format: { type: "json_object" }
+        response_format: { type: "json_object" }
+      }, {
+        gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" }
     });
 
     const text = (response as { response?: string }).response || "{}";
