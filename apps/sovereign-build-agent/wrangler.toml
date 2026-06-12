@@ -1,0 +1,22 @@
+name = "sovereign-build-agent"
+main = "src/main.js"
+compatibility_date = "2026-06-12"
+compatibility_flags = ["nodejs_compat"]
+account_id = "8b1954d216d65077c6480d62583fe2c2"
+
+[ai]
+binding = "AI"
+
+[vars]
+ACCOUNT_ID = "8b1954d216d65077c6480d62583fe2c2"
+GATEWAY_ID = "sovereign-code-agent"
+
+[env.production]
+name = "sovereign-build-agent"
+
+[env.production.ai]
+binding = "AI"
+
+[env.production.vars]
+ACCOUNT_ID = "8b1954d216d65077c6480d62583fe2c2"
+GATEWAY_ID = "sovereign-code-agent"
