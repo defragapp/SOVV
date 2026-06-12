@@ -1,5 +1,13 @@
-import type { Metadata } from "next";
-import './globals.css';
+import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
+import { GeistSans } from "geist/font/sans";
+
+import "./globals.css";
+
+const jetBrainsMono = localFont({
+  src: "../public/fonts/JetBrainsMono-VariableFont.woff2",
+  variable: "--font-jetbrains-mono",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://defrag.app"),
@@ -7,32 +15,35 @@ export const metadata: Metadata = {
     default: "Sovereign.os",
     template: "%s - Sovereign.os",
   },
-  description: "A private workspace for baseline-aware pattern recognition, response practice, and saved context.",
+  description: "Sovereign.os helps you work through the patterns that keep showing up in your relationships, family, messages, grief, and boundaries — then save what you learn before the moment disappears.",
   openGraph: {
     title: "Sovereign.os",
-    description: "A private workspace for baseline-aware pattern recognition, response practice, and saved context.",
-    images: ["/social-card.svg"],
+    description: "Your Baseline Design is the source. Sovereign.os is where the work becomes yours.",
+    images: ["/social-card.png", "/social-card.svg"],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/social-card.svg"],
+    images: ["/social-card.png", "/social-card.svg"],
   },
   icons: {
-    icon: "/brand-mark.svg",
+    icon: ["/favicon.ico", "/favicon.png", "/brand-mark.svg"],
+    apple: ["/apple-touch-icon.png", "/brand-mark.svg"],
   },
+  manifest: "/manifest.json",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#000000",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="bg-background text-foreground antialiased selection:bg-white selection:text-black">
-      <body className="min-h-screen bg-background text-foreground overflow-x-hidden">
-        <header className="p-6 border-b border-white/10">
-          <span className="font-mono font-bold tracking-widest text-white">SOVEREIGN.OS</span>
-        </header>
+    <html lang="en" className={`antialiased ${jetBrainsMono.variable} ${GeistSans.variable}`}>
+      <body className="min-h-screen overflow-x-hidden bg-black text-white overscroll-none selection:bg-white/20 selection:text-white">
         {children}
       </body>
     </html>

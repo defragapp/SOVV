@@ -2,18 +2,24 @@
   "name": "@sovereign/worker",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "wrangler dev --port 8787",
     "deploy": "wrangler deploy",
-    "build": "tsc -p tsconfig.json --noEmit"
+    "build": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260515.0",
+    "@vitest/ui": "^4.1.8",
     "typescript": "^5.5.4",
+    "vitest": "^4.1.8",
     "wrangler": "^4.93.0"
   },
   "dependencies": {
-    "@sovereign/core": "0.0.1",
+    "@sovereign/core": "file:../../packages/core",
     "itty-router": "^5.0.23"
   }
 }

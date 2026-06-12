@@ -8,6 +8,8 @@
 
 **Covenant** is a space inside Sovereign.os. It is an optional faith-context reflection space. User-initiated, plain-language, and private by design.
 
+**Alignment** is a space inside Sovereign.os. It is the response integration and action choice space. It helps turn insights into actionable responses.
+
 Future spaces are added under the same Sovereign.os architecture. They do not get separate accounts, subscriptions, or Libraries.
 
 ---
@@ -50,6 +52,7 @@ Future spaces are added under the same Sovereign.os architecture. They do not ge
 |---|---|---|
 | `/apps/defrag` | Defrag space | Default space for authenticated users |
 | `/apps/covenant` | Covenant space | Optional, user-initiated |
+| `/apps/alignment` | Alignment space | Response integration and action choice |
 
 ---
 
@@ -80,3 +83,30 @@ The following internal identifiers use legacy naming but represent Baseline Desi
 | `baselineContext` | `apps/worker/src/prompt.ts` | Baseline Design context in AI prompts |
 | `baseline_loaded` | `packages/core/src/types.ts` | Whether Baseline Design is loaded in thread |
 | `workspace_source` | D1 `library` table | Identifies which space saved the Library item |
+## Forbidden Terms in User-Facing Copy
+
+| Forbidden | Use Instead |
+|---|---|
+| DEFRAG (in body copy) | Defrag |
+| Workbench | space, guided space, reflection space |
+| workspace (for spaces) | space |
+| Design (alone, user-facing) | Baseline Design |
+| Your Baseline (as product term) | Your Baseline Design |
+| "got lit up" / "lit up" (body copy) | "what is active in the moment", "active pattern", "Defrag helps surface the pattern" |
+| artifact | result, output, saved item |
+| read | see, show, surface |
+| signal | pattern, activation |
+| mirror | reflect, show |
+| field | — (avoid) |
+| rings | — (avoid) |
+| cards | — (avoid) |
+| therapy replacement | — (never use) |
+| diagnosis | — (never use) |
+| compatibility score | — (never use) |
+| trigger | activation, pattern firing |
+| trauma | — (avoid in product copy) |
+| healing | — (avoid in product copy) |
+
+**Note on "What got lit up":** This phrase may remain as a UI label in the product interface (e.g., section headers, card labels) where it functions as a named product concept. It must not appear in body copy, marketing descriptions, FAQ answers, or documentation prose. Use "active pattern" or "what is active in the moment" in those contexts.
+
+---

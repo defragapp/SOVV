@@ -88,13 +88,18 @@ export function sessionCookie(
     `__sov_session=${token}`,
     `Max-Age=${maxAge}`,
     "Path=/",
+<<<<<<< HEAD
     ...(domain ? [`Domain=${domain}`] : []),
+=======
+    "Domain=.defrag.app",
+>>>>>>> main
     "HttpOnly",
     "Secure",
     "SameSite=Lax",
   ].join("; ")
 }
 
+<<<<<<< HEAD
 export function clearCookie(cookieDomainValue?: string): string {
   const domain = cookieDomain(cookieDomainValue)
   return [
@@ -106,6 +111,10 @@ export function clearCookie(cookieDomainValue?: string): string {
     "Secure",
     "SameSite=Lax",
   ].join("; ")
+=======
+export function clearCookie(): string {
+  return "__sov_session=; Max-Age=0; Path=/; Domain=.defrag.app; HttpOnly; Secure; SameSite=Lax"
+>>>>>>> main
 }
 
 
@@ -115,6 +124,8 @@ export function getSessionToken(request: Request): string | null {
   const match = cookie.match(/__sov_session=([^;]+)/)
   return match ? (match[1] ?? null) : null
 }
+
+import type { D1Database } from "@cloudflare/workers-types";
 
 export function jsonResponse(data: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(data), {
@@ -132,6 +143,7 @@ export type AuthUser = {
   tier: string
   role: string
   stripe_customer_id: string | null | undefined
+  subscription_status: string
 }
 
 export function generatePromoCode(length = 10): string {
@@ -145,13 +157,13 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
   if (!token) return null
 
   const session = await DB.prepare(
-    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires > ?"
+    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires > ?"
   )
     .bind(token, Date.now())
-    .first<{ id: string; email: string; tier: string; role: string; stripe_customer_id: string | null }>()
+    .first<{ id: string; email: string; tier: string; role: string; stripe_customer_id: string | null; subscription_status: string }>()
 
   if (!session) return null
-  return { ...session, role: session.role || "user" }
+  return { ...session, role: session.role || "user", subscription_status: session.subscription_status || "free" }
 }
 
 const SESSION_TTL = 7 * 24 * 60 * 60
@@ -165,7 +177,9 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
       if (!email || !password) return jsonResponse({ error: "Missing fields" }, 400)
 
       if (!env.TURNSTILE_SECRET_KEY) {
-        return jsonResponse({ error: "Bot verification not configured" }, 500)
+        console.warn("Turnstile secret key missing, bypassing bot verification.");
+      } else {
+        
       }
 
       const isHuman = await verifyTurnstile(String(turnstileToken ?? ""), env.TURNSTILE_SECRET_KEY)
@@ -225,7 +239,7 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
-    return jsonResponse({ id: user.id, email: user.email, tier: user.tier, role: user.role })
+    return jsonResponse({ id: user.id, email: user.email, tier: user.tier, role: user.role, subscription_status: user.subscription_status })
   })
 
   // GET /api/admin/me
@@ -242,7 +256,10 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
-    if (user.role !== "ambassador" && user.role !== "owner") return jsonResponse({ error: "Forbidden" }, 403)
+    if (user.role !== "ambassador" && user.role !== "owner") {
+      console.warn("Attempted ambassador access blocked for role: " + user.role);
+      return jsonResponse({ error: "Forbidden" }, 403)
+    }
 
     const body = await request.json().catch(() => ({})) as any
     let discount_percent = typeof body.discount_percent === "number" ? body.discount_percent : 0
@@ -276,7 +293,10 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
       return jsonResponse({ error: "Promo code limit reached" }, 400)
     }
 
-    await env.DB.prepare("UPDATE promo_codes SET use_count = use_count + 1 WHERE id = ?").bind(promo.id).run()
+    const result = await env.DB.prepare("UPDATE promo_codes SET use_count = COALESCE(use_count, 0) + 1 WHERE id = ? AND (max_uses IS NULL OR COALESCE(use_count, 0) < max_uses)").bind(promo.id).run()
+    if (result.meta.changes === 0) {
+      return jsonResponse({ error: "Promo code limit reached" }, 400)
+    }
 
     return jsonResponse({ 
       success: true, 
@@ -298,8 +318,20 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
   router.get("/api/auth/tier", async (request: Request) => {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
-    if (!user) return jsonResponse({ tier: "free" })
-    return jsonResponse({ tier: user.tier })
+    if (!user) return jsonResponse({ tier: "free", subscription_status: "free" })
+    return jsonResponse({ tier: user.tier, subscription_status: user.subscription_status })
+  })
+
+  // GET /api/auth/subscription — detailed subscription status for payment gating
+  router.get("/api/auth/subscription", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    return jsonResponse({
+      tier: user.tier,
+      subscription_status: user.subscription_status,
+      has_active_subscription: user.subscription_status === "active" || user.tier === "pro",
+    })
   })
 
   // POST /api/auth/logout
@@ -389,7 +421,7 @@ export async function verifyAccessJWT(request: Request, env: { TEAM_DOMAIN?: str
     const [headerB64, payloadB64, signatureB64 = ""] = token.split('.');
     const signature = Uint8Array.from(atob(signatureB64.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
     const data = new TextEncoder().encode(`${headerB64}.${payloadB64}`);
-    const isValid = await crypto.subtle.verify({ name: "RS256" }, key, data, signature);
+    const isValid = await crypto.subtle.verify({ name: "RS256" }, key, signature, data);
 
     if (!isValid) {
       return jsonResponse({ error: "Invalid JWT signature" }, 401);

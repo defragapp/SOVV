@@ -1,11 +1,12 @@
 name = "sovereign-os-api"
-main = "src/index.ts"
-compatibility_date = "2026-06-04"
+main = "./src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
 account_id = "8b1954d216d65077c6480d62583fe2c2"
 workers_dev = false
 
 [[routes]]
-pattern = "api.defrag.app"
+pattern = "api.defrag.app/*"
 custom_domain = true
 
 [[d1_databases]]
@@ -47,6 +48,13 @@ simple = { limit = 15, period = 60 }
 [vars]
 FREE_DAILY_LIMIT = "15"
 AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
+
+# send_email binding — Cloudflare Email Routing (verified destination: info@defrag.app)
+# Email Routing is active on defrag.app. Destination address verified.
+# Sender must be from defrag.app domain.
+[[email]]
+name = "EMAIL"
+destination_address = "info@defrag.app"
 
 [observability]
 enabled = true

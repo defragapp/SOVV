@@ -1,41 +1,58 @@
+import type { Metadata } from "next";
 import { SiteShell } from "@/components/marketing/site-shell";
 import { PageHero } from "@/components/marketing/page-hero";
 import { MotionSection } from "@/components/marketing/motion-section";
+import { FadeUp } from "@/components/ui/fade-up";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "About — Sovereign.os",
+  description: "Sovereign.os is a private place to work through the patterns that keep showing up in your relationships, family, messages, grief, and boundaries.",
+};
 
 export default function AboutPage() {
   return (
     <SiteShell>
       <PageHero
         eyebrow="About"
-        title="Built for real moments."
-        body="Defrag helps people understand repeating patterns without turning the product into therapy, diagnosis, or generic advice."
+        title="Before you explain yourself again, return to yourself first."
+        body="Not for abstract self-improvement. For the specific, real, sometimes difficult moments of actual life."
       />
 
-      <MotionSection className="px-6 py-24">
-        <div className="mx-auto max-w-2xl space-y-8 text-base leading-8 text-white/50">
-          <p>
-            Sovereign.os is a private platform for relational intelligence. Defrag is the space inside it for working through what is active right now — the pattern, the loop, the response that gives the moment a better chance.
-          </p>
-          <p>
-            Most people do not need more noise. They need a cleaner way to understand what is active, what is repeating, and what response is most likely to keep things grounded.
-          </p>
-          <p>
-            The product is designed to be private, direct, and useful. It is not a personality test, a mood tracker, or a substitute for professional support.
-          </p>
-          <p>
-            The goal is simple: show the pattern clearly enough that the next move is easier to make.
-          </p>
-        </div>
+      <MotionSection className="section-gap container-narrow">
+        <FadeUp>
+          <div className="space-y-8 text-body text-foreground-muted">
+            <p>
+              Sovereign.os is a private place to work through the patterns that keep showing up in your life. The message that unsettled you. The family role you keep falling back into. The boundary you keep negotiating with yourself. The grief that changes the room. The relationship dynamic you can feel, but cannot fully name.
+            </p>
+            <p>
+              It gives those moments structure — without turning them into a diagnosis, a score, or a verdict.
+            </p>
+            <p>
+              The product is designed to be private, direct, and useful. It does not diagnose, predict, or guarantee outcomes. Healing is not becoming untouched. It is becoming harder to move away from yourself.
+            </p>
+            <div className="border-t border-border pt-8 mt-12">
+              <p className="text-body font-sans font-medium uppercase tracking-widest text-foreground-disabled">
+                The wound is real. So is the choice after it.
+              </p>
+            </div>
+          </div>
+        </FadeUp>
       </MotionSection>
-
-      <MotionSection className="border-t border-white/8 px-6 py-24 text-center">
-        <Link
-          href="https://app.defrag.app/login"
-          className="inline-block border border-white/20 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-white/5 transition-colors"
-        >
-          Start Your Baseline Design
-        </Link>
+      
+      <MotionSection className="section-gap border-t border-border bg-hero-glow">
+        <div className="container-platform text-center max-w-2xl mx-auto">
+          <FadeUp>
+            <h2 className="text-headline mb-8">
+              Healing isn’t optional.<br/>Holding the pain is.
+            </h2>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="https://app.defrag.app/app/login" className="btn-primary">
+                Enter Sovereign.os
+              </Link>
+            </div>
+          </FadeUp>
+        </div>
       </MotionSection>
     </SiteShell>
   );

@@ -78,5 +78,12 @@ packages/core/page.tsx
 
 # Unused core data files (not exported from packages/core/src/index.ts)
 packages/core/src/geneKeyMeanings.ts
-packages/core/src/geneKeys.ts.wrangler/
+packages/core/src/geneKeys.ts
+packages/core/src/geneKeyMeanings.ts
 .wrangler/
+.dev.vars
+# Local environment
+.dev.vars
+.env
+.env.local
+.env.production

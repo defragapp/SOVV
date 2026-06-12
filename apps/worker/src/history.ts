@@ -3,6 +3,7 @@ import { getSessionId, cookieHeader } from "./plan";
 import type { Interaction } from "@sovereign/core";
 import { getAuthUser, verifyAccessJWT } from "./auth";
 import { mapInteraction, type InteractionRow } from "./db";
+import { requireActiveSubscription } from "./billing";
 
 async function requireSessionAuth(req: Request, env: Env): Promise<Response | null> {
   const user = await getAuthUser(req, env.DB);
@@ -15,6 +16,12 @@ export async function handleHistory(req: Request, env: Env) {
   if (authResponse) {
     return authResponse;
   }
+
+  const user = await getAuthUser(req, env.DB);
+
+  // Subscription gate for space route
+  const subGate = await requireActiveSubscription(user, req);
+  if (subGate) return subGate;
 
   const sid = await getSessionId(req);
   if (!sid) {
@@ -43,9 +50,119 @@ export async function handleHistory(req: Request, env: Env) {
   }
 }
 
+export async function handleSaveToLibrary(req: Request, env: Env) {
+  const user = await getAuthUser(req, env.DB);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  // Subscription gate for space route
+  const subGate = await requireActiveSubscription(user, req);
+  if (subGate) return subGate;
+
+  try {
+    const body = await req.json().catch(() => ({})) as any;
+    const { title, content, payload, workspace_source } = body;
+
+    if (typeof title !== "string" || typeof workspace_source !== "string") {
+       return new Response("Invalid or missing required fields", { status: 400 });
+    }
+    if (!["DEFRAG", "COVENANT", "ALIGNMENT"].includes(workspace_source)) {
+       return new Response("Invalid workspace source", { status: 400 });
+    }
+
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+
+    await env.DB.prepare(
+      "INSERT INTO library (id, user_id, title, payload, workspace_source, created_at) VALUES (?, ?, ?, ?, ?, ?)"
+    )
+    .bind(id, user.id, title, payload ? JSON.stringify(payload) : null, workspace_source, now)
+    .run();
+
+    return Response.json({ success: true, id });
+  } catch (e) {
+    console.error("Failed to save to library", String(e));
+    return new Response("Internal Server Error", { status: 500 });
+  }
+}
+
+
+export async function handleGetLibrary(req: Request, env: Env) {
+  const user = await getAuthUser(req, env.DB);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const url = new URL(req.url);
+  const limit = Math.min(parseInt(url.searchParams.get("limit") || "20", 10), 50);
+  const offset = parseInt(url.searchParams.get("offset") || "0", 10);
+
+  try {
+    const { results } = await env.DB.prepare(
+      "SELECT * FROM library WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?"
+    )
+    .bind(user.id, limit, offset)
+    .all();
+
+    return Response.json({ items: results || [] });
+  } catch (e) {
+    console.error("Failed to fetch library", String(e));
+    return Response.json({ items: [] });
+  }
+}
+
+
+export async function handleGetLibraryItem(req: Request, env: Env) {
+  const user = await getAuthUser(req, env.DB);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const url = new URL(req.url);
+  const segments = url.pathname.split('/');
+  const id = segments[segments.length - 1]; // /api/library/:id
+
+  if (!id) {
+    return new Response("Missing ID", { status: 400 });
+  }
+
+  try {
+    const item = await env.DB.prepare(
+      "SELECT * FROM library WHERE id = ? AND user_id = ?"
+    )
+    .bind(id, user.id)
+    .first();
+
+    if (!item) {
+      return new Response("Not found", { status: 404 });
+    }
+
+    return Response.json(item);
+  } catch (e) {
+    console.error("Failed to fetch library item", String(e));
+    return new Response("Internal error", { status: 500 });
+  }
+}
+
 export function registerHistoryRoute(router: any, getEnv: () => Env) {
   router.get("/api/history", async (req: Request) => {
     const env = getEnv();
     return handleHistory(req, env);
+  });
+
+  router.get("/api/library", async (req: Request) => {
+    const env = getEnv();
+    return handleGetLibrary(req, env);
+  });
+
+  router.get("/api/library/:id", async (req: Request) => {
+    const env = getEnv();
+    return handleGetLibraryItem(req, env);
+  });
+
+  router.post("/api/history", async (req: Request) => {
+    const env = getEnv();
+    return handleSaveToLibrary(req, env);
   });
 }

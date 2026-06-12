@@ -1,208 +1,184 @@
 "use client"
+import * as React from "react"
+import { SpaceShell } from "@/components/spaces/space-shell"
+import { Button } from "@/components/ui/button"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import type { Tier } from "@/components/workspace/types"
+export default function CovenantPage() {
+  const [input, setInput] = React.useState("")
+  const [result, setResult] = React.useState<any>(null)
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [error, setError] = React.useState("")
 
-// Covenant space — optional faith-context reflection space inside Sovereign.os
-// Shares auth, Baseline Design, Library, and subscription with Defrag and all spaces.
-// Saves outputs to library with workspace_source: "COVENANT".
-
-export default function CovenantSpacePage() {
-  const router = useRouter()
-  const [tier, setTier] = useState<Tier | null>(null)
-  const [moment, setMoment] = useState("")
-  const [result, setResult] = useState<Record<string, string> | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [saved, setSaved] = useState(false)
-
-  useEffect(() => {
-    // Verify auth and tier — shared with all spaces
-    fetch("/api/auth/tier", { credentials: "include" })
-      .then((res) => {
-        if (res.status === 401) {
-          router.push("/app/login")
-          return null
-        }
-        return res.ok ? res.json() : { tier: "free" }
-      })
-      .then((data) => { if (data) setTier(data.tier) })
-      .catch(() => router.push("/app/login"))
-  }, [router])
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!moment.trim()) return
-    setLoading(true)
-    setError(null)
+  const handleCovenant = async () => {
+    if (!input.trim()) return
+    setIsLoading(true)
+    setError("")
     setResult(null)
-    setSaved(false)
-
     try {
       const res = await fetch("/api/covenant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ moment }),
+        body: JSON.stringify({ moment: input })
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || "Something went wrong.")
-      const parsed = typeof data.result === "string" ? JSON.parse(data.result) : data.result
-      setResult(parsed)
+      if (!res.ok) {
+        throw new Error(data.error || data.message || "Failed to process")
+      }
+      setResult(data)
     } catch (err: any) {
-      setError(err.message || "Unable to reach Covenant space.")
+      setError(err.message || "An error occurred.")
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
-  async function handleSave() {
-    if (!result) return
-    try {
-      const res = await fetch("/api/history", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          workspace_source: "COVENANT",
-          title: moment.slice(0, 80),
-          payload: result,
-        }),
-      })
-      if (res.ok) setSaved(true)
-    } catch {
-      // silent — save is best-effort
-    }
-  }
+  const sidebarContent = (
+    <div className="flex flex-col h-full bg-surface">
+      <div className="px-6 py-5 border-b border-border">
+        <h3 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em]">Covenant Briefs</h3>
+      </div>
+      <div className="flex-1 px-6 py-8">
+        <p className="text-xs font-sans font-medium text-[#71717A] leading-relaxed max-w-[180px]">
+          Save useful Results here so you can return before the old pattern takes over again.
+        </p>
+      </div>
+    </div>
+  )
 
-  if (tier === null) {
+  const contextContent = (
+    <div className="flex flex-col gap-0 h-full bg-surface border-l border-border">
+      <div className="px-6 py-5 border-b border-border">
+        <h3 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em]">Context</h3>
+      </div>
+      <div className="p-6 flex flex-col gap-6">
+        <div className="border border-border bg-surface p-5 flex flex-col gap-2">
+          <p className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em]">Baseline Design</p>
+          <p className="text-xs text-[#A1A1AA] leading-relaxed">
+            Your Baseline Design gives the system context before you describe this moment.
+          </p>
+        </div>
+        <div className="border border-border bg-surface p-5 flex flex-col gap-2 opacity-40">
+          <p className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em]">Save to Sovereign</p>
+          <p className="text-xs text-[#A1A1AA]">Requires Pro</p>
+        </div>
+      </div>
+    </div>
+  )
+
+  const mainInputArea = (
+    <div className="flex flex-col h-full justify-end gap-8 pt-4 pb-0 max-w-4xl mx-auto w-full">
+      <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 max-w-md mx-auto opacity-50">
+        <div className="w-12 h-12 border border-border flex items-center justify-center">
+          <svg className="w-5 h-5 text-[#A1A1AA]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+        </div>
+        <div className="gap-3 flex flex-col">
+          <h2 className="text-[20px] font-medium text-[#FAFAFA] tracking-tight">Faith-context reflection</h2>
+          <p className="text-[13px] text-[#A1A1AA] font-sans font-medium leading-relaxed">
+            Connect your current moment to grounded reflection.
+          </p>
+        </div>
+      </div>
+
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 mb-4 font-sans font-medium">
+          {error}
+        </div>
+      )}
+
+      <div className="border border-border bg-surface focus-within:border-border transition-colors duration-200 shadow-2xl">
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Describe the moment or pressure..."
+          className="w-full bg-transparent text-[#FAFAFA] placeholder:text-[#3F3F46] resize-none outline-none min-h-[140px] text-sm p-5 leading-[1.75] font-sans font-medium"
+        />
+        <div className="flex justify-between items-center px-5 py-4 border-t border-border bg-surface">
+          <span className="text-[10px] text-[#71717A] font-sans font-medium tracking-[0.15em] uppercase">ENTER TO REFLECT</span>
+          <Button
+            size="sm"
+            onClick={handleCovenant}
+            disabled={!input.trim() || isLoading}
+            className="rounded-none border border-border bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9 px-6 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+          >
+            {isLoading ? "Running..." : "Reflect"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderSection = (title: string, content: any) => {
+    if (!content) return null;
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-white/30">Loading...</span>
+      <div className="border-b border-border pb-8 mb-8 last:border-0 last:pb-0 last:mb-0">
+        <h4 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em] mb-4">{title}</h4>
+        <p className="text-[14px] text-[#FAFAFA] font-sans font-medium leading-[1.75] whitespace-pre-wrap">{String(content)}</p>
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-black text-[#F6F5F3] flex flex-col">
-      {/* Header */}
-      <header className="flex h-10 shrink-0 items-center justify-between border-b border-[#F6F5F3]/10 px-4">
-        <div className="flex items-center gap-4">
-          <span className="font-mono text-xs uppercase tracking-widest text-white/40">
-            Sovereign.os
-          </span>
-          <span className="font-mono text-[9px] uppercase tracking-widest text-white/20">
-            / Covenant space
-          </span>
+  const mainResultArea = (
+    <div className="h-full flex flex-col max-w-4xl mx-auto w-full">
+      {!result ? (
+        <div className="flex-1 flex items-center justify-center border border-border bg-surface p-8 text-center min-h-[240px]">
+          <p className="text-[13px] text-[#A1A1AA] font-sans font-medium leading-relaxed max-w-[280px]">
+            The Covenant space is ready visually, but its backend route is not connected yet.
+          </p>
         </div>
-        <div className="flex items-center gap-4">
-          {tier === "pro" && (
-            <span className="font-mono text-[9px] uppercase tracking-widest text-white/25 border border-white/10 px-2 py-0.5">
-              Pro
-            </span>
-          )}
-          <button
-            onClick={() => router.push("/apps/defrag")}
-            className="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-[#F6F5F3]"
-          >
-            Defrag space
-          </button>
-          <form action="/api/auth/logout" method="POST">
-            <button
-              type="submit"
-              className="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-[#F6F5F3]"
-            >
-              Logout
-            </button>
-          </form>
+      ) : (
+        <div className="flex-1 overflow-y-auto border border-border bg-surface p-8 md:p-12 shadow-xl">
+           {renderSection("Moment feels like", result.moment_feels_like)}
+           {renderSection("Story Connection", result.story_connection)}
+           {renderSection("Reflection Prompt", result.reflection_prompt)}
+           {renderSection("Next Step", result.next_step)}
         </div>
-      </header>
-
-      <main className="flex-1 flex flex-col items-center justify-start px-6 py-16 max-w-2xl mx-auto w-full">
-        <div className="w-full space-y-8">
-          <div className="space-y-2">
-            <p className="font-mono text-[9px] uppercase tracking-widest text-white/25">
-              Covenant — reflection space
-            </p>
-            <h1 className="text-2xl font-light text-white">
-              What are you walking through?
-            </h1>
-            <p className="text-sm text-white/40 leading-7">
-              Bring the moment here. Covenant will connect it to a faith-based theme and offer a grounded reflection — not preaching, not pressure.
-            </p>
-            <p className="text-xs text-white/25 font-mono uppercase tracking-widest">
-              Uses your shared Baseline Design and saves to your Sovereign.os Library.
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <textarea
-              value={moment}
-              onChange={(e) => setMoment(e.target.value)}
-              placeholder="Describe what is happening..."
-              rows={5}
-              className="w-full bg-transparent border border-[#F6F5F3]/10 px-4 py-3 text-sm text-[#F6F5F3] placeholder-white/20 focus:outline-none focus:border-[#F6F5F3]/30 resize-none"
-            />
-            <button
-              type="submit"
-              disabled={loading || !moment.trim()}
-              className="border border-[#F6F5F3]/20 px-6 py-3 font-mono text-[10px] uppercase tracking-widest text-[#F6F5F3] hover:bg-white/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              {loading ? "Reflecting..." : "Bring it to Covenant"}
-            </button>
-          </form>
-
-          {error && (
-            <p className="font-mono text-[9px] uppercase tracking-widest text-red-400/70">{error}</p>
-          )}
-
-          {result && (
-            <div className="space-y-6 border-t border-[#F6F5F3]/10 pt-8">
-              {result.moment_feels_like && (
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/25 mb-2">The moment</p>
-                  <p className="text-sm leading-7 text-white/70">{result.moment_feels_like}</p>
-                </div>
-              )}
-              {result.story_connection && (
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/25 mb-2">A connection</p>
-                  <p className="text-sm leading-7 text-white/70">{result.story_connection}</p>
-                </div>
-              )}
-              {result.reflection_prompt && (
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/25 mb-2">Carry this</p>
-                  <p className="text-sm leading-7 text-white/60 italic">{result.reflection_prompt}</p>
-                </div>
-              )}
-              {result.next_step && (
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/25 mb-2">One step</p>
-                  <p className="text-sm leading-7 text-white/70">{result.next_step}</p>
-                </div>
-              )}
-
-              <div className="pt-4 flex items-center gap-4">
-                <button
-                  onClick={handleSave}
-                  disabled={saved}
-                  className="border border-[#F6F5F3]/15 px-4 py-2 font-mono text-[9px] uppercase tracking-widest text-white/50 hover:text-white/80 hover:border-[#F6F5F3]/30 transition-colors disabled:opacity-30"
-                >
-                  {saved ? "Saved to Library" : "Save to Sovereign.os Library"}
-                </button>
-                <button
-                  onClick={() => { setResult(null); setMoment(""); setSaved(false) }}
-                  className="font-mono text-[9px] uppercase tracking-widest text-white/25 hover:text-white/50 transition-colors"
-                >
-                  New reflection
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
+      )}
     </div>
+  )
+
+  const mobileTabs = [
+    { id: "input", label: "Input", content: mainInputArea },
+    {
+      id: "result",
+      label: "Brief",
+      content: (
+
+        <div className="flex flex-col gap-6 p-4">
+          <div className="border-b border-border pb-6">
+            <p className="text-[10px] font-sans font-medium text-[#3F3F46] uppercase tracking-[0.2em] mb-4">The Story in Plain Language</p>
+            <p className="text-sm text-[#FAFAFA] font-sans font-medium leading-relaxed">The desire to fix it immediately is bypassing the need for actual repair. True repair requires waiting for the other person to be ready to hear it.</p>
+          </div>
+          <div className="border-b border-border pb-6">
+            <p className="text-[10px] font-sans font-medium text-[#3F3F46] uppercase tracking-[0.2em] mb-4">The Scripture Connection</p>
+            <p className="text-sm text-[#FAFAFA] font-sans font-medium leading-relaxed opacity-80">&quot;Let every person be quick to hear, slow to speak, slow to anger.&quot;<br/>— James 1:19</p>
+          </div>
+          <div>
+            <p className="text-[10px] font-sans font-medium text-[#3F3F46] uppercase tracking-[0.2em] mb-4">One Grounded Response</p>
+            <p className="text-sm text-[#FAFAFA] font-sans font-medium leading-relaxed">Wait. When the time is right, take responsibility for your part without expecting them to fix theirs.</p>
+          </div>
+        </div>
+
+      )
+    },
+    { id: "context", label: "Context", content: contextContent }
+  ]
+
+  const desktopMain = (
+    <div className="flex flex-col h-full gap-8">
+       <div className="flex-none">{mainInputArea}</div>
+       <div className="flex-1 min-h-0">{mainResultArea}</div>
+    </div>
+  )
+
+  return (
+    <SpaceShell
+      spaceName="Covenant"
+      sidebar={sidebarContent}
+      main={desktopMain}
+      contextPanel={contextContent}
+      mobileTabs={mobileTabs}
+    />
   )
 }

@@ -1,5 +1,6 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
+import { requireActiveSubscription } from "./billing.js";
 
 const SYSTEM_COVENANT = `You are Covenant, an optional faith-context reflection space inside Sovereign.os.
 Your role is to help the user understand what they are walking through by connecting their moment to faith-based themes and reflection.
@@ -20,6 +21,10 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
     if (!user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
+
+    // Subscription gate: Covenant requires active subscription
+    const subGate = await requireActiveSubscription(user, request);
+    if (subGate) return subGate;
 
     try {
       const body = await request.json().catch(() => ({})) as any;

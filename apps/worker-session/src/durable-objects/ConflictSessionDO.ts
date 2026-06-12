@@ -42,7 +42,8 @@ export class ConflictSessionDO extends DurableObject<Env> {
       }
 
       const pair = new WebSocketPair();
-      const [client, server] = Object.values(pair);
+      const client = pair[0] as WebSocket;
+      const server = pair[1] as WebSocket;
 
       this.ctx.acceptWebSocket(server, [userId]);
       server.serializeAttachment({ userId } as WebSocketAttachment);
@@ -131,7 +132,7 @@ export class ConflictSessionDO extends DurableObject<Env> {
 
   private broadcastShared(message: string): void {
     for (const ws of this.ctx.getWebSockets()) {
-      if (ws.readyState === WebSocket.READY_STATE_OPEN) {
+      if (ws.readyState === WebSocket.OPEN) {
         ws.send(message);
       }
     }
@@ -140,7 +141,7 @@ export class ConflictSessionDO extends DurableObject<Env> {
   private sendPrivate(userId: string, message: string): void {
     const sockets = this.ctx.getWebSockets(userId);
     for (const ws of sockets) {
-      if (ws.readyState === WebSocket.READY_STATE_OPEN) {
+      if (ws.readyState === WebSocket.OPEN) {
         ws.send(message);
       }
     }

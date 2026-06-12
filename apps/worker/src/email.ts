@@ -32,6 +32,7 @@ interface EmailPayload {
  * Requires Email Routing destination to be verified in Cloudflare dashboard.
  * Binding name: EMAIL (declared in wrangler.toml [[send_email]] once configured).
  */
+<<<<<<< HEAD
 async function sendViaBinding(
   emailBinding: SendEmail,
   payload: EmailPayload,
@@ -41,6 +42,10 @@ async function sendViaBinding(
   const message = {
     from: FROM,
     to: payload.to,
+=======
+async function sendViaBinding(emailBinding: SendEmail, payload: EmailPayload): Promise<void> {
+  const message = new (globalThis as any).EmailMessage(FROM, payload.to, {
+>>>>>>> main
     headers: {
       Subject: payload.subject,
       "Reply-To": REPLY_TO,

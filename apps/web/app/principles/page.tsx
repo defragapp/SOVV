@@ -44,11 +44,11 @@ export default function PrinciplesPage() {
         body="The values that shape how Sovereign.os and Defrag are built and how they work."
       />
 
-      <MotionSection className="px-6 py-24">
-        <div className="mx-auto max-w-3xl divide-y divide-white/8">
+      <MotionSection className="section-gap container-platform">
+        <div className="mx-auto max-w-3xl divide-y divide-border">
           {principles.map((p) => (
             <div key={p.num} className="flex gap-8 py-10">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-white/20 shrink-0 mt-1">
+              <span className="font-sans font-medium text-[10px] uppercase tracking-widest text-white/20 shrink-0 mt-1">
                 {p.num}
               </span>
               <div>

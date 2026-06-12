@@ -47,9 +47,15 @@ export interface EmailJob {
  * Called from the queue handler in apps/worker/src/index.ts.
  */
 export async function processEmailJob(job: EmailJob, env: Env): Promise<void> {
+<<<<<<< HEAD
   const opts = {
     ...(env.EMAIL ? { emailBinding: env.EMAIL } : {}),
     ...(env.RESEND_API_KEY ? { resendApiKey: env.RESEND_API_KEY } : {}),
+=======
+  const opts: any = {
+    emailBinding: env.EMAIL,
+    resendApiKey: env.RESEND_API_KEY,
+>>>>>>> main
   };
 
   const hasEmailProvider =

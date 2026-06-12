@@ -47,17 +47,16 @@
 
 ## Cloudflare Pages — PROHIBITED for product runtime
 
-The `sovv-platform` Pages project **must be deleted** after Worker routes are confirmed.
+The `sovv-platform` Pages project has been **deleted**. DNS records now point to Workers.
 
-**Required dashboard actions:**
-1. Pages → `sovv-platform` → Custom Domains → Remove `defrag.app`
-2. Pages → `sovv-platform` → Custom Domains → Remove `www.defrag.app`
-3. DNS → Delete CNAME `defrag.app` → `sovv-platform.pages.dev`
-4. DNS → Delete CNAME `www.defrag.app` → `sovv-platform.pages.dev`
-5. DNS → Add proxied A record: `defrag.app` → `192.0.2.1`
-6. DNS → Add proxied A record: `www.defrag.app` → `192.0.2.1`
-7. Verify `sovv-web` Worker serves both domains
-8. Delete `sovv-platform` Pages project
+**Current DNS state (verified):**
+- `defrag.app` → AAAA `100::` (proxied, Worker) ✅
+- `www.defrag.app` → AAAA `100::` (proxied, Worker) ✅
+- `app.defrag.app` → AAAA `100::` (proxied, Worker) ✅
+- `sovereign.defrag.app` → AAAA `100::` (proxied, Worker) ✅
+- `api.defrag.app` → AAAA `100::` (proxied, Worker) ✅
+
+If a Pages project reappears, remove it immediately and restore DNS to Worker records.
 
 ---
 

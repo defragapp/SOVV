@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { motion } from "framer-motion";
 
 export function PageHero({
   eyebrow,
@@ -12,23 +15,61 @@ export function PageHero({
   children?: ReactNode;
 }) {
   return (
-    <div className="relative grid-bg border-b border-white/8 px-6 py-28 text-center sm:py-36">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#05070B] via-transparent to-[#05070B] pointer-events-none" />
-      <div className="relative mx-auto max-w-3xl">
+    <div className="relative overflow-hidden section-gap border-b border-border bg-background">
+      {/* Background Subtle Gradient */}
+      <div className="absolute inset-0 z-0 bg-hero-glow opacity-50" />
+      
+      {/* Background Grid Pattern */}
+      <div 
+        className="absolute inset-0 z-0 opacity-20 pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+      
+      <div className="relative z-10 container-narrow text-center">
         {eyebrow && (
-          <p className="mb-4 text-xs uppercase tracking-[0.28em] text-white/40">
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="text-label mb-6"
+          >
             {eyebrow}
-          </p>
+          </motion.p>
         )}
-        <h1 className="hero-glow text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl leading-tight">
+        
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="text-headline mb-6"
+        >
           {title}
-        </h1>
+        </motion.h1>
+        
         {body && (
-          <p className="mt-6 text-base leading-relaxed text-white/50 sm:text-lg max-w-xl mx-auto">
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="text-body max-w-2xl mx-auto"
+          >
             {body}
-          </p>
+          </motion.p>
         )}
-        {children && <div className="mt-10">{children}</div>}
+        
+        {children && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-10"
+          >
+            {children}
+          </motion.div>
+        )}
       </div>
     </div>
   );

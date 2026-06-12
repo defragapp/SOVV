@@ -2,105 +2,99 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { navItems, footerItems } from "@/data/marketing";
+import { Menu, X } from "lucide-react";
+
+const NAV_LINKS = [
+  { href: "/product", label: "Product" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/covenant", label: "Covenant" },
+];
+
+const FOOTER_LINKS = [
+  { href: "/about", label: "About" },
+  { href: "/product", label: "Product" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/covenant", label: "Covenant" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+  { href: "/contact", label: "Contact" },
+];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="fixed top-0 z-50 w-full border-b border-white/8 glass">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link
-            href="/"
-            className="font-mono text-xs uppercase tracking-[0.3em] text-white/80 hover:text-white transition-colors"
-          >
+    <div className="min-h-[100dvh] flex flex-col bg-background text-foreground font-sans">
+      <header className="fixed top-0 left-0 right-0 z-50 h-16 surface-glass border-b border-border">
+        <div className="container-platform h-full flex items-center justify-between">
+          <Link href="/" className="text-label text-foreground hover:text-white transition-colors font-medium">
             SOVEREIGN.OS
           </Link>
 
-          <nav className="hidden items-center gap-8 md:flex">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-white/80 transition-colors duration-200"
-              >
+          <nav className="hidden md:flex items-center gap-8">
+            {NAV_LINKS.map(item => (
+              <Link key={item.href} href={item.href} className="text-body-sm text-foreground-muted hover:text-white transition-colors">
                 {item.label}
               </Link>
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-4">
-            <Link
-              href="https://app.defrag.app/login"
-              className="font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-white/70 transition-colors"
-            >
-              Sign In
+          <div className="flex items-center gap-4">
+            <Link href="https://app.defrag.app/app/login" className="hidden sm:block text-body-sm text-foreground-disabled hover:text-white transition-colors">
+              Sign in
             </Link>
-            <Link
-              href="https://app.defrag.app/login"
-              className="border border-white/20 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-white/5 transition-colors"
-            >
-              Get Started
+            <Link href="https://app.defrag.app/app/login" className="btn-primary py-2 px-5 text-sm hidden sm:inline-flex">
+              Enter
             </Link>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden text-foreground-muted hover:text-white transition-colors p-2"
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
-
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden font-mono text-[10px] uppercase tracking-widest text-white/40"
-          >
-            {menuOpen ? "Close" : "Menu"}
-          </button>
         </div>
 
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="overflow-hidden border-t border-white/8 bg-[#05070B] md:hidden"
-            >
-              <nav className="flex flex-col px-6 py-6 gap-5">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMenuOpen(false)}
-                    className="font-mono text-[10px] uppercase tracking-widest text-white/50 hover:text-white transition-colors"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                <Link
-                  href="https://app.defrag.app/login"
-                  onClick={() => setMenuOpen(false)}
-                  className="mt-2 border border-white/20 px-4 py-3 font-mono text-[10px] uppercase tracking-widest text-white text-center hover:bg-white/5 transition-colors"
+        {menuOpen && (
+          <div className="md:hidden surface-glass border-t border-border p-6 shadow-2xl">
+            <nav className="flex flex-col gap-6">
+              {NAV_LINKS.map(item => (
+                <Link 
+                  key={item.href} 
+                  href={item.href} 
+                  onClick={() => setMenuOpen(false)} 
+                  className="text-body text-foreground-muted hover:text-white transition-colors"
                 >
-                  Get Started
+                  {item.label}
                 </Link>
-              </nav>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              ))}
+              <Link 
+                href="https://app.defrag.app/app/login" 
+                onClick={() => setMenuOpen(false)} 
+                className="btn-primary justify-center mt-4 py-3"
+              >
+                Enter Sovereign.os
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
-      <main className="flex-1 pt-[65px]">{children}</main>
+      <main className="flex-1 pt-16">
+        {children}
+      </main>
 
-      <footer className="border-t border-white/8 px-6 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/25">
-            Sovereign.os
-          </p>
-          <div className="flex flex-wrap items-center gap-5">
-            {footerItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="font-mono text-[10px] uppercase tracking-widest text-white/35 hover:text-white/70 transition-colors"
-              >
+      <footer className="border-t border-border bg-background py-16">
+        <div className="container-platform flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-foreground-disabled">
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <span className="text-label text-foreground-disabled">SOVEREIGN.OS</span>
+            <span className="text-micro text-foreground-disabled opacity-60">Defrag · Covenant · Baseline Design · Library</span>
+          </div>
+          <div className="flex flex-wrap justify-center gap-6">
+            {FOOTER_LINKS.map(item => (
+              <Link key={item.href} href={item.href} className="text-micro text-foreground-disabled hover:text-white transition-colors">
                 {item.label}
               </Link>
             ))}

@@ -2,9 +2,10 @@
 // Runs via ctx.waitUntil after the response is sent
 import type { D1Database, Ai } from "@cloudflare/workers-types";
 import type { Env } from "./types-env.js";
-import { getRecentInteractions, upsertPattern, getPatterns } from "./db.js";
-import { verifyAccessJWT } from "./auth.js";
+import { getRecentInteractions, upsertPatterns, getPatterns } from "./db.js";
+import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import { getSessionId, cookieHeader } from "./plan.js";
+import { requireActiveSubscription } from "./billing.js";
 
 export interface Pattern {
   type: "trigger" | "dynamic" | "defense" | "repetition" | "growth";
@@ -64,18 +65,17 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
     const ai = JSON.parse(text);
     const patterns: Pattern[] = ai.patterns || [];
 
-    // 3. Commit elements atomic to DB
-    for (const pattern of patterns) {
-      await upsertPattern(env.DB, {
-        id: `pat_${crypto.randomUUID().replace(/-/g, "")}`,
-        session_id: sessionId,
-        pattern_type: pattern.type ?? "repetition",
-        content: pattern.content ?? "",
-        source_interaction_ids: [newInteractionId],
-        confidence: pattern.confidence ?? "Low",
-        verified: 0,
-      });
-    }
+    // 3. Commit elements atomic to DB via batch
+    const patternPayloads = patterns.map((pattern) => ({
+      id: `pat_${crypto.randomUUID().replace(/-/g, "")}`,
+      session_id: sessionId,
+      pattern_type: pattern.type ?? "repetition",
+      content: pattern.content ?? "",
+      source_interaction_ids: [newInteractionId],
+      confidence: pattern.confidence ?? "Low",
+      verified: 0,
+    }));
+    await upsertPatterns(env.DB, patternPayloads);
     console.log(`[Queue] Successfully stored ${patterns.length} isolated tracks.`);
   } catch (err) {
     console.error("[Queue] Inference pipeline execution failure:", err);
@@ -87,7 +87,13 @@ export function registerPatternsRoutes(router: any, getEnv: () => Env) {
   router.get("/api/patterns", async (request: Request) => {
     const env = getEnv();
     
-    // Check session via cookies first, fallback to Auth header
+    // Check session via cookies first
+    const user = await getAuthUser(request, env.DB);
+
+    // Subscription gate for workspace route
+    const subGate = await requireActiveSubscription(user, request);
+    if (subGate) return subGate;
+
     const cookie = request.headers.get("Cookie") || "";
     let sessionId = "";
     const match = cookie.match(/sid=([a-zA-Z0-9_-]+)/);

@@ -1,6 +1,7 @@
 import type { D1Database, R2Bucket, Ai, KVNamespace, SendEmail, Queue, Fetcher } from "@cloudflare/workers-types";
 
 export interface Env {
+  RATE_LIMITER?: any;
   // ── Storage ──────────────────────────────────────────────────────────────
   // D1 — Sovereign.os platform database (Cloudflare dashboard name: vibesdk-db)
   DB: D1Database
@@ -11,7 +12,7 @@ export interface Env {
   KV: KVNamespace
 
   // R2 — media, exports, templates (bucket: vibesdk-templates)
-  TEMPLATES?: R2Bucket
+  R2?: R2Bucket
 
   // ── AI ───────────────────────────────────────────────────────────────────
   AI: Ai
@@ -68,5 +69,9 @@ export interface Env {
   FREE_DAILY_LIMIT?: string
   APP_URL?: string
   AI_MODEL?: string
+<<<<<<< HEAD
   GATEWAY_ID?: string
+=======
+  ELEVENLABS_API_KEY?: string
+>>>>>>> main
 }

@@ -95,7 +95,21 @@ scripts/           — Developer convenience scripts
 - Do not use GitHub Actions as a production deploy path.
 - Do not use Cloudflare Pages for product runtime.
 - Production artifact: `.open-next/worker.js` and `.open-next/assets/`.
-- See `docs/01_BUILD_AND_DEPLOY_STANDARD.md` for full deployment standard.
+- See `docs/CLOUDFLARE_BUILDS_FINAL_STANDARD.md` for the canonical Workers Builds configuration.
+
+## Workers Builds Commands — Do Not Change Without Inspecting Package Scripts
+
+**Do NOT change Workers Builds commands unless you inspect `apps/web/package.json` scripts first.**
+
+For `sovv-web`:
+- Workers Builds **build command** is `npm install`
+- Workers Builds **deploy command** is `npm run deploy`
+- Reason: `apps/web/package.json` deploy script runs `opennextjs-cloudflare build && opennextjs-cloudflare deploy` — it builds AND deploys in one step.
+- Do NOT use `npm install && npm run build:worker` as build command — this runs OpenNext build twice.
+
+For `sovereign-os-api`:
+- Workers Builds **build command** is `npm install`
+- Workers Builds **deploy command** is `npx wrangler deploy`
 
 ---
 

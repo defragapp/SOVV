@@ -1,8 +1,8 @@
 import { SiteShell } from "@/components/marketing/site-shell";
-import { PageHero } from "@/components/marketing/page-hero";
-import { MotionSection } from "@/components/marketing/motion-section";
+import { Container, Section } from "@/components/ui/layout-primitives";
+import { Badge } from "@/components/ui/badge";
 
-const sections = [
+const SECTIONS = [
   {
     title: "Private by design",
     body: "Sovereign.os is designed to be private by design. We store only the information required to provide the service and avoid exposing sensitive internal data in outputs.",
@@ -41,25 +41,52 @@ const sections = [
   },
 ];
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Badge
+      variant="outline"
+      className="rounded-none border-border bg-transparent text-[#71717A] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
+    >
+      {children}
+    </Badge>
+  )
+}
+
 export default function PrivacyPage() {
   return (
     <SiteShell>
-      <PageHero
-        eyebrow="Privacy"
-        title="Your data. Your clarity."
-        body="Private by design. Here is what we collect, why, and how we protect it."
-      />
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[50svh] pt-32 pb-24 overflow-hidden border-b border-border bg-surface">
+        <Container className="relative z-10 flex flex-col items-center text-center max-w-[800px]">
+          <div className="mb-12 flex items-center gap-3">
+            <div className="h-px w-10 bg-white/[0.14]" />
+            <SectionLabel>PRIVACY POLICY</SectionLabel>
+            <div className="h-px w-10 bg-white/[0.14]" />
+          </div>
 
-      <MotionSection className="px-6 py-24">
-        <div className="mx-auto max-w-2xl space-y-10 text-sm leading-8 text-white/50">
-          {sections.map((section) => (
-            <div key={section.title}>
-              <h3 className="text-base font-light text-white mb-3">{section.title}</h3>
-              <p>{section.body}</p>
-            </div>
-          ))}
-        </div>
-      </MotionSection>
+          <h1 className="text-[clamp(2.6rem,6vw,4.5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance mb-8">
+            Your data. Your clarity.
+          </h1>
+
+          <p className="text-[#A1A1AA] text-base md:text-lg font-normal tracking-[-0.01em] max-w-[560px] text-balance leading-[1.65]">
+            Private by design. Here is what we collect, why, and how we protect it.
+          </p>
+        </Container>
+      </Section>
+
+      {/* ── Content ───────────────────────────────────────────────────────── */}
+      <Section className="w-full py-24 md:py-32 bg-surface">
+        <Container className="max-w-3xl">
+          <div className="space-y-0 border border-border bg-surface divide-y divide-border">
+            {SECTIONS.map((section, i) => (
+              <div key={i} className="p-8 md:p-12 space-y-4">
+                <h3 className="text-[#FAFAFA] text-xl font-medium tracking-tight">{section.title}</h3>
+                <p className="text-[#A1A1AA] text-sm leading-relaxed max-w-2xl">{section.body}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </Section>
     </SiteShell>
   );
 }

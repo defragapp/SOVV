@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 
-const API_BASE = 'https://api.defrag.app'
-
 export default function CheckoutPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -15,7 +13,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     getSession().then((session) => {
       if (!session?.authenticated) {
-        router.push('/auth')
+        router.push('/login')
       }
     })
   }, [router])
@@ -24,7 +22,7 @@ export default function CheckoutPage() {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch(`${API_BASE}/api/billing/checkout`, {
+      const res = await fetch("/api/billing/checkout", {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -52,7 +50,7 @@ export default function CheckoutPage() {
     setPortalLoading(true)
     setError('')
     try {
-      const res = await fetch(`${API_BASE}/api/billing/checkout?portal=true`, {
+      const res = await fetch("/api/billing/portal", {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -71,13 +69,17 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white p-8 flex items-center justify-center">
-      <div className="w-full max-w-md border border-white p-8">
-        <h1 className="text-2xl font-bold mb-6 border-b border-white pb-2">SUBSCRIBE</h1>
+    <main className="min-h-screen bg-surface text-[#FAFAFA] flex items-center justify-center p-6">
+      <div className="w-full max-w-sm border border-border bg-surface p-8 flex flex-col gap-8">
+        <div className="text-center">
+          <p className="text-[10px] font-sans font-medium text-[#3F3F46] tracking-[0.3em] uppercase mb-4">Sovereign.os</p>
+          <div className="h-px w-full bg-white/[0.06] mb-6" />
+          <h1 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">Subscribe</h1>
+        </div>
 
         {error && (
-          <div className="mb-4 border border-white p-2 text-sm bg-white text-black">
-            {error}
+          <div className="border border-red-500/20 bg-red-500/5 p-3 text-center">
+            <p className="text-[10px] font-sans font-medium tracking-wide text-red-400/80">{error}</p>
           </div>
         )}
 
@@ -85,18 +87,18 @@ export default function CheckoutPage() {
           <button
             onClick={startCheckout}
             disabled={loading}
-            className="w-full border border-white p-4 hover:bg-white hover:text-black disabled:opacity-50 text-left"
+            className="w-full border border-border bg-white text-black p-4 transition-colors hover:bg-white/90 disabled:opacity-20 text-left flex flex-col gap-1"
           >
-            <div className="font-bold">Sovereign.os Pro</div>
-            <div className="text-sm text-gray-400">Full space access</div>
+            <div className="text-xs font-sans font-medium uppercase tracking-[0.1em] font-semibold">Sovereign.os Pro</div>
+            <div className="text-[10px] font-sans font-medium text-[#52525B]">Full space access</div>
           </button>
 
           <button
             onClick={openPortal}
             disabled={portalLoading}
-            className="w-full border border-white p-2 hover:bg-white hover:text-black disabled:opacity-50 text-sm"
+            className="w-full border border-border bg-transparent text-[#71717A] p-3 transition-colors hover:text-white hover:border-border disabled:opacity-20 text-[10px] font-sans font-medium uppercase tracking-widest text-center"
           >
-            {portalLoading ? '...' : 'MANAGE EXISTING SUBSCRIPTION'}
+            {portalLoading ? '...' : 'Manage existing subscription'}
           </button>
         </div>
       </div>

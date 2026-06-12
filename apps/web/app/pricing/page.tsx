@@ -1,89 +1,113 @@
-import type { Metadata } from "next";
-import { SiteShell } from "@/components/marketing/site-shell";
-import { PageHero } from "@/components/marketing/page-hero";
-import { MotionSection } from "@/components/marketing/motion-section";
-import { pricingTiers } from "@/data/marketing";
-import Link from "next/link";
+import { SiteShell } from "@/components/marketing/site-shell"
+import { Container, Section } from "@/components/ui/layout-primitives"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { Badge } from "@/components/ui/badge"
 
-export const metadata: Metadata = {
-  title: "Pricing — DEFRAG",
-  description: "Start free. Understand what is active in the moment. Upgrade to Pro to work the pattern over time, save what changes, and go deeper with another person.",
-  openGraph: {
-    title: "Pricing — DEFRAG",
-    description: "Start free. Understand what is active in the moment. Upgrade to Pro to work the pattern over time.",
-  },
-};
-
-const SUPPORT_URL = process.env.STRIPE_SUPPORT_LINK_URL;
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Badge
+      variant="outline"
+      className="rounded-none border-border bg-transparent text-[#71717A] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit mb-6"
+    >
+      {children}
+    </Badge>
+  )
+}
 
 export default function PricingPage() {
   return (
     <SiteShell>
-      <PageHero
-        eyebrow="Pricing"
-        title="Simple. No surprises."
-        body="Start free. Upgrade when you're ready for more."
-      />
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[50svh] pt-32 pb-24 overflow-hidden bg-black border-b border-white/5">
+        <Container className="relative z-10 flex flex-col items-center text-center max-w-[800px]">
+          <SectionLabel>PRICING</SectionLabel>
+          <h1 className="text-[clamp(3rem,6vw,5rem)] font-medium tracking-[-0.04em] text-[#FAFAFA] leading-[0.95] text-balance mb-8">
+            Simple, monetizable progression.
+          </h1>
+          <p className="text-[#A1A1AA] text-lg font-normal tracking-[-0.01em] max-w-[600px] text-balance leading-[1.6]">
+            We do not sell "AI features." We sell progression: the ability to return, remember, compare, and interrupt the pattern.
+          </p>
+        </Container>
+      </Section>
 
-      <MotionSection className="px-6 py-24">
-        <div className="mx-auto max-w-3xl">
-          <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
-            {pricingTiers.map((tier, i) => (
-              <div
-                key={tier.name}
-                className={`p-10 flex flex-col ${
-                  tier.highlight
-                    ? "border border-white/25 shadow-[0_0_40px_rgba(255,255,255,0.04)]"
-                    : "border border-white/8"
-                } ${i === 1 ? "md:border-l-0" : ""}`}
-              >
-                {tier.highlight && (
-                  <div className="mb-6 self-start font-mono text-[9px] uppercase tracking-widest text-black bg-white px-2.5 py-1">
-                    Recommended
-                  </div>
-                )}
-                <p className="font-mono text-[9px] uppercase tracking-widest text-white/25 mb-6">{tier.name}</p>
-                <div className="mb-2">
-                  <span className="text-5xl font-light text-white">{tier.price}</span>
-                  <span className="text-white/30 text-sm ml-2">{tier.period}</span>
-                </div>
-                <p className="text-sm text-white/35 mb-8">{tier.description}</p>
-                <ul className="space-y-3 mb-10 flex-1">
-                  {tier.features.map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-white/55">
-                      <span className="block h-px w-4 bg-white/20 shrink-0" />
-                      {f}
-                    </li>
-                  ))}
+      <Section className="w-full py-24 md:py-32 bg-[#0A0A0A]">
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+             
+             {/* Free Tier */}
+             <div className="border border-white/10 bg-black p-10 md:p-14 flex flex-col">
+                <h3 className="text-3xl font-medium text-white mb-2">Free</h3>
+                <p className="text-[#A1A1AA] text-lg mb-10">Helps you begin. Understand a moment before it takes over.</p>
+                <div className="text-5xl font-medium text-white mb-10">$0 <span className="text-xl text-[#71717A] font-normal">/ forever</span></div>
+                
+                <ul className="space-y-5 mb-14 flex-1">
+                  <li className="flex items-start gap-4 text-[#A1A1AA]">
+                    <span className="text-white mt-1">✓</span> <span><strong>Baseline Design:</strong> Setup your starting map.</span>
+                  </li>
+                  <li className="flex items-start gap-4 text-[#A1A1AA]">
+                    <span className="text-white mt-1">✓</span> <span><strong>Defrag space:</strong> Surface the active pattern.</span>
+                  </li>
+                  <li className="flex items-start gap-4 text-[#A1A1AA]">
+                    <span className="text-white mt-1">✓</span> <span><strong>Best Next Response:</strong> Get actionable steering.</span>
+                  </li>
+                  <li className="flex items-start gap-4 text-[#A1A1AA]">
+                    <span className="text-white mt-1">✓</span> <span><strong>Basic History:</strong> Limited continuity and saves.</span>
+                  </li>
+                  <li className="flex items-start gap-4 text-[#A1A1AA]">
+                    <span className="text-white mt-1">✓</span> <span><strong>Usage Limits:</strong> 5 sessions per day.</span>
+                  </li>
                 </ul>
-                <Link
-                  href={tier.href}
-                  className={`block px-6 py-3.5 text-center font-mono text-[10px] uppercase tracking-widest transition-colors ${
-                    tier.highlight
-                      ? "bg-white text-black hover:bg-white/90"
-                      : "border border-white/20 text-white hover:bg-white/5"
-                  }`}
-                >
-                  {tier.cta}
+                <Link href="/login">
+                  <Button className="w-full bg-white/5 hover:bg-white/10 text-white rounded-full h-14 text-[13px] tracking-wide">Start for Free</Button>
                 </Link>
-              </div>
-            ))}
-          </div>
+             </div>
+             
+             {/* Pro Tier */}
+             <div className="border border-white/20 bg-[#111] p-10 md:p-14 flex flex-col relative shadow-2xl">
+                <div className="absolute top-0 right-10 -translate-y-1/2 bg-white text-black text-[10px] uppercase tracking-widest px-4 py-1.5 font-medium">
+                  Recommended
+                </div>
+                <h3 className="text-3xl font-medium text-white mb-2">Pro</h3>
+                <p className="text-[#A1A1AA] text-lg mb-10">Helps you stay with it. Deeper continuity, all spaces, no limits.</p>
+                <div className="text-5xl font-medium text-white mb-10">$20 <span className="text-xl text-[#71717A] font-normal">/ month</span></div>
+                
+                <ul className="space-y-5 mb-14 flex-1">
+                  <li className="flex items-start gap-4 text-[#A1A1AA]">
+                    <span className="text-white mt-1">✓</span> <span><strong>Everything in Free</strong></span>
+                  </li>
+                  <li className="flex items-start gap-4 text-[#A1A1AA]">
+                    <span className="text-white mt-1">✓</span> <span><strong>Unlimited Sessions:</strong> No daily caps.</span>
+                  </li>
+                  <li className="flex items-start gap-4 text-[#A1A1AA]">
+                    <span className="text-white mt-1">✓</span> <span><strong>Covenant Space:</strong> Faith-context reflection.</span>
+                  </li>
+                  <li className="flex items-start gap-4 text-[#A1A1AA]">
+                    <span className="text-white mt-1">✓</span> <span><strong>Sovereign.os Library:</strong> Full depth of your saved results.</span>
+                  </li>
+                  <li className="flex items-start gap-4 text-[#A1A1AA]">
+                    <span className="text-white mt-1">✓</span> <span><strong>Invite Privately:</strong> Secure overlays when both sides matter.</span>
+                  </li>
+                  <li className="flex items-start gap-4 text-[#A1A1AA]">
+                    <span className="text-white mt-1">✓</span> <span><strong>Audio Overview:</strong> Generated context summaries.</span>
+                  </li>
+                </ul>
+                <Link href="/login">
+                  <Button className="w-full bg-white text-black hover:bg-white/90 rounded-full h-14 text-[13px] tracking-wide transition-transform hover:scale-[1.02]">Upgrade to Pro</Button>
+                </Link>
+             </div>
 
-          {SUPPORT_URL && (
-          <div className="mt-10 text-center">
-            <a
-              href={SUPPORT_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="font-mono text-[10px] uppercase tracking-widest text-white/70 hover:text-white"
-            >
-              Support Defrag development
-            </a>
           </div>
-          )}
-        </div>
-      </MotionSection>
+        </Container>
+      </Section>
+
+      <Section className="w-full py-24 bg-black border-t border-white/5 text-center">
+        <Container className="max-w-2xl">
+          <h2 className="text-2xl font-medium text-white mb-6">A note on monetization</h2>
+          <p className="text-[#A1A1AA] leading-relaxed">
+            We preserve all Stripe checkout and webhook entitlement logic. Upgrades happen through secure payment gateways, not frontend query parameters. Your Pro status unlocks backend continuity and priority access.
+          </p>
+        </Container>
+      </Section>
     </SiteShell>
-  );
+  )
 }

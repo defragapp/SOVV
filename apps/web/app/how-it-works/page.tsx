@@ -1,83 +1,109 @@
-import { SiteShell } from "@/components/marketing/site-shell";
-import { PageHero } from "@/components/marketing/page-hero";
-import { MotionSection } from "@/components/marketing/motion-section";
-import { SectionHeader } from "@/components/marketing/section-header";
-import Link from "next/link";
+import { SiteShell } from "@/components/marketing/site-shell"
+import { Container, Section } from "@/components/ui/layout-primitives"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { Badge } from "@/components/ui/badge"
 
-const steps = [
-  {
-    num: "01",
-    title: "Start Your Baseline Design",
-    body: "Enter your date, time, and place of birth. This becomes the starting map — how you tend to process, respond, connect, protect, communicate, and return to center. The AI uses it to keep every thread grounded in who you actually are.",
-  },
-  {
-    num: "02",
-    title: "Check what is active now",
-    body: "The sky over you shows what is louder right now. Your Baseline Design shows how you are built. Together they help you understand what is active in the moment — the part of you most present in this dynamic.",
-  },
-  {
-    num: "03",
-    title: "Ask or select people and layers",
-    body: "Tell Defrag what is happening. Ask freely. Add another person, a family dynamic, a group, or a team when relevant. The thread stays grounded in your Baseline Design and theirs when permitted.",
-  },
-  {
-    num: "04",
-    title: "Turn the answer into something you can use",
-    body: "Defrag helps surface the pattern underneath the moment, shows where the loop is forming, and surfaces the Best Next Response. You can save it, practice it, hear it as audio, watch it as a short scene, or return to it as part of Your Story.",
-  },
-];
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Badge
+      variant="outline"
+      className="rounded-none border-border bg-transparent text-[#71717A] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit mb-6"
+    >
+      {children}
+    </Badge>
+  )
+}
 
 export default function HowItWorksPage() {
   return (
     <SiteShell>
-      <PageHero
-        eyebrow="How It Works"
-        title="Four steps. One grounded thread."
-        body="Defrag is designed to be used in the moment — not after the fact, not in a therapy session. Right now, when it matters."
-      />
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[60svh] pt-32 pb-24 overflow-hidden bg-black border-b border-white/5">
+        <Container className="relative z-10 flex flex-col items-center text-center max-w-[800px]">
+          <SectionLabel>THE PROCESS</SectionLabel>
+          <h1 className="text-[clamp(3rem,6vw,5rem)] font-medium tracking-[-0.04em] text-[#FAFAFA] leading-[0.95] text-balance mb-8">
+            How Sovereign.os works.
+          </h1>
+          <p className="text-[#A1A1AA] text-lg font-normal tracking-[-0.01em] max-w-[600px] text-balance leading-[1.6]">
+            The system must feel like it understands your pattern context before you even type. Here is the product loop.
+          </p>
+        </Container>
+      </Section>
 
-      <MotionSection className="px-6 py-24">
-        <div className="mx-auto max-w-3xl">
-          <div className="space-y-0">
-            {steps.map((step, i) => (
-              <div
-                key={step.num}
-                className={`flex gap-8 py-10 ${i < steps.length - 1 ? "border-b border-white/8" : ""}`}
-              >
-                <div className="shrink-0">
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-white/20">{step.num}</span>
-                </div>
-                <div>
-                  <h3 className="text-xl font-light text-white mb-3">{step.title}</h3>
-                  <p className="text-sm leading-7 text-white/45">{step.body}</p>
-                </div>
-              </div>
-            ))}
+      <Section className="w-full py-24 md:py-32 bg-[#0A0A0A]">
+        <Container>
+          <div className="max-w-4xl mx-auto space-y-24">
+            
+            <div className="flex flex-col md:flex-row gap-12 items-start">
+               <div className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-mono shrink-0 w-24 pt-2">Step 01</div>
+               <div>
+                  <h3 className="text-3xl font-medium text-white mb-4">Baseline Design</h3>
+                  <p className="text-lg text-[#A1A1AA] leading-relaxed mb-6">
+                    Before you input any active situation, you define your Baseline Design. This is the starting map: how you tend to process, respond, connect, protect, communicate, and return to center.
+                  </p>
+                  <p className="text-sm text-[#71717A] leading-relaxed">
+                    This context is always active. It means you don't have to explain who you are every time a moment happens.
+                  </p>
+               </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-12 items-start">
+               <div className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-mono shrink-0 w-24 pt-2">Step 02</div>
+               <div>
+                  <h3 className="text-3xl font-medium text-white mb-4">Current Situation</h3>
+                  <p className="text-lg text-[#A1A1AA] leading-relaxed mb-6">
+                    You bring what feels active, unresolved, or repeating into the Defrag space (or Covenant/Alignment spaces). You describe the pressure, the message, or the dynamic.
+                  </p>
+               </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-12 items-start">
+               <div className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-mono shrink-0 w-24 pt-2">Step 03</div>
+               <div>
+                  <h3 className="text-3xl font-medium text-white mb-4">Structured Result</h3>
+                  <p className="text-lg text-[#A1A1AA] leading-relaxed mb-6">
+                    The platform does not output a paragraph blob. You receive a structured Result surfacing the active pattern, the old role, the strain, and a clear Best Next Response.
+                  </p>
+               </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-12 items-start">
+               <div className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-mono shrink-0 w-24 pt-2">Step 04</div>
+               <div>
+                  <h3 className="text-3xl font-medium text-white mb-4">Save to Sovereign</h3>
+                  <p className="text-lg text-[#A1A1AA] leading-relaxed mb-6">
+                    The platform succeeds when you can use the output in a real moment. Save the structured Result to your Sovereign.os Library so it is preserved.
+                  </p>
+               </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-12 items-start">
+               <div className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-mono shrink-0 w-24 pt-2">Step 05</div>
+               <div>
+                  <h3 className="text-3xl font-medium text-white mb-4">Library Return</h3>
+                  <p className="text-lg text-[#A1A1AA] leading-relaxed mb-6">
+                    The next time the loop tries to form, you don't start from zero. You return to your Library, interrupt the old pattern, and respond differently.
+                  </p>
+               </div>
+            </div>
+
           </div>
-        </div>
-      </MotionSection>
+        </Container>
+      </Section>
 
-      <MotionSection className="border-t border-white/8 px-6 py-24 text-center">
-        <SectionHeader
-          eyebrow="Ready?"
-          title="Start with your Baseline Design."
-          body="You don't need to understand the whole system. You just need one moment you want to see more clearly."
-        />
-        <div className="mt-10 flex flex-col gap-4 sm:flex-row justify-center">
-          <Link
-            href="https://app.defrag.app/login"
-            className="inline-block border border-white/20 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-white/5 transition-colors"
-          >
-            Start Your Baseline Design
+      <Section className="w-full py-32 bg-black border-t border-white/5 text-center">
+        <Container>
+          <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-white mb-10">Ready to break the loop?</h2>
+          <Link href="/login">
+            <Button
+              size="lg"
+              className="rounded-full bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-14 px-10 font-sans font-medium text-[13px] tracking-wide"
+            >
+              Start your Baseline Design
+            </Button>
           </Link>
-          <Link
-            href="https://app.defrag.app/login"
-            className="inline-block border border-white/10 px-8 py-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hover:bg-white/5 hover:text-white/60 transition-colors"
-          >
-            Enter your space
-          </Link>
-        </div>
-      </MotionSection>
+        </Container>
+      </Section>
     </SiteShell>
-  );
+  )
 }
