@@ -48,11 +48,11 @@ export default async function AdminPage() {
         <div className="space-y-4">
           <h1 className="text-4xl font-semibold">Admin</h1>
           <p className="text-sm text-white/70">
-            Signed in as <span className="font-mono text-white/90">{admin.email}</span> — role <span className="font-mono text-white/90">{admin.role}</span>.
+            Signed in as <span className="font-sans font-medium text-white/90">{admin.email}</span> — role <span className="font-sans font-medium text-white/90">{admin.role}</span>.
           </p>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+        <div className="rounded-3xl border border-border bg-white/5 p-8">
           <h2 className="text-2xl font-semibold">Ambassador promo codes</h2>
           <p className="mt-2 text-sm text-white/60">
             Generate one-time ambassador promo codes that can be redeemed publicly via the promo redeem API.

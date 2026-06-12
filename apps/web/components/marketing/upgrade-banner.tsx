@@ -5,7 +5,7 @@ import Link from "next/link"
 
 export function UpgradeBanner() {
   return (
-    <div className="w-full bg-gradient-to-r from-[#111111] to-[#0A0A0A] border border-white/10 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)]">
+    <div className="w-full bg-gradient-to-r from-[#111111] to-[#0A0A0A] border border-border rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)]">
       <div className="space-y-2">
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-semibold text-[#FDFDFD]">Sovereign.os Pro</h3>

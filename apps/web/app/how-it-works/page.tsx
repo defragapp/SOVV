@@ -37,7 +37,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <Badge
       variant="outline"
-      className="rounded-none border-white/[0.12] bg-transparent text-[#71717A] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
+      className="rounded-none border-border bg-transparent text-[#71717A] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
     >
       {children}
     </Badge>
@@ -48,7 +48,7 @@ export default function HowItWorksPage() {
   return (
     <SiteShell>
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <Section className="w-full relative flex flex-col items-center justify-center min-h-[70svh] pt-32 pb-24 overflow-hidden border-b border-white/[0.06] bg-[#050505]">
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[70svh] pt-32 pb-24 overflow-hidden border-b border-border bg-surface">
         <Container className="relative z-10 flex flex-col items-center text-center max-w-[800px]">
           <div className="mb-12 flex items-center gap-3">
             <div className="h-px w-10 bg-white/[0.14]" />
@@ -67,19 +67,19 @@ export default function HowItWorksPage() {
       </Section>
 
       {/* ── Steps ─────────────────────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
+      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container className="max-w-4xl">
-          <div className="space-y-0 border border-white/[0.07]">
+          <div className="space-y-0 border border-border">
             {STEPS.map((step, i) => (
               <div
                 key={i}
                 className={[
-                  "flex flex-col md:flex-row gap-8 items-start p-8 md:p-12 bg-[#050505]",
-                  i < STEPS.length - 1 ? "border-b border-white/[0.07]" : "",
+                  "flex flex-col md:flex-row gap-8 items-start p-8 md:p-12 bg-surface",
+                  i < STEPS.length - 1 ? "border-b border-border" : "",
                 ].join(" ")}
               >
                 <div className="w-full md:w-[120px] shrink-0">
-                  <span className="text-[#3F3F46] font-mono text-3xl tracking-tighter">
+                  <span className="text-[#3F3F46] font-sans font-medium text-3xl tracking-tighter">
                     {step.num}
                   </span>
                 </div>
@@ -98,7 +98,7 @@ export default function HowItWorksPage() {
       </Section>
 
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
-      <Section className="w-full py-32 md:py-48 bg-[#050505] relative overflow-hidden">
+      <Section className="w-full py-32 md:py-48 bg-surface relative overflow-hidden">
         <Container className="relative z-10 text-center max-w-[780px]">
           <h2 className="text-[clamp(2.4rem,5vw,3.5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance mb-12">
             The wound is real. So is the choice after it.
@@ -106,7 +106,7 @@ export default function HowItWorksPage() {
           <Link href="/login" className="inline-block">
             <Button
               size="lg"
-              className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-10 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+              className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-10 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
             >
               Enter Sovereign.os
             </Button>

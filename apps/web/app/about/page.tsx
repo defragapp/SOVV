@@ -32,7 +32,7 @@ export default function AboutPage() {
               The product is designed to be private, direct, and useful. It does not diagnose, predict, or guarantee outcomes. Healing is not becoming untouched. It is becoming harder to move away from yourself.
             </p>
             <div className="border-t border-border pt-8 mt-12">
-              <p className="text-body font-mono uppercase tracking-widest text-foreground-disabled">
+              <p className="text-body font-sans font-medium uppercase tracking-widest text-foreground-disabled">
                 The wound is real. So is the choice after it.
               </p>
             </div>

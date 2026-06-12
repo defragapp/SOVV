@@ -36,7 +36,7 @@ export default function Sidebar({
   const peopleList = people.filter((p) => p.relation !== "self")
 
   return (
-    <div className="flex h-full flex-col font-mono text-sm">
+    <div className="flex h-full flex-col font-sans font-medium text-sm">
       <div className="border-b border-border py-4">
         <span className="block px-6 mb-2 text-xs text-foreground-muted uppercase tracking-widest">
           Active Engines

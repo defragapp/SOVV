@@ -68,7 +68,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <Badge
       variant="outline"
-      className="rounded-none border-white/[0.12] bg-transparent text-[#71717A] font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
+      className="rounded-none border-border bg-transparent text-[#71717A] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
     >
       {children}
     </Badge>
@@ -91,10 +91,10 @@ function Dot({ dim }: { dim?: boolean }) {
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center selection:bg-white/10 selection:text-white bg-[#050505]">
+    <main className="flex min-h-screen flex-col items-center selection:bg-white/10 selection:text-white bg-surface">
 
       {/* ── 1. Hero ─────────────────────────────────────────────────────────── */}
-      <Section className="w-full relative flex flex-col items-center justify-center min-h-[100svh] pt-28 pb-20 overflow-hidden border-b border-white/[0.06]">
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[100svh] pt-28 pb-20 overflow-hidden border-b border-border">
 
         {/* Grid texture */}
         <div
@@ -132,7 +132,7 @@ export default function HomePage() {
           </p>
 
           {/* Three-line sub-statement */}
-          <div className="mb-12 flex flex-col sm:flex-row items-center gap-x-5 gap-y-1 text-[#71717A] font-mono text-[10px] tracking-[0.12em] uppercase">
+          <div className="mb-12 flex flex-col sm:flex-row items-center gap-x-5 gap-y-1 text-[#71717A] font-sans font-medium text-[10px] tracking-[0.12em] uppercase">
             <span>See what is actually happening</span>
             <span className="hidden sm:block text-white/[0.12]">·</span>
             <span>Understand your role in it</span>
@@ -145,7 +145,7 @@ export default function HomePage() {
             <Link href="/login" className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="w-full sm:w-auto rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-8 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+                className="w-full sm:w-auto rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-8 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
               >
                 Enter Sovereign.os
               </Button>
@@ -154,7 +154,7 @@ export default function HomePage() {
               <Button
                 size="lg"
                 variant="ghost"
-                className="w-full sm:w-auto rounded-none border-white/[0.12] bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] hover:text-white h-12 px-8 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+                className="w-full sm:w-auto rounded-none border-border bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] hover:text-white h-12 px-8 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
               >
                 Start Baseline Design
               </Button>
@@ -162,7 +162,7 @@ export default function HomePage() {
           </div>
 
           {/* Secondary CTAs */}
-          <div className="mt-8 flex gap-7 text-[#71717A] font-mono text-[10px] tracking-[0.1em] uppercase">
+          <div className="mt-8 flex gap-7 text-[#71717A] font-sans font-medium text-[10px] tracking-[0.1em] uppercase">
             <Link href="#defrag" className="hover:text-[#A1A1AA] transition-colors">
               Explore Defrag →
             </Link>
@@ -174,7 +174,7 @@ export default function HomePage() {
       </Section>
 
       {/* ── 2. What this helps with ─────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
+      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container>
           <div className="max-w-3xl mx-auto">
 
@@ -192,14 +192,14 @@ export default function HomePage() {
             </div>
 
             {/* Help grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 border border-white/[0.07]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 border border-border">
               {WHAT_HELPS.map((item, i) => (
                 <div
                   key={i}
                   className={[
                     "p-7 md:p-8 space-y-2",
-                    i % 2 === 0 && i < WHAT_HELPS.length - 1 ? "border-r border-white/[0.07]" : "",
-                    i < 2 ? "border-b border-white/[0.07]" : "",
+                    i % 2 === 0 && i < WHAT_HELPS.length - 1 ? "border-r border-border" : "",
+                    i < 2 ? "border-b border-border" : "",
                   ].join(" ")}
                 >
                   <h3 className="text-[#FAFAFA] text-[15px] font-medium tracking-tight">
@@ -214,7 +214,7 @@ export default function HomePage() {
       </Section>
 
       {/* ── 3. What Sovereign.os does ───────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#050505]">
+      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container>
           <div className="flex flex-col lg:flex-row gap-16 xl:gap-24 justify-between items-start">
 
@@ -230,16 +230,16 @@ export default function HomePage() {
             </div>
 
             {/* Step cards */}
-            <div className="flex-1 flex flex-col gap-0 border border-white/[0.07]">
+            <div className="flex-1 flex flex-col gap-0 border border-border">
               {HOW_IT_WORKS.map((item, i) => (
                 <div
                   key={i}
                   className={[
                     "flex items-start gap-6 p-7 md:p-8 group",
-                    i < HOW_IT_WORKS.length - 1 ? "border-b border-white/[0.07]" : "",
+                    i < HOW_IT_WORKS.length - 1 ? "border-b border-border" : "",
                   ].join(" ")}
                 >
-                  <span className="text-[#3F3F46] font-mono text-xs mt-[3px] shrink-0 w-6">
+                  <span className="text-[#3F3F46] font-sans font-medium text-xs mt-[3px] shrink-0 w-6">
                     {item.step}
                   </span>
                   <div className="space-y-1.5">
@@ -256,7 +256,7 @@ export default function HomePage() {
       </Section>
 
       {/* ── 4. Baseline Design ──────────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
+      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container>
           <div className="max-w-3xl mx-auto space-y-10">
             <div className="space-y-4">
@@ -269,7 +269,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="border border-white/[0.07] divide-y divide-white/[0.07]">
+            <div className="border border-border divide-y divide-border">
               {[
                 {
                   label: "Core Pattern",
@@ -285,7 +285,7 @@ export default function HomePage() {
                 },
               ].map((row, i) => (
                 <div key={i} className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-8 px-7 py-5">
-                  <span className="text-[#FAFAFA] text-[13px] font-medium font-mono tracking-tight shrink-0 sm:w-40">
+                  <span className="text-[#FAFAFA] text-[13px] font-medium font-sans font-medium tracking-tight shrink-0 sm:w-40">
                     {row.label}
                   </span>
                   <p className="text-[#71717A] text-sm leading-relaxed">{row.desc}</p>
@@ -296,7 +296,7 @@ export default function HomePage() {
             <Link href="/login">
               <Button
                 size="lg"
-                className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-11 px-7 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+                className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-11 px-7 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
               >
                 Start Baseline Design
               </Button>
@@ -306,7 +306,7 @@ export default function HomePage() {
       </Section>
 
       {/* ── 5. Defrag Space ─────────────────────────────────────────────────── */}
-      <Section id="defrag" className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#050505]">
+      <Section id="defrag" className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container>
           <div className="max-w-4xl mx-auto space-y-12">
 
@@ -321,7 +321,7 @@ export default function HomePage() {
             </div>
 
             {/* Feature tiles */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 border border-white/[0.07]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 border border-border">
               {[
                 {
                   tag: "A",
@@ -348,11 +348,11 @@ export default function HomePage() {
                   key={i}
                   className={[
                     "p-8 md:p-10 space-y-4",
-                    i % 2 === 0 ? "sm:border-r border-white/[0.07]" : "",
-                    i < 2 ? "border-b border-white/[0.07]" : "",
+                    i % 2 === 0 ? "sm:border-r border-border" : "",
+                    i < 2 ? "border-b border-border" : "",
                   ].join(" ")}
                 >
-                  <div className="w-8 h-8 border border-white/[0.12] flex items-center justify-center text-[#FAFAFA] font-mono text-[10px] tracking-widest">
+                  <div className="w-8 h-8 border border-border flex items-center justify-center text-[#FAFAFA] font-sans font-medium text-[10px] tracking-widest">
                     {tile.tag}
                   </div>
                   <h3 className="text-[#FAFAFA] text-[15px] font-medium tracking-tight">
@@ -367,7 +367,7 @@ export default function HomePage() {
       </Section>
 
       {/* ── 6. Covenant Space ───────────────────────────────────────────────── */}
-      <Section id="covenant" className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
+      <Section id="covenant" className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container>
           <div className="flex flex-col lg:flex-row gap-14 xl:gap-20 items-start">
 
@@ -396,12 +396,12 @@ export default function HomePage() {
 
             {/* Mock card */}
             <div className="lg:w-[56%] w-full">
-              <div className="border border-white/[0.08] bg-[#0A0A0A] p-8 md:p-10 relative overflow-hidden">
+              <div className="border border-border bg-surface p-8 md:p-10 relative overflow-hidden">
                 <div
                   aria-hidden
                   className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.025)_0,transparent_60%)]"
                 />
-                <div className="relative z-10 border border-white/[0.07] bg-[#070707] p-6 space-y-5 shadow-2xl">
+                <div className="relative z-10 border border-border bg-[#070707] p-6 space-y-5 shadow-2xl">
                   <div className="flex items-center justify-between">
                     <div className="h-1.5 w-16 bg-white/[0.08]" />
                     <SectionLabel>Covenant Brief</SectionLabel>
@@ -411,7 +411,7 @@ export default function HomePage() {
                     <div className="h-3 w-full bg-white/[0.05] rounded-sm" />
                     <div className="h-3 w-5/6 bg-white/[0.05] rounded-sm" />
                   </div>
-                  <div className="pt-4 mt-2 border-t border-white/[0.06] space-y-2">
+                  <div className="pt-4 mt-2 border-t border-border space-y-2">
                     <div className="h-2.5 w-full bg-white/[0.03] rounded-sm" />
                     <div className="h-2.5 w-4/5 bg-white/[0.03] rounded-sm" />
                     <div className="h-2.5 w-2/3 bg-white/[0.03] rounded-sm" />
@@ -428,7 +428,7 @@ export default function HomePage() {
       </Section>
 
       {/* ── 7. Alignment Space ──────────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#050505]">
+      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container>
           <div className="max-w-3xl mx-auto space-y-10">
             <div className="space-y-4">
@@ -441,7 +441,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="border border-white/[0.07] divide-y divide-white/[0.07]">
+            <div className="border border-border divide-y divide-border">
               {[
                 {
                   label: "What is Active",
@@ -457,7 +457,7 @@ export default function HomePage() {
                 },
               ].map((row, i) => (
                 <div key={i} className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-8 px-7 py-5">
-                  <span className="text-[#FAFAFA] text-[13px] font-medium font-mono tracking-tight shrink-0 sm:w-40">
+                  <span className="text-[#FAFAFA] text-[13px] font-medium font-sans font-medium tracking-tight shrink-0 sm:w-40">
                     {row.label}
                   </span>
                   <p className="text-[#71717A] text-sm leading-relaxed">{row.desc}</p>
@@ -469,7 +469,7 @@ export default function HomePage() {
       </Section>
 
       {/* ── 8. When Both Sides Matter ───────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
+      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container>
           <div className="max-w-3xl mx-auto space-y-10">
             <div className="space-y-4">
@@ -483,16 +483,16 @@ export default function HomePage() {
             </div>
 
             {/* What it is not */}
-            <div className="border border-white/[0.07]">
-              <div className="px-7 py-4 border-b border-white/[0.07]">
-                <span className="text-[#71717A] font-mono text-[10px] tracking-[0.15em] uppercase">
+            <div className="border border-border">
+              <div className="px-7 py-4 border-b border-border">
+                <span className="text-[#71717A] font-sans font-medium text-[10px] tracking-[0.15em] uppercase">
                   What it is not
                 </span>
               </div>
-              <div className="divide-y divide-white/[0.07]">
+              <div className="divide-y divide-border">
                 {["No diagnosis.", "No compatibility score.", "No verdict."].map((text, i) => (
                   <div key={i} className="flex items-center gap-4 px-7 py-4">
-                    <span className="font-mono text-[10px] text-[#3F3F46]">×</span>
+                    <span className="font-sans font-medium text-[10px] text-[#3F3F46]">×</span>
                     <span className="text-[#71717A] text-sm">{text}</span>
                   </div>
                 ))}
@@ -500,20 +500,20 @@ export default function HomePage() {
             </div>
 
             {/* What it does */}
-            <div className="border border-white/[0.07]">
-              <div className="px-7 py-4 border-b border-white/[0.07]">
-                <span className="text-[#71717A] font-mono text-[10px] tracking-[0.15em] uppercase">
+            <div className="border border-border">
+              <div className="px-7 py-4 border-b border-border">
+                <span className="text-[#71717A] font-sans font-medium text-[10px] tracking-[0.15em] uppercase">
                   What it does
                 </span>
               </div>
-              <div className="divide-y divide-white/[0.07]">
+              <div className="divide-y divide-border">
                 {[
                   "Shows where patterns collide.",
                   "Surfaces what each person is protecting.",
                   "Suggests where repair is possible.",
                 ].map((text, i) => (
                   <div key={i} className="flex items-center gap-4 px-7 py-4">
-                    <span className="font-mono text-[10px] text-[#A1A1AA]">→</span>
+                    <span className="font-sans font-medium text-[10px] text-[#A1A1AA]">→</span>
                     <span className="text-[#A1A1AA] text-sm">{text}</span>
                   </div>
                 ))}
@@ -524,7 +524,7 @@ export default function HomePage() {
       </Section>
 
       {/* ── 9. Sovereign.os Library ─────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#050505]">
+      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container>
           <div className="max-w-3xl mx-auto space-y-10">
             <div className="text-center space-y-4">
@@ -538,7 +538,7 @@ export default function HomePage() {
             </div>
 
             {/* Mock library rows */}
-            <div className="border border-white/[0.07] divide-y divide-white/[0.07]">
+            <div className="border border-border divide-y divide-border">
               {[
                 { type: "Defrag", label: "The argument that won't resolve", date: "Saved" },
                 { type: "Covenant", label: "Where repair is mine to initiate", date: "Saved" },
@@ -546,16 +546,16 @@ export default function HomePage() {
               ].map((entry, i) => (
                 <div key={i} className="flex items-center justify-between gap-4 px-7 py-5">
                   <div className="flex items-center gap-4 min-w-0">
-                    <span className="text-[#3F3F46] font-mono text-[10px] tracking-widest uppercase shrink-0 w-16">
+                    <span className="text-[#3F3F46] font-sans font-medium text-[10px] tracking-widest uppercase shrink-0 w-16">
                       {entry.type}
                     </span>
                     <span className="text-[#A1A1AA] text-sm truncate">{entry.label}</span>
                   </div>
-                  <span className="text-[#3F3F46] font-mono text-[10px] shrink-0">{entry.date}</span>
+                  <span className="text-[#3F3F46] font-sans font-medium text-[10px] shrink-0">{entry.date}</span>
                 </div>
               ))}
               <div className="px-7 py-4 text-center">
-                <span className="text-[#3F3F46] font-mono text-[10px] tracking-[0.1em] uppercase">
+                <span className="text-[#3F3F46] font-sans font-medium text-[10px] tracking-[0.1em] uppercase">
                   Your entries will appear here
                 </span>
               </div>
@@ -565,7 +565,7 @@ export default function HomePage() {
       </Section>
 
       {/* ── 10. Free vs Pro ─────────────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-white/[0.06] bg-[#080808]">
+      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container>
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-14">
@@ -575,10 +575,10 @@ export default function HomePage() {
               <p className="mt-3 text-[#71717A] text-sm">Start free. Go deeper when you&apos;re ready.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border border-white/[0.07]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border border-border">
 
               {/* Free */}
-              <div className="p-8 md:p-10 space-y-7 border-b md:border-b-0 md:border-r border-white/[0.07]">
+              <div className="p-8 md:p-10 space-y-7 border-b md:border-b-0 md:border-r border-border">
                 <div className="space-y-2">
                   <h3 className="text-[#FAFAFA] text-xl font-medium">Free</h3>
                   <p className="text-[#71717A] text-sm">Understand a moment.</p>
@@ -598,7 +598,7 @@ export default function HomePage() {
                 <Link href="/login" className="block">
                   <Button
                     variant="ghost"
-                    className="w-full rounded-none border-white/[0.12] bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] h-11 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+                    className="w-full rounded-none border-border bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] h-11 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
                   >
                     Get Started Free
                   </Button>
@@ -606,9 +606,9 @@ export default function HomePage() {
               </div>
 
               {/* Pro */}
-              <div className="p-8 md:p-10 space-y-7 bg-[#0A0A0A] relative">
+              <div className="p-8 md:p-10 space-y-7 bg-surface relative">
                 <div className="absolute top-6 right-7">
-                  <Badge className="bg-white text-[#050505] hover:bg-white/90 rounded-none font-mono text-[9px] uppercase tracking-[0.12em] px-2 py-0.5">
+                  <Badge className="bg-white text-[#050505] hover:bg-white/90 rounded-none font-sans font-medium text-[9px] uppercase tracking-[0.12em] px-2 py-0.5">
                     Pro
                   </Badge>
                 </div>
@@ -632,7 +632,7 @@ export default function HomePage() {
                 </ul>
                 <Link href="/login" className="block">
                   <Button
-                    className="w-full rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-11 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+                    className="w-full rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-11 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
                   >
                     Start Sovereign Pro
                   </Button>
@@ -644,7 +644,7 @@ export default function HomePage() {
       </Section>
 
       {/* ── 11. Final CTA ───────────────────────────────────────────────────── */}
-      <Section className="w-full py-32 md:py-48 bg-[#050505] relative overflow-hidden">
+      <Section className="w-full py-32 md:py-48 bg-surface relative overflow-hidden">
         <div
           aria-hidden
           className="absolute inset-0 z-0 pointer-events-none opacity-[0.018]"
@@ -664,7 +664,7 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <p className="text-[#71717A] text-sm font-mono tracking-[0.12em] uppercase mb-10">
+          <p className="text-[#71717A] text-sm font-sans font-medium tracking-[0.12em] uppercase mb-10">
             The platform is ready when you are.
           </p>
 
@@ -672,7 +672,7 @@ export default function HomePage() {
             <Link href="/login">
               <Button
                 size="lg"
-                className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-10 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+                className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-10 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
               >
                 Enter Sovereign.os
               </Button>
@@ -681,7 +681,7 @@ export default function HomePage() {
               <Button
                 size="lg"
                 variant="ghost"
-                className="rounded-none border-white/[0.12] bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] hover:text-white h-12 px-8 font-mono text-[11px] tracking-[0.1em] uppercase transition-colors"
+                className="rounded-none border-border bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] hover:text-white h-12 px-8 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
               >
                 Start Baseline Design
               </Button>

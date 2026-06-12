@@ -11,7 +11,7 @@ export function FaqAccordion({
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <div className="mx-auto max-w-2xl divide-y divide-white/8">
+    <div className="mx-auto max-w-2xl divide-y divide-border">
       {items.map((item, i) => (
         <div key={i}>
           <button

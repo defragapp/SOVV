@@ -42,12 +42,12 @@ export default function ManageSubscription() {
         type="button"
         onClick={handleOpen}
         disabled={loading}
-        className="w-full px-2 py-1 text-left font-mono text-[9px] uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors disabled:opacity-30"
+        className="w-full px-2 py-1 text-left font-sans font-medium text-[9px] uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors disabled:opacity-30"
       >
         {loading ? "···" : "Manage subscription"}
       </button>
       {error && (
-        <p className="px-2 font-mono text-[8px] uppercase tracking-widest text-red-400/60 leading-4">
+        <p className="px-2 font-sans font-medium text-[8px] uppercase tracking-widest text-red-400/60 leading-4">
           {error}
         </p>
       )}
