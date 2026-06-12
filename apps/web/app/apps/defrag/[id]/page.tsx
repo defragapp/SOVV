@@ -123,7 +123,6 @@ export default function DefragItemPage() {
                   onClick={handleGenerateAudio}
                   disabled={isGeneratingAudio}
                   variant="secondary" 
-                  className="rounded-none border border-white/[0.15] bg-transparent text-[#FAFAFA] hover:bg-white/5 font-mono text-[10px] tracking-[0.15em] uppercase h-8 w-full"
                 >
                   {isGeneratingAudio ? "Generating..." : "Generate Audio"}
                 </Button>
@@ -145,9 +144,6 @@ export default function DefragItemPage() {
   const renderSection = (title: string, content: any, isArray: boolean = false) => {
     if (!content) return null;
     return (
-    <Workbench
-      desktopMain={desktopMain}
-      desktopContext={contextContent}
       <div className="border-b border-white/[0.06] pb-6 mb-6 last:border-0 last:pb-0 last:mb-0">
         <h4 className="text-[10px] font-mono text-[#71717A] uppercase tracking-[0.15em] mb-3">{title}</h4>
         {isArray ? (
@@ -290,10 +286,11 @@ export default function DefragItemPage() {
   )
 
   return (
-    <Workbench
-      desktopMain={desktopMain}
-      desktopContext={contextContent}
+    <SpaceShell
       spaceName={`Library / ${result?.activePattern || "Item"}`}
+      sidebar={sidebarContent}
+      main={desktopMain}
+      contextPanel={contextContent}
       mobileTabs={mobileTabs}
     />
   )
