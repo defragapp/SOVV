@@ -242,8 +242,8 @@ export default function DefragPage() {
 
                 <section className="rounded-2xl border border-[#2A2A31] bg-[#16161C] p-5">
                   <h2 className="text-lg font-semibold text-[#F5F5F6]">Best Next Response</h2>
-                  <p className="mt-2 text-sm text-[#F5F5F6]">{result.bestNextResponse.summary}</p>
-                  {result.bestNextResponse.phrasing?.length ? (
+                  <p className="mt-2 text-sm text-[#F5F5F6]">{result.bestNextResponse?.summary}</p>
+                  {result.bestNextResponse?.phrasing?.length ? (
                     <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[#B1B1BA]">
                       {result.bestNextResponse.phrasing.map((line, idx) => (
                         <li key={idx}>{line}</li>
