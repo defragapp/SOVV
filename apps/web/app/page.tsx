@@ -1,336 +1,176 @@
 import { Button } from "@/components/ui/button"
-import { Container, Section } from "@/components/ui/layout-primitives"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 
-// ─── Data ────────────────────────────────────────────────────────────────────
-
-const WHAT_HELPS = [
-  {
-    title: "Repeating Conflicts",
-    desc: "Understand why the same arguments happen with different people.",
-  },
-  {
-    title: "Boundary Ruptures",
-    desc: "Identify when a boundary is yours to hold versus theirs to respect.",
-  },
-  {
-    title: "Grief & Stagnation",
-    desc: "See where you are holding onto old roles that no longer serve you.",
-  },
-  {
-    title: "Decision Paralysis",
-    desc: "Clarify what is yours to decide and what is not yours to carry.",
-  },
-]
-
-const HOW_IT_WORKS = [
-  {
-    step: "01",
-    title: "Baseline Design",
-    desc: "The context exists before you type. Sovereign.os understands your core patterns.",
-  },
-  {
-    step: "02",
-    title: "Current Situation",
-    desc: "Enter what is happening right now, without needing to explain the history.",
-  },
-  {
-    step: "03",
-    title: "Structured Result",
-    desc: "Receive a structural breakdown of the pattern, the old role, and the gift under strain.",
-  },
-  {
-    step: "04",
-    title: "Library Return",
-    desc: "Save useful Results. Return to them before the old pattern takes over again.",
-  },
-]
-
-const FREE_FEATURES = [
-  "Baseline Design access",
-  "Defrag space (limited sessions)",
-  "Library saving",
-]
-
-const PRO_FEATURES = [
-  "Unlimited Defrag sessions",
-  "Covenant Space access",
-  "Deep Library continuity",
-  "Audio Overview & Watch Preview (when available)",
-  "Private Invites",
-]
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
+export default function Home() {
   return (
-    <Badge
-      variant="outline"
-      className="rounded-full border-border bg-transparent text-secondary font-sans font-medium text-[12px] tracking-[0.1em] uppercase px-4 py-1.5 w-fit"
-    >
-      {children}
-    </Badge>
-  )
-}
+    <main className="relative min-h-screen bg-black overflow-hidden selection:bg-white/20 selection:text-white">
+      {/* Background Ambient Glow */}
+      <div 
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/3 w-[800px] h-[800px] opacity-50"
+        style={{
+          background: "radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 70%)"
+        }}
+      />
 
-function Rule() {
-  return <div className="h-px w-full bg-border" />
-}
+      {/* Nav */}
+      <nav className="fixed top-0 w-full z-50 flex items-center justify-between px-8 py-6 mix-blend-difference">
+        <div className="flex items-center gap-12">
+          <Link href="/" className="text-sm font-medium tracking-tight text-white hover:opacity-80 transition-opacity">
+            Sovereign.os
+          </Link>
+          <div className="hidden md:flex gap-8 text-[13px] text-white/50">
+            <Link href="/apps/defrag" className="hover:text-white transition-colors">Defrag</Link>
+            <Link href="/apps/covenant" className="hover:text-white transition-colors">Covenant</Link>
+            <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
+          </div>
+        </div>
+        <div>
+          <Link href="/login" className="text-[13px] px-5 py-2.5 rounded-full border border-white/10 text-white hover:bg-white hover:text-black transition-all duration-300">
+            Sign In
+          </Link>
+        </div>
+      </nav>
 
-function Dot({ dim }: { dim?: boolean }) {
-  return (
-    <div
-      className={`mt-[8px] w-1.5 h-1.5 shrink-0 rounded-full ${dim ? "bg-white/[0.15]" : "bg-white/40"}`}
-    />
-  )
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-export default function HomePage() {
-  return (
-    <main className="flex min-h-screen flex-col items-center bg-background text-foreground selection:bg-white/10 selection:text-white">
-
-      {/* ── 1. Hero ─────────────────────────────────────────────────────────── */}
-      <Section className="w-full relative flex flex-col items-center justify-center min-h-[90svh] pt-32 pb-20 overflow-hidden border-b border-border bg-gradient-to-b from-background to-surface">
-
-        {/* Dynamic Texture overlay */}
-        <div
-          aria-hidden
-          className="absolute inset-0 z-0 pointer-events-none opacity-[0.03]"
-          style={{
-            backgroundImage: "radial-gradient(circle at center, var(--text-primary) 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
-          }}
-        />
-
-        <Container className="relative z-10 flex flex-col items-center text-center max-w-4xl px-4 sm:px-6">
-
-          {/* Wordmark */}
-          <div className="mb-10 animate-fade-in-up">
-            <SectionLabel>SOVEREIGN.OS</SectionLabel>
+      {/* Hero Section */}
+      <section className="relative min-h-[90vh] flex flex-col items-center justify-center pt-32 pb-20 z-10 px-6">
+        <div className="text-center max-w-5xl flex flex-col items-center">
+          <div className="animate-fade-up px-4 py-1.5 rounded-full border border-white/10 bg-white/5 mb-10">
+            <span className="text-[11px] font-medium tracking-widest uppercase text-white/60">Platform 2.0 Live</span>
           </div>
 
-          {/* Primary headline with balanced contrast */}
-          <div className="mb-8 space-y-4 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-            <h1 className="text-[clamp(3rem,8vw,6rem)] font-bold tracking-tight text-primary leading-[1.1] text-balance">
-              Healing isn&apos;t optional.
-            </h1>
-            <h1 className="text-[clamp(3rem,8vw,6rem)] font-bold tracking-tight text-secondary leading-[1.1] text-balance">
-              Holding the pain is.
-            </h1>
-          </div>
-
-          {/* Support copy */}
-          <p className="text-secondary text-lg sm:text-xl font-normal max-w-2xl mb-12 text-balance leading-relaxed animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          <h1 className="animate-fade-up delay-100 text-[clamp(3rem,8vw,7rem)] leading-[0.95] tracking-[-0.04em] font-medium gradient-text mb-8 text-balance">
+            Healing isn&apos;t optional.<br/>
+            Holding the pain is.
+          </h1>
+          
+          <p className="animate-fade-up delay-200 text-lg md:text-xl text-white/40 max-w-2xl leading-relaxed tracking-tight text-balance mb-12">
             Understand what is shaping your relationships, family dynamics, grief, boundaries, and decisions — and get a clearer way forward.
           </p>
 
-          {/* Main CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center mb-16 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-            <Link href="/login" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto rounded-full bg-primary text-background hover:bg-primary/90 font-sans font-medium text-[13px] tracking-wider uppercase h-14 px-8 transition-transform active:scale-95 shadow-[0_4px_20px_rgba(255,255,255,0.1)]">
-                Enter Sovereign.os
-              </Button>
+          <div className="animate-fade-up delay-300 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <Link href="/login" className="px-8 py-4 rounded-full bg-white text-black text-sm font-medium hover:scale-[1.02] transition-transform text-center">
+              Enter Sovereign.os
             </Link>
-            <Link href="/login" className="w-full sm:w-auto">
-              <Button variant="ghost" size="lg" className="w-full sm:w-auto rounded-full border border-border bg-transparent text-primary hover:bg-white/5 h-14 px-8 font-sans font-medium text-[13px] tracking-wider uppercase transition-colors">
-                Start Baseline Design
-              </Button>
+            <Link href="/login" className="px-8 py-4 rounded-full bg-transparent border border-white/10 text-white/70 text-sm font-medium hover:bg-white/5 transition-colors text-center">
+              Start Baseline Design
             </Link>
           </div>
+        </div>
+      </section>
 
-          {/* Supporting lines */}
-          <div className="flex flex-col sm:flex-row items-center gap-x-6 gap-y-2 text-tertiary font-sans font-medium text-[11px] tracking-[0.15em] uppercase animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-            <span>See what is actually happening</span>
-            <span className="hidden sm:block opacity-40">·</span>
-            <span>Understand your role in it</span>
-            <span className="hidden sm:block opacity-40">·</span>
-            <span>Respond differently</span>
-          </div>
-        </Container>
-      </Section>
+      {/* Abstract Wireframe Divider */}
+      <div className="w-full flex justify-center pb-32">
+        <div className="w-px h-32 bg-gradient-to-b from-white/20 to-transparent"></div>
+      </div>
 
-      {/* ── 2. What this helps with ─────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
-        <Container>
-          <div className="max-w-4xl mx-auto space-y-16">
-            <div className="text-center space-y-6">
-              <SectionLabel>The application</SectionLabel>
-              <h2 className="text-[clamp(2rem,5vw,3rem)] font-bold tracking-tight text-primary leading-tight">
-                What this helps with
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border border border-border overflow-hidden rounded-2xl">
-              {WHAT_HELPS.map((item, i) => (
-                <div key={i} className="bg-surface p-8 sm:p-10 flex flex-col gap-4 hover:bg-elevated transition-colors duration-300">
-                  <h3 className="text-primary text-xl font-semibold tracking-tight">{item.title}</h3>
-                  <p className="text-secondary text-base leading-relaxed">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* ── 3. How it Works (Sovereign.os does) ─────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-border bg-background">
-        <Container>
-          <div className="max-w-4xl mx-auto space-y-16">
-            <div className="text-center space-y-6">
-              <SectionLabel>The progression</SectionLabel>
-              <h2 className="text-[clamp(2rem,5vw,3rem)] font-bold tracking-tight text-primary leading-tight">
-                How Sovereign.os works
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-              {HOW_IT_WORKS.map((step, i) => (
-                <div key={i} className="flex flex-col gap-4 p-8 border border-border rounded-2xl bg-surface/50">
-                  <span className="text-tertiary font-sans font-bold text-[12px] tracking-widest">{step.step}</span>
-                  <h3 className="text-primary text-xl font-semibold">{step.title}</h3>
-                  <p className="text-secondary text-base leading-relaxed">{step.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* ── 4. Library (Continuity Layer) ──────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
-        <Container>
-          <div className="max-w-3xl mx-auto space-y-12">
-            <div className="text-center space-y-6">
-              <SectionLabel>Continuity Layer</SectionLabel>
-              <h2 className="text-[clamp(2rem,5vw,3rem)] font-bold tracking-tight text-primary leading-tight">
-                Sovereign.os Library
-              </h2>
-              <p className="text-secondary text-lg leading-relaxed max-w-xl mx-auto">
-                Not just storage. The private record of what helped. Save Defrag Results, Covenant Briefs, and Best Next Responses — and return to them before the old pattern takes over again.
-              </p>
-            </div>
-
-            <div className="border border-border rounded-2xl divide-y divide-border bg-background overflow-hidden shadow-2xl">
-              {[
-                { type: "Defrag", label: "The argument that won't resolve", date: "Saved" },
-                { type: "Covenant", label: "Where repair is mine to initiate", date: "Saved" },
-                { type: "Alignment", label: "What I am carrying that isn't mine", date: "Saved" },
-              ].map((entry, i) => (
-                <div key={i} className="flex items-center justify-between gap-4 px-6 py-5 hover:bg-surface transition-colors cursor-default">
-                  <div className="flex items-center gap-4 min-w-0">
-                    <span className="text-tertiary font-sans font-medium text-[11px] tracking-widest uppercase shrink-0 w-20">
-                      {entry.type}
-                    </span>
-                    <span className="text-primary text-base font-medium truncate">{entry.label}</span>
-                  </div>
-                  <span className="text-tertiary font-sans font-medium text-[11px] shrink-0">{entry.date}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* ── 5. Pricing ──────────────────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-border bg-background">
-        <Container>
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-16 space-y-4">
-              <h2 className="text-[clamp(2rem,5vw,3rem)] font-bold tracking-tight text-primary">
-                Choose your depth
-              </h2>
-              <p className="text-secondary text-lg">Start free. Go deeper when you&apos;re ready.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-              {/* Free */}
-              <div className="flex flex-col p-10 space-y-8 border border-border rounded-3xl bg-surface hover:border-white/20 transition-colors">
-                <div className="space-y-3">
-                  <h3 className="text-primary text-2xl font-semibold">Free</h3>
-                  <p className="text-tertiary text-base">Understand a moment.</p>
-                </div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-primary text-5xl font-bold tracking-tight">$0</span>
-                  <span className="text-tertiary text-base font-medium">/forever</span>
-                </div>
-                <ul className="space-y-4 flex-1 mt-4">
-                  {FREE_FEATURES.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-4 text-secondary text-base leading-relaxed">
-                      <Dot dim />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/login" className="block mt-8">
-                  <Button variant="ghost" className="w-full rounded-full border-border bg-transparent text-primary hover:bg-white/5 h-14 font-sans font-medium text-[13px] tracking-wider uppercase transition-colors">
-                    Get Started Free
-                  </Button>
-                </Link>
-              </div>
-
-              {/* Pro */}
-              <div className="flex flex-col p-10 space-y-8 border border-white/20 rounded-3xl bg-elevated shadow-2xl relative">
-                <div className="absolute -top-4 right-8">
-                  <Badge className="bg-primary text-background hover:bg-primary/90 rounded-full font-sans font-bold text-[11px] uppercase tracking-widest px-4 py-1.5 shadow-lg">
-                    Recommended
-                  </Badge>
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-primary text-2xl font-semibold">Sovereign Pro</h3>
-                  <p className="text-tertiary text-base">Return, remember, compare, and interrupt.</p>
-                </div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-primary text-5xl font-bold tracking-tight">$20</span>
-                  <span className="text-tertiary text-base font-medium">/mo</span>
-                </div>
-                <ul className="space-y-4 flex-1 mt-4">
-                  {PRO_FEATURES.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-4 text-primary text-base leading-relaxed font-medium">
-                      <Dot />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/login" className="block mt-8">
-                  <Button className="w-full rounded-full bg-primary text-background hover:bg-primary/90 h-14 font-sans font-bold text-[13px] tracking-wider uppercase transition-transform active:scale-95 shadow-xl">
-                    Start Sovereign Pro
-                  </Button>
-                </Link>
+      {/* Cinematic Row 1: Defrag */}
+      <section className="relative py-32 border-t border-white/5">
+        <div className="max-w-[1400px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+          <div className="order-2 lg:order-1">
+            <div className="ui-fragment">
+              <div className="ui-line top-1/4"></div>
+              <div className="ui-line top-2/4"></div>
+              <div className="ui-line top-3/4"></div>
+              <div className="absolute inset-x-12 inset-y-12 border border-white/5 rounded-xl bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                <span className="text-[10px] text-white/20 tracking-widest uppercase font-mono">Active Pattern Detected</span>
               </div>
             </div>
           </div>
-        </Container>
-      </Section>
-
-      {/* ── 6. Final CTA ────────────────────────────────────────────────────── */}
-      <Section className="w-full py-32 md:py-48 bg-surface relative overflow-hidden">
-        <Container className="relative z-10 text-center max-w-3xl px-4">
-          <div className="space-y-4 mb-12">
-            <h2 className="text-[clamp(2.5rem,7vw,5rem)] font-bold tracking-tight text-primary leading-[1.05] text-balance">
-              Healing isn&apos;t optional.
-            </h2>
-            <h2 className="text-[clamp(2.5rem,7vw,5rem)] font-bold tracking-tight text-secondary leading-[1.05] text-balance opacity-50">
-              Holding the pain is.
-            </h2>
-          </div>
-
-          <p className="text-tertiary text-[13px] font-sans font-bold tracking-[0.2em] uppercase mb-12">
-            The platform is ready when you are.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/login" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto rounded-full bg-primary text-background hover:bg-primary/90 h-14 px-10 font-sans font-medium text-[13px] tracking-wider uppercase transition-transform active:scale-95 shadow-lg">
-                Enter Sovereign.os
-              </Button>
+          <div className="order-1 lg:order-2 flex flex-col items-start">
+            <span className="text-[11px] font-medium tracking-widest uppercase text-white/40 mb-6 font-mono">01 // The Defrag Space</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-[-0.03em] mb-8 leading-tight text-white">Separate the moment <br/>from the pattern.</h2>
+            <p className="text-lg text-white/40 leading-relaxed mb-10 max-w-md">
+              The conversation ended. Your body did not. Defrag slows the moment down, surfacing exactly what was activated so you can choose a response that doesn&apos;t feed the loop.
+            </p>
+            <Link href="/login" className="text-sm font-medium tracking-tight text-white/80 hover:text-white transition-colors flex items-center gap-2">
+              Explore Defrag Space <span className="text-white/40">→</span>
             </Link>
           </div>
-        </Container>
-      </Section>
+        </div>
+      </section>
+
+      {/* Cinematic Row 2: Covenant */}
+      <section className="relative py-32 border-t border-white/5">
+        <div className="max-w-[1400px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+          <div className="flex flex-col items-start">
+            <span className="text-[11px] font-medium tracking-widest uppercase text-white/40 mb-6 font-mono">02 // The Covenant Space</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-[-0.03em] mb-8 leading-tight text-white">Reflection anchored <br/>in responsibility.</h2>
+            <p className="text-lg text-white/40 leading-relaxed mb-10 max-w-md">
+              For the user who wants faith to stay connected to the work. Covenant brings plain-language reflection, repair, and grounded discernment into what you are walking through.
+            </p>
+            <Link href="/login" className="text-sm font-medium tracking-tight text-white/80 hover:text-white transition-colors flex items-center gap-2">
+              Explore Covenant Space <span className="text-white/40">→</span>
+            </Link>
+          </div>
+          <div>
+            <div className="ui-fragment flex justify-center items-center">
+              <div className="w-64 h-64 border border-white/5 rounded-full flex items-center justify-center">
+                <div className="w-48 h-48 border border-white/10 rounded-full flex items-center justify-center">
+                  <div className="w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Typographic List: The Library */}
+      <section className="relative py-40 border-t border-white/5">
+        <div className="max-w-5xl mx-auto px-8">
+          <div className="mb-24 text-center flex flex-col items-center">
+            <span className="text-[11px] font-medium tracking-widest uppercase text-white/40 mb-6 block font-mono">03 // The Library</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-[-0.03em] leading-tight text-white">The private record <br/>of what helped.</h2>
+          </div>
+          
+          <div className="w-full flex flex-col border-t border-white/10">
+            <div className="flex items-center justify-between py-8 border-b border-white/10 group hover:bg-white/[0.02] transition-colors cursor-pointer px-4 -mx-4 rounded-lg">
+              <div className="flex items-center gap-12">
+                <span className="text-[11px] text-white/30 uppercase tracking-widest font-mono w-24">Defrag</span>
+                <span className="text-lg tracking-tight text-white/90">The boundary setting conversation</span>
+              </div>
+              <span className="text-sm text-white/40 group-hover:text-white transition-colors">→</span>
+            </div>
+            <div className="flex items-center justify-between py-8 border-b border-white/10 group hover:bg-white/[0.02] transition-colors cursor-pointer px-4 -mx-4 rounded-lg">
+              <div className="flex items-center gap-12">
+                <span className="text-[11px] text-white/30 uppercase tracking-widest font-mono w-24">Alignment</span>
+                <span className="text-lg tracking-tight text-white/90">What is mine vs what is theirs</span>
+              </div>
+              <span className="text-sm text-white/40 group-hover:text-white transition-colors">→</span>
+            </div>
+            <div className="flex items-center justify-between py-8 border-b border-white/10 group hover:bg-white/[0.02] transition-colors cursor-pointer px-4 -mx-4 rounded-lg">
+              <div className="flex items-center gap-12">
+                <span className="text-[11px] text-white/30 uppercase tracking-widest font-mono w-24">Covenant</span>
+                <span className="text-lg tracking-tight text-white/90">Responsibility in family conflict</span>
+              </div>
+              <span className="text-sm text-white/40 group-hover:text-white transition-colors">→</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom CTA */}
+      <section className="relative py-40 border-t border-white/5 overflow-hidden flex justify-center items-center text-center">
+        <div className="ambient-glow bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"></div>
+        <div className="z-10 px-8 flex flex-col items-center">
+          <h2 className="text-5xl md:text-7xl font-medium tracking-[-0.04em] mb-12 text-white">Return before the <br/>pattern takes over.</h2>
+          <Link href="/login" className="px-10 py-5 rounded-full bg-white text-black text-base font-medium hover:scale-[1.02] transition-transform">
+            Start Baseline Design
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 border-t border-white/5 text-center px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <span className="text-sm font-medium tracking-tight text-white/80">Sovereign.os</span>
+          <div className="flex gap-6 text-[13px] text-white/40">
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+          </div>
+        </div>
+      </footer>
     </main>
   )
 }
