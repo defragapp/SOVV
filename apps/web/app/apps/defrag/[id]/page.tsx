@@ -122,7 +122,11 @@ export default function DefragItemPage() {
                 <Button 
                   onClick={handleGenerateAudio}
                   disabled={isGeneratingAudio}
+<<<<<<< HEAD
                   variant="secondary" 
+=======
+                  variant="secondary"
+>>>>>>> pr-61
                   className="rounded-none border border-white/[0.15] bg-transparent text-[#FAFAFA] hover:bg-white/5 font-mono text-[10px] tracking-[0.15em] uppercase h-8 w-full"
                 >
                   {isGeneratingAudio ? "Generating..." : "Generate Audio"}
@@ -287,11 +291,7 @@ export default function DefragItemPage() {
   )
 
   return (
-    <SpaceShell
       spaceName={`Library / ${result?.activePattern || "Item"}`}
-      sidebar={sidebarContent}
-      main={desktopMain}
-      contextPanel={contextContent}
       mobileTabs={mobileTabs}
     />
   )
