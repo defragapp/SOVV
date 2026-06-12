@@ -1,0 +1,44 @@
+name = "developer"
+main = "src/index.mjs"
+compatibility_date = "2026-06-12"
+compatibility_flags = ["nodejs_compat"]
+account_id = "8b1954d216d65077c6480d62583fe2c2"
+
+[[durable_objects.bindings]]
+name = "AGENT_STATE"
+class_name = "DeveloperAgent"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["DeveloperAgent"]
+
+[[r2_buckets]]
+binding = "DEVELOPER_ASSETS"
+bucket_name = "developer-assets"
+
+[[d1_databases]]
+binding = "DEVELOPER_DB"
+database_id = "a6994b42-81ef-4fd7-a001-09526be1b2db"
+database_name = "developer-db"
+
+[ai]
+binding = "AI"
+
+[env.production]
+name = "developer"
+
+[[env.production.durable_objects.bindings]]
+name = "AGENT_STATE"
+class_name = "DeveloperAgent"
+
+[[env.production.r2_buckets]]
+binding = "DEVELOPER_ASSETS"
+bucket_name = "developer-assets"
+
+[[env.production.d1_databases]]
+binding = "DEVELOPER_DB"
+database_id = "a6994b42-81ef-4fd7-a001-09526be1b2db"
+database_name = "developer-db"
+
+[env.production.ai]
+binding = "AI"
