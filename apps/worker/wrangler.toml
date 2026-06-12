@@ -6,7 +6,7 @@ account_id = "8b1954d216d65077c6480d62583fe2c2"
 workers_dev = false
 
 [[routes]]
-pattern = "api.defrag.app"
+pattern = "api.defrag.app/*"
 custom_domain = true
 
 [[d1_databases]]

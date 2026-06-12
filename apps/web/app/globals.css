@@ -1,5 +1,4 @@
-@tailwind base;
-@tailwind components;
+@import "tailwindcss/preflight";
 @tailwind utilities;
 
 @layer base {
@@ -175,17 +174,84 @@
   transition: all 200ms ease;
 }
 
+/*
+  Marketing UI primitives.
+  A bunch of marketing components reference these class names.
+  If they don't exist, the live UI looks flat/broken.
+*/
+
+.glass {
+  background: rgba(5, 7, 11, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.panel {
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.grid-bg {
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.07) 1px, transparent 0) 0 0 /
+      24px 24px;
+}
+
+.hero-glow {
+  position: relative;
+}
+
+.hero-glow::after {
+  content: "";
+  position: absolute;
+  inset: -40px -60px;
+  background:
+    radial-gradient(closest-side, rgba(255, 255, 255, 0.16), transparent 65%),
+    radial-gradient(closest-side, rgba(255, 255, 255, 0.08), transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.meta-label {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.btn-premium {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  transition: background-color 150ms ease, border-color 150ms ease,
+    transform 150ms ease;
+}
+
+.btn-premium:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.premium-card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1.5rem;
+}
+
+.premium-card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
 /* Legacy mappings */
 .sovv-button-primary { border-radius: 999px; background: #FFF; color: #000; }
 .sovv-button { border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(255,255,255,0.7); }
 .sovv-button-ghost { background: transparent; color: var(--text-secondary); }
-
-/* Safe Fallbacks and missing classes requested in instructions */
-.glass {
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
 
 .bg-elevated { background-color: var(--bg-elevated); }
 .accent-oxblood { color: var(--text-primary); }
@@ -216,3 +282,4 @@
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+

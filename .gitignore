@@ -86,3 +86,4 @@ packages/core/src/geneKeyMeanings.ts
 .dev.vars
 .env
 .env.local
+.env.production

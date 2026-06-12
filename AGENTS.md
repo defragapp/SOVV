@@ -1,22 +1,29 @@
-# Agent Orientation: Read Before Working
+# AGENTS.md — Cloudflare Workers Monorepo
 
-Welcome. Before you begin any task in this repository, you must review and adhere to the strict guardrails established to maintain the integrity of this codebase.
+## Architecture
+- Account ID: `8b1954d216d65077c6480d62583fe2c2`
+- 4 Workers: `sovereign-os-api`, `worker-session`, `worker-ai`, `sovv-web`
+- All deploys MUST use: `wrangler deploy --env production`
+- NEVER use plain `wrangler deploy` (causes ghost resources)
 
-## No Drift / No Bloat Ethos
+## Critical Rules
+1. **Durable Objects**: `[[durable_objects.bindings]]` only uses `name` + `class_name`. No `script_name`.
+2. **Secrets**: NEVER commit credentials. Use `.dev.vars` (gitignored) for local, GitHub Secrets for CI.
+3. **Routes**: Every Worker with a custom domain MUST declare `[[routes]]` with `pattern = "subdomain.defrag.app/*"` and `custom_domain = true`.
+4. **Turnstile**: Siteverify routes through `sovereign-os-api`. Browser never calls `challenges.cloudflare.com` directly.
+5. **Env Blocks**: All `wrangler.toml` changes must include both base config AND `[env.production]` duplication.
 
-We operate under a strict **No Drift / No Bloat** ethos. This means:
-   * **No Excessive Branching:** Do not create one-off feature branches for minor fixes. Build on the existing `main` branch or a single designated feature branch.
-   * **No Orphaned Branches:** If you see orphaned branches or multiple active feature branches, prioritize consolidating and cleaning them up before starting new work.
-   * **No Environmental Bloat:** Do not add redundant configuration files (`.devcontainer/`, temporary `.env` files, or `.github/workflows/` since we rely on native Cloudflare Workers Builds).
+## Live Resources
+- DB: `vibesdk-db` (ID: `c8c2fd8d-5297-46fc-8594-7629c8bad74d`)
+- KV: `SOVV_DATA` (ID: `3bd3ff5048a8468e82c574d7d66045c3`)
+- R2: `vibesdk-templates`
+- DO Class: VERIFY before changing — live class name may be `ConflictSessionDO` not `ConflictSession`
 
-## Autonomous Execution
+## Files That Must Stay Gitignored
+- `.dev.vars`
+- `.env*`
+- `.wrangler/`
 
-You are empowered to be an executor, not just a proposer.
-   * **Resolve conflicts autonomously** by favoring `main`'s architecture.
-   * **Complete tasks in full**, including addressing security fixes and ensuring all CI checks pass locally (e.g., `npm run build -w apps/web`, `npm run build -w apps/worker`) before declaring a task finished.
-
-## Full Policies
-
-For the comprehensive rules regarding your operation, you must read:
-   * `docs/03_AI_AGENT_GUARDRAILS.md` - Details the Autonomous Operation & Branching Policy.
-   * The rest of the `docs/` folder for architectural and design Source of Truth.
+## Deployment
+- GitHub Actions handles production deploys on `main` push
+- Local deploy only for testing: `cd apps/<worker> && npx wrangler deploy --env production`
