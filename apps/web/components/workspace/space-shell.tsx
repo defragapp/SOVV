@@ -2,7 +2,7 @@
 import * as React from "react"
 import { Badge } from "@/components/ui/badge"
 
-interface WorkspaceShellProps {
+interface SpaceShellProps {
   sidebar?: React.ReactNode
   main: React.ReactNode
   contextPanel?: React.ReactNode
@@ -10,22 +10,22 @@ interface WorkspaceShellProps {
   spaceName: "Defrag" | "Covenant" | "Library" | string
 }
 
-export function WorkspaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName }: WorkspaceShellProps) {
+export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName }: SpaceShellProps) {
   const [activeTab, setActiveTab] = React.useState(mobileTabs[0].id)
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground font-mono">
+    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground font-sans font-medium">
       
       {/* Desktop Layout */}
       <div className="hidden lg:grid w-full h-full" style={{ gridTemplateColumns: "256px 1fr 320px", gridTemplateRows: "56px 1fr 32px" }}>
 
         {/* Context Bar (Top) */}
         <header className="col-span-3 h-14 border-b border-border bg-background px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3 font-mono text-sm">
+          <div className="flex items-center gap-3 font-sans font-medium text-sm">
             <span className="text-foreground-muted">Sovereign.os /</span>
             <span className="text-foreground">{spaceName}</span>
           </div>
-          <div className="flex items-center font-mono text-xs text-foreground-muted">
+          <div className="flex items-center font-sans font-medium text-xs text-foreground-muted">
             <span className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
               Secure Data Vault
@@ -50,10 +50,10 @@ export function WorkspaceShell({ sidebar, main, contextPanel, mobileTabs, spaceN
 
         {/* Telemetry Footer */}
         <footer className="col-span-3 h-8 border-t border-border bg-background px-6 flex items-center justify-between">
-          <span className="font-mono text-xs text-foreground-muted uppercase tracking-widest">
+          <span className="font-sans font-medium text-xs text-foreground-muted uppercase tracking-widest">
             {spaceName.toLowerCase()}::active
           </span>
-          <span className="font-mono text-xs text-foreground-muted">
+          <span className="font-sans font-medium text-xs text-foreground-muted">
             Telemetry: OK
           </span>
         </footer>
@@ -62,7 +62,7 @@ export function WorkspaceShell({ sidebar, main, contextPanel, mobileTabs, spaceN
       {/* Mobile / iOS Layout */}
       <div className="flex lg:hidden flex-col w-full h-full safe-top safe-bottom">
          <header className="sticky top-0 z-10 bg-background/90 backdrop-blur-md border-b border-border px-5 py-3 flex items-center justify-between">
-            <span className="font-mono text-sm">{spaceName}</span>
+            <span className="font-sans font-medium text-sm">{spaceName}</span>
          </header>
          
          <div className="flex px-4 py-2 gap-2 overflow-x-auto no-scrollbar border-b border-border">
@@ -70,7 +70,7 @@ export function WorkspaceShell({ sidebar, main, contextPanel, mobileTabs, spaceN
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 rounded-none text-sm font-mono whitespace-nowrap transition-colors touch-target border border-transparent ${
+                className={`px-4 py-2 rounded-none text-sm font-sans font-medium whitespace-nowrap transition-colors touch-target border border-transparent ${
                   activeTab === tab.id 
                     ? "bg-surface text-foreground border-border"
                     : "text-foreground-muted hover:text-foreground"

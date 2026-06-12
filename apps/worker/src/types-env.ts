@@ -40,6 +40,10 @@ export interface Env {
   // Queue name: pattern-extraction-tasks
   QUEUE?: Queue
 
+  // Used for optional rate limiting in index.ts (unsafe binding in wrangler.toml).
+  RATE_LIMITER?: { limit: (opts: { key: string }) => Promise<{ success: boolean }> };
+
+
   // ── Stripe ───────────────────────────────────────────────────────────────
   STRIPE_SECRET_KEY?: string
   STRIPE_PUBLISHABLE_KEY?: string
@@ -57,8 +61,17 @@ export interface Env {
   TEAM_DOMAIN?: string  // e.g., https://your-team.cloudflareaccess.com
   POLICY_AUD?: string
 
+  // Cookie domain apex for cross-subdomain auth. Example: defrag.app
+  COOKIE_DOMAIN?: string
+
+
   // ── App config ───────────────────────────────────────────────────────────
   FREE_DAILY_LIMIT?: string
   APP_URL?: string
   AI_MODEL?: string
+<<<<<<< HEAD
+  GATEWAY_ID?: string
+=======
+  ELEVENLABS_API_KEY?: string
+>>>>>>> main
 }

@@ -15,10 +15,10 @@
     "dev:web": "wrangler dev --config apps/web/wrangler.json --local",
     "dev:all": "concurrently \"npm run dev:api\" \"npm run dev:ai\" \"npm run dev:session\" \"npm run dev:web\"",
     "build": "npm --workspace=web exec opennextjs-cloudflare build",
-    "deploy:api": "cd apps/worker && wrangler deploy",
-    "deploy:ai": "cd apps/worker-ai && wrangler deploy",
-    "deploy:session": "cd apps/worker-session && wrangler deploy",
-    "deploy:web": "cd apps/web && wrangler deploy",
+    "deploy:api": "cd apps/worker && wrangler deploy --env production",
+    "deploy:ai": "cd apps/worker-ai && wrangler deploy --env production",
+    "deploy:session": "cd apps/worker-session && wrangler deploy --env production",
+    "deploy:web": "cd apps/web && wrangler deploy --env production",
     "deploy:all": "npm run deploy:api && npm run deploy:ai && npm run deploy:session && npm run deploy:web",
     "ship": "bash ./scripts/push-live.sh",
     "lint": "npm run lint -w apps/web && tsc --noEmit -p apps/worker/tsconfig.json"
@@ -26,7 +26,10 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "concurrently": "^8.2.2",
-    "wrangler": "^4.97.0",
+    "geist": "^1.7.2",
+    "wrangler": "^4.97.0"
+  },
+  "dependencies": {
     "playwright": "^1.60.0"
   }
 }

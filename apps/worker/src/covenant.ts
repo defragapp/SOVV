@@ -41,6 +41,8 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
 
       const aiResponse = await env.AI.run(env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast", {
         messages
+      }, {
+        gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" }
       });
 
       return new Response(JSON.stringify({ success: true, result: aiResponse.response }), { status: 200, headers: { "Content-Type": "application/json" } });

@@ -82,3 +82,8 @@ packages/core/src/geneKeys.ts
 packages/core/src/geneKeyMeanings.ts
 .wrangler/
 .dev.vars
+# Local environment
+.dev.vars
+.env
+.env.local
+.env.production

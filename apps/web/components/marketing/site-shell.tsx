@@ -86,7 +86,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      <footer className="border-t border-border bg-black py-16">
+      <footer className="border-t border-border bg-background py-16">
         <div className="container-platform flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-foreground-disabled">
           <div className="flex flex-col items-center md:items-start gap-2">
             <span className="text-label text-foreground-disabled">SOVEREIGN.OS</span>

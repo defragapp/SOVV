@@ -1,20 +1,12 @@
 {
-  "name": "Sovereign.os Platform",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
-  "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
-  },
-  "postCreateCommand": "npm install -g wrangler@latest && wrangler --version",
-  "containerEnv": {
-    "CLOUDFLARE_ACCOUNT_ID": "8b1954d216d65077c6480d62583fe2c2"
-  },
+  "name": "Node.js",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "postCreateCommand": "chmod +x scripts/setup.sh && bash scripts/setup.sh",
   "customizations": {
     "vscode": {
       "extensions": [
-        "saoudrizwan.claude-dev",
-        "bradlc.vscode-tailwindcss",
-        "esbenp.prettier-vscode",
-        "google.geminicodeassist"
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
       ]
     }
   }

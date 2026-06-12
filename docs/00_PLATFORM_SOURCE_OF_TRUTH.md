@@ -8,6 +8,8 @@
 
 **Covenant** is a space inside Sovereign.os. It is an optional faith-context reflection space. User-initiated, plain-language, and private by design.
 
+**Alignment** is a space inside Sovereign.os. It is the response integration and action choice space. It helps turn insights into actionable responses.
+
 Future spaces are added under the same Sovereign.os architecture. They do not get separate accounts, subscriptions, or Libraries.
 
 ---
@@ -50,6 +52,7 @@ Future spaces are added under the same Sovereign.os architecture. They do not ge
 |---|---|---|
 | `/apps/defrag` | Defrag space | Default space for authenticated users |
 | `/apps/covenant` | Covenant space | Optional, user-initiated |
+| `/apps/alignment` | Alignment space | Response integration and action choice |
 
 ---
 
