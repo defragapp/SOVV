@@ -68,7 +68,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <Badge
       variant="outline"
-      className="rounded-none border-border bg-transparent text-[#71717A] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
+      className="rounded-full border-border bg-transparent text-secondary font-sans font-medium text-[12px] tracking-[0.1em] uppercase px-4 py-1.5 w-fit"
     >
       {children}
     </Badge>
@@ -76,13 +76,13 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 function Rule() {
-  return <div className="h-px w-full bg-white/[0.06]" />
+  return <div className="h-px w-full bg-border" />
 }
 
 function Dot({ dim }: { dim?: boolean }) {
   return (
     <div
-      className={`mt-[6px] w-1 h-1 shrink-0 rounded-full ${dim ? "bg-white/[0.15]" : "bg-white/30"}`}
+      className={`mt-[8px] w-1.5 h-1.5 shrink-0 rounded-full ${dim ? "bg-white/[0.15]" : "bg-white/40"}`}
     />
   )
 }
@@ -91,84 +91,64 @@ function Dot({ dim }: { dim?: boolean }) {
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center selection:bg-white/10 selection:text-white bg-surface">
+    <main className="flex min-h-screen flex-col items-center bg-background text-foreground selection:bg-white/10 selection:text-white">
 
       {/* ── 1. Hero ─────────────────────────────────────────────────────────── */}
-      <Section className="w-full relative flex flex-col items-center justify-center min-h-[100svh] pt-28 pb-20 overflow-hidden border-b border-border">
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[90svh] pt-32 pb-20 overflow-hidden border-b border-border bg-gradient-to-b from-background to-surface">
 
-        {/* Grid texture */}
+        {/* Dynamic Texture overlay */}
         <div
           aria-hidden
-          className="absolute inset-0 z-0 pointer-events-none opacity-[0.025]"
+          className="absolute inset-0 z-0 pointer-events-none opacity-[0.03]"
           style={{
-            backgroundImage:
-              "linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)",
-            backgroundSize: "72px 72px",
+            backgroundImage: "radial-gradient(circle at center, var(--text-primary) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
           }}
         />
 
-        <Container className="relative z-10 flex flex-col items-center text-center max-w-[900px]">
+        <Container className="relative z-10 flex flex-col items-center text-center max-w-4xl px-4 sm:px-6">
 
-          {/* Wordmark pill */}
-          <div className="mb-12 flex items-center gap-3">
-            <div className="h-px w-10 bg-white/[0.14]" />
+          {/* Wordmark */}
+          <div className="mb-10 animate-fade-in-up">
             <SectionLabel>SOVEREIGN.OS</SectionLabel>
-            <div className="h-px w-10 bg-white/[0.14]" />
           </div>
 
-          {/* Primary headline */}
-          <div className="mb-8 space-y-2">
-            <h1 className="text-[clamp(2.6rem,7vw,5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance">
+          {/* Primary headline with balanced contrast */}
+          <div className="mb-8 space-y-4 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+            <h1 className="text-[clamp(3rem,8vw,6rem)] font-bold tracking-tight text-primary leading-[1.1] text-balance">
               Healing isn&apos;t optional.
             </h1>
-            <h1 className="text-[clamp(2.6rem,7vw,5rem)] font-semibold tracking-[-0.035em] text-[#3F3F46] leading-[1.04] text-balance">
+            <h1 className="text-[clamp(3rem,8vw,6rem)] font-bold tracking-tight text-secondary leading-[1.1] text-balance">
               Holding the pain is.
             </h1>
           </div>
 
           {/* Support copy */}
-          <p className="text-[#A1A1AA] text-base md:text-lg font-normal tracking-[-0.01em] max-w-[640px] mb-3 text-balance leading-[1.65]">
+          <p className="text-secondary text-lg sm:text-xl font-normal max-w-2xl mb-12 text-balance leading-relaxed animate-fade-in-up" style={{ animationDelay: '200ms' }}>
             Understand what is shaping your relationships, family dynamics, grief, boundaries, and decisions — and get a clearer way forward.
           </p>
 
-          {/* Three-line sub-statement */}
-          <div className="mb-12 flex flex-col sm:flex-row items-center gap-x-5 gap-y-1 text-[#71717A] font-sans font-medium text-[10px] tracking-[0.12em] uppercase">
-            <span>See what is actually happening</span>
-            <span className="hidden sm:block text-white/[0.12]">·</span>
-            <span>Understand your role in it</span>
-            <span className="hidden sm:block text-white/[0.12]">·</span>
-            <span>Respond differently</span>
-          </div>
-
-          {/* Primary CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto items-center">
+          {/* Main CTAs */}
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center mb-16 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
             <Link href="/login" className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                className="w-full sm:w-auto rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-8 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
-              >
+              <Button size="lg" className="w-full sm:w-auto rounded-full bg-primary text-background hover:bg-primary/90 font-sans font-medium text-[13px] tracking-wider uppercase h-14 px-8 transition-transform active:scale-95 shadow-[0_4px_20px_rgba(255,255,255,0.1)]">
                 Enter Sovereign.os
               </Button>
             </Link>
             <Link href="/login" className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                variant="ghost"
-                className="w-full sm:w-auto rounded-none border-border bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] hover:text-white h-12 px-8 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
-              >
+              <Button variant="ghost" size="lg" className="w-full sm:w-auto rounded-full border border-border bg-transparent text-primary hover:bg-white/5 h-14 px-8 font-sans font-medium text-[13px] tracking-wider uppercase transition-colors">
                 Start Baseline Design
               </Button>
             </Link>
           </div>
 
-          {/* Secondary CTAs */}
-          <div className="mt-8 flex gap-7 text-[#71717A] font-sans font-medium text-[10px] tracking-[0.1em] uppercase">
-            <Link href="#defrag" className="hover:text-[#A1A1AA] transition-colors">
-              Explore Defrag →
-            </Link>
-            <Link href="#covenant" className="hover:text-[#A1A1AA] transition-colors">
-              Explore Covenant →
-            </Link>
+          {/* Supporting lines */}
+          <div className="flex flex-col sm:flex-row items-center gap-x-6 gap-y-2 text-tertiary font-sans font-medium text-[11px] tracking-[0.15em] uppercase animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+            <span>See what is actually happening</span>
+            <span className="hidden sm:block opacity-40">·</span>
+            <span>Understand your role in it</span>
+            <span className="hidden sm:block opacity-40">·</span>
+            <span>Respond differently</span>
           </div>
         </Container>
       </Section>
@@ -176,36 +156,19 @@ export default function HomePage() {
       {/* ── 2. What this helps with ─────────────────────────────────────────── */}
       <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container>
-          <div className="max-w-3xl mx-auto">
-
-            {/* Cascade headline */}
-            <div className="mb-16 space-y-1">
-              <h2 className="text-[clamp(1.6rem,4vw,2.25rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
-                See what is actually happening.
-              </h2>
-              <h2 className="text-[clamp(1.6rem,4vw,2.25rem)] font-semibold tracking-[-0.025em] text-[#A1A1AA] leading-tight">
-                Understand your role in it.
-              </h2>
-              <h2 className="text-[clamp(1.6rem,4vw,2.25rem)] font-semibold tracking-[-0.025em] text-[#3F3F46] leading-tight">
-                Respond differently.
+          <div className="max-w-4xl mx-auto space-y-16">
+            <div className="text-center space-y-6">
+              <SectionLabel>The application</SectionLabel>
+              <h2 className="text-[clamp(2rem,5vw,3rem)] font-bold tracking-tight text-primary leading-tight">
+                What this helps with
               </h2>
             </div>
 
-            {/* Help grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 border border-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border border border-border overflow-hidden rounded-2xl">
               {WHAT_HELPS.map((item, i) => (
-                <div
-                  key={i}
-                  className={[
-                    "p-7 md:p-8 space-y-2",
-                    i % 2 === 0 && i < WHAT_HELPS.length - 1 ? "border-r border-border" : "",
-                    i < 2 ? "border-b border-border" : "",
-                  ].join(" ")}
-                >
-                  <h3 className="text-[#FAFAFA] text-[15px] font-medium tracking-tight">
-                    {item.title}
-                  </h3>
-                  <p className="text-[#71717A] text-sm leading-relaxed">{item.desc}</p>
+                <div key={i} className="bg-surface p-8 sm:p-10 flex flex-col gap-4 hover:bg-elevated transition-colors duration-300">
+                  <h3 className="text-primary text-xl font-semibold tracking-tight">{item.title}</h3>
+                  <p className="text-secondary text-base leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -213,41 +176,23 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      {/* ── 3. What Sovereign.os does ───────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
+      {/* ── 3. How it Works (Sovereign.os does) ─────────────────────────────── */}
+      <Section className="w-full py-24 md:py-32 border-b border-border bg-background">
         <Container>
-          <div className="flex flex-col lg:flex-row gap-16 xl:gap-24 justify-between items-start">
-
-            {/* Sticky label column */}
-            <div className="lg:w-[280px] shrink-0 space-y-5 lg:sticky lg:top-24">
-              <SectionLabel>The Loop</SectionLabel>
-              <h2 className="text-2xl font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-snug">
-                How the platform works
+          <div className="max-w-4xl mx-auto space-y-16">
+            <div className="text-center space-y-6">
+              <SectionLabel>The progression</SectionLabel>
+              <h2 className="text-[clamp(2rem,5vw,3rem)] font-bold tracking-tight text-primary leading-tight">
+                How Sovereign.os works
               </h2>
-              <p className="text-[#A1A1AA] text-sm leading-relaxed">
-                Sovereign.os does not chat with you. It provides structured architectural insight into your situations, allowing you to interrupt old patterns.
-              </p>
             </div>
 
-            {/* Step cards */}
-            <div className="flex-1 flex flex-col gap-0 border border-border">
-              {HOW_IT_WORKS.map((item, i) => (
-                <div
-                  key={i}
-                  className={[
-                    "flex items-start gap-6 p-7 md:p-8 group",
-                    i < HOW_IT_WORKS.length - 1 ? "border-b border-border" : "",
-                  ].join(" ")}
-                >
-                  <span className="text-[#3F3F46] font-sans font-medium text-xs mt-[3px] shrink-0 w-6">
-                    {item.step}
-                  </span>
-                  <div className="space-y-1.5">
-                    <h3 className="text-[#FAFAFA] text-[15px] font-medium tracking-tight">
-                      {item.title}
-                    </h3>
-                    <p className="text-[#71717A] text-sm leading-relaxed">{item.desc}</p>
-                  </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              {HOW_IT_WORKS.map((step, i) => (
+                <div key={i} className="flex flex-col gap-4 p-8 border border-border rounded-2xl bg-surface/50">
+                  <span className="text-tertiary font-sans font-bold text-[12px] tracking-widest">{step.step}</span>
+                  <h3 className="text-primary text-xl font-semibold">{step.title}</h3>
+                  <p className="text-secondary text-base leading-relaxed">{step.desc}</p>
                 </div>
               ))}
             </div>
@@ -255,385 +200,103 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      {/* ── 4. Baseline Design ──────────────────────────────────────────────── */}
+      {/* ── 4. Library (Continuity Layer) ──────────────────────────────────── */}
       <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
         <Container>
-          <div className="max-w-3xl mx-auto space-y-10">
-            <div className="space-y-4">
-              <SectionLabel>Foundation</SectionLabel>
-              <h2 className="text-[clamp(1.8rem,4vw,2.5rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
-                Baseline Design
-              </h2>
-              <p className="text-[#A1A1AA] text-base leading-relaxed max-w-xl">
-                The context that exists before you type. Your core attachment patterns, relational history, and default responses — established once, applied to every session.
-              </p>
-            </div>
-
-            <div className="border border-border divide-y divide-border">
-              {[
-                {
-                  label: "Core Pattern",
-                  desc: "Your primary relational architecture — how you learned to connect and protect yourself.",
-                },
-                {
-                  label: "Default Roles",
-                  desc: "The recurring positions you step into without choosing them: caretaker, mediator, exile.",
-                },
-                {
-                  label: "Threshold Markers",
-                  desc: "The specific situations that reliably trigger your oldest protective responses.",
-                },
-              ].map((row, i) => (
-                <div key={i} className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-8 px-7 py-5">
-                  <span className="text-[#FAFAFA] text-[13px] font-medium font-sans font-medium tracking-tight shrink-0 sm:w-40">
-                    {row.label}
-                  </span>
-                  <p className="text-[#71717A] text-sm leading-relaxed">{row.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            <Link href="/login">
-              <Button
-                size="lg"
-                className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-11 px-7 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
-              >
-                Start Baseline Design
-              </Button>
-            </Link>
-          </div>
-        </Container>
-      </Section>
-
-      {/* ── 5. Defrag Space ─────────────────────────────────────────────────── */}
-      <Section id="defrag" className="w-full py-24 md:py-32 border-b border-border bg-surface">
-        <Container>
-          <div className="max-w-4xl mx-auto space-y-12">
-
-            <div className="space-y-4">
-              <SectionLabel>Primary Action</SectionLabel>
-              <h2 className="text-[clamp(1.8rem,4vw,2.5rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
-                The Defrag Space
-              </h2>
-              <p className="text-[#A1A1AA] text-base leading-relaxed max-w-xl">
-                Bring what feels active, unresolved, or repeating. Receive a structured breakdown of the dynamic — not a paragraph of advice.
-              </p>
-            </div>
-
-            {/* Feature tiles */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 border border-border">
-              {[
-                {
-                  tag: "A",
-                  title: "Structured Results",
-                  desc: "Defrag breaks the situation into: Active Pattern · The Repeat · The Old Role · What You Learned to Carry.",
-                },
-                {
-                  tag: "B",
-                  title: "Clear Direction",
-                  desc: "Move from insight to action with a Best Next Response and Conversational Steering for every situation.",
-                },
-                {
-                  tag: "C",
-                  title: "No Chat Interface",
-                  desc: "This is not a dialogue. It is a structured reading of a dynamic — returned to you, not discussed with you.",
-                },
-                {
-                  tag: "D",
-                  title: "Baseline-Aware",
-                  desc: "Every Defrag result is filtered through your Baseline Design, so the output is always contextually yours.",
-                },
-              ].map((tile, i) => (
-                <div
-                  key={i}
-                  className={[
-                    "p-8 md:p-10 space-y-4",
-                    i % 2 === 0 ? "sm:border-r border-border" : "",
-                    i < 2 ? "border-b border-border" : "",
-                  ].join(" ")}
-                >
-                  <div className="w-8 h-8 border border-border flex items-center justify-center text-[#FAFAFA] font-sans font-medium text-[10px] tracking-widest">
-                    {tile.tag}
-                  </div>
-                  <h3 className="text-[#FAFAFA] text-[15px] font-medium tracking-tight">
-                    {tile.title}
-                  </h3>
-                  <p className="text-[#71717A] text-sm leading-relaxed">{tile.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* ── 6. Covenant Space ───────────────────────────────────────────────── */}
-      <Section id="covenant" className="w-full py-24 md:py-32 border-b border-border bg-surface">
-        <Container>
-          <div className="flex flex-col lg:flex-row gap-14 xl:gap-20 items-start">
-
-            {/* Copy */}
-            <div className="lg:w-[44%] space-y-7">
-              <SectionLabel>Optional Module</SectionLabel>
-              <h2 className="text-[clamp(1.8rem,4vw,2.5rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
-                The Covenant Space
-              </h2>
-              <p className="text-[#A1A1AA] text-base leading-relaxed">
-                A grounded reflection space for faith context. Connect real-life situations to Scripture, responsibility, repair, and discernment.
-              </p>
-              <ul className="space-y-3 pt-2">
-                {[
-                  "No preachy conclusions.",
-                  "Focus on responsibility and repair.",
-                  "Connects to the same Sovereign Library.",
-                ].map((text, i) => (
-                  <li key={i} className="flex items-start gap-3 text-[#A1A1AA] text-sm leading-relaxed">
-                    <Dot />
-                    {text}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Mock card */}
-            <div className="lg:w-[56%] w-full">
-              <div className="border border-border bg-surface p-8 md:p-10 relative overflow-hidden">
-                <div
-                  aria-hidden
-                  className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.025)_0,transparent_60%)]"
-                />
-                <div className="relative z-10 border border-border bg-[#070707] p-6 space-y-5 shadow-2xl">
-                  <div className="flex items-center justify-between">
-                    <div className="h-1.5 w-16 bg-white/[0.08]" />
-                    <SectionLabel>Covenant Brief</SectionLabel>
-                  </div>
-                  <div className="space-y-2.5 pt-1">
-                    <div className="h-3 w-3/4 bg-white/[0.05] rounded-sm" />
-                    <div className="h-3 w-full bg-white/[0.05] rounded-sm" />
-                    <div className="h-3 w-5/6 bg-white/[0.05] rounded-sm" />
-                  </div>
-                  <div className="pt-4 mt-2 border-t border-border space-y-2">
-                    <div className="h-2.5 w-full bg-white/[0.03] rounded-sm" />
-                    <div className="h-2.5 w-4/5 bg-white/[0.03] rounded-sm" />
-                    <div className="h-2.5 w-2/3 bg-white/[0.03] rounded-sm" />
-                  </div>
-                  <div className="pt-2 flex gap-2">
-                    <div className="h-7 w-20 bg-white/[0.06] rounded-sm" />
-                    <div className="h-7 w-14 bg-white/[0.03] rounded-sm" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* ── 7. Alignment Space ──────────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
-        <Container>
-          <div className="max-w-3xl mx-auto space-y-10">
-            <div className="space-y-4">
-              <SectionLabel>Response Layer</SectionLabel>
-              <h2 className="text-[clamp(1.8rem,4vw,2.5rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
-                The Alignment Space
-              </h2>
-              <p className="text-[#A1A1AA] text-base leading-relaxed max-w-xl">
-                Turn insight into usable response. Understand what is active in you, what is yours to hold, and what is not yours to carry. Find the response that fits who you are now — not who you were in the old pattern.
-              </p>
-            </div>
-
-            <div className="border border-border divide-y divide-border">
-              {[
-                {
-                  label: "What is Active",
-                  desc: "Identify the emotional charge that is present right now, separate from the story.",
-                },
-                {
-                  label: "What is Yours",
-                  desc: "Distinguish between your responsibility in this moment and what you have been conditioned to carry.",
-                },
-                {
-                  label: "How to Respond",
-                  desc: "A specific, grounded response — calibrated to your Baseline and the current situation.",
-                },
-              ].map((row, i) => (
-                <div key={i} className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-8 px-7 py-5">
-                  <span className="text-[#FAFAFA] text-[13px] font-medium font-sans font-medium tracking-tight shrink-0 sm:w-40">
-                    {row.label}
-                  </span>
-                  <p className="text-[#71717A] text-sm leading-relaxed">{row.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* ── 8. When Both Sides Matter ───────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
-        <Container>
-          <div className="max-w-3xl mx-auto space-y-10">
-            <div className="space-y-4">
-              <SectionLabel>Consent-Based</SectionLabel>
-              <h2 className="text-[clamp(1.8rem,4vw,2.5rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
-                Invite Privately
-              </h2>
-              <p className="text-[#A1A1AA] text-base leading-relaxed max-w-xl">
-                When both sides matter. A consent-based comparison of patterns to see where the collision is happening — not to determine who is wrong.
-              </p>
-            </div>
-
-            {/* What it is not */}
-            <div className="border border-border">
-              <div className="px-7 py-4 border-b border-border">
-                <span className="text-[#71717A] font-sans font-medium text-[10px] tracking-[0.15em] uppercase">
-                  What it is not
-                </span>
-              </div>
-              <div className="divide-y divide-border">
-                {["No diagnosis.", "No compatibility score.", "No verdict."].map((text, i) => (
-                  <div key={i} className="flex items-center gap-4 px-7 py-4">
-                    <span className="font-sans font-medium text-[10px] text-[#3F3F46]">×</span>
-                    <span className="text-[#71717A] text-sm">{text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* What it does */}
-            <div className="border border-border">
-              <div className="px-7 py-4 border-b border-border">
-                <span className="text-[#71717A] font-sans font-medium text-[10px] tracking-[0.15em] uppercase">
-                  What it does
-                </span>
-              </div>
-              <div className="divide-y divide-border">
-                {[
-                  "Shows where patterns collide.",
-                  "Surfaces what each person is protecting.",
-                  "Suggests where repair is possible.",
-                ].map((text, i) => (
-                  <div key={i} className="flex items-center gap-4 px-7 py-4">
-                    <span className="font-sans font-medium text-[10px] text-[#A1A1AA]">→</span>
-                    <span className="text-[#A1A1AA] text-sm">{text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* ── 9. Sovereign.os Library ─────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
-        <Container>
-          <div className="max-w-3xl mx-auto space-y-10">
-            <div className="text-center space-y-4">
+          <div className="max-w-3xl mx-auto space-y-12">
+            <div className="text-center space-y-6">
               <SectionLabel>Continuity Layer</SectionLabel>
-              <h2 className="text-[clamp(1.8rem,4vw,2.5rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
+              <h2 className="text-[clamp(2rem,5vw,3rem)] font-bold tracking-tight text-primary leading-tight">
                 Sovereign.os Library
               </h2>
-              <p className="text-[#A1A1AA] text-base leading-relaxed max-w-xl mx-auto">
+              <p className="text-secondary text-lg leading-relaxed max-w-xl mx-auto">
                 Not just storage. The private record of what helped. Save Defrag Results, Covenant Briefs, and Best Next Responses — and return to them before the old pattern takes over again.
               </p>
             </div>
 
-            {/* Mock library rows */}
-            <div className="border border-border divide-y divide-border">
+            <div className="border border-border rounded-2xl divide-y divide-border bg-background overflow-hidden shadow-2xl">
               {[
                 { type: "Defrag", label: "The argument that won't resolve", date: "Saved" },
                 { type: "Covenant", label: "Where repair is mine to initiate", date: "Saved" },
                 { type: "Alignment", label: "What I am carrying that isn't mine", date: "Saved" },
               ].map((entry, i) => (
-                <div key={i} className="flex items-center justify-between gap-4 px-7 py-5">
+                <div key={i} className="flex items-center justify-between gap-4 px-6 py-5 hover:bg-surface transition-colors cursor-default">
                   <div className="flex items-center gap-4 min-w-0">
-                    <span className="text-[#3F3F46] font-sans font-medium text-[10px] tracking-widest uppercase shrink-0 w-16">
+                    <span className="text-tertiary font-sans font-medium text-[11px] tracking-widest uppercase shrink-0 w-20">
                       {entry.type}
                     </span>
-                    <span className="text-[#A1A1AA] text-sm truncate">{entry.label}</span>
+                    <span className="text-primary text-base font-medium truncate">{entry.label}</span>
                   </div>
-                  <span className="text-[#3F3F46] font-sans font-medium text-[10px] shrink-0">{entry.date}</span>
+                  <span className="text-tertiary font-sans font-medium text-[11px] shrink-0">{entry.date}</span>
                 </div>
               ))}
-              <div className="px-7 py-4 text-center">
-                <span className="text-[#3F3F46] font-sans font-medium text-[10px] tracking-[0.1em] uppercase">
-                  Your entries will appear here
-                </span>
-              </div>
             </div>
           </div>
         </Container>
       </Section>
 
-      {/* ── 10. Free vs Pro ─────────────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 border-b border-border bg-surface">
+      {/* ── 5. Pricing ──────────────────────────────────────────────────────── */}
+      <Section className="w-full py-24 md:py-32 border-b border-border bg-background">
         <Container>
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-14">
-              <h2 className="text-[clamp(1.6rem,3.5vw,2.25rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA]">
+            <div className="text-center mb-16 space-y-4">
+              <h2 className="text-[clamp(2rem,5vw,3rem)] font-bold tracking-tight text-primary">
                 Choose your depth
               </h2>
-              <p className="mt-3 text-[#71717A] text-sm">Start free. Go deeper when you&apos;re ready.</p>
+              <p className="text-secondary text-lg">Start free. Go deeper when you&apos;re ready.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border border-border">
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
               {/* Free */}
-              <div className="p-8 md:p-10 space-y-7 border-b md:border-b-0 md:border-r border-border">
-                <div className="space-y-2">
-                  <h3 className="text-[#FAFAFA] text-xl font-medium">Free</h3>
-                  <p className="text-[#71717A] text-sm">Understand a moment.</p>
+              <div className="flex flex-col p-10 space-y-8 border border-border rounded-3xl bg-surface hover:border-white/20 transition-colors">
+                <div className="space-y-3">
+                  <h3 className="text-primary text-2xl font-semibold">Free</h3>
+                  <p className="text-tertiary text-base">Understand a moment.</p>
                 </div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-[#FAFAFA] text-3xl font-semibold tracking-tight">$0</span>
-                  <span className="text-[#71717A] text-sm">/forever</span>
+                  <span className="text-primary text-5xl font-bold tracking-tight">$0</span>
+                  <span className="text-tertiary text-base font-medium">/forever</span>
                 </div>
-                <ul className="space-y-3">
+                <ul className="space-y-4 flex-1 mt-4">
                   {FREE_FEATURES.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3 text-[#A1A1AA] text-sm leading-relaxed">
+                    <li key={i} className="flex items-start gap-4 text-secondary text-base leading-relaxed">
                       <Dot dim />
                       {feature}
                     </li>
                   ))}
                 </ul>
-                <Link href="/login" className="block">
-                  <Button
-                    variant="ghost"
-                    className="w-full rounded-none border-border bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] h-11 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
-                  >
+                <Link href="/login" className="block mt-8">
+                  <Button variant="ghost" className="w-full rounded-full border-border bg-transparent text-primary hover:bg-white/5 h-14 font-sans font-medium text-[13px] tracking-wider uppercase transition-colors">
                     Get Started Free
                   </Button>
                 </Link>
               </div>
 
               {/* Pro */}
-              <div className="p-8 md:p-10 space-y-7 bg-surface relative">
-                <div className="absolute top-6 right-7">
-                  <Badge className="bg-white text-[#050505] hover:bg-white/90 rounded-none font-sans font-medium text-[9px] uppercase tracking-[0.12em] px-2 py-0.5">
-                    Pro
+              <div className="flex flex-col p-10 space-y-8 border border-white/20 rounded-3xl bg-elevated shadow-2xl relative">
+                <div className="absolute -top-4 right-8">
+                  <Badge className="bg-primary text-background hover:bg-primary/90 rounded-full font-sans font-bold text-[11px] uppercase tracking-widest px-4 py-1.5 shadow-lg">
+                    Recommended
                   </Badge>
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-[#FAFAFA] text-xl font-medium">Sovereign Pro</h3>
-                  <p className="text-[#71717A] text-sm">
-                    Return, remember, compare, and interrupt the pattern.
-                  </p>
+                <div className="space-y-3">
+                  <h3 className="text-primary text-2xl font-semibold">Sovereign Pro</h3>
+                  <p className="text-tertiary text-base">Return, remember, compare, and interrupt.</p>
                 </div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-[#FAFAFA] text-3xl font-semibold tracking-tight">$20</span>
-                  <span className="text-[#71717A] text-sm">/mo</span>
+                  <span className="text-primary text-5xl font-bold tracking-tight">$20</span>
+                  <span className="text-tertiary text-base font-medium">/mo</span>
                 </div>
-                <ul className="space-y-3">
+                <ul className="space-y-4 flex-1 mt-4">
                   {PRO_FEATURES.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3 text-[#FAFAFA] text-sm leading-relaxed">
+                    <li key={i} className="flex items-start gap-4 text-primary text-base leading-relaxed font-medium">
                       <Dot />
                       {feature}
                     </li>
                   ))}
                 </ul>
-                <Link href="/login" className="block">
-                  <Button
-                    className="w-full rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-11 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
-                  >
+                <Link href="/login" className="block mt-8">
+                  <Button className="w-full rounded-full bg-primary text-background hover:bg-primary/90 h-14 font-sans font-bold text-[13px] tracking-wider uppercase transition-transform active:scale-95 shadow-xl">
                     Start Sovereign Pro
                   </Button>
                 </Link>
@@ -643,53 +306,31 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      {/* ── 11. Final CTA ───────────────────────────────────────────────────── */}
+      {/* ── 6. Final CTA ────────────────────────────────────────────────────── */}
       <Section className="w-full py-32 md:py-48 bg-surface relative overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute inset-0 z-0 pointer-events-none opacity-[0.018]"
-          style={{
-            backgroundImage: "radial-gradient(circle at center, #ffffff 1px, transparent 1px)",
-            backgroundSize: "36px 36px",
-          }}
-        />
-
-        <Container className="relative z-10 text-center max-w-[780px]">
-          <div className="space-y-2 mb-10">
-            <h2 className="text-[clamp(2.4rem,6.5vw,4.5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance">
+        <Container className="relative z-10 text-center max-w-3xl px-4">
+          <div className="space-y-4 mb-12">
+            <h2 className="text-[clamp(2.5rem,7vw,5rem)] font-bold tracking-tight text-primary leading-[1.05] text-balance">
               Healing isn&apos;t optional.
             </h2>
-            <h2 className="text-[clamp(2.4rem,6.5vw,4.5rem)] font-semibold tracking-[-0.035em] text-[#3F3F46] leading-[1.04] text-balance">
+            <h2 className="text-[clamp(2.5rem,7vw,5rem)] font-bold tracking-tight text-secondary leading-[1.05] text-balance opacity-50">
               Holding the pain is.
             </h2>
           </div>
 
-          <p className="text-[#71717A] text-sm font-sans font-medium tracking-[0.12em] uppercase mb-10">
+          <p className="text-tertiary text-[13px] font-sans font-bold tracking-[0.2em] uppercase mb-12">
             The platform is ready when you are.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/login">
-              <Button
-                size="lg"
-                className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-10 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
-              >
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/login" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto rounded-full bg-primary text-background hover:bg-primary/90 h-14 px-10 font-sans font-medium text-[13px] tracking-wider uppercase transition-transform active:scale-95 shadow-lg">
                 Enter Sovereign.os
-              </Button>
-            </Link>
-            <Link href="/login">
-              <Button
-                size="lg"
-                variant="ghost"
-                className="rounded-none border-border bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] hover:text-white h-12 px-8 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
-              >
-                Start Baseline Design
               </Button>
             </Link>
           </div>
         </Container>
       </Section>
-
     </main>
   )
 }
