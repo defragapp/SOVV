@@ -9,6 +9,7 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "cd apps/web && pnpm dev",
     "dev:api": "wrangler dev --config apps/worker/wrangler.toml --local",
     "dev:ai": "wrangler dev --config apps/worker-ai/wrangler.toml --local",
     "dev:session": "wrangler dev --config apps/worker-session/wrangler.toml --local",
