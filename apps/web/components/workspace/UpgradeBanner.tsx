@@ -51,7 +51,7 @@ export default function UpgradeBanner() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background text-[#F6F5F3]">
+    <div className="flex min-h-screen items-center justify-center bg-background text-[#f4efe9]">
       {/* Ambient glow */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
@@ -100,7 +100,7 @@ export default function UpgradeBanner() {
           disabled={loading}
           whileHover={{ backgroundColor: "rgba(246,245,243,0.08)" }}
           whileTap={{ scale: 0.98 }}
-          className="w-full border border-[#F6F5F3]/20 px-4 py-3.5 font-sans font-medium text-[10px] uppercase tracking-widest text-[#F6F5F3] transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
+          className="w-full border border-[#F6F5F3]/20 px-4 py-3.5 font-sans font-medium text-[10px] uppercase tracking-widest text-[#f4efe9] transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -138,7 +138,7 @@ export default function UpgradeBanner() {
                 value={promoCode}
                 onChange={(e) => setPromoCode(e.target.value)}
                 placeholder="ENTER CODE"
-                className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-2.5 font-sans font-medium text-[10px] uppercase tracking-widest text-[#F6F5F3] placeholder-white/15 focus:border-[#F6F5F3]/30 focus:outline-none transition-colors text-center"
+                className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-2.5 font-sans font-medium text-[10px] uppercase tracking-widest text-[#f4efe9] placeholder-white/15 focus:border-[#F6F5F3]/30 focus:outline-none transition-colors text-center"
               />
             </motion.div>
           )}

@@ -29,7 +29,6 @@ export default function LoginScreen() {
   useEffect(() => {
     setTurnstileToken("")
     setError("")
-
     if (mode !== "register" || !turnstileSiteKey) return
     const scriptId = "cf-turnstile-script"
 
@@ -46,15 +45,11 @@ export default function LoginScreen() {
 
     const existing = document.getElementById(scriptId) as HTMLScriptElement | null
     if (existing) {
-      if (window.turnstile) {
-        renderWidget()
-      } else {
-        existing.addEventListener("load", renderWidget, { once: true })
-      }
+      if (window.turnstile) renderWidget()
+      else existing.addEventListener("load", renderWidget, { once: true })
       return () => {
-        if (turnstileWidgetId.current && window.turnstile?.reset) {
+        if (turnstileWidgetId.current && window.turnstile?.reset)
           window.turnstile.reset(turnstileWidgetId.current)
-        }
         turnstileWidgetId.current = null
       }
     }
@@ -68,9 +63,8 @@ export default function LoginScreen() {
     document.head.appendChild(script)
 
     return () => {
-      if (turnstileWidgetId.current && window.turnstile?.reset) {
+      if (turnstileWidgetId.current && window.turnstile?.reset)
         window.turnstile.reset(turnstileWidgetId.current)
-      }
       turnstileWidgetId.current = null
     }
   }, [mode, turnstileSiteKey])
@@ -79,18 +73,15 @@ export default function LoginScreen() {
     e.preventDefault()
     setError("")
     setLoading(true)
-
     try {
       if (mode === "register" && turnstileSiteKey !== "" && !turnstileToken) {
         setError("Complete bot verification to continue")
         return
       }
-
       const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register"
-      const payload =
-        mode === "register"
-          ? { email, password, turnstileToken }
-          : { email, password }
+      const payload = mode === "register"
+        ? { email, password, turnstileToken }
+        : { email, password }
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -104,57 +95,59 @@ export default function LoginScreen() {
         setError(data.error ?? "Authentication failed")
         return
       }
-
       window.location.href = "/apps/defrag"
     } catch {
-      setError("Connection failed")
+      setError("Connection failed. Please try again.")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex min-h-[100dvh] w-full items-center justify-center bg-surface text-[#f4efe9] safe-bottom">
+    <div className="flex min-h-[100dvh] w-full items-center justify-center bg-[#08070a] safe-bottom relative overflow-hidden">
 
-      {/* Subtle center glow — no bright gradients */}
-      <div
-        className="pointer-events-none fixed inset-0 z-0"
-        style={{
-          backgroundImage:
-            "radial-gradient(ellipse 60% 40% at 50% 40%, rgba(255,255,255,0.025) 0%, transparent 70%)",
-        }}
-      />
+      {/* Warm ambient glow */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(224,116,58,0.08) 0%, transparent 70%)",
+          }}
+        />
+      </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: [0.0, 0.0, 0.2, 1] }}
-        className="relative z-10 w-full max-w-sm px-6"
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 w-full max-w-md px-6 py-12"
       >
+
         {/* Wordmark */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.15, duration: 0.7 }}
-          className="mb-14 text-center"
-        >
-          <p className="text-[10px] font-sans font-medium tracking-[0.3em] text-[#4f4b47] uppercase mb-4">
-            Sovereign.os
+        <div className="mb-12 text-center">
+          <Link href="/" className="inline-block">
+            <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+              SOVEREIGN.OS
+            </span>
+          </Link>
+          <p className="mt-3 text-sm text-[#76716b] leading-relaxed">
+            {mode === "login"
+              ? "Sign in to your space."
+              : "Create your space. Free to start."}
           </p>
-          <div className="h-px w-full bg-white/[0.06]" />
-        </motion.div>
+        </div>
 
         {/* Mode tabs */}
-        <div className="mb-8 flex border-b border-border">
+        <div className="mb-8 flex border-b border-white/[0.08]">
           {(["login", "register"] as LoginMode[]).map((m) => (
             <button
               key={m}
               type="button"
               onClick={() => { setMode(m); setError(""); setTurnstileToken("") }}
-              className={`flex-1 pb-3 text-[10px] font-sans font-medium tracking-[0.15em] uppercase transition-colors duration-200 border-b ${
+              className={`flex-1 pb-4 text-sm font-medium tracking-wide transition-colors duration-200 border-b-2 ${
                 mode === m
-                  ? "border-[#FAFAFA] text-[#f4efe9]"
-                  : "border-transparent text-[#4f4b47] hover:text-[#76716b]"
+                  ? "border-[#f4efe9] text-[#f4efe9]"
+                  : "border-transparent text-[#76716b] hover:text-[#a8a29a]"
               }`}
             >
               {m === "login" ? "Sign In" : "Create Account"}
@@ -163,9 +156,10 @@ export default function LoginScreen() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+
           {/* Email */}
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-sans font-medium tracking-[0.15em] uppercase text-[#4f4b47]">
+            <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">
               Email
             </label>
             <input
@@ -175,13 +169,13 @@ export default function LoginScreen() {
               required
               autoComplete="email"
               placeholder="you@example.com"
-              className="sovv-input w-full bg-surface border border-border text-[#f4efe9] placeholder:text-[#4f4b47] text-sm font-sans font-medium px-4 py-3 outline-none focus:border-border transition-colors duration-200"
+              className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
             />
           </div>
 
           {/* Password */}
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-sans font-medium tracking-[0.15em] uppercase text-[#4f4b47]">
+            <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">
               Password
             </label>
             <input
@@ -192,21 +186,21 @@ export default function LoginScreen() {
               minLength={8}
               autoComplete={mode === "login" ? "current-password" : "new-password"}
               placeholder="••••••••"
-              className="sovv-input w-full bg-surface border border-border text-[#f4efe9] placeholder:text-[#4f4b47] text-sm font-sans font-medium px-4 py-3 outline-none focus:border-border transition-colors duration-200"
+              className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
             />
           </div>
 
           {/* Turnstile */}
           {mode === "register" && (
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-sans font-medium tracking-[0.15em] uppercase text-[#4f4b47]">
-                Bot verification
+              <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">
+                Verification
               </label>
               {turnstileSiteKey ? (
                 <div ref={turnstileRef} className="min-h-[65px]" />
               ) : (
-                <p className="text-[10px] font-sans font-medium text-[#4f4b47] leading-relaxed">
-                  Turnstile is not configured yet. Add a public site key before opening registration.
+                <p className="text-sm text-[#76716b] leading-relaxed">
+                  Bot verification not configured.
                 </p>
               )}
             </div>
@@ -219,7 +213,7 @@ export default function LoginScreen() {
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="text-[10px] font-sans font-medium text-red-400/60 tracking-wide"
+                className="text-sm text-red-400/80 leading-relaxed"
               >
                 {error}
               </motion.p>
@@ -227,7 +221,7 @@ export default function LoginScreen() {
           </AnimatePresence>
 
           {/* Submit */}
-          <motion.button
+          <button
             type="submit"
             disabled={
               loading ||
@@ -235,45 +229,28 @@ export default function LoginScreen() {
               !password ||
               (mode === "register" && turnstileSiteKey !== "" && !turnstileToken)
             }
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            className="btn-primary mt-3 w-full h-12 border border-border bg-white text-black font-sans font-medium text-[10px] tracking-[0.2em] uppercase transition-colors hover:bg-white/90 disabled:opacity-20 disabled:cursor-not-allowed"
+            className="mt-2 w-full h-12 rounded-full bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
           >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <motion.span
-                  animate={{ opacity: [1, 0.3, 1] }}
-                  transition={{ repeat: Infinity, duration: 1.2 }}
-                  className="font-sans font-medium"
-                >
-                  ···
-                </motion.span>
-              </span>
-            ) : mode === "login" ? "Sign In" : "Create Account"}
-          </motion.button>
+            {loading ? "···" : mode === "login" ? "Sign In" : "Create Account"}
+          </button>
         </form>
 
-        {/* Tier note */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.7 }}
-          className="mt-10 text-center text-[10px] font-sans font-medium text-[#4f4b47] tracking-wide"
-        >
+        {/* Footer note */}
+        <p className="mt-8 text-center text-sm text-[#76716b] leading-relaxed">
           {mode === "register"
-            ? "Protects your Baseline Design and Library. Free tier · 5 sessions/day"
-            : "Protects your Baseline Design and Library. Pro unlocks continuity and deep context"}
-        </motion.p>
+            ? "Free tier · 5 sessions per day · Your Baseline Design stays private."
+            : "Your Baseline Design and Library are waiting."}
+        </p>
 
-        {/* Back link */}
         <div className="mt-5 text-center">
           <Link
             href="/"
-            className="text-[10px] font-sans font-medium text-[#4f4b47] hover:text-[#76716b] tracking-wide transition-colors duration-200"
+            className="text-sm text-[#76716b] hover:text-[#a8a29a] transition-colors duration-200"
           >
             ← Back to Sovereign.os
           </Link>
         </div>
+
       </motion.div>
     </div>
   )
