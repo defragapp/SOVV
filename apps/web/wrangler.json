@@ -35,26 +35,7 @@
   "env": {
     "production": {
       "name": "sovv-web",
-      "workers_dev": false,
-      "routes": [
-        {"pattern": "!*defrag.app/_next/static/*", "zone_id": "45a59d754ece9221fc97c92c461eb01f"},
-        {
-          "pattern": "defrag.app/*",
-          "zone_id": "45a59d754ece9221fc97c92c461eb01f"
-        },
-        {
-          "pattern": "www.defrag.app/*",
-          "zone_id": "45a59d754ece9221fc97c92c461eb01f"
-        },
-        {
-          "pattern": "sovereign.defrag.app/*",
-          "zone_id": "45a59d754ece9221fc97c92c461eb01f"
-        },
-        {
-          "pattern": "app.defrag.app/*",
-          "zone_id": "45a59d754ece9221fc97c92c461eb01f"
-        }
-      ]
+      "workers_dev": false
     }
   }
 }
