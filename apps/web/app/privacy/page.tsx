@@ -45,7 +45,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <Badge
       variant="outline"
-      className="rounded-none border-border bg-transparent text-[#71717A] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
+      className="rounded-none border-border bg-transparent text-[#76716b] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
     >
       {children}
     </Badge>
@@ -64,11 +64,11 @@ export default function PrivacyPage() {
             <div className="h-px w-10 bg-white/[0.14]" />
           </div>
 
-          <h1 className="text-[clamp(2.6rem,6vw,4.5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance mb-8">
+          <h1 className="text-[clamp(2.6rem,6vw,4.5rem)] font-semibold tracking-[-0.035em] text-[#f4efe9] leading-[1.04] text-balance mb-8">
             Your data. Your clarity.
           </h1>
 
-          <p className="text-[#A1A1AA] text-base md:text-lg font-normal tracking-[-0.01em] max-w-[560px] text-balance leading-[1.65]">
+          <p className="text-[#a8a29a] text-base md:text-lg font-normal tracking-[-0.01em] max-w-[560px] text-balance leading-[1.65]">
             Private by design. Here is what we collect, why, and how we protect it.
           </p>
         </Container>
@@ -80,8 +80,8 @@ export default function PrivacyPage() {
           <div className="space-y-0 border border-border bg-surface divide-y divide-border">
             {SECTIONS.map((section, i) => (
               <div key={i} className="p-8 md:p-12 space-y-4">
-                <h3 className="text-[#FAFAFA] text-xl font-medium tracking-tight">{section.title}</h3>
-                <p className="text-[#A1A1AA] text-sm leading-relaxed max-w-2xl">{section.body}</p>
+                <h3 className="text-[#f4efe9] text-xl font-medium tracking-tight">{section.title}</h3>
+                <p className="text-[#a8a29a] text-sm leading-relaxed max-w-2xl">{section.body}</p>
               </div>
             ))}
           </div>

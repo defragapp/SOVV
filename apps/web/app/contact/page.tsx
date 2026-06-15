@@ -14,7 +14,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <Badge
       variant="outline"
-      className="rounded-none border-border bg-transparent text-[#71717A] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
+      className="rounded-none border-border bg-transparent text-[#76716b] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
     >
       {children}
     </Badge>
@@ -33,11 +33,11 @@ export default function ContactPage() {
             <div className="h-px w-10 bg-white/[0.14]" />
           </div>
 
-          <h1 className="text-[clamp(2.6rem,6vw,4.5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance mb-8">
+          <h1 className="text-[clamp(2.6rem,6vw,4.5rem)] font-semibold tracking-[-0.035em] text-[#f4efe9] leading-[1.04] text-balance mb-8">
             Get in touch.
           </h1>
 
-          <p className="text-[#A1A1AA] text-base md:text-lg font-normal tracking-[-0.01em] max-w-[560px] text-balance leading-[1.65]">
+          <p className="text-[#a8a29a] text-base md:text-lg font-normal tracking-[-0.01em] max-w-[560px] text-balance leading-[1.65]">
             For product questions, support, or account help.
           </p>
         </Container>
@@ -50,21 +50,21 @@ export default function ContactPage() {
             
             {/* Primary contact */}
             <div className="p-8 md:p-12 space-y-4">
-              <span className="text-[#71717A] font-sans font-medium text-[10px] tracking-[0.15em] uppercase">Primary contact</span>
+              <span className="text-[#76716b] font-sans font-medium text-[10px] tracking-[0.15em] uppercase">Primary contact</span>
               <a
                 href="mailto:info@defrag.app"
-                className="block text-2xl font-medium text-[#FAFAFA] hover:text-[#A1A1AA] transition-colors"
+                className="block text-2xl font-medium text-[#f4efe9] hover:text-[#a8a29a] transition-colors"
               >
                 info@defrag.app
               </a>
-              <p className="text-[#A1A1AA] text-sm leading-relaxed max-w-xl">
+              <p className="text-[#a8a29a] text-sm leading-relaxed max-w-xl">
                 This is the public contact address for Sovereign.os. For product questions, support, account help, privacy requests, and general inquiries.
               </p>
             </div>
 
             {/* What to include */}
             <div className="p-8 md:p-12 space-y-6">
-              <span className="text-[#71717A] font-sans font-medium text-[10px] tracking-[0.15em] uppercase">What to include</span>
+              <span className="text-[#76716b] font-sans font-medium text-[10px] tracking-[0.15em] uppercase">What to include</span>
               <ul className="space-y-3">
                 {[
                   "Your account email",
@@ -72,7 +72,7 @@ export default function ContactPage() {
                   "What happened instead",
                   "Any error message you saw",
                 ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-4 text-[#A1A1AA] text-sm">
+                  <li key={i} className="flex items-center gap-4 text-[#a8a29a] text-sm">
                     <div className="w-1 h-1 bg-white/30 rounded-full" />
                     {item}
                   </li>
@@ -82,8 +82,8 @@ export default function ContactPage() {
 
             {/* Privacy */}
             <div className="p-8 md:p-12 space-y-4">
-              <span className="text-[#71717A] font-sans font-medium text-[10px] tracking-[0.15em] uppercase">Privacy and data requests</span>
-              <p className="text-[#A1A1AA] text-sm leading-relaxed max-w-xl">
+              <span className="text-[#76716b] font-sans font-medium text-[10px] tracking-[0.15em] uppercase">Privacy and data requests</span>
+              <p className="text-[#a8a29a] text-sm leading-relaxed max-w-xl">
                 To request deletion of your account and all associated data, email info@defrag.app. We process deletion requests within 30 days.
               </p>
             </div>
@@ -95,9 +95,9 @@ export default function ContactPage() {
                   href={SUPPORT_URL}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 text-[#FAFAFA] text-sm font-sans font-medium tracking-[0.1em] uppercase hover:text-[#A1A1AA] transition-colors"
+                  className="inline-flex items-center gap-2 text-[#f4efe9] text-sm font-sans font-medium tracking-[0.1em] uppercase hover:text-[#a8a29a] transition-colors"
                 >
-                  Support Defrag development <span className="text-[#71717A]">→</span>
+                  Support Defrag development <span className="text-[#76716b]">→</span>
                 </a>
               </div>
             )}

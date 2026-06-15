@@ -36,10 +36,10 @@ export default function AlignmentPage() {
   const sidebarContent = (
     <div className="flex flex-col h-full bg-surface">
       <div className="px-6 py-5 border-b border-border">
-        <h3 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em]">Alignment</h3>
+        <h3 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em]">Alignment</h3>
       </div>
       <div className="flex-1 px-6 py-8">
-        <p className="text-xs font-sans font-medium text-[#71717A] leading-relaxed max-w-[180px]">
+        <p className="text-xs font-sans font-medium text-[#76716b] leading-relaxed max-w-[180px]">
           Save useful Results here so you can return before the old pattern takes over again.
         </p>
       </div>
@@ -49,18 +49,18 @@ export default function AlignmentPage() {
   const contextContent = (
     <div className="flex flex-col gap-0 h-full bg-surface border-l border-border">
       <div className="px-6 py-5 border-b border-border">
-        <h3 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em]">Context</h3>
+        <h3 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em]">Context</h3>
       </div>
       <div className="p-6 flex flex-col gap-6">
         <div className="border border-border bg-surface p-5 flex flex-col gap-2">
-          <p className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em]">Baseline Design</p>
-          <p className="text-xs text-[#A1A1AA] leading-relaxed">
+          <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">Baseline Design</p>
+          <p className="text-xs text-[#a8a29a] leading-relaxed">
             Your Baseline Design gives the system context before you describe this moment.
           </p>
         </div>
         <div className="border border-border bg-surface p-5 flex flex-col gap-2 opacity-40">
-          <p className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em]">Save to Sovereign</p>
-          <p className="text-xs text-[#A1A1AA]">Requires Pro</p>
+          <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">Save to Sovereign</p>
+          <p className="text-xs text-[#a8a29a]">Requires Pro</p>
         </div>
       </div>
     </div>
@@ -70,13 +70,13 @@ export default function AlignmentPage() {
     <div className="flex flex-col h-full justify-end gap-8 pt-4 pb-0 max-w-4xl mx-auto w-full">
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 max-w-md mx-auto opacity-50">
         <div className="w-12 h-12 border border-border flex items-center justify-center">
-          <svg className="w-5 h-5 text-[#A1A1AA]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-5 h-5 text-[#a8a29a]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </div>
         <div className="gap-3 flex flex-col">
-          <h2 className="text-[20px] font-medium text-[#FAFAFA] tracking-tight">Response integration</h2>
-          <p className="text-[13px] text-[#A1A1AA] font-sans font-medium leading-relaxed">
+          <h2 className="text-[20px] font-medium text-[#f4efe9] tracking-tight">Response integration</h2>
+          <p className="text-[13px] text-[#a8a29a] font-sans font-medium leading-relaxed">
             Turn your insights into an actionable response.
           </p>
         </div>
@@ -93,15 +93,15 @@ export default function AlignmentPage() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="What are you trying to integrate?"
-          className="w-full bg-transparent text-[#FAFAFA] placeholder:text-[#3F3F46] resize-none outline-none min-h-[140px] text-sm p-5 leading-[1.75] font-sans font-medium"
+          className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none min-h-[140px] text-sm p-5 leading-[1.75] font-sans font-medium"
         />
         <div className="flex justify-between items-center px-5 py-4 border-t border-border bg-surface">
-          <span className="text-[10px] text-[#71717A] font-sans font-medium tracking-[0.15em] uppercase">ENTER TO ALIGN</span>
+          <span className="text-[10px] text-[#76716b] font-sans font-medium tracking-[0.15em] uppercase">ENTER TO ALIGN</span>
           <Button
             size="sm"
             onClick={handleAlignment}
             disabled={!input.trim() || isLoading}
-            className="rounded-none border border-border bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9 px-6 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+            className="rounded-none border border-border bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9 px-6 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? "Running..." : "Align"}
           </Button>
@@ -114,8 +114,8 @@ export default function AlignmentPage() {
     if (!content) return null;
     return (
       <div className="border-b border-border pb-8 mb-8 last:border-0 last:pb-0 last:mb-0">
-        <h4 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em] mb-4">{title}</h4>
-        <p className="text-[14px] text-[#FAFAFA] font-sans font-medium leading-[1.75] whitespace-pre-wrap">{String(content)}</p>
+        <h4 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em] mb-4">{title}</h4>
+        <p className="text-[14px] text-[#f4efe9] font-sans font-medium leading-[1.75] whitespace-pre-wrap">{String(content)}</p>
       </div>
     )
   }
@@ -124,7 +124,7 @@ export default function AlignmentPage() {
     <div className="h-full flex flex-col max-w-4xl mx-auto w-full">
       {!result ? (
         <div className="flex-1 flex items-center justify-center border border-border bg-surface p-8 text-center min-h-[240px]">
-          <p className="text-[13px] text-[#A1A1AA] font-sans font-medium leading-relaxed max-w-[280px]">
+          <p className="text-[13px] text-[#a8a29a] font-sans font-medium leading-relaxed max-w-[280px]">
             Your Alignment Brief will appear here in structured sections you can use, save, and return to later.
           </p>
         </div>

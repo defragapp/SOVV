@@ -14,7 +14,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
   const [activeTab, setActiveTab] = React.useState(mobileTabs[0].id)
 
   return (
-    <div className="flex h-[100dvh] w-screen overflow-hidden bg-surface text-[#FAFAFA] font-sans">
+    <div className="flex h-[100dvh] w-screen overflow-hidden bg-surface text-[#f4efe9] font-sans">
       
       {/* Desktop Layout */}
       <div className="hidden lg:grid w-full h-full" style={{ gridTemplateColumns: "256px 1fr 320px", gridTemplateRows: "56px 1fr" }}>
@@ -22,15 +22,15 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
         {/* Top Header */}
         <header className="col-span-3 h-14 border-b border-border bg-surface px-6 flex items-center justify-between">
           <div className="flex items-center gap-3 font-sans font-medium text-[11px] tracking-widest uppercase">
-            <Link href="/" className="text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors">Sovereign.os</Link>
+            <Link href="/" className="text-[#a8a29a] hover:text-[#f4efe9] transition-colors">Sovereign.os</Link>
             <span className="text-white/20">/</span>
-            <span className="text-[#FAFAFA]">{spaceName}</span>
+            <span className="text-[#f4efe9]">{spaceName}</span>
           </div>
           <div className="flex items-center gap-6">
-            <Link href="/settings" className="font-sans font-medium text-[10px] tracking-[0.1em] uppercase text-[#71717A] hover:text-[#FAFAFA] transition-colors">
+            <Link href="/settings" className="font-sans font-medium text-[10px] tracking-[0.1em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors">
               Baseline Design
             </Link>
-            <div className="flex items-center gap-2 font-sans font-medium text-[10px] tracking-[0.1em] uppercase text-[#71717A]">
+            <div className="flex items-center gap-2 font-sans font-medium text-[10px] tracking-[0.1em] uppercase text-[#76716b]">
               <span className="w-1.5 h-1.5 rounded-full bg-white/30"></span>
               Secure Session
             </div>
@@ -57,11 +57,11 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
       <div className="flex lg:hidden flex-col w-full h-full safe-top safe-bottom">
          <header className="sticky top-0 z-10 bg-surface/90 backdrop-blur-md border-b border-border px-5 py-4 flex items-center justify-between">
             <div className="flex items-center gap-2 font-sans font-medium text-[11px] tracking-widest uppercase">
-               <Link href="/" className="text-[#A1A1AA]">Sovereign.os</Link>
+               <Link href="/" className="text-[#a8a29a]">Sovereign.os</Link>
                <span className="text-white/20">/</span>
-               <span className="text-[#FAFAFA]">{spaceName}</span>
+               <span className="text-[#f4efe9]">{spaceName}</span>
             </div>
-            <Link href="/settings" className="font-sans font-medium text-[10px] uppercase text-[#71717A]">
+            <Link href="/settings" className="font-sans font-medium text-[10px] uppercase text-[#76716b]">
               Settings
             </Link>
          </header>
@@ -73,8 +73,8 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-3 border-b-2 text-[11px] font-sans font-medium tracking-widest uppercase whitespace-nowrap transition-colors ${
                   activeTab === tab.id 
-                    ? "border-border text-[#FAFAFA]"
-                    : "border-transparent text-[#71717A] hover:text-[#A1A1AA]"
+                    ? "border-border text-[#f4efe9]"
+                    : "border-transparent text-[#76716b] hover:text-[#a8a29a]"
                 }`}
               >
                 {tab.label}

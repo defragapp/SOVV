@@ -46,7 +46,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <Badge
       variant="outline"
-      className="rounded-none border-border bg-transparent text-[#71717A] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
+      className="rounded-none border-border bg-transparent text-[#76716b] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
     >
       {children}
     </Badge>
@@ -75,11 +75,11 @@ export default function ProductPage() {
             <div className="h-px w-10 bg-white/[0.14]" />
           </div>
 
-          <h1 className="text-[clamp(2.6rem,7vw,5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance mb-8">
+          <h1 className="text-[clamp(2.6rem,7vw,5rem)] font-semibold tracking-[-0.035em] text-[#f4efe9] leading-[1.04] text-balance mb-8">
             Turn charged conversations into something you can work with.
           </h1>
 
-          <p className="text-[#A1A1AA] text-base md:text-lg font-normal tracking-[-0.01em] max-w-[640px] mb-12 text-balance leading-[1.65]">
+          <p className="text-[#a8a29a] text-base md:text-lg font-normal tracking-[-0.01em] max-w-[640px] mb-12 text-balance leading-[1.65]">
             Sovereign.os helps you work through the moments that keep replaying — the message, the conflict, the family role, the grief, the boundary — and save what you learn before the pattern takes over again.
           </p>
 
@@ -87,7 +87,7 @@ export default function ProductPage() {
             <Link href="/login" className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="w-full sm:w-auto rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-8 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
+                className="w-full sm:w-auto rounded-none bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] h-12 px-8 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
               >
                 Enter Sovereign.os
               </Button>
@@ -103,11 +103,11 @@ export default function ProductPage() {
             
             <div className="lg:w-[320px] shrink-0 space-y-6 lg:sticky lg:top-32">
               <SectionLabel>The Architecture</SectionLabel>
-              <h2 className="text-[clamp(1.6rem,4vw,2.25rem)] font-semibold tracking-[-0.025em] text-[#FAFAFA] leading-tight">
+              <h2 className="text-[clamp(1.6rem,4vw,2.25rem)] font-semibold tracking-[-0.025em] text-[#f4efe9] leading-tight">
                 You do not need a verdict.<br/>
-                <span className="text-[#A1A1AA]">You need a way through.</span>
+                <span className="text-[#a8a29a]">You need a way through.</span>
               </h2>
-              <p className="text-[#71717A] text-sm leading-relaxed">
+              <p className="text-[#76716b] text-sm leading-relaxed">
                 The conversation ended. Your body did not. Some messages do not need a reply yet. They need context. 
                 Sovereign.os gives those moments structure — without turning them into a diagnosis, a score, or a verdict.
               </p>
@@ -122,14 +122,14 @@ export default function ProductPage() {
                     i < SURFACES.length - 1 ? "border-b border-border" : "",
                   ].join(" ")}
                 >
-                  <span className="text-[#3F3F46] font-sans font-medium text-xs mt-1 shrink-0 w-6">
+                  <span className="text-[#4f4b47] font-sans font-medium text-xs mt-1 shrink-0 w-6">
                     {s.tag}
                   </span>
                   <div className="space-y-3">
-                    <h3 className="text-[#FAFAFA] text-[17px] font-medium tracking-tight">
+                    <h3 className="text-[#f4efe9] text-[17px] font-medium tracking-tight">
                       {s.title}
                     </h3>
-                    <p className="text-[#A1A1AA] text-[15px] leading-relaxed">{s.body}</p>
+                    <p className="text-[#a8a29a] text-[15px] leading-relaxed">{s.body}</p>
                   </div>
                 </div>
               ))}
@@ -142,13 +142,13 @@ export default function ProductPage() {
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
       <Section className="w-full py-32 md:py-48 bg-surface relative overflow-hidden">
         <Container className="relative z-10 text-center max-w-[780px]">
-          <h2 className="text-[clamp(2.4rem,5vw,3.5rem)] font-semibold tracking-[-0.035em] text-[#FAFAFA] leading-[1.04] text-balance mb-12">
+          <h2 className="text-[clamp(2.4rem,5vw,3.5rem)] font-semibold tracking-[-0.035em] text-[#f4efe9] leading-[1.04] text-balance mb-12">
             Your next response can change the pattern.
           </h2>
           <Link href="/login" className="inline-block">
             <Button
               size="lg"
-              className="rounded-none bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] h-12 px-10 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
+              className="rounded-none bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] h-12 px-10 font-sans font-medium text-[11px] tracking-[0.1em] uppercase transition-colors"
             >
               Start Baseline Design
             </Button>

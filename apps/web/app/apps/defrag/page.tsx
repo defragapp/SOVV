@@ -99,7 +99,7 @@ export default function DefragPage() {
     if (!content) return null
     return (
       <div className="border-b border-border pb-8 mb-8 last:border-0 last:pb-0 last:mb-0">
-        <h4 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em] mb-4">
+        <h4 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em] mb-4">
           {title}
         </h4>
         {isArray ? (
@@ -108,20 +108,20 @@ export default function DefragPage() {
               content.map((item: string, i: number) => (
                 <li
                   key={i}
-                  className="text-[14px] text-[#FAFAFA] font-sans font-medium leading-[1.75] flex items-start gap-3"
+                  className="text-[14px] text-[#f4efe9] font-sans font-medium leading-[1.75] flex items-start gap-3"
                 >
-                  <span className="text-[#3F3F46] mt-0.5 shrink-0">→</span>
+                  <span className="text-[#4f4b47] mt-0.5 shrink-0">→</span>
                   <span>{item}</span>
                 </li>
               ))
             ) : (
-              <li className="text-[14px] text-[#FAFAFA] font-sans font-medium leading-[1.75]">
+              <li className="text-[14px] text-[#f4efe9] font-sans font-medium leading-[1.75]">
                 {String(content)}
               </li>
             )}
           </ul>
         ) : (
-          <p className="text-[14px] text-[#FAFAFA] font-sans font-medium leading-[1.75] whitespace-pre-wrap">
+          <p className="text-[14px] text-[#f4efe9] font-sans font-medium leading-[1.75] whitespace-pre-wrap">
             {String(content)}
           </p>
         )}
@@ -132,12 +132,12 @@ export default function DefragPage() {
   const sidebarContent = (
     <div className="flex flex-col h-full bg-surface">
       <div className="px-6 py-5 border-b border-border">
-        <h3 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em]">
+        <h3 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em]">
           Sovereign.os Library
         </h3>
       </div>
       <div className="flex-1 px-6 py-8">
-        <p className="text-xs font-sans font-medium text-[#71717A] leading-relaxed max-w-[180px]">
+        <p className="text-xs font-sans font-medium text-[#76716b] leading-relaxed max-w-[180px]">
           The private record of what helped. Return here before the old pattern
           takes over again.
         </p>
@@ -148,16 +148,16 @@ export default function DefragPage() {
   const contextContent = (
     <div className="flex flex-col gap-0 h-full bg-surface border-l border-border">
       <div className="px-6 py-5 border-b border-border">
-        <h3 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em]">
+        <h3 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em]">
           Context
         </h3>
       </div>
       <div className="p-6 flex flex-col gap-6">
         <div className="border border-border bg-surface p-5 flex flex-col gap-2">
-          <p className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em]">
+          <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">
             Baseline Design
           </p>
-          <p className="text-xs text-[#A1A1AA] leading-relaxed">
+          <p className="text-xs text-[#a8a29a] leading-relaxed">
             Your Baseline Design gives the system context before you describe
             this moment.
           </p>
@@ -169,7 +169,7 @@ export default function DefragPage() {
               <Button
                 onClick={handleSave}
                 disabled={isSaving || saveSuccess}
-                className="w-full rounded-none border border-border bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9"
+                className="w-full rounded-none border border-border bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9"
               >
                 {isSaving
                   ? "Saving..."
@@ -180,7 +180,7 @@ export default function DefragPage() {
             </div>
 
             <div className="border border-border bg-surface p-5 flex flex-col gap-3">
-              <p className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em]">
+              <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">
                 Audio Overview
               </p>
               {audioUrl ? (
@@ -195,7 +195,7 @@ export default function DefragPage() {
                     onClick={handleGenerateAudio}
                     disabled={isGeneratingAudio}
                     variant="ghost"
-                    className="w-full rounded-none border border-border bg-transparent text-[#FAFAFA] hover:bg-white/[0.04] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9"
+                    className="w-full rounded-none border border-border bg-transparent text-[#f4efe9] hover:bg-white/[0.04] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9"
                   >
                     {isGeneratingAudio ? "Generating..." : "Generate Audio"}
                   </Button>
@@ -205,7 +205,7 @@ export default function DefragPage() {
                     </p>
                   )}
                   {!audioError && !isGeneratingAudio && (
-                    <p className="text-[10px] text-[#71717A] font-sans font-medium leading-tight">
+                    <p className="text-[10px] text-[#76716b] font-sans font-medium leading-tight">
                       Requires Pro
                     </p>
                   )}
@@ -214,10 +214,10 @@ export default function DefragPage() {
             </div>
 
             <div className="border border-border bg-surface p-5 flex flex-col gap-2 opacity-40">
-              <p className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.15em]">
+              <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">
                 Watch Preview
               </p>
-              <p className="text-xs text-[#A1A1AA]">
+              <p className="text-xs text-[#a8a29a]">
                 Watch Preview is not available for this Result yet.
               </p>
             </div>
@@ -232,7 +232,7 @@ export default function DefragPage() {
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 max-w-md mx-auto opacity-50">
         <div className="w-12 h-12 border border-border flex items-center justify-center">
           <svg
-            className="w-5 h-5 text-[#A1A1AA]"
+            className="w-5 h-5 text-[#a8a29a]"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -246,10 +246,10 @@ export default function DefragPage() {
           </svg>
         </div>
         <div className="gap-3 flex flex-col">
-          <h2 className="text-[20px] font-medium text-[#FAFAFA] tracking-tight">
+          <h2 className="text-[20px] font-medium text-[#f4efe9] tracking-tight">
             What&apos;s happening right now?
           </h2>
-          <p className="text-[13px] text-[#A1A1AA] font-sans font-medium leading-relaxed">
+          <p className="text-[13px] text-[#a8a29a] font-sans font-medium leading-relaxed">
             Understand what is active in the moment and what response gives it a
             better chance.
           </p>
@@ -261,7 +261,7 @@ export default function DefragPage() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Describe the situation, pressure, or pattern you want to understand."
-          className="w-full bg-transparent text-[#FAFAFA] placeholder:text-[#3F3F46] resize-none outline-none min-h-[140px] text-sm p-5 leading-[1.75] font-sans font-medium"
+          className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none min-h-[140px] text-sm p-5 leading-[1.75] font-sans font-medium"
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault()
@@ -270,14 +270,14 @@ export default function DefragPage() {
           }}
         />
         <div className="flex justify-between items-center px-5 py-4 border-t border-border bg-surface">
-          <span className="text-[10px] text-[#71717A] font-sans font-medium tracking-[0.15em] uppercase">
+          <span className="text-[10px] text-[#76716b] font-sans font-medium tracking-[0.15em] uppercase">
             ENTER TO DEFRAG
           </span>
           <Button
             size="sm"
             onClick={handleExplain}
             disabled={!input.trim() || isLoading}
-            className="rounded-none border border-border bg-[#FAFAFA] text-[#050505] hover:bg-[#E4E4E7] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9 px-6 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+            className="rounded-none border border-border bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9 px-6 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? "Running..." : "Defrag"}
           </Button>
@@ -290,7 +290,7 @@ export default function DefragPage() {
     <div className="h-full flex flex-col max-w-4xl mx-auto w-full">
       {!result ? (
         <div className="flex-1 flex items-center justify-center border border-border bg-surface p-8 text-center min-h-[240px]">
-          <p className="text-[13px] text-[#A1A1AA] font-sans font-medium leading-relaxed max-w-[280px]">
+          <p className="text-[13px] text-[#a8a29a] font-sans font-medium leading-relaxed max-w-[280px]">
             Your Result will appear here in structured sections you can use,
             save, and return to later.
           </p>
@@ -307,10 +307,10 @@ export default function DefragPage() {
 
           {result.bestNextResponse && (
             <div className="border-b border-border pb-8 mb-8">
-              <h4 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em] mb-4">
+              <h4 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em] mb-4">
                 Best Next Response
               </h4>
-              <p className="text-[14px] text-[#FAFAFA] font-sans font-medium leading-[1.75] mb-5">
+              <p className="text-[14px] text-[#f4efe9] font-sans font-medium leading-[1.75] mb-5">
                 {result.bestNextResponse.summary ||
                   String(result.bestNextResponse)}
               </p>
@@ -321,9 +321,9 @@ export default function DefragPage() {
                       (phrase: string, i: number) => (
                         <div
                           key={i}
-                          className="text-[14px] text-[#A1A1AA] font-sans font-medium leading-[1.75] flex items-start gap-3"
+                          className="text-[14px] text-[#a8a29a] font-sans font-medium leading-[1.75] flex items-start gap-3"
                         >
-                          <span className="text-[#3F3F46] mt-0.5 shrink-0">
+                          <span className="text-[#4f4b47] mt-0.5 shrink-0">
                             ↳
                           </span>
                           <span>{phrase}</span>
@@ -338,7 +338,7 @@ export default function DefragPage() {
           {result.conversationalSteering && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h4 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em] mb-4">
+                <h4 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em] mb-4">
                   Steer Toward
                 </h4>
                 <ul className="space-y-3">
@@ -347,7 +347,7 @@ export default function DefragPage() {
                       (item: string, i: number) => (
                         <li
                           key={i}
-                          className="text-[14px] text-[#A1A1AA] font-sans font-medium leading-[1.75] flex items-start gap-3"
+                          className="text-[14px] text-[#a8a29a] font-sans font-medium leading-[1.75] flex items-start gap-3"
                         >
                           <span className="text-[#10B981] mt-0.5 shrink-0">
                             +
@@ -357,14 +357,14 @@ export default function DefragPage() {
                       )
                     )
                   ) : (
-                    <li className="text-[14px] text-[#A1A1AA] font-sans font-medium leading-[1.75]">
+                    <li className="text-[14px] text-[#a8a29a] font-sans font-medium leading-[1.75]">
                       {String(result.conversationalSteering)}
                     </li>
                   )}
                 </ul>
               </div>
               <div>
-                <h4 className="text-[10px] font-sans font-medium text-[#71717A] uppercase tracking-[0.2em] mb-4">
+                <h4 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em] mb-4">
                   Avoid
                 </h4>
                 <ul className="space-y-3">
@@ -373,7 +373,7 @@ export default function DefragPage() {
                       (item: string, i: number) => (
                         <li
                           key={i}
-                          className="text-[14px] text-[#A1A1AA] font-sans font-medium leading-[1.75] flex items-start gap-3"
+                          className="text-[14px] text-[#a8a29a] font-sans font-medium leading-[1.75] flex items-start gap-3"
                         >
                           <span className="text-[#EF4444] mt-0.5 shrink-0">
                             -

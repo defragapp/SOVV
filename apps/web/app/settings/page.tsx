@@ -106,7 +106,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface text-[#FAFAFA]">
+    <div className="min-h-screen bg-surface text-[#f4efe9]">
 
       {/* ── Sticky header ── */}
       <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur-md">
@@ -114,21 +114,21 @@ export default function SettingsPage() {
           <nav className="flex items-center gap-2.5" aria-label="Breadcrumb">
             <Link
               href="/"
-              className="text-[11px] font-sans font-medium tracking-widest uppercase text-[#FAFAFA]/40 hover:text-[#FAFAFA]/70 transition-colors duration-200"
+              className="text-[11px] font-sans font-medium tracking-widest uppercase text-[#f4efe9]/40 hover:text-[#f4efe9]/70 transition-colors duration-200"
             >
               Sovereign.os
             </Link>
-            <span className="text-[#FAFAFA]/20 text-[11px] font-sans font-medium" aria-hidden>
+            <span className="text-[#f4efe9]/20 text-[11px] font-sans font-medium" aria-hidden>
               /
             </span>
-            <span className="text-[11px] font-sans font-medium tracking-widest uppercase text-[#FAFAFA]/60">
+            <span className="text-[11px] font-sans font-medium tracking-widest uppercase text-[#f4efe9]/60">
               Baseline Design
             </span>
           </nav>
 
           <Link
             href="/apps/defrag"
-            className="text-[11px] font-sans font-medium tracking-wide text-[#FAFAFA]/40 hover:text-[#FAFAFA]/80 transition-colors duration-200"
+            className="text-[11px] font-sans font-medium tracking-wide text-[#f4efe9]/40 hover:text-[#f4efe9]/80 transition-colors duration-200"
           >
             ← Defrag
           </Link>
@@ -140,7 +140,7 @@ export default function SettingsPage() {
         {/* ── Title block ── */}
         <div className="mb-14">
           <div className="flex items-center gap-3 mb-6">
-            <span className="text-[10px] tracking-[0.1em] uppercase font-sans font-medium text-[#71717A] border border-border px-2.5 py-1 bg-transparent">
+            <span className="text-[10px] tracking-[0.1em] uppercase font-sans font-medium text-[#76716b] border border-border px-2.5 py-1 bg-transparent">
               Baseline Design
             </span>
             <AnimatePresence>
@@ -150,7 +150,7 @@ export default function SettingsPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.25 }}
-                  className="flex items-center gap-1.5 text-[10px] font-sans font-medium tracking-[0.1em] uppercase text-[#A1A1AA]"
+                  className="flex items-center gap-1.5 text-[10px] font-sans font-medium tracking-[0.1em] uppercase text-[#a8a29a]"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-[#A1A1AA] inline-block" />
                   Active
@@ -159,11 +159,11 @@ export default function SettingsPage() {
             </AnimatePresence>
           </div>
 
-          <h1 className="text-[28px] md:text-[34px] font-semibold leading-[1.2] tracking-[-0.02em] text-[#FAFAFA] mb-5 text-balance">
+          <h1 className="text-[28px] md:text-[34px] font-semibold leading-[1.2] tracking-[-0.02em] text-[#f4efe9] mb-5 text-balance">
             Your Baseline Design<br className="hidden sm:block" /> is the source.
           </h1>
 
-          <p className="text-[14px] leading-[1.7] text-[#A1A1AA] max-w-prose mb-6">
+          <p className="text-[14px] leading-[1.7] text-[#a8a29a] max-w-prose mb-6">
             Your Baseline Design is the starting map — how you tend to process,
             respond, connect, protect, communicate, and return to center. It is
             stored privately and used to keep every thread in Defrag and
@@ -171,7 +171,7 @@ export default function SettingsPage() {
           </p>
 
           <div className="flex items-start gap-3 pl-4 border-l border-border">
-            <p className="text-[11px] leading-relaxed text-[#71717A] font-sans font-medium tracking-wide">
+            <p className="text-[11px] leading-relaxed text-[#76716b] font-sans font-medium tracking-wide">
               Shared across Defrag and Covenant. Set once. Works across all sessions.
             </p>
           </div>
@@ -278,7 +278,7 @@ export default function SettingsPage() {
 
           {/* Privacy note */}
           <div className="mt-8 pt-7 border-t border-border">
-            <p className="text-[11px] leading-[1.75] text-[#71717A] font-sans font-medium tracking-wide">
+            <p className="text-[11px] leading-[1.75] text-[#76716b] font-sans font-medium tracking-wide">
               Your birth details are used only to generate your Baseline Design.
               They are stored privately and never exposed in outputs, shared with
               other users, or used outside your own session context.
@@ -293,10 +293,10 @@ export default function SettingsPage() {
               className={[
                 "inline-flex items-center justify-center gap-2",
                 "text-[11px] font-sans font-medium tracking-[0.1em] uppercase",
-                "bg-[#FAFAFA] text-[#050505] px-7 py-3.5",
+                "bg-[#f4efe9] text-[#08070a] px-7 py-3.5",
                 "border border-transparent",
                 "transition-all duration-200",
-                "hover:bg-[#E4E4E7] active:scale-[0.98]",
+                "hover:bg-[#e8e2da] active:scale-[0.98]",
                 "disabled:opacity-25 disabled:cursor-not-allowed disabled:active:scale-100",
                 "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40",
               ].join(" ")}
@@ -326,7 +326,7 @@ export default function SettingsPage() {
                   className={[
                     "text-[11px] font-sans font-medium tracking-wide",
                     message.ok
-                      ? "text-[#A1A1AA]"
+                      ? "text-[#a8a29a]"
                       : "text-red-400/80",
                   ].join(" ")}
                   role="status"
@@ -363,7 +363,7 @@ export default function SettingsPage() {
                   className="w-[18px] h-px bg-white/[0.12] shrink-0 transition-all duration-300 group-hover:bg-white/[0.3] group-hover:w-[24px]"
                   aria-hidden
                 />
-                <span className="text-[12px] leading-relaxed text-[#A1A1AA] font-sans font-medium tracking-wide group-hover:text-[#FAFAFA] transition-colors duration-200">
+                <span className="text-[12px] leading-relaxed text-[#a8a29a] font-sans font-medium tracking-wide group-hover:text-[#f4efe9] transition-colors duration-200">
                   {item}
                 </span>
               </li>

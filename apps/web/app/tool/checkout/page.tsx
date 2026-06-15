@@ -69,12 +69,12 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-surface text-[#FAFAFA] flex items-center justify-center p-6">
+    <main className="min-h-screen bg-surface text-[#f4efe9] flex items-center justify-center p-6">
       <div className="w-full max-w-sm border border-border bg-surface p-8 flex flex-col gap-8">
         <div className="text-center">
-          <p className="text-[10px] font-sans font-medium text-[#3F3F46] tracking-[0.3em] uppercase mb-4">Sovereign.os</p>
+          <p className="text-[10px] font-sans font-medium text-[#4f4b47] tracking-[0.3em] uppercase mb-4">Sovereign.os</p>
           <div className="h-px w-full bg-white/[0.06] mb-6" />
-          <h1 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">Subscribe</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-[#f4efe9]">Subscribe</h1>
         </div>
 
         {error && (
@@ -96,7 +96,7 @@ export default function CheckoutPage() {
           <button
             onClick={openPortal}
             disabled={portalLoading}
-            className="w-full border border-border bg-transparent text-[#71717A] p-3 transition-colors hover:text-white hover:border-border disabled:opacity-20 text-[10px] font-sans font-medium uppercase tracking-widest text-center"
+            className="w-full border border-border bg-transparent text-[#76716b] p-3 transition-colors hover:text-white hover:border-border disabled:opacity-20 text-[10px] font-sans font-medium uppercase tracking-widest text-center"
           >
             {portalLoading ? '...' : 'Manage existing subscription'}
           </button>

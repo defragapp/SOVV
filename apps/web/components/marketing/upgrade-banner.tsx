@@ -11,7 +11,7 @@ export function UpgradeBanner() {
           <h3 className="text-lg font-semibold text-[#FDFDFD]">Sovereign.os Pro</h3>
           <Badge variant="pro">{PRICING_CONFIG.pro.price}/{PRICING_CONFIG.pro.period}</Badge>
         </div>
-        <p className="text-sm text-[#A1A1AA]">
+        <p className="text-sm text-[#a8a29a]">
           Unlock saved Results, your private Library, and deeper context across Defrag and Covenant.
         </p>
       </div>

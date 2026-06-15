@@ -65,10 +65,13 @@
 
 /* ── Core layout + theme utilities ──────────────────────────────────────── */
 .bg-background { background-color: var(--bg-primary); }
+.bg-surface { background-color: var(--bg-secondary); }
+.bg-elevated { background-color: var(--bg-elevated); }
 .text-foreground { color: var(--text-primary); }
 .text-foreground-muted { color: var(--text-secondary); }
 .text-foreground-disabled { color: var(--text-tertiary); }
 .border-border { border-color: var(--border-light); }
+.divide-border > * + * { border-color: var(--border-light); }
 
 .container-platform {
   width: 100%;

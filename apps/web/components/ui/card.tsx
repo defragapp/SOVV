@@ -35,7 +35,7 @@ export const CardTitle = ({ className = "", ...props }: React.HTMLAttributes<HTM
 )
 
 export const CardDescription = ({ className = "", ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-  <p className={`text-sm text-[#A1A1AA] ${className}`} {...props} />
+  <p className={`text-sm text-[#a8a29a] ${className}`} {...props} />
 )
 
 export const CardContent = ({ className = "", ...props }: React.HTMLAttributes<HTMLDivElement>) => (
