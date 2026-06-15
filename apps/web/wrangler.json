@@ -37,25 +37,22 @@
       "name": "sovv-web",
       "workers_dev": false,
       "routes": [
-        "!defrag.app/_next/static/*",
-        "!www.defrag.app/_next/static/*",
-        "!sovereign.defrag.app/_next/static/*",
-        "!app.defrag.app/_next/static/*",
+        {"pattern": "!*defrag.app/_next/static/*", "zone_id": "45a59d754ece9221fc97c92c461eb01f"},
         {
           "pattern": "defrag.app/*",
-          "custom_domain": true
+          "zone_id": "45a59d754ece9221fc97c92c461eb01f"
         },
         {
           "pattern": "www.defrag.app/*",
-          "custom_domain": true
+          "zone_id": "45a59d754ece9221fc97c92c461eb01f"
         },
         {
           "pattern": "sovereign.defrag.app/*",
-          "custom_domain": true
+          "zone_id": "45a59d754ece9221fc97c92c461eb01f"
         },
         {
           "pattern": "app.defrag.app/*",
-          "custom_domain": true
+          "zone_id": "45a59d754ece9221fc97c92c461eb01f"
         }
       ]
     }
