@@ -98,7 +98,7 @@ export default function DefragPage() {
   const renderSection = (title: string, content: any, isArray: boolean = false) => {
     if (!content) return null
     return (
-      <div className="border-b border-border pb-8 mb-8 last:border-0 last:pb-0 last:mb-0">
+      <div className="border-b border-white/[0.06] pb-8 mb-8 last:border-0 last:pb-0 last:mb-0">
         <h4 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em] mb-4">
           {title}
         </h4>
@@ -130,8 +130,8 @@ export default function DefragPage() {
   }
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-surface">
-      <div className="px-6 py-5 border-b border-border">
+    <div className="flex flex-col h-full bg-[#0c0a0d]">
+      <div className="px-6 py-5 border-b border-white/[0.06]">
         <h3 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em]">
           Sovereign.os Library
         </h3>
@@ -146,14 +146,14 @@ export default function DefragPage() {
   )
 
   const contextContent = (
-    <div className="flex flex-col gap-0 h-full bg-surface border-l border-border">
-      <div className="px-6 py-5 border-b border-border">
+    <div className="flex flex-col gap-0 h-full bg-[#0c0a0d] border-l border-white/[0.06]">
+      <div className="px-6 py-5 border-b border-white/[0.06]">
         <h3 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em]">
           Context
         </h3>
       </div>
       <div className="p-6 flex flex-col gap-6">
-        <div className="border border-border bg-surface p-5 flex flex-col gap-2">
+        <div className="border border-white/[0.08] bg-white/[0.02] p-5 flex flex-col gap-2">
           <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">
             Baseline Design
           </p>
@@ -165,11 +165,11 @@ export default function DefragPage() {
 
         {result && (
           <div className="flex flex-col gap-6 mt-4">
-            <div className="border border-border bg-surface p-5 flex flex-col gap-4">
+            <div className="border border-white/[0.08] bg-white/[0.02] p-5 flex flex-col gap-4">
               <Button
                 onClick={handleSave}
                 disabled={isSaving || saveSuccess}
-                className="w-full rounded-none border border-border bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9"
+                className="w-full rounded-none border border-white/[0.08] bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9"
               >
                 {isSaving
                   ? "Saving..."
@@ -179,7 +179,7 @@ export default function DefragPage() {
               </Button>
             </div>
 
-            <div className="border border-border bg-surface p-5 flex flex-col gap-3">
+            <div className="border border-white/[0.08] bg-white/[0.02] p-5 flex flex-col gap-3">
               <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">
                 Audio Overview
               </p>
@@ -195,7 +195,7 @@ export default function DefragPage() {
                     onClick={handleGenerateAudio}
                     disabled={isGeneratingAudio}
                     variant="ghost"
-                    className="w-full rounded-none border border-border bg-transparent text-[#f4efe9] hover:bg-white/[0.04] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9"
+                    className="w-full rounded-none border border-white/[0.08] bg-transparent text-[#f4efe9] hover:bg-white/[0.04] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9"
                   >
                     {isGeneratingAudio ? "Generating..." : "Generate Audio"}
                   </Button>
@@ -213,7 +213,7 @@ export default function DefragPage() {
               )}
             </div>
 
-            <div className="border border-border bg-surface p-5 flex flex-col gap-2 opacity-40">
+            <div className="border border-white/[0.08] bg-white/[0.02] p-5 flex flex-col gap-2 opacity-40">
               <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">
                 Watch Preview
               </p>
@@ -230,7 +230,7 @@ export default function DefragPage() {
   const mainInputArea = (
     <div className="flex flex-col h-full justify-end gap-8 pt-4 pb-0 max-w-4xl mx-auto w-full">
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 max-w-md mx-auto opacity-50">
-        <div className="w-12 h-12 border border-border flex items-center justify-center">
+        <div className="w-12 h-12 border border-white/[0.08] flex items-center justify-center">
           <svg
             className="w-5 h-5 text-[#a8a29a]"
             fill="none"
@@ -256,7 +256,7 @@ export default function DefragPage() {
         </div>
       </div>
 
-      <div className="border border-border bg-surface focus-within:border-border transition-colors duration-200 shadow-2xl">
+      <div className="border border-white/[0.08] bg-surface focus-within:border-border transition-colors duration-200 shadow-2xl">
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -277,7 +277,7 @@ export default function DefragPage() {
             size="sm"
             onClick={handleExplain}
             disabled={!input.trim() || isLoading}
-            className="rounded-none border border-border bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9 px-6 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+            className="rounded-none border border-white/[0.08] bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9 px-6 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? "Running..." : "Defrag"}
           </Button>
@@ -289,14 +289,14 @@ export default function DefragPage() {
   const mainResultArea = (
     <div className="h-full flex flex-col max-w-4xl mx-auto w-full">
       {!result ? (
-        <div className="flex-1 flex items-center justify-center border border-border bg-surface p-8 text-center min-h-[240px]">
+        <div className="flex-1 flex items-center justify-center border border-white/[0.08] bg-white/[0.02] p-8 text-center min-h-[240px]">
           <p className="text-[13px] text-[#a8a29a] font-sans font-medium leading-relaxed max-w-[280px]">
             Your Result will appear here in structured sections you can use,
             save, and return to later.
           </p>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto border border-border bg-surface p-8 md:p-12 shadow-xl">
+        <div className="flex-1 overflow-y-auto border border-white/[0.08] bg-white/[0.02] p-8 md:p-12 shadow-xl">
           {renderSection("Active pattern", result.activePattern)}
           {renderSection("The Repeat", result.theRepeat)}
           {renderSection("Old Role", result.oldRole)}
@@ -306,7 +306,7 @@ export default function DefragPage() {
           {renderSection("Alignment", result.alignment)}
 
           {result.bestNextResponse && (
-            <div className="border-b border-border pb-8 mb-8">
+            <div className="border-b border-white/[0.06] pb-8 mb-8">
               <h4 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em] mb-4">
                 Best Next Response
               </h4>
@@ -316,7 +316,7 @@ export default function DefragPage() {
               </p>
               {Array.isArray(result.bestNextResponse.phrasing) &&
                 result.bestNextResponse.phrasing.length > 0 && (
-                  <div className="bg-surface border border-border p-6 flex flex-col gap-3">
+                  <div className="bg-surface border border-white/[0.08] p-6 flex flex-col gap-3">
                     {result.bestNextResponse.phrasing.map(
                       (phrase: string, i: number) => (
                         <div

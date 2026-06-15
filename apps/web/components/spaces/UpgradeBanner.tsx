@@ -1,6 +1,6 @@
-import Link from "next/link"
 "use client"
 
+import Link from "next/link"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -16,7 +16,6 @@ export default function UpgradeBanner() {
 
     try {
       if (promoCode.trim()) {
-        // First redeem the promo code, then proceed to checkout
         const promoRes = await fetch("/api/promo/redeem", {
           method: "POST",
           credentials: "include",
@@ -44,86 +43,66 @@ export default function UpgradeBanner() {
 
       window.location.href = data.url
     } catch {
-      setError("Connection failed")
+      setError("Connection failed. Try again.")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background text-[#f4efe9]">
-      {/* Ambient glow */}
+    <div className="flex min-h-[100dvh] w-full items-center justify-center bg-[#08070a] text-[#f4efe9] relative overflow-hidden">
+
+      {/* Warm ambient glow */}
       <div
-        className="pointer-events-none fixed inset-0 z-0"
+        className="pointer-events-none absolute inset-0 z-0"
         style={{
-          backgroundImage: "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0) 60%)",
+          background: "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(224,116,58,0.07) 0%, transparent 70%)",
         }}
       />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: [0.0, 0.0, 0.2, 1] }}
-        className="relative z-10 w-full max-w-sm px-6 text-center"
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 w-full max-w-md px-6 py-12 text-center"
       >
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.8 }}
-          className="mb-12"
-        >
-          <p className="font-sans font-medium text-[10px] uppercase tracking-[0.4em] text-white/20 mb-3">
-            Sovereign.os
-          </p>
-          <div className="h-px w-full bg-[#F6F5F3]/10" />
-        </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="mb-8"
-        >
-          <h1 className="font-sans font-medium text-[11px] uppercase tracking-[0.3em] text-white/40 mb-4">
-            Space requires Pro
+        {/* Wordmark */}
+        <div className="mb-12">
+          <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+            SOVEREIGN.OS
+          </span>
+          <div className="h-px w-full bg-white/[0.06] mt-4" />
+        </div>
+
+        {/* Heading */}
+        <div className="mb-10">
+          <h1 className="font-serif text-2xl text-[#f4efe9] mb-4">
+            This space requires Pro.
           </h1>
-          <p className="text-sm leading-relaxed text-white/30 max-w-xs mx-auto">
-            An active subscription is required to use the Defrag space.
-            Upgrade to Pro for unlimited sessions, relational analysis, and
-            pattern tracking.
+          <p className="text-base text-[#a8a29a] leading-relaxed max-w-sm mx-auto">
+            Upgrade to Pro for unlimited sessions, the Covenant space, the Alignment space, full Sovereign.os Library depth, and Invite Privately.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.button
+        {/* Upgrade button */}
+        <button
           type="button"
           onClick={handleUpgrade}
           disabled={loading}
-          whileHover={{ backgroundColor: "rgba(246,245,243,0.08)" }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full border border-[#F6F5F3]/20 px-4 py-3.5 font-sans font-medium text-[10px] uppercase tracking-widest text-[#f4efe9] transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
+          className="w-full h-12 rounded-full bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none mb-4"
         >
-          {loading ? (
-            <span className="flex items-center justify-center gap-2">
-              <motion.span
-                animate={{ opacity: [1, 0.3, 1] }}
-                transition={{ repeat: Infinity, duration: 1.2 }}
-              >
-                ···
-              </motion.span>
-            </span>
-          ) : (
-            "Upgrade to Pro — $20/mo"
-          )}
-        </motion.button>
+          {loading ? "···" : "Upgrade to Pro — $20/mo"}
+        </button>
 
-        {/* Promo code toggle */}
-        <motion.button
+        {/* Promo code */}
+        <button
           type="button"
           onClick={() => setShowPromo(!showPromo)}
-          className="mt-4 font-sans font-medium text-[9px] uppercase tracking-widest text-white/20 hover:text-white/40 transition-colors"
+          className="text-sm text-[#76716b] hover:text-[#a8a29a] transition-colors duration-200 mb-3"
         >
           {showPromo ? "Hide promo code" : "Have a promo code?"}
-        </motion.button>
+        </button>
 
         <AnimatePresence>
           {showPromo && (
@@ -131,14 +110,14 @@ export default function UpgradeBanner() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="mt-3 overflow-hidden"
+              className="overflow-hidden mb-4"
             >
               <input
                 type="text"
                 value={promoCode}
                 onChange={(e) => setPromoCode(e.target.value)}
-                placeholder="ENTER CODE"
-                className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-2.5 font-sans font-medium text-[10px] uppercase tracking-widest text-[#f4efe9] placeholder-white/15 focus:border-[#F6F5F3]/30 focus:outline-none transition-colors text-center"
+                placeholder="Enter promo code"
+                className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 text-center tracking-widest uppercase"
               />
             </motion.div>
           )}
@@ -150,30 +129,40 @@ export default function UpgradeBanner() {
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="mt-4 font-sans font-medium text-[9px] uppercase tracking-widest text-red-400/70"
+              className="text-sm text-red-400/80 mb-4"
             >
               {error}
             </motion.p>
           )}
         </AnimatePresence>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-10 font-sans font-medium text-[9px] uppercase tracking-widest text-white/15"
-        >
-          Pro unlocks people, groups, unlimited sessions
-        </motion.p>
+        {/* What Pro includes */}
+        <div className="mt-8 text-left border border-white/[0.06] rounded-2xl p-6 space-y-3">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-4">Pro includes</p>
+          {[
+            "Unlimited sessions",
+            "Covenant space — faith-context reflection",
+            "Alignment space — response integration",
+            "Full Sovereign.os Library depth",
+            "Invite Privately",
+            "Audio Overview",
+          ].map((item) => (
+            <div key={item} className="flex items-center gap-3 text-sm text-[#a8a29a]">
+              <span className="text-[#e0743a]/60 shrink-0">✓</span>
+              <span>{item}</span>
+            </div>
+          ))}
+        </div>
 
-        <div className="mt-6">
-          <a
+        <div className="mt-8">
+          <Link
             href="/"
-            className="font-sans font-medium text-[9px] uppercase tracking-widest text-white/15 hover:text-white/35 transition-colors duration-200"
+            className="text-sm text-[#76716b] hover:text-[#a8a29a] transition-colors duration-200"
           >
             ← Back to Sovereign.os
-          </a>
+          </Link>
         </div>
+
       </motion.div>
     </div>
   )

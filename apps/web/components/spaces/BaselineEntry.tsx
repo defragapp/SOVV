@@ -18,7 +18,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!dob || !pob) return
-    if (precision !== ("unknown" as any) && !tob) return
+    if (precision !== "unknown" && !tob) return
 
     setStage("loading")
 
@@ -47,23 +47,21 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
   }
 
   return (
-    <div
-      className="flex min-h-screen w-full items-center justify-center bg-background text-[#f4efe9]"
-      style={{ fontFamily: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}
-    >
+    <div className="flex min-h-[100dvh] w-full items-center justify-center bg-[#08070a] text-[#f4efe9] relative overflow-hidden">
+
+      {/* Warm ambient glow */}
       <div
-        className="pointer-events-none fixed inset-0 z-0"
+        className="pointer-events-none absolute inset-0 z-0"
         style={{
-          backgroundImage:
-            "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0) 60%)",
+          background: "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(224,116,58,0.07) 0%, transparent 70%)",
         }}
       />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: [0.0, 0.0, 0.2, 1] }}
-        className="relative z-10 w-full max-w-sm px-6"
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 w-full max-w-md px-6 py-12"
       >
         <AnimatePresence mode="wait">
 
@@ -74,15 +72,10 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col items-center gap-6 py-16"
+              className="flex flex-col items-center gap-6 py-20"
             >
-              <motion.span
-                animate={{ opacity: [1, 0.3, 1] }}
-                transition={{ repeat: Infinity, duration: 1.4 }}
-                className="font-sans font-medium text-xs uppercase tracking-widest text-white/40"
-              >
-                Building your Baseline Design...
-              </motion.span>
+              <span className="w-5 h-5 border border-white/20 border-t-[#f4efe9]/60 rounded-full animate-spin" />
+              <p className="text-sm text-[#76716b]">Setting your Baseline Design…</p>
             </motion.div>
           )}
 
@@ -93,13 +86,16 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col items-center gap-4 py-16 text-center"
+              className="flex flex-col items-center gap-4 py-20 text-center"
             >
-              <p className="font-sans font-medium text-xs uppercase tracking-widest text-white/60">
+              <div className="w-10 h-10 rounded-full border border-[#e0743a]/30 bg-[#e0743a]/10 flex items-center justify-center">
+                <span className="text-[#f0a06a] text-lg">✓</span>
+              </div>
+              <p className="font-serif text-xl text-[#f4efe9]">
                 Your Baseline Design is ready.
               </p>
-              <p className="text-sm font-light text-white/40">
-                Now your space can keep the thread grounded.
+              <p className="text-sm text-[#76716b] leading-relaxed max-w-xs">
+                Your space can now keep every thread grounded.
               </p>
             </motion.div>
           )}
@@ -110,18 +106,17 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
               {/* Header */}
               <div className="mb-10 text-center">
-                <p className="font-sans font-medium text-[10px] uppercase tracking-[0.4em] text-white/20 mb-3">
-                  Sovereign OS
-                </p>
-                <div className="h-px w-full bg-[#F6F5F3]/10 mb-8" />
-                <h1 className="text-lg font-light text-[#f4efe9] mb-3">
-                  Start Your Baseline Design
+                <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+                  SOVEREIGN.OS
+                </span>
+                <div className="h-px w-full bg-white/[0.06] mt-4 mb-8" />
+                <h1 className="font-serif text-2xl text-[#f4efe9] mb-3">
+                  Set your Baseline Design.
                 </h1>
-                <p className="text-sm font-light leading-6 text-white/40">
-                  Your Baseline Design is the starting map. It helps your space understand how you tend
-                  to process, respond, connect, protect, communicate, and return to center.
+                <p className="text-sm text-[#a8a29a] leading-relaxed max-w-sm mx-auto">
+                  Your Baseline Design is the starting map — how you tend to process, respond, connect, protect, communicate, and return to center. It is private and never exposed in outputs.
                 </p>
-                <p className="mt-3 text-sm font-light text-white/30">
+                <p className="mt-3 text-sm text-[#76716b]">
                   Enter your date, time, and place of birth to begin.
                 </p>
               </div>
@@ -129,8 +124,8 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
                 {/* Date of birth */}
-                <div>
-                  <label className="mb-1.5 block font-sans font-medium text-[9px] uppercase tracking-[0.3em] text-white/25">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">
                     Date of birth
                   </label>
                   <input
@@ -138,25 +133,26 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                     value={dob}
                     onChange={(e) => setDob(e.target.value)}
                     required
-                    className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-3 text-sm font-light text-[#f4efe9] focus:border-[#F6F5F3]/30 focus:outline-none transition-colors duration-200"
+                    className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07] [color-scheme:dark]"
+                    style={{ fontSize: "16px" }}
                   />
                 </div>
 
-                {/* Time precision */}
-                <div>
-                  <label className="mb-2 block font-sans font-medium text-[9px] uppercase tracking-[0.3em] text-white/25">
-                    Birth time
+                {/* Time of birth */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">
+                    Time of birth
                   </label>
-                  <div className="flex gap-2 mb-3">
+                  <div className="flex gap-2 mb-2">
                     {(["exact", "approximate", "unknown"] as Precision[]).map((p) => (
                       <button
                         key={p}
                         type="button"
                         onClick={() => setPrecision(p)}
-                        className={`flex-1 border py-2 font-sans font-medium text-[9px] uppercase tracking-widest transition-colors duration-200 ${
+                        className={`flex-1 rounded-lg border py-2.5 text-xs font-mono uppercase tracking-wide transition-colors duration-200 ${
                           precision === p
-                            ? "border-[#F6F5F3]/40 text-[#f4efe9]"
-                            : "border-[#F6F5F3]/10 text-white/25 hover:text-white/50"
+                            ? "border-[#f4efe9]/40 text-[#f4efe9] bg-white/[0.05]"
+                            : "border-white/[0.08] text-[#76716b] hover:text-[#a8a29a]"
                         }`}
                       >
                         {p === "exact" ? "Exact" : p === "approximate" ? "Approx" : "Unknown"}
@@ -164,27 +160,27 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                     ))}
                   </div>
 
-                  {precision !== ("unknown" as any) && (
+                  {precision !== "unknown" && (
                     <input
                       type="time"
                       value={tob}
                       onChange={(e) => setTob(e.target.value)}
-                      required={precision !== ("unknown" as any)}
-                      className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-3 text-sm font-light text-[#f4efe9] focus:border-[#F6F5F3]/30 focus:outline-none transition-colors duration-200"
+                      required
+                      className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07] [color-scheme:dark]"
+                      style={{ fontSize: "16px" }}
                     />
                   )}
 
                   {precision === "unknown" && (
-                    <p className="text-sm font-light leading-6 text-white/30">
-                      Not sure of the exact time? That&apos;s okay. We&apos;ll mark the Baseline Design as
-                      partial and keep the thread grounded in what we can verify.
+                    <p className="text-sm text-[#76716b] leading-relaxed">
+                      If the exact time is unknown, we will mark the Baseline Design as partial and keep the thread grounded in what is available.
                     </p>
                   )}
                 </div>
 
                 {/* Place of birth */}
-                <div>
-                  <label className="mb-1.5 block font-sans font-medium text-[9px] uppercase tracking-[0.3em] text-white/25">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">
                     Place of birth
                   </label>
                   <input
@@ -193,7 +189,8 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                     onChange={(e) => setPob(e.target.value)}
                     required
                     placeholder="City, Country"
-                    className="w-full border border-[#F6F5F3]/10 bg-transparent px-4 py-3 text-sm font-light text-[#f4efe9] placeholder-white/15 focus:border-[#F6F5F3]/30 focus:outline-none transition-colors duration-200"
+                    className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
+                    style={{ fontSize: "16px" }}
                   />
                 </div>
 
@@ -204,7 +201,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="font-sans font-medium text-[9px] uppercase tracking-widest text-red-400/70"
+                      className="text-sm text-red-400/80 leading-relaxed"
                     >
                       {errorMsg}
                     </motion.p>
@@ -212,25 +209,19 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                 </AnimatePresence>
 
                 {/* Submit */}
-                <motion.button
+                <button
                   type="submit"
-                  disabled={
-                    !dob ||
-                    !pob ||
-                    (precision !== ("unknown" as any) && !tob)
-                  }
-                  whileHover={{ backgroundColor: "rgba(246,245,243,0.08)" }}
-                  whileTap={{ scale: 0.98 }}
-                  className="mt-2 border border-[#F6F5F3]/20 px-4 py-3.5 font-sans font-medium text-[10px] uppercase tracking-widest text-[#f4efe9] transition-colors duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
+                  disabled={!dob || !pob || (precision !== "unknown" && !tob)}
+                  className="mt-2 w-full h-12 rounded-full bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   Set Baseline Design
-                </motion.button>
+                </button>
 
               </form>
 
               {/* Privacy note */}
-              <p className="mt-8 text-center font-sans font-medium text-[9px] uppercase tracking-widest text-white/15">
-                Private by design · Birth details are never shared
+              <p className="mt-8 text-center text-sm text-[#76716b]">
+                Private by design · Birth details are never shared or exposed in outputs.
               </p>
 
             </motion.div>

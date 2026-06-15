@@ -6,9 +6,9 @@ import { Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/product", label: "Product" },
-  { href: "/how-it-works", label: "How it works" },
+  { href: "/product/defrag", label: "Defrag" },
+  { href: "/product/covenant", label: "Covenant" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/covenant", label: "Covenant" },
 ];
 
 const FOOTER_COLS = [
@@ -21,15 +21,7 @@ const FOOTER_COLS = [
       { href: "/pricing", label: "Pricing" },
     ],
   },
-  {
-    label: "Spaces",
-    links: [
-      { href: "/covenant", label: "Covenant" },
-      { href: "/principles", label: "Principles" },
-      { href: "/faq", label: "FAQ" },
-      { href: "/about", label: "About" },
-    ],
-  },
+  
   {
     label: "Legal",
     links: [

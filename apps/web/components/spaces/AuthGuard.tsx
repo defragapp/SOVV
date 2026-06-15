@@ -70,15 +70,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     checkSession()
   }, [])
 
-  if (auth.loading) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-background">
-        <span className="font-sans font-medium text-xs uppercase tracking-widest text-white/30">
-          Verifying
-        </span>
-      </div>
-    )
-  }
+  
 
   if (!auth.authenticated) {
     return <LoginScreen />

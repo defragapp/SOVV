@@ -32,10 +32,16 @@
   "assets": {
     "directory": ".open-next/assets"
   },
+  "vars": {
+    "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADhGIF8-iOLIg8MU"
+  },
   "env": {
     "production": {
       "name": "sovv-web",
-      "workers_dev": false
+      "workers_dev": false,
+      "vars": {
+        "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADhGIF8-iOLIg8MU"
+      }
     }
   }
 }
