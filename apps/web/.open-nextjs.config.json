@@ -1,0 +1,6 @@
+{
+  "dangerous": {
+    "unoptimizedPackages": ["next", "react", "react-dom"],
+    "skipNextInternals": true
+  }
+}

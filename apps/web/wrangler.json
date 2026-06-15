@@ -3,7 +3,7 @@
   "main": "./.open-next/worker.js",
   "compatibility_date": "2026-06-04",
   "build": {
-    "command": "npm run build:worker"
+    "command": "pnpm run build:worker"
   },
   "compatibility_flags": [
     "nodejs_compat"
