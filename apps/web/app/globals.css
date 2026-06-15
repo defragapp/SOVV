@@ -1,5 +1,4 @@
-@import "tailwindcss/preflight";
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -191,7 +190,7 @@
   z-index: 0;
 }
 
-/* ── Buttons (Premium Glass + Elevated) ─────────────────────────────────── */
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
