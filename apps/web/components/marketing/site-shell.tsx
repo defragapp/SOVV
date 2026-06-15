@@ -11,14 +11,33 @@ const NAV_LINKS = [
   { href: "/covenant", label: "Covenant" },
 ];
 
-const FOOTER_LINKS = [
-  { href: "/about", label: "About" },
-  { href: "/product", label: "Product" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/covenant", label: "Covenant" },
-  { href: "/privacy", label: "Privacy" },
-  { href: "/terms", label: "Terms" },
-  { href: "/contact", label: "Contact" },
+const FOOTER_COLS = [
+  {
+    label: "Platform",
+    links: [
+      { href: "/product", label: "Product" },
+      { href: "/how-it-works", label: "How it works" },
+      { href: "/use-cases", label: "Use cases" },
+      { href: "/pricing", label: "Pricing" },
+    ],
+  },
+  {
+    label: "Spaces",
+    links: [
+      { href: "/covenant", label: "Covenant" },
+      { href: "/principles", label: "Principles" },
+      { href: "/faq", label: "FAQ" },
+      { href: "/about", label: "About" },
+    ],
+  },
+  {
+    label: "Legal",
+    links: [
+      { href: "/privacy", label: "Privacy" },
+      { href: "/terms", label: "Terms" },
+      { href: "/contact", label: "Contact" },
+    ],
+  },
 ];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
@@ -26,11 +45,13 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-[#08070a] text-[#f4efe9] font-sans">
+
+      {/* Nav */}
       <header className="fixed top-0 left-0 right-0 z-50 h-16 surface-glass border-b border-white/[0.06]">
         <div className="container-platform h-full flex items-center justify-between">
           <Link
             href="/"
-            className="text-label text-[#f4efe9] hover:text-white transition-colors font-medium"
+            className="text-label text-[#f4efe9] hover:text-white transition-colors font-medium tracking-[0.18em]"
           >
             SOVEREIGN.OS
           </Link>
@@ -56,7 +77,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </Link>
             <Link
               href="https://app.defrag.app/app/login"
-              className="btn-primary py-2 px-5 text-sm hidden sm:inline-flex"
+              className="btn-primary h-9 px-5 text-sm hidden sm:inline-flex"
             >
               Enter
             </Link>
@@ -70,9 +91,10 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
+        {/* Mobile menu */}
         {menuOpen && (
           <div className="md:hidden surface-glass border-t border-white/[0.06] p-6 shadow-2xl">
-            <nav className="flex flex-col gap-6">
+            <nav className="flex flex-col gap-5">
               {NAV_LINKS.map((item) => (
                 <Link
                   key={item.href}
@@ -86,7 +108,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               <Link
                 href="https://app.defrag.app/app/login"
                 onClick={() => setMenuOpen(false)}
-                className="btn-primary justify-center mt-4 py-3"
+                className="btn-primary justify-center mt-2"
               >
                 Enter Sovereign.os
               </Link>
@@ -95,26 +117,48 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         )}
       </header>
 
+      {/* Main */}
       <main className="flex-1 pt-16">{children}</main>
 
+      {/* Footer */}
       <footer className="border-t border-white/[0.06] bg-[#08070a] py-16">
-        <div className="container-platform flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-[#76716b]">
-          <div className="flex flex-col items-center md:items-start gap-2">
-            <span className="text-label text-[#76716b]">SOVEREIGN.OS</span>
-            <span className="text-micro text-[#4f4b47]">
-              Defrag · Covenant · Baseline Design · Library
-            </span>
+        <div className="container-platform">
+          <div className="flex flex-col md:flex-row gap-12 md:gap-20 justify-between">
+
+            {/* Brand */}
+            <div className="flex flex-col gap-3 max-w-xs">
+              <span className="text-label text-[#f4efe9] tracking-[0.18em]">SOVEREIGN.OS</span>
+              <p className="text-micro text-[#4f4b47] leading-relaxed">
+                Defrag · Covenant · Alignment · Baseline Design · Library
+              </p>
+              <p className="text-micro text-[#4f4b47] leading-relaxed mt-2">
+                Private by design. Not a replacement for therapy or professional support.
+              </p>
+            </div>
+
+            {/* Links */}
+            <div className="flex flex-wrap gap-12">
+              {FOOTER_COLS.map((col) => (
+                <div key={col.label} className="flex flex-col gap-3">
+                  <span className="text-micro text-[#4f4b47] uppercase tracking-[0.15em] font-mono">{col.label}</span>
+                  {col.links.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="text-micro text-[#76716b] hover:text-[#f4efe9] transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+              ))}
+            </div>
+
           </div>
-          <div className="flex flex-wrap justify-center gap-6">
-            {FOOTER_LINKS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-micro text-[#76716b] hover:text-[#f4efe9] transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
+
+          <div className="mt-12 pt-8 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <span className="text-micro text-[#4f4b47]">© {new Date().getFullYear()} Sovereign.os</span>
+            <span className="text-micro text-[#4f4b47]">info@defrag.app</span>
           </div>
         </div>
       </footer>

@@ -27,11 +27,18 @@
   }
 
   body {
+    background-color: #08070a;
     background-color: var(--bg-primary);
+    color: #f4efe9;
     color: var(--text-primary);
+    font-family: Geist, Inter, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+  }
+
+  html {
+    background-color: #08070a;
   }
 }
 

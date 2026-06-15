@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import { SiteShell } from "@/components/marketing/site-shell";
 import { Container, Section } from "@/components/ui/layout-primitives";
-import { Badge } from "@/components/ui/badge";
+
+export const metadata: Metadata = {
+  title: "Privacy — Sovereign.os",
+  description: "Sovereign.os is private by design. Here is what we collect, why, and how we protect it.",
+};
 
 const SECTIONS = [
   {
@@ -9,19 +14,15 @@ const SECTIONS = [
   },
   {
     title: "What we collect",
-    body: "We may collect account information (email, login), Baseline Design data (date, time, and place of birth), conversation inputs, saved notebook entries, and interaction metadata. We do not expose this data publicly.",
+    body: "We may collect account information (email, login), Baseline Design data, conversation inputs, saved Library entries, and interaction metadata. We do not expose this data publicly.",
   },
   {
     title: "What we do not expose",
-    body: "Sovereign.os does not expose raw Baseline Design computation outputs, underlying symbolic or mapping systems, system prompts or internal instructions, or private notes or unapproved relational data.",
+    body: "Sovereign.os does not expose raw Baseline Design computation outputs, underlying systems, system prompts or internal instructions, or private notes or unapproved relational data.",
   },
   {
     title: "How your data is used",
     body: "Your data is used to generate Baseline Design-aware responses, maintain continuity in your space, and improve pattern recognition over time. We do not sell personal data.",
-  },
-  {
-    title: "Source transparency",
-    body: "Defrag may show a summary of what influenced an answer — such as your Baseline Design, the sky over you, selected people, notebook context, or prior patterns. This summary does not expose raw system data or proprietary logic.",
   },
   {
     title: "Your control",
@@ -29,11 +30,11 @@ const SECTIONS = [
   },
   {
     title: "Data security",
-    body: "Your data is stored in Cloudflare's infrastructure with encryption at rest and in transit. Session tokens are HttpOnly, Secure, and SameSite=Lax.",
+    body: "Your data is stored in Cloudflare infrastructure with encryption at rest and in transit. Session tokens are HttpOnly, Secure, and SameSite=Lax.",
   },
   {
     title: "Your rights",
-    body: "You can request deletion of your account and all associated data at any time by contacting us. We will process deletion requests within 30 days.",
+    body: "You can request deletion of your account and all associated data at any time by contacting us at info@defrag.app. We process deletion requests within 30 days.",
   },
   {
     title: "Contact",
@@ -41,46 +42,47 @@ const SECTIONS = [
   },
 ];
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function MetaLabel({ children }: { children: React.ReactNode }) {
   return (
-    <Badge
-      variant="outline"
-      className="rounded-none border-border bg-transparent text-[#76716b] font-sans font-medium text-[10px] tracking-[0.2em] uppercase px-3 py-1 w-fit"
-    >
-      {children}
-    </Badge>
-  )
+    <div className="inline-flex items-center gap-2 mb-6">
+      <span className="h-px w-6 bg-[#e0743a]/60" />
+      <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">
+        {children}
+      </span>
+    </div>
+  );
 }
 
 export default function PrivacyPage() {
   return (
     <SiteShell>
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <Section className="w-full relative flex flex-col items-center justify-center min-h-[50svh] pt-32 pb-24 overflow-hidden border-b border-border bg-surface">
-        <Container className="relative z-10 flex flex-col items-center text-center max-w-[800px]">
-          <div className="mb-12 flex items-center gap-3">
-            <div className="h-px w-10 bg-white/[0.14]" />
-            <SectionLabel>PRIVACY POLICY</SectionLabel>
-            <div className="h-px w-10 bg-white/[0.14]" />
-          </div>
-
-          <h1 className="text-[clamp(2.6rem,6vw,4.5rem)] font-semibold tracking-[-0.035em] text-[#f4efe9] leading-[1.04] text-balance mb-8">
+      {/* Hero */}
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[45svh] pt-32 pb-20 overflow-hidden bg-[#08070a] border-b border-white/5">
+        <div className="light-beam opacity-40" aria-hidden />
+        <Container className="relative z-10 flex flex-col items-center text-center max-w-[700px]">
+          <MetaLabel>Privacy policy</MetaLabel>
+          <h1 className="font-serif text-[clamp(2.6rem,6vw,4.5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-6">
             Your data. Your clarity.
           </h1>
-
-          <p className="text-[#a8a29a] text-base md:text-lg font-normal tracking-[-0.01em] max-w-[560px] text-balance leading-[1.65]">
+          <p className="text-[#a8a29a] text-lg max-w-[500px] text-balance leading-relaxed">
             Private by design. Here is what we collect, why, and how we protect it.
           </p>
         </Container>
       </Section>
 
-      {/* ── Content ───────────────────────────────────────────────────────── */}
-      <Section className="w-full py-24 md:py-32 bg-surface">
+      {/* Content */}
+      <Section className="w-full py-24 md:py-32 bg-[#0c0a0d]">
         <Container className="max-w-3xl">
-          <div className="space-y-0 border border-border bg-surface divide-y divide-border">
+          <div className="flex flex-col gap-0 rounded-2xl border border-white/[0.06] overflow-hidden">
             {SECTIONS.map((section, i) => (
-              <div key={i} className="p-8 md:p-12 space-y-4">
-                <h3 className="text-[#f4efe9] text-xl font-medium tracking-tight">{section.title}</h3>
+              <div
+                key={i}
+                className={[
+                  "p-8 md:p-12 space-y-3 bg-[#08070a]",
+                  i < SECTIONS.length - 1 ? "border-b border-white/[0.06]" : "",
+                ].join(" ")}
+              >
+                <h3 className="text-[#f4efe9] text-lg font-medium tracking-tight">{section.title}</h3>
                 <p className="text-[#a8a29a] text-sm leading-relaxed max-w-2xl">{section.body}</p>
               </div>
             ))}
