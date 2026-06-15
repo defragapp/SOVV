@@ -5,11 +5,11 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const variantClasses = {
-  default: "bg-white/5 text-[#A1A1AA] border border-border",
-  pro: "bg-gradient-to-br from-white/10 to-white/5 text-[#FDFDFD] border border-border shadow-[0_0_10px_rgba(255,255,255,0.05)]",
-  defrag: "bg-white/10 text-[#FDFDFD] border border-border",
-  covenant: "bg-transparent text-[#A1A1AA] border border-border",
-  outline: "bg-transparent text-[#71717A] border border-border",
+  default: "bg-white/5 text-[#a8a29a] border border-white/[0.06]",
+  pro: "bg-gradient-to-br from-[#e0743a]/15 to-[#e0743a]/5 text-[#f0a06a] border border-[#e0743a]/20 shadow-[0_0_10px_rgba(224,116,58,0.1)]",
+  defrag: "bg-[#e0743a]/10 text-[#f0a06a] border border-[#e0743a]/20",
+  covenant: "bg-transparent text-[#a8a29a] border border-white/[0.06]",
+  outline: "bg-transparent text-[#76716b] border border-white/[0.06]",
 }
 
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(

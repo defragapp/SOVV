@@ -27,6 +27,11 @@ const config: Config = {
           muted: "var(--text-secondary)",
           disabled: "var(--text-disabled)",
         },
+        accent: {
+          DEFAULT: "var(--accent)",
+          soft: "var(--accent-soft)",
+          glow: "var(--accent-glow)",
+        },
         brand: {
           DEFAULT: "#FFFFFF",
           glow: "rgba(255, 255, 255, 0.2)",
@@ -34,6 +39,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["Geist", "Inter", "SF Pro Display", "-apple-system", "sans-serif"],
+        serif: ["var(--font-fraunces)", "Times New Roman", "serif"],
         mono: ["var(--font-jetbrains-mono)", "SF Mono", "ui-monospace", "Menlo", "monospace"],
       },
       transitionTimingFunction: {
@@ -41,7 +47,7 @@ const config: Config = {
         smooth: "cubic-bezier(0.25, 1, 0.5, 1)",
       },
       backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
       },
     },
   },

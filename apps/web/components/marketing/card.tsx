@@ -20,10 +20,8 @@ export function Card({
         glow ? "glow-sm" : ""
       } ${className}`}
     >
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100" />
-      <div className="relative z-10">
-        {children}
-      </div>
+      <div className="absolute inset-0 z-0 rounded-[20px] bg-gradient-to-br from-[#e0743a]/[0.04] to-transparent opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100" />
+      <div className="relative z-10">{children}</div>
     </motion.div>
   );
 }
