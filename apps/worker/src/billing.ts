@@ -64,22 +64,19 @@ export async function requireActiveSubscription(user: { subscription_status: str
 
   const url = new URL(request.url);
 
-  // Workspace-protected routes — the apps/defrag and apps/covenant spaces
-  const isWorkspaceRoute = url.pathname === "/api/explain" ||
-    url.pathname.startsWith("/api/baseline") ||
-    url.pathname.startsWith("/api/patterns") ||
-    url.pathname.startsWith("/api/history") ||
-    url.pathname.startsWith("/api/chips");
+  // Pro-only routes — Covenant and Alignment require active subscription
+  const isProRoute = url.pathname.startsWith("/api/covenant") ||
+    url.pathname.startsWith("/api/alignment");
 
-  if (!isWorkspaceRoute) {
-    return null; // Not a protected route — let it through
+  if (!isProRoute) {
+    return null; // Not a Pro-only route — let it through (free users can use Defrag)
   }
 
   const hasActive = user.subscription_status === "active" || user.tier === "pro";
   if (!hasActive) {
     return new Response(JSON.stringify({
       error: "payment_required",
-      message: "An active subscription is required to use the space. Please upgrade to Pro.",
+      message: "The Covenant and Alignment spaces require a Pro subscription. Upgrade to access all spaces.",
     }), {
       status: 402,
       headers: { "Content-Type": "application/json" },

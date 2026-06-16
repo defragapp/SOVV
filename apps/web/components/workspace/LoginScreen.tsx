@@ -233,6 +233,18 @@ export default function LoginScreen() {
                 : "Your Baseline Design and Library are waiting."}
             </p>
 
+            {mode === "login" && (
+              <p className="mt-3 text-center text-sm text-[#4f4b47]">
+                Forgot your password?{" "}
+                <a
+                  href="mailto:info@defrag.app?subject=Password reset"
+                  className="text-[#76716b] hover:text-[#a8a29a] transition-colors"
+                >
+                  Contact support
+                </a>
+              </p>
+            )}
+
           </div>
 
           <div className="mt-5 text-center">

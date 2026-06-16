@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 import type { Tier } from "./types"
 import LoginScreen from "./LoginScreen"
 import BaselineEntry from "./BaselineEntry"
@@ -12,11 +13,14 @@ interface AuthState {
   user: { id: string; email: string } | null
   tier: Tier
   hasBaseline: boolean
-  // null = not yet checked, true/false = checked
   subscriptionChecked: boolean
 }
 
+// Routes that require Pro subscription
+const PRO_ROUTES = ["/apps/covenant", "/apps/alignment"]
+
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
   const [auth, setAuth] = useState<AuthState>({
     loading: true,
     authenticated: false,
@@ -29,7 +33,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function checkSession() {
       try {
-        // Step 1: Verify session
         const res = await fetch("/api/auth/session", {
           method: "GET",
           credentials: "include",
@@ -47,17 +50,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
           return
         }
 
-        // Step 2: Check tier (parallel with baseline — both are needed)
+        // Fetch tier + baseline in parallel
         const [tierRes, baselineRes] = await Promise.all([
           fetch("/api/auth/tier", { method: "GET", credentials: "include" }),
-          // Baseline is now ungated — all authenticated users can fetch it
           fetch("/api/baseline", { method: "GET", credentials: "include" }),
         ])
 
         const tierData = tierRes.ok ? await tierRes.json() as { tier: Tier } : { tier: "free" as Tier }
 
-        // Baseline returns 200 with { baseline: null } if not set, or 401 if not authed
-        // It no longer returns 402 for free users
         let hasBaseline = false
         if (baselineRes.ok) {
           const baselineData = await baselineRes.json() as { baseline?: { dob?: string } | null }
@@ -89,29 +89,26 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     )
   }
 
-  // Not authenticated → show login
+  // Not authenticated → login
   if (!auth.authenticated) {
     return <LoginScreen />
   }
 
-  // Authenticated but no Baseline Design → collect it first
-  // This applies to ALL users (free and pro) — Baseline Design is required before workspace
+  // No Baseline Design → collect it first (all users)
   if (!auth.hasBaseline) {
     return (
       <BaselineEntry
-        onComplete={() =>
-          setAuth((prev) => ({ ...prev, hasBaseline: true }))
-        }
+        onComplete={() => setAuth((prev) => ({ ...prev, hasBaseline: true }))}
       />
     )
   }
 
-  // Has Baseline Design but no active subscription → show upgrade
-  // Only gate workspace routes, not the baseline entry itself
-  if (auth.tier !== "pro" && auth.subscriptionChecked) {
+  // Pro-only routes → show upgrade if free
+  const requiresPro = PRO_ROUTES.some(route => pathname?.startsWith(route))
+  if (requiresPro && auth.tier !== "pro" && auth.subscriptionChecked) {
     return <UpgradeBanner />
   }
 
-  // Authenticated + has Baseline Design + active subscription → enter workspace
+  // Authenticated + Baseline Design set → enter workspace
   return <>{children}</>
 }
