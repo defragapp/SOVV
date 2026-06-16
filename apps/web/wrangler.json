@@ -2,12 +2,14 @@
   "name": "sovv-web",
   "main": "./.open-next/worker.js",
   "compatibility_date": "2026-06-04",
+  "build": {
+    "command": "npm run build:worker"
+  },
   "compatibility_flags": [
     "nodejs_compat"
   ],
   "account_id": "8b1954d216d65077c6480d62583fe2c2",
   "workers_dev": false,
-  
   "assets": {
     "directory": ".open-next/assets"
   },
