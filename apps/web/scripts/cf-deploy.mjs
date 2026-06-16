@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 /**
  * Cloudflare Workers deploy script
- * Uploads the built worker and deploys it via CF API
- * Bypasses wrangler's open-next auto-detection
+ * Called after opennextjs-cloudflare build completes
+ * Uploads worker via wrangler versions upload, then deploys via CF API
  */
 
 import { execSync } from 'child_process'
-import { readFileSync } from 'fs'
 import https from 'https'
 
 const ACCOUNT_ID = '8b1954d216d65077c6480d62583fe2c2'
@@ -18,23 +17,33 @@ if (!token) {
   process.exit(1)
 }
 
-// Upload via wrangler versions upload (no open-next detection)
-console.log('Uploading worker version...')
-let uploadOutput
+console.log('Uploading worker via wrangler versions upload...')
+
+let uploadOutput = ''
 try {
+  // Use wrangler versions upload - doesn't trigger route registration
   uploadOutput = execSync(
-    'OPEN_NEXT_DEPLOY=false npx wrangler versions upload --env production --message "CF Build"',
-    { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
+    'OPEN_NEXT_DEPLOY=false pnpm exec wrangler versions upload --message "CF Build"',
+    { 
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+      env: { ...process.env, OPEN_NEXT_DEPLOY: 'false' }
+    }
   )
+  console.log('Upload output:', uploadOutput.slice(-500))
 } catch (e) {
   uploadOutput = (e.stdout || '') + (e.stderr || '')
-  console.log('Upload output:', uploadOutput)
+  console.log('Upload output:', uploadOutput.slice(-1000))
+  if (!uploadOutput.includes('Version ID')) {
+    console.error('Upload failed')
+    process.exit(1)
+  }
 }
 
 // Extract version ID
-const match = uploadOutput.match(/Version ID:\s*([a-f0-9-]+)/)
+const match = uploadOutput.match(/Version ID:\s*([a-f0-9-]{36})/i)
 if (!match) {
-  console.error('Could not find Version ID in output:', uploadOutput)
+  console.error('Could not find Version ID in:', uploadOutput.slice(-500))
   process.exit(1)
 }
 
@@ -59,6 +68,7 @@ const options = {
   }
 }
 
+console.log('Deploying version to production...')
 const req = https.request(options, (res) => {
   let data = ''
   res.on('data', chunk => data += chunk)
