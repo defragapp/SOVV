@@ -11,6 +11,7 @@ import { registerCovenantRoute } from "./covenant.js";
 import { registerAlignmentRoute } from "./alignment.js";
 import { registerAudioRoute } from "./audio.js";
 import { insertSupportTicket } from "./db.js";
+import { registerDeriveProfileRoutes } from "./derive-profile"
 
 const router = Router();
 let currentEnv: Env;
@@ -43,6 +44,7 @@ export function getCorsHeaders(request: Request): Record<string, string> {
 // === NATAL ROUTES ===
 function registerNatalRoutes(router: any, getEnv: () => Env) {
   // GET /api/natal - fetch existing natal data
+registerDeriveProfileRoutes(router, getEnv);
   router.get("/api/natal", async (request: Request) => {
     const env = getEnv();
     const user = await getAuthUser(request, env.DB);
