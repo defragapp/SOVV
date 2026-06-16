@@ -2,7 +2,7 @@
 import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
 
-// ─── Types (exact shape from explain-extended.ts) ──────────────────────────────────────────────────────────────
+// ─── Types (exact shape from explain-extended.ts) ──────────────────────────
 
 interface Baseline {
   dob: string
@@ -12,7 +12,7 @@ interface Baseline {
 
 // Plain-language statement derived from baseline design data.
 // `statement` — plain-language tendency, written in first person.
-// `chips`     — gate/channel/placement labels that produced it (e.g. "Moon in Pisces", "Gate 55").
+// `chips`     — gate/channel/placement labels that produced it.
 interface BaselineStatement {
   statement: string
   chips: string[]
@@ -47,50 +47,16 @@ interface LibraryItem {
   created_at: string
 }
 
-// ─── Derive plain-language baseline profile statements ─────────────────────────────────────────────────────────
-// Called once after baseline loads. Returns 5 statements with gate/channel chips.
-// In production this would call a lightweight derive-profile endpoint; here we
-// produce deterministic example statements matched to the Apr 3 1990 / 7:42 AM /
-// Chicago baseline so the sidebar always shows real content during testing.
-function deriveBaselineStatements(baseline: Baseline): BaselineStatement[] {
-  // The statements below are keyed to the example DOB/TOB/POB used in development.
-  // Production: swap this function body for a call to POST /api/derive-profile
-  // which returns BaselineStatement[] computed from the actual chart.
-  void baseline // used in prod call
-  return [
-    {
-      statement: "I naturally move fast when something needs a decision — sometimes before others are ready.",
-      chips: ["Sun in Aries", "Gate 51"],
-    },
-    {
-      statement: "I tend to feel things deeply, even in situations where I appear calm on the surface.",
-      chips: ["Moon in Pisces", "Gate 55"],
-    },
-    {
-      statement: "I naturally take the lead on starting things — conversations, plans, new directions.",
-      chips: ["Channel 25-51", "Initiation"],
-    },
-    {
-      statement: "I feel internal pressure to stay reliable, even when I'm running low.",
-      chips: ["Saturn in Cap.", "Gate 38"],
-    },
-    {
-      statement: "I notice when something is off in a relationship before it becomes visible to others.",
-      chips: ["Venus in Taurus", "Gate 2"],
-    },
-  ]
-}
-
-// ─── Helpers ───────────────────────────────────────────────────────────────────────────────────────────────────
+// ─── Helpers ───────────────────────────────────────────────────────────────
 
 function formatBirthSummary(baseline: Baseline): string {
   const dob = baseline.dob
   const tob = baseline.tob.value
-  const pob = baseline.pob.split(",")[0] // first city segment only
+  const pob = baseline.pob.split(",")[0]
   return `${dob} · ${tob} · ${pob}`
 }
 
-// ─── Section component ─────────────────────────────────────────────────────────────────────────────────────────
+// ─── Section component ─────────────────────────────────────────────────────
 
 function Section({ label, value }: { label: string; value?: string }) {
   if (!value) return null
@@ -104,7 +70,7 @@ function Section({ label, value }: { label: string; value?: string }) {
   )
 }
 
-// ─── Gate chip ─────────────────────────────────────────────────────────────────────────────────────────────────
+// ─── Gate chip ─────────────────────────────────────────────────────────────
 
 function GateChip({ label }: { label: string }) {
   return (
@@ -126,7 +92,7 @@ function GateChip({ label }: { label: string }) {
   )
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────────────────────────────────────────
+// ─── Page ──────────────────────────────────────────────────────────────────
 
 export default function DefragPage() {
   const [input, setInput] = React.useState("")
@@ -138,19 +104,21 @@ export default function DefragPage() {
   const [baseline, setBaseline] = React.useState<Baseline | null>(null)
   const [baselineLoading, setBaselineLoading] = React.useState(true)
 
-  // Derived plain-language profile statements computed from baseline
+  // Derived plain-language profile statements — fetched from GET /api/derive-profile
+  // which reads the user's actual KV baseline and runs CF Workers AI to compute them.
   const [baselineStatements, setBaselineStatements] = React.useState<BaselineStatement[]>([])
+  const [statementsLoading, setStatementsLoading] = React.useState(false)
 
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
 
-  // Audio — real <audio> element driven by blob URL from POST /api/generate-audio
+  // Audio — real <audio> element driven by blob URL from POST /api/audio
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
   const [isGeneratingAudio, setIsGeneratingAudio] = React.useState(false)
   const [audioError, setAudioError] = React.useState("")
 
-  // Library from GET /api/library?workspace_source=DEFRAG — not /api/history
+  // Library from GET /api/library?workspace_source=DEFRAG
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
 
@@ -161,11 +129,27 @@ export default function DefragPage() {
       .then((d: any) => {
         const b: Baseline | null = d.baseline ?? null
         setBaseline(b)
-        if (b) setBaselineStatements(deriveBaselineStatements(b))
       })
       .catch(() => {})
       .finally(() => setBaselineLoading(false))
   }, [])
+
+  // Once baseline is confirmed present, fetch live derived statements from
+  // GET /api/derive-profile — CF Worker reads KV baseline + runs AI to produce
+  // 5 plain-language BaselineStatement objects keyed to the user's actual chart.
+  React.useEffect(() => {
+    if (!baseline) return
+    setStatementsLoading(true)
+    fetch("/api/derive-profile", { credentials: "include" })
+      .then(r => (r.ok ? r.json() : { statements: [] }))
+      .then((d: any) => {
+        if (Array.isArray(d.statements) && d.statements.length > 0) {
+          setBaselineStatements(d.statements)
+        }
+      })
+      .catch(() => {})
+      .finally(() => setStatementsLoading(false))
+  }, [baseline])
 
   // Revoke previous blob URL when a new one is created
   React.useEffect(() => {
@@ -201,7 +185,6 @@ export default function DefragPage() {
       })
       const data = await res.json()
 
-      // Handle needs_baseline — worker returns this when KV has no birth data
       if (data.type === "needs_baseline") {
         setError("needs_baseline")
         setIsLoading(false)
@@ -230,7 +213,6 @@ export default function DefragPage() {
     if (!result) return
     setIsSaving(true)
     try {
-      // Derive content field — was missing, caused null body in library
       const content =
         result.summary ||
         result.activePattern ||
@@ -259,28 +241,30 @@ export default function DefragPage() {
     }
   }
 
-  // Audio gated on result.media.audioOverviewAvailable (set by worker when isPro)
-  // Uses a real <audio> element; src is a blob URL created from the response stream
+  // Audio gated on result.media.audioOverviewAvailable (set by worker when isPro).
+  // Route: POST /api/audio — registered in audio.ts via registerAudioRoute().
+  // Uses a real <audio> element; src is a blob URL created from the response stream.
   const handleGenerateAudio = async () => {
     if (!result || isGeneratingAudio) return
     setIsGeneratingAudio(true)
     setAudioError("")
     try {
-      const res = await fetch("/api/generate-audio", {
+      const res = await fetch("/api/audio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          result: {
-            activePattern: result.activePattern,
-            theRepeat: result.theRepeat,
-            oldRole: result.oldRole,
-            giftUnderStrain: result.giftUnderStrain,
-            bestNextResponse:
-              typeof result.bestNextResponse === "object"
-                ? result.bestNextResponse?.summary
-                : result.bestNextResponse,
-          },
+          text: [
+            result.activePattern,
+            result.theRepeat,
+            result.oldRole,
+            result.giftUnderStrain,
+            typeof result.bestNextResponse === "object"
+              ? result.bestNextResponse?.summary
+              : result.bestNextResponse,
+          ]
+            .filter(Boolean)
+            .join(" "),
         }),
       })
       if (!res.ok) {
@@ -290,7 +274,6 @@ export default function DefragPage() {
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
       setAudioUrl(url)
-      // Auto-play once src is set — the ref will have been updated by React
       requestAnimationFrame(() => {
         audioRef.current?.play().catch(() => {})
       })
@@ -301,10 +284,7 @@ export default function DefragPage() {
     }
   }
 
-  // ─── LEFT PANEL — Context ──────────────────────────────────────────────────────────────────────────────────
-  // Baseline Design block shows plain-language personality statements derived
-  // from the natal chart, each paired with gate/channel chip labels.
-  // Raw birth data shown as a compact one-line summary below the section header.
+  // ─── LEFT PANEL — Context ──────────────────────────────────────────────────
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
@@ -313,10 +293,8 @@ export default function DefragPage() {
         </p>
       </div>
 
-      {/* Block 1 — Baseline Design: plain-language statements with gate chips */}
+      {/* Block 1 — Baseline Design */}
       <div className="px-5 pt-5 pb-5 border-b border-white/[0.05]">
-
-        {/* Section header row */}
         <div className="flex items-center justify-between mb-4">
           <p className="text-[11px] font-medium text-[#a8a29a] tracking-[0.04em]">
             Your Design
@@ -332,26 +310,29 @@ export default function DefragPage() {
           <span className="w-3.5 h-3.5 border border-white/[0.15] border-t-white/40 rounded-full animate-spin block" />
         ) : baseline ? (
           <>
-            {/* Plain-language tendency statements */}
-            <div className="flex flex-col">
-              {baselineStatements.map(({ statement, chips }, i) => (
-                <div
-                  key={i}
-                  className="py-2.5 border-b border-white/[0.04] last:border-0"
-                >
-                  <p className="text-[12px] text-[#c8c2bc] leading-[1.65] mb-2">
-                    {statement}
-                  </p>
-                  <div className="flex gap-1 flex-wrap">
-                    {chips.map(chip => (
-                      <GateChip key={chip} label={chip} />
-                    ))}
+            {/* Plain-language tendency statements — live from /api/derive-profile */}
+            {statementsLoading ? (
+              <span className="w-3.5 h-3.5 border border-white/[0.15] border-t-white/40 rounded-full animate-spin block" />
+            ) : (
+              <div className="flex flex-col">
+                {baselineStatements.map(({ statement, chips }, i) => (
+                  <div
+                    key={i}
+                    className="py-2.5 border-b border-white/[0.04] last:border-0"
+                  >
+                    <p className="text-[12px] text-[#c8c2bc] leading-[1.65] mb-2">
+                      {statement}
+                    </p>
+                    <div className="flex gap-1 flex-wrap">
+                      {chips.map(chip => (
+                        <GateChip key={chip} label={chip} />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
-            {/* Footer row */}
             <div className="flex items-center justify-between mt-3.5 pt-3 border-t border-white/[0.04]">
               <p className="text-[10px] text-[#4f4b47]">Active in every result.</p>
               <a
@@ -364,7 +345,6 @@ export default function DefragPage() {
             </div>
           </>
         ) : (
-          /* No baseline — prompt to add birth data */
           <div className="rounded-xl border border-white/[0.08] bg-[#111010] p-4">
             <p className="text-[11px] font-medium text-[#a8a29a] mb-1">Required to run</p>
             <p className="text-[12px] text-[#76716b] leading-relaxed mb-3">
@@ -396,7 +376,7 @@ export default function DefragPage() {
         )}
       </div>
 
-      {/* Block 3 — Invite Privately (Pro) */}
+      {/* Block 3 — Add another person (Pro) */}
       <div className="px-5 pt-5">
         <p className="text-[11px] font-medium text-[#a8a29a] tracking-[0.04em] mb-3">
           Add another person
@@ -411,11 +391,7 @@ export default function DefragPage() {
     </div>
   )
 
-  // ─── RIGHT PANEL — Library & Export ───────────────────────────────────────────────────────────────────────
-  // Library: GET /api/library?workspace_source=DEFRAG
-  // Audio: real <audio> element, src = blob URL from POST /api/generate-audio
-  // Gated on result.media.audioOverviewAvailable (isPro from worker)
-  // Saves: private by default, scoped to user_id
+  // ─── RIGHT PANEL — Library & Export ───────────────────────────────────────
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
@@ -426,7 +402,6 @@ export default function DefragPage() {
 
       {result && (
         <div className="px-5 pt-5 pb-5 border-b border-white/[0.06]">
-          {/* Save */}
           <button
             onClick={handleSave}
             disabled={isSaving || saveSuccess}
@@ -435,7 +410,6 @@ export default function DefragPage() {
             {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save to Sovereign"}
           </button>
 
-          {/* Audio Overview */}
           <p className="text-[11px] font-medium text-[#a8a29a] tracking-[0.04em] mb-1.5">
             Audio overview
           </p>
@@ -445,7 +419,6 @@ export default function DefragPage() {
 
           {result.media?.audioOverviewAvailable ? (
             <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden">
-              {/* Generate row — hidden once audio loads */}
               {!audioUrl && (
                 <button
                   onClick={handleGenerateAudio}
@@ -461,7 +434,6 @@ export default function DefragPage() {
                 </button>
               )}
 
-              {/* Real <audio> element — src set to blob URL after generation */}
               {audioUrl && (
                 <audio
                   ref={audioRef}
@@ -491,7 +463,6 @@ export default function DefragPage() {
         </div>
       )}
 
-      {/* Library list */}
       <div className="flex-1">
         {libraryLoading ? (
           <div className="flex justify-center py-10">
@@ -527,11 +498,9 @@ export default function DefragPage() {
     </div>
   )
 
-  // ─── CENTER PANEL — AI Thread ──────────────────────────────────────────────────────────────────────────────
-  // sourcesUsed chips in header — rendered from actual result.sourcesUsed fields
+  // ─── CENTER PANEL — AI Thread ──────────────────────────────────────────────
   const main = (
     <div className="flex flex-col h-full">
-      {/* Thread header */}
       <div className="h-11 px-6 flex items-center justify-between border-b border-white/[0.06] shrink-0">
         <span className="text-[11px] font-medium text-[#f4efe9] tracking-[0.04em]">Defrag</span>
         {result?.sourcesUsed && (
@@ -550,10 +519,8 @@ export default function DefragPage() {
         )}
       </div>
 
-      {/* Thread body */}
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
 
-        {/* No baseline — birth data missing */}
         {!baselineLoading && !baseline && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-3">
             <p className="text-[15px] font-medium text-[#a8a29a]">Birth data required to run.</p>
@@ -563,7 +530,6 @@ export default function DefragPage() {
           </div>
         )}
 
-        {/* Ready — baseline present, no result yet */}
         {baseline && !result && !isLoading && !error && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-2">
             <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">
@@ -575,7 +541,6 @@ export default function DefragPage() {
           </div>
         )}
 
-        {/* Loading */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <span className="w-5 h-5 border border-white/[0.15] border-t-white/[0.45] rounded-full animate-spin" />
@@ -583,14 +548,12 @@ export default function DefragPage() {
           </div>
         )}
 
-        {/* Error */}
         {error && error !== "needs_baseline" && (
           <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">
             {error}
           </p>
         )}
 
-        {/* Result card */}
         {result && (
           <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8">
 
@@ -671,7 +634,6 @@ export default function DefragPage() {
         )}
       </div>
 
-      {/* Composer — disabled when no baseline */}
       <div className={`flex-none px-6 pb-6 ${!baseline ? "opacity-40 pointer-events-none" : ""}`}>
         <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors">
           <textarea
