@@ -15,7 +15,7 @@
     "dev:session": "wrangler dev --config apps/worker-session/wrangler.toml --local",
     "dev:web": "wrangler dev --config apps/web/wrangler.json --local",
     "dev:all": "concurrently \"npm run dev:api\" \"npm run dev:ai\" \"npm run dev:session\" \"npm run dev:web\"",
-    "build": "cd apps/web && pnpm run build",
+    "build": "pnpm --filter web build",
     "deploy:api": "cd apps/worker && wrangler deploy --env production",
     "deploy:ai": "cd apps/worker-ai && wrangler deploy --env production",
     "deploy:session": "cd apps/worker-session && wrangler deploy --env production",
