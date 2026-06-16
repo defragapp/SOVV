@@ -19,6 +19,24 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+const FREE_FEATURES = [
+  "Baseline Design setup",
+  "Defrag space access",
+  "Active pattern + Best Next Response",
+  "Basic Sovereign.os Library",
+  "5 sessions per day",
+];
+
+const PRO_FEATURES = [
+  "Everything in Free",
+  "Unlimited sessions",
+  "Covenant space — faith-context reflection",
+  "Alignment space — response integration",
+  "Full Sovereign.os Library depth",
+  "Invite Privately — when both sides matter",
+  "Audio Overview of your Result",
+];
+
 export default function PricingPage() {
   return (
     <SiteShell>
@@ -36,84 +54,83 @@ export default function PricingPage() {
         </Container>
       </Section>
 
-      {/* Plans */}
+      {/* Plans — structured comparison, no card boxes */}
       <Section className="w-full py-24 md:py-32 bg-[#0c0a0d]">
-        <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        <Container className="max-w-4xl">
 
-            {/* Free */}
-            <div className="rounded-3xl border border-white/[0.08] bg-white/[0.02] p-10 md:p-12 flex flex-col">
-              <div className="mb-8">
-                <h3 className="font-serif text-3xl text-[#f4efe9] mb-2">Free</h3>
-                <p className="text-[#a8a29a] text-base leading-relaxed">Begin the work. Understand a moment before it takes over.</p>
+          {/* Column headers */}
+          <div className="grid grid-cols-3 gap-8 mb-8 pb-6 border-b border-white/[0.06]">
+            <div />
+            <div className="text-center">
+              <p className="font-serif text-2xl text-[#f4efe9] mb-1">Free</p>
+              <p className="font-serif text-3xl text-[#f4efe9]">$0</p>
+              <p className="text-sm text-[#76716b] mt-1">forever</p>
+            </div>
+            <div className="text-center relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="bg-[#e0743a] text-[#08070a] text-[10px] font-mono uppercase tracking-widest px-3 py-1 rounded-full">Recommended</span>
               </div>
-              <div className="font-serif text-5xl text-[#f4efe9] mb-10">
-                $0 <span className="text-xl text-[#76716b] font-sans font-normal">/ forever</span>
+              <p className="font-serif text-2xl text-[#f4efe9] mb-1 mt-4">Pro</p>
+              <p className="font-serif text-3xl text-[#f4efe9]">$20</p>
+              <p className="text-sm text-[#76716b] mt-1">per month</p>
+            </div>
+          </div>
+
+          {/* Feature rows */}
+          {[
+            { label: "Baseline Design", free: true, pro: true },
+            { label: "Defrag space", free: true, pro: true },
+            { label: "Active pattern + Best Next Response", free: true, pro: true },
+            { label: "Sovereign.os Library", free: "Basic", pro: "Full depth" },
+            { label: "Daily sessions", free: "5/day", pro: "Unlimited" },
+            { label: "Covenant space", free: false, pro: true },
+            { label: "Alignment space", free: false, pro: true },
+            { label: "Invite Privately", free: false, pro: true },
+            { label: "Audio Overview", free: false, pro: true },
+          ].map((row, i) => (
+            <div key={i} className="grid grid-cols-3 gap-8 py-5 border-b border-white/[0.04] items-center">
+              <p className="text-sm text-[#a8a29a]">{row.label}</p>
+              <div className="text-center">
+                {row.free === true ? (
+                  <span className="text-[#e0743a]/60 text-base">✓</span>
+                ) : row.free === false ? (
+                  <span className="text-[#4f4b47] text-base">—</span>
+                ) : (
+                  <span className="text-sm text-[#76716b]">{row.free}</span>
+                )}
               </div>
-              <ul className="space-y-4 mb-12 flex-1">
-                {[
-                  "Baseline Design setup",
-                  "Defrag space access",
-                  "Active pattern + Best Next Response",
-                  "Basic Sovereign.os Library",
-                  "5 sessions per day",
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-sm text-[#a8a29a]">
-                    <span className="text-[#e0743a] mt-0.5 shrink-0">✓</span>
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="https://app.defrag.app/app/login"
-                className="btn-secondary justify-center"
-              >
+              <div className="text-center">
+                {row.pro === true ? (
+                  <span className="text-[#e0743a] text-base">✓</span>
+                ) : row.pro === false ? (
+                  <span className="text-[#4f4b47] text-base">—</span>
+                ) : (
+                  <span className="text-sm text-[#f4efe9]">{row.pro}</span>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {/* CTA row */}
+          <div className="grid grid-cols-3 gap-8 pt-8">
+            <div />
+            <div className="flex justify-center">
+              <Link href="https://app.defrag.app/app/login" className="btn-secondary text-sm px-6 h-11">
                 Start for Free
               </Link>
             </div>
-
-            {/* Pro */}
-            <div className="rounded-3xl border border-[#e0743a]/20 bg-[#e0743a]/[0.03] p-10 md:p-12 flex flex-col relative">
-              <div className="absolute top-0 right-8 -translate-y-1/2 bg-[#e0743a] text-[#08070a] text-[10px] uppercase tracking-widest px-3 py-1 font-medium rounded-full">
-                Recommended
-              </div>
-              <div className="mb-8">
-                <h3 className="font-serif text-3xl text-[#f4efe9] mb-2">Pro</h3>
-                <p className="text-[#a8a29a] text-base leading-relaxed">Stay with it. Deep continuity across all spaces, no limits.</p>
-              </div>
-              <div className="font-serif text-5xl text-[#f4efe9] mb-10">
-                $20 <span className="text-xl text-[#76716b] font-sans font-normal">/ month</span>
-              </div>
-              <ul className="space-y-4 mb-12 flex-1">
-                {[
-                  "Everything in Free",
-                  "Unlimited sessions",
-                  "Covenant space — faith-context reflection",
-                  "Alignment space — response integration",
-                  "Full Sovereign.os Library depth",
-                  "Invite Privately — when both sides matter",
-                  "Audio Overview of your Result",
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-sm text-[#a8a29a]">
-                    <span className="text-[#e0743a] mt-0.5 shrink-0">✓</span>
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="https://app.defrag.app/app/login"
-                className="btn-primary justify-center"
-              >
+            <div className="flex justify-center">
+              <Link href="https://app.defrag.app/app/login" className="btn-primary text-sm px-6 h-11">
                 Upgrade to Pro
               </Link>
             </div>
-
           </div>
+
         </Container>
       </Section>
 
       {/* Note */}
-      <Section className="w-full py-20 bg-[#08070a] border-t border-white/5 text-center">
+      <Section className="w-full py-16 bg-[#08070a] border-t border-white/5 text-center">
         <Container className="max-w-2xl">
           <p className="text-[#76716b] text-sm leading-relaxed">
             Upgrades happen through secure payment gateways. Your Pro status unlocks backend continuity and priority access across all spaces. Cancel any time — your Library stays yours.

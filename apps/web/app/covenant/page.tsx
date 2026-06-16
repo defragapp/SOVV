@@ -10,14 +10,17 @@ export const metadata: Metadata = {
 
 const POINTS = [
   {
+    num: "01",
     title: "Grounded discernment, not certainty.",
     body: "Covenant gives faith-context reflection a structured place in the work. It translates the moment into reflection, repair, and a grounded next step — without preaching or spiritual shortcuts.",
   },
   {
+    num: "02",
     title: "Faith and repair, connected.",
     body: "For users who want faith connected to repair, Covenant helps turn the moment toward reflection and responsibility. It keeps faith and relationships connected without becoming vague or performative.",
   },
   {
+    num: "03",
     title: "Private by design.",
     body: "Covenant uses the same private space model as Defrag. Covenant Briefs save to your Sovereign.os Library — private, organized, and yours.",
   },
@@ -78,14 +81,13 @@ export default function CovenantPage() {
             <br />
             Not as a spiritual shortcut.
           </h2>
-          <div className="space-y-12">
-            {POINTS.map((pt, i) => (
-              <div key={i} className="flex flex-col md:flex-row gap-6 items-start border-t border-white/[0.06] pt-10">
-                <div className="w-full md:w-1/3">
-                  <h3 className="text-[#f4efe9] font-medium text-base leading-snug">{pt.title}</h3>
-                </div>
-                <div className="w-full md:w-2/3">
-                  <p className="text-[#a8a29a] text-[15px] leading-relaxed">{pt.body}</p>
+          <div className="flex flex-col gap-0">
+            {POINTS.map((pt) => (
+              <div key={pt.num} className="flex items-start gap-8 py-10 border-b border-white/[0.06] last:border-0">
+                <span className="font-serif text-3xl text-[#e0743a]/40 shrink-0 w-10">{pt.num}</span>
+                <div>
+                  <h3 className="text-[#f4efe9] font-medium text-base mb-3">{pt.title}</h3>
+                  <p className="text-[15px] text-[#a8a29a] leading-relaxed">{pt.body}</p>
                 </div>
               </div>
             ))}
@@ -93,25 +95,18 @@ export default function CovenantPage() {
         </Container>
       </Section>
 
-      {/* When to use */}
-      <Section className="w-full py-24 bg-[#08070a] border-t border-white/5">
-        <Container className="max-w-4xl">
-          <div className="text-center mb-14">
-            <MetaLabel>When to use Covenant</MetaLabel>
-            <h2 className="font-serif text-3xl md:text-4xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-4">
-              A space to pause before you react.
-            </h2>
-            <p className="text-[#a8a29a] text-base max-w-md mx-auto leading-relaxed">
-              Covenant is for the user who wants faith to stay connected to the work.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {WHEN_TO_USE.map((uc, i) => (
-              <div
-                key={i}
-                className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 text-[#a8a29a] text-[15px] leading-relaxed hover:border-[#e0743a]/20 hover:bg-white/[0.04] transition-all duration-300"
-              >
-                {uc}
+      {/* When to use — structured list */}
+      <Section className="w-full py-20 bg-[#08070a] border-t border-white/5">
+        <Container className="max-w-3xl">
+          <MetaLabel>When to use Covenant</MetaLabel>
+          <h2 className="font-serif text-3xl md:text-4xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-10 text-balance">
+            A space to pause before you react.
+          </h2>
+          <div className="flex flex-col gap-0">
+            {WHEN_TO_USE.map((w, i) => (
+              <div key={i} className="flex items-center gap-6 py-5 border-b border-white/[0.06] last:border-0">
+                <span className="h-px w-4 bg-[#e0743a]/30 shrink-0" />
+                <p className="text-[15px] text-[#a8a29a] leading-relaxed">{w}</p>
               </div>
             ))}
           </div>

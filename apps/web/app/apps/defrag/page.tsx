@@ -1,7 +1,6 @@
 "use client"
 import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
-import { Button } from "@/components/ui/button"
 
 export default function DefragPage() {
   const [input, setInput] = React.useState("")
@@ -14,7 +13,7 @@ export default function DefragPage() {
   const [isGeneratingAudio, setIsGeneratingAudio] = React.useState(false)
   const [audioError, setAudioError] = React.useState("")
 
-  const handleExplain = async () => {
+  const handleSubmit = async () => {
     if (!input.trim()) return
     setIsLoading(true)
     setError("")
@@ -25,12 +24,11 @@ export default function DefragPage() {
       const res = await fetch("/api/explain", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ message: input }),
       })
       const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data.error || data.message || "Failed to process")
-      }
+      if (!res.ok) throw new Error(data.error || data.message || "Failed to process")
       setResult(data)
     } catch (err: any) {
       setError(err.message || "An error occurred.")
@@ -47,179 +45,105 @@ export default function DefragPage() {
       const res = await fetch("/api/history", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: input.slice(0, 50) + "...",
-          payload: result,
-          workspace_source: "DEFRAG",
-        }),
+        credentials: "include",
+        body: JSON.stringify({ title: input.slice(0, 60) + (input.length > 60 ? "…" : ""), payload: result, workspace_source: "DEFRAG" }),
       })
       if (!res.ok) throw new Error("Failed to save")
       setSaveSuccess(true)
-    } catch (err: any) {
-      console.error("Save error:", err)
+    } catch {
+      // silent
     } finally {
       setIsSaving(false)
     }
   }
 
-  async function handleGenerateAudio() {
+  const handleGenerateAudio = async () => {
     if (!result) return
     setIsGeneratingAudio(true)
     setAudioError("")
     try {
-      const payload = {
-        activePattern: result.activePattern,
-        theRepeat: result.theRepeat,
-        oldRole: result.oldRole,
-        giftUnderStrain: result.giftUnderStrain,
-        bestNextResponse:
-          result.bestNextResponse?.summary || String(result.bestNextResponse),
-      }
       const res = await fetch("/api/generate-audio", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ result: payload }),
+        body: JSON.stringify({ result: { activePattern: result.activePattern, theRepeat: result.theRepeat, oldRole: result.oldRole, giftUnderStrain: result.giftUnderStrain, bestNextResponse: result.bestNextResponse?.summary || "" } }),
       })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || "Failed to generate audio")
-      }
+      if (!res.ok) { const d = await res.json().catch(() => ({})) as any; throw new Error(d.error || "Failed to generate audio") }
       const blob = await res.blob()
       setAudioUrl(URL.createObjectURL(blob))
     } catch (err: any) {
-      console.error("Audio generation error:", err)
       setAudioError(err.message || "Failed to generate audio")
     } finally {
       setIsGeneratingAudio(false)
     }
   }
 
-  const renderSection = (title: string, content: any, isArray: boolean = false) => {
-    if (!content) return null
+  // ── Result section renderer ──────────────────────────────────────
+  const ResultSection = ({ label, value }: { label: string; value?: string }) => {
+    if (!value) return null
     return (
-      <div className="border-b border-white/[0.06] pb-8 mb-8 last:border-0 last:pb-0 last:mb-0">
-        <h4 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em] mb-4">
-          {title}
-        </h4>
-        {isArray ? (
-          <ul className="list-none space-y-3">
-            {Array.isArray(content) ? (
-              content.map((item: string, i: number) => (
-                <li
-                  key={i}
-                  className="text-[14px] text-[#f4efe9] font-sans font-medium leading-[1.75] flex items-start gap-3"
-                >
-                  <span className="text-[#4f4b47] mt-0.5 shrink-0">→</span>
-                  <span>{item}</span>
-                </li>
-              ))
-            ) : (
-              <li className="text-[14px] text-[#f4efe9] font-sans font-medium leading-[1.75]">
-                {String(content)}
-              </li>
-            )}
-          </ul>
-        ) : (
-          <p className="text-[14px] text-[#f4efe9] font-sans font-medium leading-[1.75] whitespace-pre-wrap">
-            {String(content)}
-          </p>
-        )}
+      <div className="border-b border-white/[0.06] pb-7 mb-7 last:border-0 last:pb-0 last:mb-0">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b] mb-3">{label}</p>
+        <p className="text-[15px] text-[#f4efe9] leading-relaxed">{value}</p>
       </div>
     )
   }
 
-  const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#0c0a0d]">
+  // ── Sidebar ──────────────────────────────────────────────────────
+  const sidebar = (
+    <div className="flex flex-col h-full">
       <div className="px-6 py-5 border-b border-white/[0.06]">
-        <h3 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em]">
-          Sovereign.os Library
-        </h3>
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b]">Sovereign.os Library</p>
       </div>
       <div className="flex-1 px-6 py-8">
-        <p className="text-xs font-sans font-medium text-[#76716b] leading-relaxed max-w-[180px]">
-          The private record of what helped. Return here before the old pattern
-          takes over again.
+        <p className="text-sm text-[#76716b] leading-relaxed">
+          The private record of what helped. Return here before the old pattern takes over again.
         </p>
       </div>
     </div>
   )
 
-  const contextContent = (
-    <div className="flex flex-col gap-0 h-full bg-[#0c0a0d] border-l border-white/[0.06]">
+  // ── Context panel ────────────────────────────────────────────────
+  const context = (
+    <div className="flex flex-col h-full">
       <div className="px-6 py-5 border-b border-white/[0.06]">
-        <h3 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em]">
-          Context
-        </h3>
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b]">Context</p>
       </div>
-      <div className="p-6 flex flex-col gap-6">
-        <div className="border border-white/[0.08] bg-white/[0.02] p-5 flex flex-col gap-2">
-          <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">
-            Baseline Design
-          </p>
-          <p className="text-xs text-[#a8a29a] leading-relaxed">
-            Your Baseline Design gives the system context before you describe
-            this moment.
+      <div className="p-6 flex flex-col gap-5">
+        <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-5">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-2">Baseline Design</p>
+          <p className="text-sm text-[#a8a29a] leading-relaxed">
+            Your Baseline Design is active beneath every thread and never exposed in outputs.
           </p>
         </div>
 
         {result && (
-          <div className="flex flex-col gap-6 mt-4">
-            <div className="border border-white/[0.08] bg-white/[0.02] p-5 flex flex-col gap-4">
-              <Button
-                onClick={handleSave}
-                disabled={isSaving || saveSuccess}
-                className="w-full rounded-none border border-white/[0.08] bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9"
-              >
-                {isSaving
-                  ? "Saving..."
-                  : saveSuccess
-                  ? "Saved to Library"
-                  : "Save to Sovereign"}
-              </Button>
-            </div>
+          <div className="flex flex-col gap-4">
+            <button
+              onClick={handleSave}
+              disabled={isSaving || saveSuccess}
+              className="w-full h-10 rounded-full bg-[#f4efe9] text-[#08070a] text-xs font-medium tracking-tight transition-all hover:scale-[1.02] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              {isSaving ? "Saving…" : saveSuccess ? "Saved to Library ✓" : "Save to Sovereign"}
+            </button>
 
-            <div className="border border-white/[0.08] bg-white/[0.02] p-5 flex flex-col gap-3">
-              <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">
-                Audio Overview
-              </p>
+            <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-5">
+              <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-3">Audio Overview</p>
               {audioUrl ? (
-                <audio
-                  controls
-                  src={audioUrl}
-                  className="w-full h-8 outline-none filter grayscale sepia opacity-80 mt-1"
-                />
+                <audio controls src={audioUrl} className="w-full h-8 outline-none opacity-80 mt-1" />
               ) : (
-                <div className="flex flex-col gap-3 mt-1">
-                  <Button
+                <div className="flex flex-col gap-2">
+                  <button
                     onClick={handleGenerateAudio}
                     disabled={isGeneratingAudio}
-                    variant="ghost"
-                    className="w-full rounded-none border border-white/[0.08] bg-transparent text-[#f4efe9] hover:bg-white/[0.04] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9"
+                    className="w-full h-9 rounded-lg border border-white/[0.1] text-xs text-[#a8a29a] hover:text-[#f4efe9] hover:border-white/20 transition-all disabled:opacity-30"
                   >
-                    {isGeneratingAudio ? "Generating..." : "Generate Audio"}
-                  </Button>
-                  {audioError && (
-                    <p className="text-red-400 text-[10px] font-sans font-medium leading-tight">
-                      {audioError}
-                    </p>
-                  )}
-                  {!audioError && !isGeneratingAudio && (
-                    <p className="text-[10px] text-[#76716b] font-sans font-medium leading-tight">
-                      Requires Pro
-                    </p>
-                  )}
+                    {isGeneratingAudio ? "Generating…" : "Generate Audio"}
+                  </button>
+                  {audioError && <p className="text-xs text-red-400/70">{audioError}</p>}
+                  {!audioError && !isGeneratingAudio && <p className="text-xs text-[#4f4b47]">Pro feature</p>}
                 </div>
               )}
-            </div>
-
-            <div className="border border-white/[0.08] bg-white/[0.02] p-5 flex flex-col gap-2 opacity-40">
-              <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">
-                Watch Preview
-              </p>
-              <p className="text-xs text-[#a8a29a]">
-                Watch Preview is not available for this Result yet.
-              </p>
             </div>
           </div>
         )}
@@ -227,161 +151,102 @@ export default function DefragPage() {
     </div>
   )
 
-  const mainInputArea = (
-    <div className="flex flex-col h-full justify-end gap-8 pt-4 pb-0 max-w-4xl mx-auto w-full">
-      <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 max-w-md mx-auto opacity-50">
-        <div className="w-12 h-12 border border-white/[0.08] flex items-center justify-center">
-          <svg
-            className="w-5 h-5 text-[#a8a29a]"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            />
-          </svg>
-        </div>
-        <div className="gap-3 flex flex-col">
-          <h2 className="text-[20px] font-medium text-[#f4efe9] tracking-tight">
-            What&apos;s happening right now?
-          </h2>
-          <p className="text-[13px] text-[#a8a29a] font-sans font-medium leading-relaxed">
-            Understand what is active in the moment and what response gives it a
-            better chance.
+  // ── Input area ───────────────────────────────────────────────────
+  const inputArea = (
+    <div className="flex flex-col gap-6 max-w-3xl mx-auto w-full">
+      {!result && (
+        <div className="text-center py-8 opacity-60">
+          <p className="font-serif text-xl text-[#f4efe9] mb-2">What is active right now?</p>
+          <p className="text-sm text-[#a8a29a] leading-relaxed max-w-sm mx-auto">
+            Describe the situation, the pressure, or the pattern. Say it how it actually happened.
           </p>
         </div>
-      </div>
+      )}
 
-      <div className="border border-white/[0.08] bg-surface focus-within:border-border transition-colors duration-200 shadow-2xl">
+      <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/20 transition-colors">
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Describe the situation, pressure, or pattern you want to understand."
-          className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none min-h-[140px] text-sm p-5 leading-[1.75] font-sans font-medium"
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault()
-              handleExplain()
-            }
-          }}
+          placeholder="Describe the situation, the pressure, or the pattern you want to understand."
+          className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none min-h-[140px] text-sm p-5 leading-[1.75]"
+          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
         />
-        <div className="flex justify-between items-center px-5 py-4 border-t border-border bg-surface">
-          <span className="text-[10px] text-[#76716b] font-sans font-medium tracking-[0.15em] uppercase">
-            ENTER TO DEFRAG
-          </span>
-          <Button
-            size="sm"
-            onClick={handleExplain}
+        <div className="flex justify-between items-center px-5 py-4 border-t border-white/[0.06]">
+          <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47]">Enter to run Defrag</span>
+          <button
+            onClick={handleSubmit}
             disabled={!input.trim() || isLoading}
-            className="rounded-none border border-white/[0.08] bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] font-sans font-medium text-[10px] tracking-[0.15em] uppercase h-9 px-6 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+            className="h-9 px-6 rounded-full bg-[#f4efe9] text-[#08070a] text-xs font-medium tracking-tight transition-all hover:scale-[1.02] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
           >
-            {isLoading ? "Running..." : "Defrag"}
-          </Button>
+            {isLoading ? "Running…" : "Defrag"}
+          </button>
         </div>
       </div>
+
+      {error && (
+        <p className="text-sm text-red-400/80 text-center">{error}</p>
+      )}
     </div>
   )
 
-  const mainResultArea = (
-    <div className="h-full flex flex-col max-w-4xl mx-auto w-full">
+  // ── Result area ──────────────────────────────────────────────────
+  const resultArea = (
+    <div className="max-w-3xl mx-auto w-full">
       {!result ? (
-        <div className="flex-1 flex items-center justify-center border border-white/[0.08] bg-white/[0.02] p-8 text-center min-h-[240px]">
-          <p className="text-[13px] text-[#a8a29a] font-sans font-medium leading-relaxed max-w-[280px]">
-            Your Result will appear here in structured sections you can use,
-            save, and return to later.
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.01] flex items-center justify-center py-20 text-center">
+          <p className="text-sm text-[#4f4b47] max-w-[260px] leading-relaxed">
+            Your structured Result will appear here — Active pattern, Best Next Response, and Conversational Steering.
           </p>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto border border-white/[0.08] bg-white/[0.02] p-8 md:p-12 shadow-xl">
-          {renderSection("Active pattern", result.activePattern)}
-          {renderSection("The Repeat", result.theRepeat)}
-          {renderSection("Old Role", result.oldRole)}
-          {renderSection("What You Learned to Carry", result.whatYouLearnedToCarry)}
-          {renderSection("Strain Pattern", result.strainPattern)}
-          {renderSection("Gift Under Strain", result.giftUnderStrain)}
-          {renderSection("Alignment", result.alignment)}
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10">
+          <ResultSection label="Active pattern" value={result.activePattern} />
+          <ResultSection label="The Repeat" value={result.theRepeat} />
+          <ResultSection label="Old Role" value={result.oldRole} />
+          <ResultSection label="What You Learned to Carry" value={result.whatYouLearnedToCarry} />
+          <ResultSection label="Strain Pattern" value={result.strainPattern} />
+          <ResultSection label="Gift Under Strain" value={result.giftUnderStrain} />
+          <ResultSection label="Alignment" value={result.alignment} />
 
           {result.bestNextResponse && (
-            <div className="border-b border-white/[0.06] pb-8 mb-8">
-              <h4 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em] mb-4">
-                Best Next Response
-              </h4>
-              <p className="text-[14px] text-[#f4efe9] font-sans font-medium leading-[1.75] mb-5">
-                {result.bestNextResponse.summary ||
-                  String(result.bestNextResponse)}
+            <div className="border-b border-white/[0.06] pb-7 mb-7">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Best Next Response</p>
+              <p className="text-[15px] text-[#f4efe9] leading-relaxed mb-4">
+                {result.bestNextResponse.summary || String(result.bestNextResponse)}
               </p>
-              {Array.isArray(result.bestNextResponse.phrasing) &&
-                result.bestNextResponse.phrasing.length > 0 && (
-                  <div className="bg-surface border border-white/[0.08] p-6 flex flex-col gap-3">
-                    {result.bestNextResponse.phrasing.map(
-                      (phrase: string, i: number) => (
-                        <div
-                          key={i}
-                          className="text-[14px] text-[#a8a29a] font-sans font-medium leading-[1.75] flex items-start gap-3"
-                        >
-                          <span className="text-[#4f4b47] mt-0.5 shrink-0">
-                            ↳
-                          </span>
-                          <span>{phrase}</span>
-                        </div>
-                      )
-                    )}
-                  </div>
-                )}
+              {Array.isArray(result.bestNextResponse.phrasing) && result.bestNextResponse.phrasing.length > 0 && (
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 flex flex-col gap-3">
+                  {result.bestNextResponse.phrasing.map((phrase: string, i: number) => (
+                    <div key={i} className="flex items-start gap-3 text-sm text-[#a8a29a] leading-relaxed">
+                      <span className="text-[#e0743a]/50 shrink-0 mt-0.5">↳</span>
+                      <span>{phrase}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
           {result.conversationalSteering && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em] mb-4">
-                  Steer Toward
-                </h4>
-                <ul className="space-y-3">
-                  {Array.isArray(result.conversationalSteering.do) ? (
-                    result.conversationalSteering.do.map(
-                      (item: string, i: number) => (
-                        <li
-                          key={i}
-                          className="text-[14px] text-[#a8a29a] font-sans font-medium leading-[1.75] flex items-start gap-3"
-                        >
-                          <span className="text-[#10B981] mt-0.5 shrink-0">
-                            +
-                          </span>
-                          <span>{item}</span>
-                        </li>
-                      )
-                    )
-                  ) : (
-                    <li className="text-[14px] text-[#a8a29a] font-sans font-medium leading-[1.75]">
-                      {String(result.conversationalSteering)}
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Steer Toward</p>
+                <ul className="space-y-2">
+                  {Array.isArray(result.conversationalSteering.do) && result.conversationalSteering.do.map((item: string, i: number) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-[#a8a29a] leading-relaxed">
+                      <span className="text-[#e0743a]/60 shrink-0">+</span><span>{item}</span>
                     </li>
-                  )}
+                  ))}
                 </ul>
               </div>
               <div>
-                <h4 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em] mb-4">
-                  Avoid
-                </h4>
-                <ul className="space-y-3">
-                  {Array.isArray(result.conversationalSteering.avoid) &&
-                    result.conversationalSteering.avoid.map(
-                      (item: string, i: number) => (
-                        <li
-                          key={i}
-                          className="text-[14px] text-[#a8a29a] font-sans font-medium leading-[1.75] flex items-start gap-3"
-                        >
-                          <span className="text-[#EF4444] mt-0.5 shrink-0">
-                            -
-                          </span>
-                          <span>{item}</span>
-                        </li>
-                      )
-                    )}
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Avoid</p>
+                <ul className="space-y-2">
+                  {Array.isArray(result.conversationalSteering.avoid) && result.conversationalSteering.avoid.map((item: string, i: number) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-[#a8a29a] leading-relaxed">
+                      <span className="text-red-400/50 shrink-0">−</span><span>{item}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -391,21 +256,23 @@ export default function DefragPage() {
     </div>
   )
 
+  const main = (
+    <div className="flex flex-col gap-8 h-full">
+      <div className="flex-none">{inputArea}</div>
+      <div className="flex-1 min-h-0 overflow-y-auto">{resultArea}</div>
+    </div>
+  )
+
   return (
     <SpaceShell
       spaceName="Defrag"
-      sidebar={sidebarContent}
-      contextPanel={contextContent}
-      main={
-        <div className="flex flex-col h-full gap-8">
-          <div className="flex-none">{mainInputArea}</div>
-          <div className="flex-1 min-h-0">{mainResultArea}</div>
-        </div>
-      }
+      sidebar={sidebar}
+      contextPanel={context}
+      main={main}
       mobileTabs={[
-        { id: "input", label: "Defrag", content: mainInputArea },
-        { id: "result", label: "Result", content: mainResultArea },
-        { id: "context", label: "Context", content: contextContent },
+        { id: "input", label: "Defrag", content: inputArea },
+        { id: "result", label: "Result", content: resultArea },
+        { id: "context", label: "Context", content: context },
       ]}
     />
   )

@@ -39,27 +39,19 @@ export default function Home() {
 
         <Container className="relative z-10 flex flex-col items-center text-center pb-16 md:pb-24">
           <h1 className="font-serif text-[#f4efe9] text-balance text-[2.6rem] leading-[1.05] sm:text-6xl md:text-7xl lg:text-[5.25rem] tracking-[-0.02em] max-w-4xl animate-fade-up">
-            The moment that won&apos;t leave you alone
+            Healing isn&apos;t optional.
             <br />
-            deserves more than a reaction.
+            Holding the pain is.
           </h1>
-
           <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed text-balance animate-fade-up delay-100">
-            Sovereign.os helps you understand what is active in the moment —
-            the pattern, the loop, the response that gives it a better chance.
+            Sovereign.os is the relational intelligence that guides you from the
+            moment that won&apos;t leave you alone toward a clearer way through.
           </p>
-
           <div className="mt-9 flex flex-col sm:flex-row gap-4 animate-fade-up delay-200">
-            <Link
-              href={APP_URL}
-              className="inline-flex items-center justify-center rounded-full bg-[#f4efe9] text-[#08070a] h-12 px-8 text-sm font-medium tracking-tight transition-transform hover:scale-[1.03]"
-            >
+            <Link href={APP_URL} className="inline-flex items-center justify-center rounded-full bg-[#f4efe9] text-[#08070a] h-12 px-8 text-sm font-medium tracking-tight transition-transform hover:scale-[1.03]">
               Enter Sovereign.os
             </Link>
-            <Link
-              href="/how-it-works"
-              className="inline-flex items-center justify-center rounded-full border border-white/10 text-[#a8a29a] h-12 px-8 text-sm font-medium tracking-tight transition-all hover:border-white/20 hover:text-[#f4efe9]"
-            >
+            <Link href="/how-it-works" className="inline-flex items-center justify-center rounded-full border border-white/10 text-[#a8a29a] h-12 px-8 text-sm font-medium tracking-tight transition-all hover:border-white/20 hover:text-[#f4efe9]">
               See how it works
             </Link>
           </div>
@@ -74,7 +66,6 @@ export default function Home() {
             <br />
             <span className="text-[#a8a29a]">The way through is already here.</span>
           </p>
-
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-y-12 gap-x-8 w-full max-w-4xl">
             <AnimatedCounter value="3" label="Spaces inside the platform" delay={100} />
             <AnimatedCounter value="100%" label="Private by design" delay={200} />
@@ -84,7 +75,7 @@ export default function Home() {
         </Container>
       </Section>
 
-      {/* ── THREE SPACES ─────────────────────────────────────────────── */}
+      {/* ── THREE SPACES — no cards, structured list ─────────────────── */}
       <section className="relative w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/5 overflow-hidden">
         <div className="light-beam opacity-70" aria-hidden />
         <Container className="relative z-10">
@@ -99,49 +90,47 @@ export default function Home() {
             </p>
           </TextReveal>
 
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+          <div className="mt-14 flex flex-col gap-0 max-w-3xl">
             {[
               {
-                icon: ScanLine,
+                num: "01",
                 name: "Defrag",
-                copy: "Separate the moment from the pattern. See what is active beneath the argument, the silence, the message, or the grief.",
                 href: "/product/defrag",
-                delay: 0,
+                icon: ScanLine,
+                copy: "Separate the moment from the pattern. See what is active beneath the argument, the silence, the message, or the grief. Defrag supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics.",
               },
               {
-                icon: HeartHandshake,
+                num: "02",
                 name: "Covenant",
-                copy: "Faith-context reflection anchored in responsibility — plain-language repair and grounded discernment for what you are walking through.",
                 href: "/product/covenant",
-                delay: 100,
+                icon: HeartHandshake,
+                copy: "Faith-context reflection anchored in responsibility. Plain-language repair and grounded discernment for what you are walking through — so the next step can be honest, not just emotional.",
               },
               {
-                icon: Compass,
+                num: "03",
                 name: "Alignment",
-                copy: "Turn insight into a usable response. See what is yours to carry and what belongs to the other side.",
-                href: "/product",
-                delay: 200,
+                href: "/product/alignment",
+                icon: Compass,
+                copy: "Response integration and action choice. Turn insight into a usable response. See what is yours to carry and what belongs to the other side.",
               },
-            ].map((c, idx) => (
+            ].map((space, idx) => (
               <Link
-                key={c.name}
-                href={c.href}
-                className="group relative flex flex-col rounded-3xl border border-white/[0.08] bg-white/[0.02] p-7 md:p-8 transition-all duration-500 hover:border-[#e0743a]/30 hover:bg-white/[0.04] hover:shadow-lg hover:-translate-y-1"
-                style={{ animation: `slideUp 0.6s ease-out ${idx * 0.15}s both` }}
+                key={space.name}
+                href={space.href}
+                className="group flex items-start gap-8 py-10 border-b border-white/[0.06] hover:bg-white/[0.02] transition-colors duration-300 px-4 -mx-4 rounded-xl"
+                style={{ animation: `slideUp 0.6s ease-out ${idx * 0.12}s both` }}
               >
-                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-[#e0743a]/10 text-[#f0a06a] group-hover:scale-110 transition-transform duration-300">
-                  <c.icon size={20} strokeWidth={1.5} />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#e0743a]/10 text-[#f0a06a] group-hover:scale-110 transition-transform duration-300 mt-1">
+                  <space.icon size={20} strokeWidth={1.5} />
                 </div>
-                <h3 className="mt-6 font-serif text-2xl text-[#f4efe9] group-hover:text-[#f0a06a] transition-colors duration-300">
-                  {c.name}
-                </h3>
-                <p className="mt-3 text-sm md:text-[15px] text-[#a8a29a] leading-relaxed flex-1">
-                  {c.copy}
-                </p>
-                <div className="mt-6 flex items-center gap-2 text-xs font-mono uppercase tracking-[0.15em] text-[#76716b] group-hover:text-[#f0a06a] transition-all duration-300">
-                  <span>Explore</span>
-                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.2em]">{space.num}</span>
+                    <h3 className="font-serif text-2xl text-[#f4efe9] group-hover:text-[#f0a06a] transition-colors duration-300">{space.name}</h3>
+                  </div>
+                  <p className="text-sm md:text-[15px] text-[#a8a29a] leading-relaxed max-w-xl">{space.copy}</p>
                 </div>
+                <ArrowRight size={16} className="text-[#4f4b47] group-hover:text-[#f0a06a] group-hover:translate-x-1 transition-all duration-300 mt-2 shrink-0" />
               </Link>
             ))}
           </div>
@@ -155,46 +144,24 @@ export default function Home() {
             <div className="relative aspect-square w-full max-w-md mx-auto rounded-3xl border border-white/[0.08] bg-[#0c0a0d] overflow-hidden flex items-center justify-center transform transition-transform duration-1000 hover:scale-105">
               <div className="warm-glow w-72 h-72 animate-pulse" aria-hidden />
               <div className="relative flex flex-col items-center">
-                <div
-                  className="flex h-20 w-20 items-center justify-center rounded-full border border-[#e0743a]/30 bg-[#e0743a]/10 text-[#f0a06a] animate-spin"
-                  style={{ animationDuration: '8s' }}
-                >
+                <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#e0743a]/30 bg-[#e0743a]/10 text-[#f0a06a] animate-spin" style={{ animationDuration: '8s' }}>
                   <Sparkles size={28} strokeWidth={1.5} />
                 </div>
                 <span className="mt-4 font-serif text-xl text-[#f4efe9]">Sovereign.os</span>
-                <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b]">
-                  Core Context Engine
-                </span>
+                <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b]">Core Context Engine</span>
               </div>
             </div>
           </div>
-
           <div>
             <MetaLabel>Guided, not judged</MetaLabel>
             <AnimatedHeading className="text-3xl md:text-5xl tracking-[-0.02em] leading-tight max-w-lg">
               The longer you stay, the clearer it gets.
             </AnimatedHeading>
-
             <div className="mt-10 flex flex-col gap-8 max-w-md">
               {[
-                {
-                  icon: MessageSquareText,
-                  title: "Understands plain language",
-                  copy: "Say it how it actually happened. No frameworks to learn, no right way to phrase it.",
-                  delay: 200,
-                },
-                {
-                  icon: ShieldCheck,
-                  title: "Your Baseline Design stays private",
-                  copy: "Your Baseline Design is active beneath every thread — and is never exposed in outputs.",
-                  delay: 300,
-                },
-                {
-                  icon: Sparkles,
-                  title: "Saves what you learn",
-                  copy: "Save to Sovereign before the moment disappears. Your Library holds what helped.",
-                  delay: 400,
-                },
+                { icon: MessageSquareText, title: "Understands plain language", copy: "Say it how it actually happened. No frameworks to learn, no right way to phrase it.", delay: 200 },
+                { icon: ShieldCheck, title: "Your Baseline Design stays private", copy: "Your Baseline Design is active beneath every thread — and is never exposed in outputs.", delay: 300 },
+                { icon: Sparkles, title: "Saves what you learn", copy: "Save to Sovereign before the moment disappears. Your Library holds what helped.", delay: 400 },
               ].map((f) => (
                 <TextReveal key={f.title} delay={f.delay}>
                   <div className="flex gap-4">
@@ -213,7 +180,7 @@ export default function Home() {
         </Container>
       </StickyScrollSection>
 
-      {/* ── GETTING STARTED ──────────────────────────────────────────── */}
+      {/* ── GETTING STARTED — numbered steps, no cards ───────────────── */}
       <section className="w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/5">
         <Container>
           <div className="flex flex-col items-center text-center mb-14 md:mb-20">
@@ -228,21 +195,23 @@ export default function Home() {
             </TextReveal>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+          <div className="max-w-2xl mx-auto flex flex-col gap-0">
             {[
-              { num: "01", title: "Create your space", copy: "Verify your email. Takes two minutes.", delay: 0 },
-              { num: "02", title: "Set your Baseline Design", copy: "A few questions map how you tend to respond under pressure.", delay: 100 },
-              { num: "03", title: "Bring the moment", copy: "The conversation, the silence, the message, the grief.", delay: 200 },
-              { num: "04", title: "Find the way through", copy: "See the Active pattern. Find your Best Next Response.", delay: 300 },
+              { num: "01", title: "Create your space", copy: "Verify your email. Takes two minutes." },
+              { num: "02", title: "Set your Baseline Design", copy: "A few questions map how you tend to respond under pressure. Private, never exposed." },
+              { num: "03", title: "Describe the situation", copy: "The conversation, the silence, the message, the grief. Say it how it actually happened." },
+              { num: "04", title: "Receive a structured Result", copy: "See the Active pattern. Find your Best Next Response. Save it to your Library." },
             ].map((step, idx) => (
               <div
                 key={step.num}
-                className="rounded-3xl border border-white/[0.08] bg-white/[0.02] p-7 md:p-8 transition-all duration-500 hover:border-[#e0743a]/30 hover:bg-white/[0.04] hover:shadow-lg hover:-translate-y-2"
-                style={{ animation: `slideUp 0.6s var(--ease-apple) ${idx * 0.12}s both` }}
+                className="flex items-start gap-8 py-8 border-b border-white/[0.06] last:border-0"
+                style={{ animation: `slideUp 0.6s var(--ease-apple) ${idx * 0.1}s both` }}
               >
-                <div className="font-serif text-4xl text-[#e0743a]/70">{step.num}</div>
-                <h3 className="mt-5 text-[#f4efe9] font-medium text-lg">{step.title}</h3>
-                <p className="mt-2 text-sm text-[#a8a29a] leading-relaxed">{step.copy}</p>
+                <span className="font-serif text-3xl text-[#e0743a]/50 shrink-0 w-10">{step.num}</span>
+                <div>
+                  <h3 className="text-[#f4efe9] font-medium text-lg mb-1">{step.title}</h3>
+                  <p className="text-sm text-[#a8a29a] leading-relaxed">{step.copy}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -270,10 +239,7 @@ export default function Home() {
               { space: "Alignment", title: "What is mine vs what is theirs" },
               { space: "Covenant", title: "Responsibility in family conflict" },
             ].map((item) => (
-              <div
-                key={item.title}
-                className="flex items-center justify-between py-7 border-b border-white/[0.08] group hover:bg-white/[0.02] transition-colors cursor-pointer px-4 -mx-4 rounded-xl"
-              >
+              <div key={item.title} className="flex items-center justify-between py-7 border-b border-white/[0.08] group hover:bg-white/[0.02] transition-colors cursor-pointer px-4 -mx-4 rounded-xl">
                 <div className="flex items-center gap-10">
                   <span className="text-[11px] text-[#4f4b47] uppercase tracking-[0.2em] font-mono w-24 hidden sm:block">{item.space}</span>
                   <span className="text-lg tracking-tight text-[#f4efe9]/90">{item.title}</span>
@@ -290,29 +256,14 @@ export default function Home() {
         <Container className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-12">
           <div>
             <MetaLabel>Questions</MetaLabel>
-            <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight">
-              Before you begin.
-            </h2>
+            <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight">Before you begin.</h2>
           </div>
-
           <div className="flex flex-col">
             {[
-              {
-                q: "Is this a replacement for therapy?",
-                a: "No. Sovereign.os is complementary — it gives you a personal way to understand your patterns and respond differently, including between sessions. It does not diagnose, predict, or replace professional judgment.",
-              },
-              {
-                q: "What is the Baseline Design?",
-                a: "Your Baseline Design is the starting map. It shows how you tend to process, respond, connect, protect, communicate, and return to center. It is active beneath every thread and never exposed in outputs.",
-              },
-              {
-                q: "Is my data private?",
-                a: "Yes. Your Baseline Design and everything you share are held privately, encrypted, and never sold or exposed in outputs. Private by design.",
-              },
-              {
-                q: "What is the Sovereign.os Library?",
-                a: "The Library is the private record of what helped. Save a Result to Sovereign before the moment disappears. Return to it before the old pattern takes over again.",
-              },
+              { q: "Is this a replacement for therapy?", a: "No. Sovereign.os is complementary — it gives you a personal way to understand your patterns and respond differently, including between sessions. It does not diagnose, predict, or replace professional judgment." },
+              { q: "What is the Baseline Design?", a: "Your Baseline Design is the starting map. It shows how you tend to process, respond, connect, protect, communicate, and return to center. It is active beneath every thread and never exposed in outputs." },
+              { q: "Is my data private?", a: "Yes. Your Baseline Design and everything you share are held privately, encrypted, and never sold or exposed in outputs. Private by design." },
+              { q: "What is the Sovereign.os Library?", a: "The Library is the private record of what helped. Save a Result to Sovereign before the moment disappears. Return to it before the old pattern takes over again." },
             ].map((item, i) => (
               <details key={i} className="group border-b border-white/[0.08] py-6 cursor-pointer">
                 <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base md:text-lg font-medium list-none">
@@ -339,12 +290,8 @@ export default function Home() {
             </p>
           </TextReveal>
           <div className="mt-9 flex flex-col sm:flex-row gap-4 animate-fade-up delay-300">
-            <Link href={APP_URL} className="btn-primary">
-              Enter Sovereign.os
-            </Link>
-            <Link href="/how-it-works" className="btn-secondary">
-              See how it works
-            </Link>
+            <Link href={APP_URL} className="btn-primary">Enter Sovereign.os</Link>
+            <Link href="/how-it-works" className="btn-secondary">See how it works</Link>
           </div>
         </Container>
       </section>

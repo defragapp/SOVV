@@ -5,31 +5,37 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Use Cases — Sovereign.os",
-  description: "Sovereign.os is a broad relational intelligence space. Use it when the moment requires a grounded response instead of a reactive loop.",
+  description: "Defrag supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics.",
 };
 
 const USE_CASES = [
   {
+    num: "01",
     title: "Relational Dynamics",
     body: "When a conversation keeps looping into the same argument. Use the Defrag space to see the Active pattern, identify your Old Role, and find the Conversational Steering needed to respond differently.",
   },
   {
+    num: "02",
     title: "Family Dynamics",
     body: "When you are drawn back into a role you learned to carry under pressure. Understand the Strain Pattern and the Gift Under Strain, so you can engage without losing yourself.",
   },
   {
+    num: "03",
     title: "Boundaries",
     body: "When you need to know what is yours to carry and what belongs to the other side. The Alignment space helps turn this insight into an actionable, concrete response.",
   },
   {
+    num: "04",
     title: "High-Stakes Messages",
-    body: "When a message activates your nervous system. Do not reply immediately. Bring it to the Defrag space to separate the moment from the pattern, then find your Best Next Response.",
+    body: "When a message activates your nervous system. Do not reply immediately. Use the Defrag space to separate the moment from the pattern, then find your Best Next Response.",
   },
   {
+    num: "05",
     title: "Grief",
     body: "Grief has its own loops. Use Sovereign.os to map what is active, find grounded reflection through the Covenant space, and return to center without trying to fix what cannot be fixed.",
   },
   {
+    num: "06",
     title: "Team Dynamics",
     body: "Professional spaces are filled with unstated active patterns. When both sides matter, use Invite Privately to understand the shared loop without keeping score.",
   },
@@ -63,17 +69,21 @@ export default function UseCasesPage() {
         </Container>
       </Section>
 
-      {/* Use cases grid */}
+      {/* Use cases — structured list, no boxes */}
       <Section className="w-full py-24 md:py-32 bg-[#0c0a0d]">
-        <Container>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-5xl mx-auto">
-            {USE_CASES.map((uc) => (
+        <Container className="max-w-3xl">
+          <div className="flex flex-col gap-0">
+            {USE_CASES.map((uc, idx) => (
               <div
-                key={uc.title}
-                className="rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-10 flex flex-col gap-4 hover:border-[#e0743a]/20 hover:bg-white/[0.04] transition-all duration-300"
+                key={uc.num}
+                className="flex items-start gap-8 py-10 border-b border-white/[0.06] last:border-0"
+                style={{ animation: `slideUp 0.6s ease-out ${idx * 0.08}s both` }}
               >
-                <h3 className="font-serif text-2xl text-[#f4efe9]">{uc.title}</h3>
-                <p className="text-[#a8a29a] leading-relaxed text-[15px]">{uc.body}</p>
+                <span className="font-serif text-3xl text-[#e0743a]/40 shrink-0 w-10">{uc.num}</span>
+                <div>
+                  <h3 className="font-serif text-xl text-[#f4efe9] mb-3">{uc.title}</h3>
+                  <p className="text-[15px] text-[#a8a29a] leading-relaxed">{uc.body}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -81,7 +91,7 @@ export default function UseCasesPage() {
       </Section>
 
       {/* CTA */}
-      <Section className="w-full py-32 bg-[#08070a] border-t border-white/5 text-center relative overflow-hidden">
+      <Section className="w-full py-24 bg-[#08070a] border-t border-white/5 text-center relative overflow-hidden">
         <div className="light-beam opacity-40" aria-hidden />
         <Container className="relative z-10">
           <h2 className="font-serif text-4xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] mb-10 text-balance max-w-2xl mx-auto">
