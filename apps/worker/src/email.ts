@@ -32,20 +32,14 @@ interface EmailPayload {
  * Requires Email Routing destination to be verified in Cloudflare dashboard.
  * Binding name: EMAIL (declared in wrangler.toml [[send_email]] once configured).
  */
-<<<<<<< HEAD
 async function sendViaBinding(
   emailBinding: SendEmail,
   payload: EmailPayload,
 ): Promise<void> {
-  // workers-types may not expose the Message constructor as a runtime value depending on
-  // the installed @types version. Build a minimal payload and cast to the binding input type.
+  // Build a minimal message payload compatible with the Cloudflare send_email binding.
   const message = {
     from: FROM,
     to: payload.to,
-=======
-async function sendViaBinding(emailBinding: SendEmail, payload: EmailPayload): Promise<void> {
-  const message = new (globalThis as any).EmailMessage(FROM, payload.to, {
->>>>>>> main
     headers: {
       Subject: payload.subject,
       "Reply-To": REPLY_TO,
@@ -166,19 +160,19 @@ export async function sendWelcomeEmail(
   opts: { emailBinding?: SendEmail; resendApiKey?: string },
 ): Promise<void> {
   const html = baseTemplate(`
-    <p class="label">Welcome</p>
+    <p class="label">Welcome to Sovereign.os</p>
     <p style="color:#F6F5F3;font-size:18px;font-weight:300;margin-bottom:24px;">
-      Pro is active.
+      Your space is ready.
     </p>
-    <p>Your Baseline Design is set. The thread is grounded. You now have access to the full pattern.</p>
-    <p>What unlocked:</p>
+    <p>The next step is your Baseline Design — the starting map. It shows how you tend to process, respond, connect, protect, communicate, and return to center.</p>
+    <p>It is private, never exposed in outputs, and active beneath every thread.</p>
     <p style="color:rgba(246,245,243,0.4);">
-      Unlimited sessions &nbsp;·&nbsp; Your Story &nbsp;·&nbsp; Compare With Someone &nbsp;·&nbsp; Try It Out &nbsp;·&nbsp; Covenant space &nbsp;·&nbsp; Full history
+      Set your Baseline Design to begin. Then enter the Defrag space and start understanding what is active in the moment.
     </p>
     <a href="${APP_URL}" class="cta">Enter your space</a>
   `);
 
-  await sendEmail({ to, subject: "Pro is active — Sovereign.os", html }, opts);
+  await sendEmail({ to, subject: "Your space is ready — Sovereign.os", html }, opts);
 }
 
 export async function sendPaymentSucceededEmail(

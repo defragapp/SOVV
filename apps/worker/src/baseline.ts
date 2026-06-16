@@ -2,7 +2,7 @@ import type { Env } from "./types-env.js";
 import { safeJsonParse, type Baseline, type BaselineRequest } from "@sovereign/core";
 import { getSessionId, cookieHeader } from "./plan.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
-import { requireActiveSubscription } from "./billing.js";
+
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const USER_KEY = (sid: string) => `user:${sid}`;
@@ -65,12 +65,8 @@ export async function handleGetBaseline(req: Request, env: Env): Promise<Respons
     return authErr;
   }
 
-  const user = await getAuthUser(req, env.DB);
-
-  // Subscription gate for workspace baseline access
-  const subGate = await requireActiveSubscription(user, req);
-  if (subGate) return subGate;
-
+  // Baseline Design is accessible to all authenticated users (free + pro).
+  // It is required for onboarding and must not be gated behind subscription.
   const sid = await getSessionId(req);
   const baseline = await getBaseline(env, sid);
   return Response.json(
@@ -90,12 +86,8 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
     return authErr;
   }
 
-  const user = await getAuthUser(req, env.DB);
-
-  // Subscription gate for workspace baseline access
-  const subGate = await requireActiveSubscription(user, req);
-  if (subGate) return subGate;
-
+  // Baseline Design can be saved by all authenticated users (free + pro).
+  // It is required for onboarding and must not be gated behind subscription.
   const sid = await getSessionId(req);
   const body = (await req.json().catch(() => null)) as unknown;
 

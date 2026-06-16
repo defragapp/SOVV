@@ -69,9 +69,6 @@ export interface Env {
   FREE_DAILY_LIMIT?: string
   APP_URL?: string
   AI_MODEL?: string
-<<<<<<< HEAD
-  GATEWAY_ID?: string
-=======
+GATEWAY_ID?: string
   ELEVENLABS_API_KEY?: string
->>>>>>> main
 }

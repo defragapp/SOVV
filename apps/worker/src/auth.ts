@@ -88,33 +88,15 @@ export function sessionCookie(
     `__sov_session=${token}`,
     `Max-Age=${maxAge}`,
     "Path=/",
-<<<<<<< HEAD
-    ...(domain ? [`Domain=${domain}`] : []),
-=======
-    "Domain=.defrag.app",
->>>>>>> main
+"Domain=.defrag.app",
     "HttpOnly",
     "Secure",
     "SameSite=Lax",
   ].join("; ")
 }
 
-<<<<<<< HEAD
-export function clearCookie(cookieDomainValue?: string): string {
-  const domain = cookieDomain(cookieDomainValue)
-  return [
-    "__sov_session=",
-    "Max-Age=0",
-    "Path=/",
-    ...(domain ? [`Domain=${domain}`] : []),
-    "HttpOnly",
-    "Secure",
-    "SameSite=Lax",
-  ].join("; ")
-=======
 export function clearCookie(): string {
   return "__sov_session=; Max-Age=0; Path=/; Domain=.defrag.app; HttpOnly; Secure; SameSite=Lax"
->>>>>>> main
 }
 
 
@@ -197,6 +179,19 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
       await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
         .bind(token, userId, now + SESSION_TTL * 1000, now)
         .run()
+
+      // Send welcome email via queue (non-blocking)
+      if (env.QUEUE) {
+        void env.QUEUE.send({ type: "welcome", to: email }).catch((err: unknown) =>
+          console.warn("[auth] Failed to queue welcome email:", err)
+        )
+      } else if (env.RESEND_API_KEY) {
+        // Fallback: send directly if no queue
+        const { sendWelcomeEmail } = await import("./email.js")
+        void sendWelcomeEmail(email, { resendApiKey: env.RESEND_API_KEY }).catch((err: unknown) =>
+          console.warn("[auth] Failed to send welcome email:", err)
+        )
+      }
 
       return jsonResponse({ success: true, token }, 200, {
         "Set-Cookie": sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN),
