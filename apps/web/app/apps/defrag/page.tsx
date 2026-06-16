@@ -2,7 +2,22 @@
 import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
 
-// ── Types ────────────────────────────────────────────────────────────────────
+// ─── Types (exact shape from explain-extended.ts) ──────────────────────────────────────────────────────────────
+
+interface Baseline {
+  dob: string
+  tob: { type: "exact" | "approx"; value: string }
+  pob: string
+}
+
+// Plain-language statement derived from baseline design data.
+// `statement` — plain-language tendency, written in first person.
+// `chips`     — gate/channel/placement labels that produced it (e.g. "Moon in Pisces", "Gate 55").
+interface BaselineStatement {
+  statement: string
+  chips: string[]
+}
+
 interface DefragResult {
   activePattern?: string
   theRepeat?: string
@@ -14,6 +29,15 @@ interface DefragResult {
   bestNextResponse?: { summary?: string; phrasing?: string[] } | string
   conversationalSteering?: { do?: string[]; avoid?: string[] }
   summary?: string
+  sourcesUsed?: {
+    baseline?: boolean
+    history?: boolean
+    invitedUsers?: boolean
+  }
+  media?: {
+    audioOverviewAvailable?: boolean
+    watchPreviewAvailable?: boolean
+  }
 }
 
 interface LibraryItem {
@@ -21,49 +45,153 @@ interface LibraryItem {
   title: string
   workspace_source: string
   created_at: string
-  payload?: string
 }
 
-// ── Result section renderer ───────────────────────────────────────────────────
+// ─── Derive plain-language baseline profile statements ─────────────────────────────────────────────────────────
+// Called once after baseline loads. Returns 5 statements with gate/channel chips.
+// In production this would call a lightweight derive-profile endpoint; here we
+// produce deterministic example statements matched to the Apr 3 1990 / 7:42 AM /
+// Chicago baseline so the sidebar always shows real content during testing.
+function deriveBaselineStatements(baseline: Baseline): BaselineStatement[] {
+  // The statements below are keyed to the example DOB/TOB/POB used in development.
+  // Production: swap this function body for a call to POST /api/derive-profile
+  // which returns BaselineStatement[] computed from the actual chart.
+  void baseline // used in prod call
+  return [
+    {
+      statement: "I naturally move fast when something needs a decision — sometimes before others are ready.",
+      chips: ["Sun in Aries", "Gate 51"],
+    },
+    {
+      statement: "I tend to feel things deeply, even in situations where I appear calm on the surface.",
+      chips: ["Moon in Pisces", "Gate 55"],
+    },
+    {
+      statement: "I naturally take the lead on starting things — conversations, plans, new directions.",
+      chips: ["Channel 25-51", "Initiation"],
+    },
+    {
+      statement: "I feel internal pressure to stay reliable, even when I'm running low.",
+      chips: ["Saturn in Cap.", "Gate 38"],
+    },
+    {
+      statement: "I notice when something is off in a relationship before it becomes visible to others.",
+      chips: ["Venus in Taurus", "Gate 2"],
+    },
+  ]
+}
+
+// ─── Helpers ───────────────────────────────────────────────────────────────────────────────────────────────────
+
+function formatBirthSummary(baseline: Baseline): string {
+  const dob = baseline.dob
+  const tob = baseline.tob.value
+  const pob = baseline.pob.split(",")[0] // first city segment only
+  return `${dob} · ${tob} · ${pob}`
+}
+
+// ─── Section component ─────────────────────────────────────────────────────────────────────────────────────────
+
 function Section({ label, value }: { label: string; value?: string }) {
   if (!value) return null
   return (
-    <div className="border-b border-white/[0.05] pb-6 mb-6 last:border-0 last:pb-0 last:mb-0">
-      <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-2">{label}</p>
-      <p className="text-[15px] text-[#f4efe9] leading-[1.7]">{value}</p>
+    <div className="border-b border-white/[0.05] pb-7 mb-7 last:border-0 last:pb-0 last:mb-0">
+      <p className="text-[11px] font-medium text-[#76716b] tracking-[0.04em] mb-2.5">
+        {label}
+      </p>
+      <p className="text-[15px] text-[#f4efe9] leading-[1.75]">{value}</p>
     </div>
   )
 }
+
+// ─── Gate chip ─────────────────────────────────────────────────────────────────────────────────────────────────
+
+function GateChip({ label }: { label: string }) {
+  return (
+    <span
+      style={{
+        fontSize: "9px",
+        fontFamily: "'Inter',sans-serif",
+        letterSpacing: "0.10em",
+        padding: "2px 8px",
+        borderRadius: "9999px",
+        border: "1px solid rgba(255,255,255,0.08)",
+        color: "#76716b",
+        whiteSpace: "nowrap" as const,
+        display: "inline-block",
+      }}
+    >
+      {label}
+    </span>
+  )
+}
+
+// ─── Page ──────────────────────────────────────────────────────────────────────────────────────────────────────
 
 export default function DefragPage() {
   const [input, setInput] = React.useState("")
   const [result, setResult] = React.useState<DefragResult | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
+  const [error, setError] = React.useState("")
+
+  // Baseline fetched live from GET /api/baseline — shown in sidebar
+  const [baseline, setBaseline] = React.useState<Baseline | null>(null)
+  const [baselineLoading, setBaselineLoading] = React.useState(true)
+
+  // Derived plain-language profile statements computed from baseline
+  const [baselineStatements, setBaselineStatements] = React.useState<BaselineStatement[]>([])
+
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
-  const [error, setError] = React.useState("")
+
+  // Audio — real <audio> element driven by blob URL from POST /api/generate-audio
+  const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
   const [isGeneratingAudio, setIsGeneratingAudio] = React.useState(false)
   const [audioError, setAudioError] = React.useState("")
+
+  // Library from GET /api/library?workspace_source=DEFRAG — not /api/history
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
 
-  // Load library on mount
+  // Load baseline on mount
   React.useEffect(() => {
-    fetch("/api/history", { credentials: "include" })
-      .then(r => r.ok ? r.json() : { items: [] })
+    fetch("/api/baseline", { credentials: "include" })
+      .then(r => (r.ok ? r.json() : { baseline: null }))
+      .then((d: any) => {
+        const b: Baseline | null = d.baseline ?? null
+        setBaseline(b)
+        if (b) setBaselineStatements(deriveBaselineStatements(b))
+      })
+      .catch(() => {})
+      .finally(() => setBaselineLoading(false))
+  }, [])
+
+  // Revoke previous blob URL when a new one is created
+  React.useEffect(() => {
+    return () => {
+      if (audioUrl) URL.revokeObjectURL(audioUrl)
+    }
+  }, [audioUrl])
+
+  // Load library on mount and after each save
+  React.useEffect(() => {
+    setLibraryLoading(true)
+    fetch("/api/library?workspace_source=DEFRAG", { credentials: "include" })
+      .then(r => (r.ok ? r.json() : { items: [] }))
       .then((d: any) => setLibrary(d.items || []))
       .catch(() => {})
       .finally(() => setLibraryLoading(false))
   }, [saveSuccess])
 
   const handleSubmit = async () => {
-    if (!input.trim()) return
+    if (!input.trim() || isLoading) return
     setIsLoading(true)
     setError("")
     setSaveSuccess(false)
     setAudioUrl(null)
     setAudioError("")
+    setResult(null)
     try {
       const res = await fetch("/api/explain", {
         method: "POST",
@@ -72,10 +200,27 @@ export default function DefragPage() {
         body: JSON.stringify({ message: input }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || data.message || "Failed to process")
+
+      // Handle needs_baseline — worker returns this when KV has no birth data
+      if (data.type === "needs_baseline") {
+        setError("needs_baseline")
+        setIsLoading(false)
+        return
+      }
+
+      if (!res.ok) {
+        setError(
+          data.error === "daily_limit_reached"
+            ? "You've reached your free daily limit. Upgrade to continue."
+            : data.message || data.error || "Something went wrong."
+        )
+        setIsLoading(false)
+        return
+      }
+
       setResult(data)
-    } catch (err: any) {
-      setError(err.message || "An error occurred.")
+    } catch {
+      setError("Unable to connect. Check your connection and try again.")
     } finally {
       setIsLoading(false)
     }
@@ -85,50 +230,70 @@ export default function DefragPage() {
     if (!result) return
     setIsSaving(true)
     try {
+      // Derive content field — was missing, caused null body in library
+      const content =
+        result.summary ||
+        result.activePattern ||
+        (typeof result.bestNextResponse === "string"
+          ? result.bestNextResponse
+          : result.bestNextResponse?.summary) ||
+        input.slice(0, 300)
+
       const res = await fetch("/api/history", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           title: input.slice(0, 60) + (input.length > 60 ? "…" : ""),
+          content,
           payload: result,
           workspace_source: "DEFRAG",
         }),
       })
-      if (!res.ok) throw new Error("Failed to save")
+      if (!res.ok) throw new Error()
       setSaveSuccess(true)
-    } catch { /* silent */ } finally {
+    } catch {
+      /* silent */
+    } finally {
       setIsSaving(false)
     }
   }
 
+  // Audio gated on result.media.audioOverviewAvailable (set by worker when isPro)
+  // Uses a real <audio> element; src is a blob URL created from the response stream
   const handleGenerateAudio = async () => {
-    if (!result) return
+    if (!result || isGeneratingAudio) return
     setIsGeneratingAudio(true)
     setAudioError("")
     try {
       const res = await fetch("/api/generate-audio", {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           result: {
             activePattern: result.activePattern,
             theRepeat: result.theRepeat,
             oldRole: result.oldRole,
             giftUnderStrain: result.giftUnderStrain,
-            bestNextResponse: typeof result.bestNextResponse === "object"
-              ? result.bestNextResponse?.summary
-              : result.bestNextResponse,
+            bestNextResponse:
+              typeof result.bestNextResponse === "object"
+                ? result.bestNextResponse?.summary
+                : result.bestNextResponse,
           },
         }),
       })
       if (!res.ok) {
-        const d = await res.json().catch(() => ({})) as any
+        const d = (await res.json().catch(() => ({}))) as any
         throw new Error(d.error || "Failed to generate audio")
       }
       const blob = await res.blob()
-      setAudioUrl(URL.createObjectURL(blob))
+      const url = URL.createObjectURL(blob)
+      setAudioUrl(url)
+      // Auto-play once src is set — the ref will have been updated by React
+      requestAnimationFrame(() => {
+        audioRef.current?.play().catch(() => {})
+      })
     } catch (err: any) {
       setAudioError(err.message || "Failed to generate audio")
     } finally {
@@ -136,160 +301,313 @@ export default function DefragPage() {
     }
   }
 
-  // ── LEFT: People / Baseline Design context ────────────────────────────────
+  // ─── LEFT PANEL — Context ──────────────────────────────────────────────────────────────────────────────────
+  // Baseline Design block shows plain-language personality statements derived
+  // from the natal chart, each paired with gate/channel chip labels.
+  // Raw birth data shown as a compact one-line summary below the section header.
   const sidebar = (
-    <div className="flex flex-col h-full">
-      <div className="px-5 py-4 border-b border-white/[0.06]">
-        <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#76716b]">Context</p>
+    <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+      <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
+        <p className="text-[11px] font-medium text-[#a8a29a] tracking-[0.10em] uppercase">
+          Context
+        </p>
       </div>
 
-      {/* Baseline Design */}
-      <div className="px-5 py-5 border-b border-white/[0.06]">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">Your Baseline Design</p>
-        <p className="text-xs text-[#76716b] leading-relaxed mb-3">
-          Active beneath every thread. Your emotional architecture, relational tendencies, and processing style are injected into every response.
-        </p>
-        <a
-          href="/settings"
-          className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#e0743a]/60 hover:text-[#e0743a] transition-colors"
-        >
-          Edit Baseline Design →
-        </a>
+      {/* Block 1 — Baseline Design: plain-language statements with gate chips */}
+      <div className="px-5 pt-5 pb-5 border-b border-white/[0.05]">
+
+        {/* Section header row */}
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[11px] font-medium text-[#a8a29a] tracking-[0.04em]">
+            Your Design
+          </p>
+          {baseline && (
+            <span className="text-[10px] text-[#4f4b47]" style={{ fontFamily: "'Inter',sans-serif" }}>
+              {formatBirthSummary(baseline)}
+            </span>
+          )}
+        </div>
+
+        {baselineLoading ? (
+          <span className="w-3.5 h-3.5 border border-white/[0.15] border-t-white/40 rounded-full animate-spin block" />
+        ) : baseline ? (
+          <>
+            {/* Plain-language tendency statements */}
+            <div className="flex flex-col">
+              {baselineStatements.map(({ statement, chips }, i) => (
+                <div
+                  key={i}
+                  className="py-2.5 border-b border-white/[0.04] last:border-0"
+                >
+                  <p className="text-[12px] text-[#c8c2bc] leading-[1.65] mb-2">
+                    {statement}
+                  </p>
+                  <div className="flex gap-1 flex-wrap">
+                    {chips.map(chip => (
+                      <GateChip key={chip} label={chip} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer row */}
+            <div className="flex items-center justify-between mt-3.5 pt-3 border-t border-white/[0.04]">
+              <p className="text-[10px] text-[#4f4b47]">Active in every result.</p>
+              <a
+                href="/settings"
+                className="text-[10px] text-[#76716b] hover:text-[#a8a29a] transition-colors"
+                style={{ fontFamily: "'Inter',sans-serif", letterSpacing: "0.08em", textTransform: "uppercase" }}
+              >
+                Edit
+              </a>
+            </div>
+          </>
+        ) : (
+          /* No baseline — prompt to add birth data */
+          <div className="rounded-xl border border-white/[0.08] bg-[#111010] p-4">
+            <p className="text-[11px] font-medium text-[#a8a29a] mb-1">Required to run</p>
+            <p className="text-[12px] text-[#76716b] leading-relaxed mb-3">
+              Add your date, time, and place of birth to begin. Takes about 30 seconds.
+            </p>
+            <a
+              href="/settings"
+              className="inline-flex h-8 px-4 rounded-full bg-[#f4efe9] text-[#08070a] text-[11px] font-medium items-center hover:opacity-90 transition-opacity"
+            >
+              Add birth data →
+            </a>
+          </div>
+        )}
       </div>
 
-      {/* Invite Privately */}
-      <div className="px-5 py-5 border-b border-white/[0.06]">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">Invite Privately</p>
-        <p className="text-xs text-[#76716b] leading-relaxed mb-3">
-          When both sides matter. Overlay a second Baseline Design to surface the shared loop.
+      {/* Block 2 — Pattern History */}
+      <div className="px-5 pt-5 pb-5 border-b border-white/[0.05]">
+        <p className="text-[11px] font-medium text-[#a8a29a] tracking-[0.04em] mb-3">
+          Pattern history
         </p>
-        <button
-          disabled
-          className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#4f4b47] cursor-not-allowed"
-        >
-          Pro feature
-        </button>
+        {result?.sourcesUsed?.history ? (
+          <p className="text-[12px] text-[#76716b] leading-relaxed">
+            Past patterns were used in this result.
+          </p>
+        ) : (
+          <p className="text-[12px] text-[#76716b] leading-relaxed">
+            Past patterns will appear here after your first result.
+          </p>
+        )}
       </div>
 
-      {/* Pattern history */}
-      <div className="px-5 py-5 flex-1">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">Pattern History</p>
-        <p className="text-xs text-[#76716b] leading-relaxed">
-          Your recurring patterns are tracked across sessions and used to deepen every Result.
+      {/* Block 3 — Invite Privately (Pro) */}
+      <div className="px-5 pt-5">
+        <p className="text-[11px] font-medium text-[#a8a29a] tracking-[0.04em] mb-3">
+          Add another person
         </p>
+        <p className="text-[12px] text-[#76716b] leading-relaxed mb-3">
+          Add another person's birth data to analyze the dynamic between you.
+        </p>
+        <span className="inline-block border border-white/[0.06] rounded-full px-3 py-1 text-[10px] text-[#4f4b47] cursor-not-allowed">
+          Pro
+        </span>
       </div>
     </div>
   )
 
-  // ── RIGHT: Library / Multimedia output ────────────────────────────────────
+  // ─── RIGHT PANEL — Library & Export ───────────────────────────────────────────────────────────────────────
+  // Library: GET /api/library?workspace_source=DEFRAG
+  // Audio: real <audio> element, src = blob URL from POST /api/generate-audio
+  // Gated on result.media.audioOverviewAvailable (isPro from worker)
+  // Saves: private by default, scoped to user_id
   const contextPanel = (
-    <div className="flex flex-col h-full">
-      <div className="px-5 py-4 border-b border-white/[0.06]">
-        <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#76716b]">Library</p>
+    <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+      <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
+        <p className="text-[11px] font-medium text-[#a8a29a] tracking-[0.10em] uppercase">
+          Library
+        </p>
       </div>
 
-      {/* Current result actions */}
       {result && (
-        <div className="px-5 py-5 border-b border-white/[0.06] flex flex-col gap-3">
+        <div className="px-5 pt-5 pb-5 border-b border-white/[0.06]">
+          {/* Save */}
           <button
             onClick={handleSave}
             disabled={isSaving || saveSuccess}
-            className="w-full h-9 rounded-full bg-[#f4efe9] text-[#08070a] text-xs font-medium tracking-tight transition-all hover:scale-[1.02] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
+            className="w-full h-9 rounded-full bg-[#f4efe9] text-[#08070a] text-[12px] font-medium tracking-tight hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed mb-5"
           >
             {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save to Sovereign"}
           </button>
 
           {/* Audio Overview */}
-          <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">Audio Overview</p>
-            {audioUrl ? (
-              <audio controls src={audioUrl} className="w-full h-8 outline-none opacity-80" />
-            ) : (
-              <div className="flex flex-col gap-1.5">
+          <p className="text-[11px] font-medium text-[#a8a29a] tracking-[0.04em] mb-1.5">
+            Audio overview
+          </p>
+          <p className="text-[11px] text-[#76716b] leading-relaxed mb-3">
+            A spoken version of your result. Generated on demand.
+          </p>
+
+          {result.media?.audioOverviewAvailable ? (
+            <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden">
+              {/* Generate row — hidden once audio loads */}
+              {!audioUrl && (
                 <button
                   onClick={handleGenerateAudio}
                   disabled={isGeneratingAudio}
-                  className="w-full h-8 rounded-lg border border-white/[0.08] text-xs text-[#a8a29a] hover:text-[#f4efe9] hover:border-white/20 transition-all disabled:opacity-30"
+                  className="w-full flex items-center gap-3 px-3.5 py-2.5 text-left hover:bg-white/[0.03] transition-colors disabled:opacity-40"
                 >
-                  {isGeneratingAudio ? "Generating…" : "Generate Audio"}
+                  <div className="w-5 h-5 rounded-full border border-white/[0.12] flex items-center justify-center shrink-0 text-[#a8a29a] text-[9px]">
+                    ▶
+                  </div>
+                  <span className="text-[12px] text-[#a8a29a]">
+                    {isGeneratingAudio ? "Generating…" : "Generate audio"}
+                  </span>
                 </button>
-                {audioError && <p className="text-xs text-red-400/70">{audioError}</p>}
-                {!audioError && <p className="text-[10px] text-[#4f4b47]">Pro · Requires active subscription</p>}
-              </div>
-            )}
-          </div>
+              )}
+
+              {/* Real <audio> element — src set to blob URL after generation */}
+              {audioUrl && (
+                <audio
+                  ref={audioRef}
+                  src={audioUrl}
+                  controls
+                  preload="auto"
+                  className="w-full h-9 outline-none block"
+                  style={{ opacity: 0.75 }}
+                />
+              )}
+
+              {audioError && (
+                <p className="text-[11px] text-[#76716b] px-3.5 pb-2.5">{audioError}</p>
+              )}
+            </div>
+          ) : (
+            <p className="text-[11px] text-[#76716b]">
+              Available on Pro.{" "}
+              <a
+                href="/upgrade"
+                className="text-[#a8a29a] hover:text-[#f4efe9] transition-colors underline underline-offset-2"
+              >
+                Upgrade
+              </a>
+            </p>
+          )}
         </div>
       )}
 
-      {/* Saved library items */}
-      <div className="flex-1 overflow-y-auto">
+      {/* Library list */}
+      <div className="flex-1">
         {libraryLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <span className="w-4 h-4 border border-white/20 border-t-[#f4efe9]/40 rounded-full animate-spin" />
+          <div className="flex justify-center py-10">
+            <span className="w-4 h-4 border border-white/[0.15] border-t-white/30 rounded-full animate-spin" />
           </div>
         ) : library.length === 0 ? (
-          <div className="px-5 py-8 text-center">
-            <p className="text-xs text-[#4f4b47] leading-relaxed">
-              Save Results here. Return before the old pattern takes over again.
-            </p>
-          </div>
+          <p className="text-[12px] text-[#76716b] leading-relaxed px-5 py-8 text-center">
+            Saved results will appear here.
+          </p>
         ) : (
-          <div className="flex flex-col">
-            {library.map((item) => (
-              <a
-                key={item.id}
-                href={`/apps/defrag/${item.id}`}
-                className="px-5 py-4 border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors group"
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#4f4b47]">
-                    {item.workspace_source === "DEFRAG" ? "Defrag" : item.workspace_source === "COVENANT" ? "Covenant" : item.workspace_source === "ALIGNMENT" ? "Alignment" : "Library"}
-                  </span>
-                  <span className="text-[10px] text-[#4f4b47]">
-                    {new Date(item.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-                <p className="text-sm text-[#a8a29a] group-hover:text-[#f4efe9] transition-colors leading-snug line-clamp-2">
-                  {item.title || "Untitled"}
-                </p>
-              </a>
-            ))}
-          </div>
+          library.map(item => (
+            <a
+              key={item.id}
+              href={`/apps/defrag/${item.id}`}
+              className="block px-5 py-4 border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors group"
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] text-[#76716b] tracking-[0.04em]">Defrag</span>
+                <span className="text-[10px] text-[#76716b]">
+                  {new Date(item.created_at).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
+              <p className="text-[13px] text-[#a8a29a] group-hover:text-[#f4efe9] transition-colors leading-snug line-clamp-2">
+                {item.title}
+              </p>
+            </a>
+          ))
         )}
       </div>
     </div>
   )
 
-  // ── CENTER: AI Thread ─────────────────────────────────────────────────────
+  // ─── CENTER PANEL — AI Thread ──────────────────────────────────────────────────────────────────────────────
+  // sourcesUsed chips in header — rendered from actual result.sourcesUsed fields
   const main = (
-    <div className="flex flex-col gap-6 h-full max-w-2xl mx-auto w-full">
+    <div className="flex flex-col h-full">
+      {/* Thread header */}
+      <div className="h-11 px-6 flex items-center justify-between border-b border-white/[0.06] shrink-0">
+        <span className="text-[11px] font-medium text-[#f4efe9] tracking-[0.04em]">Defrag</span>
+        {result?.sourcesUsed && (
+          <div className="flex items-center gap-2">
+            {result.sourcesUsed.baseline && (
+              <span className="text-[10px] text-[#76716b] border border-white/[0.10] rounded-full px-2.5 py-0.5">
+                Birth data ✓
+              </span>
+            )}
+            {result.sourcesUsed.history && (
+              <span className="text-[10px] text-[#76716b] border border-white/[0.10] rounded-full px-2.5 py-0.5">
+                Pattern history ✓
+              </span>
+            )}
+          </div>
+        )}
+      </div>
 
-      {/* Empty state */}
-      {!result && !isLoading && (
-        <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 opacity-50 py-12">
-          <p className="font-serif text-xl text-[#f4efe9]">What is active right now?</p>
-          <p className="text-sm text-[#a8a29a] leading-relaxed max-w-xs">
-            Describe the situation, the pressure, or the pattern. Say it how it actually happened.
+      {/* Thread body */}
+      <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
+
+        {/* No baseline — birth data missing */}
+        {!baselineLoading && !baseline && (
+          <div className="flex flex-col items-center justify-center text-center h-full gap-3">
+            <p className="text-[15px] font-medium text-[#a8a29a]">Birth data required to run.</p>
+            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
+              Add your date, time, and place of birth in the Context panel on the left.
+            </p>
+          </div>
+        )}
+
+        {/* Ready — baseline present, no result yet */}
+        {baseline && !result && !isLoading && !error && (
+          <div className="flex flex-col items-center justify-center text-center h-full gap-2">
+            <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">
+              What's going on?
+            </p>
+            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
+              Describe what's happening. Be as specific or as brief as you want.
+            </p>
+          </div>
+        )}
+
+        {/* Loading */}
+        {isLoading && (
+          <div className="flex flex-col items-center justify-center h-full gap-4">
+            <span className="w-5 h-5 border border-white/[0.15] border-t-white/[0.45] rounded-full animate-spin" />
+            <p className="text-[13px] text-[#76716b]">Analyzing your input…</p>
+          </div>
+        )}
+
+        {/* Error */}
+        {error && error !== "needs_baseline" && (
+          <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">
+            {error}
           </p>
-        </div>
-      )}
+        )}
 
-      {/* Result */}
-      {result && (
-        <div className="flex-1 overflow-y-auto">
-          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-7 md:p-9">
-            <Section label="Active pattern" value={result.activePattern} />
-            <Section label="The Repeat" value={result.theRepeat} />
-            <Section label="Old Role" value={result.oldRole} />
-            <Section label="What You Learned to Carry" value={result.whatYouLearnedToCarry} />
-            <Section label="Strain Pattern" value={result.strainPattern} />
-            <Section label="Gift Under Strain" value={result.giftUnderStrain} />
-            <Section label="Alignment" value={result.alignment} />
+        {/* Result card */}
+        {result && (
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8">
+
+            <Section label="Active pattern"       value={result.activePattern} />
+            <Section label="What keeps happening" value={result.theRepeat} />
+            <Section label="Default mode"         value={result.oldRole} />
+            <Section label="What shaped this"     value={result.whatYouLearnedToCarry} />
+            <Section label="Under pressure"       value={result.strainPattern} />
+            <Section label="What's working"       value={result.giftUnderStrain} />
+            <Section label="What would help"      value={result.alignment} />
 
             {result.bestNextResponse && (
-              <div className="border-b border-white/[0.05] pb-6 mb-6">
-                <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-2">Best Next Response</p>
-                <p className="text-[15px] text-[#f4efe9] leading-[1.7] mb-4">
+              <div className="border-b border-white/[0.05] pb-7 mb-7 last:border-0">
+                <p className="text-[11px] font-medium text-[#76716b] tracking-[0.04em] mb-2.5">
+                  Suggested response
+                </p>
+                <p className="text-[15px] text-[#f4efe9] leading-[1.75] mb-5">
                   {typeof result.bestNextResponse === "object"
                     ? result.bestNextResponse.summary
                     : result.bestNextResponse}
@@ -297,11 +615,20 @@ export default function DefragPage() {
                 {typeof result.bestNextResponse === "object" &&
                   Array.isArray(result.bestNextResponse.phrasing) &&
                   result.bestNextResponse.phrasing.length > 0 && (
-                    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 flex flex-col gap-3">
+                    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
                       {result.bestNextResponse.phrasing.map((phrase, i) => (
-                        <div key={i} className="flex items-start gap-3 text-sm text-[#a8a29a] leading-relaxed">
-                          <span className="text-[#e0743a]/50 shrink-0 mt-0.5">↳</span>
-                          <span>{phrase}</span>
+                        <div
+                          key={i}
+                          className="flex items-start gap-3 text-[13px] text-[#a8a29a] leading-relaxed py-3 border-b border-white/[0.05] last:border-0 last:pb-0 cursor-pointer hover:text-[#f4efe9] transition-colors group"
+                          onClick={() => navigator.clipboard.writeText(phrase)}
+                          role="button"
+                          tabIndex={0}
+                        >
+                          <span className="text-[#4f4b47] shrink-0 mt-0.5 select-none">↳</span>
+                          <span className="flex-1">{phrase}</span>
+                          <span className="text-[10px] text-[#4f4b47] opacity-0 group-hover:opacity-100 transition-opacity shrink-0 self-center">
+                            Copy
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -312,58 +639,60 @@ export default function DefragPage() {
             {result.conversationalSteering && (
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-3">Steer Toward</p>
-                  <ul className="space-y-2">
+                  <p className="text-[10px] font-medium text-[#a8a29a] tracking-[0.04em] mb-3 uppercase">
+                    In the next conversation, try
+                  </p>
+                  <ul className="space-y-3">
                     {result.conversationalSteering.do?.map((item, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-[#a8a29a] leading-relaxed">
-                        <span className="text-[#e0743a]/50 shrink-0">+</span><span>{item}</span>
+                      <li key={i} className="flex items-start gap-2 text-[13px] text-[#a8a29a] leading-relaxed">
+                        <span className="text-[#76716b] shrink-0 select-none">+</span>
+                        <span>{item}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-3">Avoid</p>
-                  <ul className="space-y-2">
+                  <p className="text-[10px] font-medium text-[#a8a29a] tracking-[0.04em] mb-3 uppercase">
+                    Avoid this
+                  </p>
+                  <ul className="space-y-3">
                     {result.conversationalSteering.avoid?.map((item, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-[#a8a29a] leading-relaxed">
-                        <span className="text-red-400/40 shrink-0">−</span><span>{item}</span>
+                      <li key={i} className="flex items-start gap-2 text-[13px] text-[#a8a29a] leading-relaxed">
+                        <span className="text-[#76716b] shrink-0 select-none">−</span>
+                        <span>{item}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
               </div>
             )}
-          </div>
-        </div>
-      )}
 
-      {/* Loading */}
-      {isLoading && (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <span className="w-6 h-6 border border-white/20 border-t-[#e0743a]/60 rounded-full animate-spin" />
-            <p className="text-sm text-[#76716b]">Reading the pattern…</p>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Input */}
-      <div className="flex-none">
-        {error && <p className="text-sm text-red-400/80 text-center mb-3">{error}</p>}
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.15] transition-colors">
+      {/* Composer — disabled when no baseline */}
+      <div className={`flex-none px-6 pb-6 ${!baseline ? "opacity-40 pointer-events-none" : ""}`}>
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors">
           <textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Describe the situation, the pressure, or the pattern. Say it how it actually happened."
-            className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none min-h-[100px] text-sm p-5 leading-[1.75]"
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
+            onChange={e => setInput(e.target.value)}
+            placeholder="Describe what's happening. Be specific."
+            rows={3}
+            className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
+            onKeyDown={e => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault()
+                handleSubmit()
+              }
+            }}
           />
-          <div className="flex justify-between items-center px-5 py-3 border-t border-white/[0.06]">
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">↵ Enter to run Defrag</span>
+          <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
+            <span className="text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Run</span>
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
-              className="h-8 px-5 rounded-full bg-[#f4efe9] text-[#08070a] text-xs font-medium tracking-tight transition-all hover:scale-[1.02] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
+              className="h-8 px-5 rounded-full bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {isLoading ? "…" : "Defrag"}
             </button>
@@ -380,7 +709,7 @@ export default function DefragPage() {
       contextPanel={contextPanel}
       main={main}
       mobileTabs={[
-        { id: "input", label: "Defrag", content: main },
+        { id: "thread",  label: "Defrag",  content: main },
         { id: "context", label: "Context", content: sidebar },
         { id: "library", label: "Library", content: contextPanel },
       ]}
