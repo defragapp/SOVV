@@ -7,7 +7,7 @@
     "build": "next build",
     "build:worker": "npm run build && npx @opennextjs/cloudflare build",
     "preview": "npx @opennextjs/cloudflare build && npx @opennextjs/cloudflare preview",
-    "deploy": "next build && npx @opennextjs/cloudflare build && echo \"Build complete, starting wrangler deploy\" && OPEN_NEXT_DEPLOY=false npx wrangler deploy --env production --verbose 2>&1 || (echo \"Wrangler deploy failed with exit code $?\" && exit 1)",
+    "deploy": "bash scripts/deploy.sh",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "lint": "next lint"
   },
