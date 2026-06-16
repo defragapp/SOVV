@@ -116,14 +116,15 @@ jobs:
 
           # Use wrangler to upload (simpler than raw multipart)
           # Write a minimal wrangler config that won't trigger opennext detection
+          cwd = os.getcwd()
           wrangler_cfg = {
               "name": script_name,
-              "main": ".open-next/worker.js",
+              "main": f"{cwd}/.open-next/worker.js",
               "compatibility_date": "2026-06-04",
               "compatibility_flags": ["nodejs_compat"],
               "account_id": account_id,
               "workers_dev": False,
-              "assets": {"directory": ".open-next/assets"},
+              "assets": {"directory": f"{cwd}/.open-next/assets"},
               "vars": {
                   "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADhGIF8-iOLIg8MU",
                   "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_live_51TV1FSBk78yJ8HwwY2Hx4u0YeqbBFYiooy9BEmAfL4k1GFm1lJbT8G74IfcO4Q3W2cYhBBUa2vtK3JMrFtVQCHft00951FHlMV"
