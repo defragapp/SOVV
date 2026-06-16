@@ -26,13 +26,12 @@ export default function Home() {
 
       {/* ── HERO ──────────────────────────────────────────────────────── */}
       <section className="relative -mt-16 min-h-[100svh] w-full flex items-end justify-center overflow-hidden bg-[#08070a]">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/hero-hand.png"
           alt="An open hand with palm facing upward into a beam of warm light"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center opacity-90"
+          className="absolute inset-0 w-full h-full object-cover object-center opacity-90"
+          style={{ zIndex: 0 }}
         />
         <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-[#08070a]/60 via-transparent to-[#08070a]" />
         <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#08070a] via-[#08070a]/20 to-transparent" />
