@@ -3,11 +3,16 @@ import * as React from "react"
 import Link from "next/link"
 
 interface SpaceShellProps {
-  sidebar?: React.ReactNode
-  main: React.ReactNode
-  contextPanel?: React.ReactNode
+  sidebar?: React.ReactNode       // LEFT — people / Baseline Design context
+  main: React.ReactNode           // CENTER — AI thread
+  contextPanel?: React.ReactNode  // RIGHT — Library / multimedia output
   mobileTabs: { id: string; label: string; content: React.ReactNode }[]
-  spaceName: "Defrag" | "Covenant" | "Library" | string
+  spaceName: "Defrag" | "Covenant" | "Alignment" | "Library" | string
+}
+
+async function handleSignOut() {
+  await fetch("/api/auth/logout", { method: "POST", credentials: "include" })
+  window.location.href = "/"
 }
 
 export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName }: SpaceShellProps) {
@@ -19,71 +24,127 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
       {/* ── Desktop Layout ─────────────────────────────────────────── */}
       <div
         className="hidden lg:grid w-full h-full"
-        style={{ gridTemplateColumns: "256px 1fr 320px", gridTemplateRows: "56px 1fr" }}
+        style={{ gridTemplateColumns: "260px 1fr 300px", gridTemplateRows: "52px 1fr" }}
       >
-        {/* Header */}
-        <header className="col-span-3 h-14 border-b border-white/[0.06] bg-[#08070a]/90 backdrop-blur-md px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3 font-mono text-xs tracking-widest uppercase">
-            <Link href="/" className="text-[#76716b] hover:text-[#f4efe9] transition-colors">
+        {/* ── Header ── */}
+        <header className="col-span-3 h-[52px] border-b border-white/[0.06] bg-[#08070a]/95 backdrop-blur-md px-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/" className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors">
               Sovereign.os
             </Link>
-            <span className="text-white/20">/</span>
-            <span className="text-[#f4efe9]">{spaceName}</span>
+            <span className="text-white/20 text-xs">/</span>
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#f4efe9]">{spaceName}</span>
           </div>
-          <div className="flex items-center gap-6">
+
+          {/* Space switcher */}
+          <div className="flex items-center gap-1">
+            {[
+              { href: "/apps/defrag", label: "Defrag" },
+              { href: "/apps/covenant", label: "Covenant" },
+              { href: "/apps/alignment", label: "Alignment" },
+            ].map((s) => (
+              <Link
+                key={s.href}
+                href={s.href}
+                className={`px-3 py-1.5 rounded-lg font-mono text-[10px] tracking-[0.12em] uppercase transition-colors ${
+                  spaceName === s.label
+                    ? "bg-white/[0.08] text-[#f4efe9]"
+                    : "text-[#76716b] hover:text-[#a8a29a] hover:bg-white/[0.04]"
+                }`}
+              >
+                {s.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Right nav */}
+          <div className="flex items-center gap-4">
             <Link
               href="/settings"
               className="font-mono text-[10px] tracking-[0.12em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors"
             >
               Baseline Design
             </Link>
-            <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] uppercase text-[#4f4b47]">
+            <div className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] uppercase text-[#4f4b47]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#e0743a]/40" />
-              Secure Session
+              Secure
             </div>
+            <button
+              onClick={handleSignOut}
+              className="font-mono text-[10px] tracking-[0.12em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors"
+            >
+              Sign out
+            </button>
           </div>
         </header>
 
-        {/* Sidebar */}
-        <aside className="col-start-1 row-start-2 w-64 border-r border-white/[0.06] bg-[#0c0a0d] flex flex-col overflow-y-auto">
+        {/* ── Left: People / Baseline Design ── */}
+        <aside className="col-start-1 row-start-2 border-r border-white/[0.06] bg-[#0c0a0d] flex flex-col overflow-y-auto">
           {sidebar}
         </aside>
 
-        {/* Main */}
-        <main className="col-start-2 row-start-2 flex-1 flex flex-col bg-[#08070a] overflow-y-auto relative p-6 lg:p-8">
+        {/* ── Center: AI Thread ── */}
+        <main className="col-start-2 row-start-2 flex flex-col bg-[#08070a] overflow-y-auto relative p-6 lg:p-8">
           {main}
         </main>
 
-        {/* Context Panel */}
-        <aside className="col-start-3 row-start-2 w-80 bg-[#0c0a0d] flex flex-col overflow-y-auto border-l border-white/[0.06]">
+        {/* ── Right: Library / Multimedia ── */}
+        <aside className="col-start-3 row-start-2 border-l border-white/[0.06] bg-[#0c0a0d] flex flex-col overflow-y-auto">
           {contextPanel}
         </aside>
       </div>
 
       {/* ── Mobile Layout ──────────────────────────────────────────── */}
       <div className="flex lg:hidden flex-col w-full h-full safe-top safe-bottom">
-        <header className="sticky top-0 z-10 bg-[#08070a]/95 backdrop-blur-md border-b border-white/[0.06] px-5 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-mono text-xs tracking-widest uppercase">
+        <header className="sticky top-0 z-10 bg-[#08070a]/95 backdrop-blur-md border-b border-white/[0.06] px-5 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase">
             <Link href="/" className="text-[#76716b]">Sovereign.os</Link>
             <span className="text-white/20">/</span>
             <span className="text-[#f4efe9]">{spaceName}</span>
           </div>
-          <Link
-            href="/settings"
-            className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
-          >
-            Settings
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/settings" className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#76716b] hover:text-[#f4efe9] transition-colors">
+              Baseline
+            </Link>
+            <button
+              onClick={handleSignOut}
+              className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
+            >
+              Sign out
+            </button>
+          </div>
         </header>
 
+        {/* Space switcher mobile */}
         <div className="flex px-4 pt-2 gap-1 overflow-x-auto border-b border-white/[0.06] bg-[#08070a]">
+          {[
+            { href: "/apps/defrag", label: "Defrag" },
+            { href: "/apps/covenant", label: "Covenant" },
+            { href: "/apps/alignment", label: "Alignment" },
+          ].map((s) => (
+            <Link
+              key={s.href}
+              href={s.href}
+              className={`px-3 py-2.5 border-b-2 font-mono text-[10px] tracking-widest uppercase whitespace-nowrap transition-colors ${
+                spaceName === s.label
+                  ? "border-[#f4efe9] text-[#f4efe9]"
+                  : "border-transparent text-[#76716b] hover:text-[#a8a29a]"
+              }`}
+            >
+              {s.label}
+            </Link>
+          ))}
+        </div>
+
+        {/* Content tabs */}
+        <div className="flex px-4 gap-1 overflow-x-auto border-b border-white/[0.06] bg-[#08070a]">
           {mobileTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-3 border-b-2 text-xs font-mono tracking-widest uppercase whitespace-nowrap transition-colors ${
+              className={`px-4 py-2.5 border-b-2 font-mono text-[10px] tracking-widest uppercase whitespace-nowrap transition-colors ${
                 activeTab === tab.id
-                  ? "border-[#f4efe9] text-[#f4efe9]"
+                  ? "border-[#e0743a] text-[#f4efe9]"
                   : "border-transparent text-[#76716b] hover:text-[#a8a29a]"
               }`}
             >

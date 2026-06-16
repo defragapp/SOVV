@@ -58,22 +58,7 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* ── TAGLINE + STATS ──────────────────────────────────────────── */}
-      <Section className="w-full py-20 md:py-28 bg-[#08070a]">
-        <Container className="flex flex-col items-center text-center">
-          <p className="font-serif text-2xl md:text-3xl text-[#f4efe9] leading-snug max-w-lg text-balance">
-            Step into the work.
-            <br />
-            <span className="text-[#a8a29a]">The way through is already here.</span>
-          </p>
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-y-12 gap-x-8 w-full max-w-4xl">
-            <AnimatedCounter value="3" label="Spaces inside the platform" delay={100} />
-            <AnimatedCounter value="100%" label="Private by design" delay={200} />
-            <AnimatedCounter value="24/7" label="There when it lands" delay={300} />
-            <AnimatedCounter value="1" label="Baseline Design, all yours" delay={400} />
-          </div>
-        </Container>
-      </Section>
+      
 
       {/* ── THREE SPACES — no cards, structured list ─────────────────── */}
       <section className="relative w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/5 overflow-hidden">
