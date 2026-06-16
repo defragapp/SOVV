@@ -7,7 +7,7 @@
     "build": "next build",
     "build:worker": "npm run build && npx @opennextjs/cloudflare build",
     "preview": "npx @opennextjs/cloudflare build && npx @opennextjs/cloudflare preview",
-    "deploy": "next build && npx @opennextjs/cloudflare build && OPEN_NEXT_DEPLOY=false npx wrangler deploy --env production",
+    "deploy": "next build && npx @opennextjs/cloudflare build && npx wrangler deploy --config wrangler-deploy.json",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "lint": "next lint"
   },
