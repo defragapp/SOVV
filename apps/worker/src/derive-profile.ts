@@ -18,9 +18,9 @@
  */
 
 import { IRequest } from "itty-router"
-import { getAuthUser, jsonResponse } from "./auth"
+import { getAuthUser, jsonResponse } from "./auth.js"
 
-// ─── Types ─────────────────────────────────────────────────────────────────────────────────────────────────────
+// ─── Types ─────────────────────────────────────────────────────────────────
 
 interface Baseline {
   dob: string
@@ -42,7 +42,7 @@ interface Env {
   RATE_LIMITER?: RateLimiter
 }
 
-// ─── Handler ───────────────────────────────────────────────────────────────────────────────────────────────────
+// ─── Handler ───────────────────────────────────────────────────────────────
 
 export async function handleDeriveProfile(
   request: IRequest,
@@ -94,82 +94,84 @@ export async function handleDeriveProfile(
     return jsonResponse({ error: "ai_error", message: "Failed to generate profile." }, 500)
   }
 
-  // 5. Parse AI output into BaselineStatement[]
+  // 5. Parse structured output
   const statements = parseStatements(aiText)
 
-  if (statements.length === 0) {
-    return jsonResponse({ error: "parse_error", message: "Could not parse AI output." }, 500)
-  }
-
-  return jsonResponse({ statements }, 200)
+  return jsonResponse({ statements })
 }
 
-// ─── Prompt builders ───────────────────────────────────────────────────────────────────────────────────────────
+// ─── Prompt builders ───────────────────────────────────────────────────────
 
 function buildSystemPrompt(): string {
-  return `You are a concise personality profile generator. Given a person's birth data, you return exactly 5 plain-language first-person statements describing their natural tendencies. Each statement is paired with 1–2 brief astrological or Human Design labels.
+  return `You are a data interpreter for a personal intelligence platform called Sovereign.
+Your job is to translate a person's birth data (date, time, place) into exactly 5 plain-language
+first-person tendency statements that describe how they naturally operate.
 
 Rules:
-- Write in first person ("I naturally...", "I tend to...", "I feel...", "I notice...")
-- Plain, direct English — no metaphors, no spiritual jargon, no abstract poetry
-- Each statement describes a real, observable behavioral tendency
-- Each statement is 1–2 sentences, max 25 words
-- Chips are short labels: e.g. "Sun in Aries", "Gate 51", "Moon in Pisces", "Channel 20-34", "Saturn in Cap."
-- Output format: exactly 5 items, each on its own block, formatted as:
+- Write in first person: "I naturally..." or "I tend to..." or "I'm someone who..."
+- Each statement must be instantly understandable to any adult, no astrology or Human Design jargon in the statement text
+- Each statement must be specific and grounded — not vague or generic
+- Each statement must be paired with 1–3 chip labels (e.g. "Sun in Aries", "Gate 51", "Channel 25-51") that show which data point produced it
+- Chip labels may use system terminology since they are data labels, not prose
+- No metaphors. No spiritual language. No diagnostic framing. No abstract descriptions.
+- Tone: direct, clear, antistigma, universally legible
 
-STATEMENT: <plain-language first-person statement>
-CHIPS: <chip1> | <chip2>
-
-No other text. No numbering. No markdown. No explanation.`
+Output format — repeat exactly 5 times, no extra text:
+STATEMENT: [first-person plain-language tendency]
+CHIPS: [comma-separated chip labels]
+---`
 }
 
 function buildUserPrompt(baseline: Baseline): string {
-  const { dob, tob, pob } = baseline
+  const dob = baseline.dob
+  const tob = baseline.tob.value
+  const tobType = baseline.tob.type === "approx" ? " (approximate)" : ""
+  const pob = baseline.pob
   return `Birth data:
 Date of birth: ${dob}
-Time of birth: ${tob.value} (${tob.type})
+Time of birth: ${tob}${tobType}
 Place of birth: ${pob}
 
-Generate 5 plain-language first-person statements with chip labels for this person.`
+Generate 5 plain-language tendency statements for this person based on their birth data.`
 }
 
-// ─── Output parser ─────────────────────────────────────────────────────────────────────────────────────────────
-// Parses the structured STATEMENT / CHIPS block format from AI output.
-// Tolerant of minor formatting variations.
+// ─── Parser ────────────────────────────────────────────────────────────────
 
 function parseStatements(text: string): BaselineStatement[] {
-  const results: BaselineStatement[] = []
-
-  // Split on blank lines or by STATEMENT: prefix to find blocks
-  const blocks = text.split(/\n(?=STATEMENT:)/i).map(b => b.trim()).filter(Boolean)
+  const blocks = text.split("---").map(b => b.trim()).filter(Boolean)
+  const statements: BaselineStatement[] = []
 
   for (const block of blocks) {
-    const statementMatch = block.match(/^STATEMENT:\s*(.+?)(?:\n|$)/im)
-    const chipsMatch = block.match(/^CHIPS:\s*(.+?)(?:\n|$)/im)
+    const statementMatch = block.match(/STATEMENT:\s*(.+)/s)
+    const chipsMatch = block.match(/CHIPS:\s*(.+)/s)
 
-    if (!statementMatch) continue
+    if (!statementMatch || !chipsMatch) continue
 
-    const statement = statementMatch[1].trim()
-    const chips = chipsMatch
-      ? chipsMatch[1].split("|").map(c => c.trim()).filter(Boolean)
-      : []
+    const statement = statementMatch[1]
+      .replace(/CHIPS:.*/s, "")
+      .trim()
+      .replace(/\n/g, " ")
 
-    if (statement) {
-      results.push({ statement, chips })
+    const chips = chipsMatch[1]
+      .replace(/---.*$/s, "")
+      .split(",")
+      .map(c => c.trim())
+      .filter(Boolean)
+
+    if (statement && chips.length > 0) {
+      statements.push({ statement, chips })
     }
+
+    if (statements.length === 5) break
   }
 
-  return results.slice(0, 5)
+  return statements
 }
 
-// ─── Route registration helper ─────────────────────────────────────────────────────────────────────────────────
-// Called from index.ts: registerDeriveProfileRoute(router, getEnv)
+// ─── Route registration ────────────────────────────────────────────────────
 
-export function registerDeriveProfileRoutes(
-  router: any,
-  getEnv: (req: IRequest) => Env
-) {
-  router.get("/api/derive-profile", (req: IRequest) =>
-    handleDeriveProfile(req, getEnv(req))
+export function registerDeriveProfileRoutes(router: any, getEnv: () => Env) {
+  router.get("/api/derive-profile", (request: IRequest) =>
+    handleDeriveProfile(request, getEnv())
   )
 }
