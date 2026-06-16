@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -104,154 +105,144 @@ export default function LoginScreen() {
   }
 
   return (
-    <div className="flex min-h-[100dvh] w-full items-center justify-center bg-[#08070a] safe-bottom relative overflow-hidden">
+    <div className="relative flex min-h-[100dvh] w-full overflow-hidden bg-[#08070a]">
 
-      {/* Warm ambient glow */}
-      <div className="pointer-events-none absolute inset-0 z-0">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(224,116,58,0.08) 0%, transparent 70%)",
-          }}
-        />
-      </div>
+      {/* Full-screen background image */}
+      <Image
+        src="/hero-light.png"
+        alt="Warm light"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-center opacity-60"
+      />
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-10 w-full max-w-md px-6 py-12"
-      >
+      {/* Gradient overlays for legibility */}
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#08070a] via-[#08070a]/80 to-transparent" />
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#08070a] via-transparent to-[#08070a]/40" />
 
-        {/* Wordmark */}
-        <div className="mb-12 text-center">
-          <Link href="/" className="inline-block">
-            <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
-              SOVEREIGN.OS
-            </span>
-          </Link>
-          <p className="mt-3 text-sm text-[#76716b] leading-relaxed">
-            {mode === "login"
-              ? "Sign in to your space."
-              : "Create your space. Free to start."}
-          </p>
-        </div>
+      {/* Form panel */}
+      <div className="relative z-10 flex w-full items-center justify-center px-6 py-12 safe-bottom">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-md"
+        >
 
-        {/* Mode tabs */}
-        <div className="mb-8 flex border-b border-white/[0.08]">
-          {(["login", "register"] as LoginMode[]).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => { setMode(m); setError(""); setTurnstileToken("") }}
-              className={`flex-1 pb-4 text-sm font-medium tracking-wide transition-colors duration-200 border-b-2 ${
-                mode === m
-                  ? "border-[#f4efe9] text-[#f4efe9]"
-                  : "border-transparent text-[#76716b] hover:text-[#a8a29a]"
-              }`}
-            >
-              {m === "login" ? "Sign In" : "Create Account"}
-            </button>
-          ))}
-        </div>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
-          {/* Email */}
-          <div className="flex flex-col gap-2">
-            <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              placeholder="you@example.com"
-              className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
-            />
+          {/* Wordmark */}
+          <div className="mb-10 text-center">
+            <Link href="/" className="inline-block">
+              <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+                SOVEREIGN.OS
+              </span>
+            </Link>
+            <p className="mt-3 text-sm text-[#76716b] leading-relaxed">
+              {mode === "login"
+                ? "Sign in to your space."
+                : "Create your space. Free to start."}
+            </p>
           </div>
 
-          {/* Password */}
-          <div className="flex flex-col gap-2">
-            <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-              placeholder="••••••••"
-              className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
-            />
-          </div>
+          {/* Glass panel */}
+          <div className="rounded-2xl border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8">
 
-          {/* Turnstile */}
-          {mode === "register" && (
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">
-                Verification
-              </label>
-              {turnstileSiteKey ? (
-                <div ref={turnstileRef} className="min-h-[65px]" />
-              ) : (
-                <p className="text-sm text-[#76716b] leading-relaxed">
-                  Bot verification not configured.
-                </p>
-              )}
+            {/* Mode tabs */}
+            <div className="mb-8 flex border-b border-white/[0.08]">
+              {(["login", "register"] as LoginMode[]).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => { setMode(m); setError(""); setTurnstileToken("") }}
+                  className={`flex-1 pb-4 text-sm font-medium tracking-wide transition-colors duration-200 border-b-2 ${
+                    mode === m
+                      ? "border-[#f4efe9] text-[#f4efe9]"
+                      : "border-transparent text-[#76716b] hover:text-[#a8a29a]"
+                  }`}
+                >
+                  {m === "login" ? "Sign In" : "Create Account"}
+                </button>
+              ))}
             </div>
-          )}
 
-          {/* Error */}
-          <AnimatePresence>
-            {error && (
-              <motion.p
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="text-sm text-red-400/80 leading-relaxed"
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  autoComplete={mode === "login" ? "current-password" : "new-password"}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
+                />
+              </div>
+
+              {mode === "register" && (
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Verification</label>
+                  {turnstileSiteKey ? (
+                    <div ref={turnstileRef} className="min-h-[65px]" />
+                  ) : (
+                    <p className="text-sm text-[#76716b] leading-relaxed">Bot verification not configured.</p>
+                  )}
+                </div>
+              )}
+
+              <AnimatePresence>
+                {error && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="text-sm text-red-400/80 leading-relaxed"
+                  >
+                    {error}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+
+              <button
+                type="submit"
+                disabled={loading || !email || !password || (mode === "register" && turnstileSiteKey !== "" && !turnstileToken)}
+                className="mt-2 w-full h-12 rounded-full bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
               >
-                {error}
-              </motion.p>
-            )}
-          </AnimatePresence>
+                {loading ? "···" : mode === "login" ? "Sign In" : "Create Account"}
+              </button>
+            </form>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={
-              loading ||
-              !email ||
-              !password ||
-              (mode === "register" && turnstileSiteKey !== "" && !turnstileToken)
-            }
-            className="mt-2 w-full h-12 rounded-full bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
-          >
-            {loading ? "···" : mode === "login" ? "Sign In" : "Create Account"}
-          </button>
-        </form>
+            <p className="mt-6 text-center text-sm text-[#76716b] leading-relaxed">
+              {mode === "register"
+                ? "Free tier · 5 sessions per day · Your Baseline Design stays private."
+                : "Your Baseline Design and Library are waiting."}
+            </p>
 
-        {/* Footer note */}
-        <p className="mt-8 text-center text-sm text-[#76716b] leading-relaxed">
-          {mode === "register"
-            ? "Free tier · 5 sessions per day · Your Baseline Design stays private."
-            : "Your Baseline Design and Library are waiting."}
-        </p>
+          </div>
 
-        <div className="mt-5 text-center">
-          <Link
-            href="/"
-            className="text-sm text-[#76716b] hover:text-[#a8a29a] transition-colors duration-200"
-          >
-            ← Back to Sovereign.os
-          </Link>
-        </div>
+          <div className="mt-5 text-center">
+            <Link href="/" className="text-sm text-[#76716b] hover:text-[#a8a29a] transition-colors duration-200">
+              ← Back to Sovereign.os
+            </Link>
+          </div>
 
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   )
 }
