@@ -32,5 +32,10 @@
   },
   "dependencies": {
     "playwright": "^1.60.0"
+  },
+  "pnpm": {
+    "auditConfig": {
+      "minimumReleaseAge": 0
+    }
   }
 }
