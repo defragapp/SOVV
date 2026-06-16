@@ -11,7 +11,7 @@ import { registerCovenantRoute } from "./covenant.js";
 import { registerAlignmentRoute } from "./alignment.js";
 import { registerAudioRoute } from "./audio.js";
 import { insertSupportTicket } from "./db.js";
-import { registerDeriveProfileRoutes } from "./derive-profile"
+import { registerDeriveProfileRoutes } from "./derive-profile.js";
 
 const router = Router();
 let currentEnv: Env;
@@ -44,7 +44,6 @@ export function getCorsHeaders(request: Request): Record<string, string> {
 // === NATAL ROUTES ===
 function registerNatalRoutes(router: any, getEnv: () => Env) {
   // GET /api/natal - fetch existing natal data
-registerDeriveProfileRoutes(router, getEnv);
   router.get("/api/natal", async (request: Request) => {
     const env = getEnv();
     const user = await getAuthUser(request, env.DB);
@@ -126,6 +125,7 @@ registerNatalRoutes(router, () => currentEnv);
 registerCovenantRoute(router, getEnv);
 registerAlignmentRoute(router, getEnv);
 registerAudioRoute(router, getEnv);
+registerDeriveProfileRoutes(router, getEnv);
 
 router.get("/api/stripe/prices", async (request: Request) => {
   const env = getEnv();
@@ -184,8 +184,7 @@ router.get('/', () => {
   }), { headers: { 'Content-Type': 'application/json' } });
 });
 
-// Health check — monitoring and Cloudflare Workers Builds verification
-// GET https://api.defrag.app/health → { "ok": true, "service": "sovereign-os-api" }
+// Health check
 router.get('/health', () => {
   return new Response(JSON.stringify({
     ok: true,
@@ -227,7 +226,6 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
     return new Response(null, { status: 204, headers: getCorsHeaders(request) });
   }
   
-  // Apply Rate Limiting based on IP
   if (env.RATE_LIMITER) {
     const ip = request.headers.get('cf-connecting-ip') || 'unknown-ip';
     const { success } = await env.RATE_LIMITER.limit({ key: ip });
@@ -241,7 +239,6 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
   
   const response = await router.fetch(request, env, ctx);
   
-  // Clone response and add CORS headers
   const corsResponse = new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
