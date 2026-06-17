@@ -80,7 +80,7 @@ function GateChip({ label }: { label: string }) {
         fontFamily: "'Inter',sans-serif",
         letterSpacing: "0.10em",
         padding: "2px 8px",
-        borderRadius: "9999px",
+        borderRadius: "4px",
         border: "1px solid rgba(255,255,255,0.08)",
         color: "#76716b",
         whiteSpace: "nowrap" as const,
@@ -384,7 +384,7 @@ export default function DefragPage() {
         <p className="text-[12px] text-[#76716b] leading-relaxed mb-3">
           Add another person's birth data to analyze the dynamic between you.
         </p>
-        <span className="inline-block border border-white/[0.06] rounded-full px-3 py-1 text-[10px] text-[#4f4b47] cursor-not-allowed">
+        <span className="inline-block border border-white/[0.06] px-3 py-1 text-[10px] text-[#4f4b47] cursor-not-allowed" style={{ borderRadius: 4 }}>
           Pro
         </span>
       </div>
