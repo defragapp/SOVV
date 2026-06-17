@@ -84,7 +84,7 @@ export default function CovenantPage() {
     if (!result) return
     setIsSaving(true)
     try {
-      const content = result.summary || result.covenant || result.pattern || input.slice(0, 300)
+      const content = result.forYou || result.pattern || input.slice(0, 300)
       const res = await fetch("/api/history", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -103,7 +103,7 @@ export default function CovenantPage() {
     }
   }
 
-  // ─── LEFT PANEL — Context ──────────────────────────────────────────────────
+  // ─── LEFT PANEL ────────────────────────────────────────────────────────────
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
@@ -112,12 +112,10 @@ export default function CovenantPage() {
       <div className="px-5 pt-6 pb-5">
         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">About Covenant</p>
         <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
-          Covenant connects what you're going through to the real human stories in Scripture. It doesn't preach. It shows you you're not alone — and this has been walked before.
+          Covenant connects what you're walking through to the real human stories in Scripture. Your Baseline Design is already active — Covenant uses it to find the story that fits your moment.
         </p>
-
-        {/* Biblical patterns quick reference */}
         <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#4f4b47] mb-3">Patterns it recognizes</p>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-0">
           {[
             { feeling: "Misunderstood", figure: "Joseph" },
             { feeling: "Betrayed", figure: "David" },
@@ -125,9 +123,11 @@ export default function CovenantPage() {
             { feeling: "Tested", figure: "Job" },
             { feeling: "Unseen", figure: "Hagar" },
             { feeling: "Stuck", figure: "Abraham" },
+            { feeling: "Loyal but tired", figure: "Ruth" },
+            { feeling: "Called to rebuild", figure: "Nehemiah" },
           ].map((item) => (
-            <div key={item.feeling} className="flex items-center justify-between py-1.5 border-b border-white/[0.03] last:border-0">
-              <span className="text-[11px] text-[#76716b] italic">"{item.feeling}"</span>
+            <div key={item.feeling} className="flex items-center justify-between py-2 border-b border-white/[0.03] last:border-0">
+              <span className="text-[11px] text-[#76716b]">{item.feeling}</span>
               <span className="text-[10px] text-[#a8a29a]">{item.figure}</span>
             </div>
           ))}
@@ -136,7 +136,7 @@ export default function CovenantPage() {
     </div>
   )
 
-  // ─── RIGHT PANEL — Library ─────────────────────────────────────────────────
+  // ─── RIGHT PANEL ───────────────────────────────────────────────────────────
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
@@ -163,7 +163,7 @@ export default function CovenantPage() {
           </div>
         ) : library.length === 0 ? (
           <p className="text-[12px] text-[#76716b] leading-relaxed px-5 py-8 text-center">
-            Saved covenant sessions will appear here.
+            Saved sessions will appear here.
           </p>
         ) : (
           library.map(item => (
@@ -188,7 +188,7 @@ export default function CovenantPage() {
     </div>
   )
 
-  // ─── CENTER PANEL — Thread ─────────────────────────────────────────────────
+  // ─── CENTER PANEL ──────────────────────────────────────────────────────────
   const main = (
     <div className="flex flex-col h-full">
       <div className="h-11 px-6 flex items-center border-b border-white/[0.06] shrink-0">
@@ -203,7 +203,6 @@ export default function CovenantPage() {
               className="w-10 h-10 flex items-center justify-center border border-[#e0743a]/20 bg-[#e0743a]/5 mb-2"
               style={{ borderRadius: 10, boxShadow: "0 0 24px rgba(224,116,58,0.08)" }}
             >
-              {/* Cross / plus SVG */}
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M8 2v12M2 8h12" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
@@ -212,7 +211,7 @@ export default function CovenantPage() {
               What are you walking through?
             </p>
             <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
-              Describe the moment, the feeling, or the situation. Covenant will find the story in Scripture that matches it.
+              Your Baseline Design is already active. Describe the moment — Covenant will find the story in Scripture that matches it.
             </p>
           </div>
         )}
@@ -236,7 +235,7 @@ export default function CovenantPage() {
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8"
             >
-              {/* Biblical figure match */}
+              {/* Figure match */}
               {result.figure && (
                 <div className="mb-6 pb-6 border-b border-white/[0.05]">
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">Your moment matches</p>
@@ -247,17 +246,15 @@ export default function CovenantPage() {
                 </div>
               )}
 
-              <Section label="The pattern you're in"     value={result.pattern} />
-              <Section label="Their story"               value={result.story} />
-              <Section label="What broke"                value={result.whatBroke} />
-              <Section label="How God met them"          value={result.howGodMet} />
-              <Section label="What they learned"         value={result.whatTheyLearned} />
-              <Section label="What this means for you"   value={result.forYou} />
-              <Section label="One grounded next step"    value={result.nextStep} />
-              <Section label="Summary"                   value={result.summary} />
+              <Section label="The pattern you're in"   value={result.pattern} />
+              <Section label="Their story"             value={result.story} />
+              <Section label="What broke"              value={result.whatBroke} />
+              <Section label="How God met them"        value={result.howGodMet} />
+              <Section label="What they learned"       value={result.whatTheyLearned} />
+              <Section label="What this means for you" value={result.forYou} />
+              <Section label="One next step"           value={result.nextStep} />
 
-              {/* Scripture chips */}
-              {result.scriptures && result.scriptures.length > 0 && (
+              {result.scriptures?.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-white/[0.05]">
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Scripture to explore</p>
                   <div className="flex flex-wrap gap-2">
@@ -268,10 +265,9 @@ export default function CovenantPage() {
                 </div>
               )}
 
-              {/* Reflection prompts */}
-              {result.reflectionPrompts && result.reflectionPrompts.length > 0 && (
+              {result.reflectionPrompts?.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-white/[0.05]">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Reflection prompts</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Carry with you</p>
                   <div className="flex flex-col gap-2">
                     {result.reflectionPrompts.map((p: string, i: number) => (
                       <div key={i} className="flex items-start gap-2.5">
@@ -287,13 +283,12 @@ export default function CovenantPage() {
         </AnimatePresence>
       </div>
 
-      {/* Composer */}
       <div className="flex-none px-6 pb-6">
         <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: 16 }}>
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Describe what you're walking through. Be honest."
+            placeholder="Describe what you're walking through."
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             onKeyDown={e => {
