@@ -22,8 +22,6 @@ interface ResultCardProps {
   saveSuccess?: boolean
 }
 
-// Branded, formatted result card — similar to NotebookLM output style
-// Designed to feel like a private document, not a chat bubble
 export function ResultCard({
   result,
   input,
@@ -48,15 +46,16 @@ export function ResultCard({
   const steering = result.conversationalSteering
 
   const handleCopyAll = async () => {
+    const NL = "\n"
     const lines: string[] = [
       `SOVEREIGN.OS — ${spaceName.toUpperCase()}`,
-      `${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`,
+      new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
       "",
       `"${input}"`,
       "",
     ]
     sections.forEach(s => {
-      lines.push(`${s.label.toUpperCase()}`)
+      lines.push(s.label.toUpperCase())
       lines.push(s.value!)
       lines.push("")
     })
@@ -64,26 +63,25 @@ export function ResultCard({
       lines.push("SUGGESTED RESPONSE")
       lines.push(typeof response === "string" ? response : (response.summary || ""))
       if (typeof response === "object" && response.phrasing?.length) {
-        response.phrasing.forEach(p => lines.push(`  → ${p}`))
+        response.phrasing.forEach(p => lines.push(`  -> ${p}`))
       }
       lines.push("")
     }
     if (steering) {
       if (steering.do?.length) {
-        lines.push("IN THE NEXT CONVERSATION, TRY")
+        lines.push("IN THE NEXT CONVERSATION")
         steering.do.forEach(d => lines.push(`  + ${d}`))
         lines.push("")
       }
       if (steering.avoid?.length) {
         lines.push("AVOID")
-        steering.avoid.forEach(a => lines.push(`  − ${a}`))
+        steering.avoid.forEach(a => lines.push(`  - ${a}`))
         lines.push("")
       }
     }
     lines.push("—")
     lines.push("Sovereign.os · defrag.app")
-
-    await navigator.clipboard.writeText(lines.join("\n"))
+    await navigator.clipboard.writeText(lines.join(NL))
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -96,21 +94,19 @@ export function ResultCard({
       className="border border-white/[0.08] bg-white/[0.02] overflow-hidden"
       style={{ borderRadius: 16 }}
     >
-      {/* Card header — branded */}
+      {/* Card header */}
       <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between bg-[#08070a]/60">
         <div className="flex items-center gap-3">
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Sovereign.os</span>
           <span className="text-white/20 text-xs">/</span>
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]">{spaceName}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[9px] text-[#4f4b47]">
-            {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-          </span>
-        </div>
+        <span className="font-mono text-[9px] text-[#4f4b47]">
+          {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+        </span>
       </div>
 
-      {/* Input echo — shows what was asked */}
+      {/* Input echo */}
       <div className="px-6 py-4 border-b border-white/[0.04] bg-white/[0.01]">
         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">You described</p>
         <p className="text-[13px] text-[#76716b] leading-relaxed italic">"{input.slice(0, 120)}{input.length > 120 ? "…" : ""}"</p>
@@ -131,7 +127,6 @@ export function ResultCard({
           </motion.div>
         ))}
 
-        {/* Suggested response */}
         {response && (
           <motion.div
             initial={{ opacity: 0, y: 4 }}
@@ -155,9 +150,7 @@ export function ResultCard({
                   >
                     <span className="text-[#4f4b47] shrink-0 mt-0.5 select-none">↳</span>
                     <span className="flex-1">{phrase}</span>
-                    <span className="text-[9px] text-[#4f4b47] opacity-0 group-hover:opacity-100 transition-opacity shrink-0 self-center font-mono uppercase tracking-[0.1em]">
-                      Copy
-                    </span>
+                    <span className="text-[9px] text-[#4f4b47] opacity-0 group-hover:opacity-100 transition-opacity shrink-0 self-center font-mono uppercase tracking-[0.1em]">Copy</span>
                   </div>
                 ))}
               </div>
@@ -165,7 +158,6 @@ export function ResultCard({
           </motion.div>
         )}
 
-        {/* Conversational steering */}
         {steering && (steering.do?.length || steering.avoid?.length) && (
           <motion.div
             initial={{ opacity: 0, y: 4 }}
@@ -203,23 +195,18 @@ export function ResultCard({
         )}
       </div>
 
-      {/* Card footer — actions */}
+      {/* Footer actions */}
       <div className="px-6 py-4 border-t border-white/[0.06] bg-[#08070a]/40 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          {/* Copy all */}
-          <button
-            onClick={handleCopyAll}
-            className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1"/>
-              <path d="M1 8V1h7" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-            </svg>
-            {copied ? "Copied" : "Copy all"}
-          </button>
-        </div>
-
-        {/* Save */}
+        <button
+          onClick={handleCopyAll}
+          className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1"/>
+            <path d="M1 8V1h7" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+          </svg>
+          {copied ? "Copied" : "Copy all"}
+        </button>
         {onSave && (
           <button
             onClick={onSave}
