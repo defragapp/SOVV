@@ -37,10 +37,17 @@ jobs:
         run: npm install
       - name: Deploy worker-session
         working-directory: apps/worker-session
-        run: npx wrangler deploy --env production
+        run: npx wrangler deploy --env production 2>&1 | tee /tmp/wrangler-session.txt; exit ${PIPESTATUS[0]}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      - name: Upload session log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wrangler-session-debug
+          path: /tmp/wrangler-session.txt
+          retention-days: 1
 
   deploy-ai:
     name: Deploy AI Worker
@@ -80,10 +87,17 @@ jobs:
         run: npm install
       - name: Deploy developer agent
         working-directory: apps/developer
-        run: npx wrangler deploy --env production
+        run: npx wrangler deploy --env production 2>&1 | tee /tmp/wrangler-developer.txt; exit ${PIPESTATUS[0]}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      - name: Upload developer log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wrangler-developer-debug
+          path: /tmp/wrangler-developer.txt
+          retention-days: 1
 
   deploy-sovereign-build-agent:
     name: Deploy Sovereign Build Agent
