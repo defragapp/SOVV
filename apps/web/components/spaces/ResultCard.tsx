@@ -83,8 +83,7 @@ export function ResultCard({
     lines.push("—")
     lines.push("Sovereign.os · defrag.app")
 
-    await navigator.clipboard.writeText(lines.join("
-"))
+    await navigator.clipboard.writeText(lines.join("\n"))
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
