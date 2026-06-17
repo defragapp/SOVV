@@ -1,154 +1,136 @@
-import type { Metadata } from "next";
-import { SiteShell } from "@/components/marketing/site-shell";
-import { Container, Section } from "@/components/ui/layout-primitives";
-import Link from "next/link";
+import type { Metadata } from "next"
+import { SiteShell } from "@/components/marketing/site-shell"
+import { Container } from "@/components/ui/layout-primitives"
+import Link from "next/link"
+import { AnimatedHeading, TextReveal } from "@/components/marketing/animated-elements"
 
 export const metadata: Metadata = {
   title: "Alignment — Sovereign.os",
-  description: "Alignment is the response integration and action choice space inside Sovereign.os. Turn insight into a usable response.",
-};
+  description: "Alignment turns insight into a usable response. See what is yours to carry and what belongs to the other side.",
+}
 
-const WHAT_IT_SURFACES = [
-  { label: "Alignment Result", body: "A structured output showing what is yours to carry and what belongs to the other side." },
-  { label: "Response integration", body: "Turn the insight from Defrag into a concrete, actionable response." },
-  { label: "Action choice", body: "See the impact of each path forward before you choose." },
-  { label: "What is yours", body: "Clear framing of your responsibility — without taking on what is not yours." },
-  { label: "What is not yours", body: "What belongs to the other side. What you do not need to carry." },
-];
-
-const WHEN = [
-  "After a Defrag session — turning insight into action",
-  "When you need to decide how to respond",
-  "When you are unsure what is yours to carry",
-  "When a boundary needs to be grounded in clarity",
-  "When the next step needs to be concrete, not just emotional",
-];
+const APP_URL = "https://app.defrag.app/app/login"
 
 function MetaLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="inline-flex items-center gap-2 mb-6">
       <span className="h-px w-6 bg-[#e0743a]/60" />
-      <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">
-        {children}
-      </span>
+      <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">{children}</span>
     </div>
-  );
+  )
 }
 
 export default function AlignmentProductPage() {
   return (
     <SiteShell>
-      {/* Hero */}
-      <Section className="w-full relative flex flex-col items-center justify-center min-h-[65svh] pt-32 pb-24 overflow-hidden bg-[#08070a] border-b border-white/5">
+
+      {/* ── HERO ── */}
+      <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[#08070a] overflow-hidden">
         <div className="light-beam opacity-60" aria-hidden />
-        <Container className="relative z-10 flex flex-col items-center text-center max-w-[860px]">
-          <MetaLabel>Alignment space</MetaLabel>
-          <h1 className="font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
+        <Container className="relative z-10 max-w-4xl">
+          <MetaLabel>Alignment</MetaLabel>
+          <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
             Turn insight into a usable response.
           </h1>
-          <p className="text-[#a8a29a] text-lg max-w-[600px] text-balance leading-relaxed mb-10">
-            Alignment is the response integration and action choice space inside Sovereign.os. It helps you see what is yours to carry, what belongs to the other side, and what the next concrete step looks like.
+          <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed animate-fade-up delay-100">
+            You understand what happened. Now you need to know what to do with it. Alignment shows you what is yours to carry, what belongs to the other side, and the clearest next step — grounded in your Baseline Design.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="https://app.defrag.app/apps/alignment" className="btn-primary">
-              Enter the Alignment space
-            </Link>
-            <Link href="/how-it-works" className="btn-secondary">
-              See how it works
-            </Link>
+          <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
+            <Link href={APP_URL} className="btn-primary">Open Alignment</Link>
+            <Link href="/pricing" className="btn-secondary">Pro required</Link>
           </div>
         </Container>
-      </Section>
+      </section>
 
-      {/* What it is */}
-      <Section className="w-full py-20 md:py-28 bg-[#0c0a0d]">
-        <Container className="max-w-3xl">
-          <MetaLabel>What Alignment does</MetaLabel>
-          <h2 className="font-serif text-3xl md:text-4xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-8 text-balance">
-            The step after the insight.
-          </h2>
-          <div className="space-y-6 text-base text-[#a8a29a] leading-relaxed">
-            <p>
-              Defrag helps you see the Active pattern. Alignment helps you do something with it.
-            </p>
-            <p>
-              Alignment is the response integration and action choice space. It takes the insight from your Defrag session and turns it into a concrete, actionable response — showing you what is yours to carry and what belongs to the other side.
-            </p>
-            <p>
-              Your Baseline Design is active beneath every Alignment thread. The output is grounded in how you actually tend to respond, not a generic framework.
-            </p>
-          </div>
-        </Container>
-      </Section>
-
-      {/* What it surfaces */}
-      <Section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/5">
+      {/* ── WHAT IT DOES ── */}
+      <section className="w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/5">
         <Container>
-          <div className="flex flex-col lg:flex-row gap-16 items-start">
-            <div className="lg:w-80 shrink-0 lg:sticky lg:top-32">
-              <MetaLabel>What Alignment surfaces</MetaLabel>
-              <h2 className="font-serif text-3xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-4">
-                An Alignment Result.
-              </h2>
-              <p className="text-[#76716b] text-sm leading-relaxed">
-                Structured output showing what is yours, what is not, and what the next step looks like.
-              </p>
-            </div>
-            <div className="flex-1 flex flex-col gap-0 rounded-2xl border border-white/[0.06] overflow-hidden">
-              {WHAT_IT_SURFACES.map((item, i) => (
-                <div
-                  key={item.label}
-                  className={[
-                    "flex items-start gap-5 p-6 md:p-8 bg-[#08070a] hover:bg-[#0c0a0d] transition-colors",
-                    i < WHAT_IT_SURFACES.length - 1 ? "border-b border-white/[0.06]" : "",
-                  ].join(" ")}
-                >
-                  <span className="font-mono text-[#e0743a]/50 text-xs mt-0.5 shrink-0 w-5">{String(i + 1).padStart(2, "0")}</span>
+          <MetaLabel>What Alignment does</MetaLabel>
+          <AnimatedHeading className="text-3xl md:text-5xl tracking-[-0.02em] max-w-2xl leading-tight mb-14">
+            Response integration. Not just reflection.
+          </AnimatedHeading>
+
+          <div className="max-w-3xl flex flex-col gap-0">
+            {[
+              { label: "What is true", body: "The honest read on the situation — stripped of the story you've been telling yourself about it." },
+              { label: "What is needed", body: "What the situation is actually asking of you. Not what you want to give, and not what you're afraid to give." },
+              { label: "The shift", body: "The specific change in posture, timing, or language that would move things forward." },
+              { label: "Next steps", body: "Concrete, sequenced actions grounded in your Baseline Design and the actual dynamic." },
+              { label: "What to avoid", body: "The moves that feel right in the moment but tend to make things worse for someone with your pattern." },
+            ].map((item, i) => (
+              <TextReveal key={item.label} delay={i * 60}>
+                <div className="flex items-start gap-8 py-7 border-b border-white/[0.06] last:border-0">
+                  <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.2em] shrink-0 w-6 mt-1">{String(i + 1).padStart(2, "0")}</span>
                   <div>
-                    <h3 className="text-[#f4efe9] text-sm font-medium mb-1">{item.label}</h3>
-                    <p className="text-[#a8a29a] text-sm leading-relaxed">{item.body}</p>
+                    <h3 className="text-[#f4efe9] font-medium text-base mb-1">{item.label}</h3>
+                    <p className="text-sm text-[#a8a29a] leading-relaxed max-w-lg">{item.body}</p>
                   </div>
                 </div>
-              ))}
-            </div>
+              </TextReveal>
+            ))}
           </div>
         </Container>
-      </Section>
+      </section>
 
-      {/* When to use */}
-      <Section className="w-full py-20 bg-[#0c0a0d] border-t border-white/5">
+      {/* ── WHEN TO USE ── */}
+      <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/5">
         <Container>
-          <div className="max-w-3xl">
-            <MetaLabel>When to use Alignment</MetaLabel>
-            <h2 className="font-serif text-3xl md:text-4xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-10 text-balance">
-              When the insight needs to become a response.
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {WHEN.map((w) => (
-                <div
-                  key={w}
-                  className="border border-white/[0.08] bg-white/[0.02] px-5 py-4 text-sm text-[#a8a29a] leading-relaxed rounded-2xl"
-                >
-                  {w}
-                </div>
-              ))}
-            </div>
+          <MetaLabel>When to use Alignment</MetaLabel>
+          <AnimatedHeading className="text-3xl md:text-5xl tracking-[-0.02em] max-w-2xl leading-tight mb-14">
+            After the insight. Before the next move.
+          </AnimatedHeading>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-w-3xl">
+            {[
+              "After a Defrag session — when you know the pattern but not the next step",
+              "Before a difficult conversation — when you need to know what is actually yours to say",
+              "After a conflict — when you want to respond instead of react",
+              "When you're carrying something that might not be yours to carry",
+              "When you know what you should do but can't make yourself do it",
+              "When the insight is clear but the action isn't",
+            ].map((item, i) => (
+              <div key={i} className="flex items-start gap-4 py-5 border-b border-white/[0.06]">
+                <span className="w-1 h-1 rounded-full bg-[#e0743a]/60 shrink-0 mt-2.5" />
+                <p className="text-sm md:text-[15px] text-[#a8a29a] leading-relaxed">{item}</p>
+              </div>
+            ))}
           </div>
         </Container>
-      </Section>
+      </section>
 
-      {/* CTA */}
-      <Section className="w-full py-24 bg-[#08070a] border-t border-white/5 relative overflow-hidden">
-        <div className="light-beam opacity-40" aria-hidden />
-        <Container className="relative z-10 text-center max-w-2xl mx-auto">
-          <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-8 text-balance">
-            Your next response can change the pattern.
-          </h2>
-          <Link href="https://app.defrag.app/apps/alignment" className="btn-primary">
-            Enter the Alignment space
-          </Link>
+      {/* ── PRO NOTE ── */}
+      <section className="w-full py-16 bg-[#0c0a0d] border-t border-white/5">
+        <Container className="max-w-2xl">
+          <div className="border border-white/[0.08] p-8" style={{ borderRadius: 16 }}>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] mb-4">Pro space</p>
+            <h3 className="font-serif text-2xl text-[#f4efe9] mb-3">Alignment requires Pro.</h3>
+            <p className="text-sm text-[#a8a29a] leading-relaxed mb-6">
+              Alignment is available on the Pro plan alongside Covenant, unlimited sessions, full Library depth, and Audio Overview.
+            </p>
+            <Link href="/pricing" className="btn-primary inline-flex">See Pro plan</Link>
+          </div>
         </Container>
-      </Section>
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="relative w-full py-24 md:py-32 bg-[#08070a] border-t border-white/5 overflow-hidden">
+        <div className="light-beam" aria-hidden />
+        <Container className="relative z-10 flex flex-col items-center text-center">
+          <AnimatedHeading className="text-4xl md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
+            Know what to do next.
+          </AnimatedHeading>
+          <TextReveal delay={200}>
+            <p className="mt-6 max-w-md text-base text-[#a8a29a] leading-relaxed">
+              Open Alignment and describe what you're trying to move through. Your Baseline Design is already waiting.
+            </p>
+          </TextReveal>
+          <div className="mt-9 flex flex-col sm:flex-row gap-3">
+            <Link href={APP_URL} className="btn-primary">Open Alignment</Link>
+            <Link href="/pricing" className="btn-secondary">See plans</Link>
+          </div>
+        </Container>
+      </section>
+
     </SiteShell>
-  );
+  )
 }
