@@ -14,35 +14,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-      - name: Install root deps
-        run: npm ci
       - name: Install worker deps
         working-directory: apps/worker
-        run: npm ci
-      - name: Show wrangler version
+        run: npm install
+      - name: Deploy sovereign-os-api
         working-directory: apps/worker
-        run: npx wrangler --version
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      - name: TypeScript check
-        working-directory: apps/worker
-        run: npx tsc --noEmit 2>&1 | tee /tmp/tsc-output.txt || true
-      - name: Deploy to Production
-        working-directory: apps/worker
-        run: npx wrangler deploy 2>&1 | tee /tmp/wrangler-output.txt
+        run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-      - name: Upload deploy log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: wrangler-deploy-log
-          path: |
-            /tmp/wrangler-output.txt
-            /tmp/tsc-output.txt
-          retention-days: 1
 
   deploy-session:
     name: Deploy Session Worker
@@ -52,24 +32,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-      - run: npm ci
       - name: Install worker deps
         working-directory: apps/worker-session
-        run: npm ci
-      - name: Deploy to Production
+        run: npm install
+      - name: Deploy worker-session
         working-directory: apps/worker-session
-        run: npx wrangler deploy --env production 2>&1 | tee /tmp/wrangler-session.txt
+        run: npx wrangler deploy --env production
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-      - name: Upload deploy log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: wrangler-session-log
-          path: /tmp/wrangler-session.txt
-          retention-days: 1
 
   deploy-ai:
     name: Deploy AI Worker
@@ -79,31 +50,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-      - run: npm ci
       - name: Install worker deps
         working-directory: apps/worker-ai
-        run: npm ci
-      - name: Deploy to Production
+        run: npm install
+      - name: Deploy worker-ai
         working-directory: apps/worker-ai
-        run: npx wrangler deploy --env production 2>&1 | tee /tmp/wrangler-ai.txt
+        run: npx wrangler deploy --env production
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-      - name: Upload deploy log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: wrangler-ai-log
-          path: /tmp/wrangler-ai.txt
-          retention-days: 1
 
   deploy-web:
     name: Deploy Web App (via CF Workers Builds)
     runs-on: ubuntu-latest
     steps:
-      - name: Web app deploys via Cloudflare Workers Builds dashboard
-        run: echo "sovv-web deploys automatically via Cloudflare Workers Builds on push to main"
+      - name: Web app deploys via Cloudflare Workers Builds
+        run: echo "sovv-web auto-deploys via CF Workers Builds on push to main"
 
   deploy-developer:
     name: Deploy Developer Agent
@@ -113,24 +75,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-      - run: npm ci
       - name: Install worker deps
         working-directory: apps/developer
-        run: npm ci
-      - name: Deploy to Production
+        run: npm install
+      - name: Deploy developer agent
         working-directory: apps/developer
-        run: npx wrangler deploy --env production 2>&1 | tee /tmp/wrangler-developer.txt
+        run: npx wrangler deploy --env production
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-      - name: Upload deploy log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: wrangler-developer-log
-          path: /tmp/wrangler-developer.txt
-          retention-days: 1
 
   deploy-sovereign-build-agent:
     name: Deploy Sovereign Build Agent
@@ -140,24 +93,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-      - run: npm ci
       - name: Install worker deps
         working-directory: apps/sovereign-build-agent
-        run: npm ci
-      - name: Deploy to Production
+        run: npm install
+      - name: Deploy sovereign-build-agent
         working-directory: apps/sovereign-build-agent
-        run: npx wrangler deploy --env production 2>&1 | tee /tmp/wrangler-build-agent.txt
+        run: npx wrangler deploy --env production
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-      - name: Upload deploy log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: wrangler-build-agent-log
-          path: /tmp/wrangler-build-agent.txt
-          retention-days: 1
 
   deploy-sovereign-code-agent:
     name: Deploy Sovereign Code Agent
@@ -167,21 +111,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-      - run: npm ci
       - name: Install worker deps
         working-directory: apps/sovereign-code-agent
-        run: npm ci
-      - name: Deploy to Production
+        run: npm install
+      - name: Deploy sovereign-code-agent
         working-directory: apps/sovereign-code-agent
-        run: npx wrangler deploy --env production 2>&1 | tee /tmp/wrangler-code-agent.txt
+        run: npx wrangler deploy --env production
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-      - name: Upload deploy log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: wrangler-code-agent-log
-          path: /tmp/wrangler-code-agent.txt
-          retention-days: 1
