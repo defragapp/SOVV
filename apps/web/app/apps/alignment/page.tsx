@@ -25,28 +25,6 @@ function Section({ label, value }: { label: string; value?: string }) {
   )
 }
 
-function ListSection({ label, items, accent }: { label: string; items?: string[]; accent?: string }) {
-  if (!items?.length) return null
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="border-b border-white/[0.05] pb-6 mb-6 last:border-0 last:pb-0 last:mb-0"
-    >
-      <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-3">{label}</p>
-      <ul className="space-y-2">
-        {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm text-[#a8a29a] leading-relaxed">
-            <span className={`${accent || "text-[#e0743a]/50"} shrink-0 mt-0.5`}>→</span>
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </motion.div>
-  )
-}
-
 export default function AlignmentPage() {
   const [input, setInput] = React.useState("")
   const [result, setResult] = React.useState<any>(null)
@@ -95,7 +73,7 @@ export default function AlignmentPage() {
     if (!result) return
     setIsSaving(true)
     try {
-      const content = result.summary || result.alignment || input.slice(0, 300)
+      const content = result.alignment || result.whatIsTrue || input.slice(0, 300)
       const res = await fetch("/api/history", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -123,17 +101,17 @@ export default function AlignmentPage() {
       <div className="px-5 pt-6 pb-5">
         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">About Alignment</p>
         <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
-          Alignment helps you integrate what you've learned from a Defrag session into a concrete next response — grounded in your Baseline Design.
+          Your Baseline Design is your fixed center — how you naturally operate. The live sky is the emotional weather you're moving through right now. Alignment uses both to show you the path back to yourself.
         </p>
         <div className="space-y-3">
           {[
-            "Translates insight into action",
-            "Grounded in your Baseline Design",
-            "Generates response options",
-            "Saves to your Library",
+            "What is actually true in this situation",
+            "What is yours to carry — and what isn't",
+            "The one move that would shift things",
+            "What to avoid doing right now",
           ].map((item) => (
             <div key={item} className="flex items-start gap-2">
-              <span className="text-[#e0743a]/40 text-[10px] mt-0.5 shrink-0">✓</span>
+              <span className="text-[#e0743a]/40 text-[10px] mt-0.5 shrink-0">→</span>
               <span className="text-[12px] text-[#76716b] leading-relaxed">{item}</span>
             </div>
           ))}
@@ -154,7 +132,8 @@ export default function AlignmentPage() {
           <button
             onClick={handleSave}
             disabled={isSaving || saveSuccess}
-            className="w-full h-9 rounded-xl bg-[#f4efe9] text-[#08070a] text-[12px] font-medium tracking-tight hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full h-9 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium tracking-tight hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ borderRadius: 8 }}
           >
             {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save to Library"}
           </button>
@@ -168,7 +147,7 @@ export default function AlignmentPage() {
           </div>
         ) : library.length === 0 ? (
           <p className="text-[12px] text-[#76716b] leading-relaxed px-5 py-8 text-center">
-            Saved alignment sessions will appear here.
+            Saved sessions will appear here.
           </p>
         ) : (
           library.map(item => (
@@ -205,16 +184,19 @@ export default function AlignmentPage() {
         {!result && !isLoading && !error && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-3">
             <div
-              className="w-10 h-10 rounded-full border border-[#e0743a]/20 bg-[#e0743a]/5 flex items-center justify-center mb-2"
-              style={{ boxShadow: "0 0 24px rgba(224,116,58,0.08)" }}
+              className="w-10 h-10 flex items-center justify-center border border-[#e0743a]/20 bg-[#e0743a]/5 mb-2"
+              style={{ borderRadius: 10, boxShadow: "0 0 24px rgba(224,116,58,0.08)" }}
             >
-              <span className="text-[#e0743a]/60 text-sm">→</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 1v14M1 8h14" stroke="rgba(224,116,58,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
+                <circle cx="8" cy="8" r="3" stroke="rgba(224,116,58,0.3)" strokeWidth="1"/>
+              </svg>
             </div>
             <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">
-              What do you want to align?
+              What are you trying to navigate?
             </p>
             <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
-              Describe a situation, relationship, or decision you want to move forward on.
+              Your Baseline Design and the live sky are already active. Describe what's pulling you off course — Alignment will show you the path back.
             </p>
           </div>
         )}
@@ -222,7 +204,7 @@ export default function AlignmentPage() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/60 rounded-full animate-spin" />
-            <p className="text-[13px] text-[#76716b]">Aligning…</p>
+            <p className="text-[13px] text-[#76716b]">Finding your path…</p>
           </div>
         )}
 
@@ -238,24 +220,32 @@ export default function AlignmentPage() {
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8"
             >
-              <Section label="Alignment"         value={result.alignment} />
-              <Section label="What's true"        value={result.whatIsTrue} />
-              <Section label="What's needed"      value={result.whatIsNeeded} />
-              <Section label="The shift"          value={result.theShift} />
-              <ListSection label="Next steps"     items={result.nextSteps} />
-              <ListSection label="What to avoid"  items={result.avoid} />
-              <Section label="Summary"            value={result.summary} />
+              {/* Sky context — shown if present */}
+              {result.skyContext && (
+                <div className="mb-6 pb-6 border-b border-white/[0.05]">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">Live sky · right now</p>
+                  <p className="text-[13px] text-[#76716b] leading-relaxed">{result.skyContext}</p>
+                </div>
+              )}
+
+              <Section label="What is true"              value={result.whatIsTrue} />
+              <Section label="What is yours to carry"    value={result.whatIsYours} />
+              <Section label="What isn't yours"          value={result.whatIsNotYours} />
+              <Section label="The shift"                 value={result.theShift} />
+              <Section label="One next step"             value={result.nextStep} />
+              <Section label="What to avoid"             value={result.avoid} />
+              <Section label="Your alignment"            value={result.alignment} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       <div className="flex-none px-6 pb-6">
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors">
+        <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: 16 }}>
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Describe what you want to align. Be specific."
+            placeholder="What's pulling you off course?"
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             onKeyDown={e => {
@@ -267,7 +257,8 @@ export default function AlignmentPage() {
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
-              className="h-8 px-5 rounded-xl bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+              className="h-8 px-5 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+              style={{ borderRadius: 8 }}
             >
               {isLoading ? "…" : "Align"}
             </button>
