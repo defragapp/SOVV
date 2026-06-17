@@ -1,12 +1,15 @@
-import type { Metadata } from "next";
-import { SiteShell } from "@/components/marketing/site-shell";
-import { Container, Section } from "@/components/ui/layout-primitives";
-import Link from "next/link";
+import type { Metadata } from "next"
+import { SiteShell } from "@/components/marketing/site-shell"
+import { Container } from "@/components/ui/layout-primitives"
+import Link from "next/link"
+import { AnimatedHeading, TextReveal } from "@/components/marketing/animated-elements"
 
 export const metadata: Metadata = {
   title: "Defrag — Sovereign.os",
   description: "Defrag helps you understand what is active in the moment. See the pattern beneath the argument, the silence, the message, or the grief.",
-};
+}
+
+const APP_URL = "https://app.defrag.app/app/login"
 
 function MetaLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -14,133 +17,137 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
       <span className="h-px w-6 bg-[#e0743a]/60" />
       <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">{children}</span>
     </div>
-  );
+  )
 }
-
-const WHAT_IT_SURFACES = [
-  { label: "Active pattern", body: "What is currently active beneath the surface of the moment — the pattern firing, not the symptom." },
-  { label: "The Repeat", body: "The recurring loop that keeps showing up across different situations, relationships, and roles." },
-  { label: "Old Role", body: "The pattern you learned to carry under pressure. The role you default into before you realize it." },
-  { label: "What You Learned to Carry", body: "The adaptive behavior that made sense then and costs you now." },
-  { label: "Strain Pattern", body: "Where your strength bends under pressure. How the pattern shows up when you are overwhelmed." },
-  { label: "Gift Under Strain", body: "The positive intent or strength hidden inside the pattern. What it was protecting." },
-  { label: "Alignment", body: "What needs to align now. What brings you back to center." },
-  { label: "Best Next Response", body: "The concrete next move — grounded in your Baseline Design, not a generic script." },
-  { label: "Conversational Steering", body: "What to move toward and what to step away from. Practicing the response before you send it." },
-];
-
-const SUPPORTS = [
-  "Relational dynamics",
-  "Family dynamics",
-  "Boundaries",
-  "Messages",
-  "Grief",
-  "Team dynamics",
-];
 
 export default function DefragProductPage() {
   return (
     <SiteShell>
-      {/* Hero */}
-      <Section className="w-full relative flex flex-col items-center justify-center min-h-[65svh] pt-32 pb-24 overflow-hidden bg-[#08070a] border-b border-white/5">
+
+      {/* ── HERO ── */}
+      <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[#08070a] overflow-hidden">
         <div className="light-beam opacity-60" aria-hidden />
-        <Container className="relative z-10 flex flex-col items-center text-center max-w-[860px]">
-          <MetaLabel>Defrag space</MetaLabel>
-          <h1 className="font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
-            See what you couldn&apos;t see
-            <br />
-            from inside the moment.
+        <Container className="relative z-10 max-w-4xl">
+          <MetaLabel>Defrag</MetaLabel>
+          <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
+            Separate the moment from the pattern.
           </h1>
-          <p className="text-[#a8a29a] text-lg max-w-[600px] text-balance leading-relaxed mb-10">
-            Defrag helps you understand what is active in the moment — the pattern, the loop, the response that gives it a better chance. Say it how it actually happened. Defrag does the rest.
+          <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed animate-fade-up delay-100">
+            Something happened. You don't know if you overreacted, if they crossed a line, or if this is the same thing that always happens. Defrag shows you what is actually active — beneath the argument, the silence, the message, or the grief.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="https://app.defrag.app/app/login" className="btn-primary">Enter the Defrag space</Link>
-            <Link href="/how-it-works" className="btn-secondary">See how it works</Link>
+          <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
+            <Link href={APP_URL} className="btn-primary">Open Defrag</Link>
+            <Link href="/pricing" className="btn-secondary">See plans</Link>
           </div>
         </Container>
-      </Section>
+      </section>
 
-      {/* What it surfaces */}
-      <Section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/5">
+      {/* ── WHAT IT SURFACES ── */}
+      <section className="w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/5">
         <Container>
-          <div className="flex flex-col lg:flex-row gap-16 items-start">
-            <div className="lg:w-80 shrink-0 lg:sticky lg:top-32">
-              <MetaLabel>What Defrag surfaces</MetaLabel>
-              <h2 className="font-serif text-3xl md:text-4xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-4">
-                A structured Result.
-                <br />
-                Not a paragraph.
-              </h2>
-              <p className="text-[#76716b] text-sm leading-relaxed">
-                Every section is named. Every section is usable. Save it to your Library before the moment disappears.
-              </p>
-            </div>
-            <div className="flex-1 flex flex-col gap-0 rounded-2xl border border-white/[0.06] overflow-hidden">
-              {WHAT_IT_SURFACES.map((item, i) => (
-                <div
-                  key={item.label}
-                  className={[
-                    "flex items-start gap-5 p-6 md:p-8 bg-[#08070a] hover:bg-[#0c0a0d] transition-colors",
-                    i < WHAT_IT_SURFACES.length - 1 ? "border-b border-white/[0.06]" : "",
-                  ].join(" ")}
-                >
-                  <span className="font-mono text-[#e0743a]/40 text-xs mt-0.5 shrink-0 w-5">{String(i + 1).padStart(2, "0")}</span>
+          <MetaLabel>What Defrag surfaces</MetaLabel>
+          <AnimatedHeading className="text-3xl md:text-5xl tracking-[-0.02em] max-w-2xl leading-tight mb-14">
+            Seven structured outputs. One clear thread.
+          </AnimatedHeading>
+
+          <div className="max-w-3xl flex flex-col gap-0">
+            {[
+              { label: "Active pattern", body: "What is currently active beneath the surface of the moment — the pattern firing, not the symptom." },
+              { label: "What keeps happening", body: "The recurring loop that shows up across different situations, relationships, and roles." },
+              { label: "Default mode", body: "The pattern you learned to carry under pressure. The role you default into before you realize it." },
+              { label: "What shaped this", body: "Where the pattern came from. Not as an excuse — as context for why it keeps showing up." },
+              { label: "Under pressure", body: "How the pattern behaves when the stakes are high. What it costs you when it fires." },
+              { label: "What's working", body: "The gift underneath the strain. What the pattern is actually trying to protect." },
+              { label: "Suggested response", body: "The clearest next response — grounded in your Baseline Design, not in the heat of the moment." },
+            ].map((item, i) => (
+              <TextReveal key={item.label} delay={i * 60}>
+                <div className="flex items-start gap-8 py-7 border-b border-white/[0.06] last:border-0">
+                  <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.2em] shrink-0 w-6 mt-1">{String(i + 1).padStart(2, "0")}</span>
                   <div>
-                    <h3 className="text-[#f4efe9] text-sm font-medium mb-1">{item.label}</h3>
-                    <p className="text-[#a8a29a] text-sm leading-relaxed">{item.body}</p>
+                    <h3 className="text-[#f4efe9] font-medium text-base mb-1">{item.label}</h3>
+                    <p className="text-sm text-[#a8a29a] leading-relaxed max-w-lg">{item.body}</p>
                   </div>
                 </div>
-              ))}
-            </div>
+              </TextReveal>
+            ))}
           </div>
         </Container>
-      </Section>
+      </section>
 
-      {/* What it supports */}
-      <Section className="w-full py-20 bg-[#0c0a0d] border-t border-white/5">
-        <Container className="max-w-3xl">
-          <MetaLabel>What Defrag supports</MetaLabel>
-          <h2 className="font-serif text-3xl md:text-4xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-10 text-balance">
-            A broad relational intelligence space.
-          </h2>
-          <div className="flex flex-col gap-0">
-            {SUPPORTS.map((s, i) => (
-              <div key={s} className="flex items-center gap-6 py-5 border-b border-white/[0.06] last:border-0">
-                <span className="font-serif text-2xl text-[#e0743a]/30 shrink-0 w-8">{String(i + 1).padStart(2, "0")}</span>
-                <p className="text-[15px] text-[#f4efe9]">{s}</p>
+      {/* ── USE CASES ── */}
+      <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/5">
+        <Container>
+          <MetaLabel>Where it helps</MetaLabel>
+          <AnimatedHeading className="text-3xl md:text-5xl tracking-[-0.02em] max-w-2xl leading-tight mb-14">
+            The situations Defrag is built for.
+          </AnimatedHeading>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-w-3xl">
+            {[
+              "Relational dynamics — what is actually happening between you",
+              "Family roles — the patterns that activate when you go home",
+              "Boundaries — what you are actually protecting and why",
+              "Messages — the text you don't know how to respond to",
+              "Grief — what the loss is asking of you",
+              "Team pressure — the dynamic that keeps slowing things down",
+              "Parenting — the moment you don't want to repeat",
+              "The conversation you keep rehearsing but never have",
+            ].map((item, i) => (
+              <div key={i} className="flex items-start gap-4 py-5 border-b border-white/[0.06]">
+                <span className="w-1 h-1 rounded-full bg-[#e0743a]/60 shrink-0 mt-2.5" />
+                <p className="text-sm md:text-[15px] text-[#a8a29a] leading-relaxed">{item}</p>
               </div>
             ))}
           </div>
         </Container>
-      </Section>
+      </section>
 
-      {/* Baseline Design */}
-      <Section className="w-full py-20 bg-[#08070a] border-t border-white/5">
-        <Container className="max-w-3xl">
-          <MetaLabel>Grounded in your Baseline Design</MetaLabel>
-          <h2 className="font-serif text-3xl md:text-4xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-6 text-balance">
-            The system understands you before you type.
-          </h2>
-          <p className="text-[#a8a29a] text-base leading-relaxed mb-4">
-            Your Baseline Design maps your emotional architecture, relational tendencies, and processing style. It is active beneath every Defrag thread — injected as hidden context into every response. Never exposed in outputs.
-          </p>
-          <p className="text-[#76716b] text-sm leading-relaxed">
-            No frameworks to learn. No right way to phrase it. Say it how it actually happened.
-          </p>
-        </Container>
-      </Section>
+      {/* ── HOW IT WORKS ── */}
+      <section className="w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/5">
+        <Container className="max-w-2xl">
+          <MetaLabel>How it works</MetaLabel>
+          <AnimatedHeading className="text-3xl md:text-5xl tracking-[-0.02em] leading-tight mb-14">
+            Say it how it actually happened.
+          </AnimatedHeading>
 
-      {/* CTA */}
-      <Section className="w-full py-24 bg-[#0c0a0d] border-t border-white/5 relative overflow-hidden">
-        <div className="light-beam opacity-40" aria-hidden />
-        <Container className="relative z-10 text-center max-w-2xl mx-auto">
-          <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-8 text-balance">
-            Save what helped before the moment disappears.
-          </h2>
-          <Link href="https://app.defrag.app/app/login" className="btn-primary">Enter the Defrag space</Link>
+          <div className="flex flex-col gap-0">
+            {[
+              { num: "01", title: "Describe the situation", copy: "The argument, the silence, the message, the grief. No framework required. Say it plainly." },
+              { num: "02", title: "Defrag reads your Baseline Design", copy: "Your birth data maps how you tend to process pressure, conflict, connection, and repair. It is active beneath every result." },
+              { num: "03", title: "Receive a structured result", copy: "Seven outputs. The active pattern, the repeat, the default mode, what shaped it, how it behaves under pressure, what is working, and the clearest next response." },
+              { num: "04", title: "Save to your Library", copy: "Save the result before the moment disappears. Return to it before the old pattern takes over again." },
+            ].map((step, idx) => (
+              <div key={step.num} className="flex items-start gap-8 py-8 border-b border-white/[0.06] last:border-0">
+                <span className="font-serif text-3xl text-[#e0743a]/50 shrink-0 w-10">{step.num}</span>
+                <div>
+                  <h3 className="text-[#f4efe9] font-medium text-lg mb-1">{step.title}</h3>
+                  <p className="text-sm text-[#a8a29a] leading-relaxed">{step.copy}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </Container>
-      </Section>
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="relative w-full py-24 md:py-32 bg-[#08070a] border-t border-white/5 overflow-hidden">
+        <div className="light-beam" aria-hidden />
+        <Container className="relative z-10 flex flex-col items-center text-center">
+          <AnimatedHeading className="text-4xl md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
+            See what is actually active.
+          </AnimatedHeading>
+          <TextReveal delay={200}>
+            <p className="mt-6 max-w-md text-base text-[#a8a29a] leading-relaxed">
+              Open Defrag and describe the moment. Your Baseline Design is already waiting.
+            </p>
+          </TextReveal>
+          <div className="mt-9 flex flex-col sm:flex-row gap-3">
+            <Link href={APP_URL} className="btn-primary">Open Defrag</Link>
+            <Link href="/pricing" className="btn-secondary">See plans</Link>
+          </div>
+        </Container>
+      </section>
+
     </SiteShell>
-  );
+  )
 }
