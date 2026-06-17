@@ -556,7 +556,17 @@ export default function DefragPage() {
         )}
 
         {result && (
-          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8">
+          <ResultCard
+            result={result}
+            input={input}
+            spaceName="Defrag"
+            onSave={handleSave}
+            isSaving={isSaving}
+            saveSuccess={saveSuccess}
+          />
+        )}
+        {result && false && (
+          <div className="hidden">
 
             <Section label="Active pattern"       value={result.activePattern} />
             <Section label="What keeps happening" value={result.theRepeat} />
