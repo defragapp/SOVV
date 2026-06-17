@@ -16,9 +16,10 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci
+        working-directory: apps/worker
       - name: Deploy to Production
         working-directory: apps/worker
-        run: npx wrangler deploy --env production
+        run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
@@ -32,6 +33,7 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci
+        working-directory: apps/worker-session
       - name: Deploy to Production
         working-directory: apps/worker-session
         run: npx wrangler deploy --env production
@@ -48,6 +50,7 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci
+        working-directory: apps/worker-ai
       - name: Deploy to Production
         working-directory: apps/worker-ai
         run: npx wrangler deploy --env production
@@ -61,12 +64,7 @@ jobs:
       - name: Web app deploys via Cloudflare Workers Builds dashboard
         run: |
           echo "The web app (sovv-web) is deployed automatically by Cloudflare Workers Builds"
-          echo "when commits are pushed to main. Build settings:"
-          echo "  Build command: npm install"
-          echo "  Deploy command: npm run deploy"
-          echo "  Root directory: apps/web"
-          echo ""
-          echo "Deploy script: next build && pnpm exec opennextjs-cloudflare build && pnpm exec wrangler deploy --env production"
+          echo "when commits are pushed to main."
 
   deploy-developer:
     name: Deploy Developer Agent
@@ -78,6 +76,7 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci
+        working-directory: apps/developer
       - name: Deploy to Production
         working-directory: apps/developer
         run: npx wrangler deploy --env production
@@ -94,6 +93,7 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci
+        working-directory: apps/sovereign-build-agent
       - name: Deploy to Production
         working-directory: apps/sovereign-build-agent
         run: npx wrangler deploy --env production
@@ -110,6 +110,7 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci
+        working-directory: apps/sovereign-code-agent
       - name: Deploy to Production
         working-directory: apps/sovereign-code-agent
         run: npx wrangler deploy --env production
