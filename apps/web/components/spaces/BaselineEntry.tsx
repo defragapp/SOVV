@@ -207,7 +207,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                     <button
                       type="submit"
                       disabled={!dob || !pob || (precision !== "unknown" && !tob)}
-                      className="mt-2 w-full h-12 rounded-full bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
+                      className="mt-2 w-full h-12 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
                     >
                       Set Baseline Design
                     </button>
