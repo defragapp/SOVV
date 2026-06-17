@@ -1,7 +1,7 @@
 import type { D1Database, R2Bucket, Ai, KVNamespace, SendEmail, Queue, Fetcher } from "@cloudflare/workers-types";
 
 export interface Env {
-  RATE_LIMITER?: any;
+  RATE_LIMITER?: { limit: (opts: { key: string }) => Promise<{ success: boolean }> }
   // ── Storage ──────────────────────────────────────────────────────────────
   // D1 — Sovereign.os platform database (Cloudflare dashboard name: vibesdk-db)
   DB: D1Database
@@ -41,7 +41,6 @@ export interface Env {
   QUEUE?: Queue
 
   // Used for optional rate limiting in index.ts (unsafe binding in wrangler.toml).
-  RATE_LIMITER?: { limit: (opts: { key: string }) => Promise<{ success: boolean }> };
 
 
   // ── Stripe ───────────────────────────────────────────────────────────────
