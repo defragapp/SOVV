@@ -1,6 +1,6 @@
 "use client"
 import * as React from "react"
-import { SpaceShell } from "@/components/workspace/space-shell"
+import { SpaceShell } from "@/components/spaces/space-shell"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
