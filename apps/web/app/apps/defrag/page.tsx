@@ -352,7 +352,7 @@ export default function DefragPage() {
             </p>
             <a
               href="/settings"
-              className="inline-flex h-8 px-4 rounded-full bg-[#f4efe9] text-[#08070a] text-[11px] font-medium items-center hover:opacity-90 transition-opacity"
+              className="inline-flex h-8 px-4 rounded-xl bg-[#f4efe9] text-[#08070a] text-[11px] font-medium items-center hover:opacity-90 transition-opacity"
             >
               Add birth data →
             </a>
@@ -405,7 +405,7 @@ export default function DefragPage() {
           <button
             onClick={handleSave}
             disabled={isSaving || saveSuccess}
-            className="w-full h-9 rounded-full bg-[#f4efe9] text-[#08070a] text-[12px] font-medium tracking-tight hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed mb-5"
+            className="w-full h-9 rounded-xl bg-[#f4efe9] text-[#08070a] text-[12px] font-medium tracking-tight hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed mb-5"
           >
             {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save to Sovereign"}
           </button>
@@ -654,7 +654,7 @@ export default function DefragPage() {
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
-              className="h-8 px-5 rounded-full bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+              className="h-8 px-5 rounded-xl bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {isLoading ? "…" : "Defrag"}
             </button>
