@@ -154,7 +154,7 @@ export default function AlignmentPage() {
           <button
             onClick={handleSave}
             disabled={isSaving || saveSuccess}
-            className="w-full h-9 rounded-full bg-[#f4efe9] text-[#08070a] text-[12px] font-medium tracking-tight hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full h-9 rounded-xl bg-[#f4efe9] text-[#08070a] text-[12px] font-medium tracking-tight hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save to Library"}
           </button>
@@ -267,7 +267,7 @@ export default function AlignmentPage() {
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
-              className="h-8 px-5 rounded-full bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+              className="h-8 px-5 rounded-xl bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {isLoading ? "…" : "Align"}
             </button>
