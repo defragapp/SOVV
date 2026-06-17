@@ -6,7 +6,7 @@ account_id = "8b1954d216d65077c6480d62583fe2c2"
 workers_dev = false
 
 [[routes]]
-pattern = "ai.defrag.app/*"
+pattern = "ai.defrag.app"
 custom_domain = true
 
 [ai]
@@ -29,7 +29,7 @@ name = "worker-ai"
 workers_dev = false
 
 [[env.production.routes]]
-pattern = "ai.defrag.app/*"
+pattern = "ai.defrag.app"
 custom_domain = true
 
 [env.production.ai]
