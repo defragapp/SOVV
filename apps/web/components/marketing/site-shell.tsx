@@ -69,16 +69,10 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-4">
             <Link
               href="https://app.defrag.app/app/login"
-              className="hidden sm:block text-body-sm text-[#76716b] hover:text-[#f4efe9] transition-colors"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="https://app.defrag.app/app/login"
               className="hidden sm:inline-flex items-center justify-center h-9 px-5 text-sm font-medium bg-[#f4efe9] text-[#08070a] transition-all hover:opacity-90"
               style={{ borderRadius: 8 }}
             >
-              Enter
+              Sign in
             </Link>
             {/* Mobile menu toggle — inline SVG, no Lucide */}
             <button
