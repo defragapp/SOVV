@@ -11,9 +11,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Upload to R2
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          command: |
-            find . -type f -not -path './.git/*' -exec wrangler r2 object put sovv-codebase/SOVV/{} --file={} \;
+      - name: Install wrangler
+        run: npm install -g wrangler@latest
+
+      - name: Sync repo to R2
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          echo "Syncing repo files to R2 bucket sovv-codebase..."
+          find . -type f \
+            -not -path './.git/*' \
+            -not -path './node_modules/*' \
+            -not -path './.wrangler/*' \
+            -not -name '*.sqlite' \
+            -not -name '*.sqlite-shm' \
+            -not -name '*.sqlite-wal' \
+            -not -name 'pnpm-lock.yaml' \
+            -not -name 'package-lock.json' \
+            | while read -r file; do
+              key="SOVV/${file#./}"
+              wrangler r2 object put "sovv-codebase/${key}" --file="${file}" --content-type="text/plain" 2>/dev/null || true
+            done
+          echo "Sync complete."
