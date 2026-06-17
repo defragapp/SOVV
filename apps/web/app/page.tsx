@@ -9,17 +9,25 @@ import { motion, AnimatePresence } from "framer-motion"
 const APP_URL = "https://app.defrag.app/app/login"
 const ease = [0.16, 1, 0.3, 1] as const
 
-// ── Interactive space preview ──────────────────────────────────────────────
+// ── High-value interactive space preview ───────────────────────────────────
+// Shows a real, specific, emotionally resonant prompt + full structured output
+// including Baseline Design chips — so the user sees exactly what they'd get
 function SpacePreview() {
   const [active, setActive] = React.useState<"context" | "thread" | "library">("thread")
   const [typed, setTyped] = React.useState("")
   const [showResult, setShowResult] = React.useState(false)
 
-  const DEMO_INPUT = "She went quiet after I said that. I don't know if I crossed a line or if she's just processing."
+  // A real, specific, high-stakes prompt — not generic
+  const DEMO_INPUT = "My brother called me out in front of the whole family at Thanksgiving. I didn't say anything. I've been replaying it for three days and I still don't know if I should have defended myself or if I'm making it bigger than it was."
+
   const DEMO_RESULT = {
-    pattern: "You moved fast when the silence felt like rejection — before you could find out what it actually meant.",
-    repeat: "The loop where you interpret quiet as withdrawal, then act to close the gap before it's confirmed.",
-    response: "Wait one full day before following up. Let her process without your anxiety filling the space.",
+    pattern: "You absorbed the hit publicly and went silent — not because you had nothing to say, but because speaking felt more dangerous than the wound itself.",
+    repeat: "The loop where you protect the room at your own expense, then spend days alone carrying what you didn't say.",
+    mode: "Peacekeeper under pressure. You learned early that keeping things calm was your job. That's still running — even when the cost is yours to pay.",
+    shaped: "This pattern didn't start at Thanksgiving. It started the first time staying quiet kept something from breaking.",
+    pressure: "Under pressure, you go inward. You absorb, replay, and self-edit — while the person who caused the wound moves on.",
+    working: "You're not conflict-avoidant. You're conflict-careful. That's different. The same instinct that kept you quiet is the one that keeps relationships intact.",
+    response: "You don't owe your brother a public confrontation. You owe yourself a private one. Write down exactly what you would have said. Then decide — not from the wound, but from what's actually true.",
   }
 
   React.useEffect(() => {
@@ -29,14 +37,14 @@ function SpacePreview() {
     let i = 0
     const interval = setInterval(() => {
       if (i < DEMO_INPUT.length) { setTyped(DEMO_INPUT.slice(0, i + 1)); i++ }
-      else { clearInterval(interval); setTimeout(() => setShowResult(true), 600) }
-    }, 26)
+      else { clearInterval(interval); setTimeout(() => setShowResult(true), 700) }
+    }, 22)
     return () => clearInterval(interval)
   }, [active])
 
   const panels = [
     { id: "context" as const, label: "Context", desc: "Your Baseline Design — active in every thread" },
-    { id: "thread" as const, label: "Defrag", desc: "Describe the moment. See the pattern." },
+    { id: "thread" as const, label: "Defrag", desc: "Describe the moment. See what's actually active." },
     { id: "library" as const, label: "Library", desc: "Save what helped. Return before the pattern takes over." },
   ]
 
@@ -48,6 +56,7 @@ function SpacePreview() {
         aria-hidden
       />
       <div className="relative border border-white/[0.08] bg-[#0c0a0d] overflow-hidden shadow-2xl" style={{ borderRadius: 18 }}>
+
         {/* Titlebar */}
         <div className="h-10 border-b border-white/[0.06] bg-[#08070a]/80 flex items-center px-4 gap-3">
           <div className="flex gap-1.5">
@@ -84,20 +93,23 @@ function SpacePreview() {
         </div>
 
         {/* Content */}
-        <div className="min-h-[280px] p-5">
+        <div className="min-h-[340px] p-5">
           <AnimatePresence mode="wait">
 
+            {/* Context — Baseline Design with real gate/channel chips */}
             {active === "context" && (
               <motion.div key="context" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }} className="flex flex-col gap-0">
-                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#a8a29a]/50 mb-4">Your Design</p>
+                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#a8a29a]/50 mb-4">Your Design · Apr 3 1990 · 7:42 AM · Chicago</p>
                 {[
-                  { s: "I naturally move fast when something needs a decision — sometimes before others are ready.", chips: ["Sun in Aries", "Gate 51"] },
-                  { s: "I tend to feel things deeply, even when I appear calm on the surface.", chips: ["Moon in Pisces", "Gate 55"] },
-                  { s: "I feel pressure to stay reliable, even when I'm running low.", chips: ["Saturn in Cap.", "Gate 38"] },
+                  { s: "I naturally move fast when something needs a decision — sometimes before others are ready.", chips: ["Sun in Aries", "Gate 51", "Channel 25-51"] },
+                  { s: "I tend to feel things deeply, even in situations where I appear calm on the surface.", chips: ["Moon in Pisces", "Gate 55"] },
+                  { s: "I naturally take the lead on starting things — conversations, plans, new directions.", chips: ["Channel 25-51", "Initiation"] },
+                  { s: "I feel internal pressure to stay reliable, even when I'm running low.", chips: ["Saturn in Cap.", "Gate 38"] },
+                  { s: "I notice when something is off in a relationship before it becomes visible to others.", chips: ["Venus in Taurus", "Gate 2"] },
                 ].map((item, i) => (
                   <motion.div key={i} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.08, duration: 0.3, ease }}
+                    transition={{ delay: i * 0.07, duration: 0.3, ease }}
                     className="py-3 border-b border-white/[0.04] last:border-0">
                     <p className="text-[11px] text-[#c8c2bc] leading-relaxed mb-1.5">{item.s}</p>
                     <div className="flex gap-1 flex-wrap">
@@ -107,15 +119,16 @@ function SpacePreview() {
                     </div>
                   </motion.div>
                 ))}
-                <p className="text-[9px] text-[#4f4b47] mt-3">Active in every result.</p>
+                <p className="text-[9px] text-[#4f4b47] mt-3">Active in every result. Never exposed in outputs.</p>
               </motion.div>
             )}
 
+            {/* Thread — real high-stakes prompt + full 7-output result */}
             {active === "thread" && (
               <motion.div key="thread" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }} className="flex flex-col gap-3">
-                <div className="border border-white/[0.08] bg-white/[0.02] p-3" style={{ borderRadius: 10 }}>
-                  <p className="text-[12px] text-[#f4efe9] leading-relaxed min-h-[36px]">
+                <div className="border border-white/[0.08] bg-white/[0.02] p-4" style={{ borderRadius: 10 }}>
+                  <p className="text-[12px] text-[#f4efe9] leading-relaxed min-h-[48px]">
                     {typed}<span className="inline-block w-0.5 h-3.5 bg-[#f4efe9]/60 ml-0.5 animate-pulse" />
                   </p>
                   <div className="flex justify-end mt-2">
@@ -130,13 +143,17 @@ function SpacePreview() {
                       {[
                         { label: "Active pattern", value: DEMO_RESULT.pattern },
                         { label: "What keeps happening", value: DEMO_RESULT.repeat },
-                        { label: "Suggested response", value: DEMO_RESULT.response },
+                        { label: "Default mode", value: DEMO_RESULT.mode },
+                        { label: "What shaped this", value: DEMO_RESULT.shaped },
+                        { label: "Under pressure", value: DEMO_RESULT.pressure },
+                        { label: "What's working", value: DEMO_RESULT.working },
+                        { label: "Suggested response", value: DEMO_RESULT.response, highlight: true },
                       ].map((row, i) => (
                         <motion.div key={row.label} initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.1, duration: 0.3, ease }}
-                          className="px-4 py-3 border-b border-white/[0.04] last:border-0">
+                          transition={{ delay: i * 0.08, duration: 0.3, ease }}
+                          className={`px-4 py-3 border-b border-white/[0.04] last:border-0 ${(row as any).highlight ? "bg-white/[0.02]" : ""}`}>
                           <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#e0743a]/50 mb-1">{row.label}</p>
-                          <p className="text-[11px] text-[#f4efe9] leading-relaxed">{row.value}</p>
+                          <p className={`text-[11px] leading-relaxed ${(row as any).highlight ? "text-[#f4efe9]" : "text-[#a8a29a]"}`}>{row.value}</p>
                         </motion.div>
                       ))}
                     </motion.div>
@@ -145,15 +162,16 @@ function SpacePreview() {
               </motion.div>
             )}
 
+            {/* Library */}
             {active === "library" && (
               <motion.div key="library" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }} className="flex flex-col gap-0">
                 <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#a8a29a]/50 mb-4">Saved results</p>
                 {[
-                  { space: "Defrag", title: "The boundary conversation", date: "Jun 14" },
-                  { space: "Alignment", title: "What is mine vs what is theirs", date: "Jun 11" },
-                  { space: "Defrag", title: "After the silence at dinner", date: "Jun 9" },
-                  { space: "Covenant", title: "Responsibility in family conflict", date: "Jun 7" },
+                  { space: "Defrag", title: "Thanksgiving — what I didn't say", date: "Nov 29" },
+                  { space: "Alignment", title: "What is mine to carry after the call", date: "Nov 26" },
+                  { space: "Defrag", title: "The message I almost sent at 2am", date: "Nov 18" },
+                  { space: "Covenant", title: "Responsibility when the family is watching", date: "Nov 12" },
                 ].map((item, i) => (
                   <motion.div key={i} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.07, duration: 0.3, ease }}
@@ -234,8 +252,8 @@ export default function Home() {
               },
               {
                 num: "03", name: "Alignment", href: "/product/alignment", tier: "Pro",
-                headline: "Turn insight into a usable response.",
-                body: "You understand what happened. Now you need to know what to do with it. Alignment shows you what is yours to carry, what belongs to the other side, and the one next step.",
+                headline: "Get back into your own lane.",
+                body: "Life pulls you off course. A conversation, a conflict, a decision — and suddenly you're reacting from somewhere that isn't you. Alignment uses your Baseline Design and the live sky above you to show you the path back.",
                 tags: "After Defrag · Before a hard conversation · After a conflict",
               },
             ].map((space, idx) => (
@@ -285,10 +303,10 @@ export default function Home() {
               <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">The notebook</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
-              Three panels. One thread. Everything connected.
+              This is what you actually get.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-md">
-              Your Baseline Design is on the left. The AI thread is in the center. Your Library is on the right. Click the panels to see how each one works.
+              A real prompt. A real result. Your Baseline Design active in the background — so every output is grounded in how you actually work.
             </p>
           </div>
           <SpacePreview />
