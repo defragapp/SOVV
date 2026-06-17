@@ -17,7 +17,7 @@
  *   - No jargon unless it's inside a chip label (e.g. "Gate 51")
  */
 
-import { IRequest } from "itty-router"
+import type { IRequest } from "itty-router"
 import { getAuthUser, jsonResponse } from "./auth.js"
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -39,7 +39,7 @@ interface Env {
   KV: KVNamespace
   AI: Ai
   AI_MODEL?: string
-  RATE_LIMITER?: RateLimiter
+  RATE_LIMITER?: { limit: (opts: { key: string }) => Promise<{ success: boolean }> }
 }
 
 // ─── Handler ───────────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ export async function handleDeriveProfile(
   }
 
   // 3. Build prompt for AI
-  const model = (env.AI_MODEL as BaseAiTextGenerationModels) ?? "@cf/meta/llama-3.1-8b-instruct-fast"
+  const model = (env.AI_MODEL as any) ?? "@cf/meta/llama-3.1-8b-instruct-fast"
   const systemPrompt = buildSystemPrompt()
   const userPrompt = buildUserPrompt(baseline)
 
