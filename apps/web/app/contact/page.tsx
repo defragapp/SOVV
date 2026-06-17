@@ -63,7 +63,7 @@ export default function ContactPage() {
                   "Any error message you saw",
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-4 text-[#a8a29a] text-sm">
-                    <span className="h-1 w-1 bg-[#e0743a]/40 rounded-full shrink-0" />
+                    <span className="h-1 w-1 bg-[#e0743a]/40 rounded-xl shrink-0" />
                     {item}
                   </li>
                 ))}
