@@ -38,11 +38,7 @@ command = "npm install && npm run build"
 
 [env.production]
 name = "worker-session"
-workers_dev = false
-
-[[env.production.routes]]
-pattern = "session.defrag.app"
-custom_domain = true
+workers_dev = true
 
 [env.production.ai]
 binding = "AI"
