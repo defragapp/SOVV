@@ -1,21 +1,120 @@
-import type { Metadata } from "next"
+'use client'
+import Link from "next/link"
+import * as React from "react"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
-import Link from "next/link"
-import { AnimatedHeading, TextReveal } from "@/components/marketing/animated-elements"
-
-export const metadata: Metadata = {
-  title: "Defrag — Sovereign.os",
-  description: "Defrag helps you understand what is active in the moment. See the pattern beneath the argument, the silence, the message, or the grief.",
-}
+import { motion, AnimatePresence } from "framer-motion"
 
 const APP_URL = "https://app.defrag.app/app/login"
+const ease = [0.16, 1, 0.3, 1] as const
 
-function MetaLabel({ children }: { children: React.ReactNode }) {
+// ── Interactive demo: shows a real Defrag result ───────────────────────────
+function DefragDemo() {
+  const scenarios = [
+    {
+      input: "She went quiet after I said that. I don't know if I crossed a line or if she's just processing.",
+      result: {
+        pattern: "You moved fast when the silence felt like rejection — before you could find out what it actually meant.",
+        repeat: "The loop where you interpret quiet as withdrawal, then act to close the gap before it's confirmed.",
+        mode: "Fixer. When something feels unresolved, you move toward it immediately — even when the other person needs space.",
+        response: "Wait one full day before following up. Let her process without your anxiety filling the space.",
+      },
+    },
+    {
+      input: "My dad made a comment at dinner that I can't stop thinking about. I don't know why it hit so hard.",
+      result: {
+        pattern: "The comment landed on something that was already there — a wound that predates this dinner.",
+        repeat: "The loop where a small moment from a parent carries the weight of every similar moment before it.",
+        mode: "Absorber. You take in what's said and carry it internally, replaying it until you find the meaning.",
+        response: "Ask yourself: what would I need to hear from him that I've never heard? That's what the comment is really about.",
+      },
+    },
+    {
+      input: "I keep saying yes to things I don't want to do. I don't know how to stop.",
+      result: {
+        pattern: "You're managing other people's discomfort at the cost of your own capacity.",
+        repeat: "The loop where saying no feels more dangerous than the cost of saying yes.",
+        mode: "Peacekeeper. You learned that keeping others comfortable kept things safe. That's still running.",
+        response: "The next time you feel the pull to say yes, pause for 24 hours before responding. The discomfort you're avoiding is theirs to hold.",
+      },
+    },
+  ]
+
+  const [active, setActive] = React.useState(0)
+  const [revealed, setRevealed] = React.useState(false)
+  const current = scenarios[active]
+
+  React.useEffect(() => {
+    setRevealed(false)
+    const t = setTimeout(() => setRevealed(true), 400)
+    return () => clearTimeout(t)
+  }, [active])
+
   return (
-    <div className="inline-flex items-center gap-2 mb-6">
-      <span className="h-px w-6 bg-[#e0743a]/60" />
-      <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">{children}</span>
+    <div className="w-full max-w-3xl mx-auto">
+      {/* Scenario tabs */}
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+        {scenarios.map((s, i) => (
+          <button
+            key={i}
+            onClick={() => setActive(i)}
+            className={`shrink-0 text-left px-4 py-2.5 border text-[11px] leading-snug transition-all duration-200 max-w-[200px] ${
+              active === i
+                ? "border-[#e0743a]/40 bg-[#e0743a]/5 text-[#f4efe9]"
+                : "border-white/[0.06] text-[#76716b] hover:border-white/[0.12] hover:text-[#a8a29a]"
+            }`}
+            style={{ borderRadius: 8 }}
+          >
+            {s.input.slice(0, 60)}…
+          </button>
+        ))}
+      </div>
+
+      {/* Input */}
+      <div className="border border-white/[0.08] bg-[#0c0a0d] p-5 mb-3" style={{ borderRadius: 14 }}>
+        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">What you described</p>
+        <p className="text-[14px] text-[#f4efe9] leading-relaxed">{current.input}</p>
+        <div className="flex justify-end mt-3">
+          <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#4f4b47]">↵ Defrag</span>
+        </div>
+      </div>
+
+      {/* Result */}
+      <AnimatePresence mode="wait">
+        {revealed && (
+          <motion.div
+            key={active}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease }}
+            className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden"
+            style={{ borderRadius: 14 }}
+          >
+            {[
+              { label: "Active pattern", value: current.result.pattern },
+              { label: "What keeps happening", value: current.result.repeat },
+              { label: "Default mode", value: current.result.mode },
+              { label: "Suggested response", value: current.result.response, highlight: true },
+            ].map((row, i) => (
+              <motion.div
+                key={row.label}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.08, duration: 0.3, ease }}
+                className={`px-5 py-4 border-b border-white/[0.05] last:border-0 ${row.highlight ? "bg-white/[0.02]" : ""}`}
+              >
+                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-1.5">{row.label}</p>
+                <p className={`text-[13px] leading-relaxed ${row.highlight ? "text-[#f4efe9]" : "text-[#a8a29a]"}`}>{row.value}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <p className="text-center font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mt-4">
+        Select a scenario above to see a real Defrag result
+      </p>
     </div>
   )
 }
@@ -25,107 +124,67 @@ export default function DefragProductPage() {
     <SiteShell>
 
       {/* ── HERO ── */}
-      <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[#08070a] overflow-hidden">
+      <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[#08070a] overflow-hidden border-b border-white/5">
         <div className="light-beam opacity-60" aria-hidden />
         <Container className="relative z-10 max-w-4xl">
-          <MetaLabel>Defrag</MetaLabel>
+          <div className="inline-flex items-center gap-2 mb-6">
+            <span className="h-px w-6 bg-[#e0743a]/60" />
+            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">Defrag · Free</span>
+          </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
             Separate the moment from the pattern.
           </h1>
           <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed animate-fade-up delay-100">
-            Something happened. You don't know if you overreacted, if they crossed a line, or if this is the same thing that always happens. Defrag shows you what is actually active — beneath the argument, the silence, the message, or the grief.
+            Something happened. You don't know if you overreacted, if they crossed a line, or if this is the same thing that always happens. Defrag shows you what is actually active — and gives you the clearest next response.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
-            <Link href={APP_URL} className="btn-primary">Open Defrag</Link>
+            <Link href={APP_URL} className="btn-primary">Open Defrag — Free</Link>
             <Link href="/pricing" className="btn-secondary">See plans</Link>
           </div>
+
+          {/* What it works on */}
+          <div className="mt-14 border-t border-white/[0.06] pt-10">
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-5">Works on</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Arguments that keep repeating",
+                "Messages you don't know how to answer",
+                "Family roles you keep falling into",
+                "Boundaries you can't hold",
+                "Grief that changes the room",
+                "Team dynamics that slow things down",
+                "Conversations you keep rehearsing",
+                "Silence that feels like rejection",
+              ].map((item) => (
+                <span
+                  key={item}
+                  className="text-[11px] text-[#76716b] border border-white/[0.06] px-3 py-1.5"
+                  style={{ borderRadius: 6 }}
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
         </Container>
       </section>
 
-      {/* ── WHAT IT SURFACES ── */}
+      {/* ── LIVE DEMO ── */}
       <section className="w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/5">
         <Container>
-          <MetaLabel>What Defrag surfaces</MetaLabel>
-          <AnimatedHeading className="text-3xl md:text-5xl tracking-[-0.02em] max-w-2xl leading-tight mb-14">
-            Seven structured outputs. One clear thread.
-          </AnimatedHeading>
-
-          <div className="max-w-3xl flex flex-col gap-0">
-            {[
-              { label: "Active pattern", body: "What is currently active beneath the surface of the moment — the pattern firing, not the symptom." },
-              { label: "What keeps happening", body: "The recurring loop that shows up across different situations, relationships, and roles." },
-              { label: "Default mode", body: "The pattern you learned to carry under pressure. The role you default into before you realize it." },
-              { label: "What shaped this", body: "Where the pattern came from. Not as an excuse — as context for why it keeps showing up." },
-              { label: "Under pressure", body: "How the pattern behaves when the stakes are high. What it costs you when it fires." },
-              { label: "What's working", body: "The gift underneath the strain. What the pattern is actually trying to protect." },
-              { label: "Suggested response", body: "The clearest next response — grounded in your Baseline Design, not in the heat of the moment." },
-            ].map((item, i) => (
-              <TextReveal key={item.label} delay={i * 60}>
-                <div className="flex items-start gap-8 py-7 border-b border-white/[0.06] last:border-0">
-                  <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.2em] shrink-0 w-6 mt-1">{String(i + 1).padStart(2, "0")}</span>
-                  <div>
-                    <h3 className="text-[#f4efe9] font-medium text-base mb-1">{item.label}</h3>
-                    <p className="text-sm text-[#a8a29a] leading-relaxed max-w-lg">{item.body}</p>
-                  </div>
-                </div>
-              </TextReveal>
-            ))}
+          <div className="flex flex-col items-center text-center mb-12">
+            <div className="inline-flex items-center gap-2 mb-6">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">See it work</span>
+            </div>
+            <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
+              Real inputs. Real results.
+            </h2>
+            <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-md">
+              This is what Defrag actually returns — four structured outputs that show you what's active and what to do next.
+            </p>
           </div>
-        </Container>
-      </section>
-
-      {/* ── USE CASES ── */}
-      <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/5">
-        <Container>
-          <MetaLabel>Where it helps</MetaLabel>
-          <AnimatedHeading className="text-3xl md:text-5xl tracking-[-0.02em] max-w-2xl leading-tight mb-14">
-            The situations Defrag is built for.
-          </AnimatedHeading>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-w-3xl">
-            {[
-              "Relational dynamics — what is actually happening between you",
-              "Family roles — the patterns that activate when you go home",
-              "Boundaries — what you are actually protecting and why",
-              "Messages — the text you don't know how to respond to",
-              "Grief — what the loss is asking of you",
-              "Team pressure — the dynamic that keeps slowing things down",
-              "Parenting — the moment you don't want to repeat",
-              "The conversation you keep rehearsing but never have",
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-4 py-5 border-b border-white/[0.06]">
-                <span className="w-1 h-1 rounded-full bg-[#e0743a]/60 shrink-0 mt-2.5" />
-                <p className="text-sm md:text-[15px] text-[#a8a29a] leading-relaxed">{item}</p>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* ── HOW IT WORKS ── */}
-      <section className="w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/5">
-        <Container className="max-w-2xl">
-          <MetaLabel>How it works</MetaLabel>
-          <AnimatedHeading className="text-3xl md:text-5xl tracking-[-0.02em] leading-tight mb-14">
-            Say it how it actually happened.
-          </AnimatedHeading>
-
-          <div className="flex flex-col gap-0">
-            {[
-              { num: "01", title: "Describe the situation", copy: "The argument, the silence, the message, the grief. No framework required. Say it plainly." },
-              { num: "02", title: "Defrag reads your Baseline Design", copy: "Your birth data maps how you tend to process pressure, conflict, connection, and repair. It is active beneath every result." },
-              { num: "03", title: "Receive a structured result", copy: "Seven outputs. The active pattern, the repeat, the default mode, what shaped it, how it behaves under pressure, what is working, and the clearest next response." },
-              { num: "04", title: "Save to your Library", copy: "Save the result before the moment disappears. Return to it before the old pattern takes over again." },
-            ].map((step, idx) => (
-              <div key={step.num} className="flex items-start gap-8 py-8 border-b border-white/[0.06] last:border-0">
-                <span className="font-serif text-3xl text-[#e0743a]/50 shrink-0 w-10">{step.num}</span>
-                <div>
-                  <h3 className="text-[#f4efe9] font-medium text-lg mb-1">{step.title}</h3>
-                  <p className="text-sm text-[#a8a29a] leading-relaxed">{step.copy}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <DefragDemo />
         </Container>
       </section>
 
@@ -133,16 +192,14 @@ export default function DefragProductPage() {
       <section className="relative w-full py-24 md:py-32 bg-[#08070a] border-t border-white/5 overflow-hidden">
         <div className="light-beam" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
-          <AnimatedHeading className="text-4xl md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
+          <h2 className="font-serif text-4xl md:text-6xl text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
             See what is actually active.
-          </AnimatedHeading>
-          <TextReveal delay={200}>
-            <p className="mt-6 max-w-md text-base text-[#a8a29a] leading-relaxed">
-              Open Defrag and describe the moment. Your Baseline Design is already waiting.
-            </p>
-          </TextReveal>
+          </h2>
+          <p className="mt-6 max-w-md text-base text-[#a8a29a] leading-relaxed">
+            Defrag is free. Open it and describe the moment. Your Baseline Design is already waiting.
+          </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3">
-            <Link href={APP_URL} className="btn-primary">Open Defrag</Link>
+            <Link href={APP_URL} className="btn-primary">Open Defrag — Free</Link>
             <Link href="/pricing" className="btn-secondary">See plans</Link>
           </div>
         </Container>
