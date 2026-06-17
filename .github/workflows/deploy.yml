@@ -79,9 +79,16 @@ jobs:
       - name: Install web deps
         working-directory: apps/web
         run: npm install
-      - name: Build with OpenNext
+      - name: Build Next.js
         working-directory: apps/web
-        run: npx @opennextjs/cloudflare build
+        run: npm run build 2>&1 | tee /tmp/nextbuild.txt; exit ${PIPESTATUS[0]}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          NODE_ENV: production
+      - name: Build OpenNext (Cloudflare)
+        working-directory: apps/web
+        run: npx @opennextjs/cloudflare build 2>&1 | tee /tmp/opennext.txt; exit ${PIPESTATUS[0]}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
@@ -91,12 +98,15 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-      - name: Upload web deploy log
+      - name: Upload build logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: wrangler-web-log
-          path: /tmp/wrangler-web.txt
+          name: web-build-logs
+          path: |
+            /tmp/nextbuild.txt
+            /tmp/opennext.txt
+            /tmp/wrangler-web.txt
           retention-days: 1
 
   deploy-developer:
