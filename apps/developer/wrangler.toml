@@ -10,7 +10,7 @@ class_name = "DeveloperAgent"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["DeveloperAgent"]
+new_sqlite_classes = ["DeveloperAgent"]
 
 [[r2_buckets]]
 binding = "DEVELOPER_ASSETS"
