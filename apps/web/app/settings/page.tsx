@@ -103,7 +103,7 @@ export default function SettingsPage() {
         {/* Title */}
         <div className="mb-14">
           <div className="flex items-center gap-3 mb-6">
-            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#76716b] border border-white/[0.08] px-2.5 py-1 rounded-full">
+            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#76716b] border border-white/[0.08] px-2.5 py-1" style={{ borderRadius: 6 }}>
               Baseline Design
             </span>
             <AnimatePresence>
@@ -227,7 +227,7 @@ export default function SettingsPage() {
             <button
               onClick={handleSave}
               disabled={saving || !baseline.dob || !baseline.pob}
-              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:bg-[#e8e2da] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-25 disabled:cursor-not-allowed disabled:transform-none"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-25 disabled:cursor-not-allowed" style={{ borderRadius: 12 }}
             >
               {saving ? (
                 <>
