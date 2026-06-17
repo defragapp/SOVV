@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
-  { href: "/product", label: "Product" },
   { href: "/product/defrag", label: "Defrag" },
   { href: "/product/covenant", label: "Covenant" },
   { href: "/product/alignment", label: "Alignment" },
@@ -16,19 +14,26 @@ const FOOTER_COLS = [
   {
     label: "Platform",
     links: [
-      { href: "/product", label: "Product" },
-      { href: "/how-it-works", label: "How it works" },
-      { href: "/use-cases", label: "Use cases" },
+      { href: "/product/defrag", label: "Defrag" },
+      { href: "/product/covenant", label: "Covenant" },
+      { href: "/product/alignment", label: "Alignment" },
       { href: "/pricing", label: "Pricing" },
+      { href: "/how-it-works", label: "How it works" },
     ],
   },
-  
+  {
+    label: "Company",
+    links: [
+      { href: "/about", label: "About" },
+      { href: "/principles", label: "Principles" },
+      { href: "/contact", label: "Contact" },
+    ],
+  },
   {
     label: "Legal",
     links: [
       { href: "/privacy", label: "Privacy" },
       { href: "/terms", label: "Terms" },
-      { href: "/contact", label: "Contact" },
     ],
   },
 ];
@@ -70,16 +75,26 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </Link>
             <Link
               href="https://app.defrag.app/app/login"
-              className="btn-primary h-9 px-5 text-sm hidden sm:inline-flex"
+              className="hidden sm:inline-flex items-center justify-center h-9 px-5 text-sm font-medium bg-[#f4efe9] text-[#08070a] transition-all hover:opacity-90"
+              style={{ borderRadius: 8 }}
             >
               Enter
             </Link>
+            {/* Mobile menu toggle — inline SVG, no Lucide */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden text-[#a8a29a] hover:text-[#f4efe9] transition-colors p-2"
               aria-label="Toggle menu"
             >
-              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+              {menuOpen ? (
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M4 4l12 12M16 4L4 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              )}
             </button>
           </div>
         </div>
