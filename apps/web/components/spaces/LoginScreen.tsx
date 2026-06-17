@@ -76,7 +76,7 @@ export default function LoginScreen() {
     setLoading(true)
     try {
       if (mode === "register" && turnstileSiteKey !== "" && !turnstileToken) {
-        setError("Complete bot verification to continue")
+        setError("Complete the verification below to continue.")
         return
       }
       const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register"
@@ -107,7 +107,7 @@ export default function LoginScreen() {
   return (
     <div className="relative flex min-h-[100dvh] w-full overflow-hidden bg-[#08070a]">
 
-      {/* Full-screen background image */}
+      {/* Full-screen background */}
       <Image
         src="/hero-light.png"
         alt="Warm light"
@@ -116,8 +116,6 @@ export default function LoginScreen() {
         sizes="100vw"
         className="object-cover object-center opacity-60"
       />
-
-      {/* Gradient overlays for legibility */}
       <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#08070a] via-[#08070a]/80 to-transparent" />
       <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#08070a] via-transparent to-[#08070a]/40" />
 
@@ -145,7 +143,7 @@ export default function LoginScreen() {
           </div>
 
           {/* Glass panel */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8">
+          <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: 20 }}>
 
             {/* Mode tabs */}
             <div className="mb-8 flex border-b border-white/[0.08]">
@@ -176,7 +174,8 @@ export default function LoginScreen() {
                   required
                   autoComplete="email"
                   placeholder="you@example.com"
-                  className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
+                  className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
+                  style={{ borderRadius: 12, fontSize: "16px" }}
                 />
               </div>
 
@@ -190,17 +189,21 @@ export default function LoginScreen() {
                   minLength={8}
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
                   placeholder="••••••••"
-                  className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
+                  className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
+                  style={{ borderRadius: 12, fontSize: "16px" }}
                 />
               </div>
 
+              {/* Turnstile — only on register */}
               {mode === "register" && (
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Verification</label>
                   {turnstileSiteKey ? (
                     <div ref={turnstileRef} className="min-h-[65px]" />
                   ) : (
-                    <p className="text-sm text-[#76716b] leading-relaxed">Bot verification not configured.</p>
+                    <p className="text-sm text-[#4f4b47] leading-relaxed">
+                      Bot verification not configured.
+                    </p>
                   )}
                 </div>
               )}
@@ -221,7 +224,8 @@ export default function LoginScreen() {
               <button
                 type="submit"
                 disabled={loading || !email || !password || (mode === "register" && turnstileSiteKey !== "" && !turnstileToken)}
-                className="mt-2 w-full h-12 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-30 disabled:cursor-not-allowed" style={{ borderRadius: 12 }}
+                className="mt-2 w-full h-12 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-30 disabled:cursor-not-allowed"
+                style={{ borderRadius: 12 }}
               >
                 {loading ? "···" : mode === "login" ? "Sign In" : "Create Account"}
               </button>
