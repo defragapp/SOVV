@@ -1,6 +1,7 @@
 "use client"
 import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface LibraryItem {
   id: string
@@ -12,10 +13,15 @@ interface LibraryItem {
 function Section({ label, value }: { label: string; value?: string }) {
   if (!value) return null
   return (
-    <div className="border-b border-white/[0.05] pb-6 mb-6 last:border-0 last:pb-0 last:mb-0">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="border-b border-white/[0.05] pb-6 mb-6 last:border-0 last:pb-0 last:mb-0"
+    >
       <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-2">{label}</p>
       <p className="text-[15px] text-[#f4efe9] leading-[1.7]">{value}</p>
-    </div>
+    </motion.div>
   )
 }
 
@@ -30,18 +36,19 @@ export default function CovenantPage() {
   const [libraryLoading, setLibraryLoading] = React.useState(true)
 
   React.useEffect(() => {
-    fetch("/api/history", { credentials: "include" })
+    fetch("/api/library?workspace_source=COVENANT", { credentials: "include" })
       .then(r => r.ok ? r.json() : { items: [] })
-      .then((d: any) => setLibrary((d.items || []).filter((i: any) => i.workspace_source === "COVENANT")))
+      .then((d: any) => setLibrary(d.items || []))
       .catch(() => {})
       .finally(() => setLibraryLoading(false))
   }, [saveSuccess])
 
   const handleSubmit = async () => {
-    if (!input.trim()) return
+    if (!input.trim() || isLoading) return
     setIsLoading(true)
     setError("")
     setSaveSuccess(false)
+    setResult(null)
     try {
       const res = await fetch("/api/covenant", {
         method: "POST",
@@ -50,10 +57,13 @@ export default function CovenantPage() {
         body: JSON.stringify({ message: input }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || data.message || "Failed to process")
+      if (!res.ok) {
+        setError(data.message || data.error || "Something went wrong.")
+        return
+      }
       setResult(data)
-    } catch (err: any) {
-      setError(err.message || "An error occurred.")
+    } catch {
+      setError("Unable to connect. Check your connection and try again.")
     } finally {
       setIsLoading(false)
     }
@@ -63,148 +73,179 @@ export default function CovenantPage() {
     if (!result) return
     setIsSaving(true)
     try {
+      const content = result.summary || result.covenant || input.slice(0, 300)
       const res = await fetch("/api/history", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ title: input.slice(0, 60) + (input.length > 60 ? "…" : ""), payload: result, workspace_source: "COVENANT" }),
+        body: JSON.stringify({
+          title: input.slice(0, 60) + (input.length > 60 ? "…" : ""),
+          content,
+          payload: result,
+          workspace_source: "COVENANT",
+        }),
       })
-      if (!res.ok) throw new Error("Failed to save")
+      if (!res.ok) throw new Error()
       setSaveSuccess(true)
     } catch { /* silent */ } finally {
       setIsSaving(false)
     }
   }
 
+  // ─── LEFT PANEL ────────────────────────────────────────────────────────────
   const sidebar = (
-    <div className="flex flex-col h-full">
-      <div className="px-5 py-4 border-b border-white/[0.06]">
-        <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#76716b]">Context</p>
+    <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+      <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Context</p>
       </div>
-      <div className="px-5 py-5 border-b border-white/[0.06]">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">Your Baseline Design</p>
-        <p className="text-xs text-[#76716b] leading-relaxed mb-3">
-          Active beneath every Covenant thread. Your emotional architecture and relational tendencies ground every reflection.
+      <div className="px-5 pt-6 pb-5">
+        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">About Covenant</p>
+        <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
+          Covenant holds the faith-context layer — the commitments, values, and relational agreements that shape how you move through the world.
         </p>
-        <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#e0743a]/60 hover:text-[#e0743a] transition-colors">
-          Edit Baseline Design →
-        </a>
-      </div>
-      <div className="px-5 py-5 flex-1">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">About Covenant</p>
-        <p className="text-xs text-[#76716b] leading-relaxed">
-          Faith-context reflection anchored in responsibility. Not as certainty. Not as performance. As faith connected to repair and the next honest step.
-        </p>
+        <div className="space-y-3">
+          {[
+            "Faith-context reflection",
+            "Values and commitments",
+            "Relational agreements",
+            "Grounded in your Baseline Design",
+          ].map((item) => (
+            <div key={item} className="flex items-start gap-2">
+              <span className="text-[#e0743a]/40 text-[10px] mt-0.5 shrink-0">✓</span>
+              <span className="text-[12px] text-[#76716b] leading-relaxed">{item}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
 
+  // ─── RIGHT PANEL ───────────────────────────────────────────────────────────
   const contextPanel = (
-    <div className="flex flex-col h-full">
-      <div className="px-5 py-4 border-b border-white/[0.06]">
-        <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#76716b]">Library</p>
+    <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+      <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Library</p>
       </div>
+
       {result && (
-        <div className="px-5 py-4 border-b border-white/[0.06]">
+        <div className="px-5 pt-5 pb-5 border-b border-white/[0.06]">
           <button
             onClick={handleSave}
             disabled={isSaving || saveSuccess}
-            className="w-full h-9 rounded-full bg-[#f4efe9] text-[#08070a] text-xs font-medium tracking-tight transition-all hover:scale-[1.02] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
+            className="w-full h-9 rounded-full bg-[#f4efe9] text-[#08070a] text-[12px] font-medium tracking-tight hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save Covenant Brief"}
+            {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save to Library"}
           </button>
         </div>
       )}
-      <div className="flex-1 overflow-y-auto">
+
+      <div className="flex-1">
         {libraryLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <span className="w-4 h-4 border border-white/20 border-t-[#f4efe9]/40 rounded-full animate-spin" />
+          <div className="flex justify-center py-10">
+            <span className="w-4 h-4 border border-white/[0.15] border-t-white/30 rounded-full animate-spin" />
           </div>
         ) : library.length === 0 ? (
-          <div className="px-5 py-8 text-center">
-            <p className="text-xs text-[#4f4b47] leading-relaxed">Covenant Briefs save here. Private, organized, and yours.</p>
-          </div>
+          <p className="text-[12px] text-[#76716b] leading-relaxed px-5 py-8 text-center">
+            Saved covenant sessions will appear here.
+          </p>
         ) : (
-          <div className="flex flex-col">
-            {library.map((item) => (
-              <div key={item.id} className="px-5 py-4 border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
-                <p className="text-[10px] text-[#4f4b47] mb-1">{new Date(item.created_at).toLocaleDateString()}</p>
-                <p className="text-sm text-[#a8a29a] leading-snug line-clamp-2">{item.title || "Covenant Brief"}</p>
+          library.map(item => (
+            <a
+              key={item.id}
+              href={`/apps/covenant/${item.id}`}
+              className="block px-5 py-4 border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors group"
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#76716b]">Covenant</span>
+                <span className="text-[10px] text-[#76716b]">
+                  {new Date(item.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                </span>
               </div>
-            ))}
-          </div>
+              <p className="text-[13px] text-[#a8a29a] group-hover:text-[#f4efe9] transition-colors leading-snug line-clamp-2">
+                {item.title}
+              </p>
+            </a>
+          ))
         )}
       </div>
     </div>
   )
 
+  // ─── CENTER PANEL ──────────────────────────────────────────────────────────
   const main = (
-    <div className="flex flex-col gap-6 h-full max-w-2xl mx-auto w-full">
-      {!result && !isLoading && (
-        <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 opacity-50 py-12">
-          <p className="font-serif text-xl text-[#f4efe9]">What are you walking through?</p>
-          <p className="text-sm text-[#a8a29a] leading-relaxed max-w-xs">
-            Describe the relationship, the grief, the decision, or the boundary. Covenant brings faith, reflection, and grounded discernment to what you are carrying.
-          </p>
-        </div>
-      )}
+    <div className="flex flex-col h-full">
+      <div className="h-11 px-6 flex items-center border-b border-white/[0.06] shrink-0">
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#f4efe9]">Covenant</span>
+      </div>
 
-      {result && (
-        <div className="flex-1 overflow-y-auto">
-          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-7 md:p-9">
-            {typeof result === "string" ? (
-              <p className="text-[15px] text-[#f4efe9] leading-[1.7]">{result}</p>
-            ) : (
-              <>
-                <Section label="Covenant Brief" value={result.brief || result.summary || result.response} />
-                <Section label="The moment feels like" value={result.moment_feels_like} />
-                <Section label="Story connection" value={result.story_connection} />
-                <Section label="Reflection" value={result.reflection} />
-                <Section label="Grounded discernment" value={result.discernment} />
-                <Section label="Responsibility" value={result.responsibility} />
-                <Section label="Repair" value={result.repair} />
-                <Section label="Reflection prompt" value={result.reflection_prompt} />
-                <Section label="Next honest step" value={result.next_step || result.nextStep} />
-                {!result.brief && !result.summary && !result.response && !result.moment_feels_like && (
-                  Object.entries(result).map(([key, val]) =>
-                    typeof val === "string" && val.length > 0
-                      ? <Section key={key} label={key.replace(/([A-Z_])/g, " $1").trim()} value={val} />
-                      : null
-                  )
-                )}
-              </>
-            )}
+      <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
+
+        {!result && !isLoading && !error && (
+          <div className="flex flex-col items-center justify-center text-center h-full gap-3">
+            <div
+              className="w-10 h-10 rounded-full border border-[#e0743a]/20 bg-[#e0743a]/5 flex items-center justify-center mb-2"
+              style={{ boxShadow: "0 0 24px rgba(224,116,58,0.08)" }}
+            >
+              <span className="text-[#e0743a]/60 text-sm">◎</span>
+            </div>
+            <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">
+              What covenant are you holding?
+            </p>
+            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
+              Describe a commitment, value, or relational agreement you want to examine or strengthen.
+            </p>
           </div>
-        </div>
-      )}
+        )}
 
-      {isLoading && (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <span className="w-6 h-6 border border-white/20 border-t-[#e0743a]/60 rounded-full animate-spin" />
-            <p className="text-sm text-[#76716b]">Reflecting…</p>
+        {isLoading && (
+          <div className="flex flex-col items-center justify-center h-full gap-4">
+            <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/60 rounded-full animate-spin" />
+            <p className="text-[13px] text-[#76716b]">Reflecting…</p>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="flex-none">
-        {error && <p className="text-sm text-red-400/80 text-center mb-3">{error}</p>}
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.15] transition-colors">
+        {error && (
+          <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">{error}</p>
+        )}
+
+        <AnimatePresence>
+          {result && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8"
+            >
+              <Section label="The covenant"       value={result.covenant} />
+              <Section label="What it protects"   value={result.whatItProtects} />
+              <Section label="Where it's tested"  value={result.whereItsTested} />
+              <Section label="The invitation"     value={result.theInvitation} />
+              <Section label="Summary"            value={result.summary} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <div className="flex-none px-6 pb-6">
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors">
           <textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Describe what you are walking through — the relationship, the grief, the decision, the boundary."
-            className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none min-h-[100px] text-sm p-5 leading-[1.75]"
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
+            onChange={e => setInput(e.target.value)}
+            placeholder="Describe the commitment or value you want to examine."
+            rows={3}
+            className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
+            onKeyDown={e => {
+              if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() }
+            }}
           />
-          <div className="flex justify-between items-center px-5 py-3 border-t border-white/[0.06]">
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">↵ Enter to run Covenant</span>
+          <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
+            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Run</span>
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
-              className="h-8 px-5 rounded-full bg-[#f4efe9] text-[#08070a] text-xs font-medium tracking-tight transition-all hover:scale-[1.02] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
+              className="h-8 px-5 rounded-full bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              {isLoading ? "…" : "Covenant"}
+              {isLoading ? "…" : "Reflect"}
             </button>
           </div>
         </div>
@@ -219,9 +260,9 @@ export default function CovenantPage() {
       contextPanel={contextPanel}
       main={main}
       mobileTabs={[
-        { id: "input", label: "Covenant", content: main },
-        { id: "context", label: "Context", content: sidebar },
-        { id: "library", label: "Library", content: contextPanel },
+        { id: "thread",  label: "Covenant", content: main },
+        { id: "context", label: "Context",  content: sidebar },
+        { id: "library", label: "Library",  content: contextPanel },
       ]}
     />
   )
