@@ -56,10 +56,6 @@ export async function handleSaveToLibrary(req: Request, env: Env) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  // Subscription gate for space route
-  const subGate = await requireActiveSubscription(user, req);
-  if (subGate) return subGate;
-
   try {
     const body = await req.json().catch(() => ({})) as any;
     const { title, content, payload, workspace_source } = body;
@@ -69,6 +65,13 @@ export async function handleSaveToLibrary(req: Request, env: Env) {
     }
     if (!["DEFRAG", "COVENANT", "ALIGNMENT"].includes(workspace_source)) {
        return new Response("Invalid workspace source", { status: 400 });
+    }
+
+    // Covenant and Alignment saves require Pro subscription
+    // Defrag saves are available on free tier
+    if (workspace_source !== "DEFRAG") {
+      const subGate = await requireActiveSubscription(user, req);
+      if (subGate) return subGate;
     }
 
     const id = crypto.randomUUID();
