@@ -90,7 +90,7 @@ export default function UpgradeBanner() {
           type="button"
           onClick={handleUpgrade}
           disabled={loading}
-          className="w-full h-12 rounded-full bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none mb-4"
+          className="w-full h-12 rounded-xl bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none mb-4"
         >
           {loading ? "···" : "Upgrade to Pro — $20/mo"}
         </button>
