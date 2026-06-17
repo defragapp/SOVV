@@ -25,6 +25,17 @@ function Section({ label, value }: { label: string; value?: string }) {
   )
 }
 
+function ScriptureChip({ text }: { text: string }) {
+  return (
+    <span
+      className="inline-block font-mono text-[8px] uppercase tracking-[0.12em] text-[#76716b] border border-white/[0.08] px-2 py-1"
+      style={{ borderRadius: 4 }}
+    >
+      {text}
+    </span>
+  )
+}
+
 export default function CovenantPage() {
   const [input, setInput] = React.useState("")
   const [result, setResult] = React.useState<any>(null)
@@ -73,7 +84,7 @@ export default function CovenantPage() {
     if (!result) return
     setIsSaving(true)
     try {
-      const content = result.summary || result.covenant || input.slice(0, 300)
+      const content = result.summary || result.covenant || result.pattern || input.slice(0, 300)
       const res = await fetch("/api/history", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -92,7 +103,7 @@ export default function CovenantPage() {
     }
   }
 
-  // ─── LEFT PANEL ────────────────────────────────────────────────────────────
+  // ─── LEFT PANEL — Context ──────────────────────────────────────────────────
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
@@ -101,18 +112,23 @@ export default function CovenantPage() {
       <div className="px-5 pt-6 pb-5">
         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">About Covenant</p>
         <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
-          Covenant holds the faith-context layer — the commitments, values, and relational agreements that shape how you move through the world.
+          Covenant connects what you're going through to the real human stories in Scripture. It doesn't preach. It shows you you're not alone — and this has been walked before.
         </p>
-        <div className="space-y-3">
+
+        {/* Biblical patterns quick reference */}
+        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#4f4b47] mb-3">Patterns it recognizes</p>
+        <div className="flex flex-col gap-2">
           {[
-            "Faith-context reflection",
-            "Values and commitments",
-            "Relational agreements",
-            "Grounded in your Baseline Design",
+            { feeling: "Misunderstood", figure: "Joseph" },
+            { feeling: "Betrayed", figure: "David" },
+            { feeling: "Overwhelmed", figure: "Moses" },
+            { feeling: "Tested", figure: "Job" },
+            { feeling: "Unseen", figure: "Hagar" },
+            { feeling: "Stuck", figure: "Abraham" },
           ].map((item) => (
-            <div key={item} className="flex items-start gap-2">
-              <span className="text-[#e0743a]/40 text-[10px] mt-0.5 shrink-0">✓</span>
-              <span className="text-[12px] text-[#76716b] leading-relaxed">{item}</span>
+            <div key={item.feeling} className="flex items-center justify-between py-1.5 border-b border-white/[0.03] last:border-0">
+              <span className="text-[11px] text-[#76716b] italic">"{item.feeling}"</span>
+              <span className="text-[10px] text-[#a8a29a]">{item.figure}</span>
             </div>
           ))}
         </div>
@@ -120,7 +136,7 @@ export default function CovenantPage() {
     </div>
   )
 
-  // ─── RIGHT PANEL ───────────────────────────────────────────────────────────
+  // ─── RIGHT PANEL — Library ─────────────────────────────────────────────────
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
@@ -132,7 +148,8 @@ export default function CovenantPage() {
           <button
             onClick={handleSave}
             disabled={isSaving || saveSuccess}
-            className="w-full h-9 rounded-xl bg-[#f4efe9] text-[#08070a] text-[12px] font-medium tracking-tight hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full h-9 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium tracking-tight hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ borderRadius: 8 }}
           >
             {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save to Library"}
           </button>
@@ -171,7 +188,7 @@ export default function CovenantPage() {
     </div>
   )
 
-  // ─── CENTER PANEL ──────────────────────────────────────────────────────────
+  // ─── CENTER PANEL — Thread ─────────────────────────────────────────────────
   const main = (
     <div className="flex flex-col h-full">
       <div className="h-11 px-6 flex items-center border-b border-white/[0.06] shrink-0">
@@ -183,16 +200,19 @@ export default function CovenantPage() {
         {!result && !isLoading && !error && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-3">
             <div
-              className="w-10 h-10 rounded-full border border-[#e0743a]/20 bg-[#e0743a]/5 flex items-center justify-center mb-2"
-              style={{ boxShadow: "0 0 24px rgba(224,116,58,0.08)" }}
+              className="w-10 h-10 flex items-center justify-center border border-[#e0743a]/20 bg-[#e0743a]/5 mb-2"
+              style={{ borderRadius: 10, boxShadow: "0 0 24px rgba(224,116,58,0.08)" }}
             >
-              <span className="text-[#e0743a]/60 text-sm">◎</span>
+              {/* Cross / plus SVG */}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 2v12M2 8h12" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
             </div>
             <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">
-              What covenant are you holding?
+              What are you walking through?
             </p>
             <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
-              Describe a commitment, value, or relational agreement you want to examine or strengthen.
+              Describe the moment, the feeling, or the situation. Covenant will find the story in Scripture that matches it.
             </p>
           </div>
         )}
@@ -200,7 +220,7 @@ export default function CovenantPage() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/60 rounded-full animate-spin" />
-            <p className="text-[13px] text-[#76716b]">Reflecting…</p>
+            <p className="text-[13px] text-[#76716b]">Finding the story…</p>
           </div>
         )}
 
@@ -216,22 +236,64 @@ export default function CovenantPage() {
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8"
             >
-              <Section label="The covenant"       value={result.covenant} />
-              <Section label="What it protects"   value={result.whatItProtects} />
-              <Section label="Where it's tested"  value={result.whereItsTested} />
-              <Section label="The invitation"     value={result.theInvitation} />
-              <Section label="Summary"            value={result.summary} />
+              {/* Biblical figure match */}
+              {result.figure && (
+                <div className="mb-6 pb-6 border-b border-white/[0.05]">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">Your moment matches</p>
+                  <p className="font-serif text-2xl text-[#f4efe9]">{result.figure}</p>
+                  {result.reference && (
+                    <p className="font-mono text-[10px] text-[#4f4b47] tracking-[0.12em] mt-1">{result.reference}</p>
+                  )}
+                </div>
+              )}
+
+              <Section label="The pattern you're in"     value={result.pattern} />
+              <Section label="Their story"               value={result.story} />
+              <Section label="What broke"                value={result.whatBroke} />
+              <Section label="How God met them"          value={result.howGodMet} />
+              <Section label="What they learned"         value={result.whatTheyLearned} />
+              <Section label="What this means for you"   value={result.forYou} />
+              <Section label="One grounded next step"    value={result.nextStep} />
+              <Section label="Summary"                   value={result.summary} />
+
+              {/* Scripture chips */}
+              {result.scriptures && result.scriptures.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-white/[0.05]">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Scripture to explore</p>
+                  <div className="flex flex-wrap gap-2">
+                    {result.scriptures.map((s: string, i: number) => (
+                      <ScriptureChip key={i} text={s} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Reflection prompts */}
+              {result.reflectionPrompts && result.reflectionPrompts.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-white/[0.05]">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Reflection prompts</p>
+                  <div className="flex flex-col gap-2">
+                    {result.reflectionPrompts.map((p: string, i: number) => (
+                      <div key={i} className="flex items-start gap-2.5">
+                        <span className="text-[#e0743a]/40 text-xs shrink-0 mt-0.5">—</span>
+                        <p className="text-[12px] text-[#76716b] leading-relaxed">{p}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
+      {/* Composer */}
       <div className="flex-none px-6 pb-6">
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors">
+        <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: 16 }}>
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Describe the commitment or value you want to examine."
+            placeholder="Describe what you're walking through. Be honest."
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             onKeyDown={e => {
@@ -243,7 +305,8 @@ export default function CovenantPage() {
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
-              className="h-8 px-5 rounded-xl bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+              className="h-8 px-5 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+              style={{ borderRadius: 8 }}
             >
               {isLoading ? "…" : "Reflect"}
             </button>
