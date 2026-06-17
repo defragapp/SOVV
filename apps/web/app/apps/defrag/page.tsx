@@ -1,6 +1,7 @@
 "use client"
 import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
+import { ResultCard } from "@/components/spaces/ResultCard"
 
 // ─── Types (exact shape from explain-extended.ts) ──────────────────────────
 
