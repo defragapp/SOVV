@@ -40,6 +40,17 @@ async function handleCreateInvite(req: Request, env: Env): Promise<Response> {
   const user = await getAuthUser(req, env.DB);
   if (!user) return jsonResponse({ error: "Unauthorized" }, 401);
 
+  // Per-user invite creation rate limit (10/day)
+  if (env.KV) {
+    const inviteKey = `invite-count:${user.id}:${new Date().toISOString().slice(0, 10)}`;
+    const raw = await env.KV.get(inviteKey);
+    const count = raw ? parseInt(raw, 10) : 0;
+    if (count >= 10) {
+      return jsonResponse({ error: "You've created too many invites today. Limit resets at midnight UTC." }, 429);
+    }
+    await env.KV.put(inviteKey, String(count + 1), { expirationTtl: 86400 });
+  }
+
   const body = await req.json().catch(() => ({})) as any;
   const { workspace_source, library_id, invite_mode, result_context } = body;
 
