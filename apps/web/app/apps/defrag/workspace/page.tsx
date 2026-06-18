@@ -434,5 +434,6 @@ export default function DefragWorkspacePage() {
         { id: "library", label: "Library", content: contextPanel },
       ]}
     />
+  </>
   )
 }
