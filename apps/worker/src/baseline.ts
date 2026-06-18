@@ -2,10 +2,11 @@ import type { Env } from "./types-env.js";
 import { safeJsonParse, type Baseline, type BaselineRequest } from "@sovereign/core";
 import { getSessionId, cookieHeader } from "./plan.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
-
+import { compileBaselineDataset, formatDatasetForAI, formatDatasetForApp, type BaselineDesignDataset } from "./baseline-compiler.js";
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
-const USER_KEY = (sid: string) => `user:${sid}`;
+const DATASET_KEY  = (sid: string) => `baseline-dataset:${sid}`;
+const USER_KEY     = (sid: string) => `user:${sid}`;
 
 function isValidBaseline(data: unknown): data is BaselineRequest {
   return (
@@ -35,6 +36,29 @@ export async function getBaseline(env: Env, sid: string): Promise<Baseline | nul
   return safeJsonParse<Baseline>(raw);
 }
 
+export async function getBaselineDataset(env: Env, sid: string): Promise<BaselineDesignDataset | null> {
+  const raw = await env.KV.get(DATASET_KEY(sid));
+  if (!raw) return null;
+  return safeJsonParse<BaselineDesignDataset>(raw);
+}
+
+// Returns AI-ready context string for use in prompts
+// Prefers computed dataset, falls back to raw baseline
+export async function getBaselineForAI(
+  env: Env,
+  sid: string,
+  app?: "defrag" | "alignment" | "covenant"
+): Promise<string> {
+  const dataset = await getBaselineDataset(env, sid);
+  if (dataset?.status === "ready" && dataset.aiDataset) {
+    return app ? formatDatasetForApp(dataset, app) : formatDatasetForAI(dataset);
+  }
+  // Fallback to raw baseline
+  const baseline = await getBaseline(env, sid);
+  if (!baseline) return "";
+  return formatBaseline(baseline);
+}
+
 export function formatBaseline(baseline: Baseline): string {
   const tob = baseline.tob.type === "exact" ? baseline.tob.value : `Approx ${baseline.tob.value}`;
   return `DOB: ${baseline.dob}\nTOB: ${tob}\nPOB: ${baseline.pob}`;
@@ -61,16 +85,20 @@ export async function saveBaseline(env: Env, sid: string, baseline: BaselineRequ
 
 export async function handleGetBaseline(req: Request, env: Env): Promise<Response> {
   const authErr = await requireSessionAuth(req, env);
-  if (authErr) {
-    return authErr;
-  }
+  if (authErr) return authErr;
 
-  // Baseline Design is accessible to all authenticated users (free + pro).
-  // It is required for onboarding and must not be gated behind subscription.
   const sid = await getSessionId(req);
   const baseline = await getBaseline(env, sid);
+
+  // Include dataset status if available
+  let datasetStatus: string | undefined;
+  if (baseline) {
+    const dataset = await getBaselineDataset(env, sid);
+    datasetStatus = dataset?.status;
+  }
+
   return Response.json(
-    { baseline },
+    { baseline, datasetStatus },
     {
       headers: {
         "set-cookie": cookieHeader(sid),
@@ -82,12 +110,8 @@ export async function handleGetBaseline(req: Request, env: Env): Promise<Respons
 
 export async function handleSaveBaseline(req: Request, env: Env): Promise<Response> {
   const authErr = await requireSessionAuth(req, env);
-  if (authErr) {
-    return authErr;
-  }
+  if (authErr) return authErr;
 
-  // Baseline Design can be saved by all authenticated users (free + pro).
-  // It is required for onboarding and must not be gated behind subscription.
   const sid = await getSessionId(req);
   const body = (await req.json().catch(() => null)) as unknown;
 
@@ -98,9 +122,51 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
     });
   }
 
+  // Save raw baseline immediately (non-blocking)
   const baseline = await saveBaseline(env, sid, body);
+
+  // Trigger dataset compilation in background (non-blocking)
+  // This means the user is never blocked waiting for computation
+  const aiModel = (env as any).AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
+
+  // Store a pending dataset record immediately so the UI can show status
+  const pendingDataset: BaselineDesignDataset = {
+    version: "baseline.v2",
+    status: "pending",
+    input: {
+      dob: body.dob,
+      tob: body.tob.value,
+      tobType: body.tob.type,
+      pob: body.pob,
+    },
+  };
+  await env.KV.put(DATASET_KEY(sid), JSON.stringify(pendingDataset));
+
+  // Compile in background using waitUntil if available, otherwise fire-and-forget
+  const compileAndStore = async () => {
+    try {
+      const dataset = await compileBaselineDataset(
+        { dob: body.dob, tob: body.tob.value, tobType: body.tob.type, pob: body.pob },
+        (env as any).AI,
+        aiModel
+      );
+      await env.KV.put(DATASET_KEY(sid), JSON.stringify(dataset));
+    } catch (err) {
+      console.error("[baseline-compiler] failed:", err);
+      const failedDataset: BaselineDesignDataset = {
+        ...pendingDataset,
+        status: "failed",
+        failureReason: String(err),
+      };
+      await env.KV.put(DATASET_KEY(sid), JSON.stringify(failedDataset));
+    }
+  };
+
+  // Fire and forget — don't await, don't block the response
+  compileAndStore().catch(console.error);
+
   return Response.json(
-    { baseline },
+    { baseline, datasetStatus: "pending" },
     {
       headers: {
         "set-cookie": cookieHeader(sid),
@@ -113,4 +179,28 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
 export function registerBaselineRoutes(router: any, getEnv: () => Env) {
   router.get("/api/baseline", async (req: Request) => handleGetBaseline(req, getEnv()));
   router.post("/api/baseline", async (req: Request) => handleSaveBaseline(req, getEnv()));
+
+  // Dataset status endpoint — lets the UI poll for compilation status
+  router.get("/api/baseline/dataset", async (req: Request) => {
+    const env = getEnv();
+    const authErr = await requireSessionAuth(req, env);
+    if (authErr) return authErr;
+
+    const sid = await getSessionId(req);
+    const dataset = await getBaselineDataset(env, sid);
+
+    if (!dataset) {
+      return Response.json({ status: "none" });
+    }
+
+    // Return status + aiDataset summary (not full framework data)
+    return Response.json({
+      status: dataset.status,
+      computedAt: dataset.computedAt,
+      failureReason: dataset.failureReason,
+      hasAIDataset: !!dataset.aiDataset,
+      identityAnchors: dataset.aiDataset?.identityAnchors ?? [],
+      traitCount: dataset.aiDataset?.derivedTraits?.length ?? 0,
+    });
+  });
 }
