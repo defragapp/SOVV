@@ -30,10 +30,7 @@ export async function setPlan(env: Env, sid: string, plan: Plan): Promise<void> 
  * Count resets daily based on UTC date.
  */
 
-export const PRO_DAILY_LIMIT = parseInt(
-  (typeof process !== "undefined" ? process.env?.PRO_DAILY_LIMIT : undefined) ?? "200",
-  10
-)
+export const PRO_DAILY_LIMIT = 200
 
 export async function checkProLimit(
   kv: KVNamespace,
