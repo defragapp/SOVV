@@ -241,7 +241,7 @@ Return this exact JSON shape:
   "likelyLoops": [{ "key": "key", "label": "Short loop label", "description": "1-2 lines", "trigger": "What activates it", "tags": ["tag1"] }],
   "pressurePattern": { "lines": ["line1", "line2"], "tags": ["tag1"] },
   "repairMoves": ["move1", "move2"],
-  "workspaceHref": "/apps/defrag"
+  "workspaceHref": "/apps/defrag/workspace"
 }`
 }
 
@@ -367,7 +367,7 @@ function buildDefragFallback(dataset: BaselineDesignDataset): DefragEntryTransla
       tags: traits[0]?.evidenceTags?.slice(0, 1) ?? [],
     },
     repairMoves: overlay?.repairMoves?.slice(0, 3) ?? ["Name what is actually yours to do right now."],
-    workspaceHref: "/apps/defrag",
+    workspaceHref: "/apps/defrag/workspace",
   }
 }
 
