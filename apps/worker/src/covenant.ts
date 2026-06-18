@@ -56,6 +56,10 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
       if (!message) {
         return new Response(JSON.stringify({ error: "Message is required" }), { status: 400, headers: { "Content-Type": "application/json" } });
       }
+      // Input length validation — prevent abuse
+      if (typeof message === "string" && message.length > 3000) {
+        return new Response(JSON.stringify({ error: "Message too long. Please keep it under 3000 characters." }), { status: 400, headers: { "Content-Type": "application/json" } });
+      }
 
       // Load computed baseline dataset (or fallback to raw baseline)
       let baselineContext = "";
