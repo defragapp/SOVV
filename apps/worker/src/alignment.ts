@@ -243,7 +243,6 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
     // Per-user daily soft cap for Pro AI routes
     if (env.KV) {
-      const { checkProLimit } = await import("./plan.js");
       const limitCheck = await checkProLimit(env.KV, user.id);
       if (!limitCheck.allowed) {
         return new Response(JSON.stringify({
