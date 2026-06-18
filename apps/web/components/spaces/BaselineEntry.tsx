@@ -5,26 +5,69 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { apiSaveBaseline } from "@/lib/api"
 
-type Precision = "exact" | "approximate" | "unknown"
+// Birth time knowledge modes — ask what the user knows, not what they can guess
+type TimeMode = "exact" | "approximate" | "window" | "unknown"
+type DayWindow = "early_morning" | "morning" | "noon" | "afternoon" | "evening" | "night"
 type Stage = "form" | "loading" | "success" | "error"
+
+const ease = [0.16, 1, 0.3, 1] as const
+
+// Map day windows to approximate times for the compiler
+const WINDOW_TIMES: Record<DayWindow, { time: string; uncertaintyMinutes: number }> = {
+  early_morning: { time: "05:00", uncertaintyMinutes: 120 },
+  morning:       { time: "09:00", uncertaintyMinutes: 180 },
+  noon:          { time: "12:00", uncertaintyMinutes: 90 },
+  afternoon:     { time: "15:00", uncertaintyMinutes: 180 },
+  evening:       { time: "19:00", uncertaintyMinutes: 120 },
+  night:         { time: "22:00", uncertaintyMinutes: 120 },
+}
+
+const WINDOW_LABELS: Record<DayWindow, string> = {
+  early_morning: "Early morning",
+  morning:       "Morning",
+  noon:          "Around noon",
+  afternoon:     "Afternoon",
+  evening:       "Evening",
+  night:         "Night",
+}
 
 export default function BaselineEntry({ onComplete }: { onComplete: () => void }) {
   const [dob, setDob] = useState("")
   const [tob, setTob] = useState("")
+  const [tobApprox, setTobApprox] = useState("")
+  const [approxRange, setApproxRange] = useState<"15" | "30" | "60" | "unsure">("30")
+  const [dayWindow, setDayWindow] = useState<DayWindow>("morning")
+  const [timeMode, setTimeMode] = useState<TimeMode | null>(null)
   const [pob, setPob] = useState("")
-  const [precision, setPrecision] = useState<Precision>("exact")
   const [stage, setStage] = useState<Stage>("form")
   const [errorMsg, setErrorMsg] = useState("")
 
+  const canSubmit = dob && pob && timeMode !== null
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!dob || !pob) return
-    if (precision !== "unknown" && !tob) return
+    if (!canSubmit) return
 
     setStage("loading")
 
-    const tobValue = precision === "unknown" ? "12:00" : tob
-    const tobType = precision === "exact" ? "exact" : "approx"
+    // Build the tob value and type based on what the user knows
+    let tobValue = "12:00"
+    let tobType: "exact" | "approx" = "approx"
+
+    if (timeMode === "exact" && tob) {
+      tobValue = tob
+      tobType = "exact"
+    } else if (timeMode === "approximate" && tobApprox) {
+      tobValue = tobApprox
+      tobType = "approx"
+    } else if (timeMode === "window") {
+      tobValue = WINDOW_TIMES[dayWindow].time
+      tobType = "approx"
+    } else {
+      // unknown — use noon as neutral midpoint, marked approx
+      tobValue = "12:00"
+      tobType = "approx"
+    }
 
     try {
       const result = await apiSaveBaseline({
@@ -66,7 +109,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.7, ease }}
           className="w-full max-w-md"
         >
 
@@ -78,7 +121,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
           </div>
 
           {/* Glass panel */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8">
+          <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: 20 }}>
 
             <AnimatePresence mode="wait">
 
@@ -105,7 +148,10 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                   exit={{ opacity: 0 }}
                   className="flex flex-col items-center gap-4 py-12 text-center"
                 >
-                  <div className="w-10 h-10 rounded-full border border-[#e0743a]/30 bg-[#e0743a]/10 flex items-center justify-center">
+                  <div
+                    className="w-10 h-10 border border-[#e0743a]/30 bg-[#e0743a]/10 flex items-center justify-center"
+                    style={{ borderRadius: 10 }}
+                  >
                     <span className="text-[#f0a06a] text-lg">✓</span>
                   </div>
                   <p className="font-serif text-xl text-[#f4efe9]">Your Baseline Design is ready.</p>
@@ -126,7 +172,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                     </p>
                   </div>
 
-                  <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-6">
 
                     {/* Date of birth */}
                     <div className="flex flex-col gap-2">
@@ -136,45 +182,163 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                         value={dob}
                         onChange={(e) => setDob(e.target.value)}
                         required
-                        className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07] [color-scheme:dark]"
-                        style={{ fontSize: "16px" }}
+                        className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07] [color-scheme:dark]"
+                        style={{ borderRadius: 12, fontSize: "16px" }}
                       />
                     </div>
 
-                    {/* Time of birth */}
-                    <div className="flex flex-col gap-2">
+                    {/* Time of birth — ask what they know */}
+                    <div className="flex flex-col gap-3">
                       <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Time of birth</label>
-                      <div className="flex gap-2 mb-2">
-                        {(["exact", "approximate", "unknown"] as Precision[]).map((p) => (
+                      <p className="text-sm text-[#76716b]">How much do you know?</p>
+
+                      <div className="flex flex-col gap-2">
+                        {([
+                          { mode: "exact" as TimeMode,       label: "I know the exact time" },
+                          { mode: "approximate" as TimeMode, label: "I know roughly when" },
+                          { mode: "window" as TimeMode,      label: "I only know the part of day" },
+                          { mode: "unknown" as TimeMode,     label: "I don't know" },
+                        ]).map(({ mode, label }) => (
                           <button
-                            key={p}
+                            key={mode}
                             type="button"
-                            onClick={() => setPrecision(p)}
-                            className={`flex-1 rounded-lg border py-2.5 text-xs font-mono uppercase tracking-wide transition-colors duration-200 ${
-                              precision === p
-                                ? "border-[#f4efe9]/40 text-[#f4efe9] bg-white/[0.05]"
-                                : "border-white/[0.08] text-[#76716b] hover:text-[#a8a29a]"
+                            onClick={() => setTimeMode(mode)}
+                            className={`flex items-center gap-3 px-4 py-3 border text-left text-sm transition-all duration-200 ${
+                              timeMode === mode
+                                ? "border-[#f4efe9]/30 bg-white/[0.05] text-[#f4efe9]"
+                                : "border-white/[0.08] text-[#76716b] hover:border-white/[0.16] hover:text-[#a8a29a]"
                             }`}
+                            style={{ borderRadius: 10 }}
                           >
-                            {p === "exact" ? "Exact" : p === "approximate" ? "Approx" : "Unknown"}
+                            <span
+                              className={`w-3.5 h-3.5 border shrink-0 flex items-center justify-center transition-colors ${
+                                timeMode === mode ? "border-[#f4efe9]/60 bg-[#f4efe9]/10" : "border-white/[0.2]"
+                              }`}
+                              style={{ borderRadius: "50%" }}
+                            >
+                              {timeMode === mode && (
+                                <span className="w-1.5 h-1.5 bg-[#f4efe9]" style={{ borderRadius: "50%" }} />
+                              )}
+                            </span>
+                            {label}
                           </button>
                         ))}
                       </div>
-                      {precision !== "unknown" && (
-                        <input
-                          type="time"
-                          value={tob}
-                          onChange={(e) => setTob(e.target.value)}
-                          required
-                          className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07] [color-scheme:dark]"
-                          style={{ fontSize: "16px" }}
-                        />
-                      )}
-                      {precision === "unknown" && (
-                        <p className="text-sm text-[#76716b] leading-relaxed">
-                          If the exact time is unknown, we will mark the Baseline Design as partial and keep the thread grounded in what is available.
-                        </p>
-                      )}
+
+                      {/* Conditional fields based on selection */}
+                      <AnimatePresence mode="wait">
+
+                        {/* Exact time */}
+                        {timeMode === "exact" && (
+                          <motion.div
+                            key="exact"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.25, ease }}
+                            className="flex flex-col gap-2"
+                          >
+                            <input
+                              type="time"
+                              value={tob}
+                              onChange={(e) => setTob(e.target.value)}
+                              required
+                              className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07] [color-scheme:dark]"
+                              style={{ borderRadius: 12, fontSize: "16px" }}
+                            />
+                          </motion.div>
+                        )}
+
+                        {/* Approximate time */}
+                        {timeMode === "approximate" && (
+                          <motion.div
+                            key="approximate"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.25, ease }}
+                            className="flex flex-col gap-3"
+                          >
+                            <input
+                              type="time"
+                              value={tobApprox}
+                              onChange={(e) => setTobApprox(e.target.value)}
+                              placeholder="About what time?"
+                              className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07] [color-scheme:dark]"
+                              style={{ borderRadius: 12, fontSize: "16px" }}
+                            />
+                            <div>
+                              <p className="text-xs text-[#4f4b47] mb-2">How close is that?</p>
+                              <div className="grid grid-cols-2 gap-2">
+                                {([
+                                  { val: "15" as const,     label: "Within 15 min" },
+                                  { val: "30" as const,     label: "Within 30 min" },
+                                  { val: "60" as const,     label: "Within 1 hour" },
+                                  { val: "unsure" as const, label: "Not sure" },
+                                ]).map(({ val, label }) => (
+                                  <button
+                                    key={val}
+                                    type="button"
+                                    onClick={() => setApproxRange(val)}
+                                    className={`px-3 py-2 border text-xs text-left transition-all duration-200 ${
+                                      approxRange === val
+                                        ? "border-[#f4efe9]/30 bg-white/[0.05] text-[#f4efe9]"
+                                        : "border-white/[0.08] text-[#76716b] hover:text-[#a8a29a]"
+                                    }`}
+                                    style={{ borderRadius: 8 }}
+                                  >
+                                    {label}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+
+                        {/* Part of day */}
+                        {timeMode === "window" && (
+                          <motion.div
+                            key="window"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.25, ease }}
+                            className="grid grid-cols-2 gap-2"
+                          >
+                            {(Object.entries(WINDOW_LABELS) as [DayWindow, string][]).map(([w, label]) => (
+                              <button
+                                key={w}
+                                type="button"
+                                onClick={() => setDayWindow(w)}
+                                className={`px-3 py-2.5 border text-sm text-left transition-all duration-200 ${
+                                  dayWindow === w
+                                    ? "border-[#f4efe9]/30 bg-white/[0.05] text-[#f4efe9]"
+                                    : "border-white/[0.08] text-[#76716b] hover:text-[#a8a29a]"
+                                }`}
+                                style={{ borderRadius: 8 }}
+                              >
+                                {label}
+                              </button>
+                            ))}
+                          </motion.div>
+                        )}
+
+                        {/* Unknown */}
+                        {timeMode === "unknown" && (
+                          <motion.div
+                            key="unknown"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.25, ease }}
+                          >
+                            <p className="text-sm text-[#76716b] leading-relaxed">
+                              The system will hold this lightly. Some time-sensitive details will be kept approximate — everything else will still be grounded in what is available.
+                            </p>
+                          </motion.div>
+                        )}
+
+                      </AnimatePresence>
                     </div>
 
                     {/* Place of birth */}
@@ -186,8 +350,8 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                         onChange={(e) => setPob(e.target.value)}
                         required
                         placeholder="City, Country"
-                        className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
-                        style={{ fontSize: "16px" }}
+                        className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
+                        style={{ borderRadius: 12, fontSize: "16px" }}
                       />
                     </div>
 
@@ -206,8 +370,9 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
                     <button
                       type="submit"
-                      disabled={!dob || !pob || (precision !== "unknown" && !tob)}
-                      className="mt-2 w-full h-12 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
+                      disabled={!canSubmit}
+                      className="mt-2 w-full h-12 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-30 disabled:cursor-not-allowed"
+                      style={{ borderRadius: 12 }}
                     >
                       Set Baseline Design
                     </button>
@@ -215,6 +380,11 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                   </form>
 
                   <p className="mt-6 text-center text-sm text-[#76716b]">
+                    If you don't know the exact time, choose what you know.
+                    The system will hold uncertain details lightly.
+                  </p>
+
+                  <p className="mt-2 text-center text-xs text-[#4f4b47]">
                     Private by design · Birth details are never shared or exposed in outputs.
                   </p>
 
