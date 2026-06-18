@@ -4,44 +4,44 @@ import { Container, Section } from "@/components/ui/layout-primitives";
 
 export const metadata: Metadata = {
   title: "Principles — Sovereign.os",
-  description: "The values that shape how Sovereign.os is built and how it works.",
+  description: "The core mechanics governing how Sovereign.os processes your inputs and protects your data.",
 };
 
 const PRINCIPLES = [
   {
     num: "01",
-    title: "Clarity over comfort",
-    body: "Sovereign.os is not designed to make you feel better. It is designed to help you see more clearly. Sometimes those are the same thing. Often they are not.",
+    title: "Radical Objectivity",
+    body: "Sovereign.os cuts through the emotional noise. It isn’t designed to just validate how you feel; it’s engineered to give you the exact facts of a dynamic so you can navigate it cleanly.",
   },
   {
     num: "02",
-    title: "Structure over story",
-    body: "Most confusion comes from being inside the story. Sovereign.os helps you see the structure beneath it — the Active pattern, the dynamic, the moment where something different was possible.",
+    title: "Data over narrative",
+    body: "You don’t need to rehash the entire story. We map the underlying structure of the conflict—identifying the active pattern, the exact trigger, and the smartest way forward.",
   },
   {
     num: "03",
-    title: "No diagnosis, no labels",
-    body: "Sovereign.os does not tell you what is wrong with you. It helps you understand how you work — and what tends to happen when you are under pressure.",
+    title: "Mapping, not labeling",
+    body: "We don’t pathologize. The system maps your cognitive and relational baseline to show you exactly how you operate under pressure, completely free from clinical labels.",
   },
   {
     num: "04",
-    title: "Insight that lands",
-    body: "Clarity that only lives in the mind is not clarity. Sovereign.os is designed to produce insight that lands — the kind you recognize as true, not just understand.",
+    title: "Immediate Utility",
+    body: "Theoretical advice doesn’t survive friction. Every output is designed to be instantly recognizable, deeply accurate, and ready to act on right now.",
   },
   {
     num: "05",
-    title: "Built for real life",
-    body: "Not for therapy sessions. Not for journaling. For the moment before you send the message. For the conversation that keeps repeating. For right now.",
+    title: "Built for the friction point",
+    body: "This isn’t a passive journal. It’s a precision tool built for the exact moment before you hit send, repeat a cycle, or walk into a difficult room.",
   },
   {
     num: "06",
-    title: "No jargon",
-    body: "Sovereign.os translates complex patterns into plain language. You do not need to understand the systems underneath it. You just need to understand yourself.",
+    title: "Zero Jargon",
+    body: "Complex relational dynamics, translated into plain English. You don’t need to learn a new psychological framework—you just get the answer.",
   },
   {
     num: "07",
-    title: "Private by design",
-    body: "Your Baseline Design and everything you share are held privately, encrypted, and never sold or exposed in outputs. What you bring stays yours.",
+    title: "Edge-Private Security",
+    body: "Your Baseline Design and session inputs are processed securely on Cloudflare edge infrastructure. Your personal data trains nothing. What happens in the workspace stays there.",
   },
 ];
 
@@ -65,10 +65,10 @@ export default function PrinciplesPage() {
         <Container className="relative z-10 flex flex-col items-center text-center max-w-[700px]">
           <MetaLabel>Principles</MetaLabel>
           <h1 className="font-serif text-[clamp(2.6rem,6vw,4.5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-6">
-            What we believe.
+            The architecture of clarity.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-[500px] text-balance leading-relaxed">
-            The values that shape how Sovereign.os is built and how it works.
+            The core mechanics governing how Sovereign.os processes your inputs and protects your data.
           </p>
         </Container>
       </Section>
