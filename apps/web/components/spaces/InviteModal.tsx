@@ -3,7 +3,6 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 const ease = [0.16, 1, 0.3, 1] as const
-const APP_URL = "https://app.defrag.app"
 
 interface InviteModalProps {
   open: boolean
@@ -20,7 +19,6 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
   const [copied, setCopied] = React.useState(false)
   const [error, setError] = React.useState("")
 
-  // Reset on open
   React.useEffect(() => {
     if (open) { setStep("idle"); setInviteUrl(""); setCopied(false); setError("") }
   }, [open])
@@ -56,29 +54,19 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
     setTimeout(() => setCopied(false), 2000)
   }
 
-  // mailto: fallback (Cloudflare Email Routing not yet configured)
   const emailInvite = () => {
     if (!inviteUrl) return
     const subject = encodeURIComponent("You've been invited into a private Sovereign.os reflection")
-    const body = encodeURIComponent(
-      "You've been invited to join a private reflection in Sovereign.os.
-
-" +
-      "Open the link to choose whether to add your side.
-" +
-      "The result only generates after you accept.
-
-" +
-      inviteUrl
-    )
-    window.open(`mailto:?subject=${subject}&body=${body}`, "_blank")
+    const bodyText = "You've been invited to join a private reflection in Sovereign.os.\n\nOpen the link to choose whether to add your side.\nThe result only generates after you accept.\n\n" + inviteUrl
+    const body = encodeURIComponent(bodyText)
+    window.open("mailto:?subject=" + subject + "&body=" + body, "_blank")
   }
 
-  // sms: fallback
   const smsInvite = () => {
     if (!inviteUrl) return
-    const body = encodeURIComponent(`You've been invited into a private Sovereign.os reflection: ${inviteUrl}`)
-    window.open(`sms:?body=${body}`, "_blank")
+    const bodyText = "You've been invited into a private Sovereign.os reflection: " + inviteUrl
+    const body = encodeURIComponent(bodyText)
+    window.open("sms:?body=" + body, "_blank")
   }
 
   if (!open) return null
@@ -87,7 +75,6 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -97,7 +84,6 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
             onClick={onClose}
           />
 
-          {/* Modal */}
           <motion.div
             initial={{ opacity: 0, y: 16, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -107,7 +93,6 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
           >
             <div className="border border-white/[0.10] bg-[#0c0a0d] shadow-2xl" style={{ borderRadius: 18 }}>
 
-              {/* Header */}
               <div className="px-6 pt-6 pb-4 border-b border-white/[0.06]">
                 <div className="flex items-center justify-between">
                   <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#a8a29a]">Invite privately</p>
@@ -119,14 +104,11 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
                 </div>
               </div>
 
-              {/* Body */}
               <div className="px-6 py-5">
 
                 {step === "idle" && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-                    <p className="text-[14px] text-[#f4efe9] leading-relaxed mb-2">
-                      Send a private link.
-                    </p>
+                    <p className="text-[14px] text-[#f4efe9] leading-relaxed mb-2">Send a private link.</p>
                     <p className="text-[13px] text-[#4f4b47] leading-relaxed mb-6">
                       They only see what is needed to join. Your raw Baseline Design and private details stay hidden. The result only generates after they accept.
                     </p>
@@ -143,7 +125,7 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
                 {step === "creating" && (
                   <div className="flex items-center justify-center py-8 gap-3">
                     <span className="w-4 h-4 border border-white/[0.15] border-t-white/40 rounded-full animate-spin" />
-                    <p className="text-[13px] text-[#4f4b47]">Creating your private link…</p>
+                    <p className="text-[13px] text-[#4f4b47]">Creating your private link...</p>
                   </div>
                 )}
 
@@ -151,19 +133,17 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
                   <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease }}>
                     <p className="text-[12px] text-[#4f4b47] mb-3">Your private link is ready.</p>
 
-                    {/* Link display */}
                     <div className="border border-white/[0.08] bg-white/[0.02] px-3 py-2.5 mb-4 flex items-center gap-2" style={{ borderRadius: 8 }}>
                       <p className="text-[11px] text-[#76716b] font-mono flex-1 truncate">{inviteUrl}</p>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={copyLink}
                         className="w-full h-10 border border-white/[0.10] text-[13px] text-[#f4efe9] hover:border-white/[0.22] transition-colors"
                         style={{ borderRadius: 8 }}
                       >
-                        {copied ? "Copied ✓" : "Copy link"}
+                        {copied ? "Copied" : "Copy link"}
                       </button>
                       <div className="grid grid-cols-2 gap-2">
                         <button
@@ -184,7 +164,7 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
                     </div>
 
                     <p className="text-[10px] text-[#2e2b28] text-center mt-4 leading-relaxed">
-                      Link expires in 7 days · Private by design
+                      Link expires in 7 days &middot; Private by design
                     </p>
                   </motion.div>
                 )}
