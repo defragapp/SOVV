@@ -1,6 +1,7 @@
 "use client"
 import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
+import { InviteModal } from "@/components/spaces/InviteModal"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 
@@ -43,6 +44,7 @@ export default function CovenantWorkspacePage() {
   const [isLoading, setIsLoading] = React.useState(false)
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
+  const [inviteOpen, setInviteOpen] = React.useState(false)
   const [error, setError] = React.useState("")
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
@@ -158,6 +160,13 @@ export default function CovenantWorkspacePage() {
             style={{ borderRadius: 8 }}
           >
             {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save to Library"}
+          </button>
+          <button
+            onClick={() => setInviteOpen(true)}
+            className="w-full h-8 border border-white/[0.08] text-[11px] text-[#76716b] hover:border-white/[0.16] hover:text-[#a8a29a] transition-colors mt-2"
+            style={{ borderRadius: 6 }}
+          >
+            Invite Privately
           </button>
         </div>
       )}
@@ -312,6 +321,12 @@ export default function CovenantWorkspacePage() {
   )
 
   return (
+    <>
+    <InviteModal
+      open={inviteOpen}
+      onClose={() => setInviteOpen(false)}
+      workspaceSource="COVENANT"
+    />
     <SpaceShell
       spaceName="Covenant"
       sidebar={sidebar}
