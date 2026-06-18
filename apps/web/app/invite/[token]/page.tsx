@@ -23,6 +23,8 @@ interface InviteResult {
   needs_baseline?: boolean
 }
 
+type Step = "preview" | "accepting" | "accepted" | "result" | "needs_baseline" | "error"
+
 export default function InvitePage() {
   const params = useParams()
   const router = useRouter()
@@ -31,15 +33,14 @@ export default function InvitePage() {
   const [invite, setInvite] = React.useState<InviteData | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState("")
-  const [step, setStep] = React.useState<"preview" | "accepting" | "accepted" | "result" | "needs_baseline" | "needs_auth">("preview")
+  const [step, setStep] = React.useState<Step>("preview")
   const [result, setResult] = React.useState<InviteResult | null>(null)
   const [saving, setSaving] = React.useState(false)
   const [saved, setSaved] = React.useState(false)
 
-  // Load invite data
   React.useEffect(() => {
     if (!token) return
-    fetch(`/api/invite/${token}`)
+    fetch("/api/invite/" + token)
       .then(r => r.ok ? r.json() : null)
       .then((d: InviteData | null) => {
         if (d) setInvite(d)
@@ -52,7 +53,7 @@ export default function InvitePage() {
   const handleAccept = async () => {
     setStep("accepting")
     try {
-      const res = await fetch(`/api/invite/${token}/accept`, {
+      const res = await fetch("/api/invite/" + token + "/accept", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -61,13 +62,12 @@ export default function InvitePage() {
       const data = await res.json() as any
 
       if (res.status === 401) {
-        // Not logged in — redirect to login with return URL
-        router.push(`/app/login?return=/invite/${token}`)
+        router.push("/app/login?return=/invite/" + token)
         return
       }
       if (data.needs_baseline) { setStep("needs_baseline"); return }
       if (data.accepted) { setStep("accepted"); generateResult() }
-      else setError(data.error || "Failed to accept invite")
+      else { setError(data.error || "Failed to accept invite"); setStep("error") }
     } catch {
       setError("Unable to connect. Try again.")
       setStep("preview")
@@ -76,7 +76,7 @@ export default function InvitePage() {
 
   const generateResult = async () => {
     try {
-      const res = await fetch(`/api/invite/${token}/result`, {
+      const res = await fetch("/api/invite/" + token + "/result", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -88,6 +88,7 @@ export default function InvitePage() {
       setStep("result")
     } catch {
       setError("Unable to generate result.")
+      setStep("error")
     }
   }
 
@@ -95,12 +96,13 @@ export default function InvitePage() {
     if (!result) return
     setSaving(true)
     try {
+      const title = "Invite reflection - " + new Date().toLocaleDateString()
       const res = await fetch("/api/history", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          title: `Invite reflection — ${new Date().toLocaleDateString()}`,
+          title,
           content: result.reflection || result.pattern || "",
           payload: result,
           workspace_source: "DEFRAG",
@@ -116,7 +118,6 @@ export default function InvitePage() {
     <div className="min-h-[100dvh] bg-[#08070a] text-[#f4efe9] flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
 
-        {/* Wordmark */}
         <div className="mb-10 text-center">
           <Link href="/" className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
             SOVEREIGN.OS
@@ -129,15 +130,21 @@ export default function InvitePage() {
           </div>
         )}
 
-        {!loading && error && (
+        {!loading && (error || step === "error") && (
           <div className="text-center">
-            <p className="text-[14px] text-[#a8a29a] leading-relaxed mb-6">{error}</p>
-            <Link href="/" className="text-[12px] text-[#76716b] hover:text-[#f4efe9] transition-colors">← Back to Sovereign.os</Link>
+            <p className="text-[14px] text-[#a8a29a] leading-relaxed mb-6">{error || "Something went wrong."}</p>
+            <Link href="/" className="text-[12px] text-[#76716b] hover:text-[#f4efe9] transition-colors">
+              Back to Sovereign.os
+            </Link>
           </div>
         )}
 
         {!loading && invite && step === "preview" && (
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease }}
+          >
             <div className="border border-white/[0.08] bg-[#0c0a0d] p-8" style={{ borderRadius: 18 }}>
               <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-5">Private invitation</p>
               <h1 className="font-serif text-2xl text-[#f4efe9] leading-tight mb-4">
@@ -147,7 +154,7 @@ export default function InvitePage() {
                 Accept the invite to add your side. The result only generates after you choose to continue.
               </p>
               <p className="text-[11px] text-[#3a3733] leading-relaxed mb-8">
-                Invited by {invite.invited_by} · Your raw Baseline Design and private details stay hidden.
+                Invited by {invite.invited_by} &middot; Your raw Baseline Design and private details stay hidden.
               </p>
               <button
                 onClick={handleAccept}
@@ -166,12 +173,16 @@ export default function InvitePage() {
         {step === "accepting" && (
           <div className="flex flex-col items-center gap-4 py-12">
             <span className="w-5 h-5 border border-white/20 border-t-white/60 rounded-full animate-spin" />
-            <p className="text-[13px] text-[#4f4b47]">Accepting invite…</p>
+            <p className="text-[13px] text-[#4f4b47]">Accepting invite...</p>
           </div>
         )}
 
         {step === "needs_baseline" && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }}>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease }}
+          >
             <div className="border border-white/[0.08] bg-[#0c0a0d] p-8" style={{ borderRadius: 18 }}>
               <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-5">One more step</p>
               <h2 className="font-serif text-xl text-[#f4efe9] mb-3">Set your Baseline Design first.</h2>
@@ -179,11 +190,11 @@ export default function InvitePage() {
                 Your Baseline Design is needed to generate the reflection. It takes about 30 seconds and stays private.
               </p>
               <Link
-                href={`/settings?return=/invite/${token}`}
+                href={"/settings?return=/invite/" + token}
                 className="flex items-center justify-center w-full h-11 bg-[#f4efe9] text-[#08070a] text-[13px] font-medium hover:opacity-90 transition-opacity"
                 style={{ borderRadius: 10 }}
               >
-                Set Baseline Design →
+                Set Baseline Design
               </Link>
             </div>
           </motion.div>
@@ -192,12 +203,16 @@ export default function InvitePage() {
         {step === "accepted" && !result && (
           <div className="flex flex-col items-center gap-4 py-12">
             <span className="w-5 h-5 border border-white/20 border-t-[#e0743a]/60 rounded-full animate-spin" />
-            <p className="text-[13px] text-[#4f4b47]">Generating your reflection…</p>
+            <p className="text-[13px] text-[#4f4b47]">Generating your reflection...</p>
           </div>
         )}
 
         {step === "result" && result && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }}>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease }}
+          >
             <div className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden" style={{ borderRadius: 18 }}>
               <div className="px-6 py-5 border-b border-white/[0.06]">
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Your reflection</p>
@@ -229,13 +244,13 @@ export default function InvitePage() {
                   className="w-full h-10 border border-white/[0.10] text-[12px] text-[#f4efe9] hover:border-white/[0.22] transition-colors disabled:opacity-40"
                   style={{ borderRadius: 8 }}
                 >
-                  {saving ? "Saving…" : saved ? "Saved to Library ✓" : "Save to Sovereign"}
+                  {saving ? "Saving..." : saved ? "Saved to Library" : "Save to Sovereign"}
                 </button>
                 <Link
                   href="/apps/defrag"
                   className="flex items-center justify-center w-full h-10 text-[12px] text-[#76716b] hover:text-[#f4efe9] transition-colors"
                 >
-                  Invite someone else privately →
+                  Invite someone else privately
                 </Link>
               </div>
             </div>
