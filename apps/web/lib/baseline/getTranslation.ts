@@ -2,9 +2,6 @@
 // Fetches the HumanBehaviorTranslation for an app entry page.
 // Cached 24h server-side. Pass refresh:true to force recompute.
 
-export type { AlignmentEntryTranslation, DefragEntryTranslation, CovenantEntryTranslation }
-  from "@/lib/baseline/translation-types"
-
 export interface SourceEvidence {
   tag: string
   framework: string
@@ -12,24 +9,24 @@ export interface SourceEvidence {
 }
 
 export interface HumanBehaviorTranslation {
-  version: "translation.v1"
-  status: "ready" | "failed" | "partial"
+  version: translation.v1
+  status: ready | failed | partial
   computedAt: string
   userId: string
-  app: "alignment" | "defrag" | "covenant"
-  appRender: any
+  app: alignment | defrag | covenant
+  appRender: Record<string, unknown>
   sourceEvidence: SourceEvidence[]
 }
 
 export async function getTranslation(
-  app: "alignment" | "defrag" | "covenant",
+  app: alignment | defrag | covenant,
   options?: { refresh?: boolean }
 ): Promise<HumanBehaviorTranslation | null> {
   try {
-    const res = await fetch("/api/baseline/translate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+    const res = await fetch(/api/baseline/translate, {
+      method: POST,
+      headers: { Content-Type: application/json },
+      credentials: include,
       body: JSON.stringify({ app, refresh: options?.refresh }),
     })
     if (!res.ok) return null
