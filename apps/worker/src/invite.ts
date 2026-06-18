@@ -138,9 +138,20 @@ async function handleAcceptInvite(token: string, req: Request, env: Env): Promis
   const user = await getAuthUser(req, env.DB);
   if (!user) return jsonResponse({ error: "Unauthorized" }, 401);
 
-  const invite = await env.DB.prepare(
-    "SELECT token, owner_id, status, invitee_id FROM invites_v2 WHERE token = ?"
-  ).bind(token).first<{ token: string; owner_id: string; status: string; invitee_id: string | null }>();
+  let invite: { token: string; owner_id: string; status: string; invitee_id: string | null } | null = null;
+  try {
+    invite = await env.DB.prepare(
+      "SELECT token, owner_id, status, invitee_id FROM invites_v2 WHERE token = ?"
+    ).bind(token).first<{ token: string; owner_id: string; status: string; invitee_id: string | null }>();
+  } catch {
+    try {
+      invite = await env.DB.prepare(
+        "SELECT token, owner_id, status, invitee_id FROM invites WHERE token = ?"
+      ).bind(token).first<{ token: string; owner_id: string; status: string; invitee_id: string | null }>();
+    } catch {
+      return jsonResponse({ error: "Invite not found" }, 404);
+    }
+  }
 
   if (!invite) return jsonResponse({ error: "Invite not found" }, 404);
   if (invite.owner_id === user.id) return jsonResponse({ error: "Cannot accept your own invite" }, 400);
@@ -170,12 +181,20 @@ async function handleInviteResult(token: string, req: Request, env: Env): Promis
   const user = await getAuthUser(req, env.DB);
   if (!user) return jsonResponse({ error: "Unauthorized" }, 401);
 
-  const invite = await env.DB.prepare(
-    "SELECT token, owner_id, invitee_id, status, comparison_result FROM invites_v2 WHERE token = ?"
-  ).bind(token).first<{
-    token: string; owner_id: string; invitee_id: string | null;
-    status: string; comparison_result: string | null;
-  }>();
+  let invite: { token: string; owner_id: string; invitee_id: string | null; status: string; comparison_result: string | null } | null = null;
+  try {
+    invite = await env.DB.prepare(
+      "SELECT token, owner_id, invitee_id, status, comparison_result FROM invites_v2 WHERE token = ?"
+    ).bind(token).first<{ token: string; owner_id: string; invitee_id: string | null; status: string; comparison_result: string | null }>();
+  } catch {
+    try {
+      invite = await env.DB.prepare(
+        "SELECT token, owner_id, invitee_id, status, comparison_result FROM invites WHERE token = ?"
+      ).bind(token).first<{ token: string; owner_id: string; invitee_id: string | null; status: string; comparison_result: string | null }>();
+    } catch {
+      return jsonResponse({ error: "Invite not found" }, 404);
+    }
+  }
 
   if (!invite) return jsonResponse({ error: "Invite not found" }, 404);
   if (invite.invitee_id !== user.id) return jsonResponse({ error: "Not your invite" }, 403);
