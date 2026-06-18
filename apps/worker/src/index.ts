@@ -12,6 +12,7 @@ import { registerAlignmentRoute } from "./alignment.js";
 import { registerAudioRoute } from "./audio.js";
 import { insertSupportTicket } from "./db.js";
 import { registerDeriveProfileRoutes } from "./derive-profile.js";
+import { registerInviteRoutes } from "./invite.js";
 
 const router = Router();
 let currentEnv: Env;
@@ -126,6 +127,7 @@ registerCovenantRoute(router, getEnv);
 registerAlignmentRoute(router, getEnv);
 registerAudioRoute(router, getEnv);
 registerDeriveProfileRoutes(router, getEnv);
+registerInviteRoutes(router, getEnv);
 
 router.get("/api/stripe/prices", async (request: Request) => {
   const env = getEnv();
