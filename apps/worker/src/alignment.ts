@@ -1,7 +1,7 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
-import { getBaseline, formatBaseline } from "./baseline.js";
+import { getBaselineForAI } from "./baseline.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -244,15 +244,12 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
       // ── ENTRY MODE ──────────────────────────────────────────────────────
       if (mode === "entry") {
-        // Load user's actual baseline from KV
+        // Load computed baseline dataset (or fallback to raw baseline)
+        // getBaselineForAI returns the full aiDataset context if compiled,
+        // or raw DOB/TOB/POB if dataset is still pending
         let baselineContext = "";
-        let baselineRaw: any = {};
         try {
-          const baseline = await getBaseline(env, user.id);
-          if (baseline) {
-            baselineContext = formatBaseline(baseline);
-            baselineRaw = baseline;
-          }
+          baselineContext = await getBaselineForAI(env, user.id, "alignment");
         } catch {}
 
         const now = new Date();
@@ -306,8 +303,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
       let baselineContext = "";
       try {
-        const baseline = await getBaseline(env, user.id);
-        if (baseline) baselineContext = formatBaseline(baseline);
+        baselineContext = await getBaselineForAI(env, user.id, "alignment");
       } catch {}
 
       const now = new Date();
