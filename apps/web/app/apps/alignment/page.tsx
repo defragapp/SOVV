@@ -3,7 +3,8 @@ import * as React from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { SpaceShell } from "@/components/spaces/space-shell"
-import { getAlignmentBrief, type AlignmentBrief, type AlignmentTraitBlock } from "@/lib/alignment/getAlignmentBrief"
+import { getTranslation, type HumanBehaviorTranslation } from "@/lib/baseline/getTranslation"
+import type { AlignmentTraitBlock } from "@/lib/alignment/getAlignmentBrief"
 
 const ease = [0.16, 1, 0.3, 1] as const
 
@@ -89,14 +90,14 @@ function LoadingSkeleton() {
 
 // ─── Main entry page ──────────────────────────────────────────────────────
 export default function AlignmentEntryPage() {
-  const [brief, setBrief] = React.useState<AlignmentBrief | null>(null)
+  const [brief, setBrief] = React.useState<any | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState("")
 
   React.useEffect(() => {
-    getAlignmentBrief()
-      .then(b => {
-        if (b) setBrief(b)
+    getTranslation("alignment")
+      .then(t => {
+        if (t?.appRender) setBrief(t.appRender)
         else setError("Unable to load your alignment brief. Check your connection.")
       })
       .catch(() => setError("Unable to load your alignment brief."))
