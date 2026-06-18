@@ -64,16 +64,16 @@ async function handleCreateInvite(req: Request, env: Env): Promise<Response> {
 
   try {
     await env.DB.prepare(
-      `INSERT INTO invites (token, owner_id, library_id, status, created_at)
-       VALUES (?, ?, ?, 'pending', ?)`
-    ).bind(token, user.id, effectiveLibraryId, now).run();
+      `INSERT OR IGNORE INTO invites_v2 (token, owner_id, library_id, workspace_source, invite_mode, status, created_at, expires_at)
+       VALUES (?, ?, ?, ?, ?, 'pending', ?, datetime('now', '+7 days'))`
+    ).bind(token, user.id, library_id || null, workspace_source, invite_mode || "reflection", now).run();
   } catch (err: any) {
     // If library_id FK fails, try without FK constraint
     try {
       await env.DB.prepare(
-        `INSERT OR IGNORE INTO invites (token, owner_id, library_id, status, created_at)
-         VALUES (?, ?, ?, 'pending', ?)`
-      ).bind(token, user.id, "none", now).run();
+        `INSERT OR IGNORE INTO invites_v2 (token, owner_id, status, created_at)
+         VALUES (?, ?, 'pending', ?)`
+      ).bind(token, user.id, now).run();
     } catch {
       return jsonResponse({ error: "Failed to create invite" }, 500);
     }
@@ -94,7 +94,7 @@ async function handleCreateInvite(req: Request, env: Env): Promise<Response> {
 
 async function handleGetInvite(token: string, env: Env): Promise<Response> {
   const invite = await env.DB.prepare(
-    "SELECT token, owner_id, status, created_at FROM invites WHERE token = ?"
+    "SELECT token, owner_id, status, created_at FROM invites_v2 WHERE token = ?"
   ).bind(token).first<{ token: string; owner_id: string; status: string; created_at: string }>();
 
   if (!invite) return jsonResponse({ error: "Invite not found" }, 404);
@@ -126,7 +126,7 @@ async function handleAcceptInvite(token: string, req: Request, env: Env): Promis
   if (!user) return jsonResponse({ error: "Unauthorized" }, 401);
 
   const invite = await env.DB.prepare(
-    "SELECT token, owner_id, status, invitee_id FROM invites WHERE token = ?"
+    "SELECT token, owner_id, status, invitee_id FROM invites_v2 WHERE token = ?"
   ).bind(token).first<{ token: string; owner_id: string; status: string; invitee_id: string | null }>();
 
   if (!invite) return jsonResponse({ error: "Invite not found" }, 404);
@@ -145,7 +145,7 @@ async function handleAcceptInvite(token: string, req: Request, env: Env): Promis
 
   // Update invite with invitee
   await env.DB.prepare(
-    "UPDATE invites SET invitee_id = ?, status = 'accepted' WHERE token = ?"
+    "UPDATE invites_v2 SET invitee_id = ?, status = 'accepted' WHERE token = ?"
   ).bind(user.id, token).run();
 
   return jsonResponse({ accepted: true, ready_for_result: true, token }, 200);
@@ -158,7 +158,7 @@ async function handleInviteResult(token: string, req: Request, env: Env): Promis
   if (!user) return jsonResponse({ error: "Unauthorized" }, 401);
 
   const invite = await env.DB.prepare(
-    "SELECT token, owner_id, invitee_id, status, comparison_result FROM invites WHERE token = ?"
+    "SELECT token, owner_id, invitee_id, status, comparison_result FROM invites_v2 WHERE token = ?"
   ).bind(token).first<{
     token: string; owner_id: string; invitee_id: string | null;
     status: string; comparison_result: string | null;
@@ -231,7 +231,7 @@ Return JSON only:
   // Cache result
   try {
     await env.DB.prepare(
-      "UPDATE invites SET comparison_result = ?, status = 'completed' WHERE token = ?"
+      "UPDATE invites_v2 SET comparison_result = ?, status = 'completed' WHERE token = ?"
     ).bind(JSON.stringify(result), token).run();
   } catch {}
 
