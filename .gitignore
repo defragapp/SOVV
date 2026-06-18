@@ -87,3 +87,6 @@ packages/core/src/geneKeyMeanings.ts
 .env
 .env.local
 .env.production
+
+# Local push/audit scripts (may contain tokens)
+*.py
