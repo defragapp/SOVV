@@ -1,7 +1,7 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser, jsonResponse } from "./auth.js";
 import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
-import { getBaseline, formatBaseline } from "./baseline.js";
+import { getBaseline, formatBaseline, getBaselineForAI } from "./baseline.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
 import { requireActiveSubscription } from "./billing.js";
@@ -257,7 +257,8 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   }
 
   const patterns = await getPatterns(env.DB, sid);
-  const baselineText = formatBaseline(baseline);
+  // Use computed dataset if available, fallback to raw baseline format
+  const baselineText = await getBaselineForAI(env, sid, "defrag").catch(() => formatBaseline(baseline));
   const patternText = formatPatternsForPrompt(patterns);
   const targetBaseline =
     relational && target
