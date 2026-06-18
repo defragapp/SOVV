@@ -20,6 +20,7 @@ interface ResultCardProps {
   onSave?: () => void
   isSaving?: boolean
   saveSuccess?: boolean
+  onInvite?: () => void
 }
 
 export function ResultCard({
@@ -29,6 +30,7 @@ export function ResultCard({
   onSave,
   isSaving,
   saveSuccess,
+  onInvite,
 }: ResultCardProps) {
   const [copied, setCopied] = React.useState(false)
 
