@@ -1,5 +1,6 @@
 // lib/baseline/getTranslation.ts
 // Fetches the HumanBehaviorTranslation for an app entry page.
+// Cached 24h server-side. Pass refresh:true to force recompute.
 
 export interface SourceEvidence {
   tag: string
