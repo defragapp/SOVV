@@ -309,7 +309,7 @@ export default function AlignmentEntryPage() {
   React.useEffect(() => {
     getTranslation("alignment")
       .then(t => {
-        if (t?.appRender) setBrief(t.appRender as AlignmentRender)
+        if (t?.appRender) setBrief(t.appRender as unknown as AlignmentRender)
         else setError("Unable to load your alignment brief.")
       })
       .catch(() => setError("Unable to load your alignment brief."))
