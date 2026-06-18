@@ -22,9 +22,7 @@ import { getCorsHeaders } from "./cors.js";
 // ── Output sanitizer ─────────────────────────────────────────────────────
 // Strips any raw birth data, system prompt fragments, or forbidden phrases
 // from AI output before it reaches the frontend.
-const FORBIDDEN_OUTPUT_PATTERNS = [
-  /\b\d{4}-\d{2}-\d{2}\b/g,          // ISO dates (DOB)
-  /\b\d{1,2}:\d{2}\s*(AM|PM)?\b/gi,  // Times (TOB)
+const FORBIDDEN_OUTPUT_PATTERNS: RegExp[] = [
   /SECURITY RULES/gi,
   /ABSOLUTE RULES/gi,
   /system prompt/gi,
