@@ -45,7 +45,7 @@ function TagChip({ tag, label }: { tag: string; label?: string }) {
 // ─── Trait block ──────────────────────────────────────────────────────────
 function TraitBlock({ block, delay = 0 }: { block: { key: string; lines: string[]; tags: string[]; tagGlossary?: Array<{tag: string; label: string}> }; delay?: number }) {
   const glossaryMap = Object.fromEntries(
-    (block.tagGlossary || []).map(g => [g.tag, g.label])
+    (block.tagGlossary || []).map((g: {tag: string; label: string}) => [g.tag, g.label])
   )
   return (
     <motion.div
@@ -77,7 +77,7 @@ function LoadingSkeleton() {
       <div className="h-6 bg-white/[0.04] w-3/4" style={{ borderRadius: 2 }} />
       <div className="h-4 bg-white/[0.03] w-1/2" style={{ borderRadius: 2 }} />
       <div className="h-px bg-white/[0.06] w-full mt-4" />
-      {[1,2,3].map(i => (
+      {[1,2,3].map((_: number, i: number) => (
         <div key={i} className="flex flex-col gap-2">
           <div className="h-4 bg-white/[0.04] w-full" style={{ borderRadius: 2 }} />
           <div className="h-4 bg-white/[0.03] w-4/5" style={{ borderRadius: 2 }} />
@@ -245,7 +245,7 @@ export default function AlignmentEntryPage() {
                 <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-6">
                   When you're in your lane
                 </p>
-                {brief.aligned.map((block, i) => (
+                {(brief.aligned as any[]).map((block: any, i: number) => (
                   <TraitBlock key={block.key} block={block} delay={0.1 + i * 0.08} />
                 ))}
               </div>
@@ -260,7 +260,7 @@ export default function AlignmentEntryPage() {
                 {brief.misaligned.over.length > 0 && (
                   <div className="mb-6">
                     <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47] mb-4">Over-expression</p>
-                    {brief.misaligned.over.map((block, i) => (
+                    {(brief.misaligned.over as any[]).map((block: any, i: number) => (
                       <TraitBlock key={block.key} block={block} delay={0.3 + i * 0.06} />
                     ))}
                   </div>
@@ -268,7 +268,7 @@ export default function AlignmentEntryPage() {
                 {brief.misaligned.under.length > 0 && (
                   <div>
                     <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47] mb-4">Under-expression</p>
-                    {brief.misaligned.under.map((block, i) => (
+                    {(brief.misaligned.under as any[]).map((block: any, i: number) => (
                       <TraitBlock key={block.key} block={block} delay={0.4 + i * 0.06} />
                     ))}
                   </div>
