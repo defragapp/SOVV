@@ -93,9 +93,22 @@ async function handleCreateInvite(req: Request, env: Env): Promise<Response> {
 // ─── GET /api/invite/:token ────────────────────────────────────────────────
 
 async function handleGetInvite(token: string, env: Env): Promise<Response> {
-  const invite = await env.DB.prepare(
-    "SELECT token, owner_id, status, created_at FROM invites_v2 WHERE token = ?"
-  ).bind(token).first<{ token: string; owner_id: string; status: string; created_at: string }>();
+  // Try invites_v2 first (new table), fall back to invites (legacy)
+  let invite: { token: string; owner_id: string; status: string; created_at: string } | null = null;
+  try {
+    invite = await env.DB.prepare(
+      "SELECT token, owner_id, status, created_at FROM invites_v2 WHERE token = ?"
+    ).bind(token).first<{ token: string; owner_id: string; status: string; created_at: string }>();
+  } catch {
+    // invites_v2 table may not exist yet — try legacy invites table
+    try {
+      invite = await env.DB.prepare(
+        "SELECT token, owner_id, status, created_at FROM invites WHERE token = ?"
+      ).bind(token).first<{ token: string; owner_id: string; status: string; created_at: string }>();
+    } catch {
+      return jsonResponse({ error: "Invite not found" }, 404);
+    }
+  }
 
   if (!invite) return jsonResponse({ error: "Invite not found" }, 404);
 
