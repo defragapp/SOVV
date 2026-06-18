@@ -302,5 +302,6 @@ export default function AlignmentWorkspacePage() {
         { id: "library", label: "Library",   content: contextPanel },
       ]}
     />
+  </>
   )
 }
