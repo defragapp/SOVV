@@ -178,8 +178,8 @@ export default function SettingsPage() {
                   className={inputBase}
                   style={{ fontSize: "16px" }}
                 >
-                  <option value="exact">Exact time</option>
-                  <option value="approx">Approximate</option>
+                  <option value="exact">I know the exact time</option>
+                  <option value="approx">I know roughly when</option>
                 </select>
                 <input
                   type="time"
@@ -194,7 +194,7 @@ export default function SettingsPage() {
                   style={{ fontSize: "16px" }}
                 />
               </div>
-              <HintText>If unknown, use approximate and enter a midpoint.</HintText>
+              <HintText>If you don't know the exact time, choose what you know. The system will hold uncertain details lightly.</HintText>
             </div>
 
             {/* Place of birth */}
