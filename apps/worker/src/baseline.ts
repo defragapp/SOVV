@@ -3,6 +3,7 @@ import { safeJsonParse, type Baseline, type BaselineRequest } from "@sovereign/c
 import { getSessionId, cookieHeader } from "./plan.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import { compileBaselineDataset, formatDatasetForAI, formatDatasetForApp, type BaselineDesignDataset } from "./baseline-compiler.js";
+import { buildHumanBehaviorTranslation } from "./human-translation.js";
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const DATASET_KEY  = (sid: string) => `baseline-dataset:${sid}`;
@@ -179,6 +180,38 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
 export function registerBaselineRoutes(router: any, getEnv: () => Env) {
   router.get("/api/baseline", async (req: Request) => handleGetBaseline(req, getEnv()));
   router.post("/api/baseline", async (req: Request) => handleSaveBaseline(req, getEnv()));
+
+  // Translation endpoint — returns app-specific HumanBehaviorTranslation
+  router.post("/api/baseline/translate", async (req: Request) => {
+    const env = getEnv();
+    const authErr = await requireSessionAuth(req, env);
+    if (authErr) return authErr;
+
+    const user = await getAuthUser(req, env.DB);
+    if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+
+    const body = await req.json().catch(() => ({})) as any;
+    const app = body.app as "alignment" | "defrag" | "covenant";
+    if (!["alignment", "defrag", "covenant"].includes(app)) {
+      return new Response(JSON.stringify({ error: "Invalid app" }), { status: 400 });
+    }
+
+    // Covenant and Alignment require Pro subscription
+    if (app !== "defrag") {
+      const { requireActiveSubscription } = await import("./billing.js");
+      const subGate = await requireActiveSubscription(user, req);
+      if (subGate) return subGate;
+    }
+
+    const translation = await buildHumanBehaviorTranslation(
+      env,
+      user.id,
+      app,
+      { refresh: body.refresh === true }
+    );
+
+    return Response.json(translation);
+  });
 
   // Dataset status endpoint — lets the UI poll for compilation status
   router.get("/api/baseline/dataset", async (req: Request) => {
