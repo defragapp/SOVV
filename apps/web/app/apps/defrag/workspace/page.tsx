@@ -1,6 +1,7 @@
 "use client"
 import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
+import { InviteModal } from "@/components/spaces/InviteModal"
 import { ResultCard } from "@/components/spaces/ResultCard"
 import Link from "next/link"
 
@@ -77,6 +78,7 @@ export default function DefragWorkspacePage() {
   const [error, setError] = React.useState("")
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
+  const [inviteOpen, setInviteOpen] = React.useState(false)
 
   // Baseline
   const [baseline, setBaseline] = React.useState<Baseline | null>(null)
@@ -415,6 +417,12 @@ export default function DefragWorkspacePage() {
   )
 
   return (
+    <>
+    <InviteModal
+      open={inviteOpen}
+      onClose={() => setInviteOpen(false)}
+      workspaceSource="DEFRAG"
+    />
     <SpaceShell
       spaceName="Defrag"
       sidebar={sidebar}
