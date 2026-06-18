@@ -22,32 +22,37 @@ import { getCorsHeaders } from "./cors.js";
 // ── Output sanitizer ─────────────────────────────────────────────────────
 // Strips any raw birth data, system prompt fragments, or forbidden phrases
 // from AI output before it reaches the frontend.
-const FORBIDDEN_OUTPUT_PATTERNS: RegExp[] = [
-  /SECURITY RULES/gi,
-  /ABSOLUTE RULES/gi,
-  /system prompt/gi,
-  /You are Sovereign/gi,
-  /You are Alignment/gi,
-  /You are Covenant/gi,
-]
+// Sanitize AI output — strip any system prompt fragments from user-facing output
+function sanitizeAIOutput(value: unknown): unknown {
+  if (typeof value === "string") {
+    return value
+      .replace(/SECURITY RULES[\s\S]*?(?=
 
-function sanitizeAIOutput(obj: unknown): unknown {
-  if (typeof obj === "string") {
-    let s = obj
-    for (const pattern of FORBIDDEN_OUTPUT_PATTERNS) {
-      s = s.replace(pattern, "[redacted]")
-    }
-    return s
+|
+[A-Z]|$)/g, "")
+      .replace(/ABSOLUTE RULES[\s\S]*?(?=
+
+|
+[A-Z]|$)/g, "")
+      .replace(/You are Sovereign[^
+]*/g, "")
+      .replace(/You are Alignment[^
+]*/g, "")
+      .replace(/You are Covenant[^
+]*/g, "")
+      .trim()
   }
-  if (Array.isArray(obj)) return obj.map(sanitizeAIOutput)
-  if (obj && typeof obj === "object") {
-    const out: Record<string, unknown> = {}
-    for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
-      out[k] = sanitizeAIOutput(v)
-    }
-    return out
+  if (Array.isArray(value)) {
+    return (value as unknown[]).map(sanitizeAIOutput)
   }
-  return obj
+  if (value !== null && typeof value === "object") {
+    const result: Record<string, unknown> = {}
+    for (const key of Object.keys(value as object)) {
+      result[key] = sanitizeAIOutput((value as Record<string, unknown>)[key])
+    }
+    return result
+  }
+  return value
 }
 
 const SYSTEM_SELF = `SECURITY RULES — ABSOLUTE, NON-NEGOTIABLE:
