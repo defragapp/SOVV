@@ -209,6 +209,19 @@ export function ResultCard({
           </svg>
           {copied ? "Copied" : "Copy all"}
         </button>
+        {/* Invite Privately */}
+        {onInvite && (
+          <button
+            onClick={onInvite}
+            className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M8 1H11V4M11 1L6.5 5.5M5 2H2C1.45 2 1 2.45 1 3V10C1 10.55 1.45 11 2 11H9C9.55 11 10 10.55 10 10V7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Invite Privately
+          </button>
+        )}
+
         {onSave && (
           <button
             onClick={onSave}
