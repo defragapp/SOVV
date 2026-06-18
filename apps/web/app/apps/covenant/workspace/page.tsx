@@ -338,5 +338,6 @@ export default function CovenantWorkspacePage() {
         { id: "library", label: "Library",  content: contextPanel },
       ]}
     />
+  </>
   )
 }
