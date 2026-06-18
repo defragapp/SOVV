@@ -232,7 +232,7 @@ export default function AlignmentEntryPage() {
               {brief.hero.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {(brief.hero.tags as string[]).map((tag: string) => {
-                    const glossary = brief.hero.tagGlossary?.find(g => g.tag === tag)
+                    const glossary = brief.hero.tagGlossary?.find((g: {tag: string; label: string}) => g.tag === tag)
                     return <TagChip key={tag} tag={tag} label={glossary?.label} />
                   })}
                 </div>
