@@ -10,12 +10,21 @@ const ease = [0.16, 1, 0.3, 1] as const
 // ─── Types ─────────────────────────────────────────────────────────────────
 
 interface GlossaryItem { tag: string; label: string }
+
+interface AlignmentLine {
+  text: string
+  mechanism?: string
+  contrast?: string
+  sourceTags?: string[]
+}
+
 interface TraitBlockData {
   key: string
   lines: string[]
   tags?: string[]
   tagGlossary?: GlossaryItem[]
 }
+
 interface AlignmentRender {
   hero: { anchor: string; tags?: string[]; tagGlossary?: GlossaryItem[] }
   aligned: TraitBlockData[]
@@ -38,7 +47,7 @@ function TagChip({ tag, label }: { tag: string; label?: string }) {
         className={`font-mono text-[8px] uppercase tracking-[0.12em] border px-2 py-0.5 transition-colors duration-150 ${
           label
             ? "border-white/[0.10] text-[#4f4b47] hover:border-white/[0.22] hover:text-[#76716b] cursor-pointer"
-            : "border-white/[0.06] text-[#3a3733] cursor-default"
+            : "border-white/[0.06] text-[#2e2b28] cursor-default"
         }`}
         style={{ borderRadius: 2 }}
         aria-label={label ? `${tag}: ${label}` : tag}
@@ -64,23 +73,42 @@ function TagChip({ tag, label }: { tag: string; label?: string }) {
   )
 }
 
-// ─── Tags row ──────────────────────────────────────────────────────────────
-
 function TagsRow({ tags, glossary }: { tags?: string[]; glossary?: GlossaryItem[] }) {
   if (!tags?.length) return null
   const map = Object.fromEntries((glossary || []).map(g => [g.tag, g.label]))
   return (
-    <div className="flex flex-wrap gap-1.5 mt-3">
+    <div className="flex flex-wrap gap-1.5 mt-4">
       {tags.map(tag => <TagChip key={tag} tag={tag} label={map[tag]} />)}
+    </div>
+  )
+}
+
+// ─── Loading skeleton ──────────────────────────────────────────────────────
+
+function LoadingSkeleton() {
+  return (
+    <div className="flex flex-col gap-10 animate-pulse max-w-2xl pt-14 px-6 md:px-10">
+      <div className="flex flex-col gap-3">
+        <div className="h-9 bg-white/[0.04] w-4/5" style={{ borderRadius: 2 }} />
+        <div className="h-9 bg-white/[0.03] w-3/5" style={{ borderRadius: 2 }} />
+      </div>
+      <div className="h-px bg-white/[0.04] w-full" />
+      {[0.85, 0.7, 0.9, 0.65, 0.75].map((w, i) => (
+        <div key={i} className="h-[18px] bg-white/[0.03]" style={{ borderRadius: 2, width: `${w * 100}%` }} />
+      ))}
+      <div className="h-px bg-white/[0.04] w-full" />
+      {[0.6, 0.5].map((w, i) => (
+        <div key={i} className="h-[14px] bg-white/[0.02]" style={{ borderRadius: 2, width: `${w * 100}%` }} />
+      ))}
     </div>
   )
 }
 
 // ─── Section label ─────────────────────────────────────────────────────────
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function SectionLabel({ children, dim = false }: { children: React.ReactNode; dim?: boolean }) {
   return (
-    <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#4f4b47] mb-5">
+    <p className={`font-mono text-[9px] uppercase tracking-[0.22em] mb-6 ${dim ? "text-[#2e2b28]" : "text-[#4f4b47]"}`}>
       {children}
     </p>
   )
@@ -88,52 +116,47 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 // ─── Divider ───────────────────────────────────────────────────────────────
 
-function Divider() {
-  return <div className="h-px bg-white/[0.05] my-10" />
+function Divider({ tight = false }: { tight?: boolean }) {
+  return <div className={`h-px bg-white/[0.05] ${tight ? "my-8" : "my-12"}`} />
 }
 
-// ─── Loading skeleton ──────────────────────────────────────────────────────
+// ─── 1. Hero ───────────────────────────────────────────────────────────────
+// Slow sequential reveal — line 1, then line 2 after 180ms, then tags
 
-function LoadingSkeleton() {
+function Hero({ data }: { data: AlignmentRender["hero"] }) {
+  const prefersReduced = useReducedMotion()
+  const lines = data.anchor.includes("\n")
+    ? data.anchor.split("\n").filter(Boolean)
+    : [data.anchor]
+
   return (
-    <div className="flex flex-col gap-8 animate-pulse max-w-2xl mx-auto pt-16 px-6">
-      {/* Hero skeleton */}
-      <div className="flex flex-col gap-3">
-        <div className="h-8 bg-white/[0.04] w-4/5" style={{ borderRadius: 2 }} />
-        <div className="h-8 bg-white/[0.03] w-3/5" style={{ borderRadius: 2 }} />
-      </div>
-      <div className="h-px bg-white/[0.04] w-full" />
-      {/* Content skeletons */}
-      {[0.9, 0.7, 0.8, 0.6].map((w, i) => (
-        <div key={i} className="flex flex-col gap-2">
-          <div className="h-4 bg-white/[0.04]" style={{ borderRadius: 2, width: `${w * 100}%` }} />
-          <div className="h-4 bg-white/[0.03]" style={{ borderRadius: 2, width: `${(w - 0.15) * 100}%` }} />
-        </div>
+    <div className="mb-14">
+      {lines.map((line, i) => (
+        <motion.p
+          key={i}
+          initial={prefersReduced ? {} : { opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.75, delay: 0.05 + i * 0.18, ease }}
+          className="font-serif text-[clamp(1.6rem,3.8vw,2.4rem)] text-[#f4efe9] leading-[1.2] tracking-[-0.018em] max-w-xl"
+        >
+          {line}
+        </motion.p>
       ))}
+      {data.tags && data.tags.length > 0 && (
+        <motion.div
+          initial={prefersReduced ? {} : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.05 + lines.length * 0.18 + 0.1, ease }}
+        >
+          <TagsRow tags={data.tags} glossary={data.tagGlossary} />
+        </motion.div>
+      )}
     </div>
   )
 }
 
-// ─── Hero ──────────────────────────────────────────────────────────────────
-
-function Hero({ data, delay = 0 }: { data: AlignmentRender["hero"]; delay?: number }) {
-  const prefersReduced = useReducedMotion()
-  return (
-    <motion.div
-      initial={prefersReduced ? {} : { opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, delay, ease }}
-      className="mb-12"
-    >
-      <p className="font-serif text-[clamp(1.5rem,3.5vw,2.25rem)] text-[#f4efe9] leading-[1.25] tracking-[-0.015em] max-w-xl">
-        {data.anchor}
-      </p>
-      <TagsRow tags={data.tags} glossary={data.tagGlossary} />
-    </motion.div>
-  )
-}
-
-// ─── Alignment view ────────────────────────────────────────────────────────
+// ─── 2. Alignment view ─────────────────────────────────────────────────────
+// Open spacing, full opacity, each line as its own thought
 
 function AlignmentView({ blocks, delay = 0 }: { blocks: TraitBlockData[]; delay?: number }) {
   const prefersReduced = useReducedMotion()
@@ -142,32 +165,36 @@ function AlignmentView({ blocks, delay = 0 }: { blocks: TraitBlockData[]; delay?
     <motion.div
       initial={prefersReduced ? {} : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, delay, ease }}
+      transition={{ duration: 0.6, delay, ease }}
     >
       <SectionLabel>when you're aligned</SectionLabel>
       <div className="flex flex-col gap-0">
-        {blocks.map((block, i) => (
-          <motion.div
-            key={block.key}
-            initial={prefersReduced ? {} : { opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: delay + i * 0.07, ease }}
-            className="border-b border-white/[0.05] pb-5 mb-5 last:border-0 last:pb-0 last:mb-0"
-          >
-            <div className="flex flex-col gap-1.5">
-              {block.lines.map((line, j) => (
-                <p key={j} className="text-[15px] text-[#f4efe9] leading-[1.65]">{line}</p>
+        {blocks.map((block, bi) => (
+          <div key={block.key} className="border-b border-white/[0.05] pb-7 mb-7 last:border-0 last:pb-0 last:mb-0">
+            {/* Each line as its own thought — generous line height */}
+            <div className="flex flex-col gap-3">
+              {block.lines.map((line, li) => (
+                <motion.p
+                  key={li}
+                  initial={prefersReduced ? {} : { opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: delay + bi * 0.1 + li * 0.07, ease }}
+                  className="text-[15px] text-[#f4efe9] leading-[1.7]"
+                >
+                  {line}
+                </motion.p>
               ))}
             </div>
             <TagsRow tags={block.tags} glossary={block.tagGlossary} />
-          </motion.div>
+          </div>
         ))}
       </div>
     </motion.div>
   )
 }
 
-// ─── Misalignment view ─────────────────────────────────────────────────────
+// ─── 3. Misalignment view ──────────────────────────────────────────────────
+// Compressed spacing, dimmer opacity — same mechanism in distorted states
 
 function MisalignmentView({
   over, under, delay = 0
@@ -178,54 +205,66 @@ function MisalignmentView({
 }) {
   const prefersReduced = useReducedMotion()
   if (!over.length && !under.length) return null
+
   return (
     <motion.div
-      initial={prefersReduced ? {} : { opacity: 0, y: 10 }}
+      initial={prefersReduced ? {} : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, delay, ease }}
     >
-      <SectionLabel>when you're off</SectionLabel>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Over-expression */}
+      <SectionLabel dim>when you're off</SectionLabel>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+
+        {/* Over-expression — too much */}
         {over.length > 0 && (
           <div>
-            <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#3a3733] mb-4">too much</p>
+            <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#2e2b28] mb-5">too much</p>
             <div className="flex flex-col gap-0">
-              {over.map((block, i) => (
-                <motion.div
-                  key={block.key}
-                  initial={prefersReduced ? {} : { opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: delay + 0.05 + i * 0.06, ease }}
-                  className="border-b border-white/[0.04] pb-4 mb-4 last:border-0 last:pb-0 last:mb-0"
-                >
-                  {block.lines.map((line, j) => (
-                    <p key={j} className="text-[13px] text-[#76716b] leading-[1.6]">{line}</p>
-                  ))}
+              {over.map((block, bi) => (
+                <div key={block.key} className="border-b border-white/[0.04] pb-5 mb-5 last:border-0 last:pb-0 last:mb-0">
+                  <div className="flex flex-col gap-2">
+                    {block.lines.map((line, li) => (
+                      <motion.p
+                        key={li}
+                        initial={prefersReduced ? {} : { opacity: 0, x: -4 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: delay + 0.05 + bi * 0.08 + li * 0.05, ease }}
+                        className="text-[13px] text-[#5a5550] leading-[1.65]"
+                      >
+                        {line}
+                      </motion.p>
+                    ))}
+                  </div>
                   <TagsRow tags={block.tags} glossary={block.tagGlossary} />
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
         )}
-        {/* Under-expression */}
+
+        {/* Under-expression — too little */}
         {under.length > 0 && (
           <div>
-            <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#3a3733] mb-4">too little</p>
+            <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#2e2b28] mb-5">too little</p>
             <div className="flex flex-col gap-0">
-              {under.map((block, i) => (
-                <motion.div
-                  key={block.key}
-                  initial={prefersReduced ? {} : { opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: delay + 0.1 + i * 0.06, ease }}
-                  className="border-b border-white/[0.04] pb-4 mb-4 last:border-0 last:pb-0 last:mb-0"
-                >
-                  {block.lines.map((line, j) => (
-                    <p key={j} className="text-[13px] text-[#76716b] leading-[1.6]">{line}</p>
-                  ))}
+              {under.map((block, bi) => (
+                <div key={block.key} className="border-b border-white/[0.04] pb-5 mb-5 last:border-0 last:pb-0 last:mb-0">
+                  <div className="flex flex-col gap-2">
+                    {block.lines.map((line, li) => (
+                      <motion.p
+                        key={li}
+                        initial={prefersReduced ? {} : { opacity: 0, x: -4 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: delay + 0.1 + bi * 0.08 + li * 0.05, ease }}
+                        className="text-[13px] text-[#5a5550] leading-[1.65]"
+                      >
+                        {line}
+                      </motion.p>
+                    ))}
+                  </div>
                   <TagsRow tags={block.tags} glossary={block.tagGlossary} />
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -235,7 +274,8 @@ function MisalignmentView({
   )
 }
 
-// ─── Current drift ─────────────────────────────────────────────────────────
+// ─── 4. Current drift ──────────────────────────────────────────────────────
+// Small, timestamp-like, alive — never dominates
 
 function CurrentDrift({ lines, delay = 0 }: { lines: string[]; delay?: number }) {
   const prefersReduced = useReducedMotion()
@@ -244,19 +284,19 @@ function CurrentDrift({ lines, delay = 0 }: { lines: string[]; delay?: number })
     <motion.div
       initial={prefersReduced ? {} : { opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5, delay, ease }}
-      className="border border-white/[0.06] px-5 py-4"
-      style={{ borderRadius: 10 }}
+      transition={{ duration: 0.45, delay, ease }}
+      className="border-l-2 border-[#e0743a]/20 pl-4 py-1"
     >
-      <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#3a3733] mb-3">right now</p>
+      <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#3a3733] mb-2.5">right now</p>
       {lines.slice(0, 2).map((line, i) => (
-        <p key={i} className="text-[13px] text-[#76716b] leading-[1.6]">{line}</p>
+        <p key={i} className="text-[13px] text-[#4f4b47] leading-[1.6]">{line}</p>
       ))}
     </motion.div>
   )
 }
 
-// ─── Action panel ──────────────────────────────────────────────────────────
+// ─── 5. Action panel ───────────────────────────────────────────────────────
+// High contrast, decisive — the clearest thing on the page after the hero
 
 function ActionPanel({ lines, delay = 0 }: { lines: string[]; delay?: number }) {
   const prefersReduced = useReducedMotion()
@@ -265,19 +305,28 @@ function ActionPanel({ lines, delay = 0 }: { lines: string[]; delay?: number }) 
     <motion.div
       initial={prefersReduced ? {} : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay, ease }}
+      transition={{ duration: 0.55, delay, ease }}
     >
       <SectionLabel>the move</SectionLabel>
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2.5 max-w-lg">
         {lines.slice(0, 2).map((line, i) => (
-          <p key={i} className="text-[15px] text-[#f4efe9] leading-[1.65]">{line}</p>
+          <p
+            key={i}
+            className={`leading-[1.65] ${
+              i === 0
+                ? "text-[16px] text-[#f4efe9] font-normal"
+                : "text-[14px] text-[#a8a29a]"
+            }`}
+          >
+            {line}
+          </p>
         ))}
       </div>
     </motion.div>
   )
 }
 
-// ─── Enter workspace ───────────────────────────────────────────────────────
+// ─── 6. Enter workspace ────────────────────────────────────────────────────
 
 function EnterWorkspace({ href, delay = 0 }: { href: string; delay?: number }) {
   const prefersReduced = useReducedMotion()
@@ -286,14 +335,20 @@ function EnterWorkspace({ href, delay = 0 }: { href: string; delay?: number }) {
       initial={prefersReduced ? {} : { opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, delay, ease }}
-      className="pt-2"
     >
       <Link
         href={href}
-        className="group inline-flex items-center gap-3 text-[13px] text-[#76716b] hover:text-[#f4efe9] transition-colors duration-200"
+        className="group inline-flex items-center gap-3 text-[13px] text-[#4f4b47] hover:text-[#f4efe9] transition-colors duration-200"
       >
         <span>go deeper</span>
-        <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
+        <motion.span
+          animate={{ x: 0 }}
+          whileHover={{ x: 3 }}
+          transition={{ duration: 0.2, ease }}
+          className="inline-block"
+        >
+          →
+        </motion.span>
       </Link>
     </motion.div>
   )
@@ -324,30 +379,30 @@ export default function AlignmentEntryPage() {
       </div>
       <div className="px-5 pt-6 pb-5 flex flex-col gap-6">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50 mb-3">What this is</p>
-          <p className="text-[12px] text-[#4f4b47] leading-relaxed">
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">What this is</p>
+          <p className="text-[12px] text-[#3a3733] leading-relaxed">
             Your fixed center. The live sky above you. Alignment uses both to show you the path back to yourself — when a situation, conversation, or decision has pulled you off course.
           </p>
         </div>
-        <div className="border-t border-white/[0.05] pt-5 flex flex-col gap-3">
+        <div className="border-t border-white/[0.04] pt-5 flex flex-col gap-4">
           <div>
-            <p className="text-[11px] text-[#76716b] font-medium mb-1">Baseline Design</p>
-            <p className="text-[11px] text-[#3a3733] leading-relaxed">Your fixed center. How you naturally operate.</p>
+            <p className="text-[11px] text-[#4f4b47] font-medium mb-1">Baseline Design</p>
+            <p className="text-[11px] text-[#2e2b28] leading-relaxed">Your fixed center. How you naturally operate.</p>
           </div>
           <div>
-            <p className="text-[11px] text-[#76716b] font-medium mb-1">Live sky</p>
-            <p className="text-[11px] text-[#3a3733] leading-relaxed">The emotional weather you're moving through right now.</p>
+            <p className="text-[11px] text-[#4f4b47] font-medium mb-1">Live sky</p>
+            <p className="text-[11px] text-[#2e2b28] leading-relaxed">The emotional weather you're moving through right now.</p>
           </div>
         </div>
-        <div className="border-t border-white/[0.05] pt-5">
+        <div className="border-t border-white/[0.04] pt-5">
           <Link
             href="/apps/alignment/workspace"
             className="flex items-center justify-between group"
           >
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] group-hover:text-[#f4efe9] transition-colors">
+            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#3a3733] group-hover:text-[#f4efe9] transition-colors">
               Open workspace
             </span>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#3a3733] group-hover:text-[#f4efe9] transition-colors">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#2e2b28] group-hover:text-[#f4efe9] transition-colors">
               <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </Link>
@@ -372,23 +427,25 @@ export default function AlignmentEntryPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.7, ease }}
+            transition={{ duration: 0.5, delay: 0.8, ease }}
             className="flex flex-col gap-4"
           >
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50 mb-1">The move</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-1">The move</p>
             {brief.action.slice(0, 2).map((line, i) => (
-              <p key={i} className="text-[13px] text-[#f4efe9] leading-relaxed">{line}</p>
+              <p key={i} className={`leading-relaxed ${i === 0 ? "text-[13px] text-[#f4efe9]" : "text-[12px] text-[#76716b]"}`}>
+                {line}
+              </p>
             ))}
-            <div className="mt-4 pt-4 border-t border-white/[0.05]">
+            <div className="mt-5 pt-4 border-t border-white/[0.04]">
               <Link
                 href="/apps/alignment/workspace"
-                className="flex items-center justify-between w-full h-9 px-4 border border-white/[0.07] hover:border-white/[0.16] transition-colors group"
+                className="flex items-center justify-between w-full h-9 px-4 border border-white/[0.06] hover:border-white/[0.14] transition-colors group"
                 style={{ borderRadius: 6 }}
               >
-                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] group-hover:text-[#f4efe9] transition-colors">
+                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733] group-hover:text-[#f4efe9] transition-colors">
                   Work through a situation
                 </span>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#3a3733] group-hover:text-[#f4efe9] transition-colors">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#2e2b28] group-hover:text-[#f4efe9] transition-colors">
                   <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </Link>
@@ -399,7 +456,7 @@ export default function AlignmentEntryPage() {
     </div>
   )
 
-  // ─── CENTER PANEL — main dashboard ───────────────────────────────────────
+  // ─── CENTER PANEL ─────────────────────────────────────────────────────────
   const main = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       {/* Header */}
@@ -408,20 +465,20 @@ export default function AlignmentEntryPage() {
         {!loading && brief && (
           <Link
             href="/apps/alignment/workspace"
-            className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#f4efe9] transition-colors"
+            className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733] hover:text-[#f4efe9] transition-colors"
           >
             Workspace →
           </Link>
         )}
       </div>
 
-      {/* Content */}
-      <div className="flex-1 px-6 md:px-10 pt-10 pb-12 max-w-3xl">
+      {/* Content — max-w-2xl, generous padding */}
+      <div className="flex-1 px-6 md:px-10 pt-12 pb-16 max-w-2xl">
 
         {loading && <LoadingSkeleton />}
 
         {!loading && error && (
-          <p className="text-[13px] text-[#4f4b47] leading-relaxed pt-8">{error}</p>
+          <p className="text-[13px] text-[#3a3733] leading-relaxed pt-8">{error}</p>
         )}
 
         {!loading && brief && (
@@ -430,39 +487,42 @@ export default function AlignmentEntryPage() {
               key="content"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, ease }}
+              transition={{ duration: 0.25, ease }}
             >
-              {/* 1. Hero */}
-              <Hero data={brief.hero} delay={0.05} />
+              {/* 1. Hero — sequential line reveal */}
+              <Hero data={brief.hero} />
 
-              {/* 2. Alignment view */}
-              <AlignmentView blocks={brief.aligned} delay={0.15} />
+              {/* 2. Alignment view — open, full opacity */}
+              <AlignmentView blocks={brief.aligned} delay={0.2} />
 
               <Divider />
 
-              {/* 3. Misalignment view */}
+              {/* 3. Misalignment view — compressed, dimmer */}
               <MisalignmentView
                 over={brief.misaligned?.over ?? []}
                 under={brief.misaligned?.under ?? []}
-                delay={0.25}
+                delay={0.3}
               />
 
-              {/* 4. Current drift (optional) */}
+              {/* 4. Current drift — optional, alive, never dominant */}
               {brief.currentDrift && brief.currentDrift.length > 0 && (
                 <>
-                  <Divider />
-                  <CurrentDrift lines={brief.currentDrift} delay={0.35} />
+                  <Divider tight />
+                  <CurrentDrift lines={brief.currentDrift} delay={0.4} />
                 </>
               )}
 
               <Divider />
 
-              {/* 5. Action panel */}
-              <ActionPanel lines={brief.action} delay={0.4} />
+              {/* 5. Action panel — decisive, high contrast */}
+              <ActionPanel lines={brief.action} delay={0.45} />
 
               {/* 6. Enter workspace */}
-              <div className="mt-10">
-                <EnterWorkspace href={brief.workspaceHref || "/apps/alignment/workspace"} delay={0.5} />
+              <div className="mt-12">
+                <EnterWorkspace
+                  href={brief.workspaceHref || "/apps/alignment/workspace"}
+                  delay={0.55}
+                />
               </div>
             </motion.div>
           </AnimatePresence>
