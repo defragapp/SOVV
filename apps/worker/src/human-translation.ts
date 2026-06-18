@@ -155,30 +155,65 @@ function buildAlignmentPrompt(dataset: BaselineDesignDataset, sky?: LiveSkyConte
 
   return `Translate this baseline data into an AlignmentEntryTranslation.
 
+RECOGNITION STANDARD:
+Every visible line must name at least two of: pressure condition, timing mechanism, communication behavior, responsibility pattern, over-expression, under-expression, visible consequence, or return point.
+
+REQUIRED TRANSFORMATION: trait cluster -> pressure condition -> behavior -> visible outcome
+
+REJECT these generic lines (do not use them):
+- you move at your own pace
+- you trust yourself
+- you need balance
+- stay grounded
+- follow your truth
+- you are sensitive
+- you should slow down
+
+PREFER recognition-grade lines like these:
+- the first answer usually protects the moment; the second answer is closer to the truth
+- the response starts solving tension before it knows whether the tension belongs here
+- the delay looks like wisdom at first, then turns into carrying what should have been said earlier
+- care is clean when it stays honest; under pressure it becomes carrying more than the moment asked for
+- name the unfinished truth before it becomes a full reaction
+- clarity arrives after the pressure stops asking for an immediate answer
+
+COPY RHYTHM:
+No more than 40% of lines may start with 'you'.
+Vary sentence starts: use observation, mechanism, contrast, condition, action.
+Avoid chatbot coaching tone.
+
 COMPUTED BASELINE DATA:
 ${traits.map(t => `[${t.label}]
-Evidence tags: ${t.evidenceTags.join(", ")}
-Aligned behavior: ${t.alignedExpression.join("; ")}
-Over-expression: ${t.overExpression.join("; ")}
-Under-expression: ${t.underExpression.join("; ")}`).join("\n\n")}
+Evidence tags: ${t.evidenceTags.join(', ')}
+Aligned behavior: ${t.alignedExpression.join('; ')}
+Over-expression: ${t.overExpression.join('; ')}
+Under-expression: ${t.underExpression.join('; ')}`).join('\n\n')}
 
 ALIGNMENT OVERLAY:
-Alignment signals: ${overlay?.alignmentSignals?.join("; ") ?? ""}
-Misalignment signals: ${overlay?.misalignmentSignals?.join("; ") ?? ""}
-Action rules: ${overlay?.actionRules?.join("; ") ?? ""}
+Alignment signals: ${overlay?.alignmentSignals?.join('; ') ?? ''}
+Misalignment signals: ${overlay?.misalignmentSignals?.join('; ') ?? ''}
+Action rules: ${overlay?.actionRules?.join('; ') ?? ''}
 
-${sky?.tone ? `CURRENT SKY TONE: ${sky.tone}` : ""}
+${sky?.tone ? 'CURRENT SKY TONE: ' + sky.tone : ''}
 
-Return this exact JSON shape:
+SECTION REQUIREMENTS:
+- hero: 1-2 recognition-grade lines, short identity anchor, no explanation
+- aligned: show clean expression as behavior not trait labels, 3-5 spacious lines
+- misaligned.over: show how the same strength bends under pressure
+- misaligned.under: show the cost of holding back too long
+- currentDrift: optional, max 2 lines, current not permanent
+- action: 1-2 lines, instantly usable, may include a concrete sentence the user can say
+
+Return this exact JSON shape, no markdown, no code fences:
 {
-  "hero": { "anchor": "1-2 grounding lines", "tags": ["tag1", "tag2"] },
-  "aligned": [{ "key": "key", "lines": ["line1", "line2"], "tags": ["tag1"] }],
+  "hero": { "anchor": "1-2 recognition-grade lines", "tags": ["tag1"] },
+  "aligned": [{ "key": "key", "lines": ["line1", "line2", "line3"], "tags": ["tag1"] }],
   "misaligned": {
-    "over": [{ "key": "key", "lines": ["line1"], "tags": ["tag1"] }],
-    "under": [{ "key": "key", "lines": ["line1"], "tags": ["tag1"] }]
+    "over": [{ "key": "key", "lines": ["line1", "line2"], "tags": ["tag1"] }],
+    "under": [{ "key": "key", "lines": ["line1", "line2"], "tags": ["tag1"] }]
   },
-  "currentSky": ["optional sky line"],
-  "action": ["1-2 immediately usable lines"],
+  "currentDrift": ["optional line 1"],
+  "action": ["the move - specific and usable"],
   "workspaceHref": "/apps/alignment/workspace"
 }`
 }
