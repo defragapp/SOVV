@@ -389,6 +389,7 @@ export default function DefragWorkspacePage() {
             onSave={handleSave}
             isSaving={isSaving}
             saveSuccess={saveSuccess}
+            onInvite={() => setInviteOpen(true)}
           />
         )}
       </div>
