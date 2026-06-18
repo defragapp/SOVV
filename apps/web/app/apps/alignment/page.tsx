@@ -3,8 +3,7 @@ import * as React from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { SpaceShell } from "@/components/spaces/space-shell"
-import { getTranslation, type HumanBehaviorTranslation } from "@/lib/baseline/getTranslation"
-import type { AlignmentTraitBlock } from "@/lib/alignment/getAlignmentBrief"
+import { getTranslation } from "@/lib/baseline/getTranslation"
 
 const ease = [0.16, 1, 0.3, 1] as const
 
@@ -44,7 +43,7 @@ function TagChip({ tag, label }: { tag: string; label?: string }) {
 }
 
 // ─── Trait block ──────────────────────────────────────────────────────────
-function TraitBlock({ block, delay = 0 }: { block: AlignmentTraitBlock; delay?: number }) {
+function TraitBlock({ block, delay = 0 }: { block: { key: string; lines: string[]; tags: string[]; tagGlossary?: Array<{tag: string; label: string}> }; delay?: number }) {
   const glossaryMap = Object.fromEntries(
     (block.tagGlossary || []).map(g => [g.tag, g.label])
   )
@@ -56,13 +55,13 @@ function TraitBlock({ block, delay = 0 }: { block: AlignmentTraitBlock; delay?: 
       className="border-b border-white/[0.06] pb-6 mb-6 last:border-0 last:pb-0 last:mb-0"
     >
       <div className="flex flex-col gap-1.5 mb-3">
-        {block.lines.map((line, i) => (
+        {block.lines.map((line: string, i: number) => (
           <p key={i} className="text-[14px] text-[#f4efe9] leading-[1.65]">{line}</p>
         ))}
       </div>
       {block.tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
-          {block.tags.map(tag => (
+          {(block.tags as string[]).map((tag: string) => (
             <TagChip key={tag} tag={tag} label={glossaryMap[tag]} />
           ))}
         </div>
@@ -167,7 +166,7 @@ export default function AlignmentEntryPage() {
             className="flex flex-col gap-3"
           >
             <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-2">Right now</p>
-            {brief.action.map((line, i) => (
+            {brief.action.map((line: string, i: number) => (
               <p key={i} className="text-[13px] text-[#f4efe9] leading-relaxed">{line}</p>
             ))}
             <div className="mt-6 pt-5 border-t border-white/[0.06]">
@@ -232,7 +231,7 @@ export default function AlignmentEntryPage() {
               </p>
               {brief.hero.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
-                  {brief.hero.tags.map(tag => {
+                  {(brief.hero.tags as string[]).map((tag: string) => {
                     const glossary = brief.hero.tagGlossary?.find(g => g.tag === tag)
                     return <TagChip key={tag} tag={tag} label={glossary?.label} />
                   })}
@@ -286,7 +285,7 @@ export default function AlignmentEntryPage() {
                 className="mb-10 border-t border-white/[0.06] pt-8"
               >
                 <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#4f4b47] mb-4">Current drift</p>
-                {brief.currentDrift.map((line, i) => (
+                {brief.currentDrift.map((line: string, i: number) => (
                   <p key={i} className="text-[13px] text-[#76716b] leading-relaxed mb-2">{line}</p>
                 ))}
               </motion.div>
