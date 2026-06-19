@@ -158,7 +158,7 @@ export default function CovenantWorkspacePage() {
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Context</p>
       </div>
       <div className="px-5 pt-6 pb-5">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50 mb-3">About Covenant</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50 mb-3">How this works</p>
         <p className="text-[12px] text-[#4f4b47] leading-relaxed mb-5">
           Covenant connects what you're walking through to the real human stories in Scripture. Your Baseline Design is already active — Covenant uses it to find the story that fits your moment.
         </p>
@@ -278,7 +278,7 @@ export default function CovenantWorkspacePage() {
                 <path d="M8 2v12M2 8h12" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
             </div>
-            <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">What are you walking through?</p>
+            <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">Before you move.</p>
             <p className="text-[13px] text-[#4f4b47] leading-relaxed max-w-xs">
               Your Baseline Design is already active. Describe the moment — Covenant will find the story in Scripture that matches it.
             </p>
@@ -288,7 +288,7 @@ export default function CovenantWorkspacePage() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/60 rounded-full animate-spin" />
-            <p className="text-[13px] text-[#4f4b47]">Finding the story…</p>
+            <p className="text-[13px] text-[#4f4b47]">Looking for the story…</p>
           </div>
         )}
 
@@ -362,7 +362,7 @@ export default function CovenantWorkspacePage() {
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Describe what you're walking through."
+            placeholder="This feels bigger than this."
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
@@ -375,7 +375,7 @@ export default function CovenantWorkspacePage() {
               className="h-8 px-5 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
               style={{ borderRadius: 8 }}
             >
-              {isLoading ? "…" : "Reflect"}
+              {isLoading ? "…" : "Find the story"}
             </button>
           </div>
         </div>
