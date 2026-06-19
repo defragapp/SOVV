@@ -12,7 +12,8 @@ export interface Env {
   KV: KVNamespace
 
   // R2 — media, exports, templates (bucket: vibesdk-templates)
-  R2?: R2Bucket
+  // Binding name in wrangler.toml: TEMPLATES
+  TEMPLATES?: R2Bucket
 
   // ── AI ───────────────────────────────────────────────────────────────────
   AI: Ai
