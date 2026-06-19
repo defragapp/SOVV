@@ -344,9 +344,11 @@ export default function DefragEntryPage() {
     getTranslation("defrag")
       .then(t => {
         if (t?.appRender) setBrief(normalizeDefragRender(t.appRender as Record<string, unknown>))
-        else setError("Unable to load your Defrag brief.")
+        // If translation not available, brief stays null — workspace CTA shown instead
       })
-      .catch(() => setError("Unable to load your Defrag brief."))
+      .catch(() => {
+        // Translation unavailable — workspace CTA shown instead
+      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -431,7 +433,35 @@ export default function DefragEntryPage() {
 
       <div className="flex-1 px-6 md:px-10 pt-12 pb-16 max-w-2xl">
         {loading && <LoadingSkeleton />}
-        {!loading && error && <p className="text-[13px] text-[#3a3733] leading-relaxed pt-8">{error}</p>}
+        {!loading && !brief && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
+            className="flex flex-col gap-6 pt-8">
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">Defrag</p>
+              <p className="text-[22px] text-[#f4efe9] leading-snug mb-3">
+                Separate the moment from the pattern.
+              </p>
+              <p className="text-[13px] text-[#76716b] leading-relaxed max-w-sm">
+                Describe what is happening. Defrag shows you what is active beneath the argument, the silence, or the message — and gives you the clearest next move.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 pt-2">
+              {["Arguments that keep repeating", "Messages you don't know how to answer", "Family roles you keep falling into", "Grief that won't move", "Boundaries that don't hold"].map(item => (
+                <div key={item} className="flex items-start gap-2">
+                  <span className="text-[#e0743a]/30 text-[10px] mt-0.5 shrink-0">—</span>
+                  <span className="text-[11px] text-[#2e2b28] leading-relaxed">{item}</span>
+                </div>
+              ))}
+            </div>
+            <div className="pt-2">
+              <Link href="/apps/defrag/workspace"
+                className="inline-flex items-center gap-2 h-9 px-5 border border-white/[0.08] hover:border-white/[0.14] transition-colors"
+                style={{ borderRadius: 6 }}>
+                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733]">Open Defrag →</span>
+              </Link>
+            </div>
+          </motion.div>
+        )}
         {!loading && brief && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.25, ease }}>
 
