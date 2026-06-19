@@ -252,7 +252,7 @@ export default function DefragWorkspacePage() {
               </div>
             )}
             <div className="flex items-center justify-between mt-3.5 pt-3 border-t border-white/[0.04]">
-              <p className="text-[10px] text-[#4f4b47]">Active in every result.</p>
+              <p className="text-[10px] text-[#4f4b47]">Active in every session.</p>
               <a href="/settings" className="text-[10px] text-[#76716b] hover:text-[#a8a29a] transition-colors font-mono uppercase tracking-[0.08em]">Edit</a>
             </div>
           </>
@@ -267,9 +267,9 @@ export default function DefragWorkspacePage() {
         )}
       </div>
 
-      {/* Pattern history */}
+      {/* What you've brought before */}
       <div className="px-5 pt-5 pb-5 border-b border-white/[0.05]">
-        <p className="font-mono text-[9px] uppercase tracking-[0.04em] text-[#a8a29a] mb-3">Pattern history</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.04em] text-[#a8a29a] mb-3">What you've brought before</p>
         {result?.sourcesUsed?.history ? (
           <p className="text-[12px] text-[#76716b] leading-relaxed">Past patterns were used in this result.</p>
         ) : (
@@ -348,7 +348,7 @@ export default function DefragWorkspacePage() {
               <span className="text-[10px] text-[#76716b] border border-white/[0.10] px-2.5 py-0.5" style={{ borderRadius: 4 }}>Birth data ✓</span>
             )}
             {result.sourcesUsed.history && (
-              <span className="text-[10px] text-[#76716b] border border-white/[0.10] px-2.5 py-0.5" style={{ borderRadius: 4 }}>Pattern history ✓</span>
+              <span className="text-[10px] text-[#76716b] border border-white/[0.10] px-2.5 py-0.5" style={{ borderRadius: 4 }}>What you've brought before ✓</span>
             )}
           </div>
         )}
@@ -358,14 +358,14 @@ export default function DefragWorkspacePage() {
 
         {!baselineLoading && !baseline && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-3">
-            <p className="text-[15px] font-medium text-[#a8a29a]">Birth data required to run.</p>
+            <p className="text-[15px] font-medium text-[#a8a29a]">Your Baseline Design is needed to begin.</p>
             <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">Add your date, time, and place of birth in the Context panel on the left.</p>
           </div>
         )}
 
         {baseline && !result && !isLoading && !error && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-2">
-            <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">What's going on?</p>
+            <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">Before you move.</p>
             <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">Describe what's happening. Be as specific or as brief as you want.</p>
           </div>
         )}
@@ -373,7 +373,7 @@ export default function DefragWorkspacePage() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <span className="w-5 h-5 border border-white/[0.15] border-t-white/[0.45] rounded-full animate-spin" />
-            <p className="text-[13px] text-[#76716b]">Analyzing your input…</p>
+            <p className="text-[13px] text-[#76716b]">Looking at what's here…</p>
           </div>
         )}
 
@@ -399,7 +399,7 @@ export default function DefragWorkspacePage() {
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Describe what's happening. Be specific."
+            placeholder="I need clarity on something."
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
@@ -409,7 +409,7 @@ export default function DefragWorkspacePage() {
             <button onClick={handleSubmit} disabled={!input.trim() || isLoading}
               className="h-8 px-5 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
               style={{ borderRadius: 8 }}>
-              {isLoading ? "…" : "Defrag"}
+              {isLoading ? "…" : "Show me what I'm not seeing"}
             </button>
           </div>
         </div>
