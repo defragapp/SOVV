@@ -55,3 +55,19 @@ export function cookieHeader(sid: string): string {
   // Secure + SameSite for production; HttpOnly is fine because we don't need JS access.
   return `sid=${sid}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=31536000`;
 }
+
+export const PRO_DAILY_LIMIT = 200
+
+export async function checkProLimit(
+  kv: KVNamespace,
+  userId: string
+): Promise<{ allowed: boolean; remaining: number; limit: number }> {
+  const key = `pro-usage:${userId}:${new Date().toISOString().slice(0, 10)}`
+  const raw = await kv.get(key)
+  const count = raw ? parseInt(raw, 10) : 0
+  if (count >= PRO_DAILY_LIMIT) {
+    return { allowed: false, remaining: 0, limit: PRO_DAILY_LIMIT }
+  }
+  await kv.put(key, String(count + 1), { expirationTtl: 86400 })
+  return { allowed: true, remaining: PRO_DAILY_LIMIT - count - 1, limit: PRO_DAILY_LIMIT }
+}
