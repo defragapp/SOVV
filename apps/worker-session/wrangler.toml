@@ -34,7 +34,7 @@ command = "npm install && npm run build"
 
 [env.production]
 name = "worker-session"
-workers_dev = true
+workers_dev = false
 
 [env.production.ai]
 binding = "AI"
