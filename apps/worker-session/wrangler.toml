@@ -3,7 +3,7 @@ main = "./src/index.ts"
 compatibility_date = "2026-06-01"
 compatibility_flags = ["nodejs_compat"]
 # account_id removed — set CLOUDFLARE_ACCOUNT_ID in CI secrets
-workers_dev = true
+workers_dev = false
 
 [ai]
 binding = "AI"
