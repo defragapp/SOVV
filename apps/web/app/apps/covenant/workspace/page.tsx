@@ -373,7 +373,7 @@ export default function CovenantWorkspacePage() {
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="This feels bigger than this."
+            placeholder="What does this moment mean in the larger story?"
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
