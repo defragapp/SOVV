@@ -478,9 +478,30 @@ export default function AlignmentEntryPage() {
       <div className="flex-1 px-6 md:px-10 pt-12 pb-16 max-w-2xl">
 
         {loading && <LoadingSkeleton />}
-
         {!loading && error && (
           <p className="text-[13px] text-[#3a3733] leading-relaxed pt-8">{error}</p>
+        )}
+
+        {!loading && !brief && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
+            className="flex flex-col gap-6 pt-8">
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">Alignment</p>
+              <p className="text-[22px] text-[#f4efe9] leading-snug mb-3">
+                Get back into your own lane.
+              </p>
+              <p className="text-[13px] text-[#76716b] leading-relaxed max-w-sm">
+                Alignment uses your Baseline Design and the live sky above you to show you the path back to yourself — what is yours to carry, what belongs to the other side, and one next step.
+              </p>
+            </div>
+            <div className="pt-2">
+              <Link href="/apps/alignment/workspace"
+                className="inline-flex items-center gap-2 h-9 px-5 border border-white/[0.08] hover:border-white/[0.14] transition-colors"
+                style={{ borderRadius: 6 }}>
+                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733]">Open Alignment →</span>
+              </Link>
+            </div>
+          </motion.div>
         )}
 
         {!loading && brief && (
