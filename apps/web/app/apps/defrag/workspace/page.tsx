@@ -97,6 +97,17 @@ export default function DefragWorkspacePage() {
   const [libraryLoading, setLibraryLoading] = React.useState(true)
 
   // Load baseline
+  // Prefill composer from ?prompt= query param
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const prompt = params.get("prompt")
+      if (prompt) {
+        setInput((prev) => prev || decodeURIComponent(prompt))
+      }
+    }
+  }, [])
+
   React.useEffect(() => {
     fetch("/api/baseline", { credentials: "include" })
       .then(r => (r.ok ? r.json() : { baseline: null }))
