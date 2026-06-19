@@ -1,6 +1,5 @@
 "use client"
 import * as React from "react"
-import { useSearchParams } from "next/navigation"
 import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
 import { motion, AnimatePresence } from "framer-motion"
@@ -49,15 +48,6 @@ export default function AlignmentWorkspacePage() {
     return () => { if (audioUrl) URL.revokeObjectURL(audioUrl) }
   }, [audioUrl])
 
-
-  // Prefill composer from ?prompt= query param
-  const searchParams = useSearchParams()
-  React.useEffect(() => {
-    const prompt = searchParams.get("prompt")
-    if (prompt && !input) {
-      setInput(decodeURIComponent(prompt))
-    }
-  }, [searchParams])
 
   React.useEffect(() => {
     fetch("/api/library?workspace_source=ALIGNMENT", { credentials: "include" })
@@ -342,7 +332,7 @@ export default function AlignmentWorkspacePage() {
             }}
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
-            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Continue</span>
+            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Run</span>
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
