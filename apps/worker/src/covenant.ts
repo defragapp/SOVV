@@ -98,7 +98,9 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
         if (match) parsed = JSON.parse(match[0]);
       } catch {}
 
-      return new Response(JSON.stringify(parsed), {
+      // Add media capabilities for Pro users (subscription gate already passed)
+      const responseWithMedia = { ...parsed, media: { audioOverviewAvailable: true } };
+      return new Response(JSON.stringify(responseWithMedia), {
         status: 200,
         headers: { "Content-Type": "application/json" }
       });
