@@ -26,7 +26,7 @@ export default function LibraryPage() {
       </div>
       <div className="flex-1 px-6 py-8">
         <p className="text-xs font-sans font-medium text-[#76716b] leading-relaxed max-w-[180px]">
-          The private record of what helped. Return here before the old pattern takes over again.
+          The private record of what helped. Return here before the moment passes.
         </p>
       </div>
     </div>
@@ -67,7 +67,7 @@ export default function LibraryPage() {
           ) : items.length === 0 ? (
              <div className="border border-white/[0.08] bg-white/[0.02] flex flex-col items-center justify-center py-24 text-center">
                 <p className="text-[13px] text-[#a8a29a] font-sans font-medium max-w-[280px] leading-relaxed">
-                   Save useful Results here so you can return before the old pattern takes over again.
+                   Save what helped. Return before the moment passes.
                 </p>
              </div>
           ) : (
@@ -77,7 +77,7 @@ export default function LibraryPage() {
                    <div className="flex justify-between items-start">
                       <div className="flex flex-col gap-1">
                          <span className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">
-                            {item.workspace_source === "DEFRAG" ? "Defrag space" : item.workspace_source === "COVENANT" ? "Covenant space" : item.workspace_source === "ALIGNMENT" ? "Alignment space" : "Library item"}
+                            {item.workspace_source === "DEFRAG" ? "Defrag" : item.workspace_source === "COVENANT" ? "Covenant" : item.workspace_source === "ALIGNMENT" ? "Alignment" : "Library item"}
                          </span>
                          <h3 className="text-base text-[#f4efe9] font-medium tracking-tight">{item.title || "Untitled"}</h3>
                       </div>
