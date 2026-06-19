@@ -127,10 +127,10 @@ Do not use coercive language ("you must", "you have to", "send this now"). Prese
 Output strictly in this JSON format, no markdown, no code fences:
 {
   "skyContext": "1-2 sentences: what the current planetary weather means for this moment — plain language, not astrology jargon",
-  "whatIsTrue": "2-3 sentences: the honest read on the situation, stripped of the story they've been telling themselves",
+  "whatIsTrue": "2-3 sentences: what is actually happening — stripped of story and assumption",
   "whatIsYours": "1-2 sentences: what is theirs to carry — their part, their responsibility, their choice",
   "whatIsNotYours": "1-2 sentences: what belongs to the other side — what they cannot control or fix",
-  "theShift": "1-2 sentences: the specific change in posture, timing, or language that would move things forward",
+  "theShift": "1-2 sentences: what a clean response looks like — specific, not generic",
   "nextStep": "1 concrete, human, doable next step — not a list, not a lecture",
   "avoid": "1-2 sentences: the move that feels right in the moment but tends to make things worse for someone with their pattern",
   "alignment": "1 sentence: what it looks like to stay in their own lane through this"
