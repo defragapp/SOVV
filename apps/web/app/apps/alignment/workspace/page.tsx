@@ -169,7 +169,7 @@ export default function AlignmentWorkspacePage() {
             href="/apps/alignment"
             className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
           >
-            ← Your alignment brief
+            ← Back to Alignment
           </Link>
         </div>
       </div>
