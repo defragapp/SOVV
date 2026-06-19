@@ -37,6 +37,17 @@ export default function AlignmentWorkspacePage() {
   const [error, setError] = React.useState("")
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
+  // Audio Overview
+  const audioRef = React.useRef<HTMLAudioElement | null>(null)
+  const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
+  const [isGeneratingAudio, setIsGeneratingAudio] = React.useState(false)
+  const [audioError, setAudioError] = React.useState("")
+
+  // Revoke audio blob on unmount
+  React.useEffect(() => {
+    return () => { if (audioUrl) URL.revokeObjectURL(audioUrl) }
+  }, [audioUrl])
+
 
   React.useEffect(() => {
     fetch("/api/library?workspace_source=ALIGNMENT", { credentials: "include" })
@@ -95,6 +106,40 @@ export default function AlignmentWorkspacePage() {
     }
   }
 
+
+  const handleGenerateAudio = async () => {
+    if (!result || isGeneratingAudio) return
+    setIsGeneratingAudio(true)
+    setAudioError("")
+    try {
+      const text = [
+        result.whatIsTrue,
+        result.whatIsYours,
+        result.theShift,
+        result.nextStep,
+        result.alignment,
+      ].filter(Boolean).join(" ")
+      const res = await fetch("/api/audio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ text }),
+      })
+      if (!res.ok) {
+        const d = (await res.json().catch(() => ({}))) as any
+        throw new Error(d.error || "Failed to generate audio")
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      setAudioUrl(url)
+      requestAnimationFrame(() => { audioRef.current?.play().catch(() => {}) })
+    } catch (err: any) {
+      setAudioError(err.message || "Failed to generate audio")
+    } finally {
+      setIsGeneratingAudio(false)
+    }
+  }
+
   // ─── LEFT PANEL ────────────────────────────────────────────────────────────
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
@@ -140,6 +185,24 @@ export default function AlignmentWorkspacePage() {
 
       {result && (
         <div className="px-5 pt-5 pb-5 border-b border-white/[0.06]">
+          {/* Audio Overview */}
+          {result.media?.audioOverviewAvailable && (
+            <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden mb-4" style={{ borderRadius: 10 }}>
+              {!audioUrl && (
+                <button onClick={handleGenerateAudio} disabled={isGeneratingAudio}
+                  className="w-full flex items-center gap-3 px-3.5 py-2.5 text-left hover:bg-white/[0.03] transition-colors">
+                  <div className="w-5 h-5 border border-white/[0.12] flex items-center justify-center shrink-0" style={{ borderRadius: 4 }}>
+                    <svg width="8" height="9" viewBox="0 0 8 9" fill="currentColor" className="text-[#a8a29a]">
+                      <path d="M0 0.5L8 4.5L0 8.5V0.5Z"/>
+                    </svg>
+                  </div>
+                  <span className="text-[12px] text-[#a8a29a]">{isGeneratingAudio ? "Generating…" : "Create Audio Overview"}</span>
+                </button>
+              )}
+              {audioUrl && <audio ref={audioRef} src={audioUrl} controls preload="auto" className="w-full h-9 outline-none" />}
+              {audioError && <p className="text-[11px] text-[#76716b] px-3.5 pb-2.5">{audioError}</p>}
+            </div>
+          )}
           <button
             onClick={handleSave}
             disabled={isSaving || saveSuccess}
