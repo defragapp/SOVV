@@ -40,17 +40,6 @@ async function handleCreateInvite(req: Request, env: Env): Promise<Response> {
   const user = await getAuthUser(req, env.DB);
   if (!user) return jsonResponse({ error: "Unauthorized" }, 401);
 
-  // Per-user invite creation rate limit (10/day)
-  if (env.KV) {
-    const inviteKey = `invite-count:${user.id}:${new Date().toISOString().slice(0, 10)}`;
-    const raw = await env.KV.get(inviteKey);
-    const count = raw ? parseInt(raw, 10) : 0;
-    if (count >= 10) {
-      return jsonResponse({ error: "You've created too many invites today. Limit resets at midnight UTC." }, 429);
-    }
-    await env.KV.put(inviteKey, String(count + 1), { expirationTtl: 86400 });
-  }
-
   const body = await req.json().catch(() => ({})) as any;
   const { workspace_source, library_id, invite_mode, result_context } = body;
 
@@ -241,7 +230,6 @@ You are generating a private reflection result for someone who accepted a Sovere
 RULES:
 - Never reveal raw birth data, gate numbers, or framework internals
 - Never diagnose, predict, or make claims about the other person
-- Never make predictions about outcomes or futures
 - Never make predictions about outcomes or futures
 - Never use coercive language ("you must", "you have to", "you need to")
 - Focus on the invitee's own patterns and what they can do
