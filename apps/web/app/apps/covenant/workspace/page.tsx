@@ -60,6 +60,17 @@ export default function CovenantWorkspacePage() {
   }, [audioUrl])
 
 
+  // Prefill composer from ?prompt= query param
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const prompt = params.get("prompt")
+      if (prompt) {
+        setInput((prev) => prev || decodeURIComponent(prompt))
+      }
+    }
+  }, [])
+
   React.useEffect(() => {
     fetch("/api/library?workspace_source=COVENANT", { credentials: "include" })
       .then(r => r.ok ? r.json() : { items: [] })
