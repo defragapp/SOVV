@@ -87,7 +87,7 @@ export default function SettingsPage() {
               Sovereign.os
             </Link>
             <span className="text-white/20" aria-hidden>/</span>
-            <span className="text-[#a8a29a]">Baseline Design</span>
+            <span className="text-[#a8a29a]">Your Design</span>
           </nav>
           <Link
             href="/apps/defrag"
@@ -123,7 +123,7 @@ export default function SettingsPage() {
           </div>
 
           <h1 className="font-serif text-3xl md:text-4xl text-[#f4efe9] leading-tight tracking-[-0.02em] mb-5">
-            Your Baseline Design is the source.
+            Your Baseline Design is the starting point.
           </h1>
 
           <p className="text-base leading-relaxed text-[#a8a29a] max-w-prose mb-6">
