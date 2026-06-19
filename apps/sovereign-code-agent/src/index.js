@@ -6,7 +6,11 @@ export default {
     }
 
     const url = new URL(request.url);
-    const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' };
+    // SECURITY: Restrict CORS to operator origins only — never wildcard
+    const allowedOrigins = ['https://operator.defrag.app', 'https://developer.sovereign-os-api.workers.dev'];
+    const requestOrigin = request.headers.get('Origin') || '';
+    const corsOrigin = allowedOrigins.includes(requestOrigin) ? requestOrigin : allowedOrigins[0];
+    const cors = { 'Access-Control-Allow-Origin': corsOrigin, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization', 'Vary': 'Origin' };
     
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: cors });
@@ -65,9 +69,14 @@ export default {
     }
 
     if (url.pathname === '/deploy' && request.method === 'POST') {
-      const { scriptName, scriptCode, cfApiToken } = await request.json().catch(() => ({}));
-      if (!scriptName || !scriptCode || !cfApiToken) {
-        return Response.json({ error: 'Need scriptName, scriptCode, cfApiToken' }, { status: 400, headers: cors });
+      // SECURITY: cfApiToken must NOT come from request body — use bound secret only
+      const cfApiToken = env.CF_API_TOKEN;
+      if (!cfApiToken) {
+        return Response.json({ error: 'CF_API_TOKEN not configured as Worker secret' }, { status: 503, headers: cors });
+      }
+      const { scriptName, scriptCode } = await request.json().catch(() => ({}));
+      if (!scriptName || !scriptCode) {
+        return Response.json({ error: 'Need scriptName, scriptCode' }, { status: 400, headers: cors });
       }
       const deployRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/workers/scripts/${scriptName}`, {
         method: 'PUT',
