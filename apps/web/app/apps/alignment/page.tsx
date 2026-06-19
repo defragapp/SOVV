@@ -365,9 +365,11 @@ export default function AlignmentEntryPage() {
     getTranslation("alignment")
       .then(t => {
         if (t?.appRender) setBrief(t.appRender as unknown as AlignmentRender)
-        else setError("Unable to load your alignment brief.")
+        // If translation not available, brief stays null — workspace CTA shown instead
       })
-      .catch(() => setError("Unable to load your alignment brief."))
+      .catch(() => {
+        // Translation unavailable — workspace CTA shown instead
+      })
       .finally(() => setLoading(false))
   }, [])
 
