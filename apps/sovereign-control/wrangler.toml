@@ -1,0 +1,28 @@
+name = "sovereign-control"
+main = "./src/index.ts"
+compatibility_date = "2026-06-19"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+
+# Served at operator.defrag.app — protected by Cloudflare Access
+# Add Cloudflare Access policy in dashboard before exposing publicly
+[[routes]]
+pattern = "operator.defrag.app"
+custom_domain = true
+
+[ai]
+binding = "AI"
+
+[vars]
+ENVIRONMENT = "production"
+GATEWAY_ID = "sovereign-ai-gateway"
+# TEAM_DOMAIN and POLICY_AUD set as secrets for Cloudflare Access JWT verification
+
+[observability]
+enabled = true
+
+[env.development]
+name = "sovereign-control-dev"
+workers_dev = true
+[env.development.vars]
+ENVIRONMENT = "development"
