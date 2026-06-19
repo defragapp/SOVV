@@ -29,7 +29,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
         {/* ── Header ── */}
         <header className="col-span-3 h-[52px] border-b border-white/[0.06] bg-[#08070a]/95 backdrop-blur-md px-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors">
+            <Link href="/apps/defrag" className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors">
               Sovereign.os
             </Link>
             <span className="text-white/20 text-xs">/</span>
@@ -59,6 +59,12 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
 
           {/* Right nav */}
           <div className="flex items-center gap-4">
+            <Link
+              href="/app"
+              className="font-mono text-[10px] tracking-[0.12em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors"
+            >
+              Library
+            </Link>
             <Link
               href="/settings"
               className="font-mono text-[10px] tracking-[0.12em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors"
@@ -98,11 +104,14 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
       <div className="flex lg:hidden flex-col w-full h-full safe-top safe-bottom">
         <header className="sticky top-0 z-10 bg-[#08070a]/95 backdrop-blur-md border-b border-white/[0.06] px-5 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase">
-            <Link href="/" className="text-[#76716b]">Sovereign.os</Link>
+            <Link href="/apps/defrag" className="text-[#76716b]">Sovereign.os</Link>
             <span className="text-white/20">/</span>
             <span className="text-[#f4efe9]">{spaceName}</span>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/app" className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#76716b] hover:text-[#f4efe9] transition-colors">
+              Library
+            </Link>
             <Link href="/settings" className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#76716b] hover:text-[#f4efe9] transition-colors">
               Baseline
             </Link>
