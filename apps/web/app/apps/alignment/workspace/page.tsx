@@ -147,7 +147,7 @@ export default function AlignmentWorkspacePage() {
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Context</p>
       </div>
       <div className="px-5 pt-6 pb-5">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">About Alignment</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">How this works</p>
         <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
           Your Baseline Design is your fixed center — how you naturally operate. The live sky is the emotional weather you're moving through right now. Alignment uses both to show you the path back to yourself.
         </p>
@@ -155,8 +155,8 @@ export default function AlignmentWorkspacePage() {
           {[
             "What is actually true in this situation",
             "What is yours to carry — and what isn't",
-            "The one move that would shift things",
-            "What to avoid doing right now",
+            "What's still available to you",
+            "What can remain unfinished",
           ].map((item) => (
             <div key={item} className="flex items-start gap-2">
               <span className="text-[#e0743a]/40 text-[10px] mt-0.5 shrink-0">→</span>
@@ -277,7 +277,7 @@ export default function AlignmentWorkspacePage() {
               What's pulling you off course?
             </p>
             <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
-              Your Baseline Design and the live sky are already active. Describe what's happening — Alignment will show you the path back.
+              Your Baseline Design and the live sky are already here. Describe what's pulling at you — Alignment will show you what belongs to you and what options are still available.
             </p>
           </div>
         )}
@@ -324,7 +324,7 @@ export default function AlignmentWorkspacePage() {
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="What's pulling you off course?"
+            placeholder="I need to respond well."
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             onKeyDown={e => {
