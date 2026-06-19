@@ -1,6 +1,5 @@
 "use client"
 import * as React from "react"
-import { useSearchParams } from "next/navigation"
 import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
 import { motion, AnimatePresence } from "framer-motion"
@@ -60,15 +59,6 @@ export default function CovenantWorkspacePage() {
     return () => { if (audioUrl) URL.revokeObjectURL(audioUrl) }
   }, [audioUrl])
 
-
-  // Prefill composer from ?prompt= query param
-  const searchParams = useSearchParams()
-  React.useEffect(() => {
-    const prompt = searchParams.get("prompt")
-    if (prompt && !input) {
-      setInput(decodeURIComponent(prompt))
-    }
-  }, [searchParams])
 
   React.useEffect(() => {
     fetch("/api/library?workspace_source=COVENANT", { credentials: "include" })
