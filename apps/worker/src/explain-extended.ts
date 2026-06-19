@@ -56,7 +56,7 @@ Respond in this exact JSON format only, no markdown, no code fences:
   "whatYouLearnedToCarry": "What they learned to carry that fuels this",
   "strainPattern": "How this pattern shows up under strain",
   "giftUnderStrain": "The positive intent or gift hidden in the strain",
-  "alignment": "What needs to align now",
+  "alignment": "What gives this moment a better chance",
   "bestNextResponse": {
     "summary": "Context for the response",
     "phrasing": ["phrase 1", "phrase 2"]
