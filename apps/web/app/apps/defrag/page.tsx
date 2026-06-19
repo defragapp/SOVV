@@ -360,7 +360,7 @@ export default function DefragEntryPage() {
       </div>
       <div className="px-5 pt-6 pb-5 flex flex-col gap-6">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">What this is</p>
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">Before you move</p>
           <p className="text-[12px] text-[#3a3733] leading-relaxed">
             Defrag separates the moment from the pattern. It shows you what is active beneath the argument, the silence, the message, or the grief — and gives you the clearest next response.
           </p>
@@ -446,18 +446,30 @@ export default function DefragEntryPage() {
               </p>
             </div>
             <div className="flex flex-col gap-2 pt-2">
-              {["Something keeps happening", "I need to respond well", "I am carrying too much", "This feels bigger than this", "I am pulling back"].map(item => (
-                <div key={item} className="flex items-start gap-2">
-                  <span className="text-[#e0743a]/30 text-[10px] mt-0.5 shrink-0">—</span>
-                  <span className="text-[11px] text-[#2e2b28] leading-relaxed">{item}</span>
-                </div>
+              {[
+                { label: "I need clarity", href: "/apps/defrag/workspace?prompt=I%20need%20clarity", desc: "See the moment before you move." },
+                { label: "I am carrying too much", href: "/apps/alignment/workspace?prompt=I%20am%20carrying%20too%20much", desc: "Separate what belongs to you from what does not." },
+                { label: "I need to respond well", href: "/apps/alignment/workspace?prompt=I%20need%20to%20respond%20well", desc: "Find words that do not add weight." },
+                { label: "I am making this heavier", href: "/apps/alignment/workspace?prompt=I%20am%20making%20this%20heavier", desc: "See what you may be adding." },
+                { label: "I am pulling back", href: "/apps/defrag/workspace?prompt=I%20am%20pulling%20back", desc: "Understand what silence is protecting." },
+                { label: "This feels bigger than this", href: "/apps/covenant/workspace?prompt=This%20feels%20bigger%20than%20this", desc: "Hold what matters without forcing an answer." },
+              ].map(item => (
+                <Link key={item.label} href={item.href}
+                  className="flex items-start justify-between gap-4 py-3 border-b border-white/[0.04] last:border-0 group hover:bg-white/[0.02] transition-colors -mx-2 px-2"
+                  style={{ borderRadius: 2 }}>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[12px] text-[#c8c2bc] leading-snug group-hover:text-[#f4efe9] transition-colors">{item.label}</span>
+                    <span className="text-[10px] text-[#4f4b47] leading-relaxed">{item.desc}</span>
+                  </div>
+                  <span className="text-[#4f4b47] group-hover:text-[#c8c2bc] transition-colors text-[10px] shrink-0 mt-0.5">→</span>
+                </Link>
               ))}
             </div>
             <div className="pt-2">
               <Link href="/apps/defrag/workspace"
-                className="inline-flex items-center gap-2 h-9 px-5 border border-white/[0.08] hover:border-white/[0.14] transition-colors"
-                style={{ borderRadius: 6 }}>
-                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733]">Begin →</span>
+                className="inline-flex items-center gap-2 h-9 px-5 border border-[#c8c2bc]/30 hover:border-[#c8c2bc]/50 hover:bg-[#c8c2bc]/5 transition-all"
+                style={{ borderRadius: 2 }}>
+                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#c8c2bc]">Begin →</span>
               </Link>
             </div>
           </motion.div>
