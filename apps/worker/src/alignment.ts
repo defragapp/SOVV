@@ -2,7 +2,6 @@ import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI } from "./baseline.js";
-import { checkProLimit } from "./plan.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -241,19 +240,6 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
     const subGate = await requireActiveSubscription(user, request);
     if (subGate) return subGate;
 
-    // Per-user Pro daily soft cap (200/day)
-    if (env.KV) {
-      const limitCheck = await checkProLimit(env.KV, user.id);
-      if (!limitCheck.allowed) {
-        return new Response(JSON.stringify({
-          error: "daily_limit_reached",
-          message: "You've reached your daily Alignment limit. It resets at midnight UTC.",
-          remaining: 0,
-          limit: limitCheck.limit,
-        }), { status: 429, headers: { "Content-Type": "application/json" } });
-      }
-    }
-
     try {
       const body = await request.json().catch(() => ({})) as any;
       const mode = body.mode ?? "workspace";
@@ -316,9 +302,6 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
           status: 400, headers: { "Content-Type": "application/json" }
         });
       }
-        if (typeof message === "string" && message.length > 3000) {
-          return new Response(JSON.stringify({ error: "Message too long. Please keep it under 3000 characters." }), { status: 400, headers: { "Content-Type": "application/json" } });
-        }
 
       let baselineContext = "";
       try {
