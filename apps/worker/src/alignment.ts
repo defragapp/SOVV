@@ -316,6 +316,9 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
           status: 400, headers: { "Content-Type": "application/json" }
         });
       }
+        if (typeof message === "string" && message.length > 3000) {
+          return new Response(JSON.stringify({ error: "Message too long. Please keep it under 3000 characters." }), { status: 400, headers: { "Content-Type": "application/json" } });
+        }
 
       let baselineContext = "";
       try {
