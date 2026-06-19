@@ -7,7 +7,7 @@ export default {
     const GATEWAY_ID = env.GATEWAY_ID || "sovereign-code-agent";
 
     if (request.method === "OPTIONS") {
-      return new Response(null, { headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Authorization, Content-Type" } });
+      return new Response(null, { headers: { "Access-Control-Allow-Origin": "https://operator.defrag.app", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Authorization, Content-Type", "Vary": "Origin" } });
     }
     
     const auth = request.headers.get("Authorization");
@@ -76,6 +76,8 @@ export default {
       }
 
       if (path === "/deploy/worker" && request.method === "POST") {
+        // AUDIT: log all deploy attempts
+        console.log(JSON.stringify({ event: "deploy_attempt", path, timestamp: new Date().toISOString(), ip: request.headers.get("CF-Connecting-IP") || "unknown" }));
         const body = await request.json();
         const { name, code, bindings = [] } = body;
         if (!name || !code) return json({ error: "Missing name or code" }, 400);
