@@ -37,10 +37,10 @@ export function ResultCard({
   const sections = [
     { label: "What's happening",       value: result.activePattern },
     { label: "What you may be carrying", value: result.theRepeat },
-    { label: "How you tend to respond",         value: result.oldRole },
+    { label: "The role you're entering",         value: result.oldRole },
     { label: "What may be adding weight",     value: result.whatYouLearnedToCarry },
-    { label: "When it gets heavier",       value: result.strainPattern },
-    { label: "What's still available",       value: result.giftUnderStrain },
+    { label: "Where the pressure is",       value: result.strainPattern },
+    { label: "What gives this moment a better chance",       value: result.giftUnderStrain },
     { label: "What belongs to you",      value: result.alignment },
   ].filter(s => s.value)
 
