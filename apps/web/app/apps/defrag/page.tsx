@@ -186,7 +186,7 @@ function ActivePattern({ data, delay = 0 }: { data: NonNullable<DefragRender["ac
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, delay, ease }}
     >
-      <SectionLabel>what's active</SectionLabel>
+      <SectionLabel>what's here</SectionLabel>
       {data.name && <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#e0743a]/50 mb-4">{data.name}</p>}
       <div className="flex flex-col gap-2.5">
         {data.lines.map((line, i) => (
@@ -366,7 +366,7 @@ export default function DefragEntryPage() {
           </p>
         </div>
         <div className="border-t border-white/[0.04] pt-5 flex flex-col gap-3">
-          {["Arguments that keep repeating", "Messages you don't know how to answer", "Family roles you keep falling into", "Boundaries you can't hold"].map(item => (
+          {["Something keeps happening", "I need to respond well", "I am carrying too much", "Boundaries you can't hold"].map(item => (
             <div key={item} className="flex items-start gap-2">
               <span className="text-[#e0743a]/30 text-[10px] mt-0.5 shrink-0">—</span>
               <span className="text-[11px] text-[#2e2b28] leading-relaxed">{item}</span>
@@ -399,7 +399,7 @@ export default function DefragEntryPage() {
           </div>
         ) : brief?.cleanerMove ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.8, ease }} className="flex flex-col gap-4">
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-1">What stops feeding it</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-1">What belongs to you</p>
             {brief.cleanerMove.lines.slice(0, 2).map((line, i) => (
               <p key={i} className={`leading-relaxed ${i === 0 ? "text-[13px] text-[#f4efe9]" : "text-[12px] text-[#76716b]"}`}>{line}</p>
             ))}
@@ -446,7 +446,7 @@ export default function DefragEntryPage() {
               </p>
             </div>
             <div className="flex flex-col gap-2 pt-2">
-              {["Arguments that keep repeating", "Messages you don't know how to answer", "Family roles you keep falling into", "Grief that won't move", "Boundaries that don't hold"].map(item => (
+              {["Something keeps happening", "I need to respond well", "I am carrying too much", "This feels bigger than this", "I am pulling back"].map(item => (
                 <div key={item} className="flex items-start gap-2">
                   <span className="text-[#e0743a]/30 text-[10px] mt-0.5 shrink-0">—</span>
                   <span className="text-[11px] text-[#2e2b28] leading-relaxed">{item}</span>
@@ -457,7 +457,7 @@ export default function DefragEntryPage() {
               <Link href="/apps/defrag/workspace"
                 className="inline-flex items-center gap-2 h-9 px-5 border border-white/[0.08] hover:border-white/[0.14] transition-colors"
                 style={{ borderRadius: 6 }}>
-                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733]">Open Defrag →</span>
+                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733]">Begin →</span>
               </Link>
             </div>
           </motion.div>
