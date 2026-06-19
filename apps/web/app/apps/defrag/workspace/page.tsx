@@ -386,7 +386,6 @@ export default function DefragWorkspacePage() {
             result={result}
             input={input}
             spaceName="Defrag"
-      subtitle="Workspace"
             onSave={handleSave}
             isSaving={isSaving}
             saveSuccess={saveSuccess}
