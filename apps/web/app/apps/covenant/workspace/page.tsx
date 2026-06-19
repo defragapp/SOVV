@@ -392,6 +392,7 @@ export default function CovenantWorkspacePage() {
     />
     <SpaceShell
       spaceName="Covenant"
+      subtitle="Workspace"
       sidebar={sidebar}
       contextPanel={contextPanel}
       main={main}
