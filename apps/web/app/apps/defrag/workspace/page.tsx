@@ -280,7 +280,7 @@ export default function DefragWorkspacePage() {
       {/* Back to entry */}
       <div className="px-5 pt-5">
         <Link href="/apps/defrag" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors">
-          ← Defrag overview
+          ← Back to Defrag
         </Link>
       </div>
     </div>
