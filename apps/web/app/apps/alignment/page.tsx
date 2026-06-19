@@ -496,9 +496,9 @@ export default function AlignmentEntryPage() {
             </div>
             <div className="pt-2">
               <Link href="/apps/alignment/workspace"
-                className="inline-flex items-center gap-2 h-9 px-5 border border-white/[0.08] hover:border-white/[0.14] transition-colors"
-                style={{ borderRadius: 6 }}>
-                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733]">Begin →</span>
+                className="inline-flex items-center gap-2 h-9 px-5 border border-[#c8c2bc]/30 hover:border-[#c8c2bc]/50 hover:bg-[#c8c2bc]/5 transition-all"
+                style={{ borderRadius: 2 }}>
+                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#c8c2bc]">Begin →</span>
               </Link>
             </div>
           </motion.div>
