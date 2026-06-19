@@ -167,7 +167,7 @@ function AlignmentView({ blocks, delay = 0 }: { blocks: TraitBlockData[]; delay?
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay, ease }}
     >
-      <SectionLabel>when you're aligned</SectionLabel>
+      <SectionLabel>what's available to you</SectionLabel>
       <div className="flex flex-col gap-0">
         {blocks.map((block, bi) => (
           <div key={block.key} className="border-b border-white/[0.05] pb-7 mb-7 last:border-0 last:pb-0 last:mb-0">
@@ -212,7 +212,7 @@ function MisalignmentView({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, delay, ease }}
     >
-      <SectionLabel dim>when you're off</SectionLabel>
+      <SectionLabel dim>what may be adding weight</SectionLabel>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
 
@@ -488,17 +488,17 @@ export default function AlignmentEntryPage() {
             <div>
               <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">Alignment</p>
               <p className="text-[22px] text-[#f4efe9] leading-snug mb-3">
-                Get back into your own lane.
+                Find what belongs to you.
               </p>
               <p className="text-[13px] text-[#76716b] leading-relaxed max-w-sm">
-                Alignment uses your Baseline Design and the live sky above you to show you the path back to yourself — what is yours to carry, what belongs to the other side, and one next step.
+                Your Baseline Design and the live sky above you are already here. Alignment shows you what belongs to you, what may be adding weight, and what options are still available.
               </p>
             </div>
             <div className="pt-2">
               <Link href="/apps/alignment/workspace"
                 className="inline-flex items-center gap-2 h-9 px-5 border border-white/[0.08] hover:border-white/[0.14] transition-colors"
                 style={{ borderRadius: 6 }}>
-                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733]">Open Alignment →</span>
+                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733]">Begin →</span>
               </Link>
             </div>
           </motion.div>
@@ -563,7 +563,7 @@ export default function AlignmentEntryPage() {
       mobileTabs={[
         { id: "brief",   label: "Alignment", content: main },
         { id: "context", label: "Context",   content: sidebar },
-        { id: "action",  label: "Action",    content: contextPanel },
+        { id: "action",  label: "What's still available",    content: contextPanel },
       ]}
     />
   )
