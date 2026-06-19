@@ -35,13 +35,13 @@ export function ResultCard({
   const [copied, setCopied] = React.useState(false)
 
   const sections = [
-    { label: "Active pattern",       value: result.activePattern },
-    { label: "What keeps happening", value: result.theRepeat },
-    { label: "Default mode",         value: result.oldRole },
-    { label: "What shaped this",     value: result.whatYouLearnedToCarry },
-    { label: "Under pressure",       value: result.strainPattern },
-    { label: "What's working",       value: result.giftUnderStrain },
-    { label: "What would help",      value: result.alignment },
+    { label: "What's happening",       value: result.activePattern },
+    { label: "What you may be carrying", value: result.theRepeat },
+    { label: "How you tend to respond",         value: result.oldRole },
+    { label: "What may be adding weight",     value: result.whatYouLearnedToCarry },
+    { label: "When it gets heavier",       value: result.strainPattern },
+    { label: "What's still available",       value: result.giftUnderStrain },
+    { label: "What belongs to you",      value: result.alignment },
   ].filter(s => s.value)
 
   const response = result.bestNextResponse
