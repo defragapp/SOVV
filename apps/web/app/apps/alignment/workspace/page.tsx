@@ -356,6 +356,7 @@ export default function AlignmentWorkspacePage() {
     />
     <SpaceShell
       spaceName="Alignment"
+      subtitle="Workspace"
       sidebar={sidebar}
       contextPanel={contextPanel}
       main={main}
