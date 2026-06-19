@@ -352,7 +352,9 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
         if (match) parsed = JSON.parse(match[0]);
       } catch {}
 
-      return new Response(JSON.stringify(parsed), {
+      // Add media capabilities for Pro users
+      const responseWithMedia = { ...parsed, media: { audioOverviewAvailable: true } };
+      return new Response(JSON.stringify(responseWithMedia), {
         status: 200, headers: { "Content-Type": "application/json" }
       });
 
