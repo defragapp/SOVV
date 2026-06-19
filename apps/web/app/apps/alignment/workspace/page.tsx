@@ -166,8 +166,8 @@ export default function AlignmentWorkspacePage() {
           {[
             "What is actually true in this situation",
             "What is yours to carry — and what isn't",
-            "What's still available to you",
-            "What can remain unfinished",
+            "What a clean response looks like",
+            "What to release",
           ].map((item) => (
             <div key={item} className="flex items-start gap-2">
               <span className="text-[#e0743a]/40 text-[10px] mt-0.5 shrink-0">→</span>
@@ -318,9 +318,9 @@ export default function AlignmentWorkspacePage() {
                   <p className="text-[13px] text-[#76716b] leading-relaxed">{result.skyContext}</p>
                 </div>
               )}
-              <Section label="What is true"              value={result.whatIsTrue} />
+              <Section label="What is actually happening"              value={result.whatIsTrue} />
               <Section label="What is yours to carry"    value={result.whatIsYours} />
-              <Section label="What isn't yours"          value={result.whatIsNotYours} />
+              <Section label="What is not yours to carry"          value={result.whatIsNotYours} />
               <Section label="The shift"                 value={result.theShift} />
               <Section label="One next step"             value={result.nextStep} />
               <Section label="What to avoid"             value={result.avoid} />
@@ -335,7 +335,7 @@ export default function AlignmentWorkspacePage() {
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="I need to respond well."
+            placeholder="How do I move in a way that stays true?"
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             onKeyDown={e => {
