@@ -2,13 +2,13 @@ name = "sovereign-control"
 main = "./src/index.ts"
 compatibility_date = "2026-06-19"
 compatibility_flags = ["nodejs_compat"]
-workers_dev = false
+workers_dev = true
 
-# Served at operator.defrag.app — protected by Cloudflare Access
-# Add Cloudflare Access policy in dashboard before exposing publicly
-[[routes]]
-pattern = "operator.defrag.app"
-custom_domain = true
+# TODO: Set workers_dev = false and add custom domain after configuring in CF dashboard:
+# [[routes]]
+# pattern = "operator.defrag.app"
+# custom_domain = true
+# Then add Cloudflare Access policy on operator.defrag.app
 
 [ai]
 binding = "AI"
