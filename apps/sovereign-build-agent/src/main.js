@@ -78,6 +78,8 @@ export default {
       if (path === "/deploy/worker" && request.method === "POST") {
         // AUDIT: log all deploy attempts
         console.log(JSON.stringify({ event: "deploy_attempt", path, timestamp: new Date().toISOString(), ip: request.headers.get("CF-Connecting-IP") || "unknown" }));
+        // AUDIT: log all deploy attempts
+        console.log(JSON.stringify({ event: "deploy_attempt", path, timestamp: new Date().toISOString(), ip: request.headers.get("CF-Connecting-IP") || "unknown" }));
         const body = await request.json();
         const { name, code, bindings = [] } = body;
         if (!name || !code) return json({ error: "Missing name or code" }, 400);
