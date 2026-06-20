@@ -37,7 +37,7 @@ This file is **Layer 3** — operational quick reference only.
 | `sovereign-os-api` | `apps/worker/` | `api.defrag.app/*` | Auth, Baseline Design, AI, billing, history |
 | `worker-ai` | `apps/worker-ai/` | `ai.defrag.app/*` | Auxiliary AI analysis and gateway routing |
 | `worker-session` | `apps/worker-session/` | `session.defrag.app/*` | Session coordination with Durable Objects |
-| `sovereign-control` | `apps/sovereign-control/` | `operator.defrag.app/*` | Governed flow engine, AgentState DO, operator dashboard |
+| `sovereign-control` | `apps/sovereign-control/` | `operator.defrag.app/*` | Governed flow engine, AgentState DO, operator dashboard + React UI |
 
 ## Live Resources
 
@@ -70,7 +70,7 @@ This file is **Layer 3** — operational quick reference only.
 | `sovereign-os-api` | `/` | `npm install` | `cd apps/worker && npx wrangler deploy` | 22 |
 | `worker-ai` | `/` | `npm install` | `cd apps/worker-ai && npx wrangler deploy` | 22 |
 | `worker-session` | `/` | `npm install` | `cd apps/worker-session && npx wrangler deploy` | 22 |
-| `sovereign-control` | `/` | `npm install` | `cd apps/sovereign-control && npx wrangler deploy` | 22 |
+| `sovereign-control` | `/` | `npm install` | `cd apps/sovereign-control && npm run deploy` | 22 |
 
 > `npm run deploy` in `apps/web` runs `opennextjs-cloudflare build && opennextjs-cloudflare deploy`.
 > Do NOT use `npm install && npm run build:worker` as build command — this runs OpenNext build twice.
