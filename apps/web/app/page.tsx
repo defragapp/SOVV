@@ -414,7 +414,7 @@ export default function Home() {
           <img
             src="/hero-hand.jpg"
             alt="An open hand with palm facing upward into a beam of warm light"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover hero-drift"
             style={{ objectPosition: "center 20%", zIndex: 0, opacity: 0.85 }}
             fetchPriority="high"
             decoding="async"
@@ -486,18 +486,20 @@ export default function Home() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.48, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-8 w-full max-w-sm mx-auto px-6"
+            className="mt-6 w-full max-w-[540px] mx-auto px-6 sm:px-0"
           >
             <div
-              className="border border-white/[0.09] bg-[#08070a]/80 overflow-hidden text-left"
+              className="overflow-hidden text-left"
               style={{
                 borderRadius: 14,
-                backdropFilter: "blur(20px)",
-                WebkitBackdropFilter: "blur(20px)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                background: "linear-gradient(180deg, rgba(11,11,11,0.42), rgba(11,11,11,0.58))",
+                border: "1px solid rgba(255,255,255,0.03)",
               }}
             >
               <div className="px-4 py-3 border-b border-white/[0.06]">
-                <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47] mb-1">Moment</p>
+                <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#f4efe9]/38 mb-1">Moment</p>
                 <p className="text-[12px] text-[#76716b] leading-relaxed italic">
                   &ldquo;I thought I was being clear, but now it feels worse.&rdquo;
                 </p>
@@ -506,19 +508,19 @@ export default function Home() {
                 {
                   label: "What’s active",
                   value: "You’re trying to clear the tension by naming it. It’s landing with more pressure than you expect.",
-                  delay: 0.62,
+                  delay: 0.56,
                   highlight: false,
                 },
                 {
                   label: "What forms between you",
                   value: "The more you try to clear it up, the more pressure builds.",
-                  delay: 0.76,
+                  delay: 0.58,
                   highlight: false,
                 },
                 {
                   label: "Next move",
                   value: "Say the part that matters. Then leave room for it to land.",
-                  delay: 0.90,
+                  delay: 0.60,
                   highlight: true,
                 },
               ].map((row) => (
@@ -526,13 +528,13 @@ export default function Home() {
                   key={row.label}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: row.delay, ease: [0.16, 1, 0.3, 1] }}
-                  className={`px-4 py-3 border-b border-white/[0.05] last:border-0 ${row.highlight ? "bg-white/[0.025]" : ""}`}
+                  transition={{ duration: 0.4, delay: row.delay, ease: [0.16, 1, 0.3, 1] }}
+                  className={`px-4 py-3 border-b border-white/[0.05] last:border-0 ${row.highlight ? "border-t border-white/[0.06] bg-white/[0.02]" : ""}`}
                 >
-                  <p className={`font-mono text-[8px] uppercase tracking-[0.18em] mb-1 ${row.highlight ? "text-[#e0743a]/60" : "text-[#4f4b47]"}`}>
+                  <p className={`font-mono text-[9px] uppercase tracking-[0.12em] mb-1 ${row.highlight ? "text-[#e0743a]/60" : "text-[#f4efe9]/38"}`}>
                     {row.label}
                   </p>
-                  <p className={`text-[12px] leading-relaxed ${row.highlight ? "text-[#f4efe9]" : "text-[#a8a29a]"}`}>
+                  <p className={`text-[12px] leading-relaxed ${row.highlight ? "text-[#f4efe9] font-medium" : "text-[#a8a29a]"}`}>
                     {row.value}
                   </p>
                 </motion.div>
@@ -545,12 +547,12 @@ export default function Home() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-7 flex flex-col sm:flex-row gap-3 items-center px-6"
+            className="mt-6 flex flex-col sm:flex-row gap-3 items-center px-6"
           >
             <Link href={APP_URL} className="btn-primary">
               Enter Sovereign.os
             </Link>
-            <Link href="/how-it-works" className="btn-secondary">
+            <Link href="/how-it-works" className="btn-secondary" style={{ opacity: 0.65 }}>
               See how it works
             </Link>
           </motion.div>

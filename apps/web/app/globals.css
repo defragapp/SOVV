@@ -191,6 +191,23 @@
 
 /* Hero light cross-fade handled by Framer Motion in page.tsx */
 
+/* Subtle image drift — barely perceptible, creates life without motion */
+@keyframes heroDrift {
+  0%   { transform: translate(0px, 0px) scale(1.04); }
+  33%  { transform: translate(-4px, 3px) scale(1.04); }
+  66%  { transform: translate(4px, -3px) scale(1.04); }
+  100% { transform: translate(0px, 0px) scale(1.04); }
+}
+
+.hero-drift {
+  animation: heroDrift 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-drift { animation: none; transform: scale(1.04); }
+}
+
 .warm-glow {
   position: absolute;
   border-radius: 50%;
