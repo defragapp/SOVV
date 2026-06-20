@@ -131,6 +131,56 @@ export interface Pattern {
   verified: number;
 }
 
+// ─── Space Output Types (1:1 with prompts.ts output contracts) ───────────────
+// These types are the canonical output schemas for each space.
+// UI components must render directly from these — no transformation logic.
+// Keep in sync with: apps/worker/src/prompts.ts output contracts
+
+export interface DefragOutput {
+  summary: string;
+  activePattern: string;
+  theRepeat: string;
+  oldRole: string;
+  whatYouLearnedToCarry: string;
+  strainPattern: string;
+  giftUnderStrain: string;
+  alignment: string;
+  bestNextResponse: {
+    summary: string;
+    phrasing?: string[];
+  };
+  conversationalSteering: {
+    do: string[];
+    avoid: string[];
+  };
+}
+
+export interface AlignmentOutput {
+  skyContext: string;
+  whatIsTrue: string;
+  whatIsYours: string;
+  whatIsNotYours: string;
+  theShift: string;
+  nextStep: string;
+  avoid: string;
+  alignment: string;
+}
+
+export interface CovenantOutput {
+  figure: string;
+  reference: string;
+  pattern: string;
+  story: string;
+  whatBroke: string;
+  howGodMet: string;
+  whatTheyLearned: string;
+  forYou: string;
+  nextStep: string;
+  scriptures: string[];
+  reflectionPrompts: string[];
+}
+
+// Legacy payload types — kept for backward compatibility with existing library rows
 export interface DefragPayload {
   active_now: string;
   the_repeat: string;
@@ -149,9 +199,9 @@ export interface CovenantPayload {
 export interface LibraryItem {
   id: string;
   user_id: string;
-  workspace_source: "DEFRAG" | "COVENANT";
+  workspace_source: "DEFRAG" | "COVENANT" | "ALIGNMENT";
   title?: string;
-  payload: DefragPayload | CovenantPayload;
+  payload: DefragOutput | AlignmentOutput | CovenantOutput | DefragPayload | CovenantPayload;
   is_public: number;
   created_at: string;
 }

@@ -1449,5 +1449,154 @@ apps/web/app/todo.md
 
 ---
 
+
+---
+
+## 21. Product → Execution Mapping
+
+This section defines which tools and actions each space is permitted to use. No space may call deploy actions directly.
+
+| Space | Tool Access | Output Type | Permitted Actions |
+|-------|-------------|-------------|-------------------|
+| **Defrag** | Inspect only | `DefragOutput` JSON | Pattern analysis, read Baseline Design, read history, read patterns |
+| **Alignment** | None | `AlignmentOutput` JSON | Response-only layer — no tool usage |
+| **Covenant** | None | `CovenantOutput` JSON | Reflection-only — no system interaction |
+| **sovereign-control** | Full operator access | Governed flow | Agent orchestration, audit, flow engine |
+
+### Rules
+
+- Defrag uses inspect tools only — never executes actions on behalf of the user
+- Alignment is a response-only layer — no tool calls, no side effects
+- Covenant is reflection-only — no system interaction beyond reading Baseline Design
+- No space may trigger deployments, write to D1 directly, or modify other users' data
+- All writes to the `library` table must go through `POST /api/history` with a verified session
+
+---
+
+## 22. UI Output Contract
+
+UI components render **directly** from structured output — no transformation logic, no parsing heuristics.
+
+### 1:1 Component Mapping
+
+| Output Type | UI Component | Source |
+|-------------|-------------|--------|
+| `DefragOutput` | `DefragOutput` component | `packages/core/src/types.ts` |
+| `AlignmentOutput` | `AlignmentOutput` component | `packages/core/src/types.ts` |
+| `CovenantOutput` | `CovenantOutput` component | `packages/core/src/types.ts` |
+
+### DefragOutput Schema (canonical)
+
+```typescript
+interface DefragOutput {
+  summary: string;                    // "What's happening"
+  activePattern: string;              // "Active pattern"
+  theRepeat: string;                  // "What keeps happening"
+  oldRole: string;                    // "The role you're entering"
+  whatYouLearnedToCarry: string;      // "What shaped this"
+  strainPattern: string;              // "Where the pressure is"
+  giftUnderStrain: string;            // "What's working"
+  alignment: string;                  // "What gives this moment a better chance"
+  bestNextResponse: {
+    summary: string;
+    phrasing?: string[];
+  };
+  conversationalSteering: {
+    do: string[];
+    avoid: string[];
+  };
+}
+```
+
+### AlignmentOutput Schema (canonical)
+
+```typescript
+interface AlignmentOutput {
+  skyContext: string;       // "What this moment is asking"
+  whatIsTrue: string;       // "What is actually happening"
+  whatIsYours: string;      // "What is yours to carry"
+  whatIsNotYours: string;   // "What is not yours to carry"
+  theShift: string;         // "What a clean response looks like"
+  nextStep: string;         // "One move"
+  avoid: string;            // "What to release"
+  alignment: string;        // "What staying true looks like"
+}
+```
+
+### CovenantOutput Schema (canonical)
+
+```typescript
+interface CovenantOutput {
+  figure: string;             // "The story"
+  reference: string;          // Scripture reference
+  pattern: string;            // "The pattern"
+  story: string;              // "What happened"
+  whatBroke: string;          // "What broke"
+  howGodMet: string;          // "How presence showed up"
+  whatTheyLearned: string;    // "What they learned"
+  forYou: string;             // "What this means for you"
+  nextStep: string;           // "One honest move"
+  scriptures: string[];
+  reflectionPrompts: string[];
+}
+```
+
+### UI Rendering Rules
+
+1. **1:1 mapping** — each output field maps to exactly one UI label (see `DEFRAG_LABELS`, `ALIGNMENT_LABELS`, `COVENANT_LABELS` in `prompts.ts`)
+2. **No transformation** — UI renders directly from the parsed JSON — no reshaping, no fallback text generation
+3. **No parsing heuristics** — if a field is missing or malformed, show an empty state — do not guess
+4. **Field labels** are defined in `apps/worker/src/prompts.ts` — keep UI labels in sync with that file
+5. **`bestNextResponse.phrasing`** is optional — only render if present
+
+---
+
+## 23. Conflict Resolution Rule
+
+When instructions across documents conflict, resolve in this order:
+
+```
+1. Runtime Contract  →  overrides all other documents
+2. Master Context    →  defines behavior intent when Runtime Contract is silent
+3. AGENTS.md         →  reference only — never overrides 1 or 2
+```
+
+### Specific conflict scenarios
+
+| Conflict | Resolution |
+|----------|-----------|
+| Runtime Contract vs Master Context | Runtime Contract wins |
+| Runtime Contract vs AGENTS.md | Runtime Contract wins |
+| Master Context vs AGENTS.md | Master Context wins |
+| Two rules within Runtime Contract | More restrictive rule wins |
+| Two rules within Master Context | More specific rule wins |
+| Ambiguous instruction | Stop — ask for clarification — do not guess |
+
+### What agents must NOT do
+
+- Merge conflicting rules from different documents
+- Average or compromise between conflicting instructions
+- Apply the most recent instruction if it conflicts with a higher-authority document
+- Proceed when genuinely ambiguous — stop and surface the conflict
+
+---
+
+## 24. Security — Token Rotation Protocol
+
+The following credentials were exposed in a conversation context on 2026-06-20 and must be rotated immediately:
+
+| Token | Type | Action Required |
+|-------|------|----------------|
+| `github_pat_11CDF5OWI0Ae3L3umsirGS_*` | GitHub PAT | **Revoke immediately** at github.com/settings/tokens |
+| `cfat_0oV3LXYnA7jIGlUfaicG50oY56Rj*` | Cloudflare API Token | **Revoke immediately** at dash.cloudflare.com/profile/api-tokens |
+
+### After rotation
+
+1. Generate new GitHub PAT with `repo` scope only
+2. Generate new Cloudflare API Token with minimum required permissions
+3. Set new tokens as Worker secrets: `npx wrangler secret put CF_API_TOKEN --name=sovereign-control`
+4. Never paste tokens into chat interfaces, markdown files, or any committed file
+5. Use `.dev.vars` (gitignored) for local development only
+
 *End of Sovereign.os Master Context Document*
 *Generated from: README.md, AGENTS.md, PLAN.md, INFRASTRUCTURE.md, AUDIT_REPORT.md, RECOVERY_MANIFEST.md, ASSET_VERIFICATION_REPORT.md, .github/copilot-instructions.md, apps/web/AGENTS.md, docs/00–15, apps/worker/src/prompt.ts, apps/worker/src/types-env.ts, apps/worker/wrangler.toml, apps/worker/migrations/0001–0008*

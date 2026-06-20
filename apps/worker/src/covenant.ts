@@ -2,12 +2,8 @@ import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI } from "./baseline.js";
-import { SYSTEM_COVENANT } from "./prompts.js";
 import { checkProLimit } from "./plan.js";
-
-// SYSTEM_COVENANT imported from prompts.ts
-
-
+import { SYSTEM_COVENANT } from "./prompts.js";
 export function registerCovenantRoute(router: any, getEnv: () => Env) {
   router.post("/api/covenant", async (request: Request) => {
     const env = getEnv();
