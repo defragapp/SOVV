@@ -206,13 +206,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     return new Response(null, { headers: getCorsHeaders(req) });
   }
 
-  const user = await getAuthUser(req, env.DB);
-  if (!user) {
-    return jsonResponse({ error: "Unauthorized" }, 401, getCorsHeaders(req));
-  }
-
-  // Subscription gate: require active subscription for workspace access
-  const subGate = await requireActiveSubscription(user, req);
+  
   if (subGate) return subGate;
 
   const sid = await getSessionId(req);

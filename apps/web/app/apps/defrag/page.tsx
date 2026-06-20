@@ -353,11 +353,7 @@ export default function DefragEntryPage() {
   }, [])
 
   // ─── LEFT PANEL ──────────────────────────────────────────────────────────
-  const sidebar = (
-    <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-      <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Defrag</p>
-      </div>
+  
       <div className="px-5 pt-6 pb-5 flex flex-col gap-6">
         <div>
           <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">Before you move</p>
@@ -373,17 +369,7 @@ export default function DefragEntryPage() {
             </div>
           ))}
         </div>
-        <div className="border-t border-white/[0.04] pt-5">
-          <Link href="/apps/defrag/workspace" className="flex items-center justify-between group">
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#3a3733] group-hover:text-[#f4efe9] transition-colors">Open workspace</span>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#2e2b28] group-hover:text-[#f4efe9] transition-colors">
-              <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </Link>
-        </div>
-      </div>
-    </div>
-  )
+        
 
   // ─── RIGHT PANEL ─────────────────────────────────────────────────────────
   const contextPanel = (

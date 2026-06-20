@@ -229,13 +229,7 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
     }
   })
 
-  // GET /api/user/me
-  router.get("/api/user/me", async (request: Request) => {
-    const env = getEnv()
-    const user = await getAuthUser(request, env.DB)
-    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
-    return jsonResponse({ id: user.id, email: user.email, tier: user.tier, role: user.role, subscription_status: user.subscription_status })
-  })
+  
 
   // GET /api/admin/me
   router.get("/api/admin/me", async (request: Request) => {
