@@ -108,6 +108,7 @@ export function getSessionToken(request: Request): string | null {
 }
 
 import type { D1Database } from "@cloudflare/workers-types";
+import { getSessionId } from "./plan.js";
 
 export function jsonResponse(data: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(data), {
