@@ -18,7 +18,7 @@ function SpacePreview() {
   const [showResult, setShowResult] = React.useState(false)
 
   const DEMO_INPUT =
-    "My brother called me out in front of the whole family at Thanksgiving. I didn't say anything. I've been replaying it for three days and I still don't know if I should have defended myself or if I'm making it bigger than it was."
+    "He went quiet after our argument and hasn't responded in four days. I don't know if I pushed too hard or if this is just what he does. I keep checking my phone."
 
   const DEMO_RESULT = [
     {
@@ -72,7 +72,7 @@ function SpacePreview() {
 
   const panels = [
     { id: "context" as const, label: "Your Design", desc: "Baseline Design — active in every thread" },
-    { id: "thread" as const, label: "Defrag", desc: "Describe the moment. See what's actually active." },
+    { id: "thread" as const, label: "Defrag", desc: "Put the moment in. See what's underneath it." },
     { id: "library" as const, label: "Library", desc: "Save what helped. Return before the pattern takes over." },
   ]
 
