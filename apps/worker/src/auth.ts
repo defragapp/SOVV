@@ -344,6 +344,48 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const people = await env.DB.prepare("SELECT * FROM people WHERE user_id = ?").bind(user.id).all()
     return jsonResponse(people.results)
   })
+
+  // GET /api/user/me — current user profile
+  router.get("/api/user/me", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    const row = await env.DB.prepare("SELECT email_verified FROM users WHERE id = ?").bind(user.id).first() as any
+    return jsonResponse({
+      id: user.id,
+      email: user.email,
+      tier: user.tier || "free",
+      role: user.role || "user",
+      subscription_status: user.subscription_status || "free",
+      email_verified: row?.email_verified === 1,
+    })
+  })
+
+  // GET /api/user/usage — session quota for current user
+  router.get("/api/user/usage", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    const isPro = user.tier === "pro" || user.subscription_status === "active"
+    if (isPro) {
+      const today = new Date().toISOString().slice(0, 10)
+      const key = `pro-usage:${user.id}:${today}`
+      const raw = await env.KV.get(key)
+      const used = raw ? parseInt(raw, 10) : 0
+      const limit = parseInt(env.PRO_DAILY_LIMIT || "200", 10)
+      return jsonResponse({ tier: "pro", used, limit, remaining: Math.max(0, limit - used) })
+    }
+
+    // Free tier — keyed by session id
+    const sid = await getSessionId(request)
+    const today = new Date().toISOString().slice(0, 10)
+    const key = `usage:${sid}:${today}`
+    const raw = await env.KV.get(key)
+    const used = raw ? parseInt(raw, 10) : 0
+    const limit = parseInt(env.FREE_DAILY_LIMIT || "5", 10)
+    return jsonResponse({ tier: "free", used, limit, remaining: Math.max(0, limit - used) })
+  })
 }
 
 /**
