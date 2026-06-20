@@ -13,6 +13,7 @@ import { registerAudioRoute } from "./audio.js";
 import { insertSupportTicket } from "./db.js";
 import { registerDeriveProfileRoutes } from "./derive-profile.js";
 import { registerInviteRoutes } from "./invite.js";
+import { registerAuthExtendedRoutes } from "./routes/auth-extended.js";
 
 const router = Router();
 let currentEnv: Env;
@@ -116,6 +117,7 @@ function registerNatalRoutes(router: any, getEnv: () => Env) {
 }
 
 registerAuthRoutes(router, getEnv);
+registerAuthExtendedRoutes(router, getEnv);
 registerBaselineRoutes(router, getEnv);
 registerBillingRoutes(router, getEnv);
 registerChipsRoute(router, getEnv);
