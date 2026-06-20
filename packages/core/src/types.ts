@@ -180,7 +180,7 @@ export interface CovenantOutput {
   reflectionPrompts: string[];
 }
 
-// Legacy payload types — kept for backward compatibility with existing library rows
+
 export interface DefragPayload {
   active_now: string;
   the_repeat: string;
