@@ -325,32 +325,27 @@ function SpacePreview() {
   )
 }
 
-// ── Hero light cross-fade ─────────────────────────────────────────────────────
-// hero-hand.png = base (warmer, hand visible)
-// hero-light.png = same scene, brighter beam at top, darker hand
-// Cross-fading between them creates a natural light-breathing effect.
-// No screen blend, no scale transform — zero double-hand ghost.
+// ── Hero light pulse ──────────────────────────────────────────────────────────
+// Pure CSS gradient animation — no second image, no compositing artifacts.
+// A warm radial glow breathes in/out from the top-center of the frame,
+// simulating the light beam in the photograph intensifying and receding.
 function HeroLightBeam() {
   return (
     <motion.div
       className="absolute inset-0 z-[1] pointer-events-none select-none"
-      animate={{ opacity: [0, 0.7, 0] }}
+      animate={{ opacity: [0.0, 1.0, 0.0] }}
       transition={{
-        duration: 8,
+        duration: 9,
         ease: "easeInOut",
         repeat: Infinity,
         repeatType: "loop",
         times: [0, 0.5, 1],
       }}
-    >
-      <img
-        src="/hero-light.png"
-        alt=""
-        aria-hidden
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ objectPosition: "center 15%", userSelect: "none" }}
-      />
-    </motion.div>
+      style={{
+        background:
+          "radial-gradient(ellipse 55% 45% at 50% 0%, rgba(255,210,160,0.18) 0%, rgba(240,160,80,0.10) 35%, transparent 70%)",
+      }}
+    />
   )
 }
 
