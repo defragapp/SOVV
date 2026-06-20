@@ -1,9 +1,26 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
-import { getBaselineForAI } from "./baseline.js";
+import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { checkProLimit } from "./plan.js";
 import { SYSTEM_COVENANT } from "./prompts.js";
+import {
+  selectActiveSignals,
+  buildTimingSignals,
+  formatActiveSignalsForPrompt,
+} from "./active-signals.js";
+
+/**
+ * CRITICAL SYSTEM RULE
+ *
+ * Full baseline compute is never used directly in prompts or UI.
+ * All reasoning must pass through the active signal selection layer.
+ *
+ * If this rule breaks, the system will drift back into:
+ * - framework dumping
+ * - prompt hallucination
+ * - inconsistent outputs
+ */
 export function registerCovenantRoute(router: any, getEnv: () => Env) {
   router.post("/api/covenant", async (request: Request) => {
     const env = getEnv();
@@ -42,16 +59,7 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
         return new Response(JSON.stringify({ error: "Message too long. Please keep it under 3000 characters." }), { status: 400, headers: { "Content-Type": "application/json" } });
       }
 
-      // Load computed baseline dataset (or fallback to raw baseline)
-      let baselineContext = "";
-      try {
-        baselineContext = await getBaselineForAI(env, user.id, "covenant");
-      } catch {}
-
-      const messages = [
-        { role: "system", content: SYSTEM_COVENANT },
-        { role: "user", content: `${baselineContext ? `User Baseline Design:\n${baselineContext}\n\n` : ""}What they are walking through:\n${message}` }
-      ];
+      
 
       const aiResponse = await env.AI.run(
         (env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast") as any,

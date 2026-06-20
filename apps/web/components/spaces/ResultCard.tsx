@@ -2,6 +2,10 @@
 import * as React from "react"
 import { motion } from "framer-motion"
 
+interface RailBaseline { pace?: string; stabilizes?: string; responds?: string }
+interface RailSky { urgency?: string; tolerance?: string; state?: string }
+interface RailPattern { loop?: string }
+
 interface ResultCardProps {
   result: {
     activePattern?: string
@@ -14,6 +18,14 @@ interface ResultCardProps {
     bestNextResponse?: { summary?: string; phrasing?: string[] } | string
     conversationalSteering?: { do?: string[]; avoid?: string[] }
     summary?: string
+    /** Compressed identity signature — shown once, bottom only */
+    signature?: string
+    /** Reduced signal rail data */
+    rail?: {
+      baseline?: RailBaseline
+      sky?: RailSky
+      pattern?: RailPattern
+    }
   }
   input: string
   spaceName?: string
@@ -34,14 +46,18 @@ export function ResultCard({
 }: ResultCardProps) {
   const [copied, setCopied] = React.useState(false)
 
+  // Section labels locked to canonical Defrag output structure.
+  // Order: What's active → What keeps happening → The role → What shaped this
+  //        → Where the pressure is → What's working → What changes this
+  // "Next move" is rendered separately with emphasis below.
   const sections = [
-    { label: "What's happening",       value: result.activePattern },
-    { label: "What you may be carrying", value: result.theRepeat },
-    { label: "The role you're entering",         value: result.oldRole },
-    { label: "What may be adding weight",     value: result.whatYouLearnedToCarry },
-    { label: "Where the pressure is",       value: result.strainPattern },
-    { label: "What gives this moment a better chance",       value: result.giftUnderStrain },
-    { label: "What belongs to you",      value: result.alignment },
+    { label: "What's active",           value: result.activePattern },
+    { label: "What keeps happening",    value: result.theRepeat },
+    { label: "The role you're in",      value: result.oldRole },
+    { label: "What shaped this",        value: result.whatYouLearnedToCarry },
+    { label: "Where the pressure is",   value: result.strainPattern },
+    { label: "What's working",          value: result.giftUnderStrain },
+    { label: "What changes this",       value: result.alignment },
   ].filter(s => s.value)
 
   const response = result.bestNextResponse
@@ -62,7 +78,7 @@ export function ResultCard({
       lines.push("")
     })
     if (response) {
-      lines.push("SUGGESTED RESPONSE")
+      lines.push("NEXT MOVE")
       lines.push(typeof response === "string" ? response : (response.summary || ""))
       if (typeof response === "object" && response.phrasing?.length) {
         response.phrasing.forEach(p => lines.push(`  -> ${p}`))
@@ -136,7 +152,7 @@ export function ResultCard({
             transition={{ delay: sections.length * 0.06, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="border-t border-white/[0.06] pt-5 mt-5"
           >
-            <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-3">Suggested response</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-3">Next move</p>
             <p className="text-[14px] text-[#f4efe9] leading-[1.7] mb-4">
               {typeof response === "string" ? response : response.summary}
             </p>
@@ -197,8 +213,7 @@ export function ResultCard({
         )}
       </div>
 
-      {/* Footer actions */}
-      <div className="px-6 py-4 border-t border-white/[0.06] bg-[#08070a]/40 flex items-center justify-between gap-3">
+      
         <button
           onClick={handleCopyAll}
           className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
