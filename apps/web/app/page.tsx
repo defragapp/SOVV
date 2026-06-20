@@ -409,80 +409,149 @@ export default function Home() {
       >
         {/* High-res base image — WebP 2560px with JPEG fallback */}
         <picture>
-          <source
-            srcSet="/hero-hand.webp"
-            type="image/webp"
-            media="(min-width: 768px)"
-          />
-          <source
-            srcSet="/hero-hand-1x.webp"
-            type="image/webp"
-          />
+          <source srcSet="/hero-hand.webp" type="image/webp" media="(min-width: 768px)" />
+          <source srcSet="/hero-hand-1x.webp" type="image/webp" />
           <img
             src="/hero-hand.jpg"
             alt="An open hand with palm facing upward into a beam of warm light"
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: "center 20%", zIndex: 0 }}
+            style={{ objectPosition: "center 20%", zIndex: 0, opacity: 0.85 }}
             fetchPriority="high"
             decoding="async"
           />
         </picture>
 
-        {/* Animated light layer — pure CSS gradient, zero compositing artifacts */}
+        {/* Animated light layer */}
         <HeroLightBeam />
 
-        {/* Top vignette — nav always readable */}
+        {/* Edge vignette — all four sides, subtle */}
         <div
           aria-hidden
           className="absolute inset-0 z-[2] pointer-events-none"
           style={{
-            background:
-              "linear-gradient(180deg, rgba(8,7,10,0.72) 0%, rgba(8,7,10,0.30) 18%, transparent 42%)",
+            background: [
+              "linear-gradient(180deg, rgba(8,7,10,0.68) 0%, rgba(8,7,10,0.20) 16%, transparent 38%)",
+              "linear-gradient(0deg, rgba(8,7,10,1) 0%, rgba(8,7,10,0.88) 20%, rgba(8,7,10,0.35) 42%, transparent 62%)",
+              "linear-gradient(90deg, rgba(8,7,10,0.35) 0%, transparent 18%)",
+              "linear-gradient(270deg, rgba(8,7,10,0.35) 0%, transparent 18%)",
+            ].join(", "),
           }}
         />
 
-        {/* Bottom vignette — title floats above image */}
-        <div
-          aria-hidden
-          className="absolute inset-0 z-[2] pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(0deg, rgba(8,7,10,1) 0%, rgba(8,7,10,0.85) 18%, rgba(8,7,10,0.40) 36%, transparent 58%)",
-          }}
-        />
-
-        {/* Hero title — full-width, bottom-anchored, no description */}
+        {/* Hero content — lower-middle third, anchored to bottom */}
         <div
           className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center text-center"
-          style={{ paddingBottom: "clamp(3.5rem, 9vh, 7rem)" }}
+          style={{ paddingBottom: "clamp(2.5rem, 7vh, 5rem)" }}
         >
-          <motion.div
+          {/* Platform label */}
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-6 md:mb-8"
+            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            className="font-mono uppercase tracking-[0.3em] text-[#f4efe9]/30 mb-5"
+            style={{ fontSize: "0.65rem" }}
           >
-            <span
-              className="font-mono uppercase tracking-[0.28em] text-[#f4efe9]/40"
-              style={{ fontSize: "clamp(0.6rem, 1.2vw, 0.75rem)" }}
-            >
-              Sovereign.os
+            Sovereign.os
+          </motion.p>
+
+          {/* Headline — product-led, anchored, calm */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.0, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+            className="font-serif text-[#f4efe9] text-balance leading-[1.06] tracking-[-0.02em] px-6"
+            style={{ fontSize: "clamp(2.2rem, 5.5vw, 5rem)", maxWidth: "20ch" }}
+          >
+            See what&apos;s happening —
+            <br />
+            <span style={{ color: "rgba(244,239,233,0.52)" }}>
+              before it repeats.
             </span>
+          </motion.h1>
+
+          {/* Subhead */}
+          <motion.p
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-5 max-w-sm text-[#a8a29a] leading-relaxed px-6"
+            style={{ fontSize: "clamp(0.875rem, 1.8vw, 1rem)" }}
+          >
+            A private intelligence system built around your Baseline Design —
+            so each moment is read in context, not from scratch.
+          </motion.p>
+
+          {/* Embedded live system surface */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.48, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-8 w-full max-w-sm mx-auto px-6"
+          >
+            <div
+              className="border border-white/[0.09] bg-[#08070a]/80 overflow-hidden text-left"
+              style={{
+                borderRadius: 14,
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+              }}
+            >
+              <div className="px-4 py-3 border-b border-white/[0.06]">
+                <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47] mb-1">Moment</p>
+                <p className="text-[12px] text-[#76716b] leading-relaxed italic">
+                  &ldquo;I thought I was being clear, but now it feels worse.&rdquo;
+                </p>
+              </div>
+              {[
+                {
+                  label: "What’s active",
+                  value: "You’re trying to clear the tension by naming it. It’s landing with more pressure than you expect.",
+                  delay: 0.62,
+                  highlight: false,
+                },
+                {
+                  label: "What forms between you",
+                  value: "The more you try to clear it up, the more pressure builds.",
+                  delay: 0.76,
+                  highlight: false,
+                },
+                {
+                  label: "Next move",
+                  value: "Say the part that matters. Then leave room for it to land.",
+                  delay: 0.90,
+                  highlight: true,
+                },
+              ].map((row) => (
+                <motion.div
+                  key={row.label}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: row.delay, ease: [0.16, 1, 0.3, 1] }}
+                  className={`px-4 py-3 border-b border-white/[0.05] last:border-0 ${row.highlight ? "bg-white/[0.025]" : ""}`}
+                >
+                  <p className={`font-mono text-[8px] uppercase tracking-[0.18em] mb-1 ${row.highlight ? "text-[#e0743a]/60" : "text-[#4f4b47]"}`}>
+                    {row.label}
+                  </p>
+                  <p className={`text-[12px] leading-relaxed ${row.highlight ? "text-[#f4efe9]" : "text-[#a8a29a]"}`}>
+                    {row.value}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
 
-          
-
+          {/* CTAs */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.0, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-10 md:mt-12 flex flex-col sm:flex-row gap-3 items-center"
+            transition={{ duration: 0.8, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-7 flex flex-col sm:flex-row gap-3 items-center px-6"
           >
             <Link href={APP_URL} className="btn-primary">
-              Enter Sovereign.os — Free
+              Enter Sovereign.os
             </Link>
-            <Link href="/pricing" className="btn-secondary">
-              See plans
+            <Link href="/how-it-works" className="btn-secondary">
+              See how it works
             </Link>
           </motion.div>
         </div>

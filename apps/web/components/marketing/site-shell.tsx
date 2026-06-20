@@ -54,21 +54,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             SOVEREIGN.OS
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8">
-            {NAV_LINKS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-body-sm text-[#a8a29a] hover:text-[#f4efe9] transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-4">
-            
-            {/* Mobile menu toggle — inline SVG, no Lucide */}
+          
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden text-[#a8a29a] hover:text-[#f4efe9] transition-colors p-2"
