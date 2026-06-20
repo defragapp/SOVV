@@ -322,18 +322,7 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
   })
 
   // POST /api/auth/logout
-  router.post("/api/auth/logout", async (request: Request) => {
-    const env = getEnv()
-    const token = getSessionToken(request)
-    if (token) {
-      await env.DB.prepare("DELETE FROM sessions WHERE token = ?").bind(token).run()
-    }
-    return jsonResponse({ success: true }, 200, {
-      "Set-Cookie": clearCookie(),
-    })
-  })
-
-  // GET /api/auth/people
+  
   router.get("/api/auth/people", async (request: Request) => {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
