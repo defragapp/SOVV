@@ -194,3 +194,89 @@ export interface LibraryItem {
   is_public: number;
   created_at: string;
 }
+
+// ─── Active Signal System Types ───────────────────────────────────────────────
+// Shared between worker and web for rail/signature rendering.
+// Keep in sync with: apps/worker/src/active-signals.ts
+//
+// CRITICAL SYSTEM RULE:
+// Full baseline compute is never used directly in prompts or UI.
+// All reasoning must pass through the active signal selection layer.
+
+/** Compressed identity signature — shown once, bottom of result surface only.
+ *  Token order is locked: HD → TYPE → AUTH → GK → RIS → NOD */
+export interface BaselineSignature {
+  line: string;
+  tokens: Array<{ key: string; value: string }>;
+}
+
+/** Reduced behavioral signals — context-aware subset of full compute. */
+export interface ActiveBaselineSignals {
+  pace: "fast" | "slow" | "variable" | "unknown";
+  stabilizes: string;
+  responds: string;
+  protects?: string;
+  pattern?: string;
+  evidenceTags: string[];
+  traitLines: string[];
+}
+
+/** Timing signals — urgency/sensitivity/tolerance from current sky. */
+export interface TimingSignals {
+  urgency: "low" | "moderate" | "high";
+  sensitivity: "low" | "moderate" | "high";
+  tolerance: "low" | "moderate" | "high";
+  pacing: "fast" | "slow" | "normal";
+  state: "stable" | "reactive";
+  note?: string;
+}
+
+/** Overlay signals — what forms between two people */
+export interface OverlaySignals {
+  loop: string;
+  amplifier: string;
+  shift: string;
+}
+
+/** Default rail data — quiet, compressed, factual */
+export interface RailData {
+  baseline: { pace: string; stabilizes: string; responds: string };
+  sky: { urgency: string; tolerance: string; state?: string };
+  pattern: { loop: string };
+}
+
+/** Expanded rail data — opt-in, shows both users */
+export interface RailDataExpanded {
+  users: Array<{
+    role: "you" | "them";
+    signature?: BaselineSignature;
+    signals: ActiveBaselineSignals;
+  }>;
+  timing: TimingSignals;
+  pattern: OverlaySignals;
+}
+
+/** Export payload — human-readable, no raw compute */
+export interface ExportPayload {
+  result: Record<string, unknown>;
+  patternSummary: string;
+  timingState: string;
+  reducedSignals: ActiveBaselineSignals;
+  signature: string;
+}
+
+// Also restore missing CovenantPayload and DefragPayload definitions
+export interface DefragPayload {
+  active_now: string;
+  the_repeat: string;
+  old_role: string;
+  what_you_learned_to_carry: string;
+  strain_pattern: string;
+  gift_under_strain: string;
+  alignment: string;
+  best_next_response: string;
+}
+
+export interface CovenantPayload {
+  [key: string]: unknown;
+}
