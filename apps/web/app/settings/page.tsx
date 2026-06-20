@@ -80,7 +80,7 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-[#08070a] text-[#f4efe9]">
 
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#08070a]/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#08070a]/90 backdrop-blur-md safe-top">
         <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between">
           <nav className="flex items-center gap-2.5 font-mono text-xs tracking-widest uppercase" aria-label="Breadcrumb">
             <Link href="/apps/defrag" className="text-[#76716b] hover:text-[#f4efe9] transition-colors">
