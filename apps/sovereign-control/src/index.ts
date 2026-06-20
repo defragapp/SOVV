@@ -1,11 +1,14 @@
-// sovereign-control — Cloudflare Worker v0.3
+// sovereign-control — Cloudflare Worker v0.4
 // Controlled development operating system for Sovereign.os
 // SECURITY: No credentials from request body
 // PRIVACY: Raw user content never logged
 // SAFETY: Deploy blocked in safe mode (default)
 
+export { AgentState } from './agent-state'
+
 export interface Env {
   AI: Ai
+  AGENT_STATE: DurableObjectNamespace
   ENVIRONMENT?: string
   ENVIRONMENT_MODE?: string  // "safe" (default) | "live"
   GATEWAY_ID?: string
@@ -14,6 +17,7 @@ export interface Env {
   GITHUB_READ_TOKEN?: string
   CF_API_TOKEN?: string
   CF_ACCOUNT_ID?: string
+  DEV_MODE?: string
   // BROWSER?: Fetcher  // Add when Browser Run is configured
 }
 
@@ -547,9 +551,16 @@ export default {
       }, 200, request)
     }
 
+    // /db/* — Durable Object state (threads, messages, flows, audit, context)
+    if (url.pathname.startsWith('/db/')) {
+      const id = env.AGENT_STATE.idFromName('primary')
+      const stub = env.AGENT_STATE.get(id)
+      return stub.fetch(request)
+    }
+
     return jsonResponse({
       error: "Not found",
-      availableRoutes: ["/health", "/api/inspect?path=", "/api/inspect?url=", "/api/action", "/api/logs"],
+      availableRoutes: ["/health", "/api/inspect?path=", "/api/inspect?url=", "/api/action", "/api/logs", "/db/threads", "/db/messages", "/db/flow", "/db/audit", "/db/context"],
     }, 404, request)
   },
 } satisfies ExportedHandler<Env>

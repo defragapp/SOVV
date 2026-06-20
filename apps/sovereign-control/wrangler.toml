@@ -2,13 +2,11 @@ name = "sovereign-control"
 main = "./src/index.ts"
 compatibility_date = "2026-06-19"
 compatibility_flags = ["nodejs_compat"]
-workers_dev = true
+workers_dev = false
 
-# TODO: Set workers_dev = false and add custom domain after configuring in CF dashboard:
-# [[routes]]
-# pattern = "operator.defrag.app"
-# custom_domain = true
-# Then add Cloudflare Access policy on operator.defrag.app
+[[routes]]
+pattern = "operator.defrag.app/*"
+zone_id = "45a59d754ece9221fc97c92c461eb01f"
 
 [ai]
 binding = "AI"
@@ -16,7 +14,14 @@ binding = "AI"
 [vars]
 ENVIRONMENT = "production"
 GATEWAY_ID = "sovereign-ai-gateway"
-# TEAM_DOMAIN and POLICY_AUD set as secrets for Cloudflare Access JWT verification
+
+[[durable_objects.bindings]]
+name = "AGENT_STATE"
+class_name = "AgentState"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["AgentState"]
 
 [observability]
 enabled = true
@@ -26,3 +31,4 @@ name = "sovereign-control-dev"
 workers_dev = true
 [env.development.vars]
 ENVIRONMENT = "development"
+DEV_MODE = "true"
