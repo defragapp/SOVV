@@ -1,6 +1,38 @@
 # Sovereign.os — Master Context Document
 > Consolidated from all documentation in `defragapp/SOVV` · Last synced: 2026-06-20
-> **Purpose:** Single source of truth for AI agents building on or maintaining this platform.
+> **Purpose:** Defines what the system is and how it works — architecture, product logic, data model, prompt structure, and system philosophy.
+
+---
+
+## Position in System
+
+This document is **Layer 2** in the three-document authority hierarchy:
+
+```
+1. Runtime Contract  →  EXECUTION AUTHORITY (what is allowed to happen)
+   docs/# Sovereign.os — Full Build Runtime Contract for Cloudflare AI Agents
+
+2. Master Context    →  SYSTEM INTELLIGENCE (how the system thinks and is designed)
+   docs/16_MASTER_CONTEXT.md  ← YOU ARE HERE
+
+3. AGENTS.md         →  OPERATIONAL QUICK REFERENCE (how to act immediately)
+   /AGENTS.md
+```
+
+### When to use this document
+
+| Agent task | Use |
+|------------|-----|
+| Executing, deploying, enforcing rules | → Runtime Contract |
+| Reasoning, generating, understanding architecture | → **This document** |
+| Acting fast — commands, bindings, routes | → AGENTS.md |
+
+### What this document does NOT contain
+
+- Step-by-step deploy commands (→ AGENTS.md)
+- CLI instructions (→ AGENTS.md)
+- Enforcement rules (→ Runtime Contract)
+- Duplicated binding details (→ AGENTS.md)
 
 ---
 
@@ -855,137 +887,17 @@ To activate Cloudflare native email (currently using Resend as fallback):
 
 ## 12. Build & Deploy Standard
 
-### Primary Deployment Path
+> **This section is intentionally minimal.** Full deploy commands, Workers Builds configuration, and CLI instructions live in:
+> - **AGENTS.md** — quick-reference commands and bindings
+> - **Runtime Contract** — enforcement rules for deployments
 
-**Cloudflare Workers Builds** (Git integration on `main` branch) is the primary and only deployment path.
+### Summary
 
-```
-GitHub main → Cloudflare Workers Builds → Cloudflare Workers runtime
-```
-
-Every push to `main` triggers build and deploy automatically. No GitHub Actions required. No Codespaces terminal required.
-
-### Workers Builds Configuration
-
-#### sovv-web
-
-| Setting | Value |
-|---------|-------|
-| Worker name | `sovv-web` |
-| Root directory | `apps/web` |
-| Config file | `apps/web/wrangler.json` |
-| Build command | `npm install` |
-| Deploy command | `npm run deploy` |
-| Node version | `22` |
-| Env vars | `JWT_SECRET`, `NEXT_PUBLIC_API_URL=https://api.defrag.app`, `NEXT_PUBLIC_AI_URL=https://ai.defrag.app` |
-
-> **Why `npm install` as build command:** `apps/web/package.json` deploy script runs `opennextjs-cloudflare build && opennextjs-cloudflare deploy`. Workers Builds runs build command first (installs deps), then deploy command (builds + deploys). **Do NOT use `npm install && npm run build:worker`** — this runs OpenNext build twice.
-
-#### sovereign-os-api
-
-| Setting | Value |
-|---------|-------|
-| Root directory | `/` (repo root) |
-| Build command | `npm install` |
-| Deploy command | `cd apps/worker && npx wrangler deploy` |
-| Node version | `22` |
-
-#### worker-ai
-
-| Setting | Value |
-|---------|-------|
-| Root directory | `/` (repo root) |
-| Build command | `npm install` |
-| Deploy command | `cd apps/worker-ai && npx wrangler deploy` |
-| Node version | `22` |
-
-#### worker-session
-
-| Setting | Value |
-|---------|-------|
-| Root directory | `/` (repo root) |
-| Build command | `npm install` |
-| Deploy command | `cd apps/worker-session && npx wrangler deploy` |
-| Node version | `22` |
-
-> **Monorepo note for worker-ai and worker-session:** Root directory must be `/` (repo root) so `npm install` can resolve workspace packages (`@sovereign/core`).
-
-### Production Artifacts
-
-```
-apps/web/.open-next/worker.js    ← Worker entry point
-apps/web/.open-next/assets/      ← Static assets
-```
-
-**Never deploy:**
-- `apps/web/.next/` directly
-- Static `/dist` output
-- `apps/web/.vercel/output/` (legacy)
-- Cloudflare Pages for product runtime
-
-### Manual Deploy (Fallback — requires Node 22)
-
-```bash
-nvm use 22
-
-# Web Worker
-cd apps/web
-npm install
-npm run deploy   # runs opennextjs-cloudflare build && opennextjs-cloudflare deploy
-
-# API Worker
-cd apps/worker
-npm install
-npx wrangler deploy
-```
-
-### Local Development
-
-```bash
-npm run dev:all       # all workers in parallel
-npm run dev:api       # sovereign-os-api on :8787
-npm run dev:web       # sovv-web (OpenNext preview)
-npm run dev:ai        # worker-ai
-npm run dev:session   # worker-session
-```
-
-### Ship Script
-
-```bash
-npm run ship -- "short description of change"
-# Commits and pushes to main → triggers Cloudflare Workers Builds automatically
-```
-
-### Node Version Requirements
-
-| File | Value |
-|------|-------|
-| `.nvmrc` | `22` |
-| `package.json` engines | `node >=22` |
-| `apps/web/package.json` engines | `node >=22` |
-| `apps/worker/package.json` engines | `node >=22` |
-| Workers Builds Node version | `22` |
-
-### Prohibited Deployment Methods
-
-| Prohibited | Reason |
-|------------|--------|
-| Cloudflare Pages for product runtime | Deleted — Workers Builds is the standard |
-| GitHub Actions production deploy | `deploy-live.yml` deleted |
-| Static `/dist` product runtime | Not applicable |
-| Direct `.next/` deploy | OpenNext compiles to `.open-next/worker.js` |
-| `npm install && npm run build:worker` as build command | Causes duplicate build |
-
-### Validation Checks
-
-```bash
-curl -I https://defrag.app           # HTTP 307
-curl -I https://app.defrag.app       # HTTP 200
-curl -s https://api.defrag.app/      # { "service": "sovereign-os-api", "status": "ok" }
-curl -s https://api.defrag.app/health # { "ok": true, "service": "sovereign-os-api" }
-```
-
----
+- Primary deploy path: Cloudflare Workers Builds (push to `main` → auto-deploy)
+- Ship script: `npm run ship -- "description"`
+- Node version: 22 required everywhere
+- Production artifact: `apps/web/.open-next/worker.js` + `.open-next/assets/`
+- Never deploy via Cloudflare Pages, GitHub Actions, or direct `.next/` output
 
 ## 13. UI Visual Quality Standard
 

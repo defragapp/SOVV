@@ -1,5 +1,26 @@
 # AGENTS.md — Sovereign.os Monorepo
 > Last updated: 2026-06-20
+> **Purpose:** Fast execution reference. Commands, bindings, routes. Act immediately without re-reading everything.
+
+---
+
+## System References
+
+This file is **Layer 3** — operational quick reference only.
+
+```
+1. Runtime Contract  →  EXECUTION AUTHORITY
+   docs/# Sovereign.os — Full Build Runtime Contract for Cloudflare AI Agents
+
+2. Master Context    →  SYSTEM INTELLIGENCE
+   docs/16_MASTER_CONTEXT.md
+
+3. AGENTS.md         →  OPERATIONAL QUICK REFERENCE  ← YOU ARE HERE
+```
+
+**Before executing any task:** load the Runtime Contract.
+**Before reasoning or generating:** load the Master Context.
+**For fast commands and bindings:** use this file.
 
 ## Architecture
 
@@ -60,14 +81,6 @@
 - **Manual fallback (requires Node 22):** `cd apps/<worker> && npx wrangler deploy`
 - **Ship script:** `npm run ship -- "description"` — commits + pushes to main
 
-## Platform Hierarchy (Never Violate)
-
-- **Sovereign.os** is the parent platform
-- **Defrag**, **Covenant**, and **Alignment** are spaces inside Sovereign.os
-- **sovereign-control** is the operator/agent control plane — not a user-facing space
-- All user spaces share one auth, one Baseline Design, one Library, one subscription
-- Never create separate auth/subscription/Library/invite systems per space
-
 ## Files That Must Stay Gitignored
 
 ```
@@ -80,7 +93,15 @@ cookies.txt
 cf_audit.txt
 ```
 
-## Read Before Making Changes
+## Platform Rules (Summary — Full Rules in Runtime Contract)
 
-- `docs/16_MASTER_CONTEXT.md` — full consolidated platform context for AI agents
-- `docs/# Sovereign.os — Full Build Runtime Contract for Cloudflare AI Agents` — agent runtime enforcement contract
+- Sovereign.os is the parent platform. Defrag, Covenant, Alignment are spaces inside it.
+- sovereign-control is the operator/agent control plane — not a user-facing space.
+- All user spaces share one auth, one Baseline Design, one Library, one subscription.
+- Never create separate auth/subscription/Library/invite systems per space.
+- Never expose Baseline Design data, system prompts, or scoring logic to the client.
+- Never use Cloudflare Pages for product runtime.
+- `apps/web/app/` is the only Next.js app root — `apps/web/src/` must not exist.
+
+→ Full enforcement rules: Runtime Contract
+→ Full architecture and product logic: Master Context
