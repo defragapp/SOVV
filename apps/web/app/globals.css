@@ -480,3 +480,4 @@
 }
 .btn-rect:disabled { opacity: 0.3; cursor: not-allowed; }
 
+// build: bake NEXT_PUBLIC_TURNSTILE_SITE_KEY into sovv-web — 2026-06-20T01:26:12Z
