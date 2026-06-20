@@ -325,31 +325,30 @@ function SpacePreview() {
   )
 }
 
-// ── Hero light animation ───────────────────────────────────────────────────────
-// hero-light.png layered over hero-hand.png with a slow breathing loop.
-// Framer Motion handles the opacity/scale cycle — no jarring flash.
+// ── Hero light cross-fade ─────────────────────────────────────────────────────
+// hero-hand.png = base (warmer, hand visible)
+// hero-light.png = same scene, brighter beam at top, darker hand
+// Cross-fading between them creates a natural light-breathing effect.
+// No screen blend, no scale transform — zero double-hand ghost.
 function HeroLightBeam() {
   return (
     <motion.div
-      className="absolute inset-0 z-[1] pointer-events-none"
-      style={{ mixBlendMode: "screen" }}
-      animate={{
-        opacity: [0.55, 0.80, 0.55],
-        scale: [1, 1.03, 1],
-      }}
+      className="absolute inset-0 z-[1] pointer-events-none select-none"
+      animate={{ opacity: [0, 0.7, 0] }}
       transition={{
-        duration: 7,
+        duration: 8,
         ease: "easeInOut",
         repeat: Infinity,
         repeatType: "loop",
+        times: [0, 0.5, 1],
       }}
     >
       <img
         src="/hero-light.png"
         alt=""
         aria-hidden
-        className="absolute inset-0 w-full h-full object-cover object-top"
-        style={{ userSelect: "none" }}
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ objectPosition: "center 15%", userSelect: "none" }}
       />
     </motion.div>
   )
@@ -364,17 +363,12 @@ export default function Home() {
         className="relative -mt-16 w-full overflow-hidden bg-[#08070a]"
         style={{ minHeight: "100svh" }}
       >
-        {/* Base image — scaled up to fill widescreen, anchored top-center */}
+        {/* Base image — natural object-cover, no transform scale */}
         <img
           src="/hero-hand.png"
           alt="An open hand with palm facing upward into a beam of warm light"
           className="absolute inset-0 w-full h-full object-cover"
-          style={{
-            objectPosition: "center 15%",
-            transform: "scale(1.12)",
-            transformOrigin: "center top",
-            zIndex: 0,
-          }}
+          style={{ objectPosition: "center 15%", zIndex: 0 }}
         />
 
         {/* Animated light layer */}

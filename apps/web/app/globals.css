@@ -190,22 +190,7 @@
   mix-blend-mode: screen;
 }
 
-/* Hero light breathing — slow, non-jarring opacity + scale loop */
-@keyframes heroLightBreathe {
-  0%, 100% { opacity: 0.55; transform: scale(1.00); }
-  50%       { opacity: 0.80; transform: scale(1.03); }
-}
-
-.hero-light-breathe {
-  animation: heroLightBreathe 7s ease-in-out infinite;
-  mix-blend-mode: screen;
-  pointer-events: none;
-  user-select: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-light-breathe { animation: none; opacity: 0.65; }
-}
+/* Hero light cross-fade handled by Framer Motion in page.tsx */
 
 .warm-glow {
   position: absolute;
