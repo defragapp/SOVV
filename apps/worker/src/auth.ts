@@ -150,7 +150,7 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
 
 const SESSION_TTL = 7 * 24 * 60 * 60
 
-export function registerAuthRoutes(router: any, getEnv: () => any) {
+export async function registerAuthRoutes(router: any, getEnv: () => any) {
   // POST /api/auth/register
   router.post("/api/auth/register", async (request: Request) => {
     const env = getEnv()
