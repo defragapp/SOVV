@@ -1,5 +1,6 @@
 import type { Env } from "./types-env.js"
 import { SYSTEM_DEFRAG, SYSTEM_DEFRAG_RELATIONAL } from "./prompts.js"
+import { getFeatureFlags } from "./featureFlags.js"
 import { validateAndScore, buildRetryPrompt, parseAIOutput } from "./output-validator.js"
 import { loadMemoryContext, formatMemoryForPrompt } from "./memory.js"
 import { suggestNextSpace, formatFlowSuggestion } from "./flow.js";
