@@ -29,6 +29,16 @@
     --border-focus: rgba(255, 255, 255, 0.25);
 
     --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Radius token system
+       container: 14px  (cards, panels, modals)
+       input:     10px  (text inputs, textareas, selects)
+       button:    8px   (all buttons)
+       minimal:   4px   (chips, badges, small tags) */
+    --radius-container: 14px;
+    --radius-input:     10px;
+    --radius-button:    8px;
+    --radius-minimal:   4px;
   }
 
   html {

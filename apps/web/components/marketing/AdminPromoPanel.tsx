@@ -37,7 +37,8 @@ export default function AdminPromoPanel() {
       <button
         onClick={handleGenerate}
         disabled={loading}
-        className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-black transition hover:bg-white/90 disabled:opacity-50"
+        className="inline-flex items-center justify-center bg-white px-5 py-3 text-sm font-medium uppercase tracking-[0.2em] text-black transition hover:opacity-90 disabled:opacity-50"
+        style={{ borderRadius: "var(--radius-button)" }}
       >
         {loading ? "Generating…" : "Generate promo code"}
       </button>
