@@ -2,6 +2,7 @@ import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI } from "./baseline.js";
+import { SYSTEM_ALIGNMENT } from "./prompts.js";
 import { checkProLimit } from "./plan.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
