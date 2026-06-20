@@ -326,26 +326,44 @@ function SpacePreview() {
 }
 
 // ── Hero light pulse ──────────────────────────────────────────────────────────
-// Pure CSS gradient animation — no second image, no compositing artifacts.
-// A warm radial glow breathes in/out from the top-center of the frame,
-// simulating the light beam in the photograph intensifying and receding.
+// Warm radial glow breathes from top-center — simulates the light beam
+// in the photograph intensifying and receding. Pure CSS, zero artifacts.
 function HeroLightBeam() {
   return (
-    <motion.div
-      className="absolute inset-0 z-[1] pointer-events-none select-none"
-      animate={{ opacity: [0.0, 1.0, 0.0] }}
-      transition={{
-        duration: 9,
-        ease: "easeInOut",
-        repeat: Infinity,
-        repeatType: "loop",
-        times: [0, 0.5, 1],
-      }}
-      style={{
-        background:
-          "radial-gradient(ellipse 55% 45% at 50% 0%, rgba(255,210,160,0.18) 0%, rgba(240,160,80,0.10) 35%, transparent 70%)",
-      }}
-    />
+    <>
+      {/* Primary beam — slow breath */}
+      <motion.div
+        className="absolute inset-0 z-[1] pointer-events-none select-none"
+        animate={{ opacity: [0.0, 1.0, 0.0] }}
+        transition={{
+          duration: 11,
+          ease: "easeInOut",
+          repeat: Infinity,
+          repeatType: "loop",
+          times: [0, 0.5, 1],
+        }}
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 55% at 50% -5%, rgba(255,215,170,0.22) 0%, rgba(240,165,90,0.12) 40%, transparent 72%)",
+        }}
+      />
+      {/* Secondary shimmer — offset phase, tighter beam */}
+      <motion.div
+        className="absolute inset-0 z-[1] pointer-events-none select-none"
+        animate={{ opacity: [0.4, 0.9, 0.4] }}
+        transition={{
+          duration: 7,
+          ease: "easeInOut",
+          repeat: Infinity,
+          repeatType: "loop",
+          delay: 3,
+        }}
+        style={{
+          background:
+            "radial-gradient(ellipse 30% 35% at 50% 0%, rgba(255,230,190,0.14) 0%, transparent 65%)",
+        }}
+      />
+    </>
   )
 }
 
@@ -358,82 +376,97 @@ export default function Home() {
         className="relative -mt-16 w-full overflow-hidden bg-[#08070a]"
         style={{ minHeight: "100svh" }}
       >
-        {/* Base image — natural object-cover, no transform scale */}
-        <img
-          src="/hero-hand.png"
-          alt="An open hand with palm facing upward into a beam of warm light"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: "center 15%", zIndex: 0 }}
-        />
+        {/* High-res base image — WebP 2560px with JPEG fallback */}
+        <picture>
+          <source
+            srcSet="/hero-hand.webp"
+            type="image/webp"
+            media="(min-width: 768px)"
+          />
+          <source
+            srcSet="/hero-hand-1x.webp"
+            type="image/webp"
+          />
+          <img
+            src="/hero-hand.jpg"
+            alt="An open hand with palm facing upward into a beam of warm light"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition: "center 20%", zIndex: 0 }}
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
 
-        {/* Animated light layer */}
+        {/* Animated light layer — pure CSS gradient, zero compositing artifacts */}
         <HeroLightBeam />
 
-        {/* Top fade — darkens sky so nav reads */}
+        {/* Top vignette — nav always readable */}
         <div
           aria-hidden
-          className="absolute inset-0 z-[2]"
+          className="absolute inset-0 z-[2] pointer-events-none"
           style={{
             background:
-              "linear-gradient(to bottom, #08070a 0%, rgba(8,7,10,0.55) 22%, transparent 48%)",
+              "linear-gradient(180deg, rgba(8,7,10,0.72) 0%, rgba(8,7,10,0.30) 18%, transparent 42%)",
           }}
         />
 
-        {/* Bottom fade — text sits above this */}
+        {/* Bottom vignette — title floats above image */}
         <div
           aria-hidden
-          className="absolute inset-0 z-[2]"
+          className="absolute inset-0 z-[2] pointer-events-none"
           style={{
             background:
-              "linear-gradient(to top, #08070a 0%, rgba(8,7,10,0.80) 28%, transparent 55%)",
+              "linear-gradient(0deg, rgba(8,7,10,1) 0%, rgba(8,7,10,0.85) 18%, rgba(8,7,10,0.40) 36%, transparent 58%)",
           }}
         />
 
-        {/* Text block — anchored to bottom, clear of the hand */}
-        <Container
-          className="relative z-10 flex flex-col items-center text-center"
-          style={{ paddingBottom: "clamp(3rem, 8vh, 6rem)", paddingTop: "0" }}
+        {/* Hero title — full-width, bottom-anchored, no description */}
+        <div
+          className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center text-center"
+          style={{ paddingBottom: "clamp(3.5rem, 9vh, 7rem)" }}
         >
-          <div
-            className="flex flex-col items-center"
-            style={{ marginTop: "auto", paddingTop: "60svh" }}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-6 md:mb-8"
           >
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
-              className="font-serif text-[#f4efe9] text-balance leading-[1.04] tracking-[-0.02em] max-w-3xl"
-              style={{ fontSize: "clamp(2.8rem, 6.5vw, 5.5rem)" }}
+            <span
+              className="font-mono uppercase tracking-[0.28em] text-[#f4efe9]/40"
+              style={{ fontSize: "clamp(0.6rem, 1.2vw, 0.75rem)" }}
             >
-              Healing isn&apos;t optional.
-              <br />
+              Sovereign.os
+            </span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.3, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="font-serif text-[#f4efe9] text-balance leading-[1.02] tracking-[-0.025em] px-4"
+            style={{ fontSize: "clamp(3.2rem, 9vw, 8.5rem)", maxWidth: "16ch" }}
+          >
+            Healing isn&apos;t optional.
+            <br />
+            <span style={{ color: "rgba(244,239,233,0.55)" }}>
               Holding the pain is.
-            </motion.h1>
+            </span>
+          </motion.h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-6 max-w-md text-base md:text-lg text-[#c8c2ba] leading-relaxed text-balance"
-            >
-              A private notebook for the patterns that keep showing up — in your relationships, your family, your messages, and your grief.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.0, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-8 flex flex-col sm:flex-row gap-3"
-            >
-              <Link href={APP_URL} className="btn-primary">
-                Enter Sovereign.os — Free
-              </Link>
-              <Link href="/pricing" className="btn-secondary">
-                See plans
-              </Link>
-            </motion.div>
-          </div>
-        </Container>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.0, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-10 md:mt-12 flex flex-col sm:flex-row gap-3 items-center"
+          >
+            <Link href={APP_URL} className="btn-primary">
+              Enter Sovereign.os — Free
+            </Link>
+            <Link href="/pricing" className="btn-secondary">
+              See plans
+            </Link>
+          </motion.div>
+        </div>
       </section>
 
       {/* ── INTERACTIVE NOTEBOOK PREVIEW ─────────────────────────────────── */}
