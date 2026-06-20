@@ -6,10 +6,18 @@ import { loadMemoryContext, formatMemoryForPrompt } from "./memory.js"
 import { suggestNextSpace, formatFlowSuggestion } from "./flow.js";
 import { getAuthUser, jsonResponse } from "./auth.js";
 import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
-import { getBaseline, formatBaseline, getBaselineForAI } from "./baseline.js";
+import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
 import { requireActiveSubscription } from "./billing.js";
+import {
+  selectActiveSignals,
+  buildBaselineSignature,
+  buildTimingSignals,
+  buildOverlaySignals,
+  buildRailData,
+  formatActiveSignalsForPrompt,
+} from "./active-signals.js";
 import type {
   ExplainRequest,
   ExplainResponse,
@@ -189,6 +197,7 @@ function buildUserPrompt(args: {
   message: string;
   baselineText: string;
   patternText: string;
+  activeSignalsText?: string;
   targetName?: string | undefined;
   targetBaseline?: unknown;
 }) {
@@ -196,7 +205,11 @@ function buildUserPrompt(args: {
     ? `\nTarget person: ${args.targetName}${args.targetBaseline ? `\nTarget baseline: ${asText(args.targetBaseline)}` : ""}`
     : "";
 
-  const contextSection = [args.baselineText, args.patternText].filter(Boolean).join("\n\n");
+  const contextSection = [
+    args.activeSignalsText,
+    args.baselineText,
+    args.patternText,
+  ].filter(Boolean).join("\n\n");
 
   return `${contextSection ? `Context:\n${contextSection}\n\n` : ""}Message:\n${args.message}${targetSection}`;
 }
@@ -268,10 +281,36 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       ? await env.KV.get(`baseline:${user.id}:person:${target.id}`, "json")
       : null;
 
+  // ── Active signal selection ───────────────────────────────────────────────
+  // Derive reduced behavioral signals from full compute.
+  // Only active signals reach the AI — full compute stays server-side.
+  const dataset = await getBaselineDataset(env, sid).catch(() => null);
+  let activeSignalsText = "";
+  let railData = null;
+  let signatureLine = "";
+
+  if (dataset?.status === "ready") {
+    const activeSignals = selectActiveSignals(dataset, {
+      message,
+      relational,
+      mode: (mode as any) ?? (relational ? "pair" : "self"),
+    });
+    const timingSignals = buildTimingSignals(dataset);
+    const signature = buildBaselineSignature(dataset);
+    const overlaySignals = relational
+      ? buildOverlaySignals(activeSignals)
+      : undefined;
+
+    activeSignalsText = formatActiveSignalsForPrompt(activeSignals, timingSignals, overlaySignals);
+    railData = buildRailData(activeSignals, timingSignals, signature, overlaySignals);
+    signatureLine = signature.line;
+  }
+
   const userPrompt = buildUserPrompt({
     message,
     baselineText,
     patternText,
+    activeSignalsText: activeSignalsText || undefined,
     targetName: target ? target.relation : undefined,
     targetBaseline,
   });
@@ -279,7 +318,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const modelId = env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
   const ai = await env.AI.run(modelId, {
     messages: [
-      { role: "system", content: relational ? SYSTEM_RELATIONAL : SYSTEM_SELF },
+      { role: "system", content: relational ? SYSTEM_DEFRAG_RELATIONAL : SYSTEM_DEFRAG },
       { role: "user", content: userPrompt },
     ],
     temperature: 0.35,
@@ -307,19 +346,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     alignment: parsed.alignment || "This section needs more context.",
     bestNextResponse: parsed.bestNextResponse || { summary: "This section needs more context.", phrasing: [] },
     conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] },
-    sourcesUsed: {
-      baseline: true,
-      history: Boolean(patternText),
-      invitedUsers: Boolean(relational)
-    },
-    media: {
-      audioOverviewAvailable: isPro,
-      watchPreviewAvailable: false
-    },
-    metadata: {
-      structured: true
-    }
-  };
+    
 
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
