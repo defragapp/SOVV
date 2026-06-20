@@ -1,4 +1,5 @@
-import type { Env } from "./types-env.js";
+import type { Env } from "./types-env.js"
+import { SYSTEM_DEFRAG, SYSTEM_DEFRAG_RELATIONAL } from "./prompts.js";
 import { getAuthUser, jsonResponse } from "./auth.js";
 import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
 import { getBaseline, formatBaseline, getBaselineForAI } from "./baseline.js";
