@@ -43,7 +43,7 @@ export default function AdminPromoPanel() {
       </button>
 
       {code ? (
-        <div className="rounded-2xl bg-slate-950/60 p-4 text-sm text-white">
+        <div className="rounded-[14px] bg-slate-950/60 p-4 text-sm text-white">
           <p className="font-sans font-medium text-xs uppercase text-white/50">Promo code</p>
           <p className="mt-2 text-lg font-semibold tracking-[0.16em]">{code}</p>
           <p className="mt-2 text-xs text-white/60">

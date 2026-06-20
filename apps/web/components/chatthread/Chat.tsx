@@ -78,7 +78,7 @@ export default function Chat({
             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed whitespace-pre-wrap ${
+              className={`max-w-[80%] px-4 py-2.5 rounded-[14px] text-[13px] leading-relaxed whitespace-pre-wrap ${
                 m.role === "user"
                   ? "bg-[#f4efe9] text-[#08070a]"
                   : "bg-white/[0.05] text-[#c8c2bc] border border-white/[0.06]"
@@ -91,7 +91,7 @@ export default function Chat({
 
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-white/[0.05] border border-white/[0.06] px-4 py-2.5 rounded-2xl">
+            <div className="bg-white/[0.05] border border-white/[0.06] px-4 py-2.5 rounded-[14px]">
               <span className="w-3.5 h-3.5 border border-white/[0.15] border-t-white/40 rounded-full animate-spin block" />
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function Chat({
         )}
         <form
           onSubmit={handleSubmit}
-          className="rounded-2xl border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors"
+          className="rounded-[14px] border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors"
         >
           <textarea
             value={input}

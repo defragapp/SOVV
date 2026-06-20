@@ -52,7 +52,7 @@ export default async function AdminPage() {
           </p>
         </div>
 
-        <div className="rounded-3xl border border-border bg-white/5 p-8">
+        <div className="rounded-[14px] border border-border bg-white/5 p-8">
           <h2 className="text-2xl font-semibold">Ambassador promo codes</h2>
           <p className="mt-2 text-sm text-white/60">
             Generate one-time ambassador promo codes that can be redeemed publicly via the promo redeem API.

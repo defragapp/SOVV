@@ -33,7 +33,7 @@ function HintText({ children }: { children: React.ReactNode }) {
 
 const inputBase =
   "w-full bg-white/[0.04] border border-white/[0.1] text-[#f4efe9] text-base font-sans " +
-  "px-4 py-3.5 rounded-xl outline-none transition-all duration-200 " +
+  "px-4 py-3.5 rounded-[10px] outline-none transition-all duration-200 " +
   "placeholder:text-[#4f4b47] " +
   "focus:border-white/25 focus:bg-white/[0.07] " +
   "disabled:opacity-30 disabled:cursor-not-allowed " +
@@ -141,7 +141,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Form */}
-        <div className="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-8 md:p-10 mb-14">
+        <div className="bg-white/[0.02] border border-white/[0.08] rounded-[14px] p-8 md:p-10 mb-14">
 
           <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-8">
             Enter your birth details
@@ -227,7 +227,7 @@ export default function SettingsPage() {
             <button
               onClick={handleSave}
               disabled={saving || !baseline.dob || !baseline.pob}
-              className="inline-flex items-center justify-center gap-2 h-12 px-8 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-25 disabled:cursor-not-allowed" style={{ borderRadius: 12 }}
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 disabled:opacity-25 disabled:cursor-not-allowed" style={{ borderRadius: "var(--radius-button)" }}
             >
               {saving ? (
                 <>

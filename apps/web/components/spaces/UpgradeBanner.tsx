@@ -90,7 +90,8 @@ export default function UpgradeBanner() {
           type="button"
           onClick={handleUpgrade}
           disabled={loading}
-          className="w-full h-12 rounded-xl bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none mb-4"
+          className="w-full h-11 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-opacity duration-200 hover:opacity-90 active:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed mb-4"
+          style={{ borderRadius: "var(--radius-button)" }}
         >
           {loading ? "···" : "Upgrade to Pro — $20/mo"}
         </button>
@@ -117,7 +118,8 @@ export default function UpgradeBanner() {
                 value={promoCode}
                 onChange={(e) => setPromoCode(e.target.value)}
                 placeholder="Enter promo code"
-                className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 text-center tracking-widest uppercase"
+                className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 text-center tracking-widest uppercase"
+                style={{ borderRadius: "var(--radius-input)" }}
               />
             </motion.div>
           )}
@@ -137,7 +139,7 @@ export default function UpgradeBanner() {
         </AnimatePresence>
 
         {/* What Pro includes */}
-        <div className="mt-8 text-left border border-white/[0.06] rounded-2xl p-6 space-y-3">
+        <div className="mt-8 text-left border border-white/[0.06] rounded-[14px] p-6 space-y-3">
           <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-4">Pro includes</p>
           {[
             "Unlimited sessions",

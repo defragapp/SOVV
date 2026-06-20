@@ -310,7 +310,7 @@ export default function AlignmentWorkspacePage() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8"
+              className="rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-8"
             >
               {result.skyContext && (
                 <div className="mb-6 pb-6 border-b border-white/[0.05]">

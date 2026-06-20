@@ -38,7 +38,7 @@ export default function ContactPage() {
       {/* Content */}
       <Section className="w-full py-24 md:py-32 bg-[#0c0a0d]">
         <Container className="max-w-3xl">
-          <div className="flex flex-col gap-0 rounded-2xl border border-white/[0.06] overflow-hidden">
+          <div className="flex flex-col gap-0 rounded-[14px] border border-white/[0.06] overflow-hidden">
 
             <div className="p-8 md:p-12 space-y-4 border-b border-white/[0.06] bg-[#08070a]">
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b]">Primary contact</p>
@@ -63,7 +63,7 @@ export default function ContactPage() {
                   "Any error message you saw",
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-4 text-[#a8a29a] text-sm">
-                    <span className="h-1 w-1 bg-[#e0743a]/40 rounded-xl shrink-0" />
+                    <span className="h-1 w-1 bg-[#e0743a]/40 rounded-[10px] shrink-0" />
                     {item}
                   </li>
                 ))}

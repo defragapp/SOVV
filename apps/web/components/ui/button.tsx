@@ -9,13 +9,13 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 // No pill/capsule shapes. All variants use controlled radius.
 const variantClasses = {
   primary:
-    "bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] active:scale-[0.97] border border-transparent",
+    "bg-[#f4efe9] text-[#08070a] hover:bg-[#e8e2da] border border-transparent",
   secondary:
-    "bg-white/5 text-[#f4efe9] border border-white/10 hover:bg-white/10 hover:border-white/20 active:scale-[0.98] backdrop-blur-md",
+    "bg-white/5 text-[#f4efe9] border border-white/10 hover:bg-white/10 hover:border-white/20 backdrop-blur-md",
   ghost:
     "bg-transparent text-[#a8a29a] hover:text-[#f4efe9] hover:bg-white/5 border border-transparent",
   premium:
-    "bg-[#e0743a]/10 text-[#f0a06a] border border-[#e0743a]/20 hover:bg-[#e0743a]/20 hover:border-[#e0743a]/40 active:scale-[0.98] backdrop-blur-md shadow-[0_0_20px_rgba(224,116,58,0.1)]",
+    "bg-[#e0743a]/10 text-[#f0a06a] border border-[#e0743a]/20 hover:bg-[#e0743a]/20 hover:border-[#e0743a]/40 backdrop-blur-md shadow-[0_0_20px_rgba(224,116,58,0.1)]",
 }
 
 const sizeClasses = {

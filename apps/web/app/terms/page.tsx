@@ -81,7 +81,7 @@ export default function TermsPage() {
       {/* Content */}
       <Section className="w-full py-24 md:py-32 bg-[#0c0a0d]">
         <Container className="max-w-3xl">
-          <div className="flex flex-col gap-0 rounded-2xl border border-white/[0.06] overflow-hidden">
+          <div className="flex flex-col gap-0 rounded-[14px] border border-white/[0.06] overflow-hidden">
             {SECTIONS.map((section, i) => (
               <div
                 key={i}
