@@ -50,6 +50,7 @@ const ALLOWED_DEPLOY_TARGETS = new Set([
 // ── Role mapping ──────────────────────────────────────────────────────────────
 // Add real admin emails before enabling Cloudflare Access
 const ADMIN_EMAILS: string[] = [
+  "defragapp@gmail.com",
   // "your@email.com",
 ]
 
