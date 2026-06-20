@@ -21,6 +21,19 @@ import {
  * - prompt hallucination
  * - inconsistent outputs
  */
+
+/**
+ * COVENANT RULE
+ *
+ * Covenant does not re-run Defrag.
+ * It reframes meaning from already reduced signals.
+ *
+ * Covenant consumes: activeSignals + timingSignals
+ * Covenant must NOT: re-derive structural pattern from scratch
+ *
+ * If this breaks, Covenant becomes a second Defrag
+ * and the system loses clarity.
+ */
 export function registerCovenantRoute(router: any, getEnv: () => Env) {
   router.post("/api/covenant", async (request: Request) => {
     const env = getEnv();
