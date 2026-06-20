@@ -67,13 +67,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className="flex items-center gap-4">
-            <Link
-              href="https://app.defrag.app/app/login"
-              className="hidden sm:inline-flex items-center justify-center h-9 px-5 text-sm font-medium bg-[#f4efe9] text-[#08070a] transition-all hover:opacity-90"
-              style={{ borderRadius: 8 }}
-            >
-              Sign in
-            </Link>
+            
             {/* Mobile menu toggle — inline SVG, no Lucide */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}

@@ -470,19 +470,7 @@ export default function Home() {
             </span>
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 32 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.3, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="font-serif text-[#f4efe9] text-balance leading-[1.02] tracking-[-0.025em] px-4"
-            style={{ fontSize: "clamp(3.2rem, 9vw, 8.5rem)", maxWidth: "16ch" }}
-          >
-            Healing isn&apos;t optional.
-            <br />
-            <span style={{ color: "rgba(244,239,233,0.55)" }}>
-              Holding the pain is.
-            </span>
-          </motion.h1>
+          
 
           <motion.div
             initial={{ opacity: 0, y: 16 }}
