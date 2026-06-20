@@ -12,12 +12,14 @@ const variantClasses = {
   outline: "bg-transparent text-[#76716b] border border-white/[0.06]",
 }
 
+// No pill/capsule shapes. Badges use 3px radius — compact, restrained.
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   ({ className = "", variant = "default", ...props }, ref) => {
     return (
       <span
         ref={ref}
-        className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-sans font-medium text-[10px] tracking-widest uppercase transition-all ${variantClasses[variant]} ${className}`}
+        className={`inline-flex items-center px-2.5 py-0.5 font-sans font-medium text-[10px] tracking-widest uppercase transition-all ${variantClasses[variant]} ${className}`}
+        style={{ borderRadius: 3 }}
         {...props}
       />
     )

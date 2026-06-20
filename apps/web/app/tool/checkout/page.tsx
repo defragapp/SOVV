@@ -135,7 +135,8 @@ export default function CheckoutPage() {
             <button
               onClick={openPortal}
               disabled={portalLoading}
-              className="w-full h-11 rounded-full border border-white/[0.08] text-sm text-[#76716b] hover:text-[#f4efe9] hover:border-white/20 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-full h-11 border border-white/[0.08] text-sm text-[#76716b] hover:text-[#f4efe9] hover:border-white/20 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+              style={{ borderRadius: 8 }}
             >
               {portalLoading ? "···" : "Manage existing subscription"}
             </button>
