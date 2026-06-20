@@ -322,8 +322,20 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   })
 
   // POST /api/auth/logout
-  
-  
+  router.post("/api/auth/logout", async (request: Request) => {
+    const env = getEnv()
+    const cookieDomain = env.COOKIE_DOMAIN || undefined
+    return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Set-Cookie": clearCookie(cookieDomain),
+      },
+    })
+  })
+
+  // GET /api/people — list people for current user
+  router.get("/api/people", async (request: Request) => {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
