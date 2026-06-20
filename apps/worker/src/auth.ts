@@ -323,7 +323,7 @@ export function registerAuthRoutes(router: any, getEnv: () => any) {
 
   // POST /api/auth/logout
   
-  router.get("/api/auth/people", async (request: Request) => {
+  
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
