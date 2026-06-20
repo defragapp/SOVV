@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "wrangler dev --env development",
-    "deploy": "wrangler deploy",
+    "build:ui": "cd ../sovereign-control-ui && npm install && npm run build",
+    "deploy": "npm run build:ui && wrangler deploy",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

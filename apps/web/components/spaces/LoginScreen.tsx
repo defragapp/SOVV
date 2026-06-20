@@ -240,12 +240,12 @@ export default function LoginScreen() {
             {mode === "login" && (
               <p className="mt-3 text-center text-sm text-[#4f4b47]">
                 Forgot your password?{" "}
-                <a
-                  href="mailto:info@defrag.app?subject=Password reset"
+                <Link
+                  href="/app/forgot-password"
                   className="text-[#76716b] hover:text-[#a8a29a] transition-colors"
                 >
-                  Contact support
-                </a>
+                  Reset it
+                </Link>
               </p>
             )}
 

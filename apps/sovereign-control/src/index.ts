@@ -6,20 +6,7 @@
 
 export { AgentState } from './agent-state'
 
-export interface Env {
-  AI: Ai
-  AGENT_STATE: DurableObjectNamespace
-  ENVIRONMENT?: string
-  ENVIRONMENT_MODE?: string  // "safe" (default) | "live"
-  GATEWAY_ID?: string
-  TEAM_DOMAIN?: string
-  POLICY_AUD?: string
-  GITHUB_READ_TOKEN?: string
-  CF_API_TOKEN?: string
-  CF_ACCOUNT_ID?: string
-  DEV_MODE?: string
-  // BROWSER?: Fetcher  // Add when Browser Run is configured
-}
+
 
 type Role = "viewer" | "operator" | "deployer" | "admin"
 type ActionStatus = "ok" | "blocked" | "not_enabled" | "error" | "requires_confirm"
@@ -557,6 +544,21 @@ export default {
       const id = env.AGENT_STATE.idFromName('primary')
       const stub = env.AGENT_STATE.get(id)
       return stub.fetch(request)
+    }
+
+    // Serve static UI assets for all other routes (React SPA)
+    // API routes (/api/*, /health, /db/*) are handled above
+    // Everything else → serve the operator UI
+    if (env.ASSETS) {
+      // For SPA routing: serve index.html for unknown paths
+      const assetResponse = await env.ASSETS.fetch(request).catch(() => null)
+      if (assetResponse && assetResponse.status !== 404) {
+        return assetResponse
+      }
+      // SPA fallback — serve index.html for client-side routes
+      const indexRequest = new Request(new URL("/index.html", request.url).toString(), request)
+      const indexResponse = await env.ASSETS.fetch(indexRequest).catch(() => null)
+      if (indexResponse) return indexResponse
     }
 
     return jsonResponse({
