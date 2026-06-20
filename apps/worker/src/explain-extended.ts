@@ -18,6 +18,18 @@ import {
   buildRailData,
   formatActiveSignalsForPrompt,
 } from "./active-signals.js";
+
+/**
+ * CRITICAL SYSTEM RULE
+ *
+ * Full baseline compute is never used directly in prompts or UI.
+ * All reasoning must pass through the active signal selection layer.
+ *
+ * If this rule breaks, the system will drift back into:
+ * - framework dumping
+ * - prompt hallucination
+ * - inconsistent outputs
+ */
 import type {
   ExplainRequest,
   ExplainResponse,

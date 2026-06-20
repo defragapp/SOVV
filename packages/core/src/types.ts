@@ -181,16 +181,7 @@ export interface CovenantOutput {
 }
 
 
-export interface DefragPayload {
-  active_now: string;
-  the_repeat: string;
-  old_role: string;
-  what_you_learned_to_carry: string;
-  strain_pattern: string;
-  gift_under_strain: string;
-  alignment: string;
-  best_next_response: string;
-}
+
 
 export interface CovenantPayload {
   [key: string]: unknown;

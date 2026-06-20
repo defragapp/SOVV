@@ -3,16 +3,22 @@
  *
  * Pipeline:
  *   BaselineDesignDataset (full compute, server-side only)
- *   → selectActiveSignals()   — context-aware reduction
- *   → buildBaselineSignature() — compressed identity line
- *   → buildRailData()          — structured right-panel data
+ *   → selectActiveSignals()          — context-aware reduction
+ *   → buildBaselineSignature()       — compressed identity line
+ *   → buildTimingSignals()           — urgency/sensitivity/tolerance
+ *   → buildOverlaySignals()          — two-person loop construction
+ *   → buildRailData()                — structured right-panel data
  *   → formatActiveSignalsForPrompt() — AI-ready context string
  *
- * The full compute never leaves the server.
- * Only reduced, translated signals reach the AI or the client.
+ * CRITICAL SYSTEM RULE:
+ * Full baseline compute is never used directly in prompts or UI.
+ * All reasoning must pass through the active signal selection layer.
+ * If this rule breaks, the system will drift back into framework dumping,
+ * prompt hallucination, and inconsistent outputs.
  *
- * Signature line format:
+ * Signature line format (token order is locked):
  *   HD: 5/1 · TYPE: Generator · AUTH: Sacral · GK: 13/33 · RIS: Leo · NOD: 2/8
+ *   Order: HD → TYPE → AUTH → GK → RIS → NOD
  */
 
 import type { BaselineDesignDataset } from "./baseline-compiler.js"
@@ -27,58 +33,24 @@ export interface BaselineSignature {
   tokens: Array<{ key: string; value: string }>
 }
 
-/** Reduced behavioral signals — context-aware subset of full compute */
-export interface ActiveBaselineSignals {
-  /** How this person moves under pressure */
-  pace: "fast" | "slow" | "variable" | "unknown"
-  /** What stabilizes them */
-  stabilizes: string
-  /** How they respond to pressure */
-  pressureResponse: string
-  /** What they protect */
-  protects: string
-  /** Primary pattern tendency */
-  patternTendency: string
-  /** Evidence tags (framework references, kept internal) */
-  evidenceTags: string[]
-  /** Human-readable trait lines for AI context */
-  traitLines: string[]
-}
 
-/** Timing signals from current sky / activation state */
-export interface TimingSignals {
-  urgency: "high" | "medium" | "low"
-  sensitivity: "high" | "medium" | "low"
-  tolerance: "high" | "medium" | "low"
-  pacing: "fast" | "slow" | "normal"
-  /** Plain-language timing note for AI context */
-  note: string
-}
 
-/** Overlay signals — what forms between two people */
-export interface OverlaySignals {
-  /** The loop that forms */
-  loop: string
-  /** Why it's stronger now */
-  amplifier: string
-  /** Where the leverage is */
-  leverage: string
-}
-
-/** Rail section data — structured for the right panel */
+/** Default rail data — quiet, compressed, factual.
+ *  Max 3 baseline signals. No raw framework data. */
 export interface RailSectionData {
   baseline: {
     pace: string
     stabilizes: string
-    pressureResponse: string
-    patternTendency: string
+    responds: string
   }
   sky: {
     urgency: string
-    sensitivity: string
     tolerance: string
+    state?: string
   }
-  pattern: string
+  pattern: {
+    loop: string
+  }
   signature: string
 }
 
@@ -198,13 +170,13 @@ export function selectActiveSignals(
   }
 
   // ── Pressure response: from derived traits if available ───────────────────
-  let pressureResponse = "moves toward resolution"
+  let responds = "moves toward resolution"
   if (aiData?.derivedTraits?.length) {
     const pressureTrait = aiData.derivedTraits.find(t =>
       t.key.includes("pressure") || t.key.includes("strain") || t.key.includes("pace")
     )
     if (pressureTrait?.overExpression?.[0]) {
-      pressureResponse = pressureTrait.overExpression[0]
+      responds = pressureTrait.overExpression[0]
     }
   }
 
@@ -231,9 +203,9 @@ export function selectActiveSignals(
   }
 
   // ── Pattern tendency: from appOverlays.defrag ─────────────────────────────
-  let patternTendency = "moves early under pressure"
+  let pattern = "moves early under pressure"
   if (aiData?.appOverlays?.defrag?.likelyLoops?.length) {
-    patternTendency = aiData.appOverlays.defrag.likelyLoops[0]
+    pattern = aiData.appOverlays.defrag.likelyLoops[0]
   }
 
   // ── Evidence tags (internal, not shown to user) ───────────────────────────
@@ -277,9 +249,9 @@ export function selectActiveSignals(
   return {
     pace,
     stabilizes,
-    pressureResponse,
+    responds,
     protects,
-    patternTendency,
+    pattern,
     evidenceTags,
     traitLines,
   }
@@ -293,21 +265,21 @@ export function selectActiveSignals(
  * Timing explains activation, not fate.
  */
 export function buildTimingSignals(dataset: BaselineDesignDataset): TimingSignals {
-  // If no astronomy data, return neutral
+  // If no astronomy data, return neutral stable state
   if (!dataset.astronomy) {
     return {
-      urgency: "medium",
-      sensitivity: "medium",
-      tolerance: "medium",
+      urgency: "moderate",
+      sensitivity: "moderate",
+      tolerance: "moderate",
       pacing: "normal",
-      note: "No current sky data available.",
+      state: "stable",
     }
   }
 
   const bodies = dataset.astronomy.bodies
-  let urgency: TimingSignals["urgency"] = "medium"
-  let sensitivity: TimingSignals["sensitivity"] = "medium"
-  let tolerance: TimingSignals["tolerance"] = "medium"
+  let urgency: TimingSignals["urgency"] = "moderate"
+  let sensitivity: TimingSignals["sensitivity"] = "moderate"
+  let tolerance: TimingSignals["tolerance"] = "moderate"
   let pacing: TimingSignals["pacing"] = "normal"
   const notes: string[] = []
 
@@ -336,11 +308,15 @@ export function buildTimingSignals(dataset: BaselineDesignDataset): TimingSignal
     notes.push("Venus retrograde — relational dynamics are more charged than usual")
   }
 
-  const note = notes.length > 0
-    ? notes.join(". ")
-    : "Current timing is within normal range."
+  // Derive state: reactive if any signal is elevated
+  const state: TimingSignals["state"] =
+    urgency === "high" || tolerance === "low" || sensitivity === "high"
+      ? "reactive"
+      : "stable"
 
-  return { urgency, sensitivity, tolerance, pacing, note }
+  const note = notes.length > 0 ? notes.join(". ") : undefined
+
+  return { urgency, sensitivity, tolerance, pacing, state, note }
 }
 
 // ── Overlay signal builder ────────────────────────────────────────────────────
@@ -356,9 +332,9 @@ export function buildOverlaySignals(
   // Default: infer from user signals alone
   if (!otherSignals) {
     return {
-      loop: `${userSignals.patternTendency} → response → repeat`,
+      loop: `${userSignals.pattern} → response → repeat`,
       amplifier: "The pattern is running without a counterweight.",
-      leverage: "Pace and sequence — not content.",
+      shift: "Pace and sequence — not content.",
     }
   }
 
@@ -366,26 +342,26 @@ export function buildOverlaySignals(
   const userPace = userSignals.pace
   const otherPace = otherSignals.pace ?? "unknown"
 
-  let loop = `${userSignals.pressureResponse} meets ${otherSignals.pressureResponse ?? "withdrawal"}`
+  let loop = `${userSignals.responds} meets ${otherSignals.responds ?? "withdrawal"}`
   let amplifier = "Both sides are responding from their default pattern."
-  let leverage = "The leverage is in who moves first and how."
+  let shift = "Who moves first and how."
 
   // Fast + slow = classic pursue/withdraw
   if (userPace === "fast" && otherPace === "slow") {
     loop = "You move toward resolution. They move toward space. The more you push, the more they pull back."
     amplifier = "Your urgency reads as pressure to them. Their space reads as avoidance to you."
-    leverage = "Pace. Say the one thing that matters, then stop."
+    shift = "Pace. Say the one thing that matters, then stop."
   } else if (userPace === "slow" && otherPace === "fast") {
     loop = "They move fast. You need time. The more they push, the more you shut down."
     amplifier = "Their speed reads as pressure. Your silence reads as disengagement."
-    leverage = "Name that you need time. Give a specific window."
+    shift = "Name that you need time. Give a specific window."
   } else if (userPace === "fast" && otherPace === "fast") {
     loop = "Both sides move fast. The conversation escalates before either person has processed."
     amplifier = "Speed without pause creates collision."
-    leverage = "One person has to slow down first. It doesn't have to be them."
+    shift = "One person has to slow down first. It doesn't have to be them."
   }
 
-  return { loop, amplifier, leverage }
+  return { loop, amplifier, shift }
 }
 
 // ── Rail data builder ─────────────────────────────────────────────────────────
@@ -404,15 +380,15 @@ export function buildRailData(
     baseline: {
       pace: signals.pace,
       stabilizes: signals.stabilizes,
-      pressureResponse: signals.pressureResponse,
-      patternTendency: signals.patternTendency,
+      responds: signals.responds,
+      pattern: signals.pattern,
     },
     sky: {
       urgency: timing.urgency,
       sensitivity: timing.sensitivity,
       tolerance: timing.tolerance,
     },
-    pattern: overlay?.loop ?? signals.patternTendency,
+    pattern: { loop: overlay?.loop ?? signals.pattern ?? "" },
     signature: signature.line,
   }
 }
@@ -432,9 +408,9 @@ export function formatActiveSignalsForPrompt(
     "BASELINE ACTIVE SIGNALS (internal — do not expose to user):",
     `pace: ${signals.pace}`,
     `stabilizes: ${signals.stabilizes}`,
-    `pressure response: ${signals.pressureResponse}`,
+    `responds: ${signals.responds}`,
     `protects: ${signals.protects}`,
-    `pattern tendency: ${signals.patternTendency}`,
+    `pattern: ${signals.pattern}`,
   ]
 
   if (signals.traitLines.length > 0) {
@@ -448,10 +424,10 @@ export function formatActiveSignalsForPrompt(
     `urgency: ${timing.urgency}`,
     `sensitivity: ${timing.sensitivity}`,
     `tolerance: ${timing.tolerance}`,
-    `pacing: ${timing.pacing}`,
+    `state: ${timing.state}`,
   )
 
-  if (timing.note && timing.note !== "No current sky data available." && timing.note !== "Current timing is within normal range.") {
+  if (timing.note) {
     lines.push(`note: ${timing.note}`)
   }
 
@@ -461,7 +437,7 @@ export function formatActiveSignalsForPrompt(
       "OVERLAY (internal — do not expose to user):",
       `loop: ${overlay.loop}`,
       `amplifier: ${overlay.amplifier}`,
-      `leverage: ${overlay.leverage}`,
+      `shift: ${overlay.shift}`,
     )
   }
 
@@ -480,8 +456,8 @@ export function buildExportPayload(
   signature: BaselineSignature
 ): ExportPayload {
   const patternSummary = [
-    signals.patternTendency,
-    signals.pressureResponse,
+    signals.pattern,
+    signals.responds,
   ].filter(Boolean).join(" · ")
 
   const timingState = [
