@@ -183,9 +183,7 @@ export interface CovenantOutput {
 
 
 
-export interface CovenantPayload {
-  [key: string]: unknown;
-}
+
 
 export interface LibraryItem {
   id: string;

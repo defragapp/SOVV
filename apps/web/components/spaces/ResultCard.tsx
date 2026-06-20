@@ -55,18 +55,16 @@ export function ResultCard({
   //   oldRole               → Them  (how the other side tends to move)
   //   whatYouLearnedToCarry → What forms between you  (the loop)
   //   strainPattern         → Why it's sharper now  (timing/amplification)
-  //   giftUnderStrain       → What changes this  (the mechanism/shift)
-  //   alignment             → What changes this (secondary — merged if both present)
+  //   alignment             → What changes this  (primary shift field)
+  //   giftUnderStrain       → What changes this  (fallback if alignment absent)
   //
   // "Next move" is rendered separately with emphasis below.
   const sections = [
-    { label: "What's active",           value: result.activePattern },
-    { label: "You",                     value: result.theRepeat },
-    { label: "Them",                    value: result.oldRole },
-    { label: "What forms between you",  value: result.whatYouLearnedToCarry },
-    { label: "Why it's sharper now",    value: result.strainPattern },
-    // Merge giftUnderStrain + alignment into "What changes this"
-    // Use alignment if present (it's the primary shift field), fall back to giftUnderStrain
+    { label: "What's active",          value: result.activePattern },
+    { label: "You",                    value: result.theRepeat },
+    { label: "Them",                   value: result.oldRole },
+    { label: "What forms between you", value: result.whatYouLearnedToCarry },
+    { label: "Why it's sharper now",   value: result.strainPattern },
     {
       label: "What changes this",
       value: result.alignment || result.giftUnderStrain,
@@ -143,7 +141,7 @@ export function ResultCard({
         <p className="text-[13px] text-[#76716b] leading-relaxed italic">"{input.slice(0, 120)}{input.length > 120 ? "…" : ""}"</p>
       </div>
 
-      {/* Sections */}
+      {/* Sections — 6 rows + Next move */}
       <div className="px-6 py-6">
         {sections.map((s, i) => (
           <motion.div
@@ -158,6 +156,7 @@ export function ResultCard({
           </motion.div>
         ))}
 
+        {/* Next move — rendered with slight emphasis */}
         {response && (
           <motion.div
             initial={{ opacity: 0, y: 4 }}
@@ -189,6 +188,7 @@ export function ResultCard({
           </motion.div>
         )}
 
+        {/* Conversational steering */}
         {steering && (steering.do?.length || steering.avoid?.length) && (
           <motion.div
             initial={{ opacity: 0, y: 4 }}
@@ -226,5 +226,93 @@ export function ResultCard({
         )}
       </div>
 
-      
-        
+      {/* Rail — reduced signal instrumentation, quiet and compressed.
+           Default: baseline (pace/stabilizes/responds) + sky (urgency/tolerance) + pattern.
+           state: reactive intentionally omitted from default — expanded rail only. */}
+      {result.rail ? (
+        <div className="px-6 py-4 border-t border-white/[0.04] bg-[#08070a]/30">
+          <div className="flex flex-wrap gap-x-8 gap-y-3">
+            {result.rail.baseline && (result.rail.baseline.pace || result.rail.baseline.stabilizes || result.rail.baseline.responds) && (
+              <div>
+                <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1.5">Baseline</p>
+                <div className="flex flex-col gap-0.5">
+                  {result.rail.baseline.pace && (
+                    <p className="font-mono text-[9px] text-[#4f4b47]">pace: {result.rail.baseline.pace}</p>
+                  )}
+                  {result.rail.baseline.stabilizes && (
+                    <p className="font-mono text-[9px] text-[#4f4b47]">stabilizes: {result.rail.baseline.stabilizes}</p>
+                  )}
+                  {result.rail.baseline.responds && (
+                    <p className="font-mono text-[9px] text-[#4f4b47]">responds: {result.rail.baseline.responds}</p>
+                  )}
+                </div>
+              </div>
+            )}
+            {result.rail.sky && (result.rail.sky.urgency || result.rail.sky.tolerance) && (
+              <div>
+                <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1.5">Sky</p>
+                <div className="flex flex-col gap-0.5">
+                  {result.rail.sky.urgency && (
+                    <p className="font-mono text-[9px] text-[#4f4b47]">urgency: {result.rail.sky.urgency}</p>
+                  )}
+                  {result.rail.sky.tolerance && (
+                    <p className="font-mono text-[9px] text-[#4f4b47]">tolerance: {result.rail.sky.tolerance}</p>
+                  )}
+                </div>
+              </div>
+            )}
+            {result.rail.pattern?.loop && (
+              <div>
+                <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1.5">Pattern</p>
+                <p className="font-mono text-[9px] text-[#4f4b47]">{result.rail.pattern.loop}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : null}
+
+      {/* Signature line — once only, bottom only, very low contrast.
+           Encoded identity, not explained. Never shown in body. */}
+      {result.signature ? (
+        <div className="px-6 py-3 border-t border-white/[0.03]">
+          <p className="font-mono text-[8px] text-[#2e2b28] tracking-[0.12em]">{result.signature}</p>
+        </div>
+      ) : null}
+
+      {/* Footer actions */}
+      <div className="px-6 py-4 border-t border-white/[0.06] bg-[#08070a]/40 flex items-center justify-between gap-3">
+        <button
+          onClick={handleCopyAll}
+          className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1"/>
+            <path d="M1 8V1h7" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+          </svg>
+          {copied ? "Copied" : "Copy all"}
+        </button>
+        {onInvite && (
+          <button
+            onClick={onInvite}
+            className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M8 1H11V4M11 1L6.5 5.5M5 2H2C1.45 2 1 2.45 1 3V10C1 10.55 1.45 11 2 11H9C9.55 11 10 10.55 10 10V7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Invite Privately
+          </button>
+        )}
+        {onSave && (
+          <button
+            onClick={onSave}
+            disabled={isSaving || saveSuccess}
+            className="h-7 px-4 bg-[#f4efe9] text-[#08070a] text-[11px] font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ borderRadius: 6 }}
+          >
+            {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save to Library"}
+          </button>
+        )}
+      </div>
+    </motion.div>
+  )
+}
