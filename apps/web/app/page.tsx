@@ -9,114 +9,140 @@ import { motion, AnimatePresence } from "framer-motion"
 const APP_URL = "https://app.defrag.app/app/login"
 const ease = [0.16, 1, 0.3, 1] as const
 
-// ── Space Preview ─────────────────────────────────────────────────────────────
-// Real prompt. Real structured output. Baseline Design chips visible.
-// Text sizes bumped for legibility at all viewport sizes.
+// ── Baseline Design data — shown as evidence chips on result rows ─────────────
+const BASELINE = {
+  label: "Your Design · Apr 3 1990 · 7:42 AM · Chicago",
+  facts: [
+    { text: "Moves fast under pressure — sometimes before others are ready", chips: ["Sun in Aries", "Gate 51"] },
+    { text: "Feels things deeply, even when appearing calm", chips: ["Moon in Pisces", "Gate 55"] },
+    { text: "Internal pressure to stay reliable, even when running low", chips: ["Saturn in Cap.", "Gate 38"] },
+    { text: "Notices relational shifts before they become visible", chips: ["Venus in Taurus", "Gate 2"] },
+  ],
+}
+
+// ── Demo sequence ─────────────────────────────────────────────────────────────
+// Input types character by character.
+// Then a loading state (Sovereign is reading).
+// Then result rows appear one at a time with staggered delay.
+// Each row that draws from Baseline Design shows the evidence chip inline.
+
+const DEMO_INPUT = "He went quiet after our argument and hasn't responded in four days. I don't know if I pushed too hard or if this is just what he does. I keep checking my phone."
+
+type ResultRow = {
+  label: string
+  value: string
+  evidence?: string[]   // Baseline Design chips that support this row
+  highlight?: boolean
+}
+
+const DEMO_RESULT: ResultRow[] = [
+  {
+    label: "What's happening",
+    value: "Right now, this feels like something important didn't land.",
+    evidence: ["Moon in Pisces", "Gate 55"],
+  },
+  {
+    label: "What it lands on",
+    value: "Under this is a simple need: to be met.",
+    evidence: ["Gate 2", "Venus in Taurus"],
+  },
+  {
+    label: "The other side",
+    value: "They may be reacting from a place of protection — not indifference.",
+    evidence: ["Gate 38"],
+  },
+  {
+    label: "The pattern",
+    value: "You reach. They pull back. Distance grows. This tends to repeat.",
+    evidence: ["Sun in Aries", "Gate 51"],
+  },
+  {
+    label: "Next step",
+    value: "Name one feeling and one need — in a single sentence. Keep it brief and concrete.",
+    highlight: true,
+  },
+]
+
+// ── Phase types ───────────────────────────────────────────────────────────────
+type Phase = "typing" | "loading" | "result"
+
 function SpacePreview() {
   const [active, setActive] = React.useState<"context" | "thread" | "library">("thread")
   const [typed, setTyped] = React.useState("")
-  const [showResult, setShowResult] = React.useState(false)
+  const [phase, setPhase] = React.useState<Phase>("typing")
+  const [visibleRows, setVisibleRows] = React.useState(0)
 
-  const DEMO_INPUT =
-    "He went quiet after our argument and hasn't responded in four days. I don't know if I pushed too hard or if this is just what he does. I keep checking my phone."
-
-  const DEMO_RESULT = [
-    {
-      label: "Active pattern",
-      value:
-        "You absorbed the hit publicly and went silent — not because you had nothing to say, but because speaking felt more dangerous than the wound itself.",
-      highlight: false,
-    },
-    {
-      label: "What keeps happening",
-      value:
-        "You protect the room at your own expense, then spend days alone carrying what you didn't say.",
-      highlight: false,
-    },
-    {
-      label: "Default mode",
-      value:
-        "Peacekeeper under pressure. You learned early that keeping things calm was your job. That's still running — even when the cost is yours to pay.",
-      highlight: false,
-    },
-    {
-      label: "What shaped this",
-      value:
-        "This pattern didn't start at Thanksgiving. It started the first time staying quiet kept something from breaking.",
-      highlight: false,
-    },
-    {
-      label: "Best Next Response",
-      value:
-        "You don't owe your brother a public confrontation. You owe yourself a private one. Write down exactly what you would have said. Then decide — not from the wound, but from what's actually true.",
-      highlight: true,
-    },
-  ]
-
+  // Reset and replay when switching to thread tab
   React.useEffect(() => {
     if (active !== "thread") return
     setTyped("")
-    setShowResult(false)
+    setPhase("typing")
+    setVisibleRows(0)
+
     let i = 0
-    const interval = setInterval(() => {
+    const typeInterval = setInterval(() => {
       if (i < DEMO_INPUT.length) {
         setTyped(DEMO_INPUT.slice(0, i + 1))
         i++
       } else {
-        clearInterval(interval)
-        setTimeout(() => setShowResult(true), 600)
+        clearInterval(typeInterval)
+        // Brief pause, then show loading
+        setTimeout(() => {
+          setPhase("loading")
+          // Loading for 1.4s, then reveal results row by row
+          setTimeout(() => {
+            setPhase("result")
+            setVisibleRows(0)
+            DEMO_RESULT.forEach((_, idx) => {
+              setTimeout(() => setVisibleRows(idx + 1), idx * 380)
+            })
+          }, 1400)
+        }, 400)
       }
-    }, 18)
-    return () => clearInterval(interval)
+    }, 16)
+
+    return () => clearInterval(typeInterval)
   }, [active])
 
   const panels = [
-    { id: "context" as const, label: "Your Design", desc: "Baseline Design — active in every thread" },
-    { id: "thread" as const, label: "Defrag", desc: "Put the moment in. See what's underneath it." },
-    { id: "library" as const, label: "Library", desc: "Save what helped. Return before the pattern takes over." },
+    { id: "context" as const, label: "Your Design" },
+    { id: "thread" as const, label: "Defrag" },
+    { id: "library" as const, label: "Library" },
   ]
 
   return (
     <div className="relative w-full max-w-4xl mx-auto">
-      {/* Outer glow */}
+      {/* Outer accent glow */}
       <div
         className="pointer-events-none absolute -inset-px"
         style={{
           borderRadius: 20,
-          background:
-            "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(224,116,58,0.12) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(224,116,58,0.10) 0%, transparent 70%)",
         }}
         aria-hidden
       />
 
       <div
-        className="relative border border-white/[0.10] bg-[#0c0a0d] overflow-hidden shadow-2xl"
-        style={{ borderRadius: 18 }}
+        className="relative border border-white/[0.10] bg-[#0c0a0d] overflow-hidden"
+        style={{ borderRadius: 18, boxShadow: "0 32px 80px -16px rgba(0,0,0,0.7)" }}
       >
-        {/* Titlebar */}
-        <div className="h-11 border-b border-white/[0.07] bg-[#08070a]/90 flex items-center px-4 gap-3">
+        {/* ── Titlebar ── */}
+        <div className="h-11 border-b border-white/[0.07] bg-[#08070a]/90 flex items-center px-4 gap-3 shrink-0">
           <div className="flex gap-1.5">
-            {[0, 1, 2].map((i) => (
-              <span key={i} className="w-2.5 h-2.5 rounded-full bg-white/[0.09]" />
-            ))}
+            {[0, 1, 2].map((i) => <span key={i} className="w-2.5 h-2.5 rounded-full bg-white/[0.08]" />)}
           </div>
           <div className="flex-1 flex justify-center">
-            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#4f4b47]">
-              Sovereign.os
-            </span>
+            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47]">Sovereign.os</span>
           </div>
-          {/* Panel switcher */}
-          <div className="flex gap-1">
+          <div className="flex gap-0.5">
             {panels.map((p) => (
               <button
                 key={p.id}
                 onClick={() => setActive(p.id)}
                 className={`px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] uppercase transition-all duration-200 ${
-                  active === p.id
-                    ? "bg-white/[0.10] text-[#f4efe9]"
-                    : "text-[#4f4b47] hover:text-[#76716b]"
+                  active === p.id ? "bg-white/[0.10] text-[#f4efe9]" : "text-[#4f4b47] hover:text-[#76716b]"
                 }`}
-                style={{ borderRadius: 6 }}
+                style={{ borderRadius: 5 }}
               >
                 {p.label}
               </button>
@@ -124,193 +150,198 @@ function SpacePreview() {
           </div>
         </div>
 
-        {/* Panel descriptor */}
-        <div className="px-6 py-2.5 border-b border-white/[0.05] bg-[#08070a]/50">
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={active}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="font-mono text-[10px] tracking-[0.16em] uppercase text-[#e0743a]/60"
-            >
-              {panels.find((p) => p.id === active)?.desc}
-            </motion.p>
-          </AnimatePresence>
-        </div>
-
-        {/* Content area */}
-        <div className="min-h-[380px] p-6">
+        {/* ── Content ── */}
+        <div className="p-0">
           <AnimatePresence mode="wait">
 
-            {/* Context — Baseline Design */}
+            {/* ── YOUR DESIGN tab ── */}
             {active === "context" && (
-              <motion.div
-                key="context"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-col gap-0"
-              >
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]/50 mb-5">
-                  Your Design · Apr 3 1990 · 7:42 AM · Chicago
-                </p>
-                {[
-                  {
-                    s: "I move fast when something needs a decision — sometimes before others are ready.",
-                    chips: ["Sun in Aries", "Gate 51", "Channel 25-51"],
-                  },
-                  {
-                    s: "I feel things deeply, even when I appear calm on the surface.",
-                    chips: ["Moon in Pisces", "Gate 55"],
-                  },
-                  {
-                    s: "I feel internal pressure to stay reliable, even when I'm running low.",
-                    chips: ["Saturn in Cap.", "Gate 38"],
-                  },
-                  {
-                    s: "I notice when something is off in a relationship before it becomes visible to others.",
-                    chips: ["Venus in Taurus", "Gate 2"],
-                  },
-                ].map((item, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -6 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.07, duration: 0.3, ease }}
-                    className="py-3.5 border-b border-white/[0.05] last:border-0"
-                  >
-                    <p className="text-[13px] text-[#c8c2bc] leading-relaxed mb-2">{item.s}</p>
-                    <div className="flex gap-1.5 flex-wrap">
-                      {item.chips.map((c) => (
-                        <span
-                          key={c}
-                          className="text-[9px] font-mono tracking-[0.1em] px-2 py-0.5 border border-white/[0.09] text-[#76716b]"
-                          style={{ borderRadius: 3 }}
-                        >
-                          {c}
-                        </span>
-                      ))}
-                    </div>
-                  </motion.div>
-                ))}
-                <p className="text-[10px] text-[#4f4b47] mt-4 font-mono tracking-wide">
-                  Active in every result. Never exposed in outputs.
-                </p>
+              <motion.div key="context" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+                <div className="px-6 pt-5 pb-2 border-b border-white/[0.05]">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/50">{BASELINE.label}</p>
+                </div>
+                <div className="px-6 py-2">
+                  {BASELINE.facts.map((fact, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.08, duration: 0.35, ease }}
+                      className="flex items-start gap-4 py-4 border-b border-white/[0.04] last:border-0"
+                    >
+                      <div className="flex-1">
+                        <p className="text-[13px] text-[#c8c2bc] leading-snug">{fact.text}</p>
+                      </div>
+                      <div className="flex gap-1.5 flex-wrap justify-end shrink-0 max-w-[140px]">
+                        {fact.chips.map((c) => (
+                          <span key={c} className="font-mono text-[8px] tracking-[0.1em] px-2 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/60 bg-[#e0743a]/[0.04]" style={{ borderRadius: 3 }}>
+                            {c}
+                          </span>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                <div className="px-6 py-3 border-t border-white/[0.04]">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Active in every result · never exposed in outputs</p>
+                </div>
               </motion.div>
             )}
 
-            {/* Thread — real prompt + structured result */}
+            {/* ── DEFRAG tab ── */}
             {active === "thread" && (
-              <motion.div
-                key="thread"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-col gap-4"
-              >
-                {/* Input */}
-                <div
-                  className="border border-white/[0.09] bg-white/[0.025] p-5"
-                  style={{ borderRadius: 10 }}
-                >
-                  <p className="text-[14px] text-[#f4efe9] leading-relaxed min-h-[56px]">
-                    {typed}
-                    <span className="inline-block w-0.5 h-4 bg-[#f4efe9]/50 ml-0.5 animate-pulse" />
-                  </p>
-                  <div className="flex justify-end mt-3">
-                    <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">
-                      ↵ Defrag
-                    </span>
+              <motion.div key="thread" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+
+                {/* Input area */}
+                <div className="px-6 pt-6 pb-4 border-b border-white/[0.05]">
+                  <div className="flex items-start gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/20 mt-2 shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-[14px] text-[#f4efe9] leading-relaxed" style={{ minHeight: 44 }}>
+                        {typed}
+                        {phase === "typing" && (
+                          <span className="inline-block w-[2px] h-[15px] bg-[#f4efe9]/60 ml-0.5 align-middle animate-pulse" />
+                        )}
+                      </p>
+                    </div>
                   </div>
+
+                  {/* Send indicator — appears when typing is done */}
+                  <AnimatePresence>
+                    {phase !== "typing" && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex items-center justify-end gap-2 mt-3"
+                      >
+                        <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#4f4b47]">Sent</span>
+                        <span className="w-1 h-1 rounded-full bg-[#e0743a]/40" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                {/* Result */}
+                {/* Loading state */}
                 <AnimatePresence>
-                  {showResult && (
+                  {phase === "loading" && (
                     <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, ease }}
-                      className="border border-white/[0.09] bg-white/[0.02] overflow-hidden"
-                      style={{ borderRadius: 10 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="px-6 py-5 flex items-center gap-3"
                     >
+                      <div className="flex gap-1">
+                        {[0, 1, 2].map((i) => (
+                          <motion.span
+                            key={i}
+                            className="w-1 h-1 rounded-full bg-[#e0743a]/50"
+                            animate={{ opacity: [0.3, 1, 0.3] }}
+                            transition={{ duration: 0.9, delay: i * 0.2, repeat: Infinity }}
+                          />
+                        ))}
+                      </div>
+                      <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
+                        Reading your Baseline Design
+                      </span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Result rows — appear one at a time */}
+                <AnimatePresence>
+                  {phase === "result" && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+                      {/* Baseline Design source bar */}
+                      <div className="px-6 py-2.5 border-b border-white/[0.04] flex items-center gap-2 bg-[#e0743a]/[0.03]">
+                        <span className="w-1 h-1 rounded-full bg-[#e0743a]/50" />
+                        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50">
+                          Baseline Design active · {BASELINE.label.split("·")[0].trim()}
+                        </span>
+                      </div>
+
                       {DEMO_RESULT.map((row, i) => (
-                        <motion.div
-                          key={row.label}
-                          initial={{ opacity: 0, y: 4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.09, duration: 0.3, ease }}
-                          className={`px-5 py-4 border-b border-white/[0.05] last:border-0 ${
-                            row.highlight ? "bg-[#e0743a]/[0.06]" : ""
-                          }`}
-                        >
-                          <p
-                            className={`font-mono text-[9px] uppercase tracking-[0.2em] mb-1.5 ${
-                              row.highlight ? "text-[#e0743a]/70" : "text-[#4f4b47]"
-                            }`}
-                          >
-                            {row.label}
-                          </p>
-                          <p
-                            className={`text-[13px] leading-relaxed ${
-                              row.highlight ? "text-[#f4efe9] font-medium" : "text-[#a8a29a]"
-                            }`}
-                          >
-                            {row.value}
-                          </p>
-                        </motion.div>
+                        <AnimatePresence key={row.label}>
+                          {visibleRows > i && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.4, ease }}
+                              className={`px-6 py-4 border-b border-white/[0.04] last:border-0 ${
+                                row.highlight ? "bg-[#e0743a]/[0.05]" : ""
+                              }`}
+                            >
+                              {/* Label row */}
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`font-mono text-[9px] uppercase tracking-[0.2em] ${
+                                  row.highlight ? "text-[#e0743a]/80" : "text-[#4f4b47]"
+                                }`}>
+                                  {row.label}
+                                </span>
+                                {/* Evidence chips — Baseline Design data points */}
+                                {row.evidence && (
+                                  <div className="flex gap-1">
+                                    {row.evidence.map((chip) => (
+                                      <span
+                                        key={chip}
+                                        className="font-mono text-[8px] tracking-[0.08em] px-1.5 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/50 bg-[#e0743a]/[0.04]"
+                                        style={{ borderRadius: 3 }}
+                                      >
+                                        {chip}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              {/* Value */}
+                              <p className={`text-[13px] leading-relaxed ${
+                                row.highlight
+                                  ? "text-[#f4efe9] font-medium"
+                                  : "text-[#a8a29a]"
+                              }`}>
+                                {row.value}
+                              </p>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       ))}
                     </motion.div>
                   )}
                 </AnimatePresence>
+
               </motion.div>
             )}
 
-            {/* Library */}
+            {/* ── LIBRARY tab ── */}
             {active === "library" && (
-              <motion.div
-                key="library"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-col gap-0"
-              >
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]/50 mb-5">
-                  Saved results
-                </p>
-                {[
-                  { space: "Defrag", title: "Thanksgiving — what I didn't say", date: "Nov 29" },
-                  { space: "Alignment", title: "What is mine to carry after the call", date: "Nov 26" },
-                  { space: "Defrag", title: "The message I almost sent at 2am", date: "Nov 18" },
-                  { space: "Covenant", title: "Responsibility when the family is watching", date: "Nov 12" },
-                ].map((item, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -6 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.07, duration: 0.3, ease }}
-                    className="flex items-center justify-between py-4 border-b border-white/[0.05] last:border-0 group cursor-pointer hover:bg-white/[0.025] transition-colors px-2 -mx-2"
-                    style={{ borderRadius: 6 }}
-                  >
-                    <div className="flex items-center gap-5">
-                      <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] w-16 shrink-0">
-                        {item.space}
-                      </span>
-                      <span className="text-[13px] text-[#a8a29a] group-hover:text-[#f4efe9] transition-colors">
-                        {item.title}
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-[#4f4b47] shrink-0">{item.date}</span>
-                  </motion.div>
-                ))}
-                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#4f4b47] mt-5">
-                  Save to Sovereign before the moment disappears.
-                </p>
+              <motion.div key="library" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+                <div className="px-6 pt-5 pb-2 border-b border-white/[0.05]">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#a8a29a]/40">Saved results</p>
+                </div>
+                <div className="px-6 py-2">
+                  {[
+                    { space: "Defrag", title: "The silence after the argument", date: "Jun 18" },
+                    { space: "Alignment", title: "What is mine to carry after the call", date: "Jun 14" },
+                    { space: "Defrag", title: "The message I almost sent at 2am", date: "Jun 9" },
+                    { space: "Covenant", title: "Responsibility when the family is watching", date: "Jun 3" },
+                  ].map((item, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -6 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.07, duration: 0.3, ease }}
+                      className="flex items-center justify-between py-4 border-b border-white/[0.04] last:border-0 group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47] w-14 shrink-0">{item.space}</span>
+                        <span className="text-[13px] text-[#76716b] group-hover:text-[#c8c2bc] transition-colors">{item.title}</span>
+                      </div>
+                      <span className="font-mono text-[9px] text-[#4f4b47] shrink-0">{item.date}</span>
+                    </motion.div>
+                  ))}
+                </div>
+                <div className="px-6 py-3 border-t border-white/[0.04]">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Save to Sovereign before the moment disappears</p>
+                </div>
               </motion.div>
             )}
 
@@ -318,8 +349,8 @@ function SpacePreview() {
         </div>
       </div>
 
-      <p className="text-center font-mono text-[10px] uppercase tracking-[0.18em] text-[#4f4b47] mt-5">
-        Select a panel to explore the space
+      <p className="text-center font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mt-4">
+        Click the panels above to explore
       </p>
     </div>
   )
