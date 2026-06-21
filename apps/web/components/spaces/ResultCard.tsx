@@ -162,7 +162,7 @@ export function ResultCard({
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: sections.length * 0.06, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="border-t border-white/[0.06] pt-5 mt-5"
+            className="border-t border-[#e0743a]/20 pt-6 mt-6"
           >
             <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-3">Next move</p>
             <p className="text-[14px] text-[#f4efe9] leading-[1.7] mb-4">
@@ -274,7 +274,7 @@ export function ResultCard({
       {/* Signature line — once only, bottom only, very low contrast.
            Encoded identity, not explained. Never shown in body. */}
       {result.signature ? (
-        <div className="px-6 py-3 border-t border-white/[0.03]">
+        <div className="px-6 py-3 border-t border-white/[0.03] opacity-40 hover:opacity-80 transition-opacity">
           <p className="font-mono text-[8px] text-[#2e2b28] tracking-[0.12em]">{result.signature}</p>
         </div>
       ) : null}

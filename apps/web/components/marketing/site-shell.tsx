@@ -55,6 +55,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           </Link>
 
           
+          <div className="flex items-center gap-6">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden text-[#a8a29a] hover:text-[#f4efe9] transition-colors p-2"
@@ -88,7 +89,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                 </Link>
               ))}
               <Link
-                href="https://app.defrag.app/app/login"
+                href="/app/login"
                 onClick={() => setMenuOpen(false)}
                 className="btn-primary justify-center mt-2"
               >

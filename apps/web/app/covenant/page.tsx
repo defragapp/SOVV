@@ -62,7 +62,7 @@ export default function CovenantPage() {
             Covenant helps you bring faith, reflection, and grounded discernment into what you are walking through.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="https://app.defrag.app/apps/covenant" className="btn-primary">
+            <Link href="/apps/covenant" className="btn-primary">
               Enter the Covenant space
             </Link>
             <Link href="/pricing" className="btn-secondary">
@@ -120,7 +120,7 @@ export default function CovenantPage() {
           <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-8 text-balance">
             Keep faith and repair connected.
           </h2>
-          <Link href="https://app.defrag.app/apps/covenant" className="btn-primary">
+          <Link href="/apps/covenant" className="btn-primary">
             Enter the Covenant space
           </Link>
         </Container>

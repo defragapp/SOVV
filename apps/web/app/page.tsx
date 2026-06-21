@@ -6,7 +6,7 @@ import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
 import { motion, AnimatePresence } from "framer-motion"
 
-const APP_URL = "https://app.defrag.app/app/login"
+const APP_URL = "/app/login"
 const ease = [0.16, 1, 0.3, 1] as const
 
 // ── Baseline Design data — shown as evidence chips on result rows ─────────────
@@ -552,7 +552,7 @@ export default function Home() {
             <Link href={APP_URL} className="btn-primary">
               Enter Sovereign.os
             </Link>
-            <Link href="/how-it-works" className="btn-secondary" style={{ opacity: 0.65 }}>
+            <Link href="/how-it-works" className="btn-secondary">
               See how it works
             </Link>
           </motion.div>

@@ -27,8 +27,8 @@ test.describe('Live Visual Deployment Verification', () => {
 
     // Assert key text
     await expect(page.locator('text=Sovereign.os').first()).toBeVisible();
-    await expect(page.locator('text=Healing isn\'t optional').first()).toBeVisible();
-    await expect(page.locator('text=Holding the pain is').first()).toBeVisible();
+    
+    await expect(page.locator('text=See what\'s happening').first()).toBeVisible();
 
     await page.screenshot({ path: 'test-results/screenshots/public-homepage.png', fullPage: true });
   });
@@ -45,7 +45,7 @@ test.describe('Live Visual Deployment Verification', () => {
 
   // App Routes
   test('App Login', async ({ page }) => {
-    await page.goto('https://app.defrag.app/login', { waitUntil: 'networkidle' }); // Based on repo structure, /login redirects or is the route.
+    await page.goto('https://app.defrag.app/app/login', { waitUntil: 'networkidle' }); // Based on repo structure, /login redirects or is the route.
 
     // Assert key text
     await expect(page.locator('text=Sign In').first()).toBeVisible();

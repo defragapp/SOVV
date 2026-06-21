@@ -5,7 +5,7 @@ import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
 import { motion, AnimatePresence } from "framer-motion"
 
-const APP_URL = "https://app.defrag.app/app/login"
+const APP_URL = "/app/login"
 const ease = [0.16, 1, 0.3, 1] as const
 
 // ── Interactive demo: shows a real Defrag result ───────────────────────────
@@ -93,7 +93,7 @@ function DefragDemo() {
           >
             {[
               
-            ].map((row, i) => (
+            ].map((row: any, i) => (
               <motion.div
                 key={row.label}
                 initial={{ opacity: 0, y: 4 }}
