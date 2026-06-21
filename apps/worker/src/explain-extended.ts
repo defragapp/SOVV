@@ -144,9 +144,13 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   }
 
   
-  if (subGate) return subGate;
+  
 
   const sid = await getSessionId(req);
+  const user = await getAuthUser(req, env.DB);
+  if (!user) {
+    return jsonResponse({ error: "unauthorized" }, 401, { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) });
+  }
 
   // Free tier daily usage limit check
   const isPro = user.subscription_status === "active" || user.tier === "pro";
@@ -270,6 +274,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     alignment: parsed.alignment || "This section needs more context.",
     bestNextResponse: parsed.bestNextResponse || { summary: "This section needs more context.", phrasing: [] },
     conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] },
+  };
     
 
 
