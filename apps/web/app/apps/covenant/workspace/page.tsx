@@ -274,7 +274,11 @@ export default function CovenantWorkspacePage() {
   const main = (
     <div className="flex flex-col h-full">
       <div className="h-11 px-6 flex items-center border-b border-white/[0.06] shrink-0">
-        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Covenant</span>
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Covenant</span>
+          <span className="text-[#4f4b47] text-[10px]">·</span>
+          <span className="text-[11px] text-[#4f4b47]">The story in Scripture that fits this moment.</span>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
@@ -299,7 +303,7 @@ export default function CovenantWorkspacePage() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/60 rounded-full animate-spin" />
-            <p className="text-[13px] text-[#4f4b47]">Looking for the story…</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Finding the story that fits…</p>
           </div>
         )}
 
@@ -373,7 +377,7 @@ export default function CovenantWorkspacePage() {
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="What does this moment mean in the larger story?"
+            placeholder="Describe what you're walking through — Covenant will find the story in Scripture that matches it."
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             style={{ fontSize: "16px" }}

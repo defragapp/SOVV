@@ -386,7 +386,11 @@ export default function DefragWorkspacePage() {
 
       {/* Thread header — shows active data sources */}
       <div className="h-11 px-6 flex items-center justify-between border-b border-white/[0.06] shrink-0">
-        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Defrag</span>
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Defrag</span>
+          <span className="text-[#4f4b47] text-[10px]">·</span>
+          <span className="text-[11px] text-[#4f4b47]">What's active. What keeps happening. One next move.</span>
+        </div>
         {result?.sourcesUsed && (
           <div className="flex items-center gap-1.5">
             {result.sourcesUsed.baseline && (
@@ -436,7 +440,7 @@ export default function DefragWorkspacePage() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <span className="w-5 h-5 border border-white/[0.15] border-t-white/[0.45] rounded-full animate-spin" />
-            <p className="text-[12px] text-[#4f4b47] font-mono uppercase tracking-[0.14em]">Reading your Baseline Design…</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Reading the pattern…</p>
           </div>
         )}
 
