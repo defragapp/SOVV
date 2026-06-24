@@ -72,6 +72,13 @@ export default function CovenantWorkspacePage() {
   }, [])
 
   React.useEffect(() => {
+    fetch("/api/derive-profile", { credentials: "include" })
+      .then(r => r.ok ? r.json() : { statements: [] })
+      .then((d: any) => { if (Array.isArray(d.statements) && d.statements.length > 0) setBaselineStatements(d.statements) })
+      .catch(() => {})
+  }, [])
+
+  React.useEffect(() => {
     fetch("/api/library?workspace_source=COVENANT", { credentials: "include" })
       .then(r => r.ok ? r.json() : { items: [] })
       .then((d: any) => setLibrary(d.items || []))
@@ -169,10 +176,30 @@ export default function CovenantWorkspacePage() {
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">How Covenant works</p>
       </div>
       <div className="px-5 pt-6 pb-5">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">How this works</p>
-        <p className="text-[12px] text-[#4f4b47] leading-relaxed mb-5">
-          Covenant connects what you're walking through to the real human stories in Scripture. Your Baseline Design is already active — Covenant uses it to find the story that fits your moment.
-        </p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Baseline Design</p>
+        {baselineStatements.length > 0 ? (
+          <div className="flex flex-col gap-0 mb-5">
+            {baselineStatements.slice(0, 3).map(({ statement, chips }, i) => (
+              <div key={i} className="py-3 border-b border-white/[0.04] last:border-0">
+                <p className="text-[12px] text-[#c8c2bc] leading-[1.6] mb-2">{statement}</p>
+                {chips.length > 0 && (
+                  <div className="flex gap-1 flex-wrap">
+                    {chips.map(chip => (
+                      <span key={chip} className="font-mono text-[8px] tracking-[0.1em] px-2 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/60 bg-[#e0743a]/[0.04]" style={{ borderRadius: "var(--radius-minimal)" }}>
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            <p className="text-[10px] text-[#4f4b47] mt-3">Active in every result.</p>
+          </div>
+        ) : (
+          <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
+            Your Baseline Design is already active — Covenant uses it to find the story that fits your moment.
+          </p>
+        )}
         <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] mb-3">Patterns it recognizes</p>
         <div className="flex flex-col gap-0">
           {[

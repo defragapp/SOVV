@@ -209,7 +209,7 @@ export default function AlignmentProductPage() {
               </div>
               <div className="bg-[#0c0a0d] p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-400/60 border border-white/[0.06] px-2 py-1 rounded-sm">Moving Data</span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#a8a29a]/60 border border-white/[0.06] px-2 py-1 rounded-sm">Live Sky</span>
                 </div>
                 <p className="text-[#f4efe9] font-medium text-sm mb-2">The live sky above you</p>
                 <p className="text-sm text-[#76716b] leading-relaxed">
