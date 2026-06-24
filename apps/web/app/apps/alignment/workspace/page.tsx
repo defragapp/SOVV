@@ -96,6 +96,8 @@ export default function AlignmentWorkspacePage() {
           ? "You've reached your free daily limit. Upgrade to Pro to continue."
           : data.type === "needs_baseline" || data.error === "needs_baseline"
           ? "needs_baseline"
+          : data.error === "incomplete_output"
+          ? "The system couldn't read this moment clearly. Try describing it with more specific detail."
           : data.message || data.error || "Something went wrong.")
         return
       }
@@ -368,8 +370,27 @@ export default function AlignmentWorkspacePage() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-8"
+              className="border border-white/[0.08] bg-white/[0.02] overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}
             >
+              {/* Result header */}
+              <div className="px-8 py-4 border-b border-white/[0.06] flex items-center justify-between bg-[#08070a]/60">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Sovereign.os</span>
+                  <span className="text-[#4f4b47] text-xs">/</span>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]">Alignment</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  {(result as any).confidence && (result as any).confidence.strength !== "low" && (
+                    <span className="font-mono text-[8px] text-[#4f4b47]" title={`Signal strength: ${(result as any).confidence.strength}`}>
+                      {(result as any).confidence.strength === "high" ? "●●●" : "●●○"}
+                    </span>
+                  )}
+                  <span className="font-mono text-[9px] text-[#4f4b47]">
+                    {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  </span>
+                </div>
+              </div>
+              <div className="p-8">
               {result.skyContext && (
                 <div className="mb-6 pb-6 border-b border-white/[0.05]">
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">Live sky · right now</p>
@@ -383,6 +404,7 @@ export default function AlignmentWorkspacePage() {
               <Section label="One move"                  value={result.nextStep} />
               <Section label="What to release"           value={result.avoid} />
               <Section label="What staying true looks like" value={result.alignment} />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

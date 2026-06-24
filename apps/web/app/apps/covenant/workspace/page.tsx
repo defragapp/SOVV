@@ -105,6 +105,8 @@ export default function CovenantWorkspacePage() {
           ? "You've reached your free daily limit. Upgrade to Pro to continue."
           : data.type === "needs_baseline" || data.error === "needs_baseline"
           ? "needs_baseline"
+          : data.error === "incomplete_output"
+          ? "The system couldn't read this moment clearly. Try describing it with more specific detail."
           : data.message || data.error || "Something went wrong.")
         return
       }
@@ -337,7 +339,7 @@ export default function CovenantWorkspacePage() {
           <div className="flex flex-col items-center justify-center text-center h-full gap-3">
             <div
               className="w-10 h-10 flex items-center justify-center border border-[#e0743a]/20 bg-[#e0743a]/5 mb-2"
-              style={{ borderRadius: 10, boxShadow: "0 0 24px rgba(224,116,58,0.08)" }}
+              style={{ borderRadius: 10 }}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M8 2v12M2 8h12" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round"/>
@@ -381,10 +383,29 @@ export default function CovenantWorkspacePage() {
               className="border border-white/[0.08] bg-white/[0.02] overflow-hidden"
               style={{ borderRadius: "var(--radius-container)" }}
             >
-              {/* Figure match header */}
+              {/* Result header */}
+              <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between bg-[#08070a]/60">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Sovereign.os</span>
+                  <span className="text-[#4f4b47] text-xs">/</span>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]">Covenant</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  {(result as any).confidence && (result as any).confidence.strength !== "low" && (
+                    <span className="font-mono text-[8px] text-[#4f4b47]" title={`Signal strength: ${(result as any).confidence.strength}`}>
+                      {(result as any).confidence.strength === "high" ? "●●●" : "●●○"}
+                    </span>
+                  )}
+                  <span className="font-mono text-[9px] text-[#4f4b47]">
+                    {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  </span>
+                </div>
+              </div>
+
+              {/* Figure match */}
               {result.figure && (
                 <div className="px-6 py-5 border-b border-white/[0.06] bg-[#08070a]/40">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50 mb-2">Your moment matches</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">Your moment matches</p>
                   <p className="font-serif text-2xl text-[#f4efe9]">{result.figure}</p>
                   {result.reference && (
                     <p className="font-mono text-[10px] text-[#76716b] tracking-[0.12em] mt-1">{result.reference}</p>
