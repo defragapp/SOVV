@@ -89,9 +89,40 @@ export function ResultCard({
     }
     lines.push("—")
     lines.push("Sovereign.os · defrag.app")
-    await navigator.clipboard.writeText(lines.join(NL))
+    const text = lines.join(NL)
+    await navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleDownload = () => {
+    const NL = "\n"
+    const lines: string[] = [
+      `SOVEREIGN.OS — ${spaceName.toUpperCase()}`,
+      new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+      "",
+      `"${input}"`,
+      "",
+    ]
+    sections.forEach(s => {
+      lines.push(s.label.toUpperCase())
+      lines.push(s.value!)
+      lines.push("")
+    })
+    if (response) {
+      lines.push("NEXT MOVE")
+      lines.push(typeof response === "string" ? response : (response.summary || ""))
+      lines.push("")
+    }
+    lines.push("—")
+    lines.push("Sovereign.os · defrag.app")
+    const blob = new Blob([lines.join(NL)], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `sovereign-${spaceName.toLowerCase()}-${new Date().toISOString().slice(0,10)}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -291,16 +322,27 @@ export function ResultCard({
 
       {/* Footer actions */}
       <div className="px-6 py-4 border-t border-white/[0.06] bg-[#08070a]/40 flex items-center justify-between gap-3">
-        <button
-          onClick={handleCopyAll}
-          className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
-        >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1"/>
-            <path d="M1 8V1h7" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-          </svg>
-          {copied ? "Copied" : "Copy all"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleCopyAll}
+            className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1"/>
+              <path d="M1 8V1h7" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+            </svg>
+            {copied ? "Copied" : "Copy"}
+          </button>
+          <button
+            onClick={handleDownload}
+            className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Export
+          </button>
+        </div>
         {onInvite && (
           <button
             onClick={onInvite}
