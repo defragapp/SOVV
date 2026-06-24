@@ -31,7 +31,7 @@ export const CardHeader = ({ className = "", ...props }: React.HTMLAttributes<HT
 )
 
 export const CardTitle = ({ className = "", ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-  <h3 className={`font-semibold leading-none tracking-tight text-[#FDFDFD] ${className}`} {...props} />
+  <h3 className={`font-medium leading-none tracking-tight text-[#FDFDFD] ${className}`} {...props} />
 )
 
 export const CardDescription = ({ className = "", ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
