@@ -252,7 +252,7 @@ export function ResultCard({
            Encoded identity, not explained. Never shown in body. */}
       {result.signature ? (
         <div className="px-6 py-3 border-t border-white/[0.03]">
-          <p className="font-mono text-[8px] text-[#2e2b28] tracking-[0.12em]">{result.signature}</p>
+          <p className="font-mono text-[8px] text-[#4f4b47] tracking-[0.12em]">{result.signature}</p>
         </div>
       ) : null}
 

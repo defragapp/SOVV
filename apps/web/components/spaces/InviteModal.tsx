@@ -163,7 +163,7 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
                       </div>
                     </div>
 
-                    <p className="text-[10px] text-[#2e2b28] text-center mt-4 leading-relaxed">
+                    <p className="text-[10px] text-[#4f4b47] text-center mt-4 leading-relaxed">
                       Link expires in 7 days &middot; Private by design
                     </p>
                   </motion.div>
