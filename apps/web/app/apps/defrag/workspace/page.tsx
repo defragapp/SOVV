@@ -57,7 +57,7 @@ function formatBirthSummary(b: Baseline): string {
 function EvidenceChip({ label }: { label: string }) {
   return (
     <span
-      className="font-mono text-[8px] tracking-[0.10em] px-2 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/60 bg-[#e0743a]/[0.04]"
+      className="font-mono text-[8px] tracking-[0.1em] px-2 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/60 bg-[#e0743a]/[0.04]"
       style={{ borderRadius: "var(--radius-minimal)" }}
     >
       {label}
@@ -232,7 +232,7 @@ export default function DefragWorkspacePage() {
         ) : baseline ? (
           <>
             {/* Birth summary — compact, low priority */}
-            <p className="font-mono text-[9px] text-[#4f4b47] mb-4 tracking-[0.08em]">
+            <p className="font-mono text-[9px] text-[#4f4b47] mb-4 tracking-[0.1em]">
               {formatBirthSummary(baseline)}
             </p>
 

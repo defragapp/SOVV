@@ -21,7 +21,7 @@ function Section({ label, value }: { label: string; value?: string }) {
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className="border-b border-white/[0.05] pb-6 mb-6 last:border-0 last:pb-0 last:mb-0"
     >
-      <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-2">{label}</p>
+      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">{label}</p>
       <p className="text-[15px] text-[#f4efe9] leading-[1.7]">{value}</p>
     </motion.div>
   )
@@ -158,7 +158,7 @@ export default function AlignmentWorkspacePage() {
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">How Alignment works</p>
       </div>
       <div className="px-5 pt-6 pb-5">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">How this works</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">How this works</p>
         <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
           Your Baseline Design is your fixed center — how you naturally operate. The live sky is the emotional weather you're moving through right now. Alignment uses both to show you the path back to yourself.
         </p>
@@ -349,7 +349,7 @@ export default function AlignmentWorkspacePage() {
             }}
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
-            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Continue</span>
+            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.1em]">↵ Continue</span>
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}

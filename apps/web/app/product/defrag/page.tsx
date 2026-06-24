@@ -66,7 +66,7 @@ function DefragDemo() {
 
       {/* Input */}
       <div className="ios-panel p-5 mb-3">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">What you described</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">What you described</p>
         <p className="text-[14px] text-[#f4efe9] leading-relaxed">{current.input}</p>
         <div className="flex justify-end mt-3">
           <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#4f4b47]">↵ Defrag</span>
@@ -111,7 +111,7 @@ function DefragDemo() {
                   transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                   className="px-5 py-4 border-t border-white/[0.05] bg-white/[0.02]"
                 >
-                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-1.5">Best Next Response</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-1.5">Best Next Response</p>
                   <p className="text-[13px] leading-relaxed text-[#f4efe9] font-medium">{current.result.nextResponse}</p>
                 </motion.div>
               )}
@@ -133,7 +133,7 @@ export default function DefragProductPage() {
         <Container className="relative z-10 max-w-4xl">
           <div className="inline-flex items-center gap-2 mb-6">
             <span className="h-px w-6 bg-[#e0743a]/60" />
-            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">Defrag · Free</span>
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Defrag · Free</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
             Separate the moment from the pattern.
@@ -179,7 +179,7 @@ export default function DefragProductPage() {
           <div className="flex flex-col items-center text-center mb-12">
             <div className="inline-flex items-center gap-2 mb-6">
               <span className="h-px w-6 bg-[#e0743a]/60" />
-              <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">See it work</span>
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">See it work</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
               Real inputs. Real results.

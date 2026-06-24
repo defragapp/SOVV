@@ -115,7 +115,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
           {/* Wordmark */}
           <div className="mb-8 text-center">
-            <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+            <span className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase font-medium">
               SOVEREIGN.OS
             </span>
           </div>
@@ -176,7 +176,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
                     {/* Date of birth */}
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Date of birth</label>
+                      <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Date of birth</label>
                       <input
                         type="date"
                         value={dob}
@@ -189,7 +189,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
                     {/* Time of birth — ask what they know */}
                     <div className="flex flex-col gap-3">
-                      <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Time of birth</label>
+                      <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Time of birth</label>
                       <p className="text-sm text-[#76716b]">How much do you know?</p>
 
                       <div className="flex flex-col gap-2">
@@ -343,7 +343,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
                     {/* Place of birth */}
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Place of birth</label>
+                      <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Place of birth</label>
                       <input
                         type="text"
                         value={pob}

@@ -45,8 +45,8 @@ export default function AdminPromoPanel() {
 
       {code ? (
         <div className="rounded-[14px] bg-slate-950/60 p-4 text-sm text-white">
-          <p className="font-sans font-medium text-xs uppercase text-white/50">Promo code</p>
-          <p className="mt-2 font-mono text-[14px] tracking-[0.16em]">{code}</p>
+          <p className="font-mono text-xs uppercase text-white/50">Promo code</p>
+          <p className="mt-2 font-mono text-[14px] tracking-[0.14em]">{code}</p>
           <p className="mt-2 text-xs text-white/60">
             Share this code with an ambassador. It can be redeemed once.
           </p>
@@ -54,7 +54,7 @@ export default function AdminPromoPanel() {
       ) : null}
 
       {error ? (
-        <p className="text-sm font-sans font-medium uppercase tracking-[0.16em] text-rose-300">{error}</p>
+        <p className="text-sm font-mono uppercase tracking-[0.14em] text-rose-300">{error}</p>
       ) : null}
     </div>
   )

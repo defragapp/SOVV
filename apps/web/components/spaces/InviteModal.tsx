@@ -95,7 +95,7 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
 
               <div className="px-6 pt-6 pb-4 border-b border-white/[0.06]">
                 <div className="flex items-center justify-between">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#a8a29a]">Invite privately</p>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#a8a29a]">Invite privately</p>
                   <button onClick={onClose} className="text-[#4f4b47] hover:text-[#f4efe9] transition-colors p-1">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                       <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>

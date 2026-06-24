@@ -123,7 +123,7 @@ export default function Chat({
             }}
           />
           <div className="flex items-center justify-between px-4 py-2 border-t border-white/[0.05]">
-            <span className="text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Send</span>
+            <span className="text-[10px] text-[#4f4b47] tracking-[0.1em]">↵ Send</span>
             <button
               type="submit"
               disabled={!input.trim() || loading}

@@ -129,7 +129,7 @@ function AlignmentDemo() {
 
       {/* Sky + Baseline context */}
       <div className="border border-white/[0.06] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-[#08070a] to-[#08070a] px-5 py-4 mb-3" style={{ borderRadius: 10 }}>
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">Baseline Design + Live Sky</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">Baseline Design + Live Sky</p>
         <p className="text-[12px] text-[#76716b] leading-relaxed">{current.context}</p>
       </div>
 
@@ -157,14 +157,14 @@ function AlignmentDemo() {
               transition={{ delay: i * 0.07, duration: 0.3, ease }}
               className={`px-5 py-4 border-b border-white/[0.05] last:border-0 ${(row as any).highlight ? "bg-white/[0.02]" : ""}`}
             >
-              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-1.5">{row.label}</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-1.5">{row.label}</p>
               <p className={`text-[13px] leading-relaxed ${(row as any).highlight ? "text-[#f4efe9]" : "text-[#a8a29a]"}`}>{row.value}</p>
             </motion.div>
           ))}
         </motion.div>
       </AnimatePresence>
 
-      <p className="text-center font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mt-4">
+      <p className="text-center font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mt-4">
         Select a situation above to see how Alignment responds
       </p>
     </div>
@@ -181,7 +181,7 @@ export default function AlignmentProductPage() {
         <Container className="relative z-10 max-w-4xl">
           <div className="inline-flex items-center gap-2 mb-6">
             <span className="h-px w-6 bg-[#e0743a]/60" />
-            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">Alignment · Pro</span>
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Alignment · Pro</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
             Get back into your own lane.
@@ -200,7 +200,7 @@ export default function AlignmentProductPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/[0.05] border border-white/[0.06] rounded-sm overflow-hidden">
               <div className="bg-[#0c0a0d] p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#e0743a]/60 border border-white/[0.06] px-2 py-1 rounded-sm">Fixed Data</span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#e0743a]/60 border border-white/[0.06] px-2 py-1 rounded-sm">Fixed Data</span>
                 </div>
                 <p className="text-[#f4efe9] font-medium text-sm mb-2">Your Baseline Design</p>
                 <p className="text-sm text-[#76716b] leading-relaxed">
@@ -209,7 +209,7 @@ export default function AlignmentProductPage() {
               </div>
               <div className="bg-[#0c0a0d] p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-blue-400/60 border border-white/[0.06] px-2 py-1 rounded-sm">Moving Data</span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-400/60 border border-white/[0.06] px-2 py-1 rounded-sm">Moving Data</span>
                 </div>
                 <p className="text-[#f4efe9] font-medium text-sm mb-2">The live sky above you</p>
                 <p className="text-sm text-[#76716b] leading-relaxed">
@@ -227,7 +227,7 @@ export default function AlignmentProductPage() {
           <div className="flex flex-col items-center text-center mb-12">
             <div className="inline-flex items-center gap-2 mb-6">
               <span className="h-px w-6 bg-[#e0743a]/60" />
-              <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">Your two inputs</span>
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Your two inputs</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
               Your fixed center. The moving sky.
@@ -246,7 +246,7 @@ export default function AlignmentProductPage() {
           <div className="flex flex-col items-center text-center mb-12">
             <div className="inline-flex items-center gap-2 mb-6">
               <span className="h-px w-6 bg-[#e0743a]/60" />
-              <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">See it work</span>
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">See it work</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
               What Alignment actually returns.

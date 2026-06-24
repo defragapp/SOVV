@@ -24,7 +24,7 @@ function Section({ label, value, highlight = false }: { label: string; value: st
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       className={`border-b border-white/[0.05] pb-5 mb-5 last:border-0 last:pb-0 last:mb-0 ${highlight ? "bg-white/[0.02] -mx-6 px-6 py-4 rounded-none" : ""}`}
     >
-      <p className={`font-mono text-[9px] uppercase tracking-[0.22em] mb-2 ${highlight ? "text-[#e0743a]/60" : "text-[#4f4b47]"}`}>
+      <p className={`font-mono text-[9px] uppercase tracking-[0.2em] mb-2 ${highlight ? "text-[#e0743a]/60" : "text-[#4f4b47]"}`}>
         {label}
       </p>
       <p className={`text-[14px] leading-[1.7] ${highlight ? "text-[#f4efe9] font-medium" : "text-[#f4efe9]"}`}>
@@ -222,7 +222,7 @@ export default function DefragItemPage() {
             {/* Saved input */}
             {savedTitle && (
               <div className="px-6 py-4 border-b border-white/[0.04] bg-white/[0.01]">
-                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">You described</p>
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">You described</p>
                 <p className="text-[13px] text-[#76716b] leading-relaxed italic">"{savedTitle}"</p>
               </div>
             )}
@@ -245,7 +245,7 @@ export default function DefragItemPage() {
                   transition={{ duration: 0.3, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
                   className="border-t border-white/[0.06] pt-5 mt-5"
                 >
-                  <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-3">Next move</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">Next move</p>
                   <p className="text-[14px] text-[#f4efe9] font-medium leading-[1.7]">
                     {typeof result.bestNextResponse === "string"
                       ? result.bestNextResponse

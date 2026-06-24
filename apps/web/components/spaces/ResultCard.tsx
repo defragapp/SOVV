@@ -114,7 +114,7 @@ export function ResultCard({
 
       {/* Input echo */}
       <div className="px-6 py-4 border-b border-white/[0.04] bg-white/[0.01]">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">You described</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">You described</p>
         <p className="text-[13px] text-[#76716b] leading-relaxed italic">"{input.slice(0, 120)}{input.length > 120 ? "…" : ""}"</p>
       </div>
 
@@ -128,7 +128,7 @@ export function ResultCard({
             transition={{ delay: i * 0.06, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="border-b border-white/[0.05] pb-5 mb-5 last:border-0 last:pb-0 last:mb-0"
           >
-            <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-2">{s.label}</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">{s.label}</p>
             <p className="text-[14px] text-[#f4efe9] leading-[1.7]">{s.value}</p>
           </motion.div>
         ))}
@@ -141,7 +141,7 @@ export function ResultCard({
             transition={{ delay: sections.length * 0.06, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="border-t border-white/[0.06] pt-5 mt-5"
           >
-            <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-3">Next move</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">Next move</p>
             <p className="text-[14px] text-[#f4efe9] leading-[1.7] mb-4">
               {typeof response === "string" ? response : response.summary}
             </p>
@@ -175,7 +175,7 @@ export function ResultCard({
           >
             {steering.do?.length ? (
               <div>
-                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">In the next conversation</p>
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">In the next conversation</p>
                 <ul className="space-y-2">
                   {steering.do.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-[12px] text-[#a8a29a] leading-relaxed">
@@ -188,7 +188,7 @@ export function ResultCard({
             ) : null}
             {steering.avoid?.length ? (
               <div>
-                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">Avoid</p>
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Avoid</p>
                 <ul className="space-y-2">
                   {steering.avoid.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-[12px] text-[#a8a29a] leading-relaxed">

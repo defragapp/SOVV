@@ -132,7 +132,7 @@ function SpacePreview() {
             {[0, 1, 2].map((i) => <span key={i} className="w-2.5 h-2.5 rounded-sm bg-white/[0.08]" />)}
           </div>
           <div className="flex-1 flex justify-center">
-            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47]">Sovereign.os</span>
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#4f4b47]">Sovereign.os</span>
           </div>
           <div className="flex gap-0.5">
             {panels.map((p) => (
@@ -158,7 +158,7 @@ function SpacePreview() {
             {active === "context" && (
               <motion.div key="context" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
                 <div className="px-6 pt-5 pb-2 border-b border-white/[0.05]">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/50">{BASELINE.label}</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50">{BASELINE.label}</p>
                 </div>
                 <div className="px-6 py-2">
                   {BASELINE.facts.map((fact, i) => (
@@ -183,7 +183,7 @@ function SpacePreview() {
                   ))}
                 </div>
                 <div className="px-6 py-3 border-t border-white/[0.04]">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Active in every result · never exposed in outputs</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Active in every result · never exposed in outputs</p>
                 </div>
               </motion.div>
             )}
@@ -214,7 +214,7 @@ function SpacePreview() {
                         animate={{ opacity: 1 }}
                         className="flex items-center justify-end gap-2 mt-3"
                       >
-                        <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#4f4b47]">Sent</span>
+                        <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Sent</span>
                         <span className="w-1 h-1 rounded-sm bg-[#e0743a]/40" />
                       </motion.div>
                     )}
@@ -240,7 +240,7 @@ function SpacePreview() {
                           />
                         ))}
                       </div>
-                      <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
+                      <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">
                         Reading your Baseline Design
                       </span>
                     </motion.div>
@@ -254,7 +254,7 @@ function SpacePreview() {
                       {/* Baseline Design source bar */}
                       <div className="px-6 py-2.5 border-b border-white/[0.04] flex items-center gap-2 bg-[#e0743a]/[0.03]">
                         <span className="w-1 h-1 rounded-sm bg-[#e0743a]/50" />
-                        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50">
+                        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50">
                           Baseline Design active · {BASELINE.label.split("·")[0].trim()}
                         </span>
                       </div>
@@ -283,7 +283,7 @@ function SpacePreview() {
                                     {row.evidence.map((chip) => (
                                       <span
                                         key={chip}
-                                        className="font-mono text-[8px] tracking-[0.08em] px-1.5 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/50 bg-[#e0743a]/[0.04]"
+                                        className="font-mono text-[8px] tracking-[0.1em] px-1.5 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/50 bg-[#e0743a]/[0.04]"
                                         style={{ borderRadius: 3 }}
                                       >
                                         {chip}
@@ -315,7 +315,7 @@ function SpacePreview() {
             {active === "library" && (
               <motion.div key="library" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
                 <div className="px-6 pt-5 pb-2 border-b border-white/[0.05]">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#a8a29a]/40">Saved results</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]/40">Saved results</p>
                 </div>
                 <div className="px-6 py-2">
                   {[
@@ -340,7 +340,7 @@ function SpacePreview() {
                   ))}
                 </div>
                 <div className="px-6 py-3 border-t border-white/[0.04]">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Save to Sovereign before the moment disappears</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Save to Sovereign before the moment disappears</p>
                 </div>
               </motion.div>
             )}
@@ -448,7 +448,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-            className="font-mono uppercase tracking-[0.3em] text-[#f4efe9]/30 mb-5"
+            className="font-mono uppercase tracking-[0.28em] text-[#f4efe9]/30 mb-5"
             style={{ fontSize: "0.65rem" }}
           >
             Sovereign.os

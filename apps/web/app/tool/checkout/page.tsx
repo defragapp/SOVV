@@ -84,7 +84,7 @@ export default function CheckoutPage() {
 
         {/* Wordmark */}
         <div className="mb-10 text-center">
-          <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+          <span className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase font-medium">
             SOVEREIGN.OS
           </span>
           <div className="h-px w-full bg-white/[0.06] mt-4" />
@@ -145,7 +145,7 @@ export default function CheckoutPage() {
 
           {/* What Pro includes */}
           <div className="border-t border-white/[0.06] pt-6 space-y-2.5">
-            <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-4">Pro includes</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#76716b] mb-4">Pro includes</p>
             {[
               "Everything in Free",
               "Unlimited sessions",

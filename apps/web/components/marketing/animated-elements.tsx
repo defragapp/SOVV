@@ -19,9 +19,9 @@ export function AnimatedCounter({ value, label, delay = 0 }: { value: string; la
   }, [delay])
 
   return (
-    <div ref={ref} className="flex flex-col items-center transition-all duration-1000">
+    <div ref={ref} className="flex flex-col items-center transition-all duration-500">
       <span
-        className={`font-mono text-4xl md:text-5xl font-medium text-[#f4efe9] tracking-tight transition-all duration-1000 ${
+        className={`font-mono text-4xl md:text-5xl font-medium text-[#f4efe9] tracking-tight transition-all duration-500 ${
           isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
         }`}
       >
@@ -50,7 +50,7 @@ export function AnimatedHeading({ children, className = '' }: { children: React.
   return (
     <h2
       ref={ref}
-      className={`font-serif text-[#f4efe9] transition-all duration-1000 ${
+      className={`font-serif text-[#f4efe9] transition-all duration-500 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       } ${className}`}
     >
@@ -120,7 +120,7 @@ export function TextReveal({ children, delay = 0 }: { children: React.ReactNode;
   return (
     <div
       ref={ref}
-      className={`transition-all duration-1000 ${
+      className={`transition-all duration-500 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       }`}
     >

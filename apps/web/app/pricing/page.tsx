@@ -15,7 +15,7 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="inline-flex items-center gap-2 mb-6">
       <span className="h-px w-6 bg-[#e0743a]/60" />
-      <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">{children}</span>
+      <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">{children}</span>
     </div>
   )
 }
@@ -140,9 +140,9 @@ export default function PricingPage() {
           <div className="flex flex-col gap-0">
             {/* Header */}
             <div className="grid grid-cols-3 pb-4 border-b border-white/[0.08]">
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Feature</span>
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] text-center">Free</span>
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] text-center">Pro</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Feature</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] text-center">Free</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] text-center">Pro</span>
             </div>
             {[
               { feature: "Baseline Design", free: true, pro: true },

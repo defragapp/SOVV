@@ -69,7 +69,7 @@ export default function UpgradeBanner() {
 
         {/* Wordmark */}
         <div className="mb-12">
-          <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+          <span className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase font-medium">
             SOVEREIGN.OS
           </span>
           <div className="h-px w-full bg-white/[0.06] mt-4" />
@@ -140,7 +140,7 @@ export default function UpgradeBanner() {
 
         {/* What Pro includes */}
         <div className="mt-8 text-left border border-white/[0.06] rounded-[14px] p-6 space-y-3">
-          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-4">Pro includes</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#76716b] mb-4">Pro includes</p>
           {[
             "Unlimited sessions",
             "Covenant space — faith-context reflection",

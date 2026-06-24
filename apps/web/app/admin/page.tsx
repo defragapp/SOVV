@@ -48,7 +48,7 @@ export default async function AdminPage() {
         <div className="space-y-4">
           <h1 className="font-serif text-[32px] tracking-[-0.02em]">Admin</h1>
           <p className="text-sm text-white/70">
-            Signed in as <span className="font-sans font-medium text-white/90">{admin.email}</span> — role <span className="font-sans font-medium text-white/90">{admin.role}</span>.
+            Signed in as <span className="text-[#f4efe9]">{admin.email}</span> — role <span className="text-[#f4efe9]">{admin.role}</span>.
           </p>
         </div>
 

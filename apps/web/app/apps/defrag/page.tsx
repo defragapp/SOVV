@@ -88,7 +88,7 @@ function LoadingSkeleton() {
 }
 
 function SectionLabel({ children, dim = false }: { children: React.ReactNode; dim?: boolean }) {
-  return <p className={`font-mono text-[9px] uppercase tracking-[0.22em] mb-5 ${dim ? "text-[#4f4b47]" : "text-[#4f4b47]"}`}>{children}</p>
+  return <p className={`font-mono text-[9px] uppercase tracking-[0.2em] mb-5 ${dim ? "text-[#4f4b47]" : "text-[#4f4b47]"}`}>{children}</p>
 }
 
 function Divider() {
@@ -187,7 +187,7 @@ function ActivePattern({ data, delay = 0 }: { data: NonNullable<DefragRender["ac
       transition={{ duration: 0.55, delay, ease }}
     >
       <SectionLabel>what's here</SectionLabel>
-      {data.name && <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#e0743a]/50 mb-4">{data.name}</p>}
+      {data.name && <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#e0743a]/50 mb-4">{data.name}</p>}
       <div className="flex flex-col gap-2.5">
         {data.lines.map((line, i) => (
           <motion.p
@@ -222,21 +222,21 @@ function PressureMap({ data, delay = 0 }: { data: NonNullable<DefragRender["pres
         {/* Starts */}
         {data.starts?.map((s, i) => (
           <div key={i} className="flex items-start gap-4 py-3 border-b border-white/[0.04]">
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#76716b] shrink-0 w-12 mt-1">starts</span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#76716b] shrink-0 w-12 mt-1">starts</span>
             <p className="text-[13px] text-[#76716b] leading-[1.6]">{s}</p>
           </div>
         ))}
         {/* Moves */}
         {data.moves?.map((m, i) => (
           <div key={i} className="flex items-start gap-4 py-3 border-b border-white/[0.04]">
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#76716b] shrink-0 w-12 mt-1">moves</span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#76716b] shrink-0 w-12 mt-1">moves</span>
             <p className="text-[13px] text-[#5a5550] leading-[1.6]">{m}</p>
           </div>
         ))}
         {/* Lands */}
         {data.lands?.map((l, i) => (
           <div key={i} className="flex items-start gap-4 py-3">
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#76716b] shrink-0 w-12 mt-1">lands</span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#76716b] shrink-0 w-12 mt-1">lands</span>
             <p className="text-[13px] text-[#4f4b47] leading-[1.6]">{l}</p>
           </div>
         ))}
@@ -265,7 +265,7 @@ function LoopPreview({ data, delay = 0 }: { data: NonNullable<DefragRender["loop
           { label: "cost", value: data.cost },
         ].filter(r => r.value).map((row, i) => (
           <div key={i} className="flex items-start gap-4 px-4 py-3 border-b border-white/[0.04] last:border-0">
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#4f4b47] shrink-0 w-14 mt-0.5">{row.label}</span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47] shrink-0 w-14 mt-0.5">{row.label}</span>
             <p className="text-[13px] text-[#5a5550] leading-[1.6]">{row.value}</p>
           </div>
         ))}
@@ -360,7 +360,7 @@ export default function DefragEntryPage() {
       </div>
       <div className="px-5 pt-6 pb-5 flex flex-col gap-6">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">Before you move</p>
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Before you move</p>
           <p className="text-[12px] text-[#76716b] leading-relaxed">
             Defrag separates the moment from the pattern. It shows you what is active beneath the argument, the silence, the message, or the grief — and gives you the clearest next response.
           </p>
@@ -375,7 +375,7 @@ export default function DefragEntryPage() {
         </div>
         <div className="border-t border-white/[0.04] pt-5">
           <Link href="/apps/defrag/workspace" className="flex items-center justify-between group">
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#76716b] group-hover:text-[#f4efe9] transition-colors">Open workspace</span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] group-hover:text-[#f4efe9] transition-colors">Open workspace</span>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#4f4b47] group-hover:text-[#f4efe9] transition-colors">
               <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -399,7 +399,7 @@ export default function DefragEntryPage() {
           </div>
         ) : brief?.cleanerMove ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.8, ease }} className="flex flex-col gap-4">
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-1">What belongs to you</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/40 mb-1">What belongs to you</p>
             {brief.cleanerMove.lines.slice(0, 2).map((line, i) => (
               <p key={i} className={`leading-relaxed ${i === 0 ? "text-[13px] text-[#f4efe9]" : "text-[12px] text-[#76716b]"}`}>{line}</p>
             ))}
@@ -437,7 +437,7 @@ export default function DefragEntryPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
             className="flex flex-col gap-6 pt-8">
             <div>
-              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">Defrag</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/40 mb-3">Defrag</p>
               <p className="text-[22px] text-[#f4efe9] leading-snug mb-3">
                 Separate the moment from the pattern.
               </p>

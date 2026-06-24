@@ -21,7 +21,7 @@ function Section({ label, value }: { label: string; value?: string }) {
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className="border-b border-white/[0.05] pb-6 mb-6 last:border-0 last:pb-0 last:mb-0"
     >
-      <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-2">{label}</p>
+      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">{label}</p>
       <p className="text-[15px] text-[#f4efe9] leading-[1.7]">{value}</p>
     </motion.div>
   )
@@ -169,11 +169,11 @@ export default function CovenantWorkspacePage() {
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">How Covenant works</p>
       </div>
       <div className="px-5 pt-6 pb-5">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50 mb-3">How this works</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50 mb-3">How this works</p>
         <p className="text-[12px] text-[#4f4b47] leading-relaxed mb-5">
           Covenant connects what you're walking through to the real human stories in Scripture. Your Baseline Design is already active — Covenant uses it to find the story that fits your moment.
         </p>
-        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#4f4b47] mb-3">Patterns it recognizes</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] mb-3">Patterns it recognizes</p>
         <div className="flex flex-col gap-0">
           {[
             { feeling: "Misunderstood", figure: "Joseph" },
@@ -384,7 +384,7 @@ export default function CovenantWorkspacePage() {
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
-            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Run</span>
+            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.1em]">↵ Run</span>
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}

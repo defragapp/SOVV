@@ -108,7 +108,7 @@ function LoadingSkeleton() {
 
 function SectionLabel({ children, dim = false }: { children: React.ReactNode; dim?: boolean }) {
   return (
-    <p className={`font-mono text-[9px] uppercase tracking-[0.22em] mb-6 ${dim ? "text-[#4f4b47]" : "text-[#4f4b47]"}`}>
+    <p className={`font-mono text-[9px] uppercase tracking-[0.2em] mb-6 ${dim ? "text-[#4f4b47]" : "text-[#4f4b47]"}`}>
       {children}
     </p>
   )
@@ -219,7 +219,7 @@ function MisalignmentView({
         {/* Over-expression — too much */}
         {over.length > 0 && (
           <div>
-            <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47] mb-5">too much</p>
+            <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-5">too much</p>
             <div className="flex flex-col gap-0">
               {over.map((block, bi) => (
                 <div key={block.key} className="border-b border-white/[0.04] pb-5 mb-5 last:border-0 last:pb-0 last:mb-0">
@@ -246,7 +246,7 @@ function MisalignmentView({
         {/* Under-expression — too little */}
         {under.length > 0 && (
           <div>
-            <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47] mb-5">too little</p>
+            <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-5">too little</p>
             <div className="flex flex-col gap-0">
               {under.map((block, bi) => (
                 <div key={block.key} className="border-b border-white/[0.04] pb-5 mb-5 last:border-0 last:pb-0 last:mb-0">
@@ -287,7 +287,7 @@ function CurrentDrift({ lines, delay = 0 }: { lines: string[]; delay?: number })
       transition={{ duration: 0.45, delay, ease }}
       className="border-l-2 border-[#e0743a]/20 pl-4 py-1"
     >
-      <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#76716b] mb-2.5">right now</p>
+      <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#76716b] mb-2.5">right now</p>
       {lines.slice(0, 2).map((line, i) => (
         <p key={i} className="text-[13px] text-[#4f4b47] leading-[1.6]">{line}</p>
       ))}
@@ -381,7 +381,7 @@ export default function AlignmentEntryPage() {
       </div>
       <div className="px-5 pt-6 pb-5 flex flex-col gap-6">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">What this is</p>
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/40 mb-3">What this is</p>
           <p className="text-[12px] text-[#76716b] leading-relaxed">
             Your fixed center. The live sky above you. Alignment uses both to show you the path back to yourself — when a situation, conversation, or decision has pulled you off course.
           </p>
@@ -401,7 +401,7 @@ export default function AlignmentEntryPage() {
             href="/apps/alignment/workspace"
             className="flex items-center justify-between group"
           >
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#76716b] group-hover:text-[#f4efe9] transition-colors">
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] group-hover:text-[#f4efe9] transition-colors">
               Open workspace
             </span>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#4f4b47] group-hover:text-[#f4efe9] transition-colors">
@@ -432,7 +432,7 @@ export default function AlignmentEntryPage() {
             transition={{ duration: 0.5, delay: 0.8, ease }}
             className="flex flex-col gap-4"
           >
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-1">The move</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/40 mb-1">The move</p>
             {brief.action.slice(0, 2).map((line, i) => (
               <p key={i} className={`leading-relaxed ${i === 0 ? "text-[13px] text-[#f4efe9]" : "text-[12px] text-[#76716b]"}`}>
                 {line}
@@ -463,7 +463,7 @@ export default function AlignmentEntryPage() {
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       {/* Header */}
       <div className="h-11 px-6 flex items-center justify-between border-b border-white/[0.06] shrink-0">
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#f4efe9]">Your Alignment</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#f4efe9]">Your Alignment</span>
         {!loading && brief && (
           <Link
             href="/apps/alignment/workspace"
@@ -486,7 +486,7 @@ export default function AlignmentEntryPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
             className="flex flex-col gap-6 pt-8">
             <div>
-              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">Alignment</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/40 mb-3">Alignment</p>
               <p className="text-[22px] text-[#f4efe9] leading-snug mb-3">
                 Find what belongs to you.
               </p>

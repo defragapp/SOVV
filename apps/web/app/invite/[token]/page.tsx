@@ -119,7 +119,7 @@ export default function InvitePage() {
       <div className="w-full max-w-md">
 
         <div className="mb-10 text-center">
-          <Link href="/" className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+          <Link href="/" className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase font-medium">
             SOVEREIGN.OS
           </Link>
         </div>
@@ -220,19 +220,19 @@ export default function InvitePage() {
               <div className="px-6 py-6 flex flex-col gap-5">
                 {result.reflection && (
                   <div>
-                    <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#e0743a]/50 mb-2">What this moment is asking</p>
+                    <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#e0743a]/50 mb-2">What this moment is asking</p>
                     <p className="text-[14px] text-[#f4efe9] leading-[1.7]">{result.reflection}</p>
                   </div>
                 )}
                 {result.pattern && (
                   <div>
-                    <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">What's active</p>
+                    <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">What's active</p>
                     <p className="text-[13px] text-[#a8a29a] leading-[1.65]">{result.pattern}</p>
                   </div>
                 )}
                 {result.nextStep && (
                   <div>
-                    <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">One next step</p>
+                    <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">One next step</p>
                     <p className="text-[14px] text-[#f4efe9] leading-[1.65]">{result.nextStep}</p>
                   </div>
                 )}

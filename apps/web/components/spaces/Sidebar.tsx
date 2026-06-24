@@ -52,7 +52,7 @@ function SessionCounter() {
       >
         {isPro ? (
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">
               Sessions
             </span>
             <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#e0743a]/60">
@@ -62,7 +62,7 @@ function SessionCounter() {
         ) : (
           <>
             <div className="flex items-center justify-between mb-2">
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">
                 Sessions today
               </span>
               <span

@@ -121,7 +121,7 @@
 .text-label {
   font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
   font-size: 0.6875rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 .text-body    { font-size: 1rem;    line-height: 1.6; color: var(--text-secondary); }
@@ -343,7 +343,7 @@
   display: block;
   font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
   font-size: 0.6875rem;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-tertiary);
   margin-bottom: 0.5rem;

@@ -77,7 +77,7 @@ export default function VerifyEmailPage() {
       >
         <div className="mb-10 text-center">
           <Link href="/" className="inline-block">
-            <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+            <span className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase font-medium">
               SOVEREIGN.OS
             </span>
           </Link>
