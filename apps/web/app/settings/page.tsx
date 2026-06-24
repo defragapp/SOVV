@@ -109,8 +109,8 @@ export default function SettingsPage() {
             <AnimatePresence>
               {hasBaseline && (
                 <motion.span
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.25 }}
                   className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.1em] uppercase text-[#a8a29a]"
