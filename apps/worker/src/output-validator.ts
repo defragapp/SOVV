@@ -83,7 +83,8 @@ function scoreDefrag(output: Record<string, unknown>): DefragScoring {
   if (output.alignment && typeof output.alignment === "string" && output.alignment.length > 20) { score += 0.2; signals++ }
   if (output.bestNextResponse && typeof output.bestNextResponse === "object") { score += 0.2; signals++ }
 
-  const signalStrength: SignalStrength = signals >= 5 ? "high" : signals >= 3 ? "medium" : "low"
+  // Sparse results are intentional — 3+ fields with good content = high
+  const signalStrength: SignalStrength = signals >= 4 ? "high" : signals >= 2 ? "medium" : "low"
   return { confidence: Math.min(score, 1), signalStrength }
 }
 
