@@ -33,7 +33,7 @@ const STEPS = [
   {
     num: "03",
     title: "Receive a structured result",
-    body: "Seven outputs: the active pattern, what keeps happening, your default mode, what shaped it, how it behaves under pressure, what is working, and the clearest next response.",
+    body: "A structured result: what's active, what keeps happening, what shaped it, and the clearest next response. Depth matches the situation — a brief moment gets a focused read, a complex one gets more.",
     note: null,
   },
   {

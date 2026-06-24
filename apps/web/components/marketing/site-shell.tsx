@@ -65,10 +65,16 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                   {item.label}
                 </Link>
               ))}
-              <Link href="https://app.defrag.app/app/login" className="btn-ghost">
+              <Link
+                href="https://app.defrag.app/app/login"
+                className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
+              >
                 Sign in
               </Link>
-              <Link href="https://app.defrag.app/app/login" className="btn-rect">
+              <Link
+                href="https://app.defrag.app/app/login"
+                className="btn-primary h-9 px-5 text-[12px]"
+              >
                 Enter
               </Link>
             </nav>
