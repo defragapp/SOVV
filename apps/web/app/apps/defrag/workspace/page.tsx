@@ -446,7 +446,18 @@ export default function DefragWorkspacePage() {
 
         {/* Error */}
         {error && error !== "needs_baseline" && (
-          <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">{error}</p>
+          <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
+            <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">{error}</p>
+            {error.includes("daily limit") && (
+              <a
+                href="/pricing"
+                className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]"
+                style={{ borderRadius: "var(--radius-button)" }}
+              >
+                See Pro plans →
+              </a>
+            )}
+          </div>
         )}
 
         {/* Result */}
