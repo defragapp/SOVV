@@ -94,6 +94,8 @@ export default function AlignmentWorkspacePage() {
       if (!res.ok) {
         setError(data.error === "daily_limit_reached"
           ? "You've reached your free daily limit. Upgrade to Pro to continue."
+          : data.type === "needs_baseline" || data.error === "needs_baseline"
+          ? "needs_baseline"
           : data.message || data.error || "Something went wrong.")
         return
       }
@@ -302,6 +304,18 @@ export default function AlignmentWorkspacePage() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
+
+        {error === "needs_baseline" && (
+          <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
+            <p className="text-[15px] text-[#f4efe9] leading-snug">Set your Baseline Design first.</p>
+            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
+              Your Baseline Design grounds every Alignment result. It takes 30 seconds to set.
+            </p>
+            <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>
+              Set Baseline Design →
+            </a>
+          </div>
+        )}
 
         {!result && !isLoading && !error && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-3">

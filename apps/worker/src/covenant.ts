@@ -108,8 +108,24 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
         console.warn("[Guardrail] Covenant violations:", validation.guardrails.violations)
       }
 
-      // Add media capabilities for Pro users (subscription gate already passed)
-      const responseWithMedia = { ...parsed, media: { audioOverviewAvailable: true } };
+      // Empty result guard
+      if (!parsed.forYou && !parsed.whatIsTrue && !parsed.figure && !parsed.pattern) {
+        return new Response(JSON.stringify({
+          error: "incomplete_output",
+          message: "The system couldn't read this moment clearly. Try describing it with more specific detail."
+        }), { status: 200, headers: { "Content-Type": "application/json" } })
+      }
+
+      // Add media capabilities and confidence scoring
+      const covenantConfidence = validation.scoring as any
+      const responseWithMedia = {
+        ...parsed,
+        media: { audioOverviewAvailable: true },
+        confidence: {
+          score: covenantConfidence?.confidence ?? 0.5,
+          strength: covenantConfidence?.certainty === "stable" ? "high" : covenantConfidence?.certainty === "emerging" ? "medium" : "low",
+        },
+      };
       return new Response(JSON.stringify(responseWithMedia), {
         status: 200,
         headers: { "Content-Type": "application/json" }

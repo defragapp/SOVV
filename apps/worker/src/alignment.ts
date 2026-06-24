@@ -377,8 +377,24 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
         console.warn("[Guardrail] Alignment violations:", validation.guardrails.violations)
       }
 
-      // Add media capabilities for Pro users
-      const responseWithMedia = { ...parsed, media: { audioOverviewAvailable: true } };
+      // Empty result guard
+      if (!parsed.theShift && !parsed.whatIsTrue && !parsed.figure && !parsed.pattern) {
+        return new Response(JSON.stringify({
+          error: "incomplete_output",
+          message: "The system couldn't read this moment clearly. Try describing it with more specific detail."
+        }), { status: 200, headers: { "Content-Type": "application/json" } })
+      }
+
+      // Add media capabilities and confidence scoring
+      const alignmentConfidence = validation.scoring as any
+      const responseWithMedia = {
+        ...parsed,
+        media: { audioOverviewAvailable: true },
+        confidence: {
+          score: alignmentConfidence?.confidence ?? 0.5,
+          strength: alignmentConfidence?.stabilityScore >= 0.7 ? "high" : alignmentConfidence?.stabilityScore >= 0.4 ? "medium" : "low",
+        },
+      };
       return new Response(JSON.stringify(responseWithMedia), {
         status: 200, headers: { "Content-Type": "application/json" }
       });

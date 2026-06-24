@@ -101,16 +101,31 @@ export default function LibraryPage() {
           <span className="w-4 h-4 border border-white/[0.15] border-t-white/40 rounded-full animate-spin" />
         </div>
       ) : items.length === 0 ? (
-        <div className="border border-white/[0.06] bg-white/[0.02] flex flex-col items-center justify-center py-20 text-center" style={{ borderRadius: "var(--radius-container)" }}>
-          <p className="text-[14px] text-[#f4efe9] mb-2">Nothing saved yet.</p>
-          <p className="text-[12px] text-[#4f4b47] leading-relaxed max-w-xs">
-            After a Defrag, Alignment, or Covenant session, save the result to your Library.
+        <div className="border border-white/[0.06] bg-white/[0.02] flex flex-col items-center justify-center py-16 text-center px-8" style={{ borderRadius: "var(--radius-container)" }}>
+          <p className="text-[14px] text-[#f4efe9] mb-3">Your Library is empty.</p>
+          <p className="text-[12px] text-[#76716b] leading-relaxed max-w-xs mb-6">
+            Save results from Defrag, Alignment, or Covenant. Return before the pattern takes over again.
           </p>
+          <div className="flex flex-col gap-2 w-full max-w-xs mb-8">
+            {[
+              { label: "What's active", preview: "The pattern organizing this moment." },
+              { label: "What changes this", preview: "One clear move." },
+              { label: "Next move", preview: "Say the part that matters." },
+            ].map((row) => (
+              <div key={row.label} className="flex items-start gap-3 px-4 py-3 border border-white/[0.05] bg-white/[0.02] text-left" style={{ borderRadius: "var(--radius-container)" }}>
+                <div>
+                  <p className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47] mb-0.5">{row.label}</p>
+                  <p className="text-[11px] text-[#76716b] italic">{row.preview}</p>
+                </div>
+              </div>
+            ))}
+          </div>
           <Link
             href="/apps/defrag"
-            className="mt-6 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#a8a29a] transition-colors"
+            className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]"
+            style={{ borderRadius: "var(--radius-button)" }}
           >
-            Open Defrag →
+            Start with Defrag →
           </Link>
         </div>
       ) : (
