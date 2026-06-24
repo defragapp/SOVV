@@ -450,7 +450,42 @@ export default function DefragWorkspacePage() {
         )}
 
         {/* Result */}
-        
+        {result && (
+          <>
+            <ResultCard
+              result={result}
+              input={input}
+              spaceName="Defrag"
+              onSave={handleSave}
+              isSaving={isSaving}
+              saveSuccess={saveSuccess}
+              onInvite={() => setInviteOpen(true)}
+            />
+
+            {/* Flow suggestion — contextual next space recommendation */}
+            {(result as any).flow?.nextSpace && (
+              <div className="mt-4 border border-white/[0.06] bg-white/[0.02] px-5 py-4 flex items-center justify-between gap-4" style={{ borderRadius: "var(--radius-container)" }}>
+                <div>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">
+                    {(result as any).flow.urgency === "high" ? "Next" : "When you’re ready"}
+                  </p>
+                  <p className="text-[13px] text-[#a8a29a] leading-snug">
+                    {(result as any).flow.nextSpace === "ALIGNMENT"
+                      ? "Alignment can help you find the clearest response."
+                      : "Covenant can help you hold what this means."}
+                  </p>
+                </div>
+                <a
+                  href={`/apps/${(result as any).flow.nextSpace?.toLowerCase()}/workspace`}
+                  className="shrink-0 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-3 py-2 hover:border-white/[0.16]"
+                  style={{ borderRadius: "var(--radius-button)" }}
+                >
+                  {(result as any).flow.nextSpace === "ALIGNMENT" ? "Open Alignment" : "Open Covenant"} →
+                </a>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Input composer */}

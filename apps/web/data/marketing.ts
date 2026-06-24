@@ -15,7 +15,7 @@ export const PRICING_CONFIG = {
   },
   pro: {
     name: "Pro",
-    price: "$20",
+    price: "$12",
     period: "month",
     highlight: "Recommended",
     description: "For patterns that need continuity.",
