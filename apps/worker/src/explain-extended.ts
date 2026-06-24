@@ -251,17 +251,41 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" }
   });
 
-  const rawText = asText((ai as any).response ?? ai);
-  const parsed = parseJsonFromText(rawText);
+  let rawText = asText((ai as any).response ?? ai);
 
-  // Guardrail check — block blocked phrases, log violations
-  // (does not retry — just logs and continues with what we have)
-  const guardrailResult = checkGuardrails(parsed, "defrag")
-  if (!guardrailResult.passed) {
-    console.warn("[Guardrail] Defrag output violations:", guardrailResult.violations)
+  // ── Validate, score, and retry if needed ─────────────────────────────────
+  let validation = validateAndScore(rawText, "defrag")
+
+  // Retry once if output is completely empty (no JSON parsed at all)
+  if (validation.shouldRetry) {
+    console.warn("[Retry] Defrag output empty — retrying with correction prompt")
+    const retryMessages = [
+      { role: "system", content: relational ? SYSTEM_DEFRAG_RELATIONAL : SYSTEM_DEFRAG },
+      { role: "user", content: userPrompt },
+      { role: "assistant", content: rawText },
+      { role: "user", content: buildRetryPrompt("defrag", validation.missing) },
+    ]
+    const retryAi = await env.AI.run(modelId, {
+      messages: retryMessages,
+      temperature: 0.2,
+      max_tokens: 900,
+    }, { gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" } })
+    rawText = asText((retryAi as any).response ?? retryAi)
+    validation = validateAndScore(rawText, "defrag")
   }
 
-  // Empty result guard — if AI returned nothing useful, return a structured error
+  const parsed = validation.output
+
+  // Log guardrail violations
+  if (!validation.guardrails.passed) {
+    console.warn("[Guardrail] Defrag violations:", validation.guardrails.violations)
+  }
+
+  // Extract confidence score for client
+  const outputConfidence = (validation.scoring as any).confidence ?? 0.5
+  const signalStrength = (validation.scoring as any).signalStrength ?? "medium"
+
+  // Empty result guard — if AI returned nothing useful after retry
   if (!parsed.activePattern && !parsed.alignment && !parsed.summary) {
     return jsonResponse(
       { error: "incomplete_output", message: "The system couldn't read this moment clearly. Try describing it differently." },
@@ -300,11 +324,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       audioOverviewAvailable: isPro,
       watchPreviewAvailable: false,
     },
-    metadata: { structured: true },
-    rail: railData ?? undefined,
-    signature: signatureLine || undefined,
-    flow: flowSuggestion ? formatFlowSuggestion(flowSuggestion) : undefined,
-  };
+    
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
   const confidence: Confidence = "Medium";

@@ -349,17 +349,32 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
         { messages, temperature: 0.3, max_tokens: 700 }
       );
 
-      const rawText = (aiResponse as any).response ?? String(aiResponse);
-      let parsed: Record<string, any> = {};
-      try {
-        const match = rawText.trim().match(/\{[\s\S]*\}/);
-        if (match) parsed = JSON.parse(match[0]);
-      } catch {}
+      let rawText = (aiResponse as any).response ?? String(aiResponse);
 
-      // Guardrail check
-      const guardrailResult = checkGuardrails(parsed, "alignment")
-      if (!guardrailResult.passed) {
-        console.warn("[Guardrail] Alignment output violations:", guardrailResult.violations)
+      // Validate, score, and retry if needed
+      const { validateAndScore: validate, buildRetryPrompt: retryPrompt } = await import("./output-validator.js")
+      let validation = validate(rawText, "alignment")
+
+      if (validation.shouldRetry) {
+        console.warn("[Retry] Alignment output empty — retrying")
+        const retryAi = await env.AI.run(
+          (env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast") as any,
+          { messages: [
+              { role: "system", content: SYSTEM_ALIGNMENT },
+              { role: "user", content: [activeSignalsText || (baselineContext ? `User Baseline Design:\n${baselineContext}` : ""), `What they are navigating:\n${message}`].filter(Boolean).join("\n\n") },
+              { role: "assistant", content: rawText },
+              { role: "user", content: retryPrompt("alignment", validation.missing) },
+            ], temperature: 0.2, max_tokens: 800 }
+        )
+        rawText = (retryAi as any).response ?? String(retryAi)
+        validation = validate(rawText, "alignment")
+      }
+
+      let parsed: Record<string, any> = validation.output;
+
+      // Log guardrail violations
+      if (!validation.guardrails.passed) {
+        console.warn("[Guardrail] Alignment violations:", validation.guardrails.violations)
       }
 
       // Add media capabilities for Pro users

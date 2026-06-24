@@ -20,6 +20,8 @@ interface ResultCardProps {
     summary?: string
     /** Compressed identity signature — shown once, bottom only */
     signature?: string
+    /** Confidence scoring from output validator */
+    confidence?: { score: number; strength: "low" | "medium" | "high" }
     /** Reduced signal rail data */
     rail?: {
       baseline?: RailBaseline
@@ -107,9 +109,19 @@ export function ResultCard({
           <span className="text-[#4f4b47] text-xs">/</span>
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]">{spaceName}</span>
         </div>
-        <span className="font-mono text-[9px] text-[#4f4b47]">
-          {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-        </span>
+        <div className="flex items-center gap-3">
+          {result.confidence && result.confidence.strength !== "low" && (
+            <span
+              className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47]"
+              title={`Signal strength: ${result.confidence.strength}`}
+            >
+              {result.confidence.strength === "high" ? "●●●" : "●●○"}
+            </span>
+          )}
+          <span className="font-mono text-[9px] text-[#4f4b47]">
+            {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+          </span>
+        </div>
       </div>
 
       {/* Input echo */}
