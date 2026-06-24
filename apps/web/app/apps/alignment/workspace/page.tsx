@@ -320,6 +320,9 @@ export default function AlignmentWorkspacePage() {
             <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
               Describe the situation. Alignment separates what is yours to carry from what belongs to the other side — and shows you the clearest way to respond.
             </p>
+            <p className="text-[11px] text-[#4f4b47] leading-relaxed max-w-xs">
+              Run Defrag first for deeper pattern context — then Alignment refines the response.
+            </p>
           </div>
         )}
 
@@ -379,6 +382,7 @@ export default function AlignmentWorkspacePage() {
             placeholder="Describe what's pulling at you — a situation, a decision, a conflict."
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
+            maxLength={2000}
             style={{ fontSize: "16px" }}
             onKeyDown={e => {
               if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() }

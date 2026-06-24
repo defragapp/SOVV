@@ -10,7 +10,9 @@
  */
 
 // ── Required fields per space ─────────────────────────────────────────────────
-const DEFRAG_REQUIRED = ["summary", "activePattern", "theRepeat", "oldRole", "alignment"] as const
+// Only activePattern and alignment are always required — all other fields are conditional
+// This matches the DEFRAG_OUTPUT_CONTRACT OMIT rules in prompts.ts
+const DEFRAG_REQUIRED = ["activePattern", "alignment"] as const
 const ALIGNMENT_REQUIRED = ["whatIsTrue", "whatIsYours", "whatIsNotYours", "theShift", "nextStep"] as const
 const COVENANT_REQUIRED = ["figure", "story", "forYou", "nextStep"] as const
 

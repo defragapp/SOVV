@@ -254,6 +254,25 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const rawText = asText((ai as any).response ?? ai);
   const parsed = parseJsonFromText(rawText);
 
+  // Guardrail check — block blocked phrases, log violations
+  // (does not retry — just logs and continues with what we have)
+  const { checkGuardrails } = await import("./output-validator.js").catch(() => ({ checkGuardrails: null }))
+  if (checkGuardrails) {
+    const guardrailResult = (checkGuardrails as any)(parsed, relational ? "defrag" : "defrag")
+    if (!guardrailResult.passed) {
+      console.warn("[Guardrail] Defrag output violations:", guardrailResult.violations)
+    }
+  }
+
+  // Empty result guard — if AI returned nothing useful, return a structured error
+  if (!parsed.activePattern && !parsed.alignment && !parsed.summary) {
+    return jsonResponse(
+      { error: "incomplete_output", message: "The system couldn't read this moment clearly. Try describing it differently." },
+      200,
+      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
+    )
+  }
+
   // Flow suggestion — Defrag → Alignment chain
   const flowSuggestion = suggestNextSpace(parsed)
 

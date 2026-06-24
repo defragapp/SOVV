@@ -418,11 +418,18 @@ export default function DefragWorkspacePage() {
 
         {/* No baseline */}
         {!baselineLoading && !baseline && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-3">
-            <p className="text-[15px] text-[#a8a29a] leading-snug">Baseline Design is needed to begin.</p>
-            <p className="text-[13px] text-[#4f4b47] leading-relaxed max-w-xs">
-              Add your birth data in the Baseline Design panel on the left.
+          <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
+            <p className="text-[15px] text-[#f4efe9] leading-snug">Set your Baseline Design first.</p>
+            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
+              Your Baseline Design is the private map that grounds every result. It takes 30 seconds to set — date, time, and place of birth.
             </p>
+            <a
+              href="/settings"
+              className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]"
+              style={{ borderRadius: "var(--radius-button)" }}
+            >
+              Set Baseline Design →
+            </a>
           </div>
         )}
 
@@ -447,7 +454,9 @@ export default function DefragWorkspacePage() {
         {/* Error */}
         {error && error !== "needs_baseline" && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
-            <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">{error}</p>
+            <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">
+              {error.includes("couldn't read") ? "The system couldn't read this moment clearly. Try describing it with more specific detail." : error}
+            </p>
             {error.includes("daily limit") && (
               <a
                 href="/pricing"
@@ -482,8 +491,8 @@ export default function DefragWorkspacePage() {
                   </p>
                   <p className="text-[13px] text-[#a8a29a] leading-snug">
                     {(result as any).flow.nextSpace === "ALIGNMENT"
-                      ? "Alignment can help you find the clearest response."
-                      : "Covenant can help you hold what this means."}
+                      ? "Alignment separates what is yours to carry from what isn't — and shows you the clearest response."
+                      : "Covenant finds the biblical story that fits this moment — and what it means for you."}
                   </p>
                 </div>
                 <a
@@ -511,6 +520,7 @@ export default function DefragWorkspacePage() {
             placeholder="Describe what's happening — a message, a conversation, a pattern, a moment."
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
+            maxLength={2000}
             style={{ fontSize: "16px" }}
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
           />

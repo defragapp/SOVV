@@ -427,6 +427,7 @@ export default function CovenantWorkspacePage() {
             placeholder="Describe what you're walking through — Covenant will find the story in Scripture that matches it."
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
+            maxLength={2000}
             style={{ fontSize: "16px" }}
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
           />
