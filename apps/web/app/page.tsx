@@ -1,7 +1,6 @@
 'use client'
 
 import Link from "next/link"
-import { MotionLink, MotionButton } from "@/components/ui/motion-button"
 import * as React from "react"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
@@ -550,9 +549,9 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
             className="mt-6 flex flex-col sm:flex-row gap-3 items-center px-6"
           >
-            <MotionLink href={APP_URL} className="btn-primary">
+            <Link href={APP_URL} className="btn-primary">
               Enter Sovereign.os
-            </MotionLink>
+            </Link>
           </motion.div>
         </div>
       </section>

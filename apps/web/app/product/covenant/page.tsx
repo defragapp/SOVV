@@ -1,6 +1,5 @@
 'use client'
 import Link from "next/link"
-import { MotionLink, MotionButton } from "@/components/ui/motion-button"
 import * as React from "react"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
@@ -183,7 +182,7 @@ export default function CovenantProductPage() {
             Covenant connects what you're going through to the real human stories in Scripture — not as metaphor, but as lived experience. It finds the biblical figure who walked something like what you're facing, shows you what they learned, and gives you one honest next step.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
-            <MotionLink href={APP_URL} className="btn-primary">Open Covenant</MotionLink>
+            <Link href={APP_URL} className="btn-primary">Open Covenant</Link>
 
           </div>
 
@@ -236,7 +235,7 @@ export default function CovenantProductPage() {
             Open Covenant and describe what you're walking through. Scripture has been here before.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3">
-            <MotionLink href={APP_URL} className="btn-primary">Open Covenant</MotionLink>
+            <Link href={APP_URL} className="btn-primary">Open Covenant</Link>
 
           </div>
         </Container>

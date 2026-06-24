@@ -1,6 +1,5 @@
 'use client'
 import Link from "next/link"
-import { MotionLink, MotionButton } from "@/components/ui/motion-button"
 import * as React from "react"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
@@ -191,7 +190,7 @@ export default function AlignmentProductPage() {
             Life pulls you off course. A conversation, a conflict, a decision — and suddenly you're reacting from somewhere that isn't you. Alignment uses two things to show you the path back: your Baseline Design, and the live sky above you right now.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
-            <MotionLink href={APP_URL} className="btn-primary">Open Alignment</MotionLink>
+            <Link href={APP_URL} className="btn-primary">Open Alignment</Link>
 
           </div>
 
@@ -271,7 +270,7 @@ export default function AlignmentProductPage() {
             Open Alignment and describe what you're trying to move through. Your Baseline Design and the live sky are already waiting.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3">
-            <MotionLink href={APP_URL} className="btn-primary">Open Alignment</MotionLink>
+            <Link href={APP_URL} className="btn-primary">Open Alignment</Link>
 
           </div>
         </Container>

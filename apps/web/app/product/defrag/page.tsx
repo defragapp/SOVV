@@ -1,6 +1,5 @@
 'use client'
 import Link from "next/link"
-import { MotionLink, MotionButton } from "@/components/ui/motion-button"
 import * as React from "react"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
@@ -143,7 +142,7 @@ export default function DefragProductPage() {
             Something happened. You don't know if you overreacted, if they crossed a line, or if this is the same thing that always happens. Defrag shows you what is actually active — and gives you the clearest next response.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
-            <MotionLink href={APP_URL} className="btn-primary">Open Defrag — Free</MotionLink>
+            <Link href={APP_URL} className="btn-primary">Open Defrag — Free</Link>
           </div>
 
           {/* What it works on */}
@@ -204,7 +203,7 @@ export default function DefragProductPage() {
             Defrag is free. Open it and describe the moment. Your Baseline Design is already waiting.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3">
-            <MotionLink href={APP_URL} className="btn-primary">Open Defrag — Free</MotionLink>
+            <Link href={APP_URL} className="btn-primary">Open Defrag — Free</Link>
           </div>
         </Container>
       </section>
