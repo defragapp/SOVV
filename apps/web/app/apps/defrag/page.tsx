@@ -339,17 +339,22 @@ export default function DefragEntryPage() {
   const [brief, setBrief] = React.useState<DefragRender | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState("")
+  const [profileStatements, setProfileStatements] = React.useState<Array<{statement: string; chips: string[]}>>([])
 
   React.useEffect(() => {
+    // Load personalized translation (requires compiled dataset)
     getTranslation("defrag")
       .then(t => {
         if (t?.appRender) setBrief(normalizeDefragRender(t.appRender as Record<string, unknown>))
-        // If translation not available, brief stays null — workspace CTA shown instead
       })
-      .catch(() => {
-        // Translation unavailable — workspace CTA shown instead
-      })
+      .catch(() => {})
       .finally(() => setLoading(false))
+
+    // Load derive-profile statements as faster fallback
+    fetch("/api/derive-profile", { credentials: "include" })
+      .then(r => r.ok ? r.json() : { statements: [] })
+      .then((d: any) => { if (Array.isArray(d.statements)) setProfileStatements(d.statements) })
+      .catch(() => {})
   }, [])
 
   // ─── LEFT PANEL ──────────────────────────────────────────────────────────
@@ -441,9 +446,24 @@ export default function DefragEntryPage() {
               <p className="text-[22px] text-[#f4efe9] leading-snug mb-3">
                 Separate the moment from the pattern.
               </p>
-              <p className="text-[13px] text-[#76716b] leading-relaxed max-w-sm">
-                Describe what is happening. Defrag shows you what is active beneath the argument, the silence, or the message — and gives you the clearest next move.
-              </p>
+              {profileStatements.length > 0 ? (
+                <div className="flex flex-col gap-0 mb-2">
+                  {profileStatements.slice(0, 3).map(({ statement, chips }, i) => (
+                    <div key={i} className="py-2.5 border-b border-white/[0.04] last:border-0">
+                      <p className="text-[12px] text-[#a8a29a] leading-relaxed mb-1.5">{statement}</p>
+                      <div className="flex gap-1 flex-wrap">
+                        {chips.map((c: string) => (
+                          <span key={c} className="font-mono text-[8px] tracking-[0.1em] px-2 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/60 bg-[#e0743a]/[0.04]" style={{ borderRadius: "var(--radius-minimal)" }}>{c}</span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[13px] text-[#76716b] leading-relaxed max-w-sm">
+                  Describe what is happening. Defrag shows you what is active beneath the argument, the silence, or the message — and gives you the clearest next move.
+                </p>
+              )}
             </div>
             <div className="flex flex-col gap-2 pt-2">
               {[
