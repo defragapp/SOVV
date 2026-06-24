@@ -446,17 +446,7 @@ export default function DefragWorkspacePage() {
         )}
 
         {/* Result */}
-        {result && (
-          <ResultCard
-            result={result}
-            input={input}
-            spaceName="Defrag"
-            onSave={handleSave}
-            isSaving={isSaving}
-            saveSuccess={saveSuccess}
-            onInvite={() => setInviteOpen(true)}
-          />
-        )}
+        
       </div>
 
       {/* Input composer */}

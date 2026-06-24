@@ -254,15 +254,41 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const rawText = asText((ai as any).response ?? ai);
   const parsed = parseJsonFromText(rawText);
 
+  // Flow suggestion — Defrag → Alignment chain
+  const flowSuggestion = suggestNextSpace(parsed)
 
   const result = {
     id: crypto.randomUUID(),
     workspaceSource: "DEFRAG",
     createdAt: new Date().toISOString(),
     title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
-    
-    
-
+    // AI output fields — pass through as-is (undefined = AI omitted intentionally)
+    summary: parsed.summary || parsed.response || undefined,
+    activePattern: parsed.activePattern || undefined,
+    theRepeat: parsed.theRepeat || undefined,
+    oldRole: parsed.oldRole || undefined,
+    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || undefined,
+    strainPattern: parsed.strainPattern || undefined,
+    giftUnderStrain: parsed.giftUnderStrain || undefined,
+    alignment: parsed.alignment || undefined,
+    bestNextResponse: parsed.bestNextResponse || undefined,
+    conversationalSteering: (parsed.conversationalSteering?.do?.length || parsed.conversationalSteering?.avoid?.length)
+      ? parsed.conversationalSteering
+      : undefined,
+    sourcesUsed: {
+      baseline: true,
+      history: Boolean(patternText),
+      invitedUsers: Boolean(relational),
+    },
+    media: {
+      audioOverviewAvailable: isPro,
+      watchPreviewAvailable: false,
+    },
+    metadata: { structured: true },
+    rail: railData ?? undefined,
+    signature: signatureLine || undefined,
+    flow: flowSuggestion ? formatFlowSuggestion(flowSuggestion) : undefined,
+  };
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
   const confidence: Confidence = "Medium";
