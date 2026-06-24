@@ -107,10 +107,10 @@ export default function CovenantPage() {
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Context</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">How Covenant works</p>
       </div>
       <div className="px-5 pt-6 pb-5">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">About Covenant</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">About Covenant</p>
         <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
           Covenant connects what you're walking through to the real human stories in Scripture. Your Baseline Design is already active — Covenant uses it to find the story that fits your moment.
         </p>
@@ -140,7 +140,7 @@ export default function CovenantPage() {
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Library</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Saved results</p>
       </div>
 
       {result && (
@@ -289,7 +289,7 @@ export default function CovenantPage() {
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Describe what you're walking through."
+            placeholder="Describe what you're walking through — Covenant will find the story in Scripture that matches it."
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             onKeyDown={e => {
@@ -304,7 +304,7 @@ export default function CovenantPage() {
               className="h-8 px-5 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
               style={{ borderRadius: 8 }}
             >
-              {isLoading ? "…" : "Reflect"}
+              {isLoading ? "…" : "Find the story"}
             </button>
           </div>
         </div>

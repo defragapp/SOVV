@@ -6,8 +6,8 @@ export const PRICING_CONFIG = {
     description: "Start understanding the pattern.",
     features: [
       "Baseline Design",
-      "Defrag access",
-      "Covenant access",
+      "Defrag space — full access",
+      "5 sessions per day",
       "Clear next responses"
     ],
     cta: "Start Free",
@@ -15,17 +15,18 @@ export const PRICING_CONFIG = {
   },
   pro: {
     name: "Pro",
-    price: "$12",
+    price: "$20",
     period: "month",
     highlight: "Recommended",
     description: "For patterns that need continuity.",
     features: [
-      "Save Results",
-      "Return to your Library",
-      "Use deeper context",
-      "Invite privately",
-      "Work across Defrag and Covenant",
-      "Keep continuity instead of starting over"
+      "Unlimited sessions",
+      "Covenant space",
+      "Alignment space",
+      "Save results to your Library",
+      "Audio Overview",
+      "Invite Privately",
+      "Full Library depth"
     ],
     cta: "Upgrade to Pro",
     href: "/login",

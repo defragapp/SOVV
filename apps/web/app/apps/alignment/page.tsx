@@ -463,7 +463,7 @@ export default function AlignmentEntryPage() {
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       {/* Header */}
       <div className="h-11 px-6 flex items-center justify-between border-b border-white/[0.06] shrink-0">
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#f4efe9]">Your Alignment</span>
+        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Alignment</span>
         {!loading && brief && (
           <Link
             href="/apps/alignment/workspace"
