@@ -273,7 +273,14 @@ export default function AlignmentWorkspacePage() {
           <span className="text-[#4f4b47] text-[10px]">·</span>
           <span className="text-[11px] text-[#4f4b47]">What is yours. What isn't. One move.</span>
         </div>
-        <div />
+        {result && (
+          <span
+            className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#e0743a]/60 border border-[#e0743a]/20 px-2 py-0.5"
+            style={{ borderRadius: "var(--radius-minimal)" }}
+          >
+            Baseline Design active
+          </span>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
@@ -282,7 +289,7 @@ export default function AlignmentWorkspacePage() {
           <div className="flex flex-col items-center justify-center text-center h-full gap-3">
             <div
               className="w-10 h-10 flex items-center justify-center border border-[#e0743a]/20 bg-[#e0743a]/5 mb-2"
-              style={{ borderRadius: 10, boxShadow: "0 0 24px rgba(224,116,58,0.08)" }}
+              style={{ borderRadius: 10 }}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M8 1v14M1 8h14" stroke="rgba(224,116,58,0.5)" strokeWidth="1.5" strokeLinecap="round"/>

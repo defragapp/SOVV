@@ -278,7 +278,14 @@ export default function CovenantWorkspacePage() {
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Covenant</span>
           <span className="text-[#4f4b47] text-[10px]">·</span>
           <span className="text-[11px] text-[#4f4b47]">The story in Scripture that fits this moment.</span>
-        </div>
+        {result && (
+          <span
+            className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#e0743a]/60 border border-[#e0743a]/20 px-2 py-0.5"
+            style={{ borderRadius: "var(--radius-minimal)" }}
+          >
+            Baseline Design active
+          </span>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
