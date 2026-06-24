@@ -80,6 +80,8 @@ export default function DefragWorkspacePage() {
   const [baselineLoading, setBaselineLoading] = React.useState(true)
   const [baselineStatements, setBaselineStatements] = React.useState<BaselineStatement[]>([])
   const [statementsLoading, setStatementsLoading] = React.useState(false)
+  const [recurringPattern, setRecurringPattern] = React.useState<string | null>(null)
+  const [sessionCount, setSessionCount] = React.useState(0)
 
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
@@ -120,6 +122,17 @@ export default function DefragWorkspacePage() {
   React.useEffect(() => {
     return () => { if (audioUrl) URL.revokeObjectURL(audioUrl) }
   }, [audioUrl])
+
+  // Load pattern memory
+  React.useEffect(() => {
+    fetch("/api/memory", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then((d: any) => {
+        if (d?.recurringPattern) setRecurringPattern(d.recurringPattern)
+        if (d?.sessionCount) setSessionCount(d.sessionCount)
+      })
+      .catch(() => {})
+  }, [])
 
   // Load library
   React.useEffect(() => {
@@ -292,10 +305,24 @@ export default function DefragWorkspacePage() {
       {/* Pattern history — what's been brought before */}
       {baseline && (
         <div className="px-5 pt-4 pb-4 border-b border-white/[0.05]">
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">Pattern history</p>
-          {result?.sourcesUsed?.history ? (
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Pattern history</p>
+            {sessionCount > 0 && (
+              <span className="font-mono text-[8px] text-[#4f4b47]">{sessionCount} session{sessionCount !== 1 ? "s" : ""}</span>
+            )}
+          </div>
+          {recurringPattern ? (
+            <div>
+              <p className="text-[11px] text-[#76716b] leading-relaxed mb-1">
+                This pattern keeps appearing:
+              </p>
+              <p className="text-[11px] text-[#c8c2bc] leading-relaxed italic">
+                "{recurringPattern.length > 80 ? recurringPattern.slice(0, 80) + "…" : recurringPattern}"
+              </p>
+            </div>
+          ) : result?.sourcesUsed?.history ? (
             <p className="text-[11px] text-[#76716b] leading-relaxed">
-              Past patterns were used in this result — the system sees what keeps repeating.
+              Past patterns were used in this result.
             </p>
           ) : (
             <p className="text-[11px] text-[#4f4b47] leading-relaxed">

@@ -133,6 +133,26 @@ registerAudioRoute(router, getEnv);
 registerDeriveProfileRoutes(router, getEnv);
 registerInviteRoutes(router, getEnv);
 
+// Memory context endpoint — pattern history for UI
+router.get("/api/memory", async (request: Request) => {
+  const env = getEnv();
+  const user = await getAuthUser(request, env.DB);
+  if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
+  
+  const { loadMemoryContext } = await import("./memory.js");
+  const context = await loadMemoryContext(env, user.id);
+  
+  return new Response(JSON.stringify({
+    sessionCount: context.sessionCount,
+    recurringPattern: context.recurringPattern || null,
+    recentPatterns: context.recentPatterns.slice(0, 3).map(p => ({
+      pattern: p.pattern,
+      space: p.space,
+      sessionCount: p.sessionCount,
+    })),
+  }), { status: 200, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
+});
+
 router.get("/api/stripe/prices", async (request: Request) => {
   const env = getEnv();
   if (!env.STRIPE_SECRET_KEY) {

@@ -34,6 +34,18 @@ function extractPreview(item: LibraryItem): string {
 export default function LibraryPage() {
   const [items, setItems] = React.useState<LibraryItem[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
+  const [recurringPattern, setRecurringPattern] = React.useState<string | null>(null)
+  const [sessionCount, setSessionCount] = React.useState(0)
+
+  React.useEffect(() => {
+    fetch("/api/memory", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then((d: any) => {
+        if (d?.recurringPattern) setRecurringPattern(d.recurringPattern)
+        if (d?.sessionCount) setSessionCount(d.sessionCount)
+      })
+      .catch(() => {})
+  }, [])
 
   React.useEffect(() => {
     fetch("/api/library", { credentials: "include" })
@@ -93,6 +105,16 @@ export default function LibraryPage() {
         <p className="text-[13px] text-[#76716b] leading-relaxed mt-2">
           Results from Defrag, Alignment, and Covenant. Return before the pattern takes over again.
         </p>
+        {recurringPattern && sessionCount >= 3 && (
+          <div className="mt-5 px-4 py-3 border border-white/[0.06] bg-white/[0.02]" style={{ borderRadius: "var(--radius-container)" }}>
+            <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">
+              Most common pattern · {sessionCount} sessions
+            </p>
+            <p className="text-[12px] text-[#a8a29a] leading-relaxed italic">
+              "{recurringPattern.length > 100 ? recurringPattern.slice(0, 100) + "…" : recurringPattern}"
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Items */}
