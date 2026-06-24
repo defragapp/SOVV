@@ -4,6 +4,7 @@ import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { checkProLimit } from "./plan.js";
 import { SYSTEM_COVENANT } from "./prompts.js";
+import { checkGuardrails } from "./output-validator.js";
 import {
   selectActiveSignals,
   buildTimingSignals,
@@ -85,6 +86,12 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
         const match = rawText.trim().match(/\{[\s\S]*\}/);
         if (match) parsed = JSON.parse(match[0]);
       } catch {}
+
+      // Guardrail check
+      const guardrailResult = checkGuardrails(parsed, "covenant")
+      if (!guardrailResult.passed) {
+        console.warn("[Guardrail] Covenant output violations:", guardrailResult.violations)
+      }
 
       // Add media capabilities for Pro users (subscription gate already passed)
       const responseWithMedia = { ...parsed, media: { audioOverviewAvailable: true } };

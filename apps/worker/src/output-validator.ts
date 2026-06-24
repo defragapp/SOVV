@@ -115,7 +115,7 @@ function scoreCovenant(output: Record<string, unknown>): CovenantScoring {
 
 // ── Guardrail check ───────────────────────────────────────────────────────────
 
-function checkGuardrails(
+export function checkGuardrails(
   output: Record<string, unknown>,
   space: "defrag" | "alignment" | "covenant"
 ): { passed: boolean; violations: string[] } {

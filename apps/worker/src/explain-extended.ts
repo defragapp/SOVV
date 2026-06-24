@@ -1,7 +1,7 @@
 import type { Env } from "./types-env.js"
 import { SYSTEM_DEFRAG, SYSTEM_DEFRAG_RELATIONAL } from "./prompts.js"
 import { getFeatureFlags } from "./featureFlags.js"
-import { validateAndScore, buildRetryPrompt, parseAIOutput } from "./output-validator.js"
+import { validateAndScore, buildRetryPrompt, parseAIOutput, checkGuardrails } from "./output-validator.js"
 import { loadMemoryContext, formatMemoryForPrompt } from "./memory.js"
 import { suggestNextSpace, formatFlowSuggestion } from "./flow.js";
 import { getAuthUser, jsonResponse } from "./auth.js";
@@ -256,12 +256,9 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   // Guardrail check — block blocked phrases, log violations
   // (does not retry — just logs and continues with what we have)
-  const { checkGuardrails } = await import("./output-validator.js").catch(() => ({ checkGuardrails: null }))
-  if (checkGuardrails) {
-    const guardrailResult = (checkGuardrails as any)(parsed, relational ? "defrag" : "defrag")
-    if (!guardrailResult.passed) {
-      console.warn("[Guardrail] Defrag output violations:", guardrailResult.violations)
-    }
+  const guardrailResult = checkGuardrails(parsed, "defrag")
+  if (!guardrailResult.passed) {
+    console.warn("[Guardrail] Defrag output violations:", guardrailResult.violations)
   }
 
   // Empty result guard — if AI returned nothing useful, return a structured error

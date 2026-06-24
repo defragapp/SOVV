@@ -2,13 +2,14 @@ import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
-import { SYSTEM_ALIGNMENT } from "./prompts.js";
+import { SYSTEM_ALIGNMENT, SECURITY_PREFIX } from "./prompts.js";
 import { checkProLimit } from "./plan.js";
 import {
   selectActiveSignals,
   buildTimingSignals,
   formatActiveSignalsForPrompt,
 } from "./active-signals.js";
+import { checkGuardrails } from "./output-validator.js";
 
 /**
  * CRITICAL SYSTEM RULE
@@ -54,8 +55,7 @@ export interface AlignmentBrief {
 
 // ─── Security prefix (applied to all prompts) ──────────────────────────────
 
-// Security prefix is imported via SYSTEM_ALIGNMENT from prompts.ts
-// Local duplicate removed — prompts.ts is the single source of truth
+// SECURITY_PREFIX imported from prompts.ts for SYSTEM_ALIGNMENT_ENTRY
 
 // ─── Entry mode system prompt ──────────────────────────────────────────────
 
@@ -355,6 +355,12 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
         const match = rawText.trim().match(/\{[\s\S]*\}/);
         if (match) parsed = JSON.parse(match[0]);
       } catch {}
+
+      // Guardrail check
+      const guardrailResult = checkGuardrails(parsed, "alignment")
+      if (!guardrailResult.passed) {
+        console.warn("[Guardrail] Alignment output violations:", guardrailResult.violations)
+      }
 
       // Add media capabilities for Pro users
       const responseWithMedia = { ...parsed, media: { audioOverviewAvailable: true } };
