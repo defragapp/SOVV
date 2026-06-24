@@ -282,7 +282,7 @@
 .glow-sm { box-shadow: 0 0 40px rgba(224,116,58,0.2); }
 
 /* ── Buttons ─────────────────────────────────────────────────────────────── */
-
+.btn-primary {
   font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: -0.01em;
@@ -297,7 +297,7 @@
 .btn-primary:active { opacity: 0.85; }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 
-
+.btn-secondary {
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -324,7 +324,7 @@
 .btn-ghost:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
 
 /* ── Form elements ───────────────────────────────────────────────────────── */
-
+.sovv-input {
   padding: 0.875rem 1rem;
   color: var(--text-primary);
   font-size: 16px;
@@ -484,3 +484,26 @@
 }
 .btn-rect:disabled { opacity: 0.3; cursor: not-allowed; }
 
+
+/* ── iOS Overrides ───────────────────────────────────────────────────────── */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.ios-panel {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+}
+
+body {
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
+}

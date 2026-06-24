@@ -1,6 +1,7 @@
 'use client'
 
 import Link from "next/link"
+import { MotionLink, MotionButton } from "@/components/ui/motion-button"
 import * as React from "react"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
@@ -129,7 +130,7 @@ function SpacePreview() {
         {/* ── Titlebar ── */}
         <div className="h-11 border-b border-white/[0.07] bg-[#08070a]/90 flex items-center px-4 gap-3 shrink-0">
           <div className="flex gap-1.5">
-            {[0, 1, 2].map((i) => <span key={i} className="w-2.5 h-2.5 rounded-full bg-white/[0.08]" />)}
+            {[0, 1, 2].map((i) => <span key={i} className="w-2.5 h-2.5 rounded-sm bg-white/[0.08]" />)}
           </div>
           <div className="flex-1 flex justify-center">
             <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47]">Sovereign.os</span>
@@ -195,7 +196,7 @@ function SpacePreview() {
                 {/* Input area */}
                 <div className="px-6 pt-6 pb-4 border-b border-white/[0.05]">
                   <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-white/20 mt-2 shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-sm bg-white/20 mt-2 shrink-0" />
                     <div className="flex-1">
                       <p className="text-[14px] text-[#f4efe9] leading-relaxed" style={{ minHeight: 44 }}>
                         {typed}
@@ -215,7 +216,7 @@ function SpacePreview() {
                         className="flex items-center justify-end gap-2 mt-3"
                       >
                         <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#4f4b47]">Sent</span>
-                        <span className="w-1 h-1 rounded-full bg-[#e0743a]/40" />
+                        <span className="w-1 h-1 rounded-sm bg-[#e0743a]/40" />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -234,7 +235,7 @@ function SpacePreview() {
                         {[0, 1, 2].map((i) => (
                           <motion.span
                             key={i}
-                            className="w-1 h-1 rounded-full bg-[#e0743a]/50"
+                            className="w-1 h-1 rounded-sm bg-[#e0743a]/50"
                             animate={{ opacity: [0.3, 1, 0.3] }}
                             transition={{ duration: 0.9, delay: i * 0.2, repeat: Infinity }}
                           />
@@ -253,7 +254,7 @@ function SpacePreview() {
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
                       {/* Baseline Design source bar */}
                       <div className="px-6 py-2.5 border-b border-white/[0.04] flex items-center gap-2 bg-[#e0743a]/[0.03]">
-                        <span className="w-1 h-1 rounded-full bg-[#e0743a]/50" />
+                        <span className="w-1 h-1 rounded-sm bg-[#e0743a]/50" />
                         <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50">
                           Baseline Design active · {BASELINE.label.split("·")[0].trim()}
                         </span>
@@ -549,209 +550,11 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
             className="mt-6 flex flex-col sm:flex-row gap-3 items-center px-6"
           >
-            <Link href={APP_URL} className="btn-primary">
+            <MotionLink href={APP_URL} className="btn-primary">
               Enter Sovereign.os
-            </Link>
-            <Link href="/how-it-works" className="btn-secondary" style={{ opacity: 0.65 }}>
-              See how it works
-            </Link>
+            </MotionLink>
           </motion.div>
         </div>
-      </section>
-
-      {/* ── INTERACTIVE NOTEBOOK PREVIEW ─────────────────────────────────── */}
-      {/* Placed before the space tiles so users see the product immediately */}
-      <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/[0.05]">
-        <Container>
-          {/* Section header */}
-          <div className="flex flex-col items-center text-center mb-14">
-            <div className="inline-flex items-center gap-2 mb-5">
-              <span className="h-px w-6 bg-[#e0743a]/60" />
-              <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">
-                The notebook
-              </span>
-            </div>
-            <h2
-              className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight text-balance max-w-lg"
-              style={{ fontSize: "clamp(1.9rem, 4vw, 3.2rem)" }}
-            >
-              This is what you actually get.
-            </h2>
-            <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-sm">
-              A real prompt. A real result. Your Baseline Design active in the background.
-            </p>
-          </div>
-
-          <SpacePreview />
-        </Container>
-      </section>
-
-      {/* ── THREE SPACES ─────────────────────────────────────────────────── */}
-      <section className="relative w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/[0.05] overflow-hidden">
-        <div className="light-beam opacity-50" aria-hidden />
-        <Container className="relative z-10">
-          <div className="inline-flex items-center gap-2 mb-12">
-            <span className="h-px w-6 bg-[#e0743a]/60" />
-            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">
-              Three spaces
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.06] overflow-hidden" style={{ borderRadius: 16 }}>
-            {[
-              {
-                num: "01",
-                name: "Defrag",
-                tier: "Free",
-                href: "/product",
-                accent: false,
-                hook: "Separate the moment from the pattern.",
-                what: "Something happened. You don't know if you overreacted or if this is the same thing that always happens.",
-                cta: "What's actually active — and your clearest next response.",
-                tags: ["Arguments", "Messages", "Family roles", "Boundaries", "Grief"],
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-                    <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.4" />
-                    <circle cx="10" cy="10" r="3" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.8" />
-                    <line x1="10" y1="3" x2="10" y2="17" stroke="currentColor" strokeWidth="1" strokeOpacity="0.2" />
-                    <line x1="3" y1="10" x2="17" y2="10" stroke="currentColor" strokeWidth="1" strokeOpacity="0.2" />
-                  </svg>
-                ),
-              },
-              {
-                num: "02",
-                name: "Covenant",
-                tier: "Pro",
-                href: "/covenant",
-                accent: true,
-                hook: "Your moment has been walked before.",
-                what: "Covenant connects what you're going through to the real human stories in Scripture.",
-                cta: "One honest next step — grounded in faith, not performance.",
-                tags: ["Faith", "Values", "Commitments", "Repair"],
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-                    <path d="M10 3 L10 17" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.6" strokeLinecap="round" />
-                    <path d="M4 7 Q10 4 16 7" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.4" fill="none" strokeLinecap="round" />
-                    <path d="M4 13 Q10 16 16 13" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.4" fill="none" strokeLinecap="round" />
-                  </svg>
-                ),
-              },
-              {
-                num: "03",
-                name: "Alignment",
-                tier: "Pro",
-                href: "/product",
-                accent: false,
-                hook: "Get back into your own lane.",
-                what: "A conversation, a conflict, a decision — and suddenly you're reacting from somewhere that isn't you.",
-                cta: "Your Baseline Design and the live sky above you show the path back.",
-                tags: ["After Defrag", "Before a hard conversation", "After a conflict"],
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-                    <path d="M3 10 L17 10" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.5" strokeLinecap="round" />
-                    <path d="M10 3 L10 8" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.35" strokeLinecap="round" />
-                    <path d="M10 12 L10 17" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.35" strokeLinecap="round" />
-                    <circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.9" />
-                  </svg>
-                ),
-              },
-            ].map((space) => (
-              <Link
-                key={space.name}
-                href={space.href}
-                className="group flex flex-col gap-5 p-8 md:p-10 bg-[#0c0a0d] hover:bg-[#0f0d10] transition-colors duration-300"
-              >
-                {/* Top row */}
-                <div className="flex items-start justify-between">
-                  <div
-                    className="w-10 h-10 flex items-center justify-center border border-white/[0.08]"
-                    style={{
-                      borderRadius: 8,
-                      color: space.accent ? "#e0743a" : "#76716b",
-                      background: space.accent ? "rgba(224,116,58,0.06)" : "rgba(255,255,255,0.02)",
-                    }}
-                  >
-                    {space.icon}
-                  </div>
-                  <span
-                    className="font-mono text-[8px] uppercase tracking-[0.14em] border px-2 py-0.5 self-start"
-                    style={{
-                      borderRadius: 3,
-                      color: space.tier === "Free" ? "rgba(168,162,154,0.55)" : "rgba(224,116,58,0.65)",
-                      borderColor: space.tier === "Free" ? "rgba(255,255,255,0.08)" : "rgba(224,116,58,0.22)",
-                    }}
-                  >
-                    {space.tier}
-                  </span>
-                </div>
-
-                {/* Name + hook */}
-                <div>
-                  <h3
-                    className="font-serif text-[#f4efe9] mb-2 group-hover:text-[#f0a06a] transition-colors duration-300"
-                    style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.6rem)" }}
-                  >
-                    {space.name}
-                  </h3>
-                  <p className="text-[15px] text-[#f4efe9]/65 leading-snug font-medium">
-                    {space.hook}
-                  </p>
-                </div>
-
-                {/* What + CTA */}
-                <div className="flex flex-col gap-2 flex-1">
-                  <p className="text-[13px] text-[#76716b] leading-relaxed">{space.what}</p>
-                  <p className="text-[13px] text-[#a8a29a] leading-relaxed">{space.cta}</p>
-                </div>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.05]">
-                  {space.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] px-2 py-0.5 border border-white/[0.05]"
-                      style={{ borderRadius: 3 }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Arrow */}
-                <div className="flex items-center gap-2 text-[#4f4b47] group-hover:text-[#f0a06a] transition-colors duration-300">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.14em]">Explore</span>
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* ── CTA ──────────────────────────────────────────────────────────── */}
-      <section className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.05] overflow-hidden">
-        <div className="light-beam" aria-hidden />
-        <Container className="relative z-10 flex flex-col items-center text-center">
-          <h2
-            className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-3xl text-balance"
-            style={{ fontSize: "clamp(2.2rem, 5.5vw, 5rem)" }}
-          >
-            Return before the pattern takes over.
-          </h2>
-          <p className="mt-6 max-w-md text-base md:text-lg text-[#a8a29a] leading-relaxed">
-            Defrag is free. Start understanding the patterns beneath the moments that matter most.
-          </p>
-          <div className="mt-9 flex flex-col sm:flex-row gap-3">
-            <Link href={APP_URL} className="btn-primary">
-              Enter Sovereign.os — Free
-            </Link>
-            <Link href="/pricing" className="btn-secondary">
-              See plans
-            </Link>
-          </div>
-        </Container>
       </section>
 
     </SiteShell>
