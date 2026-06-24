@@ -194,7 +194,7 @@ export default function CovenantProductPage() {
               { label: "One next step", body: "Not a list. Not a lecture. One real, doable thing that fits the story you're in." },
             ].map((f, i) => (
               <div key={i} className="flex flex-col md:flex-row items-baseline gap-4 md:gap-12 py-8 border-b border-white/[0.06] last:border-0">
-                <span className="font-serif text-3xl md:text-5xl text-white/[0.1] w-12 shrink-0">0{i + 1}</span>
+                <span className="font-serif text-3xl md:text-5xl text-[#4f4b47] w-12 shrink-0">0{i + 1}</span>
                 <div>
                   <p className="text-[#f4efe9] font-medium text-sm mb-2">{f.label}</p>
                   <p className="text-sm text-[#76716b] leading-relaxed max-w-xl">{f.body}</p>

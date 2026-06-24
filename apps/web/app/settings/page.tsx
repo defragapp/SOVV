@@ -87,7 +87,7 @@ export default function SettingsPage() {
               Sovereign.os
             </Link>
             <span className="text-[#4f4b47]" aria-hidden>/</span>
-            <span className="text-[#a8a29a]">Your Design</span>
+            <span className="text-[#a8a29a]">Baseline Design</span>
           </nav>
           <Link
             href="/apps/defrag"

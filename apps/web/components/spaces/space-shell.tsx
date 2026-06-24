@@ -70,7 +70,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
               href="/settings"
               className="font-mono text-[10px] tracking-[0.12em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors"
             >
-              Your Design
+              Baseline Design
             </Link>
             <div className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] uppercase text-[#4f4b47]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#e0743a]/40" />
@@ -114,7 +114,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
               Library
             </Link>
             <Link href="/settings" className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#76716b] hover:text-[#f4efe9] transition-colors">
-              Your Design
+              Baseline Design
             </Link>
             <button
               onClick={handleSignOut}

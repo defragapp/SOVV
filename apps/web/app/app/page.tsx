@@ -76,7 +76,7 @@ export default function LibraryPage() {
           href="/settings"
           className="inline-block mt-4 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#a8a29a] transition-colors"
         >
-          Your Design →
+          Baseline Design →
         </a>
       </div>
     </div>
