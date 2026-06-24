@@ -47,7 +47,7 @@ function TagChip({ tag, label }: { tag: string; label?: string }) {
         className={`font-mono text-[8px] uppercase tracking-[0.12em] border px-2 py-0.5 transition-colors duration-150 ${
           label
             ? "border-white/[0.10] text-[#4f4b47] hover:border-white/[0.22] hover:text-[#76716b] cursor-pointer"
-            : "border-white/[0.06] text-[#2e2b28] cursor-default"
+            : "border-white/[0.06] text-[#4f4b47] cursor-default"
         }`}
         style={{ borderRadius: 2 }}
         aria-label={label ? `${tag}: ${label}` : tag}
@@ -108,7 +108,7 @@ function LoadingSkeleton() {
 
 function SectionLabel({ children, dim = false }: { children: React.ReactNode; dim?: boolean }) {
   return (
-    <p className={`font-mono text-[9px] uppercase tracking-[0.22em] mb-6 ${dim ? "text-[#2e2b28]" : "text-[#4f4b47]"}`}>
+    <p className={`font-mono text-[9px] uppercase tracking-[0.22em] mb-6 ${dim ? "text-[#4f4b47]" : "text-[#4f4b47]"}`}>
       {children}
     </p>
   )
@@ -219,7 +219,7 @@ function MisalignmentView({
         {/* Over-expression — too much */}
         {over.length > 0 && (
           <div>
-            <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#2e2b28] mb-5">too much</p>
+            <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47] mb-5">too much</p>
             <div className="flex flex-col gap-0">
               {over.map((block, bi) => (
                 <div key={block.key} className="border-b border-white/[0.04] pb-5 mb-5 last:border-0 last:pb-0 last:mb-0">
@@ -246,7 +246,7 @@ function MisalignmentView({
         {/* Under-expression — too little */}
         {under.length > 0 && (
           <div>
-            <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#2e2b28] mb-5">too little</p>
+            <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47] mb-5">too little</p>
             <div className="flex flex-col gap-0">
               {under.map((block, bi) => (
                 <div key={block.key} className="border-b border-white/[0.04] pb-5 mb-5 last:border-0 last:pb-0 last:mb-0">
@@ -287,7 +287,7 @@ function CurrentDrift({ lines, delay = 0 }: { lines: string[]; delay?: number })
       transition={{ duration: 0.45, delay, ease }}
       className="border-l-2 border-[#e0743a]/20 pl-4 py-1"
     >
-      <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#3a3733] mb-2.5">right now</p>
+      <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#76716b] mb-2.5">right now</p>
       {lines.slice(0, 2).map((line, i) => (
         <p key={i} className="text-[13px] text-[#4f4b47] leading-[1.6]">{line}</p>
       ))}
@@ -377,23 +377,23 @@ export default function AlignmentEntryPage() {
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Alignment</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Alignment</p>
       </div>
       <div className="px-5 pt-6 pb-5 flex flex-col gap-6">
         <div>
           <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">What this is</p>
-          <p className="text-[12px] text-[#3a3733] leading-relaxed">
+          <p className="text-[12px] text-[#76716b] leading-relaxed">
             Your fixed center. The live sky above you. Alignment uses both to show you the path back to yourself — when a situation, conversation, or decision has pulled you off course.
           </p>
         </div>
         <div className="border-t border-white/[0.04] pt-5 flex flex-col gap-4">
           <div>
             <p className="text-[11px] text-[#4f4b47] font-medium mb-1">Baseline Design</p>
-            <p className="text-[11px] text-[#2e2b28] leading-relaxed">Your fixed center. How you naturally operate.</p>
+            <p className="text-[11px] text-[#4f4b47] leading-relaxed">Your fixed center. How you naturally operate.</p>
           </div>
           <div>
             <p className="text-[11px] text-[#4f4b47] font-medium mb-1">Live sky</p>
-            <p className="text-[11px] text-[#2e2b28] leading-relaxed">The emotional weather you're moving through right now.</p>
+            <p className="text-[11px] text-[#4f4b47] leading-relaxed">The emotional weather you're moving through right now.</p>
           </div>
         </div>
         <div className="border-t border-white/[0.04] pt-5">
@@ -401,10 +401,10 @@ export default function AlignmentEntryPage() {
             href="/apps/alignment/workspace"
             className="flex items-center justify-between group"
           >
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#3a3733] group-hover:text-[#f4efe9] transition-colors">
+            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#76716b] group-hover:text-[#f4efe9] transition-colors">
               Open workspace
             </span>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#2e2b28] group-hover:text-[#f4efe9] transition-colors">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#4f4b47] group-hover:text-[#f4efe9] transition-colors">
               <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </Link>
@@ -417,7 +417,7 @@ export default function AlignmentEntryPage() {
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Action</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Action</p>
       </div>
       <div className="px-5 pt-6 pb-5">
         {loading ? (
@@ -444,10 +444,10 @@ export default function AlignmentEntryPage() {
                 className="flex items-center justify-between w-full h-9 px-4 border border-white/[0.06] hover:border-white/[0.14] transition-colors group"
                 style={{ borderRadius: 6 }}
               >
-                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733] group-hover:text-[#f4efe9] transition-colors">
+                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] group-hover:text-[#f4efe9] transition-colors">
                   Work through a situation
                 </span>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#2e2b28] group-hover:text-[#f4efe9] transition-colors">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#4f4b47] group-hover:text-[#f4efe9] transition-colors">
                   <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </Link>
@@ -467,7 +467,7 @@ export default function AlignmentEntryPage() {
         {!loading && brief && (
           <Link
             href="/apps/alignment/workspace"
-            className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733] hover:text-[#f4efe9] transition-colors"
+            className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
           >
             Workspace →
           </Link>
@@ -479,7 +479,7 @@ export default function AlignmentEntryPage() {
 
         {loading && <LoadingSkeleton />}
         {!loading && error && (
-          <p className="text-[13px] text-[#3a3733] leading-relaxed pt-8">{error}</p>
+          <p className="text-[13px] text-[#76716b] leading-relaxed pt-8">{error}</p>
         )}
 
         {!loading && !brief && (
@@ -497,7 +497,7 @@ export default function AlignmentEntryPage() {
             <div className="pt-2">
               <Link href="/apps/alignment/workspace"
                 className="inline-flex items-center gap-2 h-9 px-5 border border-[#c8c2bc]/30 hover:border-[#c8c2bc]/50 hover:bg-[#c8c2bc]/5 transition-all"
-                style={{ borderRadius: 2 }}>
+                style={{ borderRadius: "var(--radius-button)" }}>
                 <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#c8c2bc]">Begin →</span>
               </Link>
             </div>

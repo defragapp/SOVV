@@ -127,7 +127,8 @@ export default function Chat({
             <button
               type="submit"
               disabled={!input.trim() || loading}
-              className="h-7 px-4 rounded-full bg-[#f4efe9] text-[#08070a] text-[11px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+              className="h-7 px-4 bg-[#f4efe9] text-[#08070a] text-[11px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+              style={{ borderRadius: "var(--radius-button)" }}
             >
               {loading ? "…" : "Ask"}
             </button>

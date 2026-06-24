@@ -173,7 +173,7 @@ export default function CovenantWorkspacePage() {
         <p className="text-[12px] text-[#4f4b47] leading-relaxed mb-5">
           Covenant connects what you're walking through to the real human stories in Scripture. Your Baseline Design is already active — Covenant uses it to find the story that fits your moment.
         </p>
-        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#2e2b28] mb-3">Patterns it recognizes</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#4f4b47] mb-3">Patterns it recognizes</p>
         <div className="flex flex-col gap-0">
           {[
             { feeling: "Misunderstood", figure: "Joseph" },
@@ -186,13 +186,13 @@ export default function CovenantWorkspacePage() {
             { feeling: "Called to rebuild", figure: "Nehemiah" },
           ].map((item) => (
             <div key={item.feeling} className="flex items-center justify-between py-2 border-b border-white/[0.03] last:border-0">
-              <span className="text-[11px] text-[#3a3733]">{item.feeling}</span>
+              <span className="text-[11px] text-[#76716b]">{item.feeling}</span>
               <span className="text-[10px] text-[#4f4b47]">{item.figure}</span>
             </div>
           ))}
         </div>
         <div className="mt-6 pt-5 border-t border-white/[0.04]">
-          <Link href="/apps/covenant" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733] hover:text-[#76716b] transition-colors">
+          <Link href="/apps/covenant" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#76716b] transition-colors">
             ← Covenant overview
           </Link>
         </div>
@@ -251,7 +251,7 @@ export default function CovenantWorkspacePage() {
             <span className="w-4 h-4 border border-white/[0.15] border-t-white/30 rounded-full animate-spin" />
           </div>
         ) : library.length === 0 ? (
-          <p className="text-[12px] text-[#3a3733] leading-relaxed px-5 py-8 text-center">Saved sessions will appear here.</p>
+          <p className="text-[12px] text-[#76716b] leading-relaxed px-5 py-8 text-center">Saved sessions will appear here.</p>
         ) : (
           library.map(item => (
             <a key={item.id} href={`/apps/covenant/${item.id}`}
@@ -326,7 +326,7 @@ export default function CovenantWorkspacePage() {
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50 mb-2">Your moment matches</p>
                   <p className="font-serif text-2xl text-[#f4efe9]">{result.figure}</p>
                   {result.reference && (
-                    <p className="font-mono text-[10px] text-[#3a3733] tracking-[0.12em] mt-1">{result.reference}</p>
+                    <p className="font-mono text-[10px] text-[#76716b] tracking-[0.12em] mt-1">{result.reference}</p>
                   )}
                 </div>
               )}
@@ -344,7 +344,7 @@ export default function CovenantWorkspacePage() {
                 {/* Scripture chips */}
                 {result.scriptures?.length > 0 && (
                   <div className="mt-6 pt-6 border-t border-white/[0.05]">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#3a3733] mb-3">Scripture to explore</p>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Scripture to explore</p>
                     <div className="flex flex-wrap gap-2">
                       {result.scriptures.map((s: string, i: number) => <ScriptureChip key={i} text={s} />)}
                     </div>
@@ -354,7 +354,7 @@ export default function CovenantWorkspacePage() {
                 {/* Reflection prompts */}
                 {result.reflectionPrompts?.length > 0 && (
                   <div className="mt-6 pt-6 border-t border-white/[0.05]">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#3a3733] mb-3">Carry with you</p>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Carry with you</p>
                     <div className="flex flex-col gap-2">
                       {result.reflectionPrompts.map((p: string, i: number) => (
                         <div key={i} className="flex items-start gap-2.5">

@@ -37,7 +37,7 @@ function TagChip({ tag, label }: { tag: string; label?: string }) {
         onBlur={() => setOpen(false)}
         className={`font-mono text-[8px] uppercase tracking-[0.12em] border px-2 py-0.5 transition-colors duration-150 ${
           label ? "border-white/[0.10] text-[#4f4b47] hover:border-white/[0.22] hover:text-[#76716b] cursor-pointer"
-                : "border-white/[0.06] text-[#2e2b28] cursor-default"
+                : "border-white/[0.06] text-[#4f4b47] cursor-default"
         }`}
         style={{ borderRadius: 2 }}
         aria-label={label ? `${tag}: ${label}` : tag}
@@ -88,7 +88,7 @@ function LoadingSkeleton() {
 }
 
 function SectionLabel({ children, dim = false }: { children: React.ReactNode; dim?: boolean }) {
-  return <p className={`font-mono text-[9px] uppercase tracking-[0.22em] mb-5 ${dim ? "text-[#2e2b28]" : "text-[#4f4b47]"}`}>{children}</p>
+  return <p className={`font-mono text-[9px] uppercase tracking-[0.22em] mb-5 ${dim ? "text-[#4f4b47]" : "text-[#4f4b47]"}`}>{children}</p>
 }
 
 function Divider() {
@@ -222,21 +222,21 @@ function PressureMap({ data, delay = 0 }: { data: NonNullable<DefragRender["pres
         {/* Starts */}
         {data.starts?.map((s, i) => (
           <div key={i} className="flex items-start gap-4 py-3 border-b border-white/[0.04]">
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#3a3733] shrink-0 w-12 mt-1">starts</span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#76716b] shrink-0 w-12 mt-1">starts</span>
             <p className="text-[13px] text-[#76716b] leading-[1.6]">{s}</p>
           </div>
         ))}
         {/* Moves */}
         {data.moves?.map((m, i) => (
           <div key={i} className="flex items-start gap-4 py-3 border-b border-white/[0.04]">
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#3a3733] shrink-0 w-12 mt-1">moves</span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#76716b] shrink-0 w-12 mt-1">moves</span>
             <p className="text-[13px] text-[#5a5550] leading-[1.6]">{m}</p>
           </div>
         ))}
         {/* Lands */}
         {data.lands?.map((l, i) => (
           <div key={i} className="flex items-start gap-4 py-3">
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#3a3733] shrink-0 w-12 mt-1">lands</span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#76716b] shrink-0 w-12 mt-1">lands</span>
             <p className="text-[13px] text-[#4f4b47] leading-[1.6]">{l}</p>
           </div>
         ))}
@@ -265,7 +265,7 @@ function LoopPreview({ data, delay = 0 }: { data: NonNullable<DefragRender["loop
           { label: "cost", value: data.cost },
         ].filter(r => r.value).map((row, i) => (
           <div key={i} className="flex items-start gap-4 px-4 py-3 border-b border-white/[0.04] last:border-0">
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#2e2b28] shrink-0 w-14 mt-0.5">{row.label}</span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#4f4b47] shrink-0 w-14 mt-0.5">{row.label}</span>
             <p className="text-[13px] text-[#5a5550] leading-[1.6]">{row.value}</p>
           </div>
         ))}
@@ -356,12 +356,12 @@ export default function DefragEntryPage() {
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Defrag</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Defrag</p>
       </div>
       <div className="px-5 pt-6 pb-5 flex flex-col gap-6">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">Before you move</p>
-          <p className="text-[12px] text-[#3a3733] leading-relaxed">
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">Before you move</p>
+          <p className="text-[12px] text-[#76716b] leading-relaxed">
             Defrag separates the moment from the pattern. It shows you what is active beneath the argument, the silence, the message, or the grief — and gives you the clearest next response.
           </p>
         </div>
@@ -369,14 +369,14 @@ export default function DefragEntryPage() {
           {["Something keeps happening", "I need to respond well", "I am carrying too much", "Boundaries you can't hold"].map(item => (
             <div key={item} className="flex items-start gap-2">
               <span className="text-[#e0743a]/30 text-[10px] mt-0.5 shrink-0">—</span>
-              <span className="text-[11px] text-[#2e2b28] leading-relaxed">{item}</span>
+              <span className="text-[11px] text-[#4f4b47] leading-relaxed">{item}</span>
             </div>
           ))}
         </div>
         <div className="border-t border-white/[0.04] pt-5">
           <Link href="/apps/defrag/workspace" className="flex items-center justify-between group">
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#3a3733] group-hover:text-[#f4efe9] transition-colors">Open workspace</span>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#2e2b28] group-hover:text-[#f4efe9] transition-colors">
+            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#76716b] group-hover:text-[#f4efe9] transition-colors">Open workspace</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#4f4b47] group-hover:text-[#f4efe9] transition-colors">
               <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </Link>
@@ -389,7 +389,7 @@ export default function DefragEntryPage() {
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Move</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Next move</p>
       </div>
       <div className="px-5 pt-6 pb-5">
         {loading ? (
@@ -407,8 +407,8 @@ export default function DefragEntryPage() {
               <Link href="/apps/defrag/workspace"
                 className="flex items-center justify-between w-full h-9 px-4 border border-white/[0.06] hover:border-white/[0.14] transition-colors group"
                 style={{ borderRadius: 6 }}>
-                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733] group-hover:text-[#f4efe9] transition-colors">Work through a moment</span>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#2e2b28] group-hover:text-[#f4efe9] transition-colors">
+                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] group-hover:text-[#f4efe9] transition-colors">Work through a moment</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#4f4b47] group-hover:text-[#f4efe9] transition-colors">
                   <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </Link>
@@ -423,9 +423,9 @@ export default function DefragEntryPage() {
   const main = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="h-11 px-6 flex items-center justify-between border-b border-white/[0.06] shrink-0">
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#f4efe9]">Your Pattern</span>
+        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Defrag</span>
         {!loading && brief && (
-          <Link href="/apps/defrag/workspace" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733] hover:text-[#f4efe9] transition-colors">
+          <Link href="/apps/defrag/workspace" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors">
             Workspace →
           </Link>
         )}
@@ -468,7 +468,7 @@ export default function DefragEntryPage() {
             <div className="pt-2">
               <Link href="/apps/defrag/workspace"
                 className="inline-flex items-center gap-2 h-9 px-5 border border-[#c8c2bc]/30 hover:border-[#c8c2bc]/50 hover:bg-[#c8c2bc]/5 transition-all"
-                style={{ borderRadius: 2 }}>
+                style={{ borderRadius: "var(--radius-button)" }}>
                 <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#c8c2bc]">Begin →</span>
               </Link>
             </div>

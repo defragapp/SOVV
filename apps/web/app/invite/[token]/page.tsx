@@ -153,7 +153,7 @@ export default function InvitePage() {
               <p className="text-[13px] text-[#76716b] leading-relaxed mb-6">
                 Accept the invite to add your side. The result only generates after you choose to continue.
               </p>
-              <p className="text-[11px] text-[#3a3733] leading-relaxed mb-8">
+              <p className="text-[11px] text-[#76716b] leading-relaxed mb-8">
                 Invited by {invite.invited_by} &middot; Your raw Baseline Design and private details stay hidden.
               </p>
               <button
@@ -163,7 +163,7 @@ export default function InvitePage() {
               >
                 Accept invite
               </button>
-              <p className="text-center text-[10px] text-[#2e2b28] mt-4">
+              <p className="text-center text-[10px] text-[#4f4b47] mt-4">
                 You'll need to sign in and set your Baseline Design to continue.
               </p>
             </div>

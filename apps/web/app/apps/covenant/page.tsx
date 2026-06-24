@@ -107,7 +107,7 @@ export default function CovenantPage() {
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Context</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Context</p>
       </div>
       <div className="px-5 pt-6 pb-5">
         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">About Covenant</p>
@@ -140,7 +140,7 @@ export default function CovenantPage() {
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Library</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Library</p>
       </div>
 
       {result && (
