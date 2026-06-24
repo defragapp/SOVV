@@ -438,122 +438,188 @@ export default function Home() {
           }}
         />
 
-        {/* Hero content — lower-middle third, anchored to bottom */}
+        {/* Hero content — headline + single CTA only. Image breathes. */}
         <div
           className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center text-center"
-          style={{ paddingBottom: "max(clamp(2.5rem, 7vh, 5rem), env(safe-area-inset-bottom, 0px))" }}
+          style={{ paddingBottom: "max(clamp(3rem, 8vh, 6rem), env(safe-area-inset-bottom, 0px))" }}
         >
-          {/* Platform label */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-            className="font-mono uppercase tracking-[0.28em] text-[#f4efe9]/30 mb-5"
-            style={{ fontSize: "0.65rem" }}
-          >
-            Sovereign.os
-          </motion.p>
-
-          {/* Headline — product-led, anchored, calm */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.0, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-            className="font-serif text-[#f4efe9] text-balance leading-[1.06] tracking-[-0.02em] px-6"
-            style={{ fontSize: "clamp(2.2rem, 5.5vw, 5rem)", maxWidth: "20ch" }}
+            transition={{ duration: 1.1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="font-serif text-[#f4efe9] text-balance leading-[1.06] tracking-[-0.02em] px-8"
+            style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", maxWidth: "22ch" }}
           >
-            See what&apos;s happening —
+            Healing isn&apos;t optional.
             <br />
-            <span style={{ color: "rgba(244,239,233,0.52)" }}>
-              before it repeats.
+            <span style={{ color: "rgba(244,239,233,0.48)" }}>
+              Holding the pain is.
             </span>
           </motion.h1>
 
-          {/* Subhead */}
-          <motion.p
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-5 max-w-sm text-[#a8a29a] leading-relaxed px-6"
-            style={{ fontSize: "clamp(0.875rem, 1.8vw, 1rem)" }}
-          >
-            A private intelligence system built around your Baseline Design —
-            so each moment is read in context, not from scratch.
-          </motion.p>
-
-          {/* Embedded live system surface */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.48, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-6 w-full max-w-[540px] mx-auto px-6 sm:px-0"
-          >
-            <div
-              className="overflow-hidden text-left"
-              style={{
-                borderRadius: 14,
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                background: "linear-gradient(180deg, rgba(11,11,11,0.42), rgba(11,11,11,0.58))",
-                border: "1px solid rgba(255,255,255,0.03)",
-              }}
-            >
-              <div className="px-4 py-3 border-b border-white/[0.06]">
-                <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#f4efe9]/38 mb-1">Moment</p>
-                <p className="text-[12px] text-[#76716b] leading-relaxed italic">
-                  &ldquo;I thought I was being clear, but now it feels worse.&rdquo;
-                </p>
-              </div>
-              {[
-                {
-                  label: "What’s active",
-                  value: "You’re trying to clear the tension by naming it. It’s landing with more pressure than you expect.",
-                  delay: 0.56,
-                  highlight: false,
-                },
-                {
-                  label: "What forms between you",
-                  value: "The more you try to clear it up, the more pressure builds.",
-                  delay: 0.58,
-                  highlight: false,
-                },
-                {
-                  label: "Next move",
-                  value: "Say the part that matters. Then leave room for it to land.",
-                  delay: 0.60,
-                  highlight: true,
-                },
-              ].map((row) => (
-                <motion.div
-                  key={row.label}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4, delay: row.delay, ease: [0.16, 1, 0.3, 1] }}
-                  className={`px-4 py-3 border-b border-white/[0.05] last:border-0 ${row.highlight ? "border-t border-white/[0.06] bg-white/[0.02]" : ""}`}
-                >
-                  <p className={`font-mono text-[9px] uppercase tracking-[0.12em] mb-1 ${row.highlight ? "text-[#e0743a]/60" : "text-[#f4efe9]/38"}`}>
-                    {row.label}
-                  </p>
-                  <p className={`text-[12px] leading-relaxed ${row.highlight ? "text-[#f4efe9] font-medium" : "text-[#a8a29a]"}`}>
-                    {row.value}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-6 flex flex-col sm:flex-row gap-3 items-center px-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-8"
           >
             <Link href={APP_URL} className="btn-primary">
               Enter Sovereign.os
             </Link>
           </motion.div>
         </div>
+      </section>
+
+
+      {/* ── NOTEBOOK PREVIEW ─────────────────────────────────────────────── */}
+      <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/[0.05]">
+        <Container>
+          <div className="flex flex-col items-center text-center mb-14">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
+                The notebook
+              </span>
+            </div>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight text-balance max-w-lg"
+              style={{ fontSize: "clamp(1.9rem, 4vw, 3.2rem)" }}
+            >
+              This is what you actually get.
+            </h2>
+            <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-sm">
+              A real prompt. A real result. Your Baseline Design active in the background.
+            </p>
+          </div>
+          <SpacePreview />
+        </Container>
+      </section>
+
+      {/* ── THREE SPACES ─────────────────────────────────────────────────── */}
+      <section className="relative w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/[0.05] overflow-hidden">
+        <div className="light-beam opacity-50" aria-hidden />
+        <Container className="relative z-10">
+          <div className="inline-flex items-center gap-2 mb-12">
+            <span className="h-px w-6 bg-[#e0743a]/60" />
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
+              Three spaces
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.06] overflow-hidden" style={{ borderRadius: 16 }}>
+            {[
+              {
+                num: "01",
+                name: "Defrag",
+                tier: "Free",
+                href: "/product",
+                hook: "Separate the moment from the pattern.",
+                what: "Something happened. You don't know if you overreacted or if this is the same thing that always happens.",
+                cta: "What's actually active — and your clearest next response.",
+                tags: ["Arguments", "Messages", "Family roles", "Boundaries", "Grief"],
+              },
+              {
+                num: "02",
+                name: "Covenant",
+                tier: "Pro",
+                href: "/covenant",
+                hook: "Your moment has been walked before.",
+                what: "Covenant connects what you're going through to the real human stories in Scripture.",
+                cta: "One honest next step — grounded in faith, not performance.",
+                tags: ["Faith", "Values", "Commitments", "Repair"],
+              },
+              {
+                num: "03",
+                name: "Alignment",
+                tier: "Pro",
+                href: "/product",
+                hook: "Get back into your own lane.",
+                what: "A conversation, a conflict, a decision — and suddenly you're reacting from somewhere that isn't you.",
+                cta: "Your Baseline Design shows the path back.",
+                tags: ["After Defrag", "Before a hard conversation", "After a conflict"],
+              },
+            ].map((space) => (
+              <Link
+                key={space.name}
+                href={space.href}
+                className="group flex flex-col gap-5 p-8 md:p-10 bg-[#0c0a0d] hover:bg-[#0f0d10] transition-colors duration-300"
+              >
+                <div className="flex items-start justify-between">
+                  <div
+                    className="w-10 h-10 flex items-center justify-center border border-white/[0.08]"
+                    style={{
+                      borderRadius: 8,
+                      color: space.tier === "Pro" ? "#e0743a" : "#76716b",
+                      background: space.tier === "Pro" ? "rgba(224,116,58,0.06)" : "rgba(255,255,255,0.02)",
+                    }}
+                  >
+                    <span className="font-mono text-[9px] tracking-[0.1em]">{space.num}</span>
+                  </div>
+                  <span
+                    className="font-mono text-[8px] uppercase tracking-[0.14em] border px-2 py-0.5 self-start"
+                    style={{
+                      borderRadius: 3,
+                      color: space.tier === "Free" ? "rgba(168,162,154,0.55)" : "rgba(224,116,58,0.65)",
+                      borderColor: space.tier === "Free" ? "rgba(255,255,255,0.08)" : "rgba(224,116,58,0.22)",
+                    }}
+                  >
+                    {space.tier}
+                  </span>
+                </div>
+
+                <div>
+                  <h3
+                    className="font-serif text-[#f4efe9] mb-2 group-hover:text-[#f0a06a] transition-colors duration-300"
+                    style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.6rem)" }}
+                  >
+                    {space.name}
+                  </h3>
+                  <p className="text-[15px] text-[#f4efe9]/65 leading-snug font-medium">
+                    {space.hook}
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-2 flex-1">
+                  <p className="text-[13px] text-[#76716b] leading-relaxed">{space.what}</p>
+                  <p className="text-[13px] text-[#a8a29a] leading-relaxed">{space.cta}</p>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.05]">
+                  {space.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] px-2 py-0.5 border border-white/[0.05]"
+                      style={{ borderRadius: 3 }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      <section className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.05] overflow-hidden">
+        <div className="light-beam" aria-hidden />
+        <Container className="relative z-10 flex flex-col items-center text-center">
+          <h2
+            className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-3xl text-balance"
+            style={{ fontSize: "clamp(2.2rem, 5.5vw, 5rem)" }}
+          >
+            Return before the pattern takes over.
+          </h2>
+          <p className="mt-6 max-w-md text-base md:text-lg text-[#a8a29a] leading-relaxed">
+            Defrag is free. Start understanding the patterns beneath the moments that matter most.
+          </p>
+          <div className="mt-9">
+            <Link href={APP_URL} className="btn-primary">
+              Enter Sovereign.os
+            </Link>
+          </div>
+        </Container>
       </section>
 
     </SiteShell>
