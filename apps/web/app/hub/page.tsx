@@ -11,7 +11,7 @@ export default function HubLanding() {
             <div className="h-px w-8 bg-white/20" />
             <span className="font-sans font-medium text-[10px] text-[#76716b] tracking-[0.2em] uppercase">Sovereign.os</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[#f4efe9] text-balance">
+          <h1 className="font-serif text-[clamp(2rem,5vw,3.5rem)] tracking-[-0.02em] text-[#f4efe9] text-balance">
             Your private platform for relational intelligence.
           </h1>
         </header>

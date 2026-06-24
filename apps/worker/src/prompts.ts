@@ -191,6 +191,42 @@ COVENANT RULES:
 // ── Output contracts (enforced JSON schemas) ──────────────────────────────────
 
 
+const DEFRAG_OUTPUT_CONTRACT = `OUTPUT FORMAT — JSON only, no markdown, no code fences:
+{
+  "summary": "1-2 sentences: what is active right now",
+  "activePattern": "name the pattern in plain language — specific, not generic",
+  "theRepeat": "what keeps happening — the loop that forms. OMIT if not clearly present.",
+  "oldRole": "the role the user is being pulled into — name it plainly. OMIT if not clearly present.",
+  "whatYouLearnedToCarry": "what shaped this pattern — brief, structural. OMIT if not enough context.",
+  "strainPattern": "how this shows up under pressure — observable behavior. OMIT if not clearly present.",
+  "giftUnderStrain": "what is working even now — honest, not forced. OMIT if forced or unclear.",
+  "alignment": "what gives this moment a better chance — one clear move",
+  "bestNextResponse": {
+    "summary": "one specific, actionable move — not a list",
+    "phrasing": ["specific language if useful — OMIT array if not genuinely useful"]
+  },
+  "conversationalSteering": {
+    "do": ["what to do — specific. OMIT entire object if redundant with bestNextResponse."],
+    "avoid": ["what not to do — specific"]
+  }
+}
+
+FIELD RULES:
+- "activePattern" and "alignment" are ALWAYS required. All other fields are conditional.
+- Only include a field if it adds genuine, specific value to this situation.
+- Do NOT fill every field for every input. A short or simple input may only need 3-4 fields.
+- A complex relational situation may use more fields. Match depth to the input.
+- "activePattern" must name the pattern, not describe feelings
+- "oldRole" must name the role (e.g., "the fixer", "the translator", "the one who holds it together")
+- "alignment" is the most important field — one clear move, not advice
+- "phrasing" is optional — only include if specific language is genuinely useful
+- "conversationalSteering" — omit entirely if it would repeat bestNextResponse
+- Max 2 sentences per field
+- Use short declarative lines
+- Prefer ordinary words used precisely
+- If the input is brief or unclear, return only: activePattern + alignment + bestNextResponse
+`
+
 
 const ALIGNMENT_OUTPUT_CONTRACT = `OUTPUT FORMAT — JSON only, no markdown, no code fences:
 {

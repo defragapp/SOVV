@@ -33,7 +33,7 @@ export default async function AdminPage() {
     return (
       <SiteShell>
         <div className="mx-auto max-w-3xl px-6 py-24 text-white">
-          <h1 className="text-3xl font-semibold">Owner access required</h1>
+          <h1 className="font-serif text-[28px] tracking-[-0.02em]">Owner access required</h1>
           <p className="mt-4 text-sm text-white/70">
             This page is only available to Sovereign.os owners. Please sign in with an owner account or return to the main site.
           </p>
@@ -46,14 +46,14 @@ export default async function AdminPage() {
     <SiteShell>
       <div className="mx-auto max-w-3xl px-6 py-24 space-y-10">
         <div className="space-y-4">
-          <h1 className="text-4xl font-semibold">Admin</h1>
+          <h1 className="font-serif text-[32px] tracking-[-0.02em]">Admin</h1>
           <p className="text-sm text-white/70">
             Signed in as <span className="font-sans font-medium text-white/90">{admin.email}</span> — role <span className="font-sans font-medium text-white/90">{admin.role}</span>.
           </p>
         </div>
 
         <div className="rounded-[14px] border border-border bg-white/5 p-8">
-          <h2 className="text-2xl font-semibold">Ambassador promo codes</h2>
+          <h2 className="text-[18px] font-medium tracking-[-0.01em]">Ambassador promo codes</h2>
           <p className="mt-2 text-sm text-white/60">
             Generate one-time ambassador promo codes that can be redeemed publicly via the promo redeem API.
           </p>
