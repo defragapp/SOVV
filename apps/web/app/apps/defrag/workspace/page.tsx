@@ -82,6 +82,9 @@ export default function DefragWorkspacePage() {
   const [statementsLoading, setStatementsLoading] = React.useState(false)
   const [recurringPattern, setRecurringPattern] = React.useState<string | null>(null)
   const [sessionCount, setSessionCount] = React.useState(0)
+  // Compare With Someone — Pro only
+  const [compareMode, setCompareMode] = React.useState(false)
+  const [compareName, setCompareName] = React.useState("")
 
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
@@ -157,7 +160,14 @@ export default function DefragWorkspacePage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({
+          message: input,
+          // Compare With Someone — passes target name for relational overlay
+          ...(compareMode && compareName.trim() ? {
+            target: { id: "compare", relation: "partner" },
+            targetName: compareName.trim(),
+          } : {}),
+        }),
       })
       const data = await res.json()
       if (data.type === "needs_baseline") { setError("needs_baseline"); return }
@@ -546,10 +556,22 @@ export default function DefragWorkspacePage() {
           className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors"
           style={{ borderRadius: "var(--radius-container)" }}
         >
+          {compareMode && (
+            <div className="px-5 pt-4 pb-0 border-b border-white/[0.05]">
+              <input
+                type="text"
+                value={compareName}
+                onChange={e => setCompareName(e.target.value)}
+                placeholder="Who are you comparing with? (name or relation)"
+                className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] outline-none text-[13px] pb-3"
+                style={{ fontSize: "16px" }}
+              />
+            </div>
+          )}
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Describe what's happening — a message, a conversation, a pattern, a moment."
+            placeholder={compareMode ? "Describe the dynamic between you — what keeps happening." : "Describe what's happening — a message, a conversation, a pattern, a moment."}
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             maxLength={2000}
@@ -557,7 +579,18 @@ export default function DefragWorkspacePage() {
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
+            <div className="flex items-center gap-3">
             <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">↵ Run · Shift+Enter for new line</span>
+            {result?.sourcesUsed?.invitedUsers === false && (
+              <button
+                type="button"
+                onClick={() => setCompareMode(m => !m)}
+                className={`font-mono text-[8px] uppercase tracking-[0.1em] transition-colors ${compareMode ? "text-[#e0743a]/70" : "text-[#4f4b47] hover:text-[#76716b]"}`}
+              >
+                {compareMode ? "Solo mode" : "+ Compare"}
+              </button>
+            )}
+          </div>
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
