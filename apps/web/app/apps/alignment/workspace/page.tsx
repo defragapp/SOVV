@@ -35,6 +35,7 @@ export default function AlignmentWorkspacePage() {
   const [saveSuccess, setSaveSuccess] = React.useState(false)
   const [inviteOpen, setInviteOpen] = React.useState(false)
   const [error, setError] = React.useState("")
+  const [baselineStatements, setBaselineStatements] = React.useState<Array<{ statement: string; chips: string[] }>>([])
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
   // Audio Overview
@@ -58,6 +59,14 @@ export default function AlignmentWorkspacePage() {
         setInput((prev) => prev || decodeURIComponent(prompt))
       }
     }
+  }, [])
+
+  // Load Baseline Design statements for sidebar
+  React.useEffect(() => {
+    fetch("/api/derive-profile", { credentials: "include" })
+      .then(r => r.ok ? r.json() : { statements: [] })
+      .then((d: any) => { if (Array.isArray(d.statements) && d.statements.length > 0) setBaselineStatements(d.statements) })
+      .catch(() => {})
   }, [])
 
   React.useEffect(() => {
@@ -158,23 +167,30 @@ export default function AlignmentWorkspacePage() {
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">How Alignment works</p>
       </div>
       <div className="px-5 pt-6 pb-5">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">How this works</p>
-        <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
-          Your Baseline Design is your fixed center — how you naturally operate. The live sky is the emotional weather you're moving through right now. Alignment uses both to show you the path back to yourself.
-        </p>
-        <div className="space-y-3">
-          {[
-            "What is actually true in this situation",
-            "What is yours to carry — and what isn't",
-            "What a clean response looks like",
-            "What to release",
-          ].map((item) => (
-            <div key={item} className="flex items-start gap-2">
-              <span className="text-[#4f4b47] text-[10px] mt-0.5 shrink-0">—</span>
-              <span className="text-[12px] text-[#76716b] leading-relaxed">{item}</span>
-            </div>
-          ))}
-        </div>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Baseline Design</p>
+        {baselineStatements.length > 0 ? (
+          <div className="flex flex-col gap-0">
+            {baselineStatements.slice(0, 4).map(({ statement, chips }, i) => (
+              <div key={i} className="py-3 border-b border-white/[0.04] last:border-0">
+                <p className="text-[12px] text-[#c8c2bc] leading-[1.6] mb-2">{statement}</p>
+                {chips.length > 0 && (
+                  <div className="flex gap-1 flex-wrap">
+                    {chips.map(chip => (
+                      <span key={chip} className="font-mono text-[8px] tracking-[0.1em] px-2 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/60 bg-[#e0743a]/[0.04]" style={{ borderRadius: "var(--radius-minimal)" }}>
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            <p className="text-[10px] text-[#4f4b47] mt-3">Active in every result.</p>
+          </div>
+        ) : (
+          <p className="text-[12px] text-[#76716b] leading-relaxed">
+            Your Baseline Design is active — it grounds every Alignment result in how you actually operate.
+          </p>
+        )}
         <div className="mt-6 pt-5 border-t border-white/[0.06]">
           <Link
             href="/apps/alignment"
