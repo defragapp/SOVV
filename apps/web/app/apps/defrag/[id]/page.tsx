@@ -211,7 +211,7 @@ export default function DefragItemPage() {
             <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between bg-[#08070a]/60">
               <div className="flex items-center gap-3">
                 <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Sovereign.os</span>
-                <span className="text-white/20 text-xs">/</span>
+                <span className="text-[#4f4b47] text-xs">/</span>
                 <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]">Defrag</span>
               </div>
               {savedDate && (

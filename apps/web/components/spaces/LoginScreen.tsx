@@ -152,7 +152,7 @@ export default function LoginScreen() {
                   key={m}
                   type="button"
                   onClick={() => { setMode(m); setError(""); setTurnstileToken("") }}
-                  className={`flex-1 pb-4 text-sm font-medium tracking-wide transition-colors duration-200 border-b-2 ${
+                  className={`flex-1 pb-4 text-sm font-medium tracking-[0.14em] transition-colors duration-200 border-b-2 ${
                     mode === m
                       ? "border-[#f4efe9] text-[#f4efe9]"
                       : "border-transparent text-[#76716b] hover:text-[#a8a29a]"

@@ -32,7 +32,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
             <Link href="/apps/defrag" className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors">
               Sovereign.os
             </Link>
-            <span className="text-white/20 text-xs">/</span>
+            <span className="text-[#4f4b47] text-xs">/</span>
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#f4efe9]">{spaceName}</span>
           </div>
 
@@ -104,9 +104,9 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
       {/* ── Mobile Layout ──────────────────────────────────────────── */}
       <div className="flex lg:hidden flex-col w-full h-full safe-top safe-bottom">
         <header className="sticky top-0 z-10 bg-[#08070a]/95 backdrop-blur-md border-b border-white/[0.06] px-5 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase">
+          <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.2em] uppercase">
             <Link href="/apps/defrag" className="text-[#76716b]">Sovereign.os</Link>
-            <span className="text-white/20">/</span>
+            <span className="text-[#4f4b47]">/</span>
             <span className="text-[#f4efe9]">{spaceName}</span>
           </div>
           <div className="flex items-center gap-3">
@@ -135,7 +135,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
             <Link
               key={s.href}
               href={s.href}
-              className={`px-3 py-2.5 border-b-2 font-mono text-[10px] tracking-widest uppercase whitespace-nowrap transition-colors ${
+              className={`px-3 py-2.5 border-b-2 font-mono text-[10px] tracking-[0.2em] uppercase whitespace-nowrap transition-colors ${
                 spaceName === s.label
                   ? "border-[#f4efe9] text-[#f4efe9]"
                   : "border-transparent text-[#76716b] hover:text-[#a8a29a]"
@@ -152,7 +152,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 border-b-2 font-mono text-[10px] tracking-widest uppercase whitespace-nowrap transition-colors ${
+              className={`px-4 py-2.5 border-b-2 font-mono text-[10px] tracking-[0.2em] uppercase whitespace-nowrap transition-colors ${
                 activeTab === tab.id
                   ? "border-[#e0743a] text-[#f4efe9]"
                   : "border-transparent text-[#76716b] hover:text-[#a8a29a]"

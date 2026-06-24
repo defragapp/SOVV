@@ -48,11 +48,11 @@ export default function LibraryView() {
   }, [])
 
   return (
-    <aside className="flex h-full flex-col bg-background overflow-y-auto" aria-label="Sovereign.os Library">
+    <aside className="flex h-full flex-col bg-[#08070a] overflow-y-auto" aria-label="Sovereign.os Library">
 
       {/* Header */}
       <div className="flex h-10 shrink-0 items-center border-b border-[#F6F5F3]/10 px-4">
-        <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">
+        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">
           Sovereign.os Library
         </span>
       </div>
@@ -113,15 +113,15 @@ export default function LibraryView() {
                   <span className="text-micro text-foreground-disabled">
                     {MODE_LABELS[item.mode] ?? item.mode}
                   </span>
-                  <span className="font-mono text-[9px] uppercase tracking-widest text-white/15">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">
                     {formatDate(item.created_at)}
                   </span>
                 </div>
-                <p className="text-sm font-light text-white/60 leading-5 line-clamp-2">
+                <p className="text-sm font-light text-[#76716b] leading-5 line-clamp-2">
                   {item.question}
                 </p>
                 {item.confidence && item.confidence !== "Not enough information" && (
-                  <span className="mt-1 block font-mono text-[8px] uppercase tracking-widest text-white/20">
+                  <span className="mt-1 block font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47]">
                     {CONFIDENCE_LABELS[item.confidence] ?? item.confidence}
                   </span>
                 )}
@@ -141,10 +141,10 @@ export default function LibraryView() {
                 key={label}
                 className="flex items-center justify-between px-4 py-3 border-b border-[#F6F5F3]/5"
               >
-                <span className="font-mono text-[9px] uppercase tracking-widest text-white/15">
+                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">
                   {label}
                 </span>
-                <span className="font-mono text-[8px] uppercase tracking-widest text-white/10">
+                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47]">
                   Saves here
                 </span>
               </div>

@@ -5,10 +5,10 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variantClasses = {
-  default: "bg-surface border border-border",
-  elevated: "bg-surface border border-border shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)]",
-  premium: "bg-gradient-to-br from-[#141414] to-[#0A0A0A] border border-border backdrop-blur-xl shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.05)]",
-  ghost: "bg-transparent border border-border hover:bg-white/5 transition-colors",
+  default: "bg-[#0c0a0d] border border-white/[0.06]",
+  elevated: "bg-[#0c0a0d] border border-white/[0.06] shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)]",
+  premium: "bg-gradient-to-br from-[#141414] to-[#0A0A0A] border border-white/[0.06] backdrop-blur-xl shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.05)]",
+  ghost: "bg-transparent border border-white/[0.06] hover:bg-white/5 transition-colors",
 }
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(

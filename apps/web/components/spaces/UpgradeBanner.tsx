@@ -118,7 +118,7 @@ export default function UpgradeBanner() {
                 value={promoCode}
                 onChange={(e) => setPromoCode(e.target.value)}
                 placeholder="Enter promo code"
-                className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 text-center tracking-widest uppercase"
+                className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 text-center tracking-[0.2em] uppercase"
                 style={{ borderRadius: "var(--radius-input)" }}
               />
             </motion.div>

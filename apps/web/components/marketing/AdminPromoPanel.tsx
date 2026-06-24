@@ -45,9 +45,9 @@ export default function AdminPromoPanel() {
 
       {code ? (
         <div className="rounded-[14px] bg-slate-950/60 p-4 text-sm text-white">
-          <p className="font-mono text-xs uppercase text-white/50">Promo code</p>
+          <p className="font-mono text-xs uppercase text-[#76716b]">Promo code</p>
           <p className="mt-2 font-mono text-[14px] tracking-[0.14em]">{code}</p>
-          <p className="mt-2 text-xs text-white/60">
+          <p className="mt-2 text-xs text-[#76716b]">
             Share this code with an ambassador. It can be redeemed once.
           </p>
         </div>

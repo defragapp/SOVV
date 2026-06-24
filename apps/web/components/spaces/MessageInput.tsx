@@ -59,19 +59,19 @@ export default function MessageInput({
           rows={2}
           disabled={disabled}
           aria-disabled={disabled}
-          className="flex-1 resize-none bg-transparent text-sm font-light text-[#f4efe9] placeholder:text-white/20 focus:outline-none disabled:opacity-40 leading-6"
+          className="flex-1 resize-none bg-transparent text-sm font-light text-[#f4efe9] placeholder:text-[#4f4b47] focus:outline-none disabled:opacity-40 leading-6"
           style={{ minHeight: "3rem", maxHeight: "10rem" }}
         />
         <button
           type="submit"
           disabled={disabled || !value.trim()}
           aria-label="Send message"
-          className="shrink-0 border border-[#F6F5F3]/20 px-4 py-2 font-mono text-[9px] uppercase tracking-widest text-[#f4efe9] transition-colors hover:bg-[#F6F5F3]/5 disabled:opacity-25 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-1 focus-visible:outline-white/40"
+          className="shrink-0 border border-[#F6F5F3]/20 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9] transition-colors hover:bg-[#F6F5F3]/5 disabled:opacity-25 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-1 focus-visible:outline-white/40"
         >
           Send
         </button>
       </div>
-      <p className="mt-2 font-mono text-[8px] uppercase tracking-widest text-white/15">
+      <p className="mt-2 font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47]">
         Enter to send · Shift+Enter for new line
       </p>
     </form>

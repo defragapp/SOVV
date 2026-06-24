@@ -139,7 +139,7 @@ export default function Sidebar({
     <div className="flex h-full flex-col font-sans text-sm">
 
       {/* Space navigation */}
-      <div className="border-b border-border py-4 shrink-0">
+      <div className="border-b border-white/[0.06] py-4 shrink-0">
         <span className="block px-6 mb-2 font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">
           Spaces
         </span>

@@ -82,16 +82,16 @@ export default function SettingsPage() {
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#08070a]/90 backdrop-blur-md safe-top">
         <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between">
-          <nav className="flex items-center gap-2.5 font-mono text-xs tracking-widest uppercase" aria-label="Breadcrumb">
+          <nav className="flex items-center gap-2.5 font-mono text-xs tracking-[0.2em] uppercase" aria-label="Breadcrumb">
             <Link href="/apps/defrag" className="text-[#76716b] hover:text-[#f4efe9] transition-colors">
               Sovereign.os
             </Link>
-            <span className="text-white/20" aria-hidden>/</span>
+            <span className="text-[#4f4b47]" aria-hidden>/</span>
             <span className="text-[#a8a29a]">Your Design</span>
           </nav>
           <Link
             href="/apps/defrag"
-            className="text-xs font-mono tracking-wide text-[#76716b] hover:text-[#f4efe9] transition-colors"
+            className="text-xs font-mono tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
           >
             ← Defrag
           </Link>
