@@ -197,9 +197,14 @@ export default function DefragWorkspacePage() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          text: [result.activePattern, result.theRepeat, result.oldRole, result.giftUnderStrain,
-            typeof result.bestNextResponse === "object" ? result.bestNextResponse?.summary : result.bestNextResponse]
-            .filter(Boolean).join(" "),
+          text: [
+            result.activePattern,
+            result.theRepeat ? `What keeps happening: ${result.theRepeat}` : null,
+            result.alignment ? `What gives this moment a better chance: ${result.alignment}` : null,
+            result.bestNextResponse
+              ? `Next move: ${typeof result.bestNextResponse === "object" ? result.bestNextResponse?.summary : result.bestNextResponse}`
+              : null,
+          ].filter(Boolean).join(". "),
         }),
       })
       if (!res.ok) { const d = (await res.json().catch(() => ({}))) as any; throw new Error(d.error || "Failed") }

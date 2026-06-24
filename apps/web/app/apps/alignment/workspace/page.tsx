@@ -139,12 +139,12 @@ export default function AlignmentWorkspacePage() {
     setAudioError("")
     try {
       const text = [
-        result.whatIsTrue,
-        result.whatIsYours,
-        result.theShift,
-        result.nextStep,
-        result.alignment,
-      ].filter(Boolean).join(" ")
+        result.whatIsTrue ? `What is actually happening: ${result.whatIsTrue}` : null,
+        result.whatIsYours ? `What is yours to carry: ${result.whatIsYours}` : null,
+        result.whatIsNotYours ? `What is not yours: ${result.whatIsNotYours}` : null,
+        result.theShift ? `What a clean response looks like: ${result.theShift}` : null,
+        result.nextStep ? `One move: ${result.nextStep}` : null,
+      ].filter(Boolean).join(". ")
       const res = await fetch("/api/audio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -240,19 +240,32 @@ export default function AlignmentWorkspacePage() {
             onClick={handleSave}
             disabled={isSaving || saveSuccess}
             className="w-full h-9 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium tracking-tight hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ borderRadius: 8 }}
+            style={{ borderRadius: "var(--radius-button)" }}
           >
             {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save to Library"}
           </button>
           <button
             onClick={() => setInviteOpen(true)}
             className="w-full h-8 border border-white/[0.08] text-[11px] text-[#76716b] hover:border-white/[0.16] hover:text-[#a8a29a] transition-colors mt-2"
-            style={{ borderRadius: 6 }}
+            style={{ borderRadius: "var(--radius-button)" }}
           >
             Invite Privately
           </button>
+
+          {/* Back-flow to Defrag */}
+          <div className="mt-4 pt-4 border-t border-white/[0.04]">
+            <p className="text-[10px] text-[#4f4b47] leading-relaxed mb-2">
+              Defrag shows the pattern beneath this. Run it first for deeper context.
+            </p>
+            <a
+              href="/apps/defrag/workspace"
+              className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+            >
+              Open Defrag →
+            </a>
+          </div>
         </div>
-      )}
+      }}
 
       <div className="flex-1">
         {libraryLoading ? (

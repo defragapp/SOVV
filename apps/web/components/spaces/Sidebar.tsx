@@ -48,7 +48,7 @@ function SessionCounter() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         className="mx-4 mb-4 px-4 py-3 border border-white/[0.06] bg-white/[0.02]"
-        style={{ borderRadius: 10 }}
+        style={{ borderRadius: "var(--radius-container)" }}
       >
         {isPro ? (
           <div className="flex items-center justify-between">
@@ -70,7 +70,7 @@ function SessionCounter() {
                   low ? "text-red-400/80" : warn ? "text-[#e0743a]/70" : "text-[#76716b]"
                 }`}
               >
-                {usage.remaining} left
+                {usage.remaining === 0 ? "Limit reached" : `${usage.remaining} left`}
               </span>
             </div>
 
@@ -89,14 +89,16 @@ function SessionCounter() {
               <span className="font-mono text-[8px] text-[#4f4b47]">
                 {usage.used} / {usage.limit} used
               </span>
-              {warn && (
+              {low ? (
+                <span className="font-mono text-[8px] text-[#4f4b47]">Resets midnight UTC</span>
+              ) : warn ? (
                 <Link
                   href="/pricing"
                   className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#e0743a]/60 hover:text-[#e0743a] transition-colors"
                 >
                   Upgrade →
                 </Link>
-              )}
+              ) : null}
             </div>
           </>
         )}

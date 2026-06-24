@@ -268,6 +268,27 @@ export function ResultCard({
         </div>
       ) : null}
 
+      {/* Save confirmation — brief, auto-dismiss */}
+      {saveSuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="px-6 py-3 border-t border-[#e0743a]/10 bg-[#e0743a]/[0.04] flex items-center justify-between"
+        >
+          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70">
+            Saved to your Library
+          </span>
+          <a
+            href="/app"
+            className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+          >
+            View Library →
+          </a>
+        </motion.div>
+      )}
+
       {/* Footer actions */}
       <div className="px-6 py-4 border-t border-white/[0.06] bg-[#08070a]/40 flex items-center justify-between gap-3">
         <button

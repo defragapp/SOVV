@@ -149,10 +149,10 @@ export default function CovenantWorkspacePage() {
     try {
       // Story-led audio — no raw baseline, no birth data
       const text = [
+        result.figure ? `The story of ${result.figure}.` : null,
         result.story,
-        result.forYou,
-        result.nextStep,
-        result.pattern,
+        result.forYou ? `What this means for you: ${result.forYou}` : null,
+        result.nextStep ? `One honest move: ${result.nextStep}` : null,
       ].filter(Boolean).join(" ")
       const res = await fetch("/api/audio", {
         method: "POST",
@@ -264,19 +264,32 @@ export default function CovenantWorkspacePage() {
             onClick={handleSave}
             disabled={isSaving || saveSuccess}
             className="w-full h-9 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium tracking-tight hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ borderRadius: 8 }}
+            style={{ borderRadius: "var(--radius-button)" }}
           >
             {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save to Library"}
           </button>
           <button
             onClick={() => setInviteOpen(true)}
             className="w-full h-8 border border-white/[0.08] text-[11px] text-[#76716b] hover:border-white/[0.16] hover:text-[#a8a29a] transition-colors mt-2"
-            style={{ borderRadius: 6 }}
+            style={{ borderRadius: "var(--radius-button)" }}
           >
             Invite Privately
           </button>
+
+          {/* Back-flow to Defrag */}
+          <div className="mt-4 pt-4 border-t border-white/[0.04]">
+            <p className="text-[10px] text-[#4f4b47] leading-relaxed mb-2">
+              Defrag shows the pattern beneath this moment. Run it first for deeper context.
+            </p>
+            <a
+              href="/apps/defrag/workspace"
+              className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+            >
+              Open Defrag →
+            </a>
+          </div>
         </div>
-      )}
+      }}
 
       <div className="flex-1">
         {libraryLoading ? (
