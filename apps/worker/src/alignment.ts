@@ -392,7 +392,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
         media: { audioOverviewAvailable: true },
         confidence: {
           score: alignmentConfidence?.confidence ?? 0.5,
-          strength: alignmentConfidence?.stabilityScore >= 0.7 ? "high" : alignmentConfidence?.stabilityScore >= 0.4 ? "medium" : "low",
+          strength: alignmentConfidence?.stabilityScore >= 0.7 ? "high" : alignmentConfidence?.stabilityScore >= 0.3 ? "medium" : "low",
         },
       };
       return new Response(JSON.stringify(responseWithMedia), {

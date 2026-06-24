@@ -80,8 +80,8 @@ function scoreDefrag(output: Record<string, unknown>): DefragScoring {
   if (output.theRepeat && typeof output.theRepeat === "string" && output.theRepeat.length > 20) { score += 0.15; signals++ }
   if (output.oldRole && typeof output.oldRole === "string" && output.oldRole.length > 10) { score += 0.15; signals++ }
   if (output.strainPattern && typeof output.strainPattern === "string") { score += 0.1; signals++ }
-  if (output.alignment && typeof output.alignment === "string" && output.alignment.length > 20) { score += 0.2; signals++ }
-  if (output.bestNextResponse && typeof output.bestNextResponse === "object") { score += 0.2; signals++ }
+  if (output.alignment && typeof output.alignment === "string" && output.alignment.length > 10) { score += 0.2; signals++ }
+  if (output.bestNextResponse && (typeof output.bestNextResponse === "object" || typeof output.bestNextResponse === "string")) { score += 0.2; signals++ }
 
   // Sparse results are intentional — 3+ fields with good content = high
   const signalStrength: SignalStrength = signals >= 4 ? "high" : signals >= 2 ? "medium" : "low"
@@ -95,7 +95,7 @@ function scoreAlignment(output: Record<string, unknown>): AlignmentScoring {
   if (output.whatIsTrue && typeof output.whatIsTrue === "string" && output.whatIsTrue.length > 20) { score += 0.2; stability += 0.2 }
   if (output.whatIsYours && typeof output.whatIsYours === "string" && output.whatIsYours.length > 15) { score += 0.2; stability += 0.3 }
   if (output.whatIsNotYours && typeof output.whatIsNotYours === "string") { score += 0.15; stability += 0.2 }
-  if (output.theShift && typeof output.theShift === "string" && output.theShift.length > 20) { score += 0.25; stability += 0.3 }
+  if (output.theShift && typeof output.theShift === "string" && output.theShift.length > 20) { score += 0.25; stability += 0.4 }
   if (output.nextStep && typeof output.nextStep === "string" && output.nextStep.length > 10) { score += 0.2 }
 
   return { confidence: Math.min(score, 1), stabilityScore: Math.min(stability, 1) }
