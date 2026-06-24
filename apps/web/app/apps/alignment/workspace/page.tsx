@@ -155,7 +155,7 @@ export default function AlignmentWorkspacePage() {
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Context</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">How Alignment works</p>
       </div>
       <div className="px-5 pt-6 pb-5">
         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">How this works</p>
@@ -191,7 +191,7 @@ export default function AlignmentWorkspacePage() {
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Library</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Saved results</p>
       </div>
 
       {result && (
@@ -268,7 +268,7 @@ export default function AlignmentWorkspacePage() {
   const main = (
     <div className="flex flex-col h-full">
       <div className="h-11 px-6 flex items-center border-b border-white/[0.06] shrink-0">
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#f4efe9]">Alignment</span>
+        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Alignment</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
@@ -296,7 +296,7 @@ export default function AlignmentWorkspacePage() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/60 rounded-full animate-spin" />
-            <p className="text-[13px] text-[#76716b]">Finding your path…</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Reading your Baseline Design…</p>
           </div>
         )}
 
@@ -321,10 +321,10 @@ export default function AlignmentWorkspacePage() {
               <Section label="What is actually happening"              value={result.whatIsTrue} />
               <Section label="What is yours to carry"    value={result.whatIsYours} />
               <Section label="What is not yours to carry"          value={result.whatIsNotYours} />
-              <Section label="The shift"                 value={result.theShift} />
-              <Section label="One next step"             value={result.nextStep} />
-              <Section label="What to avoid"             value={result.avoid} />
-              <Section label="Your alignment"            value={result.alignment} />
+              <Section label="What a clean response looks like" value={result.theShift} />
+              <Section label="One move"                  value={result.nextStep} />
+              <Section label="What to release"           value={result.avoid} />
+              <Section label="What staying true looks like" value={result.alignment} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -335,9 +335,10 @@ export default function AlignmentWorkspacePage() {
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="How do I move in a way that stays true?"
+            placeholder="Describe what's pulling at you — a situation, a decision, a conflict."
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
+            style={{ fontSize: "16px" }}
             onKeyDown={e => {
               if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() }
             }}
@@ -348,7 +349,7 @@ export default function AlignmentWorkspacePage() {
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
               className="h-8 px-5 border border-[#c8c2bc]/40 text-[#c8c2bc] text-[11px] font-medium tracking-wide hover:bg-[#c8c2bc]/10 hover:border-[#c8c2bc]/60 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-              style={{ borderRadius: 2 }}
+              style={{ borderRadius: "var(--radius-button)" }}
             >
               {isLoading ? "…" : "Align"}
             </button>

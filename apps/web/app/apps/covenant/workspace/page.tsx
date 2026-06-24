@@ -166,7 +166,7 @@ export default function CovenantWorkspacePage() {
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Context</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">How Covenant works</p>
       </div>
       <div className="px-5 pt-6 pb-5">
         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50 mb-3">How this works</p>
@@ -204,7 +204,7 @@ export default function CovenantWorkspacePage() {
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Library</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Saved results</p>
       </div>
 
       {result && (
@@ -274,7 +274,7 @@ export default function CovenantWorkspacePage() {
   const main = (
     <div className="flex flex-col h-full">
       <div className="h-11 px-6 flex items-center border-b border-white/[0.06] shrink-0">
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#f4efe9]">Covenant</span>
+        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Covenant</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
@@ -329,13 +329,13 @@ export default function CovenantWorkspacePage() {
 
               {/* Story sections */}
               <div className="px-6 py-6">
-                <Section label="The pattern you're in"   value={result.pattern} />
-                <Section label="Their story"             value={result.story} />
+                <Section label="The pattern"             value={result.pattern} />
+                <Section label="What happened"           value={result.story} />
                 <Section label="What broke"              value={result.whatBroke} />
-                <Section label="How God met them"        value={result.howGodMet} />
-                <Section label="What they learned"       value={result.whatTheyLearned} />
+                <Section label="How presence showed up"  value={result.howGodMet} />
+                <Section label="What they came to understand" value={result.whatTheyLearned} />
                 <Section label="What this means for you" value={result.forYou} />
-                <Section label="One next step"           value={result.nextStep} />
+                <Section label="One honest move"         value={result.nextStep} />
 
                 {/* Scripture chips */}
                 {result.scriptures?.length > 0 && (
@@ -376,6 +376,7 @@ export default function CovenantWorkspacePage() {
             placeholder="What does this moment mean in the larger story?"
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
+            style={{ fontSize: "16px" }}
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
