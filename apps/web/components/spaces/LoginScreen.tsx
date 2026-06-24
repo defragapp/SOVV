@@ -143,7 +143,7 @@ export default function LoginScreen() {
           </div>
 
           {/* Glass panel */}
-          <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: 20 }}>
+          <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: "var(--radius-container)" }}>
 
             {/* Mode tabs */}
             <div className="mb-8 flex border-b border-white/[0.08]">
@@ -175,7 +175,7 @@ export default function LoginScreen() {
                   autoComplete="email"
                   placeholder="you@example.com"
                   className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
-                  style={{ borderRadius: 12, fontSize: "16px" }}
+                  style={{ borderRadius: "var(--radius-input)", fontSize: "16px" }}
                 />
               </div>
 
@@ -190,7 +190,7 @@ export default function LoginScreen() {
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
                   placeholder="••••••••"
                   className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
-                  style={{ borderRadius: 12, fontSize: "16px" }}
+                  style={{ borderRadius: "var(--radius-input)", fontSize: "16px" }}
                 />
               </div>
 

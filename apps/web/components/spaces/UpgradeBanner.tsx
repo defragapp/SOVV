@@ -69,7 +69,7 @@ export default function UpgradeBanner() {
 
         {/* Wordmark */}
         <div className="mb-12">
-          <span className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase font-medium">
+          <span className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase">
             SOVEREIGN.OS
           </span>
           <div className="h-px w-full bg-white/[0.06] mt-4" />
