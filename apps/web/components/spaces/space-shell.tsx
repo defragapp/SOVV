@@ -46,11 +46,12 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
               <Link
                 key={s.href}
                 href={s.href}
-                className={`px-3 py-1.5 rounded-lg font-mono text-[10px] tracking-[0.12em] uppercase transition-colors ${
+                className={`px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] uppercase transition-colors ${
                   spaceName === s.label
                     ? "bg-white/[0.08] text-[#f4efe9]"
                     : "text-[#76716b] hover:text-[#a8a29a] hover:bg-white/[0.04]"
                 }`}
+                style={{ borderRadius: "var(--radius-minimal)" }}
               >
                 {s.label}
               </Link>

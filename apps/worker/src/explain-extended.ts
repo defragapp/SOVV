@@ -260,16 +260,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     workspaceSource: "DEFRAG",
     createdAt: new Date().toISOString(),
     title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
-    summary: parsed.response || "",
-    activePattern: parsed.activePattern || "This section needs more context.",
-    theRepeat: parsed.theRepeat || "This section needs more context.",
-    oldRole: parsed.oldRole || "This section needs more context.",
-    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || "This section needs more context.",
-    strainPattern: parsed.strainPattern || "This section needs more context.",
-    giftUnderStrain: parsed.giftUnderStrain || "This section needs more context.",
-    alignment: parsed.alignment || "This section needs more context.",
-    bestNextResponse: parsed.bestNextResponse || { summary: "This section needs more context.", phrasing: [] },
-    conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] },
+    
     
 
 

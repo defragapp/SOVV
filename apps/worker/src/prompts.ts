@@ -190,36 +190,7 @@ COVENANT RULES:
 
 // ── Output contracts (enforced JSON schemas) ──────────────────────────────────
 
-const DEFRAG_OUTPUT_CONTRACT = `OUTPUT FORMAT — JSON only, no markdown, no code fences:
-{
-  "summary": "1-2 sentences: what is active right now",
-  "activePattern": "name the pattern in plain language — specific, not generic",
-  "theRepeat": "what keeps happening — the loop that forms",
-  "oldRole": "the role the user is being pulled into — name it plainly",
-  "whatYouLearnedToCarry": "what shaped this pattern — brief, structural",
-  "strainPattern": "how this shows up under pressure — observable behavior",
-  "giftUnderStrain": "what is working even now — honest, not forced",
-  "alignment": "what gives this moment a better chance — one clear move",
-  "bestNextResponse": {
-    "summary": "one specific, actionable move — not a list",
-    "phrasing": ["specific language if useful — optional"]
-  },
-  "conversationalSteering": {
-    "do": ["what to do — specific"],
-    "avoid": ["what not to do — specific"]
-  }
-}
 
-FIELD RULES:
-- Every field must be specific to this situation
-- "activePattern" must name the pattern, not describe feelings
-- "oldRole" must name the role (e.g., "the fixer", "the translator", "the one who holds it together")
-- "alignment" is the most important field — one clear move, not advice
-- "phrasing" is optional — only include if specific language is genuinely useful
-- Max 2 sentences per field
-- Use short declarative lines
-- Prefer ordinary words used precisely
-`
 
 const ALIGNMENT_OUTPUT_CONTRACT = `OUTPUT FORMAT — JSON only, no markdown, no code fences:
 {

@@ -46,30 +46,7 @@ export function ResultCard({
 }: ResultCardProps) {
   const [copied, setCopied] = React.useState(false)
 
-  // Section labels locked to canonical Defrag output structure.
-  // These 7 labels are the system contract — do not change them.
-  //
-  // Field mapping:
-  //   activePattern         → What's active
-  //   theRepeat             → You  (your pattern under this pressure)
-  //   oldRole               → Them  (how the other side tends to move)
-  //   whatYouLearnedToCarry → What forms between you  (the loop)
-  //   strainPattern         → Why it's sharper now  (timing/amplification)
-  //   alignment             → What changes this  (primary shift field)
-  //   giftUnderStrain       → What changes this  (fallback if alignment absent)
-  //
-  // "Next move" is rendered separately with emphasis below.
-  const sections = [
-    { label: "What's active",          value: result.activePattern },
-    { label: "You",                    value: result.theRepeat },
-    { label: "Them",                   value: result.oldRole },
-    { label: "What forms between you", value: result.whatYouLearnedToCarry },
-    { label: "Why it's sharper now",   value: result.strainPattern },
-    {
-      label: "What changes this",
-      value: result.alignment || result.giftUnderStrain,
-    },
-  ].filter(s => s.value)
+  
 
   const response = result.bestNextResponse
   const steering = result.conversationalSteering
