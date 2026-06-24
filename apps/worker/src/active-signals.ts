@@ -209,7 +209,37 @@ export function selectActiveSignals(
   }
 
   // ── Evidence tags (internal, not shown to user) ───────────────────────────
-  const evidenceTags: string[] = []
+  // ── Cross-framework synthesis ─────────────────────────────────────────────────
+  // Compound signals from multiple frameworks produce stronger behavioral insights
+  const gk = dataset.frameworks?.geneKeys
+
+  // HD type + Moon sign compound
+  if (hd?.type && ast?.placements) {
+    const moon = ast.placements.find(p => p.body === "Moon")
+    if (moon) {
+      const waterMoon = ["Pisces", "Cancer", "Scorpio"].includes(moon.sign)
+      const fireMoon = ["Aries", "Leo", "Sagittarius"].includes(moon.sign)
+      const isProjector = hd.type?.includes("Projector")
+      const isManifestar = hd.type?.includes("Manifestor") || hd.type?.includes("Manifesting")
+      if (isProjector && waterMoon && !traitLines.some(t => t.includes("absorb"))) {
+        traitLines.push("Absorbs others' emotional states — needs recognition before acting")
+      }
+      if (isManifestar && fireMoon && !traitLines.some(t => t.includes("initiat"))) {
+        traitLines.push("Initiates quickly under pressure — others may not be ready")
+      }
+    }
+  }
+
+  // Gate 51 (shock/initiation) + Aries sun compound
+  if (hd?.gates && ast?.placements) {
+    const hasGate51 = (hd.gates as any[]).some((g: any) => g.gate === 51)
+    const sun = ast.placements.find(p => p.body === "Sun")
+    if (hasGate51 && sun?.sign === "Aries" && !traitLines.some(t => t.includes("shock"))) {
+      traitLines.push("Moves first under shock — initiates before others have processed")
+    }
+  }
+
+    const evidenceTags: string[] = []
   if (hd?.profile) evidenceTags.push(`HD ${hd.profile}`)
   if (hd?.type) evidenceTags.push(hd.type)
   if (hd?.authority) evidenceTags.push(hd.authority)
@@ -306,6 +336,32 @@ export function buildTimingSignals(dataset: BaselineDesignDataset): TimingSignal
   if (bodies["Venus"]?.retrograde) {
     sensitivity = "high"
     notes.push("Venus retrograde — relational dynamics are more charged than usual")
+  }
+
+  // ── Transit-based timing signals ─────────────────────────────────────────────
+  // Check planetary positions for high-pressure configurations
+  // Saturn in Capricorn/Aquarius → structural pressure, accountability
+  if (bodies["Saturn"]?.sign && ["Capricorn", "Aquarius"].includes(bodies["Saturn"].sign)) {
+    if (tolerance !== "low") tolerance = "low"
+    notes.push("Saturn in " + bodies["Saturn"].sign + " — structural pressure, accountability active")
+  }
+
+  // Mars in Aries/Scorpio → high action energy, lower patience
+  if (bodies["Mars"]?.sign && ["Aries", "Scorpio"].includes(bodies["Mars"].sign)) {
+    if (urgency !== "high") urgency = "moderate"
+    notes.push("Mars in " + bodies["Mars"].sign + " — action energy high, patience lower")
+  }
+
+  // Moon in water signs → emotional sensitivity elevated
+  if (bodies["Moon"]?.sign && ["Pisces", "Cancer", "Scorpio"].includes(bodies["Moon"].sign)) {
+    if (sensitivity !== "high") sensitivity = "high"
+    notes.push("Moon in " + bodies["Moon"].sign + " — emotional sensitivity elevated")
+  }
+
+  // Jupiter in fire signs → expansion, optimism, may move too fast
+  if (bodies["Jupiter"]?.sign && ["Aries", "Leo", "Sagittarius"].includes(bodies["Jupiter"].sign)) {
+    if (pacing !== "slow") pacing = "fast"
+    notes.push("Jupiter in " + bodies["Jupiter"].sign + " — expansion energy, may move faster than usual")
   }
 
   // Derive state: reactive if any signal is elevated
