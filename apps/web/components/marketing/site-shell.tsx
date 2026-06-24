@@ -54,7 +54,24 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             SOVEREIGN.OS
           </Link>
 
-          
+          <div className="flex items-center gap-6">
+            <nav className="hidden md:flex items-center gap-6">
+              {NAV_LINKS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-body text-[#a8a29a] hover:text-[#f4efe9] transition-colors text-[13px]"
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <Link href="https://app.defrag.app/app/login" className="btn-ghost">
+                Sign in
+              </Link>
+              <Link href="https://app.defrag.app/app/login" className="btn-rect">
+                Enter
+              </Link>
+            </nav>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden text-[#a8a29a] hover:text-[#f4efe9] transition-colors p-2"
