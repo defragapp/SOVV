@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
 
-        <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: 20 }}>
+        <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: "var(--radius-container)" }}>
           {sent ? (
             <div className="text-center">
               <p className="text-sm text-[#f4efe9] leading-relaxed mb-2">

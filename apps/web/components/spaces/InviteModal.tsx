@@ -91,7 +91,7 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
             transition={{ duration: 0.3, ease }}
             className="fixed inset-x-4 bottom-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md z-50"
           >
-            <div className="border border-white/[0.10] bg-[#0c0a0d] shadow-2xl" style={{ borderRadius: 18 }}>
+            <div className="border border-white/[0.10] bg-[#0c0a0d] shadow-2xl" style={{ borderRadius: "var(--radius-container)" }}>
 
               <div className="px-6 pt-6 pb-4 border-b border-white/[0.06]">
                 <div className="flex items-center justify-between">

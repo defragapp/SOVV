@@ -145,7 +145,7 @@ export default function InvitePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease }}
           >
-            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8" style={{ borderRadius: 18 }}>
+            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8" style={{ borderRadius: "var(--radius-container)" }}>
               <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-5">Private invitation</p>
               <h1 className="font-serif text-2xl text-[#f4efe9] leading-tight mb-4">
                 You've been invited into a private Sovereign.os reflection.
@@ -183,7 +183,7 @@ export default function InvitePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease }}
           >
-            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8" style={{ borderRadius: 18 }}>
+            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8" style={{ borderRadius: "var(--radius-container)" }}>
               <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-5">One more step</p>
               <h2 className="font-serif text-xl text-[#f4efe9] mb-3">Set your Baseline Design first.</h2>
               <p className="text-[13px] text-[#76716b] leading-relaxed mb-6">
@@ -213,7 +213,7 @@ export default function InvitePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease }}
           >
-            <div className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden" style={{ borderRadius: 18 }}>
+            <div className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}>
               <div className="px-6 py-5 border-b border-white/[0.06]">
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Your reflection</p>
               </div>

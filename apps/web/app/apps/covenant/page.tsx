@@ -285,7 +285,7 @@ export default function CovenantPage() {
       </div>
 
       <div className="flex-none px-6 pb-6">
-        <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: 16 }}>
+        <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: "var(--radius-container)" }}>
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}

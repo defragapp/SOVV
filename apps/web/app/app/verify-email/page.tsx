@@ -83,7 +83,7 @@ export default function VerifyEmailPage() {
           </Link>
         </div>
 
-        <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8 text-center" style={{ borderRadius: 20 }}>
+        <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8 text-center" style={{ borderRadius: "var(--radius-container)" }}>
           {stage === "verifying" && (
             <div className="flex justify-center mb-6">
               <div className="w-5 h-5 border border-white/20 border-t-white/60 rounded-full animate-spin" />

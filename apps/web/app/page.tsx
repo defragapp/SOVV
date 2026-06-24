@@ -116,7 +116,7 @@ function SpacePreview() {
       <div
         className="pointer-events-none absolute -inset-px"
         style={{
-          borderRadius: 20,
+          borderRadius: "var(--radius-container)",
           background: "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(224,116,58,0.10) 0%, transparent 70%)",
         }}
         aria-hidden
@@ -124,7 +124,7 @@ function SpacePreview() {
 
       <div
         className="relative border border-white/[0.10] bg-[#0c0a0d] overflow-hidden"
-        style={{ borderRadius: 18, boxShadow: "0 32px 80px -16px rgba(0,0,0,0.7)" }}
+        style={{ borderRadius: "var(--radius-container)", boxShadow: "0 32px 80px -16px rgba(0,0,0,0.7)" }}
       >
         {/* ── Titlebar ── */}
         <div className="h-11 border-b border-white/[0.07] bg-[#08070a]/90 flex items-center px-4 gap-3 shrink-0">

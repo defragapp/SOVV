@@ -68,7 +68,7 @@ export default function ResetPasswordPage() {
           </Link>
         </div>
 
-        <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: 20 }}>
+        <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: "var(--radius-container)" }}>
 
           {stage === "invalid" && (
             <div className="text-center">

@@ -98,7 +98,7 @@ export function ResultCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="border border-white/[0.08] bg-white/[0.02] overflow-hidden"
-      style={{ borderRadius: 16 }}
+      style={{ borderRadius: "var(--radius-container)" }}
     >
       {/* Card header */}
       <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between bg-[#08070a]/60">
