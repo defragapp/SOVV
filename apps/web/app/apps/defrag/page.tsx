@@ -368,7 +368,7 @@ export default function DefragEntryPage() {
         <div className="border-t border-white/[0.04] pt-5 flex flex-col gap-3">
           {["Something keeps happening", "I need to respond well", "I am carrying too much", "Boundaries you can't hold"].map(item => (
             <div key={item} className="flex items-start gap-2">
-              <span className="text-[#e0743a]/30 text-[10px] mt-0.5 shrink-0">—</span>
+              <span className="text-[#4f4b47] text-[10px] mt-0.5 shrink-0">—</span>
               <span className="text-[11px] text-[#4f4b47] leading-relaxed">{item}</span>
             </div>
           ))}
@@ -399,7 +399,7 @@ export default function DefragEntryPage() {
           </div>
         ) : brief?.cleanerMove ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.8, ease }} className="flex flex-col gap-4">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/40 mb-1">What belongs to you</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">What belongs to you</p>
             {brief.cleanerMove.lines.slice(0, 2).map((line, i) => (
               <p key={i} className={`leading-relaxed ${i === 0 ? "text-[13px] text-[#f4efe9]" : "text-[12px] text-[#76716b]"}`}>{line}</p>
             ))}
@@ -437,7 +437,7 @@ export default function DefragEntryPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
             className="flex flex-col gap-6 pt-8">
             <div>
-              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/40 mb-3">Defrag</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Defrag</p>
               <p className="text-[22px] text-[#f4efe9] leading-snug mb-3">
                 Separate the moment from the pattern.
               </p>

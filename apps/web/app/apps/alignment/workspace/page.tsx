@@ -158,7 +158,7 @@ export default function AlignmentWorkspacePage() {
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">How Alignment works</p>
       </div>
       <div className="px-5 pt-6 pb-5">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">How this works</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">How this works</p>
         <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
           Your Baseline Design is your fixed center — how you naturally operate. The live sky is the emotional weather you're moving through right now. Alignment uses both to show you the path back to yourself.
         </p>
@@ -170,7 +170,7 @@ export default function AlignmentWorkspacePage() {
             "What to release",
           ].map((item) => (
             <div key={item} className="flex items-start gap-2">
-              <span className="text-[#e0743a]/40 text-[10px] mt-0.5 shrink-0">→</span>
+              <span className="text-[#4f4b47] text-[10px] mt-0.5 shrink-0">—</span>
               <span className="text-[12px] text-[#76716b] leading-relaxed">{item}</span>
             </div>
           ))}

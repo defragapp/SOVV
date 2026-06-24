@@ -381,7 +381,7 @@ export default function AlignmentEntryPage() {
       </div>
       <div className="px-5 pt-6 pb-5 flex flex-col gap-6">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/40 mb-3">What this is</p>
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">What this is</p>
           <p className="text-[12px] text-[#76716b] leading-relaxed">
             Your fixed center. The live sky above you. Alignment uses both to show you the path back to yourself — when a situation, conversation, or decision has pulled you off course.
           </p>
@@ -432,7 +432,7 @@ export default function AlignmentEntryPage() {
             transition={{ duration: 0.5, delay: 0.8, ease }}
             className="flex flex-col gap-4"
           >
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/40 mb-1">The move</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">The move</p>
             {brief.action.slice(0, 2).map((line, i) => (
               <p key={i} className={`leading-relaxed ${i === 0 ? "text-[13px] text-[#f4efe9]" : "text-[12px] text-[#76716b]"}`}>
                 {line}
@@ -486,7 +486,7 @@ export default function AlignmentEntryPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
             className="flex flex-col gap-6 pt-8">
             <div>
-              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/40 mb-3">Alignment</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Alignment</p>
               <p className="text-[22px] text-[#f4efe9] leading-snug mb-3">
                 Find what belongs to you.
               </p>

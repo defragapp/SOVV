@@ -169,7 +169,7 @@ export default function CovenantWorkspacePage() {
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">How Covenant works</p>
       </div>
       <div className="px-5 pt-6 pb-5">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50 mb-3">How this works</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">How this works</p>
         <p className="text-[12px] text-[#4f4b47] leading-relaxed mb-5">
           Covenant connects what you're walking through to the real human stories in Scripture. Your Baseline Design is already active — Covenant uses it to find the story that fits your moment.
         </p>
@@ -192,7 +192,7 @@ export default function CovenantWorkspacePage() {
           ))}
         </div>
         <div className="mt-6 pt-5 border-t border-white/[0.04]">
-          <Link href="/apps/covenant" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#76716b] transition-colors">
+          <Link href="/apps/covenant" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors">
             ← Covenant overview
           </Link>
         </div>
@@ -365,7 +365,7 @@ export default function CovenantWorkspacePage() {
                     <div className="flex flex-col gap-2">
                       {result.reflectionPrompts.map((p: string, i: number) => (
                         <div key={i} className="flex items-start gap-2.5">
-                          <span className="text-[#e0743a]/30 text-xs shrink-0 mt-0.5">—</span>
+                          <span className="text-[#4f4b47] text-xs shrink-0 mt-0.5">—</span>
                           <p className="text-[12px] text-[#4f4b47] leading-relaxed">{p}</p>
                         </div>
                       ))}

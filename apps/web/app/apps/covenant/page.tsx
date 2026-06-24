@@ -272,7 +272,7 @@ export default function CovenantPage() {
                   <div className="flex flex-col gap-2">
                     {result.reflectionPrompts.map((p: string, i: number) => (
                       <div key={i} className="flex items-start gap-2.5">
-                        <span className="text-[#e0743a]/40 text-xs shrink-0 mt-0.5">—</span>
+                        <span className="text-[#4f4b47] text-xs shrink-0 mt-0.5">—</span>
                         <p className="text-[12px] text-[#76716b] leading-relaxed">{p}</p>
                       </div>
                     ))}
