@@ -101,7 +101,9 @@ export default function CovenantWorkspacePage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.message || data.error || "Something went wrong.")
+        setError(data.error === "daily_limit_reached"
+          ? "You've reached your free daily limit. Upgrade to Pro to continue."
+          : data.message || data.error || "Something went wrong.")
         return
       }
       setResult(data)
