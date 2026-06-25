@@ -84,7 +84,7 @@ export default function CheckoutPage() {
 
         {/* Wordmark */}
         <div className="mb-10 text-center">
-          <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+          <span className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase font-medium">
             SOVEREIGN.OS
           </span>
           <div className="h-px w-full bg-white/[0.06] mt-4" />
@@ -126,7 +126,7 @@ export default function CheckoutPage() {
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-base font-medium text-[#f4efe9]">Sovereign.os Pro</span>
-                <span className="font-serif text-lg text-[#f4efe9]">$20<span className="text-sm text-[#76716b] font-sans font-normal">/mo</span></span>
+                <span className="font-serif text-lg text-[#f4efe9]">$12<span className="text-sm text-[#76716b]">/mo</span></span>
               </div>
               <p className="text-sm text-[#a8a29a]">
                 {loading ? "Redirecting to checkout…" : "Unlimited sessions · All spaces · Full Library"}
@@ -147,7 +147,7 @@ export default function CheckoutPage() {
 
           {/* What Pro includes */}
           <div className="border-t border-white/[0.06] pt-6 space-y-2.5">
-            <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-4">Pro includes</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#76716b] mb-4">Pro includes</p>
             {[
               "Everything in Free",
               "Unlimited sessions",

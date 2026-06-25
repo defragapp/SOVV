@@ -116,7 +116,7 @@ function SpacePreview() {
       <div
         className="pointer-events-none absolute -inset-px"
         style={{
-          borderRadius: 20,
+          borderRadius: "var(--radius-container)",
           background: "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(224,116,58,0.10) 0%, transparent 70%)",
         }}
         aria-hidden
@@ -124,15 +124,15 @@ function SpacePreview() {
 
       <div
         className="relative border border-white/[0.10] bg-[#0c0a0d] overflow-hidden"
-        style={{ borderRadius: 18, boxShadow: "0 32px 80px -16px rgba(0,0,0,0.7)" }}
+        style={{ borderRadius: "var(--radius-container)", boxShadow: "0 32px 80px -16px rgba(0,0,0,0.7)" }}
       >
         {/* ── Titlebar ── */}
         <div className="h-11 border-b border-white/[0.07] bg-[#08070a]/90 flex items-center px-4 gap-3 shrink-0">
           <div className="flex gap-1.5">
-            {[0, 1, 2].map((i) => <span key={i} className="w-2.5 h-2.5 rounded-full bg-white/[0.08]" />)}
+            {[0, 1, 2].map((i) => <span key={i} className="w-2.5 h-2.5 rounded-sm bg-white/[0.08]" />)}
           </div>
           <div className="flex-1 flex justify-center">
-            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47]">Sovereign.os</span>
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#4f4b47]">Sovereign.os</span>
           </div>
           <div className="flex gap-0.5">
             {panels.map((p) => (
@@ -158,7 +158,7 @@ function SpacePreview() {
             {active === "context" && (
               <motion.div key="context" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
                 <div className="px-6 pt-5 pb-2 border-b border-white/[0.05]">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/50">{BASELINE.label}</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50">{BASELINE.label}</p>
                 </div>
                 <div className="px-6 py-2">
                   {BASELINE.facts.map((fact, i) => (
@@ -183,7 +183,7 @@ function SpacePreview() {
                   ))}
                 </div>
                 <div className="px-6 py-3 border-t border-white/[0.04]">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Active in every result · never exposed in outputs</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Active in every result · never exposed in outputs</p>
                 </div>
               </motion.div>
             )}
@@ -195,7 +195,7 @@ function SpacePreview() {
                 {/* Input area */}
                 <div className="px-6 pt-6 pb-4 border-b border-white/[0.05]">
                   <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-white/20 mt-2 shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-sm bg-white/20 mt-2 shrink-0" />
                     <div className="flex-1">
                       <p className="text-[14px] text-[#f4efe9] leading-relaxed" style={{ minHeight: 44 }}>
                         {typed}
@@ -214,8 +214,8 @@ function SpacePreview() {
                         animate={{ opacity: 1 }}
                         className="flex items-center justify-end gap-2 mt-3"
                       >
-                        <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#4f4b47]">Sent</span>
-                        <span className="w-1 h-1 rounded-full bg-[#e0743a]/40" />
+                        <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Sent</span>
+                        <span className="w-1 h-1 rounded-sm bg-[#e0743a]/40" />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -234,13 +234,13 @@ function SpacePreview() {
                         {[0, 1, 2].map((i) => (
                           <motion.span
                             key={i}
-                            className="w-1 h-1 rounded-full bg-[#e0743a]/50"
+                            className="w-1 h-1 rounded-sm bg-[#e0743a]/50"
                             animate={{ opacity: [0.3, 1, 0.3] }}
                             transition={{ duration: 0.9, delay: i * 0.2, repeat: Infinity }}
                           />
                         ))}
                       </div>
-                      <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
+                      <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">
                         Reading your Baseline Design
                       </span>
                     </motion.div>
@@ -253,8 +253,8 @@ function SpacePreview() {
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
                       {/* Baseline Design source bar */}
                       <div className="px-6 py-2.5 border-b border-white/[0.04] flex items-center gap-2 bg-[#e0743a]/[0.03]">
-                        <span className="w-1 h-1 rounded-full bg-[#e0743a]/50" />
-                        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50">
+                        <span className="w-1 h-1 rounded-sm bg-[#e0743a]/50" />
+                        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70">
                           Baseline Design active · {BASELINE.label.split("·")[0].trim()}
                         </span>
                       </div>
@@ -267,13 +267,13 @@ function SpacePreview() {
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.4, ease }}
                               className={`px-6 py-4 border-b border-white/[0.04] last:border-0 ${
-                                row.highlight ? "bg-[#e0743a]/[0.05]" : ""
+                                row.highlight ? "bg-[#e0743a]/[0.08]" : "bg-white/[0.01]"
                               }`}
                             >
                               {/* Label row */}
                               <div className="flex items-center justify-between mb-2">
                                 <span className={`font-mono text-[9px] uppercase tracking-[0.2em] ${
-                                  row.highlight ? "text-[#e0743a]/80" : "text-[#4f4b47]"
+                                  row.highlight ? "text-[#e0743a]/90" : "text-[#76716b]"
                                 }`}>
                                   {row.label}
                                 </span>
@@ -283,7 +283,7 @@ function SpacePreview() {
                                     {row.evidence.map((chip) => (
                                       <span
                                         key={chip}
-                                        className="font-mono text-[8px] tracking-[0.08em] px-1.5 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/50 bg-[#e0743a]/[0.04]"
+                                        className="font-mono text-[8px] tracking-[0.1em] px-1.5 py-0.5 border border-[#e0743a]/30 text-[#e0743a]/75 bg-[#e0743a]/[0.06]"
                                         style={{ borderRadius: 3 }}
                                       >
                                         {chip}
@@ -296,7 +296,7 @@ function SpacePreview() {
                               <p className={`text-[13px] leading-relaxed ${
                                 row.highlight
                                   ? "text-[#f4efe9] font-medium"
-                                  : "text-[#a8a29a]"
+                                  : "text-[#c8c2bc]"
                               }`}>
                                 {row.value}
                               </p>
@@ -315,7 +315,7 @@ function SpacePreview() {
             {active === "library" && (
               <motion.div key="library" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
                 <div className="px-6 pt-5 pb-2 border-b border-white/[0.05]">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#a8a29a]/40">Saved results</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]/40">Saved results</p>
                 </div>
                 <div className="px-6 py-2">
                   {[
@@ -333,14 +333,14 @@ function SpacePreview() {
                     >
                       <div className="flex items-center gap-4">
                         <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47] w-14 shrink-0">{item.space}</span>
-                        <span className="text-[13px] text-[#76716b] group-hover:text-[#c8c2bc] transition-colors">{item.title}</span>
+                        <span className="text-[13px] text-[#a8a29a] group-hover:text-[#f4efe9] transition-colors">{item.title}</span>
                       </div>
                       <span className="font-mono text-[9px] text-[#4f4b47] shrink-0">{item.date}</span>
                     </motion.div>
                   ))}
                 </div>
                 <div className="px-6 py-3 border-t border-white/[0.04]">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Save to Sovereign before the moment disappears</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Save to Sovereign before the moment disappears</p>
                 </div>
               </motion.div>
             )}
@@ -438,136 +438,46 @@ export default function Home() {
           }}
         />
 
-        {/* Hero content — lower-middle third, anchored to bottom */}
+        {/* Hero content — headline + single CTA only. Image breathes. */}
         <div
           className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center text-center"
-          style={{ paddingBottom: "max(clamp(2.5rem, 7vh, 5rem), env(safe-area-inset-bottom, 0px))" }}
+          style={{ paddingBottom: "max(clamp(3rem, 8vh, 6rem), env(safe-area-inset-bottom, 0px))" }}
         >
-          {/* Platform label */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-            className="font-mono uppercase tracking-[0.3em] text-[#f4efe9]/30 mb-5"
-            style={{ fontSize: "0.65rem" }}
-          >
-            Sovereign.os
-          </motion.p>
-
-          {/* Headline — product-led, anchored, calm */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.0, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-            className="font-serif text-[#f4efe9] text-balance leading-[1.06] tracking-[-0.02em] px-6"
-            style={{ fontSize: "clamp(2.2rem, 5.5vw, 5rem)", maxWidth: "20ch" }}
+            transition={{ duration: 1.1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="font-serif text-[#f4efe9] text-balance leading-[1.06] tracking-[-0.02em] px-8"
+            style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", maxWidth: "22ch" }}
           >
-            See what&apos;s happening —
+            Healing isn&apos;t optional.
             <br />
-            <span style={{ color: "rgba(244,239,233,0.52)" }}>
-              before it repeats.
+            <span style={{ color: "rgba(244,239,233,0.48)" }}>
+              Holding the pain is.
             </span>
           </motion.h1>
 
-          {/* Subhead */}
-          <motion.p
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-5 max-w-sm text-[#a8a29a] leading-relaxed px-6"
-            style={{ fontSize: "clamp(0.875rem, 1.8vw, 1rem)" }}
-          >
-            A private intelligence system built around your Baseline Design —
-            so each moment is read in context, not from scratch.
-          </motion.p>
-
-          {/* Embedded live system surface */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.48, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-6 w-full max-w-[540px] mx-auto px-6 sm:px-0"
-          >
-            <div
-              className="overflow-hidden text-left"
-              style={{
-                borderRadius: 14,
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                background: "linear-gradient(180deg, rgba(11,11,11,0.42), rgba(11,11,11,0.58))",
-                border: "1px solid rgba(255,255,255,0.03)",
-              }}
-            >
-              <div className="px-4 py-3 border-b border-white/[0.06]">
-                <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#f4efe9]/38 mb-1">Moment</p>
-                <p className="text-[12px] text-[#76716b] leading-relaxed italic">
-                  &ldquo;I thought I was being clear, but now it feels worse.&rdquo;
-                </p>
-              </div>
-              {[
-                {
-                  label: "What’s active",
-                  value: "You’re trying to clear the tension by naming it. It’s landing with more pressure than you expect.",
-                  delay: 0.56,
-                  highlight: false,
-                },
-                {
-                  label: "What forms between you",
-                  value: "The more you try to clear it up, the more pressure builds.",
-                  delay: 0.58,
-                  highlight: false,
-                },
-                {
-                  label: "Next move",
-                  value: "Say the part that matters. Then leave room for it to land.",
-                  delay: 0.60,
-                  highlight: true,
-                },
-              ].map((row) => (
-                <motion.div
-                  key={row.label}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4, delay: row.delay, ease: [0.16, 1, 0.3, 1] }}
-                  className={`px-4 py-3 border-b border-white/[0.05] last:border-0 ${row.highlight ? "border-t border-white/[0.06] bg-white/[0.02]" : ""}`}
-                >
-                  <p className={`font-mono text-[9px] uppercase tracking-[0.12em] mb-1 ${row.highlight ? "text-[#e0743a]/60" : "text-[#f4efe9]/38"}`}>
-                    {row.label}
-                  </p>
-                  <p className={`text-[12px] leading-relaxed ${row.highlight ? "text-[#f4efe9] font-medium" : "text-[#a8a29a]"}`}>
-                    {row.value}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-6 flex flex-col sm:flex-row gap-3 items-center px-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-8"
           >
             <Link href={APP_URL} className="btn-primary">
               Enter Sovereign.os
-            </Link>
-            <Link href="/how-it-works" className="btn-secondary">
-              See how it works
             </Link>
           </motion.div>
         </div>
       </section>
 
-      {/* ── INTERACTIVE NOTEBOOK PREVIEW ─────────────────────────────────── */}
-      {/* Placed before the space tiles so users see the product immediately */}
+
+      {/* ── NOTEBOOK PREVIEW ─────────────────────────────────────────────── */}
       <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/[0.05]">
         <Container>
-          {/* Section header */}
           <div className="flex flex-col items-center text-center mb-14">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-6 bg-[#e0743a]/60" />
-              <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
                 The notebook
               </span>
             </div>
@@ -581,7 +491,6 @@ export default function Home() {
               A real prompt. A real result. Your Baseline Design active in the background.
             </p>
           </div>
-
           <SpacePreview />
         </Container>
       </section>
@@ -592,7 +501,7 @@ export default function Home() {
         <Container className="relative z-10">
           <div className="inline-flex items-center gap-2 mb-12">
             <span className="h-px w-6 bg-[#e0743a]/60" />
-            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
               Three spaces
             </span>
           </div>
@@ -604,56 +513,30 @@ export default function Home() {
                 name: "Defrag",
                 tier: "Free",
                 href: "/product",
-                accent: false,
                 hook: "Separate the moment from the pattern.",
                 what: "Something happened. You don't know if you overreacted or if this is the same thing that always happens.",
                 cta: "What's actually active — and your clearest next response.",
                 tags: ["Arguments", "Messages", "Family roles", "Boundaries", "Grief"],
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-                    <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.4" />
-                    <circle cx="10" cy="10" r="3" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.8" />
-                    <line x1="10" y1="3" x2="10" y2="17" stroke="currentColor" strokeWidth="1" strokeOpacity="0.2" />
-                    <line x1="3" y1="10" x2="17" y2="10" stroke="currentColor" strokeWidth="1" strokeOpacity="0.2" />
-                  </svg>
-                ),
               },
               {
                 num: "02",
                 name: "Covenant",
                 tier: "Pro",
                 href: "/covenant",
-                accent: true,
                 hook: "Your moment has been walked before.",
                 what: "Covenant connects what you're going through to the real human stories in Scripture.",
                 cta: "One honest next step — grounded in faith, not performance.",
                 tags: ["Faith", "Values", "Commitments", "Repair"],
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-                    <path d="M10 3 L10 17" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.6" strokeLinecap="round" />
-                    <path d="M4 7 Q10 4 16 7" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.4" fill="none" strokeLinecap="round" />
-                    <path d="M4 13 Q10 16 16 13" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.4" fill="none" strokeLinecap="round" />
-                  </svg>
-                ),
               },
               {
                 num: "03",
                 name: "Alignment",
                 tier: "Pro",
                 href: "/product",
-                accent: false,
                 hook: "Get back into your own lane.",
                 what: "A conversation, a conflict, a decision — and suddenly you're reacting from somewhere that isn't you.",
-                cta: "Your Baseline Design and the live sky above you show the path back.",
+                cta: "Your Baseline Design shows the path back.",
                 tags: ["After Defrag", "Before a hard conversation", "After a conflict"],
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-                    <path d="M3 10 L17 10" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.5" strokeLinecap="round" />
-                    <path d="M10 3 L10 8" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.35" strokeLinecap="round" />
-                    <path d="M10 12 L10 17" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.35" strokeLinecap="round" />
-                    <circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.9" />
-                  </svg>
-                ),
               },
             ].map((space) => (
               <Link
@@ -661,17 +544,16 @@ export default function Home() {
                 href={space.href}
                 className="group flex flex-col gap-5 p-8 md:p-10 bg-[#0c0a0d] hover:bg-[#0f0d10] transition-colors duration-300"
               >
-                {/* Top row */}
                 <div className="flex items-start justify-between">
                   <div
                     className="w-10 h-10 flex items-center justify-center border border-white/[0.08]"
                     style={{
                       borderRadius: 8,
-                      color: space.accent ? "#e0743a" : "#76716b",
-                      background: space.accent ? "rgba(224,116,58,0.06)" : "rgba(255,255,255,0.02)",
+                      color: space.tier === "Pro" ? "#e0743a" : "#76716b",
+                      background: space.tier === "Pro" ? "rgba(224,116,58,0.06)" : "rgba(255,255,255,0.02)",
                     }}
                   >
-                    {space.icon}
+                    <span className="font-mono text-[9px] tracking-[0.1em]">{space.num}</span>
                   </div>
                   <span
                     className="font-mono text-[8px] uppercase tracking-[0.14em] border px-2 py-0.5 self-start"
@@ -685,7 +567,6 @@ export default function Home() {
                   </span>
                 </div>
 
-                {/* Name + hook */}
                 <div>
                   <h3
                     className="font-serif text-[#f4efe9] mb-2 group-hover:text-[#f0a06a] transition-colors duration-300"
@@ -698,13 +579,11 @@ export default function Home() {
                   </p>
                 </div>
 
-                {/* What + CTA */}
                 <div className="flex flex-col gap-2 flex-1">
                   <p className="text-[13px] text-[#76716b] leading-relaxed">{space.what}</p>
                   <p className="text-[13px] text-[#a8a29a] leading-relaxed">{space.cta}</p>
                 </div>
 
-                {/* Tags */}
                 <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.05]">
                   {space.tags.map((tag) => (
                     <span
@@ -715,14 +594,6 @@ export default function Home() {
                       {tag}
                     </span>
                   ))}
-                </div>
-
-                {/* Arrow */}
-                <div className="flex items-center gap-2 text-[#4f4b47] group-hover:text-[#f0a06a] transition-colors duration-300">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.14em]">Explore</span>
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
                 </div>
               </Link>
             ))}
@@ -743,12 +614,9 @@ export default function Home() {
           <p className="mt-6 max-w-md text-base md:text-lg text-[#a8a29a] leading-relaxed">
             Defrag is free. Start understanding the patterns beneath the moments that matter most.
           </p>
-          <div className="mt-9 flex flex-col sm:flex-row gap-3">
+          <div className="mt-9">
             <Link href={APP_URL} className="btn-primary">
-              Enter Sovereign.os — Free
-            </Link>
-            <Link href="/pricing" className="btn-secondary">
-              See plans
+              Enter Sovereign.os
             </Link>
           </div>
         </Container>

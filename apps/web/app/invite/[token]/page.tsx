@@ -119,7 +119,7 @@ export default function InvitePage() {
       <div className="w-full max-w-md">
 
         <div className="mb-10 text-center">
-          <Link href="/" className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+          <Link href="/" className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase font-medium">
             SOVEREIGN.OS
           </Link>
         </div>
@@ -145,7 +145,7 @@ export default function InvitePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease }}
           >
-            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8" style={{ borderRadius: 18 }}>
+            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8" style={{ borderRadius: "var(--radius-container)" }}>
               <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-5">Private invitation</p>
               <h1 className="font-serif text-2xl text-[#f4efe9] leading-tight mb-4">
                 You've been invited into a private Sovereign.os reflection.
@@ -153,7 +153,7 @@ export default function InvitePage() {
               <p className="text-[13px] text-[#76716b] leading-relaxed mb-6">
                 Accept the invite to add your side. The result only generates after you choose to continue.
               </p>
-              <p className="text-[11px] text-[#3a3733] leading-relaxed mb-8">
+              <p className="text-[11px] text-[#76716b] leading-relaxed mb-8">
                 Invited by {invite.invited_by} &middot; Your raw Baseline Design and private details stay hidden.
               </p>
               <button
@@ -163,7 +163,7 @@ export default function InvitePage() {
               >
                 Accept invite
               </button>
-              <p className="text-center text-[10px] text-[#2e2b28] mt-4">
+              <p className="text-center text-[10px] text-[#4f4b47] mt-4">
                 You'll need to sign in and set your Baseline Design to continue.
               </p>
             </div>
@@ -183,7 +183,7 @@ export default function InvitePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease }}
           >
-            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8" style={{ borderRadius: 18 }}>
+            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8" style={{ borderRadius: "var(--radius-container)" }}>
               <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-5">One more step</p>
               <h2 className="font-serif text-xl text-[#f4efe9] mb-3">Set your Baseline Design first.</h2>
               <p className="text-[13px] text-[#76716b] leading-relaxed mb-6">
@@ -213,26 +213,26 @@ export default function InvitePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease }}
           >
-            <div className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden" style={{ borderRadius: 18 }}>
+            <div className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}>
               <div className="px-6 py-5 border-b border-white/[0.06]">
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Your reflection</p>
               </div>
               <div className="px-6 py-6 flex flex-col gap-5">
                 {result.reflection && (
                   <div>
-                    <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#e0743a]/50 mb-2">What this moment is asking</p>
+                    <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#e0743a]/50 mb-2">What this moment is asking</p>
                     <p className="text-[14px] text-[#f4efe9] leading-[1.7]">{result.reflection}</p>
                   </div>
                 )}
                 {result.pattern && (
                   <div>
-                    <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">What's active</p>
+                    <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">What's active</p>
                     <p className="text-[13px] text-[#a8a29a] leading-[1.65]">{result.pattern}</p>
                   </div>
                 )}
                 {result.nextStep && (
                   <div>
-                    <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">One next step</p>
+                    <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">One next step</p>
                     <p className="text-[14px] text-[#f4efe9] leading-[1.65]">{result.nextStep}</p>
                   </div>
                 )}

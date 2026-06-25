@@ -1,7 +1,7 @@
 import type { Env } from "./types-env.js"
 import { SYSTEM_DEFRAG, SYSTEM_DEFRAG_RELATIONAL } from "./prompts.js"
 import { getFeatureFlags } from "./featureFlags.js"
-import { validateAndScore, buildRetryPrompt, parseAIOutput } from "./output-validator.js"
+import { validateAndScore, buildRetryPrompt, parseAIOutput, checkGuardrails } from "./output-validator.js"
 import { loadMemoryContext, formatMemoryForPrompt } from "./memory.js"
 import { suggestNextSpace, formatFlowSuggestion } from "./flow.js";
 import { getAuthUser, jsonResponse } from "./auth.js";
@@ -40,9 +40,6 @@ import type {
   Confidence,
   ThreadMeta,
 } from "@sovereign/core";
-
-import { getCorsHeaders } from "./cors.js";
-
 
 // SYSTEM_SELF and SYSTEM_RELATIONAL removed — use SYSTEM_DEFRAG / SYSTEM_DEFRAG_RELATIONAL from prompts.ts
 
@@ -144,13 +141,18 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   }
 
   
-  
-
   const sid = await getSessionId(req);
   const user = await getAuthUser(req, env.DB);
+
   if (!user) {
-    return jsonResponse({ error: "unauthorized" }, 401, { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) });
+    return jsonResponse({ error: "Unauthorized" }, 401, {
+      ...getCorsHeaders(req),
+      "set-cookie": cookieHeader(sid),
+    });
   }
+
+  const subGate = requireActiveSubscription(user);
+  if (subGate) return subGate;
 
   // Free tier daily usage limit check
   const isPro = user.subscription_status === "active" || user.tier === "pro";
@@ -238,7 +240,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     message,
     baselineText,
     patternText,
-    activeSignalsText: activeSignalsText || undefined,
+    activeSignalsText: activeSignalsText || "",
     targetName: target ? target.relation : undefined,
     targetBaseline,
   });
@@ -255,28 +257,80 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" }
   });
 
-  const rawText = asText((ai as any).response ?? ai);
-  const parsed = parseJsonFromText(rawText);
+  let rawText = asText((ai as any).response ?? ai);
 
+  // ── Validate, score, and retry if needed ─────────────────────────────────
+  let validation = validateAndScore(rawText, "defrag")
+
+  // Retry once if output is completely empty (no JSON parsed at all)
+  if (validation.shouldRetry) {
+    console.warn("[Retry] Defrag output empty — retrying with correction prompt")
+    const retryMessages = [
+      { role: "system", content: relational ? SYSTEM_DEFRAG_RELATIONAL : SYSTEM_DEFRAG },
+      { role: "user", content: userPrompt },
+      { role: "assistant", content: rawText },
+      { role: "user", content: buildRetryPrompt("defrag", validation.missing) },
+    ]
+    const retryAi = await env.AI.run(modelId, {
+      messages: retryMessages,
+      temperature: 0.2,
+      max_tokens: 900,
+    }, { gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" } })
+    rawText = asText((retryAi as any).response ?? retryAi)
+    validation = validateAndScore(rawText, "defrag")
+  }
+
+  const parsed = validation.output
+
+  // Log guardrail violations
+  if (!validation.guardrails.passed) {
+    console.warn("[Guardrail] Defrag violations:", validation.guardrails.violations)
+  }
+
+  // Extract confidence score for client
+  const outputConfidence = (validation.scoring as any).confidence ?? 0.5
+  const signalStrength = (validation.scoring as any).signalStrength ?? "medium"
+
+  // Empty result guard — if AI returned nothing useful after retry
+  if (!parsed.activePattern && !parsed.alignment && !parsed.summary) {
+    return jsonResponse(
+      { error: "incomplete_output", message: "The system couldn't read this moment clearly. Try describing it differently." },
+      200,
+      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
+    )
+  }
+
+  // Flow suggestion — Defrag → Alignment chain
+  const flowSuggestion = suggestNextSpace(parsed)
 
   const result = {
     id: crypto.randomUUID(),
     workspaceSource: "DEFRAG",
     createdAt: new Date().toISOString(),
     title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
-    summary: parsed.response || "",
-    activePattern: parsed.activePattern || "This section needs more context.",
-    theRepeat: parsed.theRepeat || "This section needs more context.",
-    oldRole: parsed.oldRole || "This section needs more context.",
-    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || "This section needs more context.",
-    strainPattern: parsed.strainPattern || "This section needs more context.",
-    giftUnderStrain: parsed.giftUnderStrain || "This section needs more context.",
-    alignment: parsed.alignment || "This section needs more context.",
-    bestNextResponse: parsed.bestNextResponse || { summary: "This section needs more context.", phrasing: [] },
-    conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] },
+    // AI output fields — pass through as-is (undefined = AI omitted intentionally)
+    summary: parsed.summary || parsed.response || undefined,
+    activePattern: parsed.activePattern || undefined,
+    theRepeat: parsed.theRepeat || undefined,
+    oldRole: parsed.oldRole || undefined,
+    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || undefined,
+    strainPattern: parsed.strainPattern || undefined,
+    giftUnderStrain: parsed.giftUnderStrain || undefined,
+    alignment: parsed.alignment || undefined,
+    bestNextResponse: parsed.bestNextResponse || undefined,
+    conversationalSteering: (parsed.conversationalSteering?.do?.length || parsed.conversationalSteering?.avoid?.length)
+      ? parsed.conversationalSteering
+      : undefined,
+    sourcesUsed: {
+      baseline: true,
+      history: Boolean(patternText),
+      invitedUsers: Boolean(relational),
+    },
+    media: {
+      audioOverviewAvailable: isPro,
+      watchPreviewAvailable: false,
+    },
   };
-    
-
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
   const confidence: Confidence = "Medium";

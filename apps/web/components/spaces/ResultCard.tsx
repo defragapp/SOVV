@@ -20,6 +20,8 @@ interface ResultCardProps {
     summary?: string
     /** Compressed identity signature — shown once, bottom only */
     signature?: string
+    /** Confidence scoring from output validator */
+    confidence?: { score: number; strength: "low" | "medium" | "high" }
     /** Reduced signal rail data */
     rail?: {
       baseline?: RailBaseline
@@ -46,29 +48,14 @@ export function ResultCard({
 }: ResultCardProps) {
   const [copied, setCopied] = React.useState(false)
 
-  // Section labels locked to canonical Defrag output structure.
-  // These 7 labels are the system contract — do not change them.
-  //
-  // Field mapping:
-  //   activePattern         → What's active
-  //   theRepeat             → You  (your pattern under this pressure)
-  //   oldRole               → Them  (how the other side tends to move)
-  //   whatYouLearnedToCarry → What forms between you  (the loop)
-  //   strainPattern         → Why it's sharper now  (timing/amplification)
-  //   alignment             → What changes this  (primary shift field)
-  //   giftUnderStrain       → What changes this  (fallback if alignment absent)
-  //
-  // "Next move" is rendered separately with emphasis below.
   const sections = [
-    { label: "What's active",          value: result.activePattern },
-    { label: "You",                    value: result.theRepeat },
-    { label: "Them",                   value: result.oldRole },
-    { label: "What forms between you", value: result.whatYouLearnedToCarry },
-    { label: "Why it's sharper now",   value: result.strainPattern },
-    {
-      label: "What changes this",
-      value: result.alignment || result.giftUnderStrain,
-    },
+    { label: "What's happening",       value: result.activePattern },
+    { label: "What you may be carrying", value: result.theRepeat },
+    { label: "The role you're entering",         value: result.oldRole },
+    { label: "What may be adding weight",     value: result.whatYouLearnedToCarry },
+    { label: "Where the pressure is",       value: result.strainPattern },
+    { label: "What gives this moment a better chance",       value: result.giftUnderStrain },
+    { label: "What belongs to you",      value: result.alignment },
   ].filter(s => s.value)
 
   const response = result.bestNextResponse
@@ -110,9 +97,40 @@ export function ResultCard({
     }
     lines.push("—")
     lines.push("Sovereign.os · defrag.app")
-    await navigator.clipboard.writeText(lines.join(NL))
+    const text = lines.join(NL)
+    await navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleDownload = () => {
+    const NL = "\n"
+    const lines: string[] = [
+      `SOVEREIGN.OS — ${spaceName.toUpperCase()}`,
+      new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+      "",
+      `"${input}"`,
+      "",
+    ]
+    sections.forEach(s => {
+      lines.push(s.label.toUpperCase())
+      lines.push(s.value!)
+      lines.push("")
+    })
+    if (response) {
+      lines.push("NEXT MOVE")
+      lines.push(typeof response === "string" ? response : (response.summary || ""))
+      lines.push("")
+    }
+    lines.push("—")
+    lines.push("Sovereign.os · defrag.app")
+    const blob = new Blob([lines.join(NL)], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `sovereign-${spaceName.toLowerCase()}-${new Date().toISOString().slice(0,10)}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -121,23 +139,33 @@ export function ResultCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="border border-white/[0.08] bg-white/[0.02] overflow-hidden"
-      style={{ borderRadius: 16 }}
+      style={{ borderRadius: "var(--radius-container)" }}
     >
       {/* Card header */}
       <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between bg-[#08070a]/60">
         <div className="flex items-center gap-3">
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Sovereign.os</span>
-          <span className="text-white/20 text-xs">/</span>
+          <span className="text-[#4f4b47] text-xs">/</span>
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]">{spaceName}</span>
         </div>
-        <span className="font-mono text-[9px] text-[#4f4b47]">
-          {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-        </span>
+        <div className="flex items-center gap-3">
+          {result.confidence && result.confidence.strength !== "low" && (
+            <span
+              className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47]"
+              title={`Signal strength: ${result.confidence.strength}`}
+            >
+              {result.confidence.strength === "high" ? "●●●" : "●●○"}
+            </span>
+          )}
+          <span className="font-mono text-[9px] text-[#4f4b47]">
+            {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+          </span>
+        </div>
       </div>
 
       {/* Input echo */}
       <div className="px-6 py-4 border-b border-white/[0.04] bg-white/[0.01]">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">You described</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">You described</p>
         <p className="text-[13px] text-[#76716b] leading-relaxed italic">"{input.slice(0, 120)}{input.length > 120 ? "…" : ""}"</p>
       </div>
 
@@ -151,7 +179,7 @@ export function ResultCard({
             transition={{ delay: i * 0.06, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="border-b border-white/[0.05] pb-5 mb-5 last:border-0 last:pb-0 last:mb-0"
           >
-            <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-2">{s.label}</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">{s.label}</p>
             <p className="text-[14px] text-[#f4efe9] leading-[1.7]">{s.value}</p>
           </motion.div>
         ))}
@@ -164,7 +192,7 @@ export function ResultCard({
             transition={{ delay: sections.length * 0.06, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="border-t border-[#e0743a]/20 pt-6 mt-6"
           >
-            <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-3">Next move</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">Next move</p>
             <p className="text-[14px] text-[#f4efe9] leading-[1.7] mb-4">
               {typeof response === "string" ? response : response.summary}
             </p>
@@ -198,7 +226,7 @@ export function ResultCard({
           >
             {steering.do?.length ? (
               <div>
-                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">In the next conversation</p>
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">In the next conversation</p>
                 <ul className="space-y-2">
                   {steering.do.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-[12px] text-[#a8a29a] leading-relaxed">
@@ -211,7 +239,7 @@ export function ResultCard({
             ) : null}
             {steering.avoid?.length ? (
               <div>
-                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">Avoid</p>
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Avoid</p>
                 <ul className="space-y-2">
                   {steering.avoid.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-[12px] text-[#a8a29a] leading-relaxed">
@@ -274,23 +302,55 @@ export function ResultCard({
       {/* Signature line — once only, bottom only, very low contrast.
            Encoded identity, not explained. Never shown in body. */}
       {result.signature ? (
-        <div className="px-6 py-3 border-t border-white/[0.03] opacity-40 hover:opacity-80 transition-opacity">
-          <p className="font-mono text-[8px] text-[#2e2b28] tracking-[0.12em]">{result.signature}</p>
+        <div className="px-6 py-3 border-t border-white/[0.03]">
+          <p className="font-mono text-[8px] text-[#4f4b47] tracking-[0.12em]">{result.signature}</p>
         </div>
       ) : null}
 
+      {/* Save confirmation — brief, auto-dismiss */}
+      {saveSuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="px-6 py-3 border-t border-[#e0743a]/10 bg-[#e0743a]/[0.04] flex items-center justify-between"
+        >
+          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70">
+            Saved to your Library
+          </span>
+          <a
+            href="/app"
+            className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+          >
+            View Library →
+          </a>
+        </motion.div>
+      )}
+
       {/* Footer actions */}
       <div className="px-6 py-4 border-t border-white/[0.06] bg-[#08070a]/40 flex items-center justify-between gap-3">
-        <button
-          onClick={handleCopyAll}
-          className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
-        >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1"/>
-            <path d="M1 8V1h7" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-          </svg>
-          {copied ? "Copied" : "Copy all"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleCopyAll}
+            className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1"/>
+              <path d="M1 8V1h7" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+            </svg>
+            {copied ? "Copied" : "Copy"}
+          </button>
+          <button
+            onClick={handleDownload}
+            className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Export
+          </button>
+        </div>
         {onInvite && (
           <button
             onClick={onInvite}

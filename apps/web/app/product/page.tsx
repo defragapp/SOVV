@@ -12,7 +12,7 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="inline-flex items-center gap-2 mb-6">
       <span className="h-px w-6 bg-[#e0743a]/60" />
-      <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">{children}</span>
+      <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">{children}</span>
     </div>
   )
 }
@@ -95,7 +95,7 @@ export default function ProductPage() {
                   </div>
                   <p className="text-base text-[#f4efe9]/80 mb-2 leading-snug">{space.headline}</p>
                   <p className="text-sm text-[#a8a29a] leading-relaxed mb-3 max-w-xl">{space.body}</p>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#4f4b47]">{space.detail}</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">{space.detail}</p>
                 </div>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-[#4f4b47] group-hover:text-[#f0a06a] group-hover:translate-x-1 transition-all mt-2 shrink-0">
                   <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

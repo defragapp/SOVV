@@ -91,11 +91,11 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
             transition={{ duration: 0.3, ease }}
             className="fixed inset-x-4 bottom-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md z-50"
           >
-            <div className="border border-white/[0.10] bg-[#0c0a0d] shadow-2xl" style={{ borderRadius: 18 }}>
+            <div className="border border-white/[0.10] bg-[#0c0a0d] shadow-2xl" style={{ borderRadius: "var(--radius-container)" }}>
 
               <div className="px-6 pt-6 pb-4 border-b border-white/[0.06]">
                 <div className="flex items-center justify-between">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#a8a29a]">Invite privately</p>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#a8a29a]">Invite privately</p>
                   <button onClick={onClose} className="text-[#4f4b47] hover:text-[#f4efe9] transition-colors p-1">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                       <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -108,14 +108,17 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
 
                 {step === "idle" && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-                    <p className="text-[14px] text-[#f4efe9] leading-relaxed mb-2">Send a private link.</p>
-                    <p className="text-[13px] text-[#4f4b47] leading-relaxed mb-6">
-                      They only see what is needed to join. Your raw Baseline Design and private details stay hidden. The result only generates after they accept.
+                    <p className="text-[14px] text-[#f4efe9] leading-relaxed mb-2">Invite someone into this moment.</p>
+                    <p className="text-[13px] text-[#76716b] leading-relaxed mb-3">
+                      They'll add their Baseline Design. You'll both see how your patterns interact — not who is right.
+                    </p>
+                    <p className="text-[11px] text-[#4f4b47] leading-relaxed mb-6">
+                      Your raw Baseline Design stays private. The result only generates after they accept.
                     </p>
                     <button
                       onClick={createInvite}
                       className="w-full h-11 bg-[#f4efe9] text-[#08070a] text-[13px] font-medium hover:opacity-90 transition-opacity"
-                      style={{ borderRadius: 10 }}
+                      style={{ borderRadius: "var(--radius-button)" }}
                     >
                       Create private link
                     </button>
@@ -163,7 +166,7 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
                       </div>
                     </div>
 
-                    <p className="text-[10px] text-[#2e2b28] text-center mt-4 leading-relaxed">
+                    <p className="text-[10px] text-[#4f4b47] text-center mt-4 leading-relaxed">
                       Link expires in 7 days &middot; Private by design
                     </p>
                   </motion.div>

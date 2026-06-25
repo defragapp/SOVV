@@ -224,8 +224,8 @@ export default function LoginScreen() {
               <button
                 type="submit"
                 disabled={loading || !email || !password || (mode === "register" && turnstileSiteKey !== "" && !turnstileToken)}
-                className="mt-2 w-full h-12 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
-                style={{ borderRadius: "var(--radius-button)" }}
+                className="mt-2 w-full h-12 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-30 disabled:cursor-not-allowed"
+                style={{ borderRadius: 12 }}
               >
                 {loading ? "···" : mode === "login" ? "Sign In" : "Create Account"}
               </button>
@@ -240,12 +240,12 @@ export default function LoginScreen() {
             {mode === "login" && (
               <p className="mt-3 text-center text-sm text-[#4f4b47]">
                 Forgot your password?{" "}
-                <Link
-                  href="/app/forgot-password"
+                <a
+                  href="mailto:info@defrag.app?subject=Password reset"
                   className="text-[#76716b] hover:text-[#a8a29a] transition-colors"
                 >
-                  Reset it
-                </Link>
+                  Contact support
+                </a>
               </p>
             )}
 

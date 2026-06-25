@@ -12,7 +12,7 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="inline-flex items-center gap-2 mb-6">
       <span className="h-px w-6 bg-[#e0743a]/60" />
-      <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">{children}</span>
+      <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">{children}</span>
     </div>
   )
 }
@@ -33,7 +33,7 @@ const STEPS = [
   {
     num: "03",
     title: "Receive a structured result",
-    body: "Seven outputs: the active pattern, what keeps happening, your default mode, what shaped it, how it behaves under pressure, what is working, and the clearest next response.",
+    body: "A structured result: what's active, what keeps happening, what shaped it, and the clearest next response. Depth matches the situation — a brief moment gets a focused read, a complex one gets more.",
     note: null,
   },
   {

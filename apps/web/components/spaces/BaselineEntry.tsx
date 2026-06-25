@@ -115,13 +115,13 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
           {/* Wordmark */}
           <div className="mb-8 text-center">
-            <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+            <span className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase">
               SOVEREIGN.OS
             </span>
           </div>
 
           {/* Glass panel */}
-          <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: 20 }}>
+          <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: "var(--radius-container)" }}>
 
             <AnimatePresence mode="wait">
 
@@ -135,7 +135,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                   className="flex flex-col items-center gap-6 py-12"
                 >
                   <span className="w-5 h-5 border border-white/20 border-t-[#f4efe9]/60 rounded-full animate-spin" />
-                  <p className="text-sm text-[#76716b]">Setting your Baseline Design…</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Setting your Baseline Design…</p>
                 </motion.div>
               )}
 
@@ -176,7 +176,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
                     {/* Date of birth */}
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Date of birth</label>
+                      <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Date of birth</label>
                       <input
                         type="date"
                         value={dob}
@@ -189,7 +189,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
                     {/* Time of birth — ask what they know */}
                     <div className="flex flex-col gap-3">
-                      <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Time of birth</label>
+                      <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Time of birth</label>
                       <p className="text-sm text-[#76716b]">How much do you know?</p>
 
                       <div className="flex flex-col gap-2">
@@ -343,7 +343,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
                     {/* Place of birth */}
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Place of birth</label>
+                      <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Place of birth</label>
                       <input
                         type="text"
                         value={pob}

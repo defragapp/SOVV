@@ -62,13 +62,13 @@ export default function ResetPasswordPage() {
       >
         <div className="mb-10 text-center">
           <Link href="/" className="inline-block">
-            <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+            <span className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase font-medium">
               SOVEREIGN.OS
             </span>
           </Link>
         </div>
 
-        <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: 20 }}>
+        <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: "var(--radius-container)" }}>
 
           {stage === "invalid" && (
             <div className="text-center">
@@ -111,7 +111,7 @@ export default function ResetPasswordPage() {
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">New Password</label>
+                  <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">New Password</label>
                   <input
                     type="password"
                     value={password}
@@ -126,7 +126,7 @@ export default function ResetPasswordPage() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Confirm Password</label>
+                  <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Confirm Password</label>
                   <input
                     type="password"
                     value={confirm}
