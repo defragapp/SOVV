@@ -75,22 +75,36 @@ function DefragDemo() {
 
       {/* Result */}
       <AnimatePresence mode="wait">
-        <motion.div
-          key={active}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.4, ease }}
-          className="ios-panel overflow-hidden relative"
-        >
-          {phase === 0 && (
-            <div className="p-5 animate-pulse">
-              <div className="h-3 bg-white/[0.05] rounded-sm w-1/4 mb-4"></div>
-              <div className="h-2 bg-white/[0.05] rounded-sm w-full mb-2"></div>
-              <div className="h-2 bg-white/[0.05] rounded-sm w-full mb-2"></div>
-              <div className="h-2 bg-white/[0.05] rounded-sm w-3/4"></div>
-            </div>
-          )}
+        {revealed && (
+          <motion.div
+            key={active}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease }}
+            className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden"
+            style={{ borderRadius: 14 }}
+          >
+            {[
+              { label: "What's active", value: current.result.pattern },
+              { label: "The loop", value: current.result.repeat },
+              { label: "Your default mode", value: current.result.mode },
+              { label: "Next response", value: current.result.response, highlight: true },
+            ].map((row: any, i) => (
+              <motion.div
+                key={row.label}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.08, duration: 0.3, ease }}
+                className={`px-5 py-4 border-b border-white/[0.05] last:border-0 ${row.highlight ? "bg-white/[0.02]" : ""}`}
+              >
+                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-1.5">{row.label}</p>
+                <p className={`text-[13px] leading-relaxed ${row.highlight ? "text-[#f4efe9]" : "text-[#a8a29a]"}`}>{row.value}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
           {phase >= 1 && (
             <motion.div
