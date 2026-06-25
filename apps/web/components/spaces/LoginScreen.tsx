@@ -5,14 +5,6 @@ import Image from "next/image"
 import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
-declare global {
-  interface Window {
-    turnstile?: {
-      render: (container: HTMLElement, options: Record<string, unknown>) => string
-      reset?: (widgetId: string) => void
-    }
-  }
-}
 
 type LoginMode = "login" | "register"
 
@@ -20,69 +12,20 @@ export default function LoginScreen() {
   const [mode, setMode] = useState<LoginMode>("login")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [turnstileToken, setTurnstileToken] = useState("")
-  const [error, setError] = useState("")
+    const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""
-  const turnstileRef = useRef<HTMLDivElement | null>(null)
-  const turnstileWidgetId = useRef<string | null>(null)
 
   useEffect(() => {
-    setTurnstileToken("")
     setError("")
-    if (mode !== "register" || !turnstileSiteKey) return
-    const scriptId = "cf-turnstile-script"
-
-    const renderWidget = () => {
-      if (!turnstileRef.current || !window.turnstile || turnstileWidgetId.current) return
-      turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
-        sitekey: turnstileSiteKey,
-        theme: "dark",
-        callback: (token: string) => setTurnstileToken(token),
-        "expired-callback": () => setTurnstileToken(""),
-        "error-callback": () => setTurnstileToken(""),
-      })
-    }
-
-    const existing = document.getElementById(scriptId) as HTMLScriptElement | null
-    if (existing) {
-      if (window.turnstile) renderWidget()
-      else existing.addEventListener("load", renderWidget, { once: true })
-      return () => {
-        if (turnstileWidgetId.current && window.turnstile?.reset)
-          window.turnstile.reset(turnstileWidgetId.current)
-        turnstileWidgetId.current = null
-      }
-    }
-
-    const script = document.createElement("script")
-    script.id = scriptId
-    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-    script.async = true
-    script.defer = true
-    script.onload = renderWidget
-    document.head.appendChild(script)
-
-    return () => {
-      if (turnstileWidgetId.current && window.turnstile?.reset)
-        window.turnstile.reset(turnstileWidgetId.current)
-      turnstileWidgetId.current = null
-    }
-  }, [mode, turnstileSiteKey])
+  }, [mode])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setLoading(true)
     try {
-      if (mode === "register" && turnstileSiteKey !== "" && !turnstileToken) {
-        setError("Complete the verification below to continue.")
-        return
-      }
       const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register"
-      const payload = mode === "register"
-        ? { email, password, turnstileToken }
-        : { email, password }
+      const payload = { email, password }
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -151,7 +94,7 @@ export default function LoginScreen() {
                 <button
                   key={m}
                   type="button"
-                  onClick={() => { setMode(m); setError(""); setTurnstileToken("") }}
+                  onClick={() => { setMode(m); setError("") }}
                   className={`flex-1 pb-4 text-sm font-medium tracking-wide transition-colors duration-200 border-b-2 ${
                     mode === m
                       ? "border-[#f4efe9] text-[#f4efe9]"
@@ -194,19 +137,7 @@ export default function LoginScreen() {
                 />
               </div>
 
-              {/* Turnstile — only on register */}
-              {mode === "register" && (
-                <div className="flex flex-col gap-2">
-                  <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Verification</label>
-                  {turnstileSiteKey ? (
-                    <div ref={turnstileRef} className="min-h-[65px]" />
-                  ) : (
-                    <p className="text-sm text-[#4f4b47] leading-relaxed">
-                      Bot verification not configured.
-                    </p>
-                  )}
-                </div>
-              )}
+
 
               <AnimatePresence>
                 {error && (
@@ -223,7 +154,7 @@ export default function LoginScreen() {
 
               <button
                 type="submit"
-                disabled={loading || !email || !password || (mode === "register" && turnstileSiteKey !== "" && !turnstileToken)}
+                disabled={loading || !email || !password}
                 className="mt-2 w-full h-12 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
                 style={{ borderRadius: "var(--radius-button)" }}
               >
