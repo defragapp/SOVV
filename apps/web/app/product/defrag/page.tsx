@@ -105,34 +105,6 @@ function DefragDemo() {
           </motion.div>
         )}
       </AnimatePresence>
-
-          {phase >= 1 && (
-            <motion.div
-              initial={{ filter: "blur(8px)", opacity: 0.5 }}
-              animate={{ filter: "blur(0px)", opacity: 1 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="px-5 py-5 border-b border-white/[0.05]">
-                <p className="text-[13px] leading-relaxed text-[#a8a29a]">
-                  {current.result.analysis}
-                </p>
-              </div>
-              
-              {phase === 2 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 4, backgroundColor: "rgba(255,255,255,0.05)" }}
-                  animate={{ opacity: 1, y: 0, backgroundColor: "transparent" }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  className="px-5 py-4 border-t border-white/[0.05] bg-white/[0.02]"
-                >
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-1.5">Best Next Response</p>
-                  <p className="text-[13px] leading-relaxed text-[#f4efe9] font-medium">{current.result.nextResponse}</p>
-                </motion.div>
-              )}
-            </motion.div>
-          )}
-        </motion.div>
-      </AnimatePresence>
     </div>
   )
 }
