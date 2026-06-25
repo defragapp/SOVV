@@ -8,7 +8,7 @@ export async function generateDefragWithRetry(
   maxRetries = 2
 ): Promise<DefragResult> {
   let attempt = 0;
-  let lastError = null;
+  let lastError: Error | null = null;
 
   while (attempt <= maxRetries) {
     try {
@@ -31,22 +31,22 @@ export async function generateDefragWithRetry(
         // Enforce length limits (simulated constraint)
         return applyLengthConstraints(validationResult.data);
       } else {
-        throw new Error();
+        throw new Error(`Schema validation failed: ${validationResult.error.message}`);
       }
     } catch (e: any) {
       lastError = e;
       attempt++;
 
       // Update prompt for retry
-      userPrompt += ;
+      userPrompt += `\n\nYour previous output was invalid. Error: ${e.message}. Please return strictly valid JSON matching the schema, with fields limited to 1-2 sentences.`;
     }
   }
 
-  throw new Error();
+  throw new Error(`Failed to generate valid Defrag result after ${maxRetries} retries. Last error: ${lastError}`);
 }
 
 function extractJson(text: string): string {
-  const match = text.match(//);
+  const match = text.match(/```json\n([\s\S]*?)\n```/);
   return match ? match[1] : text;
 }
 
