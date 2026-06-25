@@ -16,13 +16,13 @@ export function FaqAccordion({
         <div key={i}>
           <button
             onClick={() => setOpen(open === i ? null : i)}
-            className="flex w-full items-center justify-between py-5 text-left text-sm font-medium text-white/80 hover:text-white transition-colors duration-200"
+            className="flex w-full items-center justify-between py-5 text-left text-sm font-medium text-[#c8c2bc] hover:text-[#f4efe9] transition-colors duration-200"
           >
             <span>{item.q}</span>
             <motion.span
               animate={{ rotate: open === i ? 45 : 0 }}
               transition={{ duration: 0.2 }}
-              className="ml-4 shrink-0 text-white/40 text-lg leading-none"
+              className="ml-4 shrink-0 text-[#4f4b47] text-lg leading-none"
             >
               +
             </motion.span>
@@ -36,7 +36,7 @@ export function FaqAccordion({
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 className="overflow-hidden"
               >
-                <p className="pb-5 text-sm leading-7 text-white/50">{item.a}</p>
+                <p className="pb-5 text-sm leading-7 text-[#76716b]">{item.a}</p>
               </motion.div>
             )}
           </AnimatePresence>

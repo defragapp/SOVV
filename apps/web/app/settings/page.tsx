@@ -16,7 +16,7 @@ function FieldLabel({ htmlFor, children }: { htmlFor?: string; children: React.R
   return (
     <label
       htmlFor={htmlFor}
-      className="block text-xs font-mono uppercase tracking-[0.15em] text-[#76716b] mb-2"
+      className="block text-xs font-mono uppercase tracking-[0.14em] text-[#76716b] mb-2"
     >
       {children}
     </label>
@@ -82,16 +82,16 @@ export default function SettingsPage() {
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#08070a]/90 backdrop-blur-md safe-top">
         <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between">
-          <nav className="flex items-center gap-2.5 font-mono text-xs tracking-widest uppercase" aria-label="Breadcrumb">
+          <nav className="flex items-center gap-2.5 font-mono text-xs tracking-[0.2em] uppercase" aria-label="Breadcrumb">
             <Link href="/apps/defrag" className="text-[#76716b] hover:text-[#f4efe9] transition-colors">
               Sovereign.os
             </Link>
-            <span className="text-white/20" aria-hidden>/</span>
-            <span className="text-[#a8a29a]">Your Design</span>
+            <span className="text-[#4f4b47]" aria-hidden>/</span>
+            <span className="text-[#a8a29a]">Baseline Design</span>
           </nav>
           <Link
             href="/apps/defrag"
-            className="text-xs font-mono tracking-wide text-[#76716b] hover:text-[#f4efe9] transition-colors"
+            className="text-xs font-mono tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
           >
             ← Defrag
           </Link>
@@ -103,14 +103,14 @@ export default function SettingsPage() {
         {/* Title */}
         <div className="mb-14">
           <div className="flex items-center gap-3 mb-6">
-            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#76716b] border border-white/[0.08] px-2.5 py-1" style={{ borderRadius: 6 }}>
+            <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-[#76716b] border border-white/[0.08] px-2.5 py-1" style={{ borderRadius: 6 }}>
               Baseline Design
             </span>
             <AnimatePresence>
               {hasBaseline && (
                 <motion.span
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.25 }}
                   className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.1em] uppercase text-[#a8a29a]"
@@ -143,7 +143,7 @@ export default function SettingsPage() {
         {/* Form */}
         <div className="bg-white/[0.02] border border-white/[0.08] rounded-[14px] p-8 md:p-10 mb-14">
 
-          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-8">
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#76716b] mb-8">
             Enter your birth details
           </p>
 
@@ -257,7 +257,7 @@ export default function SettingsPage() {
 
         {/* What it unlocks */}
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-6">
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#76716b] mb-6">
             What your Baseline Design unlocks
           </p>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-0">

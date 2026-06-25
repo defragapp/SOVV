@@ -1,6 +1,5 @@
 'use client'
 import Link from "next/link"
-import { MotionLink, MotionButton } from "@/components/ui/motion-button"
 import * as React from "react"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
@@ -131,11 +130,11 @@ function CovenantDemo() {
               {/* Three columns */}
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
                 <div className="p-6">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">Their story</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">Their story</p>
                   <p className="text-[13px] text-[#a8a29a] leading-relaxed">{current.story}</p>
                 </div>
                 <div className="p-6">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">What this means for you</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">What this means for you</p>
                   <p className="text-[13px] text-[#a8a29a] leading-relaxed">{current.forYou}</p>
                 </div>
                 {phase === 2 ? (
@@ -145,7 +144,7 @@ function CovenantDemo() {
                     transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                     className="p-6 bg-white/[0.02]"
                   >
-                    <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">One grounded next step</p>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">One grounded next step</p>
                     <p className="text-[13px] text-[#f4efe9] leading-relaxed font-medium">{current.step}</p>
                   </motion.div>
                 ) : (
@@ -157,7 +156,7 @@ function CovenantDemo() {
         </motion.div>
       </AnimatePresence>
 
-      <p className="text-center font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mt-4">
+      <p className="text-center font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mt-4">
         Select a situation above to see how Covenant responds
       </p>
     </div>
@@ -174,7 +173,7 @@ export default function CovenantProductPage() {
         <Container className="relative z-10 max-w-4xl">
           <div className="inline-flex items-center gap-2 mb-6">
             <span className="h-px w-6 bg-[#e0743a]/60" />
-            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">Covenant · Pro</span>
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Covenant · Pro</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
             Your moment has been walked before.
@@ -183,7 +182,7 @@ export default function CovenantProductPage() {
             Covenant connects what you're going through to the real human stories in Scripture — not as metaphor, but as lived experience. It finds the biblical figure who walked something like what you're facing, shows you what they learned, and gives you one honest next step.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
-            <MotionLink href={APP_URL} className="btn-primary">Open Covenant</MotionLink>
+            <Link href={APP_URL} className="btn-primary">Open Covenant</Link>
 
           </div>
 
@@ -195,7 +194,7 @@ export default function CovenantProductPage() {
               { label: "One next step", body: "Not a list. Not a lecture. One real, doable thing that fits the story you're in." },
             ].map((f, i) => (
               <div key={i} className="flex flex-col md:flex-row items-baseline gap-4 md:gap-12 py-8 border-b border-white/[0.06] last:border-0">
-                <span className="font-serif text-3xl md:text-5xl text-white/[0.1] w-12 shrink-0">0{i + 1}</span>
+                <span className="font-serif text-3xl md:text-5xl text-[#4f4b47] w-12 shrink-0">0{i + 1}</span>
                 <div>
                   <p className="text-[#f4efe9] font-medium text-sm mb-2">{f.label}</p>
                   <p className="text-sm text-[#76716b] leading-relaxed max-w-xl">{f.body}</p>
@@ -212,7 +211,7 @@ export default function CovenantProductPage() {
           <div className="flex flex-col items-center text-center mb-12">
             <div className="inline-flex items-center gap-2 mb-6">
               <span className="h-px w-6 bg-[#e0743a]/60" />
-              <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">See it work</span>
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">See it work</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
               Pick a situation. See the story.
@@ -236,7 +235,7 @@ export default function CovenantProductPage() {
             Open Covenant and describe what you're walking through. Scripture has been here before.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3">
-            <MotionLink href={APP_URL} className="btn-primary">Open Covenant</MotionLink>
+            <Link href={APP_URL} className="btn-primary">Open Covenant</Link>
 
           </div>
         </Container>

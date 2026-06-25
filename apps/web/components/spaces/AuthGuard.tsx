@@ -29,6 +29,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     hasBaseline: false,
     subscriptionChecked: false,
   })
+  const [justSetBaseline, setJustSetBaseline] = useState(false)
 
   useEffect(() => {
     async function checkSession() {
@@ -110,5 +111,26 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   // Authenticated + Baseline Design set → enter workspace
-  return <>{children}</>
+  return (
+    <>
+      {children}
+      {/* First-session hint — shown briefly after Baseline Design is set */}
+      {justSetBaseline && (
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 border border-white/[0.10] bg-[#0c0a0d]/95 backdrop-blur-md shadow-2xl"
+          style={{ borderRadius: "var(--radius-container)", maxWidth: 360 }}
+        >
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70 mb-1">
+            Baseline Design active
+          </p>
+          <p className="text-[13px] text-[#f4efe9] leading-snug mb-1">
+            Your space is ready.
+          </p>
+          <p className="text-[11px] text-[#76716b] leading-relaxed">
+            Describe what is happening — Defrag will show you what is active beneath it.
+          </p>
+        </div>
+      )}
+    </>
+  )
 }

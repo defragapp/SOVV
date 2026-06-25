@@ -40,7 +40,7 @@ export function PageHero({
             className="inline-flex items-center gap-2 mb-6"
           >
             <span className="h-px w-6 bg-[#e0743a]/60" />
-            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
               {eyebrow}
             </span>
           </motion.div>

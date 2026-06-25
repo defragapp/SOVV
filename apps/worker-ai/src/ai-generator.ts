@@ -1,4 +1,5 @@
-import { DefragResultSchema, DefragResult } from '@sovereign/prompts';
+import { DefragResultSchema } from '@sovereign/prompts';
+import type { DefragResult } from '@sovereign/prompts';
 
 export async function generateDefragWithRetry(
   aiContext: any,
@@ -7,7 +8,7 @@ export async function generateDefragWithRetry(
   maxRetries = 2
 ): Promise<DefragResult> {
   let attempt = 0;
-  let lastError = null;
+  let lastError: Error | null = null;
 
   while (attempt <= maxRetries) {
     try {
@@ -20,7 +21,7 @@ export async function generateDefragWithRetry(
       });
 
       // Parse JSON from markdown block if needed
-      const jsonStr = extractJson(rawResponse.response);
+      const jsonStr = extractJson(rawResponse.response ?? '');
       const parsedData = JSON.parse(jsonStr);
 
       // 2. Validate against strict schema
@@ -46,7 +47,7 @@ export async function generateDefragWithRetry(
 
 function extractJson(text: string): string {
   const match = text.match(/```json\n([\s\S]*?)\n```/);
-  return match ? match[1] : text;
+  return match ? match[1] ?? text : text;
 }
 
 function applyLengthConstraints(data: DefragResult): DefragResult {

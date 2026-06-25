@@ -49,7 +49,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         <div className="container-platform h-full flex items-center justify-between">
           <Link
             href="/"
-            className="text-label text-[#f4efe9] hover:text-white transition-colors font-medium tracking-[0.18em]"
+            className="text-label text-[#f4efe9] hover:text-[#f4efe9] transition-colors font-medium tracking-[0.2em]"
           >
             SOVEREIGN.OS
           </Link>
@@ -65,10 +65,16 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                   {item.label}
                 </Link>
               ))}
-              <Link href="https://app.defrag.app/app/login" className="btn-ghost">
+              <Link
+                href="https://app.defrag.app/app/login"
+                className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
+              >
                 Sign in
               </Link>
-              <Link href="https://app.defrag.app/app/login" className="btn-rect">
+              <Link
+                href="https://app.defrag.app/app/login"
+                className="btn-primary h-9 px-5 text-[12px]"
+              >
                 Enter
               </Link>
             </nav>
@@ -126,7 +132,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
             {/* Brand */}
             <div className="flex flex-col gap-3 max-w-xs">
-              <span className="text-label text-[#f4efe9] tracking-[0.18em]">SOVEREIGN.OS</span>
+              <span className="text-label text-[#f4efe9] tracking-[0.2em]">SOVEREIGN.OS</span>
               <p className="text-micro text-[#4f4b47] leading-relaxed">
                 Defrag · Covenant · Alignment · Baseline Design · Library
               </p>
@@ -139,7 +145,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             <div className="flex flex-wrap gap-12">
               {FOOTER_COLS.map((col) => (
                 <div key={col.label} className="flex flex-col gap-3">
-                  <span className="text-micro text-[#4f4b47] uppercase tracking-[0.15em] font-mono">{col.label}</span>
+                  <span className="text-micro text-[#4f4b47] uppercase tracking-[0.14em] font-mono">{col.label}</span>
                   {col.links.map((link) => (
                     <Link
                       key={link.href}

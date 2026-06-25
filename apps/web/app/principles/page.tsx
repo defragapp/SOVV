@@ -76,7 +76,7 @@ export default function PrinciplesPage() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="mb-16 md:mb-20"
           >
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#c8c2bc]/50 mb-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#c8c2bc]/50 mb-6">
               Principles
             </p>
             <h1 className="font-serif text-[#f4efe9] text-3xl md:text-5xl tracking-[-0.02em] leading-tight mb-5">

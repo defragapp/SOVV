@@ -74,7 +74,7 @@ export default function LoginScreen() {
           {/* Wordmark */}
           <div className="mb-10 text-center">
             <Link href="/" className="inline-block">
-              <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+              <span className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase font-medium">
                 SOVEREIGN.OS
               </span>
             </Link>
@@ -86,7 +86,7 @@ export default function LoginScreen() {
           </div>
 
           {/* Glass panel */}
-          <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: 20 }}>
+          <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: "var(--radius-container)" }}>
 
             {/* Mode tabs */}
             <div className="mb-8 flex border-b border-white/[0.08]">
@@ -94,8 +94,8 @@ export default function LoginScreen() {
                 <button
                   key={m}
                   type="button"
-                  onClick={() => { setMode(m); setError("") }}
-                  className={`flex-1 pb-4 text-sm font-medium tracking-wide transition-colors duration-200 border-b-2 ${
+                  onClick={() => { setMode(m); setError(""); setTurnstileToken("") }}
+                  className={`flex-1 pb-4 text-sm font-medium tracking-[0.14em] transition-colors duration-200 border-b-2 ${
                     mode === m
                       ? "border-[#f4efe9] text-[#f4efe9]"
                       : "border-transparent text-[#76716b] hover:text-[#a8a29a]"
@@ -109,7 +109,7 @@ export default function LoginScreen() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Email</label>
+                <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Email</label>
                 <input
                   type="email"
                   value={email}
@@ -118,12 +118,12 @@ export default function LoginScreen() {
                   autoComplete="email"
                   placeholder="you@example.com"
                   className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
-                  style={{ borderRadius: 12, fontSize: "16px" }}
+                  style={{ borderRadius: "var(--radius-input)", fontSize: "16px" }}
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Password</label>
+                <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Password</label>
                 <input
                   type="password"
                   value={password}
@@ -133,11 +133,23 @@ export default function LoginScreen() {
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
                   placeholder="••••••••"
                   className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
-                  style={{ borderRadius: 12, fontSize: "16px" }}
+                  style={{ borderRadius: "var(--radius-input)", fontSize: "16px" }}
                 />
               </div>
 
-
+              {/* Turnstile — only on register */}
+              {mode === "register" && (
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Verification</label>
+                  {turnstileSiteKey ? (
+                    <div ref={turnstileRef} className="min-h-[65px]" />
+                  ) : (
+                    <p className="text-sm text-[#4f4b47] leading-relaxed">
+                      Bot verification not configured.
+                    </p>
+                  )}
+                </div>
+              )}
 
               <AnimatePresence>
                 {error && (

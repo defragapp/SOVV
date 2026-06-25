@@ -140,7 +140,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 },
                 {
                   "@type": "Offer",
-                  "price": "20",
+                  "price": "12",
                   "priceCurrency": "USD",
                   "billingIncrement": "P1M",
                   "name": "Pro",
