@@ -54,7 +54,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             SOVEREIGN.OS
           </Link>
 
-          
+          <div className="flex items-center gap-4">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden text-[#a8a29a] hover:text-[#f4efe9] transition-colors p-2"

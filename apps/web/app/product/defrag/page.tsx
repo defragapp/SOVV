@@ -92,7 +92,9 @@ function DefragDemo() {
             style={{ borderRadius: 14 }}
           >
             {[
-              
+              { label: "What’s active", value: "You’re trying to clear the tension by naming it.", highlight: false },
+              { label: "What forms between you", value: "The more you try to clear it up, the more pressure builds.", highlight: false },
+              { label: "Next step", value: "Name one feeling and one need — in a single sentence.", highlight: true }
             ].map((row, i) => (
               <motion.div
                 key={row.label}
