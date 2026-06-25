@@ -425,7 +425,7 @@ export default function Home() {
         <HeroLightBeam />
 
         {/* Gradient mask for text contrast */}
-        <div className="absolute inset-0 z-[2] pointer-events-none bg-gradient-to-r from-neutral-950 via-neutral-950/60 to-transparent w-[80%] md:w-[60%]" />
+        <div className="absolute top-0 bottom-0 left-0 z-[2] pointer-events-none bg-gradient-to-r from-neutral-950 via-neutral-950/60 to-transparent w-[80%] md:w-[60%]" />
 
         {/* Edge vignette — all four sides, subtle */}
         <div
