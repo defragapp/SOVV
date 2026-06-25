@@ -48,7 +48,15 @@ export function ResultCard({
 }: ResultCardProps) {
   const [copied, setCopied] = React.useState(false)
 
-  
+  const sections = [
+    { label: "What's happening",       value: result.activePattern },
+    { label: "What you may be carrying", value: result.theRepeat },
+    { label: "The role you're entering",         value: result.oldRole },
+    { label: "What may be adding weight",     value: result.whatYouLearnedToCarry },
+    { label: "Where the pressure is",       value: result.strainPattern },
+    { label: "What gives this moment a better chance",       value: result.giftUnderStrain },
+    { label: "What belongs to you",      value: result.alignment },
+  ].filter(s => s.value)
 
   const response = result.bestNextResponse
   const steering = result.conversationalSteering
