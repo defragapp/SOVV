@@ -9,8 +9,21 @@ const APP_URL = "/app/login"
 const ease = [0.16, 1, 0.3, 1] as const
 
 // ── Interactive demo: shows a real Defrag result ───────────────────────────
+// ── Typed contract for Defrag demo scenario shape ──────────────────────────
+// These types prevent field-name drift between the data and the render layer.
+// If you rename a field in scenarios[], TypeScript will catch it immediately.
+type DefragScenarioResult = {
+  analysis: string
+  nextResponse: string
+}
+
+type DefragScenario = {
+  input: string
+  result: DefragScenarioResult
+}
+
 function DefragDemo() {
-  const scenarios = [
+  const scenarios: DefragScenario[] = [
     {
       input: "She went quiet after I said that. I don't know if I crossed a line or if she's just processing.",
       result: {
