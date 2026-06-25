@@ -41,15 +41,6 @@ import type {
   ThreadMeta,
 } from "@sovereign/core";
 
-import { getCorsHeaders } from "./cors.js";
-import { getSessionId, getAuthUser, cookieHeader, jsonResponse } from "./auth.js";
-import { checkFreeLimit } from "./limits.js";
-import { getBaseline, getBaselineDataset, getBaselineForAI, formatBaseline } from "./baseline-compiler.js";
-import { getPatterns, formatPatternsForPrompt } from "./patterns.js";
-import { Env } from "./types-env.js";
-import { SYSTEM_DEFRAG, SYSTEM_DEFRAG_RELATIONAL } from "@sovereign/prompts";
-
-
 // SYSTEM_SELF and SYSTEM_RELATIONAL removed — use SYSTEM_DEFRAG / SYSTEM_DEFRAG_RELATIONAL from prompts.ts
 
 function asText(value: unknown): string {
