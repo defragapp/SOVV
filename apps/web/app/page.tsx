@@ -424,6 +424,9 @@ export default function Home() {
         {/* Animated light layer */}
         <HeroLightBeam />
 
+        {/* Gradient mask for text contrast */}
+        <div className="absolute inset-0 z-[2] pointer-events-none bg-gradient-to-r from-neutral-950 via-neutral-950/60 to-transparent w-[80%] md:w-[60%]" />
+
         {/* Edge vignette — all four sides, subtle */}
         <div
           aria-hidden
@@ -440,19 +443,20 @@ export default function Home() {
 
         {/* Hero content — headline + single CTA only. Image breathes. */}
         <div
-          className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center text-center"
-          style={{ paddingBottom: "max(clamp(3rem, 8vh, 6rem), env(safe-area-inset-bottom, 0px))" }}
+          className="absolute inset-0 z-10 flex flex-col justify-center items-start text-left px-8 md:px-16 w-full max-w-7xl mx-auto"
+          style={{ paddingTop: "10vh" }}
+
         >
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="font-serif text-[#f4efe9] text-balance leading-[1.06] tracking-[-0.02em] px-8"
+            className="font-serif text-[#f4efe9] text-balance leading-none tracking-[-0.02em]"
             style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", maxWidth: "22ch" }}
           >
             Healing isn&apos;t optional.
             <br />
-            <span style={{ color: "rgba(244,239,233,0.48)" }}>
+            <span className="text-white/60">
               Holding the pain is.
             </span>
           </motion.h1>
@@ -463,9 +467,11 @@ export default function Home() {
             transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="mt-8"
           >
-            <Link href={APP_URL} className="btn-primary">
-              Enter Sovereign.os
-            </Link>
+            <motion.div whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }} transition={{ duration: 0.15, ease: "easeOut" }} className="inline-block rounded-md">
+              <Link href={APP_URL} className="btn-primary block px-6 py-3 border-[1px] border-white/10 rounded-md transition-colors">
+                Enter Sovereign.os
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </section>
