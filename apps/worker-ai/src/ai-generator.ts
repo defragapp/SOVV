@@ -47,7 +47,7 @@ export async function generateDefragWithRetry(
 
 function extractJson(text: string): string {
   const match = text.match(/```json\n([\s\S]*?)\n```/);
-  return match ? match[1] : text;
+  return match ? match[1] ?? text : text;
 }
 
 function applyLengthConstraints(data: DefragResult): DefragResult {
