@@ -86,10 +86,8 @@ function DefragDemo() {
             style={{ borderRadius: 14 }}
           >
             {[
-              { label: "What's active", value: current.result.pattern },
-              { label: "The loop", value: current.result.repeat },
-              { label: "Your default mode", value: current.result.mode },
-              { label: "Next response", value: current.result.response, highlight: true },
+              { label: "What's happening", value: current.result.analysis },
+              { label: "Next response", value: current.result.nextResponse, highlight: true },
             ].map((row: any, i) => (
               <motion.div
                 key={row.label}
