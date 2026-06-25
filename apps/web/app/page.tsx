@@ -254,7 +254,7 @@ function SpacePreview() {
                       {/* Baseline Design source bar */}
                       <div className="px-6 py-2.5 border-b border-white/[0.04] flex items-center gap-2 bg-[#e0743a]/[0.03]">
                         <span className="w-1 h-1 rounded-sm bg-[#e0743a]/50" />
-                        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50">
+                        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70">
                           Baseline Design active · {BASELINE.label.split("·")[0].trim()}
                         </span>
                       </div>
@@ -267,13 +267,13 @@ function SpacePreview() {
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.4, ease }}
                               className={`px-6 py-4 border-b border-white/[0.04] last:border-0 ${
-                                row.highlight ? "bg-[#e0743a]/[0.05]" : ""
+                                row.highlight ? "bg-[#e0743a]/[0.08]" : "bg-white/[0.01]"
                               }`}
                             >
                               {/* Label row */}
                               <div className="flex items-center justify-between mb-2">
                                 <span className={`font-mono text-[9px] uppercase tracking-[0.2em] ${
-                                  row.highlight ? "text-[#e0743a]/80" : "text-[#4f4b47]"
+                                  row.highlight ? "text-[#e0743a]/90" : "text-[#76716b]"
                                 }`}>
                                   {row.label}
                                 </span>
@@ -333,7 +333,7 @@ function SpacePreview() {
                     >
                       <div className="flex items-center gap-4">
                         <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47] w-14 shrink-0">{item.space}</span>
-                        <span className="text-[13px] text-[#76716b] group-hover:text-[#c8c2bc] transition-colors">{item.title}</span>
+                        <span className="text-[13px] text-[#a8a29a] group-hover:text-[#f4efe9] transition-colors">{item.title}</span>
                       </div>
                       <span className="font-mono text-[9px] text-[#4f4b47] shrink-0">{item.date}</span>
                     </motion.div>
