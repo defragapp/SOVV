@@ -23,6 +23,12 @@ async function verifyStripeSignature(rawBody: string, sigHeader: string, secret:
   const v1 = parts["v1"];
   if (!t || !v1) return false;
 
+  // Replay attack protection: reject webhooks older than 5 minutes
+  const TOLERANCE_SECONDS = 300
+  const webhookTimestamp = parseInt(t, 10)
+  const nowSeconds = Math.floor(Date.now() / 1000)
+  if (Math.abs(nowSeconds - webhookTimestamp) > TOLERANCE_SECONDS) return false
+
   const enc = new TextEncoder();
   const key = await crypto.subtle.importKey(
     "raw",

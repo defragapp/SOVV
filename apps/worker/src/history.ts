@@ -12,12 +12,11 @@ async function requireSessionAuth(req: Request, env: Env): Promise<Response | nu
 }
 
 export async function handleHistory(req: Request, env: Env) {
-  const authResponse = await requireSessionAuth(req, env);
-  if (authResponse) {
-    return authResponse;
-  }
-
   const user = await getAuthUser(req, env.DB);
+  if (!user) {
+    const jwtResponse = await verifyAccessJWT(req, env);
+    if (jwtResponse) return jwtResponse;
+  }
 
   // Subscription gate for space route
   const subGate = await requireActiveSubscription(user, req);

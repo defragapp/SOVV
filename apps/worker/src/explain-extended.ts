@@ -181,6 +181,12 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       "set-cookie": cookieHeader(sid),
     });
   }
+  if (message.length > 3000) {
+    return jsonResponse({ error: "Message too long. Please keep it under 3000 characters." }, 400, {
+      ...getCorsHeaders(req),
+      "set-cookie": cookieHeader(sid),
+    });
+  }
 
   const target = body.target;
   const relational = Boolean(target);
