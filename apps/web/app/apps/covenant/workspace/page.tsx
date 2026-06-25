@@ -21,7 +21,7 @@ function Section({ label, value }: { label: string; value?: string }) {
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className="border-b border-white/[0.05] pb-6 mb-6 last:border-0 last:pb-0 last:mb-0"
     >
-      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">{label}</p>
+      <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-2">{label}</p>
       <p className="text-[15px] text-[#f4efe9] leading-[1.7]">{value}</p>
     </motion.div>
   )
@@ -72,13 +72,6 @@ export default function CovenantWorkspacePage() {
   }, [])
 
   React.useEffect(() => {
-    fetch("/api/derive-profile", { credentials: "include" })
-      .then(r => r.ok ? r.json() : { statements: [] })
-      .then((d: any) => { if (Array.isArray(d.statements) && d.statements.length > 0) setBaselineStatements(d.statements) })
-      .catch(() => {})
-  }, [])
-
-  React.useEffect(() => {
     fetch("/api/library?workspace_source=COVENANT", { credentials: "include" })
       .then(r => r.ok ? r.json() : { items: [] })
       .then((d: any) => setLibrary(d.items || []))
@@ -101,13 +94,7 @@ export default function CovenantWorkspacePage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error === "daily_limit_reached"
-          ? "You've reached your free daily limit. Upgrade to Pro to continue."
-          : data.type === "needs_baseline" || data.error === "needs_baseline"
-          ? "needs_baseline"
-          : data.error === "incomplete_output"
-          ? "The system couldn't read this moment clearly. Try describing it with more specific detail."
-          : data.message || data.error || "Something went wrong.")
+        setError(data.message || data.error || "Something went wrong.")
         return
       }
       setResult(data)
@@ -179,34 +166,14 @@ export default function CovenantWorkspacePage() {
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">How Covenant works</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Context</p>
       </div>
       <div className="px-5 pt-6 pb-5">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Baseline Design</p>
-        {baselineStatements.length > 0 ? (
-          <div className="flex flex-col gap-0 mb-5">
-            {baselineStatements.slice(0, 3).map(({ statement, chips }, i) => (
-              <div key={i} className="py-3 border-b border-white/[0.04] last:border-0">
-                <p className="text-[12px] text-[#c8c2bc] leading-[1.6] mb-2">{statement}</p>
-                {chips.length > 0 && (
-                  <div className="flex gap-1 flex-wrap">
-                    {chips.map(chip => (
-                      <span key={chip} className="font-mono text-[8px] tracking-[0.1em] px-2 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/60 bg-[#e0743a]/[0.04]" style={{ borderRadius: "var(--radius-minimal)" }}>
-                        {chip}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-            <p className="text-[10px] text-[#4f4b47] mt-3">Active in every result.</p>
-          </div>
-        ) : (
-          <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
-            Your Baseline Design is already active — Covenant uses it to find the story that fits your moment.
-          </p>
-        )}
-        <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] mb-3">Patterns it recognizes</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50 mb-3">How this works</p>
+        <p className="text-[12px] text-[#4f4b47] leading-relaxed mb-5">
+          Covenant connects what you're walking through to the real human stories in Scripture. Your Baseline Design is already active — Covenant uses it to find the story that fits your moment.
+        </p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#2e2b28] mb-3">Patterns it recognizes</p>
         <div className="flex flex-col gap-0">
           {[
             { feeling: "Misunderstood", figure: "Joseph" },
@@ -219,13 +186,13 @@ export default function CovenantWorkspacePage() {
             { feeling: "Called to rebuild", figure: "Nehemiah" },
           ].map((item) => (
             <div key={item.feeling} className="flex items-center justify-between py-2 border-b border-white/[0.03] last:border-0">
-              <span className="text-[11px] text-[#76716b]">{item.feeling}</span>
+              <span className="text-[11px] text-[#3a3733]">{item.feeling}</span>
               <span className="text-[10px] text-[#4f4b47]">{item.figure}</span>
             </div>
           ))}
         </div>
         <div className="mt-6 pt-5 border-t border-white/[0.04]">
-          <Link href="/apps/covenant" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors">
+          <Link href="/apps/covenant" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733] hover:text-[#76716b] transition-colors">
             ← Covenant overview
           </Link>
         </div>
@@ -237,7 +204,7 @@ export default function CovenantWorkspacePage() {
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Saved results</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Library</p>
       </div>
 
       {result && (
@@ -275,19 +242,6 @@ export default function CovenantWorkspacePage() {
           >
             Invite Privately
           </button>
-
-          {/* Back-flow to Defrag */}
-          <div className="mt-4 pt-4 border-t border-white/[0.04]">
-            <p className="text-[10px] text-[#4f4b47] leading-relaxed mb-2">
-              Defrag shows the pattern beneath this. Run it first for deeper context.
-            </p>
-            <a
-              href="/apps/defrag/workspace"
-              className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
-            >
-              Open Defrag →
-            </a>
-          </div>
         </div>
       )}
 
@@ -297,7 +251,7 @@ export default function CovenantWorkspacePage() {
             <span className="w-4 h-4 border border-white/[0.15] border-t-white/30 rounded-full animate-spin" />
           </div>
         ) : library.length === 0 ? (
-          <p className="text-[12px] text-[#76716b] leading-relaxed px-5 py-8 text-center">Saved sessions will appear here.</p>
+          <p className="text-[12px] text-[#3a3733] leading-relaxed px-5 py-8 text-center">Saved sessions will appear here.</p>
         ) : (
           library.map(item => (
             <a key={item.id} href={`/apps/covenant/${item.id}`}
@@ -320,39 +274,16 @@ export default function CovenantWorkspacePage() {
   const main = (
     <div className="flex flex-col h-full">
       <div className="h-11 px-6 flex items-center border-b border-white/[0.06] shrink-0">
-        <div className="flex items-center gap-3">
-          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Covenant</span>
-          <span className="text-[#4f4b47] text-[10px]">·</span>
-          <span className="text-[11px] text-[#4f4b47]">The story in Scripture that fits this moment.</span>
-        {result && (
-          <span
-            className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#e0743a]/60 border border-[#e0743a]/20 px-2 py-0.5"
-            style={{ borderRadius: "var(--radius-minimal)" }}
-          >
-            Baseline Design active
-          </span>
-        )}
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#f4efe9]">Covenant</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
-
-        {error === "needs_baseline" && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
-            <p className="text-[15px] text-[#f4efe9] leading-snug">Set your Baseline Design first.</p>
-            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
-              Covenant uses your Baseline Design to find the story that fits your moment. It takes 30 seconds to set.
-            </p>
-            <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>
-              Set Baseline Design →
-            </a>
-          </div>
-        )}
 
         {!result && !isLoading && !error && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-3">
             <div
               className="w-10 h-10 flex items-center justify-center border border-[#e0743a]/20 bg-[#e0743a]/5 mb-2"
-              style={{ borderRadius: 10 }}
+              style={{ borderRadius: 10, boxShadow: "0 0 24px rgba(224,116,58,0.08)" }}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M8 2v12M2 8h12" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round"/>
@@ -368,23 +299,12 @@ export default function CovenantWorkspacePage() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/60 rounded-full animate-spin" />
-            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Finding the story that fits…</p>
+            <p className="text-[13px] text-[#4f4b47]">Looking for the story…</p>
           </div>
         )}
 
-        {error && error !== "needs_baseline" && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
-            <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">{error}</p>
-            {error.includes("daily limit") && (
-              <a
-                href="/pricing"
-                className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]"
-                style={{ borderRadius: "var(--radius-button)" }}
-              >
-                See Pro plans →
-              </a>
-            )}
-          </div>
+        {error && (
+          <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">{error}</p>
         )}
 
         <AnimatePresence>
@@ -394,52 +314,33 @@ export default function CovenantWorkspacePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="border border-white/[0.08] bg-white/[0.02] overflow-hidden"
-              style={{ borderRadius: "var(--radius-container)" }}
+              style={{ borderRadius: 16 }}
             >
-              {/* Result header */}
-              <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between bg-[#08070a]/60">
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Sovereign.os</span>
-                  <span className="text-[#4f4b47] text-xs">/</span>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]">Covenant</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  {(result as any).confidence && (result as any).confidence.strength !== "low" && (
-                    <span className="font-mono text-[8px] text-[#4f4b47]" title={`Signal strength: ${(result as any).confidence.strength}`}>
-                      {(result as any).confidence.strength === "high" ? "●●●" : "●●○"}
-                    </span>
-                  )}
-                  <span className="font-mono text-[9px] text-[#4f4b47]">
-                    {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                  </span>
-                </div>
-              </div>
-
-              {/* Figure match */}
+              {/* Figure match header */}
               {result.figure && (
                 <div className="px-6 py-5 border-b border-white/[0.06] bg-[#08070a]/40">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">Your moment matches</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50 mb-2">Your moment matches</p>
                   <p className="font-serif text-2xl text-[#f4efe9]">{result.figure}</p>
                   {result.reference && (
-                    <p className="font-mono text-[10px] text-[#76716b] tracking-[0.12em] mt-1">{result.reference}</p>
+                    <p className="font-mono text-[10px] text-[#3a3733] tracking-[0.12em] mt-1">{result.reference}</p>
                   )}
                 </div>
               )}
 
               {/* Story sections */}
               <div className="px-6 py-6">
-                <Section label="The pattern"             value={result.pattern} />
-                <Section label="What happened"           value={result.story} />
+                <Section label="The pattern you're in"   value={result.pattern} />
+                <Section label="Their story"             value={result.story} />
                 <Section label="What broke"              value={result.whatBroke} />
-                <Section label="How presence showed up"  value={result.howGodMet} />
-                <Section label="What they came to understand" value={result.whatTheyLearned} />
+                <Section label="How God met them"        value={result.howGodMet} />
+                <Section label="What they learned"       value={result.whatTheyLearned} />
                 <Section label="What this means for you" value={result.forYou} />
-                <Section label="One honest move"         value={result.nextStep} />
+                <Section label="One next step"           value={result.nextStep} />
 
                 {/* Scripture chips */}
                 {result.scriptures?.length > 0 && (
                   <div className="mt-6 pt-6 border-t border-white/[0.05]">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Scripture to explore</p>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#3a3733] mb-3">Scripture to explore</p>
                     <div className="flex flex-wrap gap-2">
                       {result.scriptures.map((s: string, i: number) => <ScriptureChip key={i} text={s} />)}
                     </div>
@@ -449,11 +350,11 @@ export default function CovenantWorkspacePage() {
                 {/* Reflection prompts */}
                 {result.reflectionPrompts?.length > 0 && (
                   <div className="mt-6 pt-6 border-t border-white/[0.05]">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Carry with you</p>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#3a3733] mb-3">Carry with you</p>
                     <div className="flex flex-col gap-2">
                       {result.reflectionPrompts.map((p: string, i: number) => (
                         <div key={i} className="flex items-start gap-2.5">
-                          <span className="text-[#4f4b47] text-xs shrink-0 mt-0.5">—</span>
+                          <span className="text-[#e0743a]/30 text-xs shrink-0 mt-0.5">—</span>
                           <p className="text-[12px] text-[#4f4b47] leading-relaxed">{p}</p>
                         </div>
                       ))}
@@ -468,23 +369,21 @@ export default function CovenantWorkspacePage() {
 
       {/* Composer */}
       <div className="flex-none px-6 pb-6">
-        <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: "var(--radius-container)" }}>
+        <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: 16 }}>
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Describe what you're walking through — Covenant will find the story in Scripture that matches it."
+            placeholder="What does this moment mean in the larger story?"
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
-            maxLength={2000}
-            style={{ fontSize: "16px" }}
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
-            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.1em]">↵ Run</span>
+            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Run</span>
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
-              className="h-8 px-5 border border-[#c8c2bc]/40 text-[#c8c2bc] text-[11px] font-medium tracking-[0.14em] hover:bg-[#c8c2bc]/10 hover:border-[#c8c2bc]/60 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="h-8 px-5 border border-[#c8c2bc]/40 text-[#c8c2bc] text-[11px] font-medium tracking-wide hover:bg-[#c8c2bc]/10 hover:border-[#c8c2bc]/60 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               style={{ borderRadius: 2 }}
             >
               {isLoading ? "…" : "Find the story"}
