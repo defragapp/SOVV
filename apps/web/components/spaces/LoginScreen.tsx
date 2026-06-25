@@ -5,6 +5,14 @@ import Image from "next/image"
 import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (container: HTMLElement, options: Record<string, unknown>) => string
+      reset?: (widgetId: string) => void
+    }
+  }
+}
 
 type LoginMode = "login" | "register"
 
@@ -12,21 +20,69 @@ export default function LoginScreen() {
   const [mode, setMode] = useState<LoginMode>("login")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-    const [error, setError] = useState("")
   const [turnstileToken, setTurnstileToken] = useState("")
+  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""
+  const turnstileRef = useRef<HTMLDivElement | null>(null)
+  const turnstileWidgetId = useRef<string | null>(null)
 
   useEffect(() => {
+    setTurnstileToken("")
     setError("")
-  }, [mode])
+    if (mode !== "register" || !turnstileSiteKey) return
+    const scriptId = "cf-turnstile-script"
+
+    const renderWidget = () => {
+      if (!turnstileRef.current || !window.turnstile || turnstileWidgetId.current) return
+      turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
+        sitekey: turnstileSiteKey,
+        theme: "dark",
+        callback: (token: string) => setTurnstileToken(token),
+        "expired-callback": () => setTurnstileToken(""),
+        "error-callback": () => setTurnstileToken(""),
+      })
+    }
+
+    const existing = document.getElementById(scriptId) as HTMLScriptElement | null
+    if (existing) {
+      if (window.turnstile) renderWidget()
+      else existing.addEventListener("load", renderWidget, { once: true })
+      return () => {
+        if (turnstileWidgetId.current && window.turnstile?.reset)
+          window.turnstile.reset(turnstileWidgetId.current)
+        turnstileWidgetId.current = null
+      }
+    }
+
+    const script = document.createElement("script")
+    script.id = scriptId
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+    script.async = true
+    script.defer = true
+    script.onload = renderWidget
+    document.head.appendChild(script)
+
+    return () => {
+      if (turnstileWidgetId.current && window.turnstile?.reset)
+        window.turnstile.reset(turnstileWidgetId.current)
+      turnstileWidgetId.current = null
+    }
+  }, [mode, turnstileSiteKey])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setLoading(true)
     try {
+      if (mode === "register" && turnstileSiteKey !== "" && !turnstileToken) {
+        setError("Complete the verification below to continue.")
+        return
+      }
       const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register"
-      const payload = { email, password }
+      const payload = mode === "register"
+        ? { email, password, turnstileToken }
+        : { email, password }
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -75,7 +131,7 @@ export default function LoginScreen() {
           {/* Wordmark */}
           <div className="mb-10 text-center">
             <Link href="/" className="inline-block">
-              <span className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase font-medium">
+              <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
                 SOVEREIGN.OS
               </span>
             </Link>
@@ -87,7 +143,7 @@ export default function LoginScreen() {
           </div>
 
           {/* Glass panel */}
-          <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: "var(--radius-container)" }}>
+          <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: 20 }}>
 
             {/* Mode tabs */}
             <div className="mb-8 flex border-b border-white/[0.08]">
@@ -96,7 +152,7 @@ export default function LoginScreen() {
                   key={m}
                   type="button"
                   onClick={() => { setMode(m); setError(""); setTurnstileToken("") }}
-                  className={`flex-1 pb-4 text-sm font-medium tracking-[0.14em] transition-colors duration-200 border-b-2 ${
+                  className={`flex-1 pb-4 text-sm font-medium tracking-wide transition-colors duration-200 border-b-2 ${
                     mode === m
                       ? "border-[#f4efe9] text-[#f4efe9]"
                       : "border-transparent text-[#76716b] hover:text-[#a8a29a]"
@@ -110,7 +166,7 @@ export default function LoginScreen() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Email</label>
+                <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Email</label>
                 <input
                   type="email"
                   value={email}
@@ -119,12 +175,12 @@ export default function LoginScreen() {
                   autoComplete="email"
                   placeholder="you@example.com"
                   className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
-                  style={{ borderRadius: "var(--radius-input)", fontSize: "16px" }}
+                  style={{ borderRadius: 12, fontSize: "16px" }}
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Password</label>
+                <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Password</label>
                 <input
                   type="password"
                   value={password}
@@ -134,14 +190,14 @@ export default function LoginScreen() {
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
                   placeholder="••••••••"
                   className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
-                  style={{ borderRadius: "var(--radius-input)", fontSize: "16px" }}
+                  style={{ borderRadius: 12, fontSize: "16px" }}
                 />
               </div>
 
               {/* Turnstile — only on register */}
               {mode === "register" && (
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Verification</label>
+                  <label className="text-xs font-mono uppercase tracking-[0.15em] text-[#76716b]">Verification</label>
                   {turnstileSiteKey ? (
                     <div ref={turnstileRef} className="min-h-[65px]" />
                   ) : (
@@ -167,9 +223,9 @@ export default function LoginScreen() {
 
               <button
                 type="submit"
-                disabled={loading || !email || !password}
-                className="mt-2 w-full h-12 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
-                style={{ borderRadius: "var(--radius-button)" }}
+                disabled={loading || !email || !password || (mode === "register" && turnstileSiteKey !== "" && !turnstileToken)}
+                className="mt-2 w-full h-12 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-30 disabled:cursor-not-allowed"
+                style={{ borderRadius: 12 }}
               >
                 {loading ? "···" : mode === "login" ? "Sign In" : "Create Account"}
               </button>
@@ -184,12 +240,12 @@ export default function LoginScreen() {
             {mode === "login" && (
               <p className="mt-3 text-center text-sm text-[#4f4b47]">
                 Forgot your password?{" "}
-                <Link
-                  href="/app/forgot-password"
+                <a
+                  href="mailto:info@defrag.app?subject=Password reset"
                   className="text-[#76716b] hover:text-[#a8a29a] transition-colors"
                 >
-                  Reset it
-                </Link>
+                  Contact support
+                </a>
               </p>
             )}
 
