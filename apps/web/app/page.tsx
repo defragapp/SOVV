@@ -283,7 +283,7 @@ function SpacePreview() {
                                     {row.evidence.map((chip) => (
                                       <span
                                         key={chip}
-                                        className="font-mono text-[8px] tracking-[0.1em] px-1.5 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/50 bg-[#e0743a]/[0.04]"
+                                        className="font-mono text-[8px] tracking-[0.1em] px-1.5 py-0.5 border border-[#e0743a]/30 text-[#e0743a]/75 bg-[#e0743a]/[0.06]"
                                         style={{ borderRadius: 3 }}
                                       >
                                         {chip}
@@ -296,7 +296,7 @@ function SpacePreview() {
                               <p className={`text-[13px] leading-relaxed ${
                                 row.highlight
                                   ? "text-[#f4efe9] font-medium"
-                                  : "text-[#a8a29a]"
+                                  : "text-[#c8c2bc]"
                               }`}>
                                 {row.value}
                               </p>
