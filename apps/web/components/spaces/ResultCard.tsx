@@ -53,6 +53,15 @@ export function ResultCard({
   const response = result.bestNextResponse
   const steering = result.conversationalSteering
 
+  const sections = [
+    { label: "What's active",          value: result.activePattern },
+    { label: "You",                    value: result.theRepeat },
+    { label: "Them",                   value: result.oldRole },
+    { label: "What forms between you", value: result.whatYouLearnedToCarry },
+    { label: "Why it's sharper now",   value: result.strainPattern },
+    { label: "What changes this",      value: result.alignment ?? result.giftUnderStrain },
+  ].filter(s => s.value)
+
   const handleCopyAll = async () => {
     const NL = "\n"
     const lines: string[] = [

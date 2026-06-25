@@ -48,6 +48,8 @@ export default function CovenantWorkspacePage() {
   const [error, setError] = React.useState("")
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
+  const [baselineStatements, setBaselineStatements] = React.useState<Array<{ statement: string; chips: string[] }>>([])
+
   // Audio Overview
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
