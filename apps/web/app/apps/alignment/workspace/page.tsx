@@ -265,7 +265,7 @@ export default function AlignmentWorkspacePage() {
             </a>
           </div>
         </div>
-      }}
+      }
 
       <div className="flex-1">
         {libraryLoading ? (
