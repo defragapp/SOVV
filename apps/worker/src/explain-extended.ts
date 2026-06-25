@@ -324,7 +324,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       audioOverviewAvailable: isPro,
       watchPreviewAvailable: false,
     },
-    
+  };
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
   const confidence: Confidence = "Medium";
