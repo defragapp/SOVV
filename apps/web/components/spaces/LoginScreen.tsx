@@ -13,6 +13,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
     const [error, setError] = useState("")
+  const [turnstileToken, setTurnstileToken] = useState("")
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
