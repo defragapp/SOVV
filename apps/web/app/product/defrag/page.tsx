@@ -75,7 +75,7 @@ function DefragDemo() {
 
       {/* Result */}
       <AnimatePresence mode="wait">
-        {revealed && (
+        {phase >= 1 && (
           <motion.div
             key={active}
             initial={{ opacity: 0, y: 6 }}
