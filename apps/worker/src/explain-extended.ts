@@ -42,6 +42,12 @@ import type {
 } from "@sovereign/core";
 
 import { getCorsHeaders } from "./cors.js";
+import { getSessionId, getAuthUser, cookieHeader, jsonResponse } from "./auth.js";
+import { checkFreeLimit } from "./limits.js";
+import { getBaseline, getBaselineDataset, getBaselineForAI, formatBaseline } from "./baseline-compiler.js";
+import { getPatterns, formatPatternsForPrompt } from "./patterns.js";
+import { Env } from "./types-env.js";
+import { SYSTEM_DEFRAG, SYSTEM_DEFRAG_RELATIONAL } from "@sovereign/prompts";
 
 
 // SYSTEM_SELF and SYSTEM_RELATIONAL removed — use SYSTEM_DEFRAG / SYSTEM_DEFRAG_RELATIONAL from prompts.ts
@@ -144,9 +150,18 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   }
 
   
-  if (subGate) return subGate;
-
   const sid = await getSessionId(req);
+  const user = await getAuthUser(req, env.DB);
+
+  if (!user) {
+    return jsonResponse({ error: "Unauthorized" }, 401, {
+      ...getCorsHeaders(req),
+      "set-cookie": cookieHeader(sid),
+    });
+  }
+
+  const subGate = requireActiveSubscription(user);
+  if (subGate) return subGate;
 
   // Free tier daily usage limit check
   const isPro = user.subscription_status === "active" || user.tier === "pro";
@@ -234,7 +249,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     message,
     baselineText,
     patternText,
-    activeSignalsText: activeSignalsText || undefined,
+    activeSignalsText: activeSignalsText || "",
     targetName: target ? target.relation : undefined,
     targetBaseline,
   });

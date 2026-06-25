@@ -52,10 +52,6 @@ export interface Env {
   STRIPE_ACCOUNT_ID?: string
   STRIPE_SUPPORT_LINK_URL?: string
 
-  // ── Turnstile ────────────────────────────────────────────────────────────
-  TURNSTILE_SECRET_KEY?: string
-  TURNSTILE_SITE_KEY?: string
-
   // ── Cloudflare Access ────────────────────────────────────────────────────
   // For admin/staging route protection via Cloudflare Access JWT validation.
   TEAM_DOMAIN?: string  // e.g., https://your-team.cloudflareaccess.com
