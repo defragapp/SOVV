@@ -181,6 +181,12 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       "set-cookie": cookieHeader(sid),
     });
   }
+  if (message.length > 3000) {
+    return jsonResponse({ error: "Message too long. Please keep it under 3000 characters." }, 400, {
+      ...getCorsHeaders(req),
+      "set-cookie": cookieHeader(sid),
+    });
+  }
 
   const target = body.target;
   const relational = Boolean(target);
@@ -309,28 +315,31 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     workspaceSource: "DEFRAG",
     createdAt: new Date().toISOString(),
     title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
-    // AI output fields — pass through as-is (undefined = AI omitted intentionally)
-    summary: parsed.summary || parsed.response || undefined,
-    activePattern: parsed.activePattern || undefined,
-    theRepeat: parsed.theRepeat || undefined,
-    oldRole: parsed.oldRole || undefined,
-    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || undefined,
-    strainPattern: parsed.strainPattern || undefined,
-    giftUnderStrain: parsed.giftUnderStrain || undefined,
-    alignment: parsed.alignment || undefined,
-    bestNextResponse: parsed.bestNextResponse || undefined,
-    conversationalSteering: (parsed.conversationalSteering?.do?.length || parsed.conversationalSteering?.avoid?.length)
-      ? parsed.conversationalSteering
-      : undefined,
-    sourcesUsed: {
-      baseline: true,
-      history: Boolean(patternText),
-      invitedUsers: Boolean(relational),
-    },
-    media: {
-      audioOverviewAvailable: isPro,
-      watchPreviewAvailable: false,
-    },
+    summary: parsed.response || "",
+    activePattern: parsed.activePattern || "This section needs more context.",
+    theRepeat: parsed.theRepeat || "This section needs more context.",
+    oldRole: parsed.oldRole || "This section needs more context.",
+    whatYouLearnedToCarry: parsed.whatYouLearnedToCarry || "This section needs more context.",
+    strainPattern: parsed.strainPattern || "This section needs more context.",
+    giftUnderStrain: parsed.giftUnderStrain || "This section needs more context.",
+    alignment: parsed.alignment || "This section needs more context.",
+    bestNextResponse: (() => {
+      const bnr = parsed.bestNextResponse
+      if (!bnr) return { summary: "This section needs more context.", phrasing: [] }
+      if (typeof bnr === "string") return { summary: bnr, phrasing: [] }
+      return {
+        summary: bnr.summary || "This section needs more context.",
+        phrasing: Array.isArray(bnr.phrasing) ? bnr.phrasing : [],
+      }
+    })(),
+    conversationalSteering: (() => {
+      const cs = parsed.conversationalSteering
+      if (!cs || typeof cs !== "object") return { do: [], avoid: [] }
+      return {
+        do: Array.isArray(cs.do) ? cs.do : [],
+        avoid: Array.isArray(cs.avoid) ? cs.avoid : [],
+      }
+    })(),
   };
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
@@ -347,9 +356,9 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     confidence,
   });
 
-  if (env.QUEUE) {
+  if (env.PATTERN_QUEUE) {
     // Offload pattern extraction to a queue to avoid delaying the response.
-    await env.QUEUE.send({ sessionId: sid, interactionId: interactionId });
+    await env.PATTERN_QUEUE.send({ sessionId: sid, interactionId: interactionId });
   } else {
     // Fallback for local dev or if queue is not configured.
     console.warn("QUEUE binding not found. Running pattern extraction in a non-blocking way, but this may be unreliable.");

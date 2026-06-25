@@ -9,8 +9,21 @@ const APP_URL = "/app/login"
 const ease = [0.16, 1, 0.3, 1] as const
 
 // ── Interactive demo: shows a real Defrag result ───────────────────────────
+// ── Typed contract for Defrag demo scenario shape ──────────────────────────
+// These types prevent field-name drift between the data and the render layer.
+// If you rename a field in scenarios[], TypeScript will catch it immediately.
+type DefragScenarioResult = {
+  analysis: string
+  nextResponse: string
+}
+
+type DefragScenario = {
+  input: string
+  result: DefragScenarioResult
+}
+
 function DefragDemo() {
-  const scenarios = [
+  const scenarios: DefragScenario[] = [
     {
       input: "She went quiet after I said that. I don't know if I crossed a line or if she's just processing.",
       result: {
@@ -75,49 +88,33 @@ function DefragDemo() {
 
       {/* Result */}
       <AnimatePresence mode="wait">
-        <motion.div
-          key={active}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.4, ease }}
-          className="ios-panel overflow-hidden relative"
-        >
-          {phase === 0 && (
-            <div className="p-5 animate-pulse">
-              <div className="h-3 bg-white/[0.05] rounded-sm w-1/4 mb-4"></div>
-              <div className="h-2 bg-white/[0.05] rounded-sm w-full mb-2"></div>
-              <div className="h-2 bg-white/[0.05] rounded-sm w-full mb-2"></div>
-              <div className="h-2 bg-white/[0.05] rounded-sm w-3/4"></div>
-            </div>
-          )}
-
-          {phase >= 1 && (
-            <motion.div
-              initial={{ filter: "blur(8px)", opacity: 0.5 }}
-              animate={{ filter: "blur(0px)", opacity: 1 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="px-5 py-5 border-b border-white/[0.05]">
-                <p className="text-[13px] leading-relaxed text-[#a8a29a]">
-                  {current.result.analysis}
-                </p>
-              </div>
-              
-              {phase === 2 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 4, backgroundColor: "rgba(255,255,255,0.05)" }}
-                  animate={{ opacity: 1, y: 0, backgroundColor: "transparent" }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  className="px-5 py-4 border-t border-white/[0.05] bg-white/[0.02]"
-                >
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-1.5">Best Next Response</p>
-                  <p className="text-[13px] leading-relaxed text-[#f4efe9] font-medium">{current.result.nextResponse}</p>
-                </motion.div>
-              )}
-            </motion.div>
-          )}
-        </motion.div>
+        {phase >= 1 && (
+          <motion.div
+            key={active}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease }}
+            className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden"
+            style={{ borderRadius: 14 }}
+          >
+            {[
+              { label: "What's happening", value: current.result.analysis },
+              { label: "Next response", value: current.result.nextResponse, highlight: true },
+            ].map((row: any, i) => (
+              <motion.div
+                key={row.label}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.08, duration: 0.3, ease }}
+                className={`px-5 py-4 border-b border-white/[0.05] last:border-0 ${row.highlight ? "bg-white/[0.02]" : ""}`}
+              >
+                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-1.5">{row.label}</p>
+                <p className={`text-[13px] leading-relaxed ${row.highlight ? "text-[#f4efe9]" : "text-[#a8a29a]"}`}>{row.value}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   )

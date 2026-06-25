@@ -4,6 +4,8 @@ import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
 import { ResultCard } from "@/components/spaces/ResultCard"
 import Link from "next/link"
+import { processInput } from "@/lib/system/processInput"
+import type { DefragMeta } from "@/lib/system/outputContract"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -69,7 +71,7 @@ function EvidenceChip({ label }: { label: string }) {
 
 export default function DefragWorkspacePage() {
   const [input, setInput] = React.useState("")
-  const [result, setResult] = React.useState<DefragResult | null>(null)
+  const [result, setResult] = React.useState<DefragMeta | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
   const [error, setError] = React.useState("")
   const [isSaving, setIsSaving] = React.useState(false)
@@ -156,28 +158,23 @@ export default function DefragWorkspacePage() {
     setAudioError("")
     setResult(null)
     try {
-      const res = await fetch("/api/explain", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          message: input,
-          // Compare With Someone — passes target name for relational overlay
-          ...(compareMode && compareName.trim() ? {
-            target: { id: "compare", relation: "partner" },
-            targetName: compareName.trim(),
-          } : {}),
-        }),
+      const pResult = await processInput({
+        space: "defrag",
+        message: input,
+        ...(compareMode && compareName.trim() ? {
+          target: { id: "compare", relation: "partner" },
+          context: { targetName: compareName.trim() },
+        } : {}),
       })
-      const data = await res.json()
-      if (data.type === "needs_baseline") { setError("needs_baseline"); return }
-      if (!res.ok) {
-        setError(data.error === "daily_limit_reached"
-          ? "You've reached your free daily limit. Upgrade to continue."
-          : data.message || data.error || "Something went wrong.")
+
+      if (!pResult.ok) {
+        setError(pResult.error)
         return
       }
-      setResult(data)
+
+      // Render from the unified output contract
+      // meta contains the full Defrag-specific fields for ResultCard
+      setResult(pResult.output.meta as DefragMeta)
     } catch {
       setError("Unable to connect. Check your connection and try again.")
     } finally {

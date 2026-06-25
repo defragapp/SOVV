@@ -1,4 +1,4 @@
-const API_BASE = 'https://api.defrag.app'
+const API_BASE = process.env.API_BASE || 'https://api.defrag.app'
 
 export async function getSession() {
   const res = await fetch(`${API_BASE}/api/auth/session`, {

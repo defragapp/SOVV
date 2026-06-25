@@ -75,7 +75,7 @@ export async function saveBaseline(env: Env, sid: string, baseline: BaselineRequ
     updatedAt: now,
   };
 
-  await env.KV.put(BASELINE_KEY(sid), JSON.stringify(record));
+  await env.KV.put(BASELINE_KEY(sid), JSON.stringify(record), { expirationTtl: 90 * 24 * 60 * 60 }); // 90 days
   await env.KV.put(
     USER_KEY(sid),
     JSON.stringify({ sid, createdAt: record.createdAt, updatedAt: record.updatedAt, baselineAt: record.updatedAt })
@@ -141,7 +141,7 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
       pob: body.pob,
     },
   };
-  await env.KV.put(DATASET_KEY(sid), JSON.stringify(pendingDataset));
+  await env.KV.put(DATASET_KEY(sid), JSON.stringify(pendingDataset), { expirationTtl: 90 * 24 * 60 * 60 }); // 90 days
 
   // Compile in background using waitUntil if available, otherwise fire-and-forget
   const compileAndStore = async () => {
@@ -151,7 +151,7 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
         (env as any).AI,
         aiModel
       );
-      await env.KV.put(DATASET_KEY(sid), JSON.stringify(dataset));
+      await env.KV.put(DATASET_KEY(sid), JSON.stringify(dataset), { expirationTtl: 90 * 24 * 60 * 60 }); // 90 days
     } catch (err) {
       console.error("[baseline-compiler] failed:", err);
       const failedDataset: BaselineDesignDataset = {
@@ -159,7 +159,7 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
         status: "failed",
         failureReason: String(err),
       };
-      await env.KV.put(DATASET_KEY(sid), JSON.stringify(failedDataset));
+      await env.KV.put(DATASET_KEY(sid), JSON.stringify(failedDataset), { expirationTtl: 24 * 60 * 60 }); // 1 day (retry sooner on failure)
     }
   };
 

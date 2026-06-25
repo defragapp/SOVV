@@ -13,6 +13,7 @@ custom_domain = true
 binding = "DB"
 database_name = "vibesdk-db"
 database_id = "c8c2fd8d-5297-46fc-8594-7629c8bad74d"
+migrations_dir = "migrations"
 
 # KV namespace for session state, Baseline Design cache, usage counters, and replay protection
 # Internal identifier: SOVV_DATA (KV namespace title in Cloudflare dashboard)
@@ -48,6 +49,9 @@ simple = { limit = 15, period = 60 }
 [vars]
 FREE_DAILY_LIMIT = "15"
 AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
+# Story Engine (set via wrangler secret for production)
+# STORY_ENGINE_API_URL = ""
+# STORY_ENGINE_API_KEY = ""
 APP_URL = "https://app.defrag.app"
 GATEWAY_ID = "sovereign-ai-gateway"
 
