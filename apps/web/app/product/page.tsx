@@ -146,7 +146,7 @@ export default function ProductPage() {
             Start with Defrag. Free, no time limit.
           </h2>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="https://app.defrag.app/app/login" className="btn-primary">Enter Sovereign.os</Link>
+            <Link href="/app/login" className="btn-primary">Enter Sovereign.os</Link>
             <Link href="/pricing" className="btn-secondary">See plans</Link>
           </div>
         </Container>

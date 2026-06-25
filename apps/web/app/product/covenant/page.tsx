@@ -6,7 +6,7 @@ import { Container } from "@/components/ui/layout-primitives"
 import { motion, AnimatePresence } from "framer-motion"
 import type { Metadata } from "next"
 
-const APP_URL = "https://app.defrag.app/app/login"
+const APP_URL = "/app/login"
 const ease = [0.16, 1, 0.3, 1] as const
 
 // ── Interactive demo: shows how Covenant works ─────────────────────────────

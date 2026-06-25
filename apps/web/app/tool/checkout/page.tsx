@@ -90,7 +90,8 @@ export default function CheckoutPage() {
           <div className="h-px w-full bg-white/[0.06] mt-4" />
         </div>
 
-        <div className="rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-8 flex flex-col gap-8">
+        <div className="border border-white/[0.08] bg-[#0c0a0d] p-8 flex flex-col gap-8"
+          style={{ borderRadius: "var(--radius-container)" }}>
 
           <div className="text-center">
             <h1 className="font-serif text-2xl text-[#f4efe9] mb-3">
@@ -120,7 +121,8 @@ export default function CheckoutPage() {
             <button
               onClick={startCheckout}
               disabled={loading}
-              className="w-full rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-5 text-left hover:border-[#e0743a]/20 hover:bg-white/[0.04] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-full border border-white/[0.08] bg-white/[0.02] p-5 text-left hover:border-[#e0743a]/30 hover:bg-white/[0.04] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+              style={{ borderRadius: "var(--radius-container)" }}
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-base font-medium text-[#f4efe9]">Sovereign.os Pro</span>

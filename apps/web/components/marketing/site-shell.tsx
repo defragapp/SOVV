@@ -111,7 +111,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                 </Link>
               ))}
               <Link
-                href="https://app.defrag.app/app/login"
+                href="/app/login"
                 onClick={() => setMenuOpen(false)}
                 className="btn-primary justify-center mt-2"
               >

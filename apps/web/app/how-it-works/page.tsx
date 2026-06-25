@@ -122,7 +122,7 @@ export default function HowItWorksPage() {
           <h2 className="font-serif text-4xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] mb-8 text-balance max-w-2xl mx-auto">
             Ready to interrupt the loop?
           </h2>
-          <Link href="https://app.defrag.app/app/login" className="btn-primary">
+          <Link href="/app/login" className="btn-primary">
             Enter Sovereign.os
           </Link>
         </Container>
