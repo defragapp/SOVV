@@ -1,3 +1,4 @@
+import Link from "next/link"
 // defrag.app tool landing — served when host-based routing sends defrag.app to /tool
 // Note: per platform hierarchy, defrag.app should serve the Sovereign.os platform landing.
 // This page is a fallback for the feat/host-routing branch pattern.
@@ -15,15 +16,15 @@ export default function ToolLanding() {
         </header>
 
         <section className="space-y-4">
-          <a href="/login" className="flex items-center justify-center w-full border border-white/[0.06] bg-white text-black hover:bg-white/90 transition-colors h-10 text-[10px] font-mono uppercase tracking-[0.14em]">
+          <Link href="/app/login" className="flex items-center justify-center w-full border border-white/[0.06] bg-[#f4efe9] text-[#08070a] hover:bg-[#f4efe9]/90 transition-colors h-10 text-[10px] font-sans font-medium uppercase tracking-[0.15em]">
             Sign In
-          </a>
-          <a href="/apps/defrag" className="flex items-center justify-center w-full border border-white/[0.06] bg-transparent text-[#a8a29a] hover:text-[#f4efe9] hover:border-white/[0.06] transition-colors h-10 text-[10px] font-mono uppercase tracking-[0.14em]">
+          </Link>
+          <Link href="/apps/defrag" className="flex items-center justify-center w-full border border-white/[0.06] bg-transparent text-[#a8a29a] hover:text-white hover:border-white/[0.06] transition-colors h-10 text-[10px] font-sans font-medium uppercase tracking-[0.15em]">
             Defrag Space
-          </a>
-          <a href="/apps/covenant" className="flex items-center justify-center w-full border border-white/[0.06] bg-transparent text-[#a8a29a] hover:text-[#f4efe9] hover:border-white/[0.06] transition-colors h-10 text-[10px] font-mono uppercase tracking-[0.14em]">
+          </Link>
+          <Link href="/apps/covenant" className="flex items-center justify-center w-full border border-white/[0.06] bg-transparent text-[#a8a29a] hover:text-white hover:border-white/[0.06] transition-colors h-10 text-[10px] font-sans font-medium uppercase tracking-[0.15em]">
             Covenant Space
-          </a>
+          </Link>
         </section>
 
         <footer className="pt-6 border-t border-white/[0.06] text-center">
