@@ -27,6 +27,10 @@ const ALLOWED_ORIGINS = [
   'https://app.defrag.app',
   'https://sovereign.defrag.app',
   'https://premium.defrag.app',
+  // sovv-web Worker (workers.dev staging URL)
+  'https://sovv-web.8b1954d216d65077c6480d62583fe2c2.workers.dev',
+  // operator.defrag.app (sovereign-control UI)
+  'https://operator.defrag.app',
 ];
 
 export function getCorsHeaders(request: Request): Record<string, string> {
@@ -34,6 +38,7 @@ export function getCorsHeaders(request: Request): Record<string, string> {
   const headers: Record<string, string> = {
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Credentials': 'true',
     'Vary': 'Origin',
   };
 
