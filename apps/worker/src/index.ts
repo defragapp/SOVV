@@ -245,6 +245,45 @@ async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: stri
   }
 }
 
+// GET /api/user/me — current authenticated user info
+router.get("/api/user/me", async (request: Request) => {
+  const env = getEnv();
+  const user = await getAuthUser(request, env.DB);
+  if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    status: 401, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) }
+  });
+  return new Response(JSON.stringify({
+    id: user.id,
+    email: user.email,
+    tier: user.tier || "free",
+    subscription_status: user.subscription_status || "free",
+  }), { status: 200, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
+});
+
+// GET /api/user/usage — session usage for current user (free tier counter)
+router.get("/api/user/usage", async (request: Request) => {
+  const env = getEnv();
+  const user = await getAuthUser(request, env.DB);
+  if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    status: 401, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) }
+  });
+
+  const FREE_LIMIT = parseInt(env.FREE_DAILY_LIMIT || "15", 10);
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const usageKey = `usage:${user.id}:${today}`;
+  const usedStr = await env.KV.get(usageKey);
+  const used = usedStr ? parseInt(usedStr, 10) : 0;
+  const isPro = user.tier === "pro" || user.subscription_status === "active";
+
+  return new Response(JSON.stringify({
+    used,
+    limit: isPro ? null : FREE_LIMIT,
+    remaining: isPro ? null : Math.max(0, FREE_LIMIT - used),
+    isPro,
+    resetAt: today + "T00:00:00Z",
+  }), { status: 200, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
+});
+
 router.all("*", () => new Response("Not Found", { status: 404 }));
 
 async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext) {
