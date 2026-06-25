@@ -107,7 +107,6 @@ export function getSessionToken(request: Request): string | null {
   return match ? (match[1] ?? null) : null
 }
 
-import type { D1Database } from "@cloudflare/workers-types";
 import { getSessionId } from "./plan.js";
 
 export function jsonResponse(data: unknown, status = 200, headers: Record<string, string> = {}): Response {
@@ -323,7 +322,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Set-Cookie": clearCookie(cookieDomain),
+        "Set-Cookie": clearCookie(),
       },
     })
   })

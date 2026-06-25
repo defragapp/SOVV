@@ -217,7 +217,7 @@ async function fetchHorizonsPosition(
     const soeMatch = text.match(/\$\$SOE([\s\S]*?)\$\$EOE/)
     if (!soeMatch) return null
 
-    const dataLine = soeMatch[1].trim().split("\n")[0] ?? ""
+    const dataLine = (soeMatch[1] ?? "").trim().split("\n")[0] ?? ""
     // Horizons QUANTITIES=31 returns: Date, RA, Dec, Ecliptic Lon, Ecliptic Lat
     // The exact format depends on the quantities requested
     // Parse the numeric values from the data line
@@ -251,7 +251,8 @@ async function computeAstronomySnapshot(
     const monthName = monthNames[parseInt(month ?? "1") - 1] ?? "Jan"
     const datetime = `${year}-${monthName}-${day} ${tob}`
 
-    const bodies: BaselineDesignDataset["astronomy"]["bodies"] = {}
+    type AstronomyBodies = NonNullable<BaselineDesignDataset["astronomy"]>["bodies"]
+    const bodies: AstronomyBodies = {}
 
     // Fetch positions for all planets (with concurrency limit)
     const planetEntries = Object.entries(PLANET_IDS)
@@ -312,7 +313,7 @@ function computeAscendant(
 }
 
 function computeAspects(
-  bodies: BaselineDesignDataset["astronomy"]["bodies"]
+  bodies: NonNullable<BaselineDesignDataset["astronomy"]>["bodies"]
 ): Array<{ body1: string; body2: string; type: string; orb: number }> {
   const aspects: Array<{ body1: string; body2: string; type: string; orb: number }> = []
   const aspectDefs = [
@@ -349,7 +350,7 @@ function computeAstrologyFramework(
   lat: number,
   dob: string,
   tob: string
-): BaselineDesignDataset["frameworks"]["astrology"] {
+): NonNullable<BaselineDesignDataset["frameworks"]>["astrology"] {
   const bodies = astronomy?.bodies ?? {}
 
   const placements = Object.entries(bodies).map(([body, data]) => ({
@@ -480,7 +481,7 @@ function determineHDType(gates: Array<{ gate: number }>): string {
 
 function computeHumanDesignFramework(
   astronomy: BaselineDesignDataset["astronomy"]
-): BaselineDesignDataset["frameworks"]["humanDesign"] {
+): NonNullable<BaselineDesignDataset["frameworks"]>["humanDesign"] {
   const bodies = astronomy?.bodies ?? {}
 
   // Compute gates for each planet
@@ -590,19 +591,20 @@ const GENE_KEY_DATA: Record<number, { shadow: string; gift: string; siddhi: stri
 }
 
 function computeGeneKeysFramework(
-  hdFramework: BaselineDesignDataset["frameworks"]["humanDesign"]
-): BaselineDesignDataset["frameworks"]["geneKeys"] {
+  hdFramework: NonNullable<BaselineDesignDataset["frameworks"]>["humanDesign"]
+): NonNullable<BaselineDesignDataset["frameworks"]>["geneKeys"] {
   const gates = hdFramework?.gates ?? []
-  const activations = gates.slice(0, 8).map(g => {
+  const activations = gates.slice(0, 8).map((g: { gate: number; line: number; planet: string; conscious: boolean }) => {
     const gkData = GENE_KEY_DATA[g.gate]
-    return {
+    const activation: { key: number; line: number; sphere?: string; shadow?: string; gift?: string; siddhi?: string } = {
       key: g.gate,
       line: g.line,
       sphere: g.conscious ? "activation" : "design",
-      shadow: gkData?.shadow,
-      gift: gkData?.gift,
-      siddhi: gkData?.siddhi,
     }
+    if (gkData?.shadow !== undefined) activation.shadow = gkData.shadow
+    if (gkData?.gift !== undefined) activation.gift = gkData.gift
+    if (gkData?.siddhi !== undefined) activation.siddhi = gkData.siddhi
+    return activation
   })
   return { activations }
 }
@@ -616,11 +618,11 @@ function reduceNumber(n: number): number {
   return n
 }
 
-function computeNumerology(dob: string): BaselineDesignDataset["frameworks"]["numerology"] {
+function computeNumerology(dob: string): NonNullable<BaselineDesignDataset["frameworks"]>["numerology"] {
   const [year, month, day] = dob.split("-").map(Number)
   const lifePath = reduceNumber((year ?? 0) + (month ?? 0) + (day ?? 0))
   const birthDay = reduceNumber(day ?? 1)
-  return { lifePath, birthDay }
+  return { lifePath }
 }
 
 // ─── AI synthesis — derivedTraits + appOverlays ────────────────────────────
@@ -769,12 +771,16 @@ export async function compileBaselineDataset(
     const frameworks: BaselineDesignDataset["frameworks"] = {}
 
     if (astronomy) {
-      frameworks.astrology = computeAstrologyFramework(astronomy, lat, input.dob, input.tob)
-      frameworks.humanDesign = computeHumanDesignFramework(astronomy)
-      frameworks.geneKeys = computeGeneKeysFramework(frameworks.humanDesign)
+      const astrology = computeAstrologyFramework(astronomy, lat, input.dob, input.tob)
+      if (astrology !== undefined) frameworks.astrology = astrology
+      const humanDesign = computeHumanDesignFramework(astronomy)
+      if (humanDesign !== undefined) frameworks.humanDesign = humanDesign
+      const geneKeys = computeGeneKeysFramework(frameworks.humanDesign)
+      if (geneKeys !== undefined) frameworks.geneKeys = geneKeys
     }
 
-    frameworks.numerology = computeNumerology(input.dob)
+    const numerology = computeNumerology(input.dob)
+    if (numerology !== undefined) frameworks.numerology = numerology
     dataset.frameworks = frameworks
 
     // Step 4: AI synthesis layer
@@ -784,7 +790,8 @@ export async function compileBaselineDataset(
       dataset.status = "ready"
     } else {
       // Build minimal fallback aiDataset from framework data
-      dataset.aiDataset = buildFallbackAIDataset(frameworks)
+      const fallback = buildFallbackAIDataset(frameworks)
+      if (fallback !== undefined) dataset.aiDataset = fallback
       dataset.status = "ready"
     }
 

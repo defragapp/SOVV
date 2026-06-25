@@ -44,33 +44,36 @@ export function extractPatternSignature(
   if (space === "DEFRAG") {
     const pattern = output.activePattern as string
     if (!pattern) return null
-    return {
+    const defragResult: Omit<PatternMemory, "id" | "userId" | "timestamp" | "sessionCount"> = {
       space,
       pattern,
-      role: output.oldRole as string | undefined,
-      pressure: output.strainPattern as string | undefined,
-      shift: output.alignment as string | undefined,
     }
+    if (output.oldRole !== undefined) defragResult.role = output.oldRole as string
+    if (output.strainPattern !== undefined) defragResult.pressure = output.strainPattern as string
+    if (output.alignment !== undefined) defragResult.shift = output.alignment as string
+    return defragResult
   }
 
   if (space === "ALIGNMENT") {
     const shift = output.theShift as string
     if (!shift) return null
-    return {
+    const alignResult: Omit<PatternMemory, "id" | "userId" | "timestamp" | "sessionCount"> = {
       space,
       pattern: output.whatIsTrue as string || shift,
-      shift,
     }
+    if (shift !== undefined) alignResult.shift = shift
+    return alignResult
   }
 
   if (space === "COVENANT") {
     const pattern = output.pattern as string
     if (!pattern) return null
-    return {
+    const covenantResult: Omit<PatternMemory, "id" | "userId" | "timestamp" | "sessionCount"> = {
       space,
       pattern,
-      shift: output.nextStep as string | undefined,
     }
+    if (output.nextStep !== undefined) covenantResult.shift = output.nextStep as string
+    return covenantResult
   }
 
   return null
@@ -102,8 +105,11 @@ export async function savePatternMemory(
 
     if (existingIdx >= 0) {
       // Increment session count for recurring pattern
-      memories[existingIdx].sessionCount++
-      memories[existingIdx].timestamp = new Date().toISOString()
+      const existing = memories[existingIdx]
+      if (existing) {
+        existing.sessionCount++
+        existing.timestamp = new Date().toISOString()
+      }
     } else {
       // Add new pattern memory
       const newMemory: PatternMemory = {
@@ -149,11 +155,12 @@ export async function loadMemoryContext(
       .filter(m => m.sessionCount > 1)
       .sort((a, b) => b.sessionCount - a.sessionCount)[0]
 
-    return {
+    const ctx: MemoryContext = {
       recentPatterns: filtered.slice(0, 5),
-      recurringPattern: recurring?.pattern,
       sessionCount: filtered.reduce((sum, m) => sum + m.sessionCount, 0),
     }
+    if (recurring?.pattern !== undefined) ctx.recurringPattern = recurring.pattern
+    return ctx
   } catch {
     return { recentPatterns: [], sessionCount: 0 }
   }

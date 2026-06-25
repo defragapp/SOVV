@@ -1,6 +1,5 @@
 // --- Background Pattern Extraction ---
 // Runs via ctx.waitUntil after the response is sent
-import type { D1Database, Ai } from "@cloudflare/workers-types";
 import type { Env } from "./types-env.js";
 import { getRecentInteractions, upsertPatterns, getPatterns } from "./db.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";

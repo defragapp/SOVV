@@ -1,5 +1,3 @@
-import type { D1Database, R2Bucket, Ai, KVNamespace, SendEmail, Queue, Fetcher } from "@cloudflare/workers-types";
-
 export interface Env {
   RATE_LIMITER?: { limit: (opts: { key: string }) => Promise<{ success: boolean }> }
   // ── Storage ──────────────────────────────────────────────────────────────

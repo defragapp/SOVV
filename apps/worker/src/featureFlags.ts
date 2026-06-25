@@ -27,8 +27,8 @@ export interface FeatureFlags {
  */
 export function getFeatureFlags(env: Env): FeatureFlags {
   return {
-    enableNewFlow: (env as Record<string, unknown>).ENABLE_NEW_FLOW === "true",
-    enableMemory: (env as Record<string, unknown>).ENABLE_MEMORY === "true",
-    enableFlowSuggestion: (env as Record<string, unknown>).ENABLE_FLOW_SUGGESTION === "true",
+    enableNewFlow: (env as unknown as Record<string, unknown>).ENABLE_NEW_FLOW === "true",
+    enableMemory: (env as unknown as Record<string, unknown>).ENABLE_MEMORY === "true",
+    enableFlowSuggestion: (env as unknown as Record<string, unknown>).ENABLE_FLOW_SUGGESTION === "true",
   }
 }

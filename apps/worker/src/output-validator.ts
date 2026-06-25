@@ -243,7 +243,7 @@ export function validateAndScore(
       space,
       scoring,
       guardrailsPassed: guardrails.passed,
-      confidence: (scoring as Record<string, unknown>).confidence,
+      confidence: (scoring as unknown as Record<string, unknown>).confidence,
     },
   }
 

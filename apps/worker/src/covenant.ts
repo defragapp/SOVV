@@ -2,7 +2,7 @@ import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
-import { checkProLimit } from "./plan.js";
+import { checkProLimit, getSessionId } from "./plan.js";
 import { SYSTEM_COVENANT } from "./prompts.js";
 import { checkGuardrails } from "./output-validator.js";
 import {
@@ -73,7 +73,45 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
         return new Response(JSON.stringify({ error: "Message too long. Please keep it under 3000 characters." }), { status: 400, headers: { "Content-Type": "application/json" } });
       }
 
-      
+
+      // ── Baseline & active signals ──────────────────────────────────────────
+      let activeSignalsText: string | null = null
+      let baselineContext: string | null = null
+
+      const sid = await getSessionId(request)
+
+      try {
+        const dataset = await getBaselineDataset(env, sid)
+        if (dataset) {
+          const activeSignals = selectActiveSignals(dataset, {
+            message: typeof message === "string" ? message : "",
+            relational: false,
+            mode: "self",
+          })
+          const timingSignals = buildTimingSignals(dataset)
+          activeSignalsText = formatActiveSignalsForPrompt(activeSignals, timingSignals)
+        }
+      } catch (_e) {
+        // Baseline not available — proceed without it
+      }
+
+      if (!activeSignalsText) {
+        try {
+          baselineContext = await getBaselineForAI(env, sid, "covenant").catch(() => null)
+        } catch (_e) {
+          // No baseline context available
+        }
+      }
+
+      const userContent = [
+        activeSignalsText || (baselineContext ? `User Baseline Design:\n${baselineContext}` : ""),
+        `What they are navigating:\n${message}`,
+      ].filter(Boolean).join("\n\n")
+
+      const messages = [
+        { role: "system" as const, content: SYSTEM_COVENANT },
+        { role: "user" as const, content: userContent },
+      ]
 
       const aiResponse = await env.AI.run(
         (env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast") as any,

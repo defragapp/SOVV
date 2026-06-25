@@ -33,7 +33,33 @@ export interface BaselineSignature {
   tokens: Array<{ key: string; value: string }>
 }
 
+/** Active behavioral signals — context-reduced, AI-ready */
+export interface ActiveBaselineSignals {
+  pace: "fast" | "slow" | "variable" | "unknown"
+  stabilizes: string
+  responds: string
+  protects: string
+  pattern: string
+  evidenceTags: string[]
+  traitLines: string[]
+}
 
+/** Timing signals derived from current sky/astronomy context */
+export interface TimingSignals {
+  urgency: "low" | "moderate" | "high"
+  sensitivity: "low" | "moderate" | "high"
+  tolerance: "low" | "moderate" | "high"
+  pacing: "slow" | "normal" | "fast"
+  state: "stable" | "reactive"
+  note?: string
+}
+
+/** Overlay signals for two-person relational analysis */
+export interface OverlaySignals {
+  loop: string
+  amplifier: string
+  shift: string
+}
 
 /** Default rail data — quiet, compressed, factual.
  *  Max 3 baseline signals. No raw framework data. */
@@ -93,7 +119,7 @@ export function buildBaselineSignature(dataset: BaselineDesignDataset): Baseline
 
   // Gene Keys — primary activation (first activation, sphere if available)
   if (gk?.activations?.length) {
-    const primary = gk.activations[0]
+    const primary = gk.activations[0]!
     const gkLabel = primary.sphere
       ? `${primary.key}/${primary.line} (${primary.sphere})`
       : `${primary.key}/${primary.line}`
@@ -176,14 +202,14 @@ export function selectActiveSignals(
       t.key.includes("pressure") || t.key.includes("strain") || t.key.includes("pace")
     )
     if (pressureTrait?.overExpression?.[0]) {
-      responds = pressureTrait.overExpression[0]
+      responds = pressureTrait.overExpression[0] ?? responds
     }
   }
 
   // ── Protects: from identity anchors or sun sign ───────────────────────────
   let protects = "autonomy"
   if (aiData?.identityAnchors?.length) {
-    const anchor = aiData.identityAnchors[0]
+    const anchor = aiData.identityAnchors[0]!
     if (anchor.toLowerCase().includes("space")) protects = "space"
     else if (anchor.toLowerCase().includes("connection")) protects = "connection"
     else if (anchor.toLowerCase().includes("clarity")) protects = "clarity"
@@ -205,8 +231,11 @@ export function selectActiveSignals(
   // ── Pattern tendency: from appOverlays.defrag ─────────────────────────────
   let pattern = "moves early under pressure"
   if (aiData?.appOverlays?.defrag?.likelyLoops?.length) {
-    pattern = aiData.appOverlays.defrag.likelyLoops[0]
+    pattern = aiData.appOverlays.defrag.likelyLoops[0] ?? pattern
   }
+
+  const traitLines: string[] = []
+  const evidenceTags: string[] = []
 
   // ── Evidence tags (internal, not shown to user) ───────────────────────────
   // ── Cross-framework synthesis ─────────────────────────────────────────────────
@@ -239,7 +268,6 @@ export function selectActiveSignals(
     }
   }
 
-    const evidenceTags: string[] = []
   if (hd?.profile) evidenceTags.push(`HD ${hd.profile}`)
   if (hd?.type) evidenceTags.push(hd.type)
   if (hd?.authority) evidenceTags.push(hd.authority)
@@ -251,7 +279,6 @@ export function selectActiveSignals(
   }
 
   // ── Trait lines: human-readable for AI context ────────────────────────────
-  const traitLines: string[] = []
   if (aiData?.derivedTraits?.length) {
     // Select top 3 most relevant traits based on context
     const relevantTraits = aiData.derivedTraits
@@ -370,9 +397,10 @@ export function buildTimingSignals(dataset: BaselineDesignDataset): TimingSignal
       ? "reactive"
       : "stable"
 
-  const note = notes.length > 0 ? notes.join(". ") : undefined
-
-  return { urgency, sensitivity, tolerance, pacing, state, note }
+  if (notes.length > 0) {
+    return { urgency, sensitivity, tolerance, pacing, state, note: notes.join(". ") }
+  }
+  return { urgency, sensitivity, tolerance, pacing, state }
 }
 
 // ── Overlay signal builder ────────────────────────────────────────────────────
@@ -437,12 +465,11 @@ export function buildRailData(
       pace: signals.pace,
       stabilizes: signals.stabilizes,
       responds: signals.responds,
-      pattern: signals.pattern,
     },
     sky: {
       urgency: timing.urgency,
-      sensitivity: timing.sensitivity,
       tolerance: timing.tolerance,
+      state: timing.state,
     },
     pattern: { loop: overlay?.loop ?? signals.pattern ?? "" },
     signature: signature.line,

@@ -13,7 +13,6 @@
  * See docs/contact-and-email-standard.md for contact address policy.
  */
 
-import type { SendEmail } from "@cloudflare/workers-types";
 
 const FROM = "Sovereign.os <info@defrag.app>";
 const REPLY_TO = "info@defrag.app";

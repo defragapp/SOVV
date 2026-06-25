@@ -147,12 +147,12 @@ function parseStatements(text: string): BaselineStatement[] {
 
     if (!statementMatch || !chipsMatch) continue
 
-    const statement = statementMatch[1]
+    const statement = statementMatch[1]!
       .replace(/CHIPS:.*/s, "")
       .trim()
       .replace(/\n/g, " ")
 
-    const chips = chipsMatch[1]
+    const chips = chipsMatch[1]!
       .replace(/---.*$/s, "")
       .split(",")
       .map(c => c.trim())

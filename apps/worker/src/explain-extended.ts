@@ -1,4 +1,5 @@
 import type { Env } from "./types-env.js"
+import { getCorsHeaders } from "./cors.js"
 import { SYSTEM_DEFRAG, SYSTEM_DEFRAG_RELATIONAL } from "./prompts.js"
 import { getFeatureFlags } from "./featureFlags.js"
 import { validateAndScore, buildRetryPrompt, parseAIOutput, checkGuardrails } from "./output-validator.js"
@@ -151,7 +152,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     });
   }
 
-  const subGate = requireActiveSubscription(user);
+  const subGate = await requireActiveSubscription(user, req);
   if (subGate) return subGate;
 
   // Free tier daily usage limit check
@@ -280,7 +281,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     validation = validateAndScore(rawText, "defrag")
   }
 
-  const parsed = validation.output
+  const parsed = validation.output as any
 
   // Log guardrail violations
   if (!validation.guardrails.passed) {
