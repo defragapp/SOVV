@@ -29,7 +29,7 @@ new_sqlite_classes = ["AgentState"]
 
 [[migrations]]
 tag = "v7"
-deleted_classes = ["UserSecretsStore", "DORateLimitStore", "SpaceDO"]
+deleted_classes = ["UserSecretsStore", "DORateLimitStore", "SpaceDO", "UserAppSandboxService"]
 
 [observability]
 enabled = true
