@@ -39,13 +39,14 @@ export function CheckoutButton({ priceId, cta }: { priceId: string; cta: string 
     <div className="flex flex-col gap-2">
       <Button 
         variant="premium" 
-        className="w-full rounded-none border border-border bg-white text-black hover:bg-white/90 font-sans font-medium text-xs tracking-[0.15em] uppercase h-12 px-8 transition-colors disabled:opacity-50"
+        className="w-full h-12 px-8 bg-[#f4efe9] text-[#08070a] font-mono text-[10px] tracking-[0.14em] uppercase hover:opacity-90 transition-opacity disabled:opacity-50"
+        style={{ borderRadius: "var(--radius-button)" }}
         onClick={handleCheckout} 
         disabled={loading}
       >
         {loading ? "..." : cta}
       </Button>
-      {error && <p className="text-red-400 text-[10px] font-sans font-medium mt-1">{error}</p>}
+      {error && <p className="font-mono text-[9px] text-red-400/70 mt-1">{error}</p>}
     </div>
   )
 }

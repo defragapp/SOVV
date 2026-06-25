@@ -77,13 +77,13 @@ export default function VerifyEmailPage() {
       >
         <div className="mb-10 text-center">
           <Link href="/" className="inline-block">
-            <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+            <span className="font-mono text-xs tracking-[0.28em] text-[#f4efe9] uppercase font-medium">
               SOVEREIGN.OS
             </span>
           </Link>
         </div>
 
-        <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8 text-center" style={{ borderRadius: 20 }}>
+        <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8 text-center" style={{ borderRadius: "var(--radius-container)" }}>
           {stage === "verifying" && (
             <div className="flex justify-center mb-6">
               <div className="w-5 h-5 border border-white/20 border-t-white/60 rounded-full animate-spin" />

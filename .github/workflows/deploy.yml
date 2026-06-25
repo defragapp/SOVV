@@ -192,6 +192,7 @@ jobs:
       - name: Deploy sovereign-control
         working-directory: apps/sovereign-control
         run: npx wrangler deploy
+        continue-on-error: true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}

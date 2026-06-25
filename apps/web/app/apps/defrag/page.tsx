@@ -37,7 +37,7 @@ function TagChip({ tag, label }: { tag: string; label?: string }) {
         onBlur={() => setOpen(false)}
         className={`font-mono text-[8px] uppercase tracking-[0.12em] border px-2 py-0.5 transition-colors duration-150 ${
           label ? "border-white/[0.10] text-[#4f4b47] hover:border-white/[0.22] hover:text-[#76716b] cursor-pointer"
-                : "border-white/[0.06] text-[#2e2b28] cursor-default"
+                : "border-white/[0.06] text-[#4f4b47] cursor-default"
         }`}
         style={{ borderRadius: 2 }}
         aria-label={label ? `${tag}: ${label}` : tag}
@@ -88,7 +88,7 @@ function LoadingSkeleton() {
 }
 
 function SectionLabel({ children, dim = false }: { children: React.ReactNode; dim?: boolean }) {
-  return <p className={`font-mono text-[9px] uppercase tracking-[0.22em] mb-5 ${dim ? "text-[#2e2b28]" : "text-[#4f4b47]"}`}>{children}</p>
+  return <p className={`font-mono text-[9px] uppercase tracking-[0.2em] mb-5 ${dim ? "text-[#4f4b47]" : "text-[#4f4b47]"}`}>{children}</p>
 }
 
 function Divider() {
@@ -187,7 +187,7 @@ function ActivePattern({ data, delay = 0 }: { data: NonNullable<DefragRender["ac
       transition={{ duration: 0.55, delay, ease }}
     >
       <SectionLabel>what's here</SectionLabel>
-      {data.name && <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#e0743a]/50 mb-4">{data.name}</p>}
+      {data.name && <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#e0743a]/50 mb-4">{data.name}</p>}
       <div className="flex flex-col gap-2.5">
         {data.lines.map((line, i) => (
           <motion.p
@@ -222,21 +222,21 @@ function PressureMap({ data, delay = 0 }: { data: NonNullable<DefragRender["pres
         {/* Starts */}
         {data.starts?.map((s, i) => (
           <div key={i} className="flex items-start gap-4 py-3 border-b border-white/[0.04]">
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#3a3733] shrink-0 w-12 mt-1">starts</span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#76716b] shrink-0 w-12 mt-1">starts</span>
             <p className="text-[13px] text-[#76716b] leading-[1.6]">{s}</p>
           </div>
         ))}
         {/* Moves */}
         {data.moves?.map((m, i) => (
           <div key={i} className="flex items-start gap-4 py-3 border-b border-white/[0.04]">
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#3a3733] shrink-0 w-12 mt-1">moves</span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#76716b] shrink-0 w-12 mt-1">moves</span>
             <p className="text-[13px] text-[#5a5550] leading-[1.6]">{m}</p>
           </div>
         ))}
         {/* Lands */}
         {data.lands?.map((l, i) => (
           <div key={i} className="flex items-start gap-4 py-3">
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#3a3733] shrink-0 w-12 mt-1">lands</span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#76716b] shrink-0 w-12 mt-1">lands</span>
             <p className="text-[13px] text-[#4f4b47] leading-[1.6]">{l}</p>
           </div>
         ))}
@@ -265,7 +265,7 @@ function LoopPreview({ data, delay = 0 }: { data: NonNullable<DefragRender["loop
           { label: "cost", value: data.cost },
         ].filter(r => r.value).map((row, i) => (
           <div key={i} className="flex items-start gap-4 px-4 py-3 border-b border-white/[0.04] last:border-0">
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#2e2b28] shrink-0 w-14 mt-0.5">{row.label}</span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47] shrink-0 w-14 mt-0.5">{row.label}</span>
             <p className="text-[13px] text-[#5a5550] leading-[1.6]">{row.value}</p>
           </div>
         ))}
@@ -339,44 +339,49 @@ export default function DefragEntryPage() {
   const [brief, setBrief] = React.useState<DefragRender | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState("")
+  const [profileStatements, setProfileStatements] = React.useState<Array<{statement: string; chips: string[]}>>([])
 
   React.useEffect(() => {
+    // Load personalized translation (requires compiled dataset)
     getTranslation("defrag")
       .then(t => {
         if (t?.appRender) setBrief(normalizeDefragRender(t.appRender as Record<string, unknown>))
-        // If translation not available, brief stays null — workspace CTA shown instead
       })
-      .catch(() => {
-        // Translation unavailable — workspace CTA shown instead
-      })
+      .catch(() => {})
       .finally(() => setLoading(false))
+
+    // Load derive-profile statements as faster fallback
+    fetch("/api/derive-profile", { credentials: "include" })
+      .then(r => r.ok ? r.json() : { statements: [] })
+      .then((d: any) => { if (Array.isArray(d.statements)) setProfileStatements(d.statements) })
+      .catch(() => {})
   }, [])
 
   // ─── LEFT PANEL ──────────────────────────────────────────────────────────
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Defrag</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Defrag</p>
       </div>
       <div className="px-5 pt-6 pb-5 flex flex-col gap-6">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">Before you move</p>
-          <p className="text-[12px] text-[#3a3733] leading-relaxed">
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Before you move</p>
+          <p className="text-[12px] text-[#76716b] leading-relaxed">
             Defrag separates the moment from the pattern. It shows you what is active beneath the argument, the silence, the message, or the grief — and gives you the clearest next response.
           </p>
         </div>
         <div className="border-t border-white/[0.04] pt-5 flex flex-col gap-3">
           {["Something keeps happening", "I need to respond well", "I am carrying too much", "Boundaries you can't hold"].map(item => (
             <div key={item} className="flex items-start gap-2">
-              <span className="text-[#e0743a]/30 text-[10px] mt-0.5 shrink-0">—</span>
-              <span className="text-[11px] text-[#2e2b28] leading-relaxed">{item}</span>
+              <span className="text-[#4f4b47] text-[10px] mt-0.5 shrink-0">—</span>
+              <span className="text-[11px] text-[#4f4b47] leading-relaxed">{item}</span>
             </div>
           ))}
         </div>
         <div className="border-t border-white/[0.04] pt-5">
           <Link href="/apps/defrag/workspace" className="flex items-center justify-between group">
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#3a3733] group-hover:text-[#f4efe9] transition-colors">Open workspace</span>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#2e2b28] group-hover:text-[#f4efe9] transition-colors">
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] group-hover:text-[#f4efe9] transition-colors">Open workspace</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#4f4b47] group-hover:text-[#f4efe9] transition-colors">
               <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </Link>
@@ -389,7 +394,7 @@ export default function DefragEntryPage() {
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Move</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Next move</p>
       </div>
       <div className="px-5 pt-6 pb-5">
         {loading ? (
@@ -399,7 +404,7 @@ export default function DefragEntryPage() {
           </div>
         ) : brief?.cleanerMove ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.8, ease }} className="flex flex-col gap-4">
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-1">What belongs to you</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">What belongs to you</p>
             {brief.cleanerMove.lines.slice(0, 2).map((line, i) => (
               <p key={i} className={`leading-relaxed ${i === 0 ? "text-[13px] text-[#f4efe9]" : "text-[12px] text-[#76716b]"}`}>{line}</p>
             ))}
@@ -407,8 +412,8 @@ export default function DefragEntryPage() {
               <Link href="/apps/defrag/workspace"
                 className="flex items-center justify-between w-full h-9 px-4 border border-white/[0.06] hover:border-white/[0.14] transition-colors group"
                 style={{ borderRadius: 6 }}>
-                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733] group-hover:text-[#f4efe9] transition-colors">Work through a moment</span>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#2e2b28] group-hover:text-[#f4efe9] transition-colors">
+                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] group-hover:text-[#f4efe9] transition-colors">Work through a moment</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#4f4b47] group-hover:text-[#f4efe9] transition-colors">
                   <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </Link>
@@ -423,9 +428,9 @@ export default function DefragEntryPage() {
   const main = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="h-11 px-6 flex items-center justify-between border-b border-white/[0.06] shrink-0">
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#f4efe9]">Your Pattern</span>
+        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Defrag</span>
         {!loading && brief && (
-          <Link href="/apps/defrag/workspace" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733] hover:text-[#f4efe9] transition-colors">
+          <Link href="/apps/defrag/workspace" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors">
             Workspace →
           </Link>
         )}
@@ -437,13 +442,28 @@ export default function DefragEntryPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
             className="flex flex-col gap-6 pt-8">
             <div>
-              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/40 mb-3">Defrag</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Defrag</p>
               <p className="text-[22px] text-[#f4efe9] leading-snug mb-3">
                 Separate the moment from the pattern.
               </p>
-              <p className="text-[13px] text-[#76716b] leading-relaxed max-w-sm">
-                Describe what is happening. Defrag shows you what is active beneath the argument, the silence, or the message — and gives you the clearest next move.
-              </p>
+              {profileStatements.length > 0 ? (
+                <div className="flex flex-col gap-0 mb-2">
+                  {profileStatements.slice(0, 3).map(({ statement, chips }, i) => (
+                    <div key={i} className="py-2.5 border-b border-white/[0.04] last:border-0">
+                      <p className="text-[12px] text-[#a8a29a] leading-relaxed mb-1.5">{statement}</p>
+                      <div className="flex gap-1 flex-wrap">
+                        {chips.map((c: string) => (
+                          <span key={c} className="font-mono text-[8px] tracking-[0.1em] px-2 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/60 bg-[#e0743a]/[0.04]" style={{ borderRadius: "var(--radius-minimal)" }}>{c}</span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[13px] text-[#76716b] leading-relaxed max-w-sm">
+                  Describe what is happening. Defrag shows you what is active beneath the argument, the silence, or the message — and gives you the clearest next move.
+                </p>
+              )}
             </div>
             <div className="flex flex-col gap-2 pt-2">
               {[
@@ -468,7 +488,7 @@ export default function DefragEntryPage() {
             <div className="pt-2">
               <Link href="/apps/defrag/workspace"
                 className="inline-flex items-center gap-2 h-9 px-5 border border-[#c8c2bc]/30 hover:border-[#c8c2bc]/50 hover:bg-[#c8c2bc]/5 transition-all"
-                style={{ borderRadius: 2 }}>
+                style={{ borderRadius: "var(--radius-button)" }}>
                 <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#c8c2bc]">Begin →</span>
               </Link>
             </div>

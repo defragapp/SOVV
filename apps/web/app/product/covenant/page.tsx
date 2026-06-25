@@ -48,7 +48,15 @@ function CovenantDemo() {
   ]
 
   const [active, setActive] = React.useState(0)
+  const [phase, setPhase] = React.useState(0)
   const current = situations[active]
+
+  React.useEffect(() => {
+    setPhase(0)
+    const t1 = setTimeout(() => setPhase(1), 800)
+    const t2 = setTimeout(() => setPhase(2), 1400)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [active])
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -58,12 +66,11 @@ function CovenantDemo() {
           <button
             key={i}
             onClick={() => setActive(i)}
-            className={`text-left p-3 border transition-all duration-200 text-[11px] leading-relaxed ${
+            className={`text-left p-3 border transition-all duration-200 text-[11px] leading-relaxed rounded-sm ${
               active === i
                 ? "border-[#e0743a]/40 bg-[#e0743a]/5 text-[#f4efe9]"
                 : "border-white/[0.06] text-[#76716b] hover:border-white/[0.12] hover:text-[#a8a29a]"
             }`}
-            style={{ borderRadius: 10 }}
           >
             {s.feeling}
           </button>
@@ -78,37 +85,78 @@ function CovenantDemo() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.35, ease }}
-          className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden"
-          style={{ borderRadius: 16 }}
+          className="ios-panel overflow-hidden"
         >
-          {/* Header */}
-          <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
-            <div>
-              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">Your moment matches</p>
-              <p className="font-serif text-xl text-[#f4efe9]">{current.figure}</p>
+          {phase === 0 && (
+            <div className="p-6 animate-pulse">
+               <div className="flex justify-between items-center mb-6 border-b border-white/[0.06] pb-4">
+                  <div className="h-4 bg-white/[0.05] rounded-sm w-1/4"></div>
+                  <div className="h-2 bg-white/[0.05] rounded-sm w-1/6"></div>
+               </div>
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <div className="h-2 bg-white/[0.05] rounded-sm w-1/2 mb-3"></div>
+                    <div className="h-2 bg-white/[0.05] rounded-sm w-full mb-2"></div>
+                    <div className="h-2 bg-white/[0.05] rounded-sm w-full"></div>
+                  </div>
+                  <div>
+                    <div className="h-2 bg-white/[0.05] rounded-sm w-1/2 mb-3"></div>
+                    <div className="h-2 bg-white/[0.05] rounded-sm w-full mb-2"></div>
+                    <div className="h-2 bg-white/[0.05] rounded-sm w-full"></div>
+                  </div>
+                  <div>
+                    <div className="h-2 bg-white/[0.05] rounded-sm w-1/2 mb-3"></div>
+                    <div className="h-2 bg-white/[0.05] rounded-sm w-full mb-2"></div>
+                    <div className="h-2 bg-white/[0.05] rounded-sm w-full"></div>
+                  </div>
+               </div>
             </div>
-            <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em]">{current.ref}</span>
-          </div>
+          )}
+          {phase >= 1 && (
+            <motion.div
+              initial={{ filter: "blur(8px)", opacity: 0.5 }}
+              animate={{ filter: "blur(0px)", opacity: 1 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
+                <div>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">Your moment matches</p>
+                  <p className="font-serif text-xl text-[#f4efe9]">{current.figure}</p>
+                </div>
+                <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em]">{current.ref}</span>
+              </div>
 
-          {/* Three columns */}
-          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
-            <div className="p-6">
-              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">Their story</p>
-              <p className="text-[13px] text-[#a8a29a] leading-relaxed">{current.story}</p>
-            </div>
-            <div className="p-6">
-              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">What this means for you</p>
-              <p className="text-[13px] text-[#a8a29a] leading-relaxed">{current.forYou}</p>
-            </div>
-            <div className="p-6">
-              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">One grounded next step</p>
-              <p className="text-[13px] text-[#f4efe9] leading-relaxed">{current.step}</p>
-            </div>
-          </div>
+              {/* Three columns */}
+              <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
+                <div className="p-6">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">Their story</p>
+                  <p className="text-[13px] text-[#a8a29a] leading-relaxed">{current.story}</p>
+                </div>
+                <div className="p-6">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">What this means for you</p>
+                  <p className="text-[13px] text-[#a8a29a] leading-relaxed">{current.forYou}</p>
+                </div>
+                {phase === 2 ? (
+                  <motion.div
+                    initial={{ opacity: 0, backgroundColor: "rgba(255,255,255,0.05)" }}
+                    animate={{ opacity: 1, backgroundColor: "transparent" }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    className="p-6 bg-white/[0.02]"
+                  >
+                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">One grounded next step</p>
+                    <p className="text-[13px] text-[#f4efe9] leading-relaxed font-medium">{current.step}</p>
+                  </motion.div>
+                ) : (
+                  <div className="p-6"></div>
+                )}
+              </div>
+            </motion.div>
+          )}
         </motion.div>
       </AnimatePresence>
 
-      <p className="text-center font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mt-4">
+      <p className="text-center font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mt-4">
         Select a situation above to see how Covenant responds
       </p>
     </div>
@@ -120,12 +168,12 @@ export default function CovenantProductPage() {
     <SiteShell>
 
       {/* ── HERO ── */}
-      <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[#08070a] overflow-hidden border-b border-white/5">
+      <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/[0.04] via-[#08070a] to-[#08070a] overflow-hidden border-b border-white/5">
         <div className="light-beam opacity-60" aria-hidden />
         <Container className="relative z-10 max-w-4xl">
           <div className="inline-flex items-center gap-2 mb-6">
             <span className="h-px w-6 bg-[#e0743a]/60" />
-            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">Covenant · Pro</span>
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Covenant · Pro</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
             Your moment has been walked before.
@@ -135,19 +183,22 @@ export default function CovenantProductPage() {
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
             <Link href={APP_URL} className="btn-primary">Open Covenant</Link>
-            <Link href="/pricing" className="btn-secondary">See Pro plan</Link>
+
           </div>
 
           {/* Three facts — no icons, no cards */}
-          <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-0 border-t border-white/[0.06] pt-10">
+          <div className="mt-14 flex flex-col gap-0 border-t border-white/[0.06] pt-10">
             {[
               { label: "Doesn't preach", body: "No judgment. No assumptions about your beliefs. Just the story and what it means for you." },
               { label: "Plain language", body: "No theology jargon. The stories are told the way they actually happened — human, honest, and direct." },
               { label: "One next step", body: "Not a list. Not a lecture. One real, doable thing that fits the story you're in." },
             ].map((f, i) => (
-              <div key={i} className="pr-8 pb-6 md:pb-0 border-b md:border-b-0 md:border-r border-white/[0.06] last:border-0 pt-6 md:pt-0 md:pl-8 first:pl-0">
-                <p className="text-[#f4efe9] font-medium text-sm mb-1">{f.label}</p>
-                <p className="text-sm text-[#76716b] leading-relaxed">{f.body}</p>
+              <div key={i} className="flex flex-col md:flex-row items-baseline gap-4 md:gap-12 py-8 border-b border-white/[0.06] last:border-0">
+                <span className="font-serif text-3xl md:text-5xl text-[#4f4b47] w-12 shrink-0">0{i + 1}</span>
+                <div>
+                  <p className="text-[#f4efe9] font-medium text-sm mb-2">{f.label}</p>
+                  <p className="text-sm text-[#76716b] leading-relaxed max-w-xl">{f.body}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -160,7 +211,7 @@ export default function CovenantProductPage() {
           <div className="flex flex-col items-center text-center mb-12">
             <div className="inline-flex items-center gap-2 mb-6">
               <span className="h-px w-6 bg-[#e0743a]/60" />
-              <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">See it work</span>
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">See it work</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
               Pick a situation. See the story.
@@ -174,7 +225,7 @@ export default function CovenantProductPage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="relative w-full py-24 md:py-32 bg-[#08070a] border-t border-white/5 overflow-hidden">
+      <section className="relative w-full py-24 md:py-32 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/[0.04] via-[#08070a] to-[#08070a] border-t border-white/5 overflow-hidden">
         <div className="light-beam" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <h2 className="font-serif text-4xl md:text-6xl text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
@@ -185,7 +236,7 @@ export default function CovenantProductPage() {
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3">
             <Link href={APP_URL} className="btn-primary">Open Covenant</Link>
-            <Link href="/pricing" className="btn-secondary">See Pro plan</Link>
+
           </div>
         </Container>
       </section>

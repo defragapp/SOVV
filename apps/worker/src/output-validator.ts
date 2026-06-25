@@ -10,7 +10,9 @@
  */
 
 // ── Required fields per space ─────────────────────────────────────────────────
-const DEFRAG_REQUIRED = ["summary", "activePattern", "theRepeat", "oldRole", "alignment"] as const
+// Only activePattern and alignment are always required — all other fields are conditional
+// This matches the DEFRAG_OUTPUT_CONTRACT OMIT rules in prompts.ts
+const DEFRAG_REQUIRED = ["activePattern", "alignment"] as const
 const ALIGNMENT_REQUIRED = ["whatIsTrue", "whatIsYours", "whatIsNotYours", "theShift", "nextStep"] as const
 const COVENANT_REQUIRED = ["figure", "story", "forYou", "nextStep"] as const
 
@@ -69,19 +71,65 @@ export interface CovenantScoring {
   certainty: CertaintyLevel
 }
 
+// ── Semantic quality helpers ─────────────────────────────────────────────────
+// Detect generic/weak phrases that indicate low-quality output
+const GENERIC_PHRASES = [
+  "you care deeply", "you feel overwhelmed", "you are struggling",
+  "it is important", "you need to", "you should", "consider",
+  "you may want to", "it sounds like", "you might be feeling",
+  "this is a time", "take care of yourself", "be kind to yourself",
+]
+
+function hasGenericPhrases(text: string): boolean {
+  const lower = text.toLowerCase()
+  return GENERIC_PHRASES.some(phrase => lower.includes(phrase))
+}
+
+// Check if text names a specific pattern/role (structural language)
+function isStructural(text: string): boolean {
+  const structural = [
+    "the fixer", "the translator", "the one who", "the loop",
+    "pursue", "withdraw", "over-function", "under-function",
+    "peacekeeper", "caretaker", "the role", "the pattern",
+    "clarify", "pressure", "distance", "silence", "space",
+  ]
+  const lower = text.toLowerCase()
+  return structural.some(s => lower.includes(s))
+}
+
+// Quality multiplier: structural language = 1.2x, generic = 0.7x
+function qualityMultiplier(text: string): number {
+  if (!text) return 1
+  if (isStructural(text)) return 1.2
+  if (hasGenericPhrases(text)) return 0.7
+  return 1
+}
+
 function scoreDefrag(output: Record<string, unknown>): DefragScoring {
   let score = 0
   let signals = 0
 
-  // Score based on field completeness and specificity
-  if (output.activePattern && typeof output.activePattern === "string" && output.activePattern.length > 20) { score += 0.2; signals++ }
-  if (output.theRepeat && typeof output.theRepeat === "string" && output.theRepeat.length > 20) { score += 0.15; signals++ }
-  if (output.oldRole && typeof output.oldRole === "string" && output.oldRole.length > 10) { score += 0.15; signals++ }
-  if (output.strainPattern && typeof output.strainPattern === "string") { score += 0.1; signals++ }
-  if (output.alignment && typeof output.alignment === "string" && output.alignment.length > 20) { score += 0.2; signals++ }
-  if (output.bestNextResponse && typeof output.bestNextResponse === "object") { score += 0.2; signals++ }
+  // Score based on field completeness, specificity, and semantic quality
+  const ap = output.activePattern as string
+  if (ap && ap.length > 20) { score += 0.2 * qualityMultiplier(ap); signals++ }
+  
+  const tr = output.theRepeat as string
+  if (tr && tr.length > 20) { score += 0.15 * qualityMultiplier(tr); signals++ }
+  
+  const or_ = output.oldRole as string
+  if (or_ && or_.length > 10) { score += 0.15 * qualityMultiplier(or_); signals++ }
+  
+  const sp = output.strainPattern as string
+  if (sp) { score += 0.1 * qualityMultiplier(sp); signals++ }
+  
+  const al = output.alignment as string
+  if (al && al.length > 10) { score += 0.2 * qualityMultiplier(al); signals++ }
+  
+  const bnr = output.bestNextResponse
+  if (bnr && (typeof bnr === "object" || typeof bnr === "string")) { score += 0.2; signals++ }
 
-  const signalStrength: SignalStrength = signals >= 5 ? "high" : signals >= 3 ? "medium" : "low"
+  // Sparse results are intentional — 3+ fields with good content = high
+  const signalStrength: SignalStrength = signals >= 4 ? "high" : signals >= 2 ? "medium" : "low"
   return { confidence: Math.min(score, 1), signalStrength }
 }
 
@@ -92,7 +140,7 @@ function scoreAlignment(output: Record<string, unknown>): AlignmentScoring {
   if (output.whatIsTrue && typeof output.whatIsTrue === "string" && output.whatIsTrue.length > 20) { score += 0.2; stability += 0.2 }
   if (output.whatIsYours && typeof output.whatIsYours === "string" && output.whatIsYours.length > 15) { score += 0.2; stability += 0.3 }
   if (output.whatIsNotYours && typeof output.whatIsNotYours === "string") { score += 0.15; stability += 0.2 }
-  if (output.theShift && typeof output.theShift === "string" && output.theShift.length > 20) { score += 0.25; stability += 0.3 }
+  if (output.theShift && typeof output.theShift === "string" && output.theShift.length > 20) { score += 0.25; stability += 0.4 }
   if (output.nextStep && typeof output.nextStep === "string" && output.nextStep.length > 10) { score += 0.2 }
 
   return { confidence: Math.min(score, 1), stabilityScore: Math.min(stability, 1) }
@@ -113,7 +161,7 @@ function scoreCovenant(output: Record<string, unknown>): CovenantScoring {
 
 // ── Guardrail check ───────────────────────────────────────────────────────────
 
-function checkGuardrails(
+export function checkGuardrails(
   output: Record<string, unknown>,
   space: "defrag" | "alignment" | "covenant"
 ): { passed: boolean; violations: string[] } {

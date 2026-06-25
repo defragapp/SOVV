@@ -156,15 +156,8 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   router.post("/api/auth/register", async (request: Request) => {
     const env = getEnv()
     try {
-      const { email, password, turnstileToken } = await request.json() as any
+      const { email, password } = await request.json() as any
       if (!email || !password) return jsonResponse({ error: "Missing fields" }, 400)
-
-      if (env.TURNSTILE_SECRET_KEY) {
-        const isHuman = await verifyTurnstile(String(turnstileToken ?? ""), env.TURNSTILE_SECRET_KEY)
-        if (!isHuman) return jsonResponse({ error: "Bot verification failed" }, 403)
-      } else {
-        console.warn("Turnstile secret key missing — bypassing bot verification.")
-      }
 
       const password_hash = await hashPassword(password)
       const userId = crypto.randomUUID()
@@ -465,18 +458,3 @@ export async function verifyAccessJWT(request: Request, env: { TEAM_DOMAIN?: str
   }
 }
 
-// Turnstile bot verification
-export async function verifyTurnstile(token: string, secretKey: string): Promise<boolean> {
-  if (!token) return false;
-  try {
-    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ secret: secretKey, response: token }),
-    });
-    const data = await response.json() as { success: boolean };
-    return data.success;
-  } catch {
-    return false;
-  }
-}

@@ -15,7 +15,7 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="inline-flex items-center gap-2 mb-6">
       <span className="h-px w-6 bg-[#e0743a]/60" />
-      <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#a8a29a]">{children}</span>
+      <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">{children}</span>
     </div>
   )
 }
@@ -66,7 +66,7 @@ export default function PricingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
 
             {/* Free */}
-            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8 flex flex-col" style={{ borderRadius: 16 }}>
+            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8 flex flex-col" style={{ borderRadius: "var(--radius-container)" }}>
               <div className="mb-8">
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Free</p>
                 <div className="flex items-baseline gap-1 mb-3">
@@ -91,7 +91,7 @@ export default function PricingPage() {
             </div>
 
             {/* Pro */}
-            <div className="border border-[#e0743a]/30 bg-[#0c0a0d] p-8 flex flex-col relative overflow-hidden" style={{ borderRadius: 16 }}>
+            <div className="border border-[#e0743a]/30 bg-[#0c0a0d] p-8 flex flex-col relative overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}>
               <div
                 className="pointer-events-none absolute inset-0"
                 style={{ background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(224,116,58,0.06) 0%, transparent 70%)" }}
@@ -105,7 +105,7 @@ export default function PricingPage() {
                   </span>
                 </div>
                 <div className="flex items-baseline gap-1 mb-3">
-                  <span className="font-serif text-4xl text-[#f4efe9]">$20</span>
+                  <span className="font-serif text-4xl text-[#f4efe9]">$12</span>
                   <span className="text-sm text-[#76716b]">/ month</span>
                 </div>
                 <p className="text-sm text-[#a8a29a] leading-relaxed">For patterns that need continuity.</p>
@@ -140,9 +140,9 @@ export default function PricingPage() {
           <div className="flex flex-col gap-0">
             {/* Header */}
             <div className="grid grid-cols-3 pb-4 border-b border-white/[0.08]">
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Feature</span>
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] text-center">Free</span>
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] text-center">Pro</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Feature</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] text-center">Free</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] text-center">Pro</span>
             </div>
             {[
               { feature: "Baseline Design", free: true, pro: true },
