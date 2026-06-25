@@ -289,7 +289,7 @@ export default function CovenantWorkspacePage() {
             </a>
           </div>
         </div>
-      }
+      )}
 
       <div className="flex-1">
         {libraryLoading ? (
