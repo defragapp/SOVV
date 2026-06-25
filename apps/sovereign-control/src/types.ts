@@ -49,6 +49,11 @@ export interface AuditEntry {
 export interface Env {
   AI: Ai
   ENVIRONMENT?: string
+  ENVIRONMENT_MODE?: string
+  // Durable Object binding for agent state
+  AGENT_STATE: DurableObjectNamespace
+  // Static assets binding
+  ASSETS?: { fetch: (req: Request) => Promise<Response> }
   GATEWAY_ID?: string
   // Cloudflare Access JWT verification
   TEAM_DOMAIN?: string

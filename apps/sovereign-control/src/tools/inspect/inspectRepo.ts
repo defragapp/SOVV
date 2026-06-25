@@ -38,8 +38,7 @@ export async function inspectRepo(
 
   // For files, decode content
   if (data && typeof data === "object" && "content" in data) {
-    const content = atob((data as Record<string, string>).content.replace(/
-/g, ""))
+    const content = atob((data as Record<string, string>).content.replace(/\n/g, ""))
     return {
       path: (data as Record<string, string>).path,
       content: content.slice(0, 50000), // cap at 50KB

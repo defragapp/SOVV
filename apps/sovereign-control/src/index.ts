@@ -5,6 +5,7 @@
 // SAFETY: Deploy blocked in safe mode (default)
 
 export { AgentState } from './agent-state'
+import type { Env } from './types.js'
 
 
 
