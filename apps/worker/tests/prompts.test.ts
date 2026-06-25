@@ -62,7 +62,7 @@ describe("Defrag prompt", () => {
   })
 
   it("blocks therapy language", () => {
-    expect(SYSTEM_DEFRAG).toContain("it sounds like")
+    expect(SYSTEM_DEFRAG).toContain("It sounds like")
     expect(SYSTEM_DEFRAG).toContain("I hear that")
   })
 
@@ -94,7 +94,7 @@ describe("Covenant prompt", () => {
 
   it("blocks condemnation language", () => {
     expect(SYSTEM_COVENANT).toContain("condemnation")
-    expect(SYSTEM_COVENANT).toContain("God told you")
+    expect(SYSTEM_COVENANT).toContain("spiritual pressure")
   })
 
   it("enforces presence not rescue", () => {

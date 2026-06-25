@@ -27,11 +27,11 @@
     "exactOptionalPropertyTypes": true,
 
     // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    // "noUnusedLocals": true,        // enable after cleanup sprint
+    // "noUnusedParameters": true,    // enable after cleanup sprint
     // "noPropertyAccessFromIndexSignature": true,
 
     // Recommended Options

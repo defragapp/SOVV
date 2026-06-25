@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Pre-commit: TypeScript checks..."
+
+# API Worker
+echo "  → apps/worker"
+cd apps/worker && npx tsc --noEmit || { echo "❌ TypeScript errors in apps/worker — commit blocked"; exit 1; }
+cd ../..
+
+# Sovereign Control
+echo "  → apps/sovereign-control"
+cd apps/sovereign-control && npm run typecheck || { echo "❌ TypeScript errors in apps/sovereign-control — commit blocked"; exit 1; }
+cd ../..
+
+# AI Worker
+echo "  → apps/worker-ai"
+cd apps/worker-ai && npx tsc --noEmit || { echo "❌ TypeScript errors in apps/worker-ai — commit blocked"; exit 1; }
+cd ../..
+
+# Session Worker
+echo "  → apps/worker-session"
+cd apps/worker-session && npx tsc --noEmit || { echo "❌ TypeScript errors in apps/worker-session — commit blocked"; exit 1; }
+cd ../..
+
+echo "✅ All TypeScript checks passed"
