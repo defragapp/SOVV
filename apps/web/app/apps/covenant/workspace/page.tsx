@@ -4,6 +4,8 @@ import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
+import { processInput } from "@/lib/system/processInput"
+import type { CovenantMeta } from "@/lib/system/outputContract"
 
 interface LibraryItem {
   id: string
@@ -88,18 +90,12 @@ export default function CovenantWorkspacePage() {
     setSaveSuccess(false)
     setResult(null)
     try {
-      const res = await fetch("/api/covenant", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ message: input }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.message || data.error || "Something went wrong.")
+      const pResult = await processInput({ space: "covenant", message: input })
+      if (!pResult.ok) {
+        setError(pResult.error)
         return
       }
-      setResult(data)
+      setResult(pResult.output.meta as CovenantMeta)
     } catch {
       setError("Unable to connect. Check your connection and try again.")
     } finally {
