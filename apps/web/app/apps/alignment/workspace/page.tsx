@@ -21,7 +21,7 @@ function Section({ label, value }: { label: string; value?: string }) {
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className="border-b border-white/[0.05] pb-6 mb-6 last:border-0 last:pb-0 last:mb-0"
     >
-      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">{label}</p>
+      <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-2">{label}</p>
       <p className="text-[15px] text-[#f4efe9] leading-[1.7]">{value}</p>
     </motion.div>
   )
@@ -35,7 +35,6 @@ export default function AlignmentWorkspacePage() {
   const [saveSuccess, setSaveSuccess] = React.useState(false)
   const [inviteOpen, setInviteOpen] = React.useState(false)
   const [error, setError] = React.useState("")
-  const [baselineStatements, setBaselineStatements] = React.useState<Array<{ statement: string; chips: string[] }>>([])
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
   // Audio Overview
@@ -61,14 +60,6 @@ export default function AlignmentWorkspacePage() {
     }
   }, [])
 
-  // Load Baseline Design statements for sidebar
-  React.useEffect(() => {
-    fetch("/api/derive-profile", { credentials: "include" })
-      .then(r => r.ok ? r.json() : { statements: [] })
-      .then((d: any) => { if (Array.isArray(d.statements) && d.statements.length > 0) setBaselineStatements(d.statements) })
-      .catch(() => {})
-  }, [])
-
   React.useEffect(() => {
     fetch("/api/library?workspace_source=ALIGNMENT", { credentials: "include" })
       .then(r => r.ok ? r.json() : { items: [] })
@@ -92,13 +83,7 @@ export default function AlignmentWorkspacePage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error === "daily_limit_reached"
-          ? "You've reached your free daily limit. Upgrade to Pro to continue."
-          : data.type === "needs_baseline" || data.error === "needs_baseline"
-          ? "needs_baseline"
-          : data.error === "incomplete_output"
-          ? "The system couldn't read this moment clearly. Try describing it with more specific detail."
-          : data.message || data.error || "Something went wrong.")
+        setError(data.message || data.error || "Something went wrong.")
         return
       }
       setResult(data)
@@ -170,33 +155,26 @@ export default function AlignmentWorkspacePage() {
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">How Alignment works</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Context</p>
       </div>
       <div className="px-5 pt-6 pb-5">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Baseline Design</p>
-        {baselineStatements.length > 0 ? (
-          <div className="flex flex-col gap-0">
-            {baselineStatements.slice(0, 4).map(({ statement, chips }, i) => (
-              <div key={i} className="py-3 border-b border-white/[0.04] last:border-0">
-                <p className="text-[12px] text-[#c8c2bc] leading-[1.6] mb-2">{statement}</p>
-                {chips.length > 0 && (
-                  <div className="flex gap-1 flex-wrap">
-                    {chips.map(chip => (
-                      <span key={chip} className="font-mono text-[8px] tracking-[0.1em] px-2 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/60 bg-[#e0743a]/[0.04]" style={{ borderRadius: "var(--radius-minimal)" }}>
-                        {chip}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-            <p className="text-[10px] text-[#4f4b47] mt-3">Active in every result.</p>
-          </div>
-        ) : (
-          <p className="text-[12px] text-[#76716b] leading-relaxed">
-            Your Baseline Design is active — it grounds every Alignment result in how you actually operate.
-          </p>
-        )}
+        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-3">How this works</p>
+        <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
+          Your Baseline Design is your fixed center — how you naturally operate. The live sky is the emotional weather you're moving through right now. Alignment uses both to show you the path back to yourself.
+        </p>
+        <div className="space-y-3">
+          {[
+            "What is actually true in this situation",
+            "What is yours to carry — and what isn't",
+            "What a clean response looks like",
+            "What to release",
+          ].map((item) => (
+            <div key={item} className="flex items-start gap-2">
+              <span className="text-[#e0743a]/40 text-[10px] mt-0.5 shrink-0">→</span>
+              <span className="text-[12px] text-[#76716b] leading-relaxed">{item}</span>
+            </div>
+          ))}
+        </div>
         <div className="mt-6 pt-5 border-t border-white/[0.06]">
           <Link
             href="/apps/alignment"
@@ -213,7 +191,7 @@ export default function AlignmentWorkspacePage() {
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Saved results</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Library</p>
       </div>
 
       {result && (
@@ -251,19 +229,6 @@ export default function AlignmentWorkspacePage() {
           >
             Invite Privately
           </button>
-
-          {/* Back-flow to Defrag */}
-          <div className="mt-4 pt-4 border-t border-white/[0.04]">
-            <p className="text-[10px] text-[#4f4b47] leading-relaxed mb-2">
-              Defrag shows the pattern beneath this. Run it first for deeper context.
-            </p>
-            <a
-              href="/apps/defrag/workspace"
-              className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
-            >
-              Open Defrag →
-            </a>
-          </div>
         </div>
       )}
 
@@ -302,41 +267,17 @@ export default function AlignmentWorkspacePage() {
   // ─── CENTER PANEL ──────────────────────────────────────────────────────────
   const main = (
     <div className="flex flex-col h-full">
-      <div className="h-11 px-6 flex items-center justify-between border-b border-white/[0.06] shrink-0">
-        <div className="flex items-center gap-3">
-          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Alignment</span>
-          <span className="text-[#4f4b47] text-[10px]">·</span>
-          <span className="text-[11px] text-[#4f4b47]">What is yours. What isn't. One move.</span>
-        </div>
-        {result && (
-          <span
-            className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#e0743a]/60 border border-[#e0743a]/20 px-2 py-0.5"
-            style={{ borderRadius: "var(--radius-minimal)" }}
-          >
-            Baseline Design active
-          </span>
-        )}
+      <div className="h-11 px-6 flex items-center border-b border-white/[0.06] shrink-0">
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#f4efe9]">Alignment</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
-
-        {error === "needs_baseline" && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
-            <p className="text-[15px] text-[#f4efe9] leading-snug">Set your Baseline Design first.</p>
-            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
-              Your Baseline Design grounds every Alignment result. It takes 30 seconds to set.
-            </p>
-            <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>
-              Set Baseline Design →
-            </a>
-          </div>
-        )}
 
         {!result && !isLoading && !error && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-3">
             <div
               className="w-10 h-10 flex items-center justify-center border border-[#e0743a]/20 bg-[#e0743a]/5 mb-2"
-              style={{ borderRadius: 10 }}
+              style={{ borderRadius: 10, boxShadow: "0 0 24px rgba(224,116,58,0.08)" }}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M8 1v14M1 8h14" stroke="rgba(224,116,58,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
@@ -344,13 +285,10 @@ export default function AlignmentWorkspacePage() {
               </svg>
             </div>
             <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">
-              What needs to be yours — and what doesn't?
+              What's pulling you off course?
             </p>
             <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
-              Describe the situation. Alignment separates what is yours to carry from what belongs to the other side — and shows you the clearest way to respond.
-            </p>
-            <p className="text-[11px] text-[#4f4b47] leading-relaxed max-w-xs">
-              Run Defrag first for deeper pattern context — then Alignment refines the response.
+              Your Baseline Design and the live sky are already here. Describe what's pulling at you — Alignment will show you what belongs to you and what options are still available.
             </p>
           </div>
         )}
@@ -358,23 +296,12 @@ export default function AlignmentWorkspacePage() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/60 rounded-full animate-spin" />
-            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Finding what is yours…</p>
+            <p className="text-[13px] text-[#76716b]">Finding your path…</p>
           </div>
         )}
 
         {error && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
-            <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">{error}</p>
-            {error.includes("daily limit") && (
-              <a
-                href="/pricing"
-                className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]"
-                style={{ borderRadius: "var(--radius-button)" }}
-              >
-                See Pro plans →
-              </a>
-            )}
-          </div>
+          <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">{error}</p>
         )}
 
         <AnimatePresence>
@@ -383,27 +310,8 @@ export default function AlignmentWorkspacePage() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="border border-white/[0.08] bg-white/[0.02] overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}
+              className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8"
             >
-              {/* Result header */}
-              <div className="px-8 py-4 border-b border-white/[0.06] flex items-center justify-between bg-[#08070a]/60">
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Sovereign.os</span>
-                  <span className="text-[#4f4b47] text-xs">/</span>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]">Alignment</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  {(result as any).confidence && (result as any).confidence.strength !== "low" && (
-                    <span className="font-mono text-[8px] text-[#4f4b47]" title={`Signal strength: ${(result as any).confidence.strength}`}>
-                      {(result as any).confidence.strength === "high" ? "●●●" : "●●○"}
-                    </span>
-                  )}
-                  <span className="font-mono text-[9px] text-[#4f4b47]">
-                    {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                  </span>
-                </div>
-              </div>
-              <div className="p-8">
               {result.skyContext && (
                 <div className="mb-6 pb-6 border-b border-white/[0.05]">
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">Live sky · right now</p>
@@ -413,39 +321,36 @@ export default function AlignmentWorkspacePage() {
               <Section label="What is actually happening"              value={result.whatIsTrue} />
               <Section label="What is yours to carry"    value={result.whatIsYours} />
               <Section label="What is not yours to carry"          value={result.whatIsNotYours} />
-              <Section label="What a clean response looks like" value={result.theShift} />
-              <Section label="One move"                  value={result.nextStep} />
-              <Section label="What to release"           value={result.avoid} />
-              <Section label="What staying true looks like" value={result.alignment} />
-              </div>
+              <Section label="The shift"                 value={result.theShift} />
+              <Section label="One next step"             value={result.nextStep} />
+              <Section label="What to avoid"             value={result.avoid} />
+              <Section label="Your alignment"            value={result.alignment} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       <div className="flex-none px-6 pb-6">
-        <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: "var(--radius-container)" }}>
+        <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: 16 }}>
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Describe what's pulling at you — a situation, a decision, a conflict."
+            placeholder="How do I move in a way that stays true?"
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
-            maxLength={2000}
-            style={{ fontSize: "16px" }}
             onKeyDown={e => {
               if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() }
             }}
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
-            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.1em]">↵ Continue</span>
+            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Continue</span>
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
-              className="h-8 px-5 border border-[#c8c2bc]/40 text-[#c8c2bc] text-[11px] font-medium tracking-[0.14em] hover:bg-[#c8c2bc]/10 hover:border-[#c8c2bc]/60 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-              style={{ borderRadius: "var(--radius-button)" }}
+              className="h-8 px-5 border border-[#c8c2bc]/40 text-[#c8c2bc] text-[11px] font-medium tracking-wide hover:bg-[#c8c2bc]/10 hover:border-[#c8c2bc]/60 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              style={{ borderRadius: 2 }}
             >
-              {isLoading ? "…" : "Find my lane"}
+              {isLoading ? "…" : "Align"}
             </button>
           </div>
         </div>
