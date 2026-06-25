@@ -172,8 +172,8 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         .run()
 
       // Send welcome email via queue (non-blocking)
-      if (env.QUEUE) {
-        void env.QUEUE.send({ type: "welcome", to: email }).catch((err: unknown) =>
+      if (env.PATTERN_QUEUE) {
+        void env.PATTERN_QUEUE.send({ type: "welcome", to: email }).catch((err: unknown) =>
           console.warn("[auth] Failed to queue welcome email:", err)
         )
       } else if (env.RESEND_API_KEY) {

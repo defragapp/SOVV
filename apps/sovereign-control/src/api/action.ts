@@ -69,7 +69,7 @@ export async function handleAction(
         result = await rollbackWorker(env, (payload || {}) as { workerName: string; versionId?: string })
         break
       case "capture_screenshot":
-        result = await captureScreenshot((payload || {}) as { url: string })
+        result = await captureScreenshot(env, (payload || {}) as { url: string })
         break
       default:
         result = { status: "not_enabled", message: `Tool ${tool} not yet implemented` }

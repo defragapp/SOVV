@@ -1,3 +1,21 @@
+## STATUS UPDATE — 2026-06-25
+
+| Issue | Status |
+|-------|--------|
+| D1 Migration Naming Chaos | ✅ FIXED — renamed to 0001-0015 consistent format |
+| Missing sessions.token index | ✅ FIXED — 0015_sessions_token_index.sql applied |
+| CORS Missing Allow-Credentials | ✅ FIXED — added in index.ts |
+| CORS Missing workers.dev origin | ✅ FIXED — added sovv-web.*.workers.dev |
+| subscription_updated_at type | ✅ CONFIRMED OK — billing.ts uses Date.now() (integer ms) |
+| No migrations_dir in wrangler.toml | ✅ FIXED — migrations_dir = "migrations" added |
+| 003_role.sql no-op | ✅ KEPT — renamed to 0007_role.sql, harmless SELECT 1 |
+| QUEUE binding mismatch | ✅ FIXED — QUEUE → PATTERN_QUEUE in types-env + source |
+| story-engine schema mismatch | ✅ FIXED — rewrote to use actual patterns/library schema |
+| STORY_ENGINE_API_URL/KEY missing | ✅ FIXED — added to Env interface |
+| NEXT_PUBLIC_STRIPE_PRO_PRICE_ID missing | ✅ FIXED — added to wrangler.json |
+
+---
+
 # Sovereign.os — Phase 1 Architectural Viability Audit
 **Date:** 2026-06-25  
 **Scope:** Backend pipeline, D1 schema, CORS, session handling, migration integrity

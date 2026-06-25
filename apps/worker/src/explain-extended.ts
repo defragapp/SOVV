@@ -350,9 +350,9 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     confidence,
   });
 
-  if (env.QUEUE) {
+  if (env.PATTERN_QUEUE) {
     // Offload pattern extraction to a queue to avoid delaying the response.
-    await env.QUEUE.send({ sessionId: sid, interactionId: interactionId });
+    await env.PATTERN_QUEUE.send({ sessionId: sid, interactionId: interactionId });
   } else {
     // Fallback for local dev or if queue is not configured.
     console.warn("QUEUE binding not found. Running pattern extraction in a non-blocking way, but this may be unreliable.");

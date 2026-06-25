@@ -37,7 +37,7 @@ export interface Env {
   // ── Queue ─────────────────────────────────────────────────────────────────
   // Cloudflare Queue — pattern extraction, email jobs, webhook follow-up.
   // Queue name: pattern-extraction-tasks
-  QUEUE?: Queue
+  PATTERN_QUEUE?: Queue
 
   // Used for optional rate limiting in index.ts (unsafe binding in wrangler.toml).
 
@@ -65,4 +65,8 @@ export interface Env {
   AI_MODEL?: string
 GATEWAY_ID?: string
   ELEVENLABS_API_KEY?: string
+
+  // Story Engine (optional — narrative synthesis for recurring patterns)
+  STORY_ENGINE_API_URL?: string
+  STORY_ENGINE_API_KEY?: string
 }

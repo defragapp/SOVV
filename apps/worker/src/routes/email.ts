@@ -62,9 +62,9 @@ export async function handleInboundEmail(
   // Step 2: Queue internal notification
   // This allows operators to track inbound contact volume without
   // requiring the send_email binding to be active.
-  if (env.QUEUE) {
+  if (env.PATTERN_QUEUE) {
     try {
-      await env.QUEUE.send({
+      await env.PATTERN_QUEUE.send({
         type: "inbound_email",
         from: message.from,
         to: message.to,

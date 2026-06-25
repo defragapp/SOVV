@@ -164,7 +164,7 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
       if (userId && stripeCustomerId) {
         // Set tier to 'pro' AND subscription_status to 'active' on checkout
         await env.DB.prepare(
-          "UPDATE users SET tier = 'pro', subscription_status = 'active', stripe_customer_id = ?, subscription_updated_at = ? WHERE id = ?"
+          "UPDATE users SET tier = 'pro', subscription_status = 'active', stripe_customer_id = ?, subscription_updated_at = ? WHERE id = ?" // subscription_updated_at: Unix ms via Date.now()
         )
           .bind(stripeCustomerId, Date.now(), userId).run();
         if (emailOpts.emailBinding || emailOpts.resendApiKey) {
