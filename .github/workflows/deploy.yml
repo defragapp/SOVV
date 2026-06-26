@@ -12,12 +12,15 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install worker deps
-        working-directory: apps/worker
-        run: npm install
+          cache: 'pnpm'
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
       - name: Check worker types
         working-directory: apps/worker
         run: npx tsc --noEmit 2>&1 || echo "TypeScript errors found - non-blocking"
@@ -31,12 +34,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install worker deps
-        working-directory: apps/worker
-        run: npm install
+          cache: 'pnpm'
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
       - name: Deploy sovereign-os-api
         working-directory: apps/worker
         run: npx wrangler deploy
@@ -50,12 +56,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install worker deps
-        working-directory: apps/worker-session
-        run: npm install
+          cache: 'pnpm'
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
       - name: Deploy worker-session
         working-directory: apps/worker-session
         run: npx wrangler deploy --env production
@@ -69,12 +78,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install worker deps
-        working-directory: apps/worker-ai
-        run: npm install
+          cache: 'pnpm'
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
       - name: Deploy worker-ai
         working-directory: apps/worker-ai
         run: npx wrangler deploy --env production
