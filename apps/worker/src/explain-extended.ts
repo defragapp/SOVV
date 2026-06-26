@@ -150,7 +150,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const sid = await getSessionId(req);
 
   // Free tier daily usage limit check
-  const isPro = ({} as any).subscription_status === "active" || ({} as any).tier === "pro";
+  const isPro = user.subscription_status === "active" || user.tier === "pro";
   if (!isPro) {
     const limit = await checkFreeLimit(env, sid);
     if (!limit.allowed) {
