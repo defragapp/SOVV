@@ -92,7 +92,9 @@ function DefragDemo() {
             style={{ borderRadius: 14 }}
           >
             {[
-              
+              { label: "Role", value: "Over-functioner", highlight: false },
+              { label: "Core Tension", value: "Waiting on someone to show up.", highlight: false },
+              { label: "Baseline Response", value: "Taking control.", highlight: true }
             ].map((row, i) => (
               <motion.div
                 key={row.label}

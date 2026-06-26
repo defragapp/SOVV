@@ -1,4 +1,6 @@
 import { handleEmotionalDrivers } from "./emotional-drivers";
+import { generateDefragWithRetry } from "./ai-generator";
+import { generateDefragPrompt } from "@sovereign/prompts";
 
 export interface Env {
   AI: Ai;
@@ -39,6 +41,19 @@ export default {
     if (url.pathname === "/emotional-drivers" && request.method === "POST") {
       const response = await handleEmotionalDrivers(request, env);
       return withHeaders(response);
+    }
+
+    if (url.pathname === "/defrag" && request.method === "POST") {
+      try {
+        const body = await request.json() as { baseline: string, context?: string };
+        const prompt = generateDefragPrompt(body.baseline, body.context);
+
+        const result = await generateDefragWithRetry(env.AI, prompt.system, prompt.user);
+
+        return withHeaders(Response.json({ ok: true, result }));
+      } catch (e: any) {
+         return withHeaders(Response.json({ ok: false, error: e.message }, { status: 500 }));
+      }
     }
 
     if (url.pathname === "/health" && request.method === "GET") {
