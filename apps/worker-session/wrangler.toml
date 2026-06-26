@@ -30,7 +30,7 @@ head_sampling_rate = 1
 invocation_logs = true
 
 [build]
-command = "npm run build"
+command = "pnpm run build"
 
 [env.production]
 name = "worker-session"
