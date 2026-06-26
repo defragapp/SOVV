@@ -30,6 +30,6 @@
   }
   /* Lock in container radiuses */
   .container, .card, .panel {
-    @apply rounded-md md:rounded-lg; 
+    @apply rounded-md md:rounded-lg;
   }
 }
