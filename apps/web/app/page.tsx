@@ -37,23 +37,23 @@ type ResultRow = {
 
 const DEMO_RESULT: ResultRow[] = [
   {
-    label: "What's happening",
-    value: "Right now, this feels like something important didn't land.",
+    label: "Active Dynamic",
+    value: "High-pressure urgency meeting withdrawal response.",
     evidence: ["Moon in Pisces", "Gate 55"],
   },
   {
-    label: "What it lands on",
-    value: "Under this is a simple need: to be met.",
+    label: "Baseline Interaction",
+    value: "Your need for immediate resolution is clashing with their required processing time.",
     evidence: ["Gate 2", "Venus in Taurus"],
   },
   {
-    label: "The other side",
-    value: "They may be reacting from a place of protection — not indifference.",
+    label: "System Conflict",
+    value: "Withdrawal is functioning as a pressure-regulation mechanism, not necessarily rejection.",
     evidence: ["Gate 38"],
   },
   {
-    label: "The pattern",
-    value: "You reach. They pull back. Distance grows. This tends to repeat.",
+    label: "Recurring Loop",
+    value: "Pressure applied generates distance. Distance triggers anxiety. The cycle repeats.",
     evidence: ["Sun in Aries", "Gate 51"],
   },
   {
@@ -404,39 +404,16 @@ export default function Home() {
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section
-        className="relative -mt-16 w-full overflow-hidden bg-[#08070a]"
+        className="relative -mt-16 w-full overflow-hidden bg-[#000000] border-b border-white/[0.05]"
         style={{ minHeight: "100svh" }}
       >
         {/* High-res base image — WebP 2560px with JPEG fallback */}
-        <picture>
-          <source srcSet="/hero-hand.webp" type="image/webp" media="(min-width: 768px)" />
-          <source srcSet="/hero-hand-1x.webp" type="image/webp" />
-          <img
-            src="/hero-hand.jpg"
-            alt="An open hand with palm facing upward into a beam of warm light"
-            className="absolute inset-0 w-full h-full object-cover hero-drift"
-            style={{ objectPosition: "center 20%", zIndex: 0, opacity: 0.85 }}
-            fetchPriority="high"
-            decoding="async"
-          />
-        </picture>
+        
 
         {/* Animated light layer */}
-        <HeroLightBeam />
+        
 
-        {/* Edge vignette — all four sides, subtle */}
-        <div
-          aria-hidden
-          className="absolute inset-0 z-[2] pointer-events-none"
-          style={{
-            background: [
-              "linear-gradient(180deg, rgba(8,7,10,0.68) 0%, rgba(8,7,10,0.20) 16%, transparent 38%)",
-              "linear-gradient(0deg, rgba(8,7,10,1) 0%, rgba(8,7,10,0.88) 20%, rgba(8,7,10,0.35) 42%, transparent 62%)",
-              "linear-gradient(90deg, rgba(8,7,10,0.35) 0%, transparent 18%)",
-              "linear-gradient(270deg, rgba(8,7,10,0.35) 0%, transparent 18%)",
-            ].join(", "),
-          }}
-        />
+        
 
         {/* Hero content — lower-middle third, anchored to bottom */}
         <div
@@ -578,7 +555,7 @@ export default function Home() {
               This is what you actually get.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-sm">
-              A real prompt. A real result. Your Baseline Design active in the background.
+              Your input mapped directly to your Baseline Design. Pure pattern recognition.
             </p>
           </div>
 
@@ -606,8 +583,8 @@ export default function Home() {
                 href: "/product",
                 accent: false,
                 hook: "Separate the moment from the pattern.",
-                what: "Something happened. You don't know if you overreacted or if this is the same thing that always happens.",
-                cta: "What's actually active — and your clearest next response.",
+                what: "Strip away the noise and identify the exact dynamic playing out between you.",
+                cta: "Defrag: Map your relational patterns.",
                 tags: ["Arguments", "Messages", "Family roles", "Boundaries", "Grief"],
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
@@ -625,8 +602,8 @@ export default function Home() {
                 href: "/covenant",
                 accent: true,
                 hook: "Your moment has been walked before.",
-                what: "Covenant connects what you're going through to the real human stories in Scripture.",
-                cta: "One honest next step — grounded in faith, not performance.",
+                what: "Map your current situation to historical narratives to find the clearest way forward.",
+                cta: "Covenant: Navigate using biblical precedent.",
                 tags: ["Faith", "Values", "Commitments", "Repair"],
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
@@ -643,7 +620,7 @@ export default function Home() {
                 href: "/product",
                 accent: false,
                 hook: "Get back into your own lane.",
-                what: "A conversation, a conflict, a decision — and suddenly you're reacting from somewhere that isn't you.",
+                what: "Identify what is pulling you off-center and recalibrate back to your native state.",
                 cta: "Your Baseline Design and the live sky above you show the path back.",
                 tags: ["After Defrag", "Before a hard conversation", "After a conflict"],
                 icon: (
