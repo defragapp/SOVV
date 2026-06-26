@@ -271,7 +271,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     bestNextResponse: parsed.bestNextResponse || { summary: "This section needs more context.", phrasing: [] },
     conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] },
     
-
+  };
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
   const confidence: Confidence = "Medium";
