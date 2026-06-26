@@ -76,7 +76,7 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
 
       const aiResponse = await env.AI.run(
         (env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast") as any,
-        {  temperature: 0.3, max_tokens: 800 }
+        { messages, temperature: 0.3, max_tokens: 800 }
       );
 
       const rawText = (aiResponse as any).response ?? String(aiResponse);
