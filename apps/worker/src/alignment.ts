@@ -59,7 +59,7 @@ export interface AlignmentBrief {
 
 // ─── Entry mode system prompt ──────────────────────────────────────────────
 
-const SYSTEM_ALIGNMENT_ENTRY = "SECURITY_PREFIX_" + `You generate the entry brief for the Alignment space inside Sovereign.os.
+const SYSTEM_ALIGNMENT_ENTRY = SECURITY_PREFIX + `You generate the entry brief for the Alignment space inside Sovereign.os.
 
 The Alignment space helps users get back into their own lane — grounded in who they actually are, not who the situation is pulling them to be.
 
