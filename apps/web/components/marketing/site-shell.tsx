@@ -27,24 +27,7 @@ export function SiteShell({ children }: SiteShellProps) {
             </span>
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="/about" className="text-sm text-gray-400 hover:text-white transition-colors">
-              Method
-            </Link>
-            <Link href="/pricing" className="text-sm text-gray-400 hover:text-white transition-colors">
-              Pricing
-            </Link>
-            <Link href="/login" className="text-sm font-medium text-white hover:text-[#e0743a] transition-colors">
-              Sign in
-            </Link>
-            <Link href="/signup" className="btn-primary">
-              Initialize
-            </Link>
-          </nav>
-
-          {/* Mobile Menu Toggle */}
-          <div className="md:hidden flex items-center">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="p-2 -mr-2 text-gray-400 hover:text-white focus:outline-none"

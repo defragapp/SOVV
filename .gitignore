@@ -90,3 +90,4 @@ packages/core/src/geneKeyMeanings.ts
 
 # Local push/audit scripts (may contain tokens)
 *.py
+apps/sovereign-vibe

@@ -273,7 +273,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] }
   };
     
-
+  };
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
   const confidence: Confidence = "Medium";
