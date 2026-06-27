@@ -1,6 +1,7 @@
 {
   "name": "sovereign-platform",
   "private": true,
+  "packageManager": "pnpm@10.11.1",
   "engines": {
     "node": ">=22"
   },
@@ -9,20 +10,21 @@
     "packages/*"
   ],
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "dev": "cd apps/web && pnpm dev",
     "dev:api": "wrangler dev --config apps/worker/wrangler.toml --local",
     "dev:ai": "wrangler dev --config apps/worker-ai/wrangler.toml --local",
     "dev:session": "wrangler dev --config apps/worker-session/wrangler.toml --local",
     "dev:web": "wrangler dev --config apps/web/wrangler.json --local",
-    "dev:all": "concurrently \"npm run dev:api\" \"npm run dev:ai\" \"npm run dev:session\" \"npm run dev:web\"",
-    "build": "npm --workspace=web exec opennextjs-cloudflare build",
+    "dev:all": "concurrently \"pnpm run dev:api\" \"pnpm run dev:ai\" \"pnpm run dev:session\" \"pnpm run dev:web\"",
+    "build": "pnpm --workspace=web exec opennextjs-cloudflare build",
     "deploy:api": "cd apps/worker && wrangler deploy --env production",
     "deploy:ai": "cd apps/worker-ai && wrangler deploy --env production",
     "deploy:session": "cd apps/worker-session && wrangler deploy --env production",
     "deploy:web": "cd apps/web && wrangler deploy --env production",
-    "deploy:all": "npm run deploy:api && npm run deploy:ai && npm run deploy:session && npm run deploy:web",
+    "deploy:all": "pnpm run deploy:api && pnpm run deploy:ai && pnpm run deploy:session && pnpm run deploy:web",
     "ship": "bash ./scripts/push-live.sh",
-    "lint": "npm run lint -w apps/web && tsc --noEmit -p apps/worker/tsconfig.json"
+    "lint": "pnpm run lint -w apps/web && tsc --noEmit -p apps/worker/tsconfig.json"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
