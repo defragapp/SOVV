@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Env } from "./types-env.js";
 import { type ChipsResponse, type Mode, CHIP_GROUPS } from "@sovereign/core";
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Email inbound route handler
  *

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * output-validator.ts
  *

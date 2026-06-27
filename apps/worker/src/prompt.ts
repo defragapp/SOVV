@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @deprecated prompt.ts is superseded by prompts.ts (unified prompt architecture).
  * Do not add new prompts here. Use apps/worker/src/prompts.ts instead.

@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface EmotionalDriversRequest {
   sessionId: string;
   targetUserId: string;

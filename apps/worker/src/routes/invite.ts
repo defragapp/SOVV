@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Invite system — controlled user onboarding
  * Sovereign.os

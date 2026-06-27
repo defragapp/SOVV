@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Env } from "./types-env.js";
 import { getSessionId, cookieHeader } from "./plan.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";

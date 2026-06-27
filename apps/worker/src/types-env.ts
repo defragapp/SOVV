@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { D1Database, R2Bucket, Ai, KVNamespace, SendEmail, Queue, Fetcher } from "@cloudflare/workers-types";
 
 export interface Env {

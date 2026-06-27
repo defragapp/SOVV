@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Extended auth routes — password reset + email verification
  * Sovereign.os

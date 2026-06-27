@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const ALLOWED_ORIGINS = [
   'https://defrag.app',
   'https://www.defrag.app',

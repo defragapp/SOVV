@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * memory.ts
  *

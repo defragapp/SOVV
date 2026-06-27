@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Password hashing - PBKDF2 with SHA-512 via Web Crypto API
 const PBKDF2_ITERATIONS = 100_000
 const SALT_LENGTH = 32

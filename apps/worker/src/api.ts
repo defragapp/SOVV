@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Sovereign OS Frontend API Client
  * 

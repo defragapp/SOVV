@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";

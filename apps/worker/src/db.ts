@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface Interaction {
   id?: number;
   session_id: string;

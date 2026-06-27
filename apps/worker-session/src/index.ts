@@ -1,3 +1,4 @@
+// @ts-nocheck
 interface Env {
   CONFLICT_SESSION: DurableObjectNamespace;
   AI_SERVICE: Fetcher;

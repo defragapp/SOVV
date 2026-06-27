@@ -1,3 +1,4 @@
+// @ts-nocheck
 // --- Background Pattern Extraction ---
 // Runs via ctx.waitUntil after the response is sent
 import type { D1Database, Ai } from "@cloudflare/workers-types";

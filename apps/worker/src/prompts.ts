@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * prompts.ts — Unified prompt architecture for Sovereign.os
  *

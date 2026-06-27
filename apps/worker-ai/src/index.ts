@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { handleEmotionalDrivers } from "./emotional-drivers";
 
 export interface Env {

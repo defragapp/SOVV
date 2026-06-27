@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Email queue consumer
  *

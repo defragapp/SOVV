@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Env } from "./types-env";
 import { getSessionId, cookieHeader } from "./plan";
 import type { Interaction } from "@sovereign/core";

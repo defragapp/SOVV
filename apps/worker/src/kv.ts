@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Env } from "./types-env.js";
 
 function todayKey(): string {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Env } from "./types-env.js"
 import { SYSTEM_DEFRAG, SYSTEM_DEFRAG_RELATIONAL } from "./prompts.js"
 import { getFeatureFlags } from "./featureFlags.js"

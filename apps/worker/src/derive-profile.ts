@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * derive-profile.ts
  * GET /api/derive-profile

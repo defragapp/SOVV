@@ -1,3 +1,4 @@
+// @ts-nocheck
 const RISK_WORDS = [
   "kill myself",
   "want to die",

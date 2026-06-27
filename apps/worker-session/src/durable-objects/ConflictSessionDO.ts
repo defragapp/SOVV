@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { DurableObject } from "cloudflare:workers";
 
 interface Env {

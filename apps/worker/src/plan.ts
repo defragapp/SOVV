@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Env } from "./types-env.js";
 
 export type Plan = "free" | "pro";

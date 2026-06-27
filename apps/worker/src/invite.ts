@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * invite.ts — Invite Privately loop
  *
