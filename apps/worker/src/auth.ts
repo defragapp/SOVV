@@ -330,7 +330,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Set-Cookie": clearCookie(cookieDomain),
+        "Set-Cookie": clearCookie(),
       },
     })
   })

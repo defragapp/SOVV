@@ -21,7 +21,7 @@ export function Card({
       } ${className}`}
     >
       <div className="absolute inset-0 z-0 rounded-[20px] bg-gradient-to-br from-[#e0743a]/[0.04] to-transparent opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100" />
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10">{children as any}</div>
     </motion.div>
   );
 }

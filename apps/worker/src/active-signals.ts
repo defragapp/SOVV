@@ -381,11 +381,11 @@ export function buildRailData(
       pace: signals.pace,
       stabilizes: signals.stabilizes,
       responds: signals.responds,
-      pattern: signals.pattern,
+      // pattern: signals.pattern,
     },
     sky: {
       urgency: timing.urgency,
-      sensitivity: timing.sensitivity,
+      state: timing.sensitivity,
       tolerance: timing.tolerance,
     },
     pattern: { loop: overlay?.loop ?? signals.pattern ?? "" },

@@ -18,7 +18,7 @@ export async function explain(text: string, mode: string = 'sovereign') {
 }
 
 export async function getPatterns() {
-  const res = await fetch(`${API_BASE}/api/patterns`, { credentials: 'include' });
+  const res = await fetch(`${API_BASE}/api/patterns`, {});
   return res.json();
 }
 

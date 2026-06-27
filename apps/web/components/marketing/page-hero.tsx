@@ -52,7 +52,7 @@ export function PageHero({
           transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           className="text-headline mb-6"
         >
-          {title}
+          {title as any}
         </motion.h1>
 
         {body && (
@@ -73,7 +73,7 @@ export function PageHero({
             transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="mt-10"
           >
-            {children}
+            {children as any}
           </motion.div>
         )}
       </div>

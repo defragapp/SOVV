@@ -23,7 +23,7 @@ export function MotionSection({
       viewport={{ once: true, margin: "-10%" }}
       transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
     >
-      {children}
+      {children as any}
     </motion.section>
   );
 }

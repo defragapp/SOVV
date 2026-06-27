@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
+
 
 export function CheckoutButton({ priceId, cta }: { priceId: string; cta: string }) {
   const [loading, setLoading] = useState(false)
@@ -37,14 +37,14 @@ export function CheckoutButton({ priceId, cta }: { priceId: string; cta: string 
 
   return (
     <div className="flex flex-col gap-2">
-      <Button 
-        variant="premium" 
+      <button
+
         className="w-full rounded-none border border-border bg-white text-black hover:bg-white/90 font-sans font-medium text-xs tracking-[0.15em] uppercase h-12 px-8 transition-colors disabled:opacity-50"
         onClick={handleCheckout} 
         disabled={loading}
       >
         {loading ? "..." : cta}
-      </Button>
+      </button>
       {error && <p className="text-red-400 text-[10px] font-sans font-medium mt-1">{error}</p>}
     </div>
   )
