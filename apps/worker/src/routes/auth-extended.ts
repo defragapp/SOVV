@@ -1,8 +1,3 @@
-/**
- * Extended auth routes — password reset + email verification
- * Sovereign.os
- */
-
 import type { Env } from '../types-env.js'
 import { hashPassword } from '../auth.js'
 import { getCorsHeaders } from '../cors.js'
@@ -93,9 +88,11 @@ export function registerAuthExtendedRoutes(router: any, getEnv: () => Env) {
       if (resetToken.expires_at < now) return jsonResponse({ error: 'This reset link has expired' }, 400, request)
 
       const password_hash = await hashPassword(password)
-      await env.DB.prepare('UPDATE users SET password_hash = ? WHERE id = ?').bind(password_hash, resetToken.user_id).run()
-      await env.DB.prepare('UPDATE password_reset_tokens SET used_at = ? WHERE id = ?').bind(now, resetToken.id).run()
-      await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(resetToken.user_id).run()
+      await env.DB.batch([
+        env.DB.prepare('UPDATE users SET password_hash = ? WHERE id = ?').bind(password_hash, resetToken.user_id) as any,
+        env.DB.prepare('UPDATE password_reset_tokens SET used_at = ? WHERE id = ?').bind(now, resetToken.id) as any,
+        env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(resetToken.user_id) as any
+      ])
 
       return jsonResponse({ success: true, message: 'Password updated. Please sign in.' }, 200, request)
     } catch (err) {
@@ -149,8 +146,10 @@ export function registerAuthExtendedRoutes(router: any, getEnv: () => Env) {
       if (verifyToken.verified_at) return jsonResponse({ success: true, message: 'Email already verified' }, 200, request)
       if (verifyToken.expires_at < now) return jsonResponse({ error: 'Verification link expired' }, 400, request)
 
-      await env.DB.prepare('UPDATE users SET email_verified = 1 WHERE id = ?').bind(verifyToken.user_id).run()
-      await env.DB.prepare('UPDATE email_verification_tokens SET verified_at = ? WHERE id = ?').bind(now, verifyToken.id).run()
+      await env.DB.batch([
+        env.DB.prepare('UPDATE users SET email_verified = 1 WHERE id = ?').bind(verifyToken.user_id) as any,
+        env.DB.prepare('UPDATE email_verification_tokens SET verified_at = ? WHERE id = ?').bind(now, verifyToken.id) as any
+      ])
 
       return jsonResponse({ success: true, message: 'Email verified. Your space is ready.' }, 200, request)
     } catch (err) {
