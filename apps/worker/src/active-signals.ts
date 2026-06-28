@@ -22,6 +22,11 @@
  */
 
 import type { BaselineDesignDataset } from "./baseline-compiler.js"
+import type {
+  ActiveBaselineSignals,
+  TimingSignals,
+  OverlaySignals,
+} from "@sovereign/core"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
