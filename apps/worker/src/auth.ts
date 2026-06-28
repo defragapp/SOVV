@@ -144,7 +144,14 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
     "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires > ?"
   )
     .bind(token, Date.now())
-    .first()
+    .first<{
+      id: string
+      email: string
+      tier: string
+      role: string | null
+      stripe_customer_id: string | null
+      subscription_status: string | null
+    }>()
 
   if (!session) return null
 
@@ -152,8 +159,14 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
   DB.prepare("UPDATE sessions SET last_active = ? WHERE token = ?")
     .bind(Date.now(), token).run().catch(() => {})
 
-  const s = session as { id: string; email: string; tier: string; role: string; stripe_customer_id: string | null; subscription_status: string }
-  return { ...s, role: s.role || "user", subscription_status: s.subscription_status || "free" }
+  return {
+    id: session.id,
+    email: session.email,
+    tier: session.tier,
+    role: session.role || "user",
+    stripe_customer_id: session.stripe_customer_id,
+    subscription_status: session.subscription_status || "free",
+  }
 }
 
 const SESSION_TTL = 7 * 24 * 60 * 60
@@ -368,7 +381,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       // Verify current password
       const dbUser = await env.DB.prepare("SELECT password_hash FROM users WHERE id = ?")
-        .bind(user.id).first() as { password_hash: string } | null
+        .bind(user.id).first()
       if (!dbUser) return jsonResponse({ error: "User not found" }, 404)
 
       const valid = await verifyPassword(currentPassword, dbUser.password_hash)
@@ -473,10 +486,15 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
 
     try {
-      const sessionQuery = await env.DB.prepare(
+      const queryResult = await env.DB.prepare(
         "SELECT token, created_at, expires_at FROM sessions WHERE user_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 10"
       ).bind(user.id, Date.now()).all()
-      const results = sessionQuery.results as Array<{ token: string; created_at: number; expires_at: number }> | undefined
+
+      const results = ((queryResult as { results?: unknown[] })?.results ?? []) as Array<{
+        token: string
+        created_at: number
+        expires_at: number
+      }>
 
       // Mask tokens for security — only show last 6 chars
       const sessions = (results || []).map(s => ({
