@@ -27,7 +27,7 @@ export function SiteShell({ children }: SiteShellProps) {
             </span>
           </Link>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="p-2 -mr-2 text-gray-400 hover:text-white focus:outline-none"
@@ -57,14 +57,14 @@ export function SiteShell({ children }: SiteShellProps) {
                 Pricing
               </Link>
               <Link
-                href="/login"
+                href="/app/login"
                 className="text-lg text-white font-medium"
                 onClick={() => setMenuOpen(false)}
               >
                 Sign in
               </Link>
               <Link
-                href="/signup"
+                href="/app/login"
                 className="btn-primary text-center mt-2"
                 onClick={() => setMenuOpen(false)}
               >
