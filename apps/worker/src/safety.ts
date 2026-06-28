@@ -10,6 +10,8 @@ const RISK_WORDS = [
   "threat"
 ];
 
+export { RISK_WORDS };
+
 export function safetyMode(text: string): "normal" | "support" {
   const t = (text || "").toLowerCase();
   for (const w of RISK_WORDS) {
