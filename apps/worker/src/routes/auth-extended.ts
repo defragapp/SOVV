@@ -48,6 +48,12 @@ export function registerAuthExtendedRoutes(router: any, getEnv: () => Env) {
   router.post('/api/auth/forgot-password', async (request: Request) => {
     const env = getEnv()
     try {
+      // Rate limit password reset requests by IP
+      if (env.RATE_LIMITER) {
+        const ip = request.headers.get('CF-Connecting-IP') || 'unknown'
+        const { success } = await env.RATE_LIMITER.limit({ key: `reset:${ip}` })
+        if (!success) return jsonResponse({ error: 'Too many requests. Please wait before trying again.' }, 429, request)
+      }
       const { email } = await request.json() as { email?: string }
       if (!email) return jsonResponse({ error: 'Email required' }, 400, request)
 

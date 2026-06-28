@@ -157,6 +157,37 @@ export async function handleGetLibraryItem(req: Request, env: Env) {
   }
 }
 
+export async function handleDeleteLibraryItem(req: Request, env: Env) {
+  const user = await getAuthUser(req, env.DB);
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const url = new URL(req.url);
+  const segments = url.pathname.split('/');
+  const id = segments[segments.length - 1];
+
+  if (!id) {
+    return new Response("Missing ID", { status: 400 });
+  }
+
+  try {
+    // Only delete if the item belongs to this user
+    const result = await env.DB.prepare(
+      "DELETE FROM library WHERE id = ? AND user_id = ?"
+    ).bind(id, user.id).run();
+
+    if (result.meta?.changes === 0) {
+      return new Response("Not found", { status: 404 });
+    }
+
+    return Response.json({ success: true });
+  } catch (e) {
+    console.error("Failed to delete library item", String(e));
+    return new Response("Internal Server Error", { status: 500 });
+  }
+}
+
 export function registerHistoryRoute(router: any, getEnv: () => Env) {
   router.get("/api/history", async (req: Request) => {
     const env = getEnv();
@@ -171,6 +202,11 @@ export function registerHistoryRoute(router: any, getEnv: () => Env) {
   router.get("/api/library/:id", async (req: Request) => {
     const env = getEnv();
     return handleGetLibraryItem(req, env);
+  });
+
+  router.delete("/api/library/:id", async (req: Request) => {
+    const env = getEnv();
+    return handleDeleteLibraryItem(req, env);
   });
 
   router.post("/api/history", async (req: Request) => {

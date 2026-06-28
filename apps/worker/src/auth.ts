@@ -338,6 +338,42 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     })
   })
 
+  // DELETE /api/auth/account — permanently delete user account and all data
+  router.delete("/api/auth/account", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    try {
+      // Delete all user data in order (FK constraints)
+      await env.DB.batch([
+        env.DB.prepare("DELETE FROM sessions WHERE user_id = ?").bind(user.id),
+        env.DB.prepare("DELETE FROM library WHERE user_id = ?").bind(user.id),
+        env.DB.prepare("DELETE FROM interactions WHERE session_id IN (SELECT token FROM sessions WHERE user_id = ?)").bind(user.id),
+        env.DB.prepare("DELETE FROM patterns WHERE session_id IN (SELECT token FROM sessions WHERE user_id = ?)").bind(user.id),
+        env.DB.prepare("DELETE FROM people WHERE user_id = ?").bind(user.id),
+        env.DB.prepare("DELETE FROM users WHERE id = ?").bind(user.id),
+      ])
+
+      // Clear KV data
+      await env.KV.delete(`natal:${user.id}`).catch(() => {})
+      await env.KV.delete(`baseline:${user.id}`).catch(() => {})
+
+      const cookieDomain = env.COOKIE_DOMAIN || undefined
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Set-Cookie": clearCookie(),
+          ...getCorsHeaders(request),
+        },
+      })
+    } catch (e) {
+      console.error("[DELETE_ACCOUNT]", e)
+      return jsonResponse({ error: "Failed to delete account" }, 500)
+    }
+  })
+
   // POST /api/auth/logout
   router.post("/api/auth/logout", async (request: Request) => {
     const env = getEnv()
@@ -365,6 +401,45 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
     const people = await env.DB.prepare("SELECT * FROM people WHERE user_id = ?").bind(user.id).all()
     return jsonResponse(people.results)
+  })
+
+  // POST /api/people — add a person
+  router.post("/api/people", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    try {
+      const { name, relation } = await request.json() as { name?: string; relation?: string }
+      if (!name || typeof name !== "string" || !name.trim()) {
+        return jsonResponse({ error: "Name is required" }, 400)
+      }
+      const id = crypto.randomUUID()
+      const now = new Date().toISOString()
+      await env.DB.prepare(
+        "INSERT INTO people (id, user_id, name, relation, created_at) VALUES (?, ?, ?, ?, ?)"
+      ).bind(id, user.id, name.trim(), relation?.trim() || null, now).run()
+      return jsonResponse({ success: true, id, name: name.trim() })
+    } catch (e) {
+      console.error("[PEOPLE_CREATE]", e)
+      return jsonResponse({ error: "Failed to create person" }, 500)
+    }
+  })
+
+  // DELETE /api/people/:id — remove a person
+  router.delete("/api/people/:id", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    const url = new URL(request.url)
+    const id = url.pathname.split('/').pop()
+    if (!id) return jsonResponse({ error: "Missing ID" }, 400)
+    try {
+      await env.DB.prepare("DELETE FROM people WHERE id = ? AND user_id = ?")
+        .bind(id, user.id).run()
+      return jsonResponse({ success: true })
+    } catch (e) {
+      return jsonResponse({ error: "Failed to delete person" }, 500)
+    }
   })
 
   // GET /api/user/me — current user profile
