@@ -9,7 +9,7 @@ import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
 import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
-import { logSafetyEvent } from "./safety.js";
+import { logSafetyEvent, protectionActive } from "./safety.js";
 import {
   selectActiveSignals,
   buildBaselineSignature,
@@ -59,7 +59,15 @@ function parseJsonFromText(text: string): Record<string, any> {
 
   try {
     return JSON.parse(match[0]) as Record<string, any>;
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "defrag_response_parse_failed",
+      endpoint: "defrag",
+      requestId: "internal",
+      reason: "unknown_failure",
+      error,
+    });
     return {};
   }
 }
@@ -137,6 +145,31 @@ function buildUserPrompt(args: {
   ].filter(Boolean).join("\n\n");
 
   return `${contextSection ? `Context:\n${contextSection}\n\n` : ""}Message:\n${args.message}${targetSection}`;
+}
+
+function buildProtectiveFallbackResult(message: string) {
+  return {
+    id: crypto.randomUUID(),
+    workspaceSource: "DEFRAG",
+    createdAt: new Date().toISOString(),
+    title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
+    summary: "The system is stabilizing under elevated traffic. Stay with the cleanest next move instead of solving everything at once.",
+    activePattern: "Pressure rises when urgency starts making decisions for you.",
+    theRepeat: "The loop is trying to turn this moment into something bigger than it is.",
+    oldRole: "You may be stepping into responsibility that is not fully yours.",
+    whatYouLearnedToCarry: "The reflex is to carry more than the moment actually requires.",
+    strainPattern: "Overwork, overexplaining, or overmanaging will add weight here.",
+    giftUnderStrain: "Clarity returns when you narrow the move to what is actually yours.",
+    alignment: "A smaller, cleaner response gives you a better chance than a faster one.",
+    bestNextResponse: {
+      summary: "Name the next honest action and keep it contained.",
+      phrasing: ["Here is what is mine to do next.", "I am not going to carry the whole outcome right now."],
+    },
+    conversationalSteering: {
+      do: ["Stay concrete.", "Separate facts from pressure."],
+      avoid: ["Do not solve the whole story.", "Do not manage the other person's reaction."],
+    },
+  };
 }
 
 export async function handleExplain(req: Request, env: Env): Promise<Response> {
@@ -294,6 +327,37 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     targetName: target ? (target.relation ?? target.name) : undefined,
     targetBaseline,
   });
+
+  if (protectionActive(req, 2)) {
+    logSafetyEvent({
+      level: "warn",
+      event: "defrag_protective_fallback",
+      request: req,
+      reason: "protection_escalation",
+      error_type: "system",
+      protection_level: 2,
+      details: { sessionId: sid },
+    });
+    const protectedResult = buildProtectiveFallbackResult(message);
+    const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
+    const confidence: Confidence = "Medium";
+
+    await insertInteraction(env.DB, {
+      id: interactionId,
+      session_id: sid,
+      mode,
+      question: message,
+      text: message,
+      people: target ? [{ id: target.id, relation: target.relation, name: target.relation }] : [],
+      result: protectedResult as unknown as Record<string, unknown>,
+      confidence,
+    });
+
+    return jsonResponse(protectedResult, 200, {
+      ...getCorsHeaders(req),
+      ...responseHeaders,
+    });
+  }
 
   const modelId = env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
   const ai = await env.AI.run(modelId, {

@@ -18,6 +18,8 @@
  * All framework data is computed deterministically before AI sees it.
  */
 
+import { logSafetyEvent } from "./safety.js";
+
 // ─── Types ─────────────────────────────────────────────────────────────────
 
 export interface BaselineDesignDataset {
@@ -141,10 +143,27 @@ async function geocodeLocation(pob: string): Promise<{
         const tzData = await tzRes.json() as any
         timezone = tzData.timeZone || "UTC"
       }
-    } catch {}
+    } catch (error) {
+      logSafetyEvent({
+        level: "warn",
+        event: "baseline_timezone_lookup_failed",
+        endpoint: "baseline-compiler",
+        requestId: `${latNum},${lngNum}`,
+        reason: "unknown_failure",
+        error,
+      })
+    }
 
     return { lat: latNum, lng: lngNum, timezone, displayName: display_name }
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "baseline_geocode_failed",
+      endpoint: "baseline-compiler",
+      requestId: pob,
+      reason: "unknown_failure",
+      error,
+    })
     return null
   }
 }
@@ -231,7 +250,15 @@ async function fetchHorizonsPosition(
     const retrograde = text.includes("R") && dataLine.includes("R")
 
     return { longitude, latitude, retrograde }
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "baseline_planet_parse_failed",
+      endpoint: "baseline-compiler",
+      requestId: targetId,
+      reason: "unknown_failure",
+      error,
+    })
     return null
   }
 }
@@ -283,7 +310,15 @@ async function computeAstronomySnapshot(
       epoch: `${dob}T${tob}`,
       bodies,
     }
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "baseline_astronomy_snapshot_failed",
+      endpoint: "baseline-compiler",
+      requestId: `${dob}T${tob}`,
+      reason: "unknown_failure",
+      error,
+    })
     return null
   }
 }
@@ -729,7 +764,15 @@ async function synthesizeAIDataset(
     if (!match) return null
 
     return JSON.parse(match[0]) as BaselineDesignDataset["aiDataset"]
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "baseline_ai_dataset_parse_failed",
+      endpoint: "baseline-compiler",
+      requestId: "synthesis",
+      reason: "unknown_failure",
+      error,
+    })
     return null
   }
 }

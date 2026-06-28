@@ -5,7 +5,7 @@ import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { checkProLimit } from "./plan.js";
 import { SYSTEM_COVENANT } from "./prompts.js";
 import { parseJsonBody, validateTextInput } from "./safety-validation.js";
-import { logSafetyEvent } from "./safety.js";
+import { logSafetyEvent, protectionActive } from "./safety.js";
 import {
   selectActiveSignals,
   buildTimingSignals,
@@ -80,7 +80,31 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
 
       const { text: message } = messageValidation.value;
 
-      
+      if (protectionActive(request, 2)) {
+        logSafetyEvent({
+          level: "warn",
+          event: "covenant_protective_fallback",
+          request,
+          reason: "protection_escalation",
+          error_type: "system",
+          protection_level: 2,
+        });
+        const fallback = {
+          figure: "Hold the real shape of this moment",
+          pattern: "Under load, the story can look louder than the truth.",
+          story: "The immediate story may not be the deepest one. Let the first interpretation pass.",
+          whatBroke: "Certainty broke before clarity had time to form.",
+          howGodMet: "You are still allowed to meet this moment with honesty and restraint.",
+          whatTheyLearned: "You learn more when you stay with what is real instead of what is urgent.",
+          forYou: "Carry only what is yours. Let the rest stay where it belongs.",
+          nextStep: "Take one clean step that does not require the whole story to be solved.",
+          media: { audioOverviewAvailable: false },
+        };
+        return new Response(JSON.stringify(fallback), {
+          status: 200,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
 
       const aiResponse = await env.AI.run(
         (env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast") as any,

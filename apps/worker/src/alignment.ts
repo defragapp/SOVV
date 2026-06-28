@@ -5,7 +5,7 @@ import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { SYSTEM_ALIGNMENT, SECURITY_PREFIX } from "./prompts.js";
 import { checkProLimit } from "./plan.js";
 import { parseJsonBody, validateTextInput } from "./safety-validation.js";
-import { logSafetyEvent } from "./safety.js";
+import { logSafetyEvent, protectionActive } from "./safety.js";
 import {
   selectActiveSignals,
   buildTimingSignals,
@@ -216,6 +216,18 @@ function sanitizeBrief(brief: AlignmentBrief): void {
   brief.action = brief.action.slice(0, 2)
 }
 
+function buildWorkspaceFallback() {
+  return {
+    whatIsTrue: "This moment is easier to read when you separate the facts from the pressure around them.",
+    whatIsYours: "Carry the part that is actually yours to decide, say, or do.",
+    whatIsNotYours: "Do not carry the reaction, timing, or outcome that belongs to someone else.",
+    theShift: "Smaller, cleaner movement will tell you more than forcing certainty.",
+    nextStep: "Name the next honest action and keep it small.",
+    avoid: "Do not solve the whole thing in one move.",
+    alignment: "Your alignment returns when you stop managing what is not yours.",
+  };
+}
+
 // ─── Route registration ────────────────────────────────────────────────────
 
 export function registerAlignmentRoute(router: any, getEnv: () => Env) {
@@ -272,6 +284,22 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
         const now = new Date();
         const dateStr = now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+        if (protectionActive(request, 2)) {
+          logSafetyEvent({
+            level: "warn",
+            event: "alignment_entry_protective_fallback",
+            request,
+            reason: "protection_escalation",
+            error_type: "system",
+            protection_level: 2,
+          });
+          const protectedBrief = buildEntryFallback(baselineContext);
+          sanitizeBrief(protectedBrief);
+          return new Response(JSON.stringify(protectedBrief), {
+            status: 200, headers: { "Content-Type": "application/json" }
+          });
+        }
 
         const messages = [
           { role: "system", content: SYSTEM_ALIGNMENT_ENTRY },
@@ -382,6 +410,24 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
       const now = new Date();
       const dateStr = now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+      if (protectionActive(request, 2)) {
+        logSafetyEvent({
+          level: "warn",
+          event: "alignment_workspace_protective_fallback",
+          request,
+          reason: "protection_escalation",
+          error_type: "system",
+          protection_level: 2,
+        });
+        return new Response(JSON.stringify({
+          ...buildWorkspaceFallback(),
+          media: { audioOverviewAvailable: false },
+        }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
 
       const messages = [
         { role: "system", content: SYSTEM_ALIGNMENT },

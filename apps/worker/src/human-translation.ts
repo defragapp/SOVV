@@ -12,6 +12,7 @@
 
 import type { Env } from "./types-env.js";
 import type { BaselineDesignDataset } from "./baseline-compiler.js";
+import { logSafetyEvent } from "./safety.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -439,7 +440,7 @@ export async function buildHumanBehaviorTranslation(
   env: Env,
   userId: string,
   app: "alignment" | "defrag" | "covenant",
-  context?: { liveSky?: LiveSkyContext; recentPatterns?: string[]; refresh?: boolean }
+  context?: { liveSky?: LiveSkyContext; recentPatterns?: string[]; refresh?: boolean; protectiveMode?: boolean }
 ): Promise<HumanBehaviorTranslation> {
   const cacheKey = TRANSLATION_KEY(userId, app)
 
@@ -451,7 +452,16 @@ export async function buildHumanBehaviorTranslation(
         const parsed = JSON.parse(cached) as HumanBehaviorTranslation
         if (parsed.status === "ready") return parsed
       }
-    } catch {}
+    } catch (error) {
+      logSafetyEvent({
+        level: "warn",
+        event: "translation_cache_read_failed",
+        endpoint: `translation:${app}`,
+        requestId: userId,
+        reason: "unknown_failure",
+        error,
+      })
+    }
   }
 
   // Load computed dataset
@@ -490,23 +500,43 @@ export async function buildHumanBehaviorTranslation(
 
   let appRender: AlignmentEntryTranslation | DefragEntryTranslation | CovenantEntryTranslation | null = null
 
-  try {
-    const aiResponse = await (env as any).AI.run(aiModel, {
-      messages: [
-        { role: "system", content: SYSTEM_HUMAN_TRANSLATION },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.25,
-      max_tokens: 1000,
+  if (context?.protectiveMode) {
+    logSafetyEvent({
+      level: "warn",
+      event: "translation_protective_fallback",
+      endpoint: `translation:${app}`,
+      requestId: userId,
+      reason: "protection_escalation",
+      error_type: "system",
+      protection_level: 2,
     })
+  } else {
+    try {
+      const aiResponse = await (env as any).AI.run(aiModel, {
+        messages: [
+          { role: "system", content: SYSTEM_HUMAN_TRANSLATION },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.25,
+        max_tokens: 1000,
+      })
 
-    const rawText = (aiResponse as any).response ?? String(aiResponse)
-    const match = rawText.trim().match(/\{[\s\S]*\}/)
-    if (match) {
-      appRender = JSON.parse(match[0])
+      const rawText = (aiResponse as any).response ?? String(aiResponse)
+      const match = rawText.trim().match(/\{[\s\S]*\}/)
+      if (match) {
+        appRender = JSON.parse(match[0])
+      }
+    } catch (err) {
+      logSafetyEvent({
+        level: "error",
+        event: "translation_ai_failed",
+        endpoint: `translation:${app}`,
+        requestId: userId,
+        reason: "unknown_failure",
+        error_type: "system",
+        error: err,
+      })
     }
-  } catch (err) {
-    console.error("[human-translation] AI error:", err)
   }
 
   // Fallback if AI failed
@@ -531,14 +561,31 @@ export async function buildHumanBehaviorTranslation(
   // Validate
   const { valid, violations } = validateHumanBehaviorTranslation(translation)
   if (!valid) {
-    console.warn("[human-translation] validation violations:", violations)
+    logSafetyEvent({
+      level: "warn",
+      event: "translation_validation_violations",
+      endpoint: `translation:${app}`,
+      requestId: userId,
+      reason: "unknown_failure",
+      error_type: "system",
+      details: { violations },
+    })
     translation.status = "partial"
   }
 
   // Cache result
   try {
     await env.KV.put(cacheKey, JSON.stringify(translation), { expirationTtl: TRANSLATION_TTL })
-  } catch {}
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "translation_cache_write_failed",
+      endpoint: `translation:${app}`,
+      requestId: userId,
+      reason: "unknown_failure",
+      error,
+    })
+  }
 
   return translation
 }

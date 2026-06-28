@@ -63,7 +63,15 @@ export async function verifyPassword(password: string, stored: string): Promise<
       diff |= (actualHash[i] ?? 0) ^ (expectedHash[i] ?? 0)
     }
     return diff === 0
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "password_verification_failed",
+      endpoint: "auth",
+      requestId: "internal",
+      reason: "unknown_failure",
+      error,
+    })
     return false
   }
 }
@@ -753,7 +761,15 @@ function decodeJwt(token: string): { header: any; payload: any } | null {
       header: JSON.parse(headerStr),
       payload: JSON.parse(payloadStr),
     };
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "jwt_decode_failed",
+      endpoint: "auth",
+      requestId: "internal",
+      reason: "unknown_failure",
+      error,
+    })
     return null;
   }
 }

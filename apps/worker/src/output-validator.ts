@@ -9,6 +9,8 @@
  * This module is the quality gate between AI output and the user.
  */
 
+import { logSafetyEvent } from "./safety.js"
+
 // ── Required fields per space ─────────────────────────────────────────────────
 const DEFRAG_REQUIRED = ["summary", "activePattern", "theRepeat", "oldRole", "alignment"] as const
 const ALIGNMENT_REQUIRED = ["whatIsTrue", "whatIsYours", "whatIsNotYours", "theShift", "nextStep"] as const
@@ -155,7 +157,15 @@ export function parseAIOutput(rawText: string): Record<string, unknown> | null {
   if (!match) return null
   try {
     return JSON.parse(match[0]) as Record<string, unknown>
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "output_validator_parse_failed",
+      endpoint: "output-validator",
+      requestId: "internal",
+      reason: "unknown_failure",
+      error,
+    })
     return null
   }
 }
@@ -201,12 +211,19 @@ export function validateAndScore(
 
   // Log guardrail violations (never block — just log)
   if (!guardrails.passed) {
-    console.warn(JSON.stringify({
+    logSafetyEvent({
+      level: "warn",
       event: "guardrail_violation",
-      space,
-      violations: guardrails.violations,
-      timestamp: new Date().toISOString(),
-    }))
+      endpoint: `output-validator:${space}`,
+      requestId: "internal",
+      error_type: "system",
+      reason: "unknown_failure",
+      details: {
+        space,
+        violations: guardrails.violations,
+        timestamp: new Date().toISOString(),
+      },
+    })
   }
 
   return {

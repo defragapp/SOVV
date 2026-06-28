@@ -15,7 +15,16 @@ import { registerDeriveProfileRoutes } from "./derive-profile.js";
 import { registerInviteRoutes } from "./invite.js";
 import { registerAuthExtendedRoutes } from "./routes/auth-extended.js";
 import { registerInviteSystemRoutes } from "./routes/invite.js";
-import { classifyErrorType, getRequestContext, logSafetyEvent } from "./safety.js";
+import {
+  classifyErrorType,
+  enforceProtectiveRateLimit,
+  getEndpointProtectionLevel,
+  getProtectionLevel,
+  getRequestContext,
+  logSafetyEvent,
+  observeRequestFingerprint,
+  trackRuntimeOutcome,
+} from "./safety.js";
 
 const router = Router();
 let currentEnv: Env;
@@ -61,11 +70,25 @@ function createDiagnosticRequest(request: Request) {
   };
 }
 
+function withProtectionLevel(request: Request, protectionLevel: number): Request {
+  const headers = new Headers(request.headers);
+  headers.set("x-protection-level", String(protectionLevel));
+  return new Request(request, { headers });
+}
+
 function tryParseJson(rawText: string): unknown | null {
   if (!rawText) return null;
   try {
     return JSON.parse(rawText);
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "response_json_parse_failed",
+      endpoint: "index",
+      requestId: "internal",
+      reason: "unknown_failure",
+      error,
+    });
     return null;
   }
 }
@@ -129,7 +152,7 @@ function applyResponseHeaders(headers: Headers, request: Request): void {
   headers.set("x-endpoint", endpoint);
 }
 
-async function finalizeResponse(request: Request, response: Response, startedAt: number): Promise<Response> {
+async function finalizeResponse(request: Request, response: Response, startedAt: number, env: Env): Promise<Response> {
   const headers = new Headers(response.headers);
   applyResponseHeaders(headers, request);
 
@@ -138,6 +161,11 @@ async function finalizeResponse(request: Request, response: Response, startedAt:
   const status = response.status;
   const statusText = response.statusText;
   const { endpoint } = getRequestContext(request);
+  const activeProtectionLevel = getProtectionLevel(request);
+  const runtimeProtectionLevel = await trackRuntimeOutcome(env, request, { status, durationMs });
+  if (runtimeProtectionLevel > 0) {
+    headers.set("x-protection-level", String(runtimeProtectionLevel));
+  }
 
   if (status === 204 || response.body === null) {
     logSafetyEvent({
@@ -145,6 +173,7 @@ async function finalizeResponse(request: Request, response: Response, startedAt:
       request,
       status,
       duration_ms: durationMs,
+      protection_level: activeProtectionLevel,
     });
     return new Response(null, { status, statusText, headers });
   }
@@ -155,6 +184,7 @@ async function finalizeResponse(request: Request, response: Response, startedAt:
       request,
       status,
       duration_ms: durationMs,
+      protection_level: activeProtectionLevel,
     });
     return new Response(response.body, { status, statusText, headers });
   }
@@ -176,6 +206,7 @@ async function finalizeResponse(request: Request, response: Response, startedAt:
         error_type: classifyErrorType({ endpoint, status, error: errorMessage }),
         status,
         duration_ms: durationMs,
+        protection_level: activeProtectionLevel,
         error: errorMessage,
       });
     } else {
@@ -184,6 +215,8 @@ async function finalizeResponse(request: Request, response: Response, startedAt:
         request,
         status,
         duration_ms: durationMs,
+        protection_level: activeProtectionLevel,
+        details: activeProtectionLevel > 0 ? { runtime_protection_level: runtimeProtectionLevel } : undefined,
       });
     }
 
@@ -195,6 +228,7 @@ async function finalizeResponse(request: Request, response: Response, startedAt:
     request,
     status,
     duration_ms: durationMs,
+    protection_level: activeProtectionLevel,
   });
   return new Response(response.body, { status, statusText, headers });
 }
@@ -448,12 +482,26 @@ router.all("*", () => new Response("Not Found", { status: 404 }));
 
 async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext) {
   const diagnostic = createDiagnosticRequest(request);
-  const tracedRequest = diagnostic.request;
+  const protectionLevel = await getEndpointProtectionLevel(env, diagnostic.endpoint);
+  const tracedRequest = withProtectionLevel(diagnostic.request, protectionLevel);
+  await observeRequestFingerprint(env, tracedRequest);
 
   if (tracedRequest.method === 'OPTIONS') {
     const headers = new Headers();
     applyResponseHeaders(headers, tracedRequest);
     return new Response(null, { status: 204, headers });
+  }
+
+  if (protectionLevel >= 2) {
+    const protectiveLimitAllowed = await enforceProtectiveRateLimit(env, tracedRequest);
+    if (!protectiveLimitAllowed) {
+      return finalizeResponse(tracedRequest, new Response(JSON.stringify({
+        error: "Protective rate limit active. Please retry in a moment.",
+      }), {
+        status: 429,
+        headers: { "Content-Type": "application/json" },
+      }), diagnostic.startedAt, env);
+    }
   }
   
   if (env.RATE_LIMITER) {
@@ -463,12 +511,12 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
       return finalizeResponse(tracedRequest, new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
         status: 429,
         headers: { 'Content-Type': 'application/json' }
-      }), diagnostic.startedAt);
+      }), diagnostic.startedAt, env);
     }
   }
   
   const response = await router.fetch(tracedRequest, env, ctx);
-  return finalizeResponse(tracedRequest, response, diagnostic.startedAt);
+  return finalizeResponse(tracedRequest, response, diagnostic.startedAt, env);
 }
 
 export default {
@@ -492,6 +540,7 @@ export default {
           headers: { "Content-Type": "application/json" },
         }),
         diagnostic.startedAt,
+        env,
       );
     }
   },

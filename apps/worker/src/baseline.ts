@@ -4,7 +4,7 @@ import { getSessionId, cookieHeader } from "./plan.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import { compileBaselineDataset, formatDatasetForAI, formatDatasetForApp, type BaselineDesignDataset } from "./baseline-compiler.js";
 import { buildHumanBehaviorTranslation } from "./human-translation.js";
-import { logSafetyEvent } from "./safety.js";
+import { logSafetyEvent, protectionActive } from "./safety.js";
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const DATASET_KEY  = (sid: string) => `baseline-dataset:${sid}`;
@@ -240,7 +240,7 @@ export function registerBaselineRoutes(router: any, getEnv: () => Env) {
       env,
       user.id,
       app,
-      { refresh: body.refresh === true }
+      { refresh: body.refresh === true, protectiveMode: protectionActive(req, 2) }
     );
 
     return Response.json(translation);
