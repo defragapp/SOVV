@@ -126,7 +126,7 @@ export async function handleGetLibrary(req: Request, env: Env) {
       bindings = [user.id, limit, offset];
     }
 
-    const { results } = await env.DB.prepare(query).bind(...bindings).all();
+    const { results } = await env.DB.prepare(query).bind(...(bindings as any[])).all();
 
     return Response.json({ items: results || [] });
   } catch (e) {
