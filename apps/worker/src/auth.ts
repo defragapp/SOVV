@@ -146,6 +146,11 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
     .first<{ id: string; email: string; tier: string; role: string; stripe_customer_id: string | null; subscription_status: string }>()
 
   if (!session) return null
+
+  // Update last_active non-blocking
+  DB.prepare("UPDATE sessions SET last_active = ? WHERE token = ?")
+    .bind(Date.now(), token).run().catch(() => {})
+
   return { ...session, role: session.role || "user", subscription_status: session.subscription_status || "free" }
 }
 

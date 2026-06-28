@@ -8,10 +8,19 @@ import Link from "next/link"
 export default function LibraryPage() {
   const [items, setItems] = React.useState<any[]>([])
   const [deletingId, setDeletingId] = React.useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [activeFilter, setActiveFilter] = React.useState<"ALL" | "DEFRAG" | "COVENANT" | "ALIGNMENT">("ALL")
   const [page, setPage] = React.useState(0)
   const [hasMore, setHasMore] = React.useState(false)
   const [loadingMore, setLoadingMore] = React.useState(false)
   const PAGE_SIZE = 20
+
+  const filteredItems = items.filter(item => {
+    const matchesFilter = activeFilter === "ALL" || item.workspace_source === activeFilter
+    const matchesSearch = !searchQuery || 
+      (item.title || "").toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesFilter && matchesSearch
+  })
 
   const loadMore = async () => {
     setLoadingMore(true)
@@ -105,7 +114,7 @@ export default function LibraryPage() {
              </div>
           ) : (
 
-             items.map(item => (
+             filteredItems.map(item => (
                 <Link href={`/apps/defrag/${item.id}`} key={item.id} className="block border border-white/[0.08] bg-white/[0.02] p-6 flex flex-col gap-4 hover:border-border transition-colors cursor-pointer">
                    <div className="flex justify-between items-start">
                       <div className="flex flex-col gap-1">

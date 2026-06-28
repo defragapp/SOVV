@@ -109,6 +109,38 @@ function DeleteAccountSection() {
 }
 
 
+
+function ActiveSessionsList() {
+  const [sessions, setSessions] = React.useState<Array<{ id: string; createdAt: string; expiresAt: string }>>([])
+  const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    fetch("/api/auth/sessions", { credentials: "include" })
+      .then(r => r.ok ? r.json() : { sessions: [] })
+      .then((d: any) => setSessions(d.sessions || []))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) return <span className="font-mono text-[10px] text-[#4f4b47]">Loading…</span>
+  if (sessions.length === 0) return <span className="font-mono text-[10px] text-[#4f4b47]">No active sessions</span>
+
+  return (
+    <div className="flex flex-col gap-2">
+      {sessions.map((s, i) => (
+        <div key={s.id} className="flex items-center justify-between">
+          <span className="font-mono text-[10px] text-[#4f4b47]">
+            Session ···{s.id}
+          </span>
+          <span className="font-mono text-[9px] text-[#4f4b47]/60">
+            Expires {new Date(s.expiresAt).toLocaleDateString()}
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function EmailVerificationStatus() {
   const [status, setStatus] = React.useState<"loading" | "verified" | "unverified" | "unknown">("loading")
   const [sending, setSending] = React.useState(false)
@@ -493,6 +525,12 @@ export default function SettingsPage() {
         <div className="mt-8 pt-6 border-t border-white/[0.06]">
           <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] mb-3">Email</p>
           <EmailVerificationStatus />
+        </div>
+
+        {/* Active sessions */}
+        <div className="mt-6 pt-6 border-t border-white/[0.06]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] mb-3">Active Sessions</p>
+          <ActiveSessionsList />
         </div>
 
         {/* Subscription */}
