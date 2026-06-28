@@ -230,8 +230,8 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     // ════════════════════════════════════════════════════════════════════════
     // SAFETY LAYER 3: RATE LIMITING
     // ════════════════════════════════════════════════════════════════════════
-    if (rateLimiter && user) {
-      const rateLimitKey = extractRateLimitKey(req, user.id);
+    if (rateLimiter) {
+      const rateLimitKey = extractRateLimitKey(req, user?.id);
       const limitResult = await rateLimiter.checkLimit(rateLimitKey);
 
       if (!limitResult.allowed) {
