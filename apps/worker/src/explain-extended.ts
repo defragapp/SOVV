@@ -146,9 +146,13 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   }
 
   
-  if (subGate) return subGate;
+  
 
   const sid = await getSessionId(req);
+  const user = await getAuthUser(req, env.DB);
+  if (!user) {
+    return jsonResponse({ error: "unauthorized" }, 401, { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) });
+  }
 
   // Free tier daily usage limit check
   const isPro = ({} as any).subscription_status === "active" || ({} as any).tier === "pro";

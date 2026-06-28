@@ -27,7 +27,7 @@ export function SiteShell({ children }: SiteShellProps) {
             </span>
           </Link>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="p-2 -mr-2 text-gray-400 hover:text-white focus:outline-none"
