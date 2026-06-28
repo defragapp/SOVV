@@ -2,7 +2,7 @@ name = "sovereign-code-agent"
 main = "src/index.js"
 compatibility_date = "2026-06-12"
 compatibility_flags = ["nodejs_compat"]
-# account_id removed — set CLOUDFLARE_ACCOUNT_ID in CI secrets
+account_id = "8b1954d216d65077c6480d62583fe2c2"
 
 [ai]
 binding = "AI"
