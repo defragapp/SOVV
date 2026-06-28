@@ -57,14 +57,14 @@ export function SiteShell({ children }: SiteShellProps) {
                 Pricing
               </Link>
               <Link
-                href="/login"
+                href="/app/login"
                 className="text-lg text-white font-medium"
                 onClick={() => setMenuOpen(false)}
               >
                 Sign in
               </Link>
               <Link
-                href="/signup"
+                href="/app/login"
                 className="btn-primary text-center mt-2"
                 onClick={() => setMenuOpen(false)}
               >
