@@ -1,5 +1,6 @@
 "use client"
 import * as React from "react"
+import { processInput } from "@/lib/system/processInput"
 import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
 import { ResultCard } from "@/components/spaces/ResultCard"
@@ -151,22 +152,15 @@ export default function DefragWorkspacePage() {
     setAudioError("")
     setResult(null)
     try {
-      const res = await fetch("/api/explain", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ message: input }),
+      const pResult = await processInput({
+        space: "defrag",
+        message: input,
       })
-      const data = await res.json()
-      if (data.type === "needs_baseline") { setError("needs_baseline"); setIsLoading(false); return }
-      if (!res.ok) {
-        setError(data.error === "daily_limit_reached"
-          ? "You've reached your free daily limit. Upgrade to continue."
-          : data.message || data.error || "Something went wrong.")
-        setIsLoading(false)
+      if (!pResult.ok) {
+        setError(pResult.error)
         return
       }
-      setResult(data)
+      setResult(pResult.output.meta as any)
     } catch {
       setError("Unable to connect. Check your connection and try again.")
     } finally {

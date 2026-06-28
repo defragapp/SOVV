@@ -1,5 +1,6 @@
 "use client"
 import * as React from "react"
+import { processInput } from "@/lib/system/processInput"
 import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
 import { motion, AnimatePresence } from "framer-motion"
@@ -75,18 +76,12 @@ export default function AlignmentWorkspacePage() {
     setSaveSuccess(false)
     setResult(null)
     try {
-      const res = await fetch("/api/alignment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ message: input }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.message || data.error || "Something went wrong.")
+      const pResult = await processInput({ space: "alignment", message: input })
+      if (!pResult.ok) {
+        setError(pResult.error)
         return
       }
-      setResult(data)
+      setResult(pResult.output.meta as any)
     } catch {
       setError("Unable to connect. Check your connection and try again.")
     } finally {
