@@ -187,7 +187,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   // Per-user rate limit on AI calls (prevents burst abuse)
   if (env.RATE_LIMITER) {
-    const { success } = await env.RATE_LIMITER.limit({ key: `explain:${user.id}` })
+    const { success } = await env.RATE_LIMITER.limit({ key: `explain:${sid}` })
     if (!success) {
       return jsonResponse({ error: "Too many requests. Please wait a moment before trying again." }, 429, {
         ...getCorsHeaders(req),

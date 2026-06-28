@@ -108,6 +108,7 @@ export function getSessionToken(request: Request): string | null {
 }
 
 import type { D1Database } from "@cloudflare/workers-types";
+import { getCorsHeaders } from "./cors.js";
 import { getSessionId } from "./plan.js";
 
 export function jsonResponse(data: unknown, status = 200, headers: Record<string, string> = {}): Response {
@@ -143,7 +144,7 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
     "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires > ?"
   )
     .bind(token, Date.now())
-    .first<{ id: string; email: string; tier: string; role: string; stripe_customer_id: string | null; subscription_status: string }>()
+    .first()
 
   if (!session) return null
 
@@ -366,7 +367,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       // Verify current password
       const dbUser = await env.DB.prepare("SELECT password_hash FROM users WHERE id = ?")
-        .bind(user.id).first<{ password_hash: string }>()
+        .bind(user.id).first()
       if (!dbUser) return jsonResponse({ error: "User not found" }, 404)
 
       const valid = await verifyPassword(currentPassword, dbUser.password_hash)
