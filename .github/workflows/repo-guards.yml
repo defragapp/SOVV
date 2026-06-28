@@ -3,6 +3,9 @@ name: Repo Guards
 on:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   lockfile-policy:
     name: Enforce npm lockfile policy
