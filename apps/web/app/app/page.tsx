@@ -70,7 +70,7 @@ export default function LibraryPage() {
       .then(r => r.ok ? r.json() : null)
       .then((d: any) => d?.stats && setStats(d.stats))
       .catch(() => {})
-  }, [saveSuccess, searchQuery, activeFilter])
+  }, [searchQuery, activeFilter])
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-[#0c0a0d]">

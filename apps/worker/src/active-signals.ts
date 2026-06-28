@@ -25,23 +25,26 @@ import type { BaselineDesignDataset } from "./baseline-compiler.js"
 
 // Types defined locally to avoid circular dependency with @sovereign/core
 // These match the interfaces in packages/core/src/types.ts
-type ActiveBaselineSignals = {
-  pace: "fast" | "slow" | "variable"
+export type ActiveBaselineSignals = {
+  pace: "fast" | "slow" | "variable" | "unknown"
   stabilizes: string
   responds: string
-  protects?: string
-  pattern?: string
+  protects: string
+  pattern: string
+  evidenceTags: string[]
+  traitLines: string[]
 }
 
-type TimingSignals = {
+export type TimingSignals = {
   urgency: "low" | "moderate" | "high"
   sensitivity: "low" | "moderate" | "high"
   tolerance: "low" | "moderate" | "high"
+  pacing: "slow" | "normal" | "fast"
   state: "stable" | "reactive"
   note?: string
 }
 
-type OverlaySignals = {
+export type OverlaySignals = {
   loop: string
   amplifier: string
   shift: string
