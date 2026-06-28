@@ -466,7 +466,16 @@ export default function SettingsPage() {
           <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] mb-4">
             Account
           </p>
-          <DeleteAccountSection />
+          <div className="flex flex-col gap-4">
+            <a
+              href="/api/auth/export"
+              download
+              className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+            >
+              Export my data
+            </a>
+            <DeleteAccountSection />
+          </div>
         </div>
 
       </main>

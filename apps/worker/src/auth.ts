@@ -383,6 +383,46 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     }
   })
 
+  // GET /api/auth/export — export all user data (GDPR compliance)
+  router.get("/api/auth/export", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    try {
+      // Collect all user data
+      const [library, interactions, people, natal] = await Promise.all([
+        env.DB.prepare("SELECT id, title, workspace_source, created_at FROM library WHERE user_id = ?")
+          .bind(user.id).all(),
+        env.DB.prepare("SELECT id, mode, question, confidence, created_at FROM interactions WHERE session_id IN (SELECT token FROM sessions WHERE user_id = ?)")
+          .bind(user.id).all(),
+        env.DB.prepare("SELECT id, name, relation, created_at FROM people WHERE user_id = ?")
+          .bind(user.id).all(),
+        env.KV.get(`natal:${user.id}`),
+      ])
+
+      const exportData = {
+        exportedAt: new Date().toISOString(),
+        account: { id: user.id, email: user.email, tier: user.tier, createdAt: (user as any).created_at },
+        library: library.results || [],
+        interactions: interactions.results || [],
+        people: people.results || [],
+        baselineDesign: natal ? JSON.parse(natal) : null,
+      }
+
+      return new Response(JSON.stringify(exportData, null, 2), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Disposition": `attachment; filename="sovereign-os-export-${user.id.slice(0, 8)}.json"`,
+        },
+      })
+    } catch (e) {
+      console.error("[EXPORT]", e)
+      return jsonResponse({ error: "Failed to export data" }, 500)
+    }
+  })
+
   // DELETE /api/auth/account — permanently delete user account and all data
   router.delete("/api/auth/account", async (request: Request) => {
     const env = getEnv()
@@ -416,6 +456,30 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     } catch (e) {
       console.error("[DELETE_ACCOUNT]", e)
       return jsonResponse({ error: "Failed to delete account" }, 500)
+    }
+  })
+
+  // GET /api/auth/sessions — list active sessions for current user
+  router.get("/api/auth/sessions", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    try {
+      const { results } = await env.DB.prepare(
+        "SELECT token, created_at, expires_at FROM sessions WHERE user_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 10"
+      ).bind(user.id, Date.now()).all<{ token: string; created_at: number; expires_at: number }>()
+
+      // Mask tokens for security — only show last 6 chars
+      const sessions = (results || []).map(s => ({
+        id: s.token.slice(-6),
+        createdAt: new Date(s.created_at).toISOString(),
+        expiresAt: new Date(s.expires_at).toISOString(),
+      }))
+
+      return jsonResponse({ sessions })
+    } catch (e) {
+      return jsonResponse({ error: "Failed to fetch sessions" }, 500)
     }
   })
 
