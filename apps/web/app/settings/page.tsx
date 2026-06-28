@@ -108,6 +108,50 @@ function DeleteAccountSection() {
   )
 }
 
+
+function EmailVerificationStatus() {
+  const [status, setStatus] = React.useState<"loading" | "verified" | "unverified" | "unknown">("loading")
+  const [sending, setSending] = React.useState(false)
+  const [sent, setSent] = React.useState(false)
+
+  React.useEffect(() => {
+    fetch("/api/user/me", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then((d: any) => {
+        if (!d) { setStatus("unknown"); return }
+        setStatus(d.emailVerified ? "verified" : "unverified")
+      })
+      .catch(() => setStatus("unknown"))
+  }, [])
+
+  const sendVerification = async () => {
+    setSending(true)
+    try {
+      await fetch("/api/auth/send-verification", { method: "POST", credentials: "include" })
+      setSent(true)
+    } catch { /* silent */ } finally {
+      setSending(false)
+    }
+  }
+
+  if (status === "loading") return <span className="font-mono text-[10px] text-[#4f4b47]">Checking…</span>
+  if (status === "verified") return <span className="font-mono text-[10px] text-[#76716b]">Email verified ✓</span>
+  if (status === "unverified") return (
+    <div className="flex items-center gap-4">
+      <span className="font-mono text-[10px] text-[#4f4b47]">Email not verified</span>
+      {!sent ? (
+        <button onClick={sendVerification} disabled={sending}
+          className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] hover:text-[#f4efe9] transition-colors disabled:opacity-30">
+          {sending ? "Sending…" : "Send verification"}
+        </button>
+      ) : (
+        <span className="font-mono text-[10px] text-[#76716b]">Check your email</span>
+      )}
+    </div>
+  )
+  return null
+}
+
 function ChangePasswordForm() {
   const [currentPassword, setCurrentPassword] = React.useState("")
   const [newPassword, setNewPassword] = React.useState("")
@@ -443,6 +487,12 @@ export default function SettingsPage() {
               </li>
             ))}
           </ul>
+        </div>
+
+        {/* Email verification */}
+        <div className="mt-8 pt-6 border-t border-white/[0.06]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] mb-3">Email</p>
+          <EmailVerificationStatus />
         </div>
 
         {/* Subscription */}

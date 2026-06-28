@@ -18,6 +18,12 @@ async function handleSignOut() {
 export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName }: SpaceShellProps) {
   const [activeTab, setActiveTab] = React.useState(mobileTabs[0].id)
 
+  // Refresh session on mount to extend 7-day expiry
+  React.useEffect(() => {
+    fetch("/api/auth/refresh", { method: "POST", credentials: "include" })
+      .catch(() => {}) // Non-blocking — failure just means session expires naturally
+  }, [])
+
   return (
     <div className="flex h-[100dvh] w-screen overflow-hidden bg-[#08070a] text-[#f4efe9] font-sans">
 

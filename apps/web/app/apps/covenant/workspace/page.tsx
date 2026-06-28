@@ -49,6 +49,7 @@ export default function CovenantWorkspacePage() {
   const [error, setError] = React.useState("")
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
+  const [patterns, setPatterns] = React.useState<Array<{ key: string; value: string }>>([])
   // Audio Overview
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
@@ -78,6 +79,11 @@ export default function CovenantWorkspacePage() {
       .then((d: any) => setLibrary(d.items || []))
       .catch(() => {})
       .finally(() => setLibraryLoading(false))
+
+    fetch("/api/patterns", { credentials: "include" })
+      .then(r => r.ok ? r.json() : { patterns: [] })
+      .then((d: any) => setPatterns((d.patterns || []).slice(0, 5)))
+      .catch(() => {})
   }, [saveSuccess])
 
   const handleSubmit = async () => {

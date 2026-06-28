@@ -425,7 +425,12 @@ export default function DefragWorkspacePage() {
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
-            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Run</span>
+            <div className="flex items-center gap-3">
+              <span className={`font-mono text-[9px] tracking-[0.08em] transition-colors ${input.length > 1800 ? 'text-[#e0743a]/60' : 'text-[#4f4b47]/60'}`}>
+                {input.length > 0 ? `${input.length}/2000` : ''}
+              </span>
+              <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Run</span>
+            </div>
             <button onClick={handleSubmit} disabled={!input.trim() || isLoading}
               className="h-8 px-5 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
               style={{ borderRadius: 8 }}>
