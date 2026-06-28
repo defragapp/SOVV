@@ -300,7 +300,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     const patternText = formatPatternsForPrompt(patterns);
     const targetBaseline =
       relational && target
-        ? await env.KV.get(`baseline:${({} as any).id}:person:${target.id}`, "json")
+        ? await env.KV.get(`baseline:${user?.id || sid}:person:${target.id}`, "json")
         : null;
 
     // ── Active signal selection ───────────────────────────────────────────────
