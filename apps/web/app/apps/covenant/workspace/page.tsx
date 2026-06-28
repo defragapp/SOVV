@@ -1,5 +1,7 @@
 "use client"
 import * as React from "react"
+import { OsOutput } from "@/components/system/OsOutput"
+import type { SystemOutput } from "@/lib/system/outputContract"
 import { processInput } from "@/lib/system/processInput"
 import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
@@ -42,6 +44,7 @@ function ScriptureChip({ text }: { text: string }) {
 export default function CovenantWorkspacePage() {
   const [input, setInput] = React.useState("")
   const [result, setResult] = React.useState<any>(null)
+  const [systemOutput, setSystemOutput] = React.useState<SystemOutput | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
@@ -92,6 +95,7 @@ export default function CovenantWorkspacePage() {
     setError("")
     setSaveSuccess(false)
     setResult(null)
+    setSystemOutput(null)
     try {
       const pResult = await processInput({ space: "covenant", message: input })
       if (!pResult.ok) {
@@ -99,6 +103,7 @@ export default function CovenantWorkspacePage() {
         return
       }
       setResult(pResult.output.meta as any)
+      setSystemOutput(pResult.output)
     } catch {
       setError("Unable to connect. Check your connection and try again.")
     } finally {
@@ -306,6 +311,12 @@ export default function CovenantWorkspacePage() {
 
         {error && (
           <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">{error}</p>
+        )}
+
+        {systemOutput && (
+          <div className="mb-4">
+            <OsOutput output={systemOutput} compact />
+          </div>
         )}
 
         <AnimatePresence>

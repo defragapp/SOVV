@@ -22,10 +22,10 @@ jobs:
         run: npm install --legacy-peer-deps
       - name: Check worker types
         working-directory: apps/worker
-        run: npx tsc --noEmit
+        run: node node_modules/.bin/tsc --noEmit
       - name: Run worker tests
         working-directory: apps/worker
-        run: npx vitest run --reporter=verbose
+        run: node node_modules/.bin/vitest run --reporter=verbose
 
   deploy-api:
     needs: typecheck
