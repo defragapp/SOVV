@@ -110,11 +110,16 @@ async function requireSessionAuth(req: Request, env: Env): Promise<Response | nu
  * Returns a 402 Payment Required response if the subscription is not active
  * and the route is a workspace-protected route.
  */
-export async function requireActiveSubscription(user: { subscription_status: string; tier: string } | null, request: Request): Promise<Response | null> {
+export async function requireActiveSubscription(
+  user: { subscription_status: string; tier: string } | null,
+  request: Request,
+  requestId?: string
+): Promise<Response | null> {
+  const reqMeta = requestId ? { requestId } : {};
   if (!user) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    return new Response(JSON.stringify({ error: "Unauthorized", ...reqMeta }), {
       status: 401,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(requestId ? { "x-request-id": requestId } : {}) },
     });
   }
 
@@ -133,9 +138,10 @@ export async function requireActiveSubscription(user: { subscription_status: str
     return new Response(JSON.stringify({
       error: "payment_required",
       message: "The Covenant and Alignment spaces require a Pro subscription. Upgrade to access all spaces.",
+      ...reqMeta,
     }), {
       status: 402,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(requestId ? { "x-request-id": requestId } : {}) },
     });
   }
 
@@ -143,8 +149,28 @@ export async function requireActiveSubscription(user: { subscription_status: str
 }
 
 export async function handleCheckout(req: Request, env: Env): Promise<Response> {
+  const requestId = crypto.randomUUID();
+  const endpoint = "/api/billing/checkout";
+  const errorJson = (status: number, error: string, message?: string) =>
+    new Response(JSON.stringify({ error, ...(message ? { message } : {}), requestId }), {
+      status,
+      headers: { "Content-Type": "application/json", "x-request-id": requestId },
+    });
+
+  await logSafetyEvent(env, {
+    type: "request_lifecycle",
+    requestId,
+    metadata: { endpoint, stage: "start" },
+  });
   const authErr = await requireSessionAuth(req, env);
-  if (authErr) return authErr;
+  if (authErr) {
+    await logSafetyEvent(env, {
+      type: "request_lifecycle",
+      requestId,
+      metadata: { endpoint, stage: "auth_failed" },
+    });
+    return authErr;
+  }
 
   // Get user from session for client_reference_id
   const user = await getAuthUser(req, env.DB);
@@ -153,12 +179,13 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
   const sid = await getSessionId(req);
 
   if (!env.STRIPE_SECRET_KEY || !env.STRIPE_PRICE_ID || !env.APP_URL) {
-      return Response.json({ error: "Checkout is not configured in this environment (STRIPE_SECRET_KEY, STRIPE_PRICE_ID, or APP_URL missing)" }, { status: 400 });
+      await logSafetyEvent(env, {
+        type: "validation_error",
+        requestId,
+        metadata: { endpoint, reason: "billing_not_configured", userId },
+      });
+      return errorJson(400, "billing_not_configured", "Checkout is not configured in this environment (STRIPE_SECRET_KEY, STRIPE_PRICE_ID, or APP_URL missing)");
     }
-    if (false) {
-    return Response.json({ error: "billing_not_configured" }, { status: 500 });
-  }
-
   const params = new URLSearchParams();
   params.set("mode", "subscription");
   params.set("line_items[0][price]", env.STRIPE_PRICE_ID);
@@ -179,9 +206,19 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
 
   const data = await res.json() as Record<string, unknown>;
   if (!res.ok || typeof data["url"] !== "string") {
-    return Response.json({ error: "checkout_failed" }, { status: 400 });
+    await logSafetyEvent(env, {
+      type: "system_error",
+      requestId,
+      metadata: { endpoint, reason: "checkout_failed", userId },
+    });
+    return errorJson(503, "checkout_failed");
   }
 
+  await logSafetyEvent(env, {
+    type: "request_lifecycle",
+    requestId,
+    metadata: { endpoint, stage: "end", userId },
+  });
   return Response.json(
     { url: data["url"] },
     { headers: { "set-cookie": cookieHeader(sid) } }
@@ -190,6 +227,12 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
 
 export async function handleWebhook(req: Request, env: Env): Promise<Response> {
   const requestId = crypto.randomUUID();
+  const endpoint = "/api/billing/webhook";
+  await logSafetyEvent(env, {
+    type: "request_lifecycle",
+    requestId,
+    metadata: { endpoint, stage: "start" },
+  });
 
   if (!env.STRIPE_WEBHOOK_SECRET) {
     await logSafetyEvent(env, {
@@ -568,21 +611,33 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
 }
 
 export async function handlePortal(req: Request, env: Env): Promise<Response> {
+  const requestId = crypto.randomUUID();
+  const endpoint = "/api/billing/portal";
+  const errorJson = (status: number, error: string) =>
+    new Response(JSON.stringify({ error, requestId }), {
+      status,
+      headers: { "Content-Type": "application/json", "x-request-id": requestId },
+    });
+  await logSafetyEvent(env, {
+    type: "request_lifecycle",
+    requestId,
+    metadata: { endpoint, stage: "start" },
+  });
   const authErr = await requireSessionAuth(req, env);
   if (authErr) return authErr;
 
   const user = await getAuthUser(req, env.DB);
 
   if (!user) {
-    return Response.json({ error: "unauthorized" }, { status: 401 });
+    return errorJson(401, "unauthorized");
   }
 
   if (!user.stripe_customer_id) {
-    return Response.json({ error: "no_billing_account" }, { status: 404 });
+    return errorJson(404, "no_billing_account");
   }
 
   if (!env.STRIPE_SECRET_KEY || !env.APP_URL) {
-    return Response.json({ error: "billing_not_configured" }, { status: 500 });
+    return errorJson(500, "billing_not_configured");
   }
 
   const params = new URLSearchParams();
@@ -600,9 +655,14 @@ export async function handlePortal(req: Request, env: Env): Promise<Response> {
 
   const data = await res.json() as Record<string, unknown>;
   if (!res.ok || typeof data["url"] !== "string") {
-    return Response.json({ error: "portal_failed" }, { status: 400 });
+    return errorJson(503, "portal_failed");
   }
 
+  await logSafetyEvent(env, {
+    type: "request_lifecycle",
+    requestId,
+    metadata: { endpoint, stage: "end", userId: user.id },
+  });
   return Response.json({ url: data["url"] });
 }
 

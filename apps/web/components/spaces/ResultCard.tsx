@@ -50,6 +50,18 @@ export function ResultCard({
   const [shareUrl, setShareUrl] = React.useState("")
   const [streamedPrimary, setStreamedPrimary] = React.useState("")
   const [streamedResponse, setStreamedResponse] = React.useState("")
+  const isRelational = Boolean(result.oldRole || result.whatYouLearnedToCarry)
+  const sections = [
+    { label: "What's active",          value: result.activePattern },
+    { label: "You",                    value: result.theRepeat },
+    { label: "Them",                   value: result.oldRole },
+    { label: "What forms between you", value: result.whatYouLearnedToCarry },
+    { label: "Why it's sharper now",   value: result.strainPattern },
+    {
+      label: "What changes this",
+      value: result.alignment || result.giftUnderStrain,
+    },
+  ].filter(s => s.value)
 
   // Stream the primary section (What's active) on mount
   React.useEffect(() => {
@@ -86,20 +98,6 @@ export function ResultCard({
   //   giftUnderStrain       → What changes this  (fallback if alignment absent)
   //
   // "Next move" is rendered separately with emphasis below.
-  const isRelational = Boolean(result.oldRole || result.whatYouLearnedToCarry)
-
-  const sections = [
-    { label: "What's active",          value: result.activePattern },
-    { label: "You",                    value: result.theRepeat },
-    { label: "Them",                   value: result.oldRole },
-    { label: "What forms between you", value: result.whatYouLearnedToCarry },
-    { label: "Why it's sharper now",   value: result.strainPattern },
-    {
-      label: "What changes this",
-      value: result.alignment || result.giftUnderStrain,
-    },
-  ].filter(s => s.value)
-
   const response = result.bestNextResponse
   const steering = result.conversationalSteering
 
