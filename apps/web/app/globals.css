@@ -35,10 +35,10 @@
        input:     10px  (text inputs, textareas, selects)
        button:    8px   (all buttons)
        minimal:   4px   (chips, badges, small tags) */
-    --radius-container: 14px;
-    --radius-input:     10px;
-    --radius-button:    8px;
-    --radius-minimal:   4px;
+    --radius-container: 0px;
+    --radius-input:     0px;
+    --radius-button:    0px;
+    --radius-minimal:   0px;
   }
 
   html {
@@ -271,8 +271,8 @@
 /* ── Cards ───────────────────────────────────────────────────────────────── */
 .card {
   background: rgba(255,255,255,0.02);
-  border: 1px solid var(--border-light);
-  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0px;
   transition: background 220ms ease, border-color 220ms ease;
 }
 .card:hover {

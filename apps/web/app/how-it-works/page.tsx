@@ -33,7 +33,7 @@ const STEPS = [
   {
     num: "03",
     title: "Receive a structured result",
-    body: "Seven outputs: the active pattern, what keeps happening, your default mode, what shaped it, how it behaves under pressure, what is working, and the clearest next response.",
+    body: "Analyze structural pattern data across seven dimensions: active dynamic, loop recurrence, default behavioral response, origin architecture, pressure mechanics, current utility, and objective next action.",
     note: null,
   },
   {
@@ -45,7 +45,7 @@ const STEPS = [
   {
     num: "05",
     title: "Return before the pattern takes over",
-    body: "The next time the loop tries to form, you do not start from zero. Return to your Library, interrupt the old role, and respond differently.",
+    body: "When the pattern recurs, retrieve prior structural analysis from the Library to interrupt the default response and deploy a calibrated action.",
     note: null,
   },
 ]

@@ -491,7 +491,7 @@ export default function Home() {
             <div
               className="overflow-hidden text-left"
               style={{
-                borderRadius: 14,
+                borderRadius: 0,
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",
                 background: "linear-gradient(180deg, rgba(11,11,11,0.42), rgba(11,11,11,0.58))",
@@ -597,7 +597,7 @@ export default function Home() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.06] overflow-hidden" style={{ borderRadius: 16 }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.06] overflow-hidden" style={{ borderRadius: 0 }}>
             {[
               {
                 num: "01",
