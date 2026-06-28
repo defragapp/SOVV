@@ -305,6 +305,27 @@ export function registerInviteRoutes(router: any, getEnv: () => Env) {
   // Create invite
   router.post("/api/invite", (req: Request) => handleCreateInvite(req, getEnv()));
 
+  // GET /api/invite/list — list pending invites for current user
+  router.get("/api/invite/list", async (req: Request) => {
+    const env = getEnv()
+    const { getAuthUser } = await import("./auth.js")
+    const user = await getAuthUser(req, env.DB)
+    if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 })
+
+    try {
+      const { results } = await env.DB.prepare(
+        "SELECT token, status, invite_mode, created_at, expires_at, invitee_id FROM invites_v2 WHERE owner_id = ? ORDER BY created_at DESC LIMIT 20"
+      ).bind(user.id).all()
+
+      return new Response(JSON.stringify({ invites: results || [] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    } catch (e) {
+      return new Response(JSON.stringify({ error: "Failed to fetch invites" }), { status: 500 })
+    }
+  });
+
   // DELETE /api/invite/:token — revoke an invite (owner only)
   router.delete("/api/invite/:token", async (req: Request, params: any) => {
     const env = getEnv()

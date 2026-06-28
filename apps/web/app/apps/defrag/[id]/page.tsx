@@ -43,7 +43,7 @@ export default function DefragItemPage() {
     setError("")
     try {
       // Create a continuity prompt
-      const message = `Previous Context: Active Pattern: ${result.activePattern}. The alignment needed was: ${result.alignment}. \n\nUser Update: ${input}`
+      const message = `Previous context — What was active: ${result.activePattern || ''}. What changes this: ${result.alignment || result.giftUnderStrain || ''}. \n\nUpdate: ${input}`
       
       const res = await fetch("/api/explain", {
         method: "POST",
@@ -69,7 +69,13 @@ export default function DefragItemPage() {
     setIsGeneratingAudio(true)
     setAudioError("")
     try {
-      const audioText = `Active Pattern: ${result.activePattern}. Here is what is repeating: ${result.theRepeat}. The alignment needed is: ${result.alignment}. Your best next response is: ${result.bestNextResponse?.summary || "to pause."}`
+      const audioText = [
+        result.activePattern && `What's active: ${result.activePattern}`,
+        result.theRepeat && `You: ${result.theRepeat}`,
+        result.whatYouLearnedToCarry && `What forms between you: ${result.whatYouLearnedToCarry}`,
+        result.alignment && `What changes this: ${result.alignment}`,
+        result.bestNextResponse && `Next move: ${typeof result.bestNextResponse === 'string' ? result.bestNextResponse : result.bestNextResponse?.summary || 'Pause and observe.'}`,
+      ].filter(Boolean).join('. ')
       const res = await fetch("/api/audio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -181,13 +187,13 @@ export default function DefragItemPage() {
            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
            className="flex-1 overflow-y-auto border border-border bg-surface p-8"
         >
-           {renderSection("Active pattern", result.activePattern)}
-           {renderSection("The Repeat", result.theRepeat)}
-           {renderSection("Old Role", result.oldRole)}
-           {renderSection("What You Learned to Carry", result.whatYouLearnedToCarry)}
-           {renderSection("Strain Pattern", result.strainPattern)}
-           {renderSection("Gift Under Strain", result.giftUnderStrain)}
-           {renderSection("Alignment", result.alignment)}
+           {renderSection("What's active", result.activePattern)}
+           {renderSection("You", result.theRepeat)}
+           {renderSection("Them", result.oldRole)}
+           {renderSection("What forms between you", result.whatYouLearnedToCarry)}
+           {renderSection("Why it's sharper now", result.strainPattern)}
+           {renderSection("What changes this", result.giftUnderStrain)}
+           {renderSection("What changes this", result.alignment)}
            
            {result.bestNextResponse && (
              <div className="border-b border-border pb-6 mb-6">

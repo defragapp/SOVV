@@ -1,6 +1,7 @@
 "use client"
 import * as React from "react"
 import { motion } from "framer-motion"
+import { streamText } from "@/lib/system/streamText"
 
 interface RailBaseline { pace?: string; stabilizes?: string; responds?: string }
 interface RailSky { urgency?: string; tolerance?: string; state?: string }
@@ -45,6 +46,30 @@ export function ResultCard({
   onInvite,
 }: ResultCardProps) {
   const [copied, setCopied] = React.useState(false)
+  const [streamedPrimary, setStreamedPrimary] = React.useState("")
+  const [streamedResponse, setStreamedResponse] = React.useState("")
+
+  // Stream the primary section (What's active) on mount
+  React.useEffect(() => {
+    const primary = result.activePattern
+    if (!primary) return
+    setStreamedPrimary("")
+    streamText(primary, setStreamedPrimary, 14)
+  }, [result.activePattern])
+
+  // Stream the Next move response
+  React.useEffect(() => {
+    const resp = typeof result.bestNextResponse === "string"
+      ? result.bestNextResponse
+      : result.bestNextResponse?.summary
+    if (!resp) return
+    setStreamedResponse("")
+    const delay = (sections.length + 1) * 60 + 200 // start after sections animate in
+    const timer = setTimeout(() => {
+      streamText(resp, setStreamedResponse, 16)
+    }, delay)
+    return () => clearTimeout(timer)
+  }, [result.bestNextResponse])
 
   // Section labels locked to canonical Defrag output structure.
   // These 7 labels are the system contract — do not change them.
@@ -152,7 +177,9 @@ export function ResultCard({
             className="border-b border-white/[0.05] pb-5 mb-5 last:border-0 last:pb-0 last:mb-0"
           >
             <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-2">{s.label}</p>
-            <p className="text-[14px] text-[#f4efe9] leading-[1.7]">{s.value}</p>
+            <p className="text-[14px] text-[#f4efe9] leading-[1.7]">
+              {s.label === "What's active" && streamedPrimary ? streamedPrimary : s.value}
+            </p>
           </motion.div>
         ))}
 
@@ -166,7 +193,7 @@ export function ResultCard({
           >
             <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/60 mb-3">Next move</p>
             <p className="text-[14px] text-[#f4efe9] leading-[1.7] mb-4">
-              {typeof response === "string" ? response : response.summary}
+              {streamedResponse || (typeof response === "string" ? response : response.summary)}
             </p>
             {typeof response === "object" && response.phrasing && response.phrasing.length > 0 && (
               <div className="border border-white/[0.06] bg-white/[0.02] p-4" style={{ borderRadius: 10 }}>

@@ -428,6 +428,7 @@ export default function DefragWorkspacePage() {
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
+            onFocus={e => { setTimeout(() => e.target.scrollIntoView({ behavior: "smooth", block: "center" }), 300) }}
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
             <div className="flex items-center gap-3">

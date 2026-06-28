@@ -342,6 +342,7 @@ export default function AlignmentWorkspacePage() {
             onKeyDown={e => {
               if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() }
             }}
+            onFocus={e => { setTimeout(() => e.target.scrollIntoView({ behavior: "smooth", block: "center" }), 300) }}
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
             <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Continue</span>
