@@ -41,6 +41,72 @@ const inputBase =
   "[color-scheme:dark]";
 
 
+
+function DeleteAccountSection() {
+  const [confirming, setConfirming] = React.useState(false)
+  const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState("")
+
+  const handleDelete = async () => {
+    setLoading(true)
+    setError("")
+    try {
+      const res = await fetch("/api/auth/account", {
+        method: "DELETE",
+        credentials: "include",
+      })
+      if (!res.ok) {
+        const data = await res.json() as { error?: string }
+        setError(data.error || "Failed to delete account")
+        return
+      }
+      window.location.href = "/"
+    } catch {
+      setError("Connection failed. Try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (!confirming) {
+    return (
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] hover:text-red-400/60 transition-colors"
+      >
+        Delete account
+      </button>
+    )
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-[13px] text-[#a8a29a] leading-relaxed">
+        This will permanently delete your account, all saved results, and your Baseline Design. This cannot be undone.
+      </p>
+      {error && <p className="text-[12px] text-red-400/70">{error}</p>}
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={loading}
+          className="font-mono text-[10px] uppercase tracking-[0.15em] text-red-400/60 hover:text-red-400 transition-colors disabled:opacity-30"
+        >
+          {loading ? "Deleting…" : "Yes, delete my account"}
+        </button>
+        <button
+          type="button"
+          onClick={() => setConfirming(false)}
+          className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function ChangePasswordForm() {
   const [currentPassword, setCurrentPassword] = React.useState("")
   const [newPassword, setNewPassword] = React.useState("")
@@ -384,6 +450,14 @@ export default function SettingsPage() {
             Change Password
           </p>
           <ChangePasswordForm />
+        </div>
+
+        {/* Danger zone */}
+        <div className="mt-14 pt-8 border-t border-white/[0.06]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] mb-4">
+            Account
+          </p>
+          <DeleteAccountSection />
         </div>
 
       </main>
