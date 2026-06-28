@@ -9,7 +9,6 @@ jobs:
   typecheck:
     name: TypeScript Check + Tests
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v3
@@ -23,10 +22,10 @@ jobs:
         run: npm install --legacy-peer-deps
       - name: Check worker types
         working-directory: apps/worker
-        run: npx tsc --noEmit 2>&1 || echo "TypeScript errors found - non-blocking"
+        run: npx tsc --noEmit
       - name: Run worker tests
         working-directory: apps/worker
-        run: npx vitest run --reporter=verbose 2>&1 || echo "Tests failed - non-blocking during transition"
+        run: npx vitest run --reporter=verbose
 
   deploy-api:
     needs: typecheck
