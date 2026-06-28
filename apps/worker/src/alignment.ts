@@ -1,6 +1,7 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { safetyMode, supportResponse } from "./safety.js"
+import { getCorsHeaders } from "./cors.js"
 import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { SYSTEM_ALIGNMENT, SECURITY_PREFIX } from "./prompts.js";
@@ -304,7 +305,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
       // Safety check
       if (message && safetyMode(message) === "support") {
-        return Response.json(supportResponse(), { status: 200 })
+        return Response.json(supportResponse(), { status: 200, headers: getCorsHeaders(request) })
       }
 
       if (!message) {

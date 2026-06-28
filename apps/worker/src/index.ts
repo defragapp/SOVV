@@ -133,6 +133,39 @@ registerAudioRoute(router, getEnv);
 registerDeriveProfileRoutes(router, getEnv);
 registerInviteRoutes(router, getEnv);
 
+// User info endpoints
+router.get("/api/user/me", async (request: Request) => {
+  const env = getEnv();
+  const user = await getAuthUser(request, env.DB);
+  if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
+  return new Response(JSON.stringify({
+    id: user.id,
+    email: user.email,
+    tier: user.tier,
+    role: user.role,
+  }), { status: 200, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
+});
+
+router.get("/api/user/usage", async (request: Request) => {
+  const env = getEnv();
+  const user = await getAuthUser(request, env.DB);
+  if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
+  
+  const FREE_LIMIT = parseInt(env.FREE_DAILY_LIMIT || "15", 10);
+  const today = new Date().toISOString().slice(0, 10);
+  const usageKey = `usage:${user.id}:${today}`;
+  const usedStr = await env.KV.get(usageKey);
+  const used = usedStr ? parseInt(usedStr, 10) : 0;
+  const isPro = user.tier === "pro" || (user as any).subscription_status === "active";
+  
+  return new Response(JSON.stringify({
+    tier: isPro ? "pro" : "free",
+    used,
+    limit: isPro ? -1 : FREE_LIMIT,
+    remaining: isPro ? -1 : Math.max(0, FREE_LIMIT - used),
+  }), { status: 200, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
+});
+
 router.get("/api/stripe/prices", async (request: Request) => {
   const env = getEnv();
   if (!env.STRIPE_SECRET_KEY) {

@@ -158,6 +158,8 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     try {
       const { email, password, turnstileToken } = await request.json() as any
       if (!email || !password) return jsonResponse({ error: "Missing fields" }, 400)
+      if (typeof password === "string" && password.length < 8) return jsonResponse({ error: "Password must be at least 8 characters" }, 400)
+      if (typeof email === "string" && !email.includes("@")) return jsonResponse({ error: "Invalid email address" }, 400)
 
       if (env.TURNSTILE_SECRET_KEY) {
         const isHuman = await verifyTurnstile(String(turnstileToken ?? ""), env.TURNSTILE_SECRET_KEY)
@@ -206,6 +208,12 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   router.post("/api/auth/login", async (request: Request) => {
     const env = getEnv()
     try {
+      // Rate limit login attempts by IP
+      if (env.RATE_LIMITER) {
+        const ip = request.headers.get("CF-Connecting-IP") || "unknown"
+        const { success } = await env.RATE_LIMITER.limit({ key: `login:${ip}` })
+        if (!success) return jsonResponse({ error: "Too many login attempts. Please wait before trying again." }, 429)
+      }
       const { email, password } = await request.json() as any
       const user = await env.DB.prepare("SELECT id, email, password_hash, tier, role FROM users WHERE email = ?").bind(email).first() as any
       if (!user) return jsonResponse({ error: "Invalid credentials" }, 401)
