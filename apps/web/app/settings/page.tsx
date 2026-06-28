@@ -113,14 +113,27 @@ function DeleteAccountSection() {
 function ActiveSessionsList() {
   const [sessions, setSessions] = React.useState<Array<{ id: string; createdAt: string; expiresAt: string }>>([])
   const [loading, setLoading] = React.useState(true)
+  const [revoking, setRevoking] = React.useState<string | null>(null)
 
-  React.useEffect(() => {
+  const loadSessions = () => {
     fetch("/api/auth/sessions", { credentials: "include" })
       .then(r => r.ok ? r.json() : { sessions: [] })
       .then((d: any) => setSessions(d.sessions || []))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  React.useEffect(() => { loadSessions() }, [])
+
+  const revokeSession = async (id: string) => {
+    setRevoking(id)
+    try {
+      await fetch(`/api/auth/sessions/${id}`, { method: "DELETE", credentials: "include" })
+      setSessions(prev => prev.filter(s => s.id !== id))
+    } catch { /* silent */ } finally {
+      setRevoking(null)
+    }
+  }
 
   if (loading) return <span className="font-mono text-[10px] text-[#4f4b47]">Loading…</span>
   if (sessions.length === 0) return <span className="font-mono text-[10px] text-[#4f4b47]">No active sessions</span>
@@ -129,12 +142,21 @@ function ActiveSessionsList() {
     <div className="flex flex-col gap-2">
       {sessions.map((s, i) => (
         <div key={s.id} className="flex items-center justify-between">
-          <span className="font-mono text-[10px] text-[#4f4b47]">
-            Session ···{s.id}
-          </span>
-          <span className="font-mono text-[9px] text-[#4f4b47]/60">
-            Expires {new Date(s.expiresAt).toLocaleDateString()}
-          </span>
+          <div className="flex flex-col gap-0.5">
+            <span className="font-mono text-[10px] text-[#4f4b47]">
+              Session ···{s.id}
+            </span>
+            <span className="font-mono text-[9px] text-[#4f4b47]/60">
+              Expires {new Date(s.expiresAt).toLocaleDateString()}
+            </span>
+          </div>
+          <button
+            onClick={() => revokeSession(s.id)}
+            disabled={revoking === s.id}
+            className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#4f4b47] hover:text-red-400/60 transition-colors disabled:opacity-30"
+          >
+            {revoking === s.id ? "…" : "Revoke"}
+          </button>
         </div>
       ))}
     </div>

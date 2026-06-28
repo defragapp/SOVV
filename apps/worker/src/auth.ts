@@ -479,6 +479,38 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     }
   })
 
+  // DELETE /api/auth/sessions/:token — revoke a specific session
+  router.delete("/api/auth/sessions/:token", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    const url = new URL(request.url)
+    const tokenSuffix = url.pathname.split('/').pop()
+    if (!tokenSuffix) return jsonResponse({ error: "Missing token" }, 400)
+
+    try {
+      // Find and delete session by last 6 chars of token (masked ID)
+      // This prevents exposing full tokens while still allowing revocation
+      const { results } = await env.DB.prepare(
+        "SELECT token FROM sessions WHERE user_id = ? AND expires_at > ?"
+      ).bind(user.id, Date.now()).all()
+
+      const session = (results || []).find((s: any) => 
+        String(s.token).slice(-6) === tokenSuffix
+      )
+
+      if (!session) return jsonResponse({ error: "Session not found" }, 404)
+
+      await env.DB.prepare("DELETE FROM sessions WHERE token = ? AND user_id = ?")
+        .bind((session as any).token, user.id).run()
+
+      return jsonResponse({ success: true })
+    } catch (e) {
+      return jsonResponse({ error: "Failed to revoke session" }, 500)
+    }
+  })
+
   // GET /api/auth/sessions — list active sessions for current user
   router.get("/api/auth/sessions", async (request: Request) => {
     const env = getEnv()
