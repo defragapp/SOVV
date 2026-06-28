@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@sovereign/core": "file:../../packages/core",
-    "itty-router": "^5.0.23"
+    "itty-router": "^5.0.23",
+    "zod": "^4.1.5"
   }
 }

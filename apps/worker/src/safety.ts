@@ -1,3 +1,5 @@
+import type { Env } from "./types-env.js";
+
 const RISK_WORDS = [
   "kill myself",
   "want to die",
@@ -29,4 +31,31 @@ export function supportResponse() {
     ],
     confidence: "Support mode" as const
   };
+}
+
+export type SafetyEventType =
+  | "validation_error"
+  | "rate_limit_exceeded"
+  | "system_error"
+  | "billing_event";
+
+export type SafetyEvent = {
+  type: SafetyEventType;
+  requestId: string;
+  metadata: Record<string, unknown>;
+};
+
+export async function logSafetyEvent(env: Env, event: SafetyEvent): Promise<void> {
+  const payload = {
+    channel: "safety",
+    timestamp: new Date().toISOString(),
+    ...event,
+  };
+
+  console.log(JSON.stringify(payload));
+
+  if (!env.KV) return;
+
+  const key = `safety:audit:${Date.now()}:${event.requestId}:${crypto.randomUUID()}`;
+  await env.KV.put(key, JSON.stringify(payload), { expirationTtl: 60 * 60 * 24 * 30 });
 }

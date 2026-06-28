@@ -71,7 +71,7 @@ export function ResultCard({
       streamText(resp, setStreamedResponse, 16)
     }, delay)
     return () => clearTimeout(timer)
-  }, [result.bestNextResponse])
+  }, [result.bestNextResponse, sections.length])
 
   // Section labels locked to canonical Defrag output structure.
   // These 7 labels are the system contract — do not change them.
