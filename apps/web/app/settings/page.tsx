@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import ManageSubscription from "@/components/spaces/ManageSubscription"
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -442,6 +443,14 @@ export default function SettingsPage() {
               </li>
             ))}
           </ul>
+        </div>
+
+        {/* Subscription */}
+        <div className="bg-white/[0.02] border border-white/[0.08] rounded-[14px] p-8 md:p-10 mt-14">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-6">
+            Subscription
+          </p>
+          <ManageSubscription />
         </div>
 
         {/* Change Password */}

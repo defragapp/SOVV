@@ -185,6 +185,14 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     });
   }
 
+  // Input length limit — prevent abuse and control AI costs
+  if (message.length > 2000) {
+    return jsonResponse({ error: "Input too long. Please keep your message under 2000 characters." }, 400, {
+      ...getCorsHeaders(req),
+      "set-cookie": cookieHeader(sid),
+    });
+  }
+
   const target = body.target;
   const relational = Boolean(target);
   const mode = (body.mode ?? (relational ? "pair" : "self")) as string;

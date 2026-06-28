@@ -201,6 +201,16 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         )
       }
 
+      // Trigger email verification non-blocking (only if RESEND configured)
+      if (env.RESEND_API_KEY) {
+        const appUrl = env.APP_URL || "https://app.defrag.app"
+        void fetch(`${appUrl}/api/auth/send-verification`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Cookie": `session=${token}` },
+          body: JSON.stringify({ email }),
+        }).catch(() => {})
+      }
+
       return jsonResponse({ success: true, token }, 200, {
         "Set-Cookie": sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN),
       })
@@ -406,6 +416,45 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     } catch (e) {
       console.error("[DELETE_ACCOUNT]", e)
       return jsonResponse({ error: "Failed to delete account" }, 500)
+    }
+  })
+
+  // POST /api/auth/refresh — extend session by 7 days if still valid
+  router.post("/api/auth/refresh", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    try {
+      // Generate new session token
+      const newToken = generateSessionToken()
+      const now = Date.now()
+      const SESSION_TTL = 7 * 24 * 60 * 60 // 7 days in seconds
+      const cookieDomain = env.COOKIE_DOMAIN || undefined
+
+      // Get old token from cookie
+      const cookieHeader_val = request.headers.get("cookie") || ""
+      const oldToken = cookieHeader_val.match(/session=([^;]+)/)?.[1]
+
+      // Insert new session
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
+        .bind(newToken, user.id, now + SESSION_TTL * 1000, now).run()
+
+      // Delete old session
+      if (oldToken) {
+        await env.DB.prepare("DELETE FROM sessions WHERE token = ?").bind(oldToken).run()
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Set-Cookie": sessionCookie(newToken, SESSION_TTL, cookieDomain),
+        },
+      })
+    } catch (e) {
+      console.error("[REFRESH]", e)
+      return jsonResponse({ error: "Failed to refresh session" }, 500)
     }
   })
 

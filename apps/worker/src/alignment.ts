@@ -308,6 +308,11 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
         return Response.json(supportResponse(), { status: 200, headers: getCorsHeaders(request) })
       }
 
+      // Input length limit
+      if (message && message.length > 2000) {
+        return Response.json({ error: "Input too long. Please keep your message under 2000 characters." }, { status: 400 })
+      }
+
       if (!message) {
         return new Response(JSON.stringify({ error: "Message is required" }), {
           status: 400, headers: { "Content-Type": "application/json" }
