@@ -181,7 +181,13 @@ export class ConflictSessionDO extends DurableObject<Env> {
         if (!item) {
           continue;
         }
-        await this.processSingleMessage(item);
+        try {
+          await this.processSingleMessage(item);
+        } catch (error) {
+          this.logSystemError("message_processing_failed", {
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
       }
     } finally {
       this.processingQueue = false;

@@ -84,12 +84,26 @@ async function enforceRequestSize(request: Request): Promise<Response | null> {
     }
   }
 
-  const bytes = (await request.clone().arrayBuffer()).byteLength;
-  if (bytes > MAX_REQUEST_BYTES) {
-    return new Response(JSON.stringify({ error: "payload_too_large" }), {
-      status: 413,
-      headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
-    });
+  const requestBody = request.clone().body;
+  if (requestBody) {
+    const reader = requestBody.getReader();
+    let bytesRead = 0;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        bytesRead += value.byteLength;
+        if (bytesRead > MAX_REQUEST_BYTES) {
+          await reader.cancel();
+          return new Response(JSON.stringify({ error: "payload_too_large" }), {
+            status: 413,
+            headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
+          });
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
   }
   return null;
 }

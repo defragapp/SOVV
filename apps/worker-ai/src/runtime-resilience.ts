@@ -95,9 +95,21 @@ export async function runAiWithResilience(
   }
 
   await acquireSlot();
+  let aiPromise: Promise<{ response?: string }>;
+  try {
+    aiPromise = env.AI.run(model, { messages }) as Promise<{ response?: string }>;
+  } catch (error) {
+    releaseSlot();
+    throw error;
+  }
+
+  void aiPromise.finally(() => {
+    releaseSlot();
+  });
+
   try {
     const aiResponse = await runWithTimeout(
-      env.AI.run(model, { messages }) as Promise<{ response?: string }>,
+      aiPromise,
       AI_TIMEOUT_MS
     );
     markSuccess();
@@ -110,8 +122,6 @@ export async function runAiWithResilience(
     });
     markFailure();
     throw error;
-  } finally {
-    releaseSlot();
   }
 }
 
