@@ -342,6 +342,11 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   router.post("/api/auth/logout", async (request: Request) => {
     const env = getEnv()
     const cookieDomain = env.COOKIE_DOMAIN || undefined
+    // Clean up expired sessions opportunistically on logout
+    try {
+      await env.DB.prepare("DELETE FROM sessions WHERE expires_at < ?")
+        .bind(Date.now()).run()
+    } catch { /* non-blocking */ }
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: {
