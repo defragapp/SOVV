@@ -1,5 +1,8 @@
 "use client"
 import * as React from "react"
+import { processInput } from "@/lib/system/processInput"
+import { OsOutput } from "@/components/system/OsOutput"
+import type { SystemOutput } from "@/lib/system/outputContract"
 import { SpaceShell } from "@/components/spaces/space-shell"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -12,6 +15,7 @@ export default function DefragItemPage() {
 
   const [input, setInput] = React.useState("")
   const [result, setResult] = React.useState<any>(null)
+  const [systemOutput, setSystemOutput] = React.useState<SystemOutput | null>(null)
   const [initialLoading, setInitialLoading] = React.useState(true)
   const [isLoading, setIsLoading] = React.useState(false)
   const [error, setError] = React.useState("")
@@ -41,20 +45,18 @@ export default function DefragItemPage() {
     if (!input.trim() || !result) return
     setIsLoading(true)
     setError("")
+    setSystemOutput(null)
     try {
-      // Create a continuity prompt
+      // Build continuity prompt from previous result context
       const message = `Previous context — What was active: ${result.activePattern || ''}. What changes this: ${result.alignment || result.giftUnderStrain || ''}. \n\nUpdate: ${input}`
-      
-      const res = await fetch("/api/explain", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message })
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data.error || data.message || "Failed to update")
+
+      const pResult = await processInput({ space: "defrag", message })
+      if (!pResult.ok) {
+        setError(pResult.error)
+        return
       }
-      setResult(data)
+      setSystemOutput(pResult.output)
+      setResult(pResult.output.meta as any)
       setInput("")
       setAudioUrl(null)
     } catch (err: any) {
@@ -117,7 +119,13 @@ export default function DefragItemPage() {
         <p className="text-xs text-[#76716b]">Your Baseline Design gives the system context before you describe this moment.</p>
       </div>
       
-      {result && (
+      {systemOutput && (
+        <div className="mb-4">
+          <OsOutput output={systemOutput} compact />
+        </div>
+      )}
+
+            {result && (
         <>
           <div className="border border-border bg-surface p-4 flex flex-col gap-2">
             <p className="text-[10px] font-sans font-medium text-[#4f4b47] uppercase tracking-[0.15em]">Audio Overview</p>
