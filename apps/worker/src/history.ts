@@ -105,7 +105,7 @@ export async function handleGetLibrary(req: Request, env: Env) {
 
   try {
     let query: string;
-    let bindings: unknown[];
+    let bindings: (string | number)[];
 
     if (workspaceSource && ["DEFRAG", "COVENANT", "ALIGNMENT"].includes(workspaceSource)) {
       if (searchQuery) {
