@@ -124,7 +124,7 @@ export default function CheckoutPage() {
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-base font-medium text-[#f4efe9]">Sovereign.os Pro</span>
-                <span className="font-serif text-lg text-[#f4efe9]">$20<span className="text-sm text-[#76716b] font-sans font-normal">/mo</span></span>
+                <span className="font-serif text-lg text-[#f4efe9]">$12<span className="text-sm text-[#76716b] font-sans font-normal">/mo</span></span>
               </div>
               <p className="text-sm text-[#a8a29a]">
                 {loading ? "Redirecting to checkout…" : "Unlimited sessions · All spaces · Full Library"}

@@ -105,7 +105,7 @@ export default function PricingPage() {
                   </span>
                 </div>
                 <div className="flex items-baseline gap-1 mb-3">
-                  <span className="font-serif text-4xl text-[#f4efe9]">$20</span>
+                  <span className="font-serif text-4xl text-[#f4efe9]">$12</span>
                   <span className="text-sm text-[#76716b]">/ month</span>
                 </div>
                 <p className="text-sm text-[#a8a29a] leading-relaxed">For patterns that need continuity.</p>
