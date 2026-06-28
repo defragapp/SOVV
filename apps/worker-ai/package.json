@@ -11,7 +11,7 @@
     "build": "echo \"Skipping strict tsc for worker-ai\""
   },
   "dependencies": {
-    "@sovereign/prompts": "workspace:*"
+    "@sovereign/prompts": "file:../../packages/prompts"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260515.0",
