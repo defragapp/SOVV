@@ -185,6 +185,17 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     });
   }
 
+  // Per-user rate limit on AI calls (prevents burst abuse)
+  if (env.RATE_LIMITER) {
+    const { success } = await env.RATE_LIMITER.limit({ key: `explain:${user.id}` })
+    if (!success) {
+      return jsonResponse({ error: "Too many requests. Please wait a moment before trying again." }, 429, {
+        ...getCorsHeaders(req),
+        "set-cookie": cookieHeader(sid),
+      })
+    }
+  }
+
   // Input length limit — prevent abuse and control AI costs
   if (message.length > 2000) {
     return jsonResponse({ error: "Input too long. Please keep your message under 2000 characters." }, 400, {

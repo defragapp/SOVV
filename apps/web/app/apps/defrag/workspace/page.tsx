@@ -142,6 +142,11 @@ export default function DefragWorkspacePage() {
       .then((d: any) => setLibrary(d.items || []))
       .catch(() => {})
       .finally(() => setLibraryLoading(false))
+
+    fetch("/api/patterns", { credentials: "include" })
+      .then(r => r.ok ? r.json() : { patterns: [] })
+      .then((d: any) => setPatterns((d.patterns || []).slice(0, 5)))
+      .catch(() => {})
   }, [saveSuccess])
 
   const handleSubmit = async () => {
