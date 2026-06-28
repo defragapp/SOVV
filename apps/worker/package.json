@@ -9,6 +9,7 @@
     "dev": "wrangler dev --port 8787",
     "deploy": "wrangler deploy",
     "build": "echo \"Skipping strict tsc for worker\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run"
   },
   "devDependencies": {
