@@ -416,8 +416,13 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       const id = crypto.randomUUID()
       const now = new Date().toISOString()
       await env.DB.prepare(
-        "INSERT INTO people (id, user_id, name, relation, created_at) VALUES (?, ?, ?, ?, ?)"
-      ).bind(id, user.id, name.trim(), relation?.trim() || null, now).run()
+        "INSERT INTO people (id, user_id, name, created_at) VALUES (?, ?, ?, ?)"
+      ).bind(id, user.id, name.trim(), now).run()
+      // Update relation if provided (column added in migration 0018)
+      if (relation?.trim()) {
+        await env.DB.prepare("UPDATE people SET relation = ? WHERE id = ?")
+          .bind(relation.trim(), id).run().catch(() => {})
+      }
       return jsonResponse({ success: true, id, name: name.trim() })
     } catch (e) {
       console.error("[PEOPLE_CREATE]", e)
