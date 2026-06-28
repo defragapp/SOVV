@@ -1,4 +1,5 @@
 import type { Env } from "./types-env";
+import { getCorsHeaders } from "./cors.js";
 import { getSessionId, cookieHeader } from "./plan";
 import type { Interaction } from "@sovereign/core";
 import { getAuthUser, verifyAccessJWT } from "./auth";
@@ -214,9 +215,9 @@ export async function handleGetLibraryStats(req: Request, env: Env) {
       stats.total += row.count;
     }
 
-    return Response.json({ stats });
+    return Response.json({ stats }, { headers: getCorsHeaders(req) });
   } catch (e) {
-    return Response.json({ stats: { DEFRAG: 0, COVENANT: 0, ALIGNMENT: 0, total: 0 } });
+    return Response.json({ stats: { DEFRAG: 0, COVENANT: 0, ALIGNMENT: 0, total: 0 } }, { headers: getCorsHeaders(req) });
   }
 }
 

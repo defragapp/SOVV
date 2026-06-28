@@ -141,7 +141,7 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
   if (!token) return null
 
   const session = await DB.prepare(
-    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires > ?"
+    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
   )
     .bind(token, Date.now())
     .first<{
@@ -204,7 +204,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         .run()
 
       const token = generateSessionToken()
-      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
         .bind(token, userId, now + SESSION_TTL * 1000, now)
         .run()
 
@@ -261,7 +261,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       const token = generateSessionToken()
       const now = Date.now()
-      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
         .bind(token, user.id, now + SESSION_TTL * 1000, now)
         .run()
 
