@@ -11,7 +11,6 @@ export async function explain(text: string, mode: string = 'sovereign') {
   const res = await fetch(`${API_BASE}/api/explain`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify({ text, mode }),
   });
   return res.json();
@@ -26,7 +25,6 @@ export async function verifyPattern(patternId: string, action: 'confirm' | 'dism
   const res = await fetch(`${API_BASE}/api/patterns/verify`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify({ patternId, action }),
   });
   return res.json();

@@ -231,7 +231,7 @@ router.get('/health', (request: Request) => {
     ok: true,
     service: 'sovereign-os-api',
     timestamp: new Date().toISOString(),
-    version: typeof process !== 'undefined' ? process.env.CF_VERSION_METADATA : undefined,
+    version: undefined,
   }), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders(request) } });
 });
 
