@@ -86,6 +86,8 @@ export function ResultCard({
   //   giftUnderStrain       → What changes this  (fallback if alignment absent)
   //
   // "Next move" is rendered separately with emphasis below.
+  const isRelational = Boolean(result.oldRole || result.whatYouLearnedToCarry)
+
   const sections = [
     { label: "What's active",          value: result.activePattern },
     { label: "You",                    value: result.theRepeat },
@@ -180,6 +182,15 @@ export function ResultCard({
           {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
         </span>
       </div>
+
+      {/* Relational indicator */}
+      {isRelational && (
+        <div className="px-6 pt-4 pb-0">
+          <span className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#e0743a]/50 border border-[#e0743a]/15 px-2 py-0.5" style={{ borderRadius: 3 }}>
+            Relational overlay
+          </span>
+        </div>
+      )}
 
       {/* Input echo */}
       <div className="px-6 py-4 border-b border-white/[0.04] bg-white/[0.01]">

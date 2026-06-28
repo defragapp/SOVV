@@ -402,7 +402,7 @@ export default function AlignmentEntryPage() {
             className="flex items-center justify-between group"
           >
             <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#3a3733] group-hover:text-[#f4efe9] transition-colors">
-              Open workspace
+              Open Space
             </span>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#2e2b28] group-hover:text-[#f4efe9] transition-colors">
               <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
