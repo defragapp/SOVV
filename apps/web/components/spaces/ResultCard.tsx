@@ -142,6 +142,25 @@ export function ResultCard({
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const handleShare = async () => {
+    setSharing(true)
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `Sovereign.os — ${spaceName}`,
+          text: sections[0]?.value || "A pattern I'm working through.",
+          url: window.location.href,
+        })
+      } else {
+        await navigator.clipboard.writeText(window.location.href)
+        setShareUrl("Link copied")
+        setTimeout(() => setShareUrl(""), 2000)
+      }
+    } catch { /* user cancelled */ } finally {
+      setSharing(false)
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
