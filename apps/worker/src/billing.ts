@@ -7,6 +7,7 @@ import {
   sendPaymentFailedEmail,
   sendCancellationEmail,
 } from "./email.js";
+import { fetchWithTimeout, withLimitedRetry } from "./runtime-resilience.js";
 
 // Stripe webhook signature verification in Workers (no Stripe SDK)
 // Stripe signs: "t=timestamp,v1=signature"
@@ -112,14 +113,24 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
   params.set("client_reference_id", userId);
   params.set("subscription_data[metadata][userId]", userId);
 
-  const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: params.toString(),
-  });
+  const res = await withLimitedRetry(
+    "stripe_checkout_create",
+    () =>
+      fetchWithTimeout(
+        "https://api.stripe.com/v1/checkout/sessions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: params.toString(),
+        },
+        10_000
+      ),
+    2,
+    10_000
+  );
 
   const data = await res.json() as Record<string, unknown>;
   if (!res.ok || typeof data["url"] !== "string") {
@@ -148,9 +159,17 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
 
   // Idempotency
   const eventId = event.id;
-  const existing = await env.KV.get(`stripe_event:${eventId}`);
+  const existing = await withLimitedRetry(
+    "kv_stripe_event_get",
+    () => env.KV.get(`stripe_event:${eventId}`),
+    2
+  );
   if (existing) return new Response("OK (already processed)");
-  await env.KV.put(`stripe_event:${eventId}`, "processed", { expirationTtl: 86400 });
+  await withLimitedRetry(
+    "kv_stripe_event_put",
+    () => env.KV.put(`stripe_event:${eventId}`, "processed", { expirationTtl: 86400 }),
+    2
+  );
 
   const emailOpts: { emailBinding?: typeof env.EMAIL; resendApiKey?: string } = {};
   if (env.EMAIL) emailOpts.emailBinding = env.EMAIL;
@@ -158,13 +177,20 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
 
   // Idempotency check — skip already-processed events
   try {
-    const existing = await env.DB.prepare("SELECT id FROM stripe_events WHERE id = ?")
-      .bind(event.id).first()
+    const existing = await withLimitedRetry(
+      "d1_stripe_event_select",
+      () => env.DB.prepare("SELECT id FROM stripe_events WHERE id = ?").bind(event.id).first(),
+      2
+    );
     if (existing) {
       return new Response(JSON.stringify({ received: true, skipped: true }), { status: 200 })
     }
-    await env.DB.prepare("INSERT INTO stripe_events (id, type, processed_at) VALUES (?, ?, CURRENT_TIMESTAMP)")
-      .bind(event.id, event.type).run()
+    await withLimitedRetry(
+      "d1_stripe_event_insert",
+      () => env.DB.prepare("INSERT INTO stripe_events (id, type, processed_at) VALUES (?, ?, CURRENT_TIMESTAMP)")
+        .bind(event.id, event.type).run(),
+      2
+    );
   } catch {
     // If stripe_events table doesn't exist yet, continue without idempotency
   }
@@ -331,14 +357,24 @@ export async function handlePortal(req: Request, env: Env): Promise<Response> {
   params.set("customer", user.stripe_customer_id);
   params.set("return_url", `${env.APP_URL}/app`);
 
-  const res = await fetch("https://api.stripe.com/v1/billing_portal/sessions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: params.toString(),
-  });
+  const res = await withLimitedRetry(
+    "stripe_portal_create",
+    () =>
+      fetchWithTimeout(
+        "https://api.stripe.com/v1/billing_portal/sessions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: params.toString(),
+        },
+        10_000
+      ),
+    2,
+    10_000
+  );
 
   const data = await res.json() as Record<string, unknown>;
   if (!res.ok || typeof data["url"] !== "string") {
