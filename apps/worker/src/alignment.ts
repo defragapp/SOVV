@@ -5,6 +5,7 @@ import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { SYSTEM_ALIGNMENT, SECURITY_PREFIX } from "./prompts.js";
 import { checkProLimit } from "./plan.js";
 import { parseJsonBody, validateTextInput } from "./safety-validation.js";
+import { logSafetyEvent } from "./safety.js";
 import {
   selectActiveSignals,
   buildTimingSignals,
@@ -259,7 +260,15 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
         let baselineContext = "";
         try {
           baselineContext = await getBaselineForAI(env, user.id, "alignment");
-        } catch {}
+        } catch (error) {
+          logSafetyEvent({
+            level: "warn",
+            event: "alignment_baseline_context_unavailable",
+            request,
+            error_type: "system",
+            error,
+          });
+        }
 
         const now = new Date();
         const dateStr = now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -300,7 +309,15 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
         try {
           const match = rawText.trim().match(/\{[\s\S]*\}/);
           if (match) brief = JSON.parse(match[0]) as AlignmentBrief;
-        } catch {}
+        } catch (error) {
+          logSafetyEvent({
+            level: "warn",
+            event: "alignment_entry_parse_failed",
+            request,
+            error_type: "system",
+            error,
+          });
+        }
 
         if (!brief) {
           brief = buildEntryFallback(baselineContext);
@@ -330,7 +347,15 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       let baselineContext = "";
       try {
         baselineContext = await getBaselineForAI(env, user.id, "alignment");
-      } catch {}
+      } catch (error) {
+        logSafetyEvent({
+          level: "warn",
+          event: "alignment_workspace_baseline_context_unavailable",
+          request,
+          error_type: "system",
+          error,
+        });
+      }
 
       // Active signal selection — only reduced signals reach the AI
       let activeSignalsText = "";
@@ -345,7 +370,15 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
           const timingSignals = buildTimingSignals(dataset);
           activeSignalsText = formatActiveSignalsForPrompt(activeSignals, timingSignals);
         }
-      } catch {}
+      } catch (error) {
+        logSafetyEvent({
+          level: "warn",
+          event: "alignment_active_signals_unavailable",
+          request,
+          error_type: "system",
+          error,
+        });
+      }
 
       const now = new Date();
       const dateStr = now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -372,7 +405,15 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       try {
         const match = rawText.trim().match(/\{[\s\S]*\}/);
         if (match) parsed = JSON.parse(match[0]);
-      } catch {}
+      } catch (error) {
+        logSafetyEvent({
+          level: "warn",
+          event: "alignment_response_parse_failed",
+          request,
+          error_type: "system",
+          error,
+        });
+      }
 
       // Add media capabilities for Pro users
       const responseWithMedia = { ...parsed, media: { audioOverviewAvailable: true } };
@@ -381,7 +422,13 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       });
 
     } catch (e: any) {
-      console.error("Alignment route error:", e);
+      logSafetyEvent({
+        level: "error",
+        event: "alignment_request_failed",
+        request,
+        error_type: "system",
+        error: e,
+      });
       return new Response(JSON.stringify({ error: "Failed to process" }), {
         status: 500, headers: { "Content-Type": "application/json" }
       });

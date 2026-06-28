@@ -6,6 +6,7 @@ import { getRecentInteractions, upsertPatterns, getPatterns } from "./db.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import { getSessionId, cookieHeader } from "./plan.js";
 import { requireActiveSubscription } from "./billing.js";
+import { logSafetyEvent } from "./safety.js";
 
 export interface Pattern {
   type: "trigger" | "dynamic" | "defense" | "repetition" | "growth";
@@ -28,12 +29,22 @@ const PATTERN_SYSTEM_PROMPT = `You are a pattern recognition engine. Analyze the
 }`;
 
 export async function extractPatterns(env: Env, sessionId: string, newInteractionId: string): Promise<void> {
-  console.log(`[Queue] Starting pattern extraction for session: ${sessionId}`);
+  logSafetyEvent({
+    event: "pattern_extraction_started",
+    endpoint: "queue:patterns",
+    requestId: newInteractionId,
+    details: { sessionId },
+  });
 
   // 1. Get recent contextual data
   const interactions = await getRecentInteractions(env.DB, sessionId, 15);
   if (interactions.length < 2) {
-    console.log("[Queue] Insufficient interactions to calculate recursive behavior.");
+    logSafetyEvent({
+      event: "pattern_extraction_skipped_insufficient_interactions",
+      endpoint: "queue:patterns",
+      requestId: newInteractionId,
+      details: { sessionId, interactionCount: interactions.length },
+    });
     return;
   }
 
@@ -46,7 +57,14 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
     : "No persistent behavioral structures logged yet.";
 
   if (!env.AI) {
-    console.error("[Queue] Cloudflare AI binding unavailable.");
+    logSafetyEvent({
+      level: "error",
+      event: "pattern_extraction_ai_unavailable",
+      endpoint: "queue:patterns",
+      requestId: newInteractionId,
+      error_type: "system",
+      details: { sessionId },
+    });
     return;
   }
 
@@ -76,9 +94,22 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
       verified: 0,
     }));
     await upsertPatterns(env.DB, patternPayloads);
-    console.log(`[Queue] Successfully stored ${patterns.length} isolated tracks.`);
+    logSafetyEvent({
+      event: "pattern_extraction_completed",
+      endpoint: "queue:patterns",
+      requestId: newInteractionId,
+      details: { sessionId, patternCount: patterns.length },
+    });
   } catch (err) {
-    console.error("[Queue] Inference pipeline execution failure:", err);
+    logSafetyEvent({
+      level: "error",
+      event: "pattern_extraction_failed",
+      endpoint: "queue:patterns",
+      requestId: newInteractionId,
+      error_type: "system",
+      error: err,
+      details: { sessionId },
+    });
     throw err;
   }
 }
@@ -119,6 +150,13 @@ export function registerPatternsRoutes(router: any, getEnv: () => Env) {
         headers: { "Content-Type": "application/json" }
       });
     } catch (err: any) {
+      logSafetyEvent({
+        level: "error",
+        event: "patterns_fetch_failed",
+        request,
+        error_type: "system",
+        error: err,
+      });
       return new Response(JSON.stringify({ error: err.message }), {
         status: 500,
         headers: { "Content-Type": "application/json" }

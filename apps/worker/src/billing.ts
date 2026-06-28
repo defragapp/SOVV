@@ -7,6 +7,7 @@ import {
   sendPaymentFailedEmail,
   sendCancellationEmail,
 } from "./email.js";
+import { logSafetyEvent } from "./safety.js";
 
 // Stripe webhook signature verification in Workers (no Stripe SDK)
 // Stripe signs: "t=timestamp,v1=signature"
@@ -165,7 +166,15 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
     }
     await env.DB.prepare("INSERT INTO stripe_events (id, type, processed_at) VALUES (?, ?, CURRENT_TIMESTAMP)")
       .bind(event.id, event.type).run()
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "billing_webhook_idempotency_fallback",
+      request: req,
+      error_type: "billing",
+      error,
+      details: { stripeEventId: event.id, stripeEventType: event.type },
+    });
     // If stripe_events table doesn't exist yet, continue without idempotency
   }
 
@@ -184,7 +193,16 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
           const user = await env.DB.prepare("SELECT email FROM users WHERE id = ?")
             .bind(userId).first<{ email?: string }>();
           if (user?.email) {
-            await sendWelcomeEmail(user.email, emailOpts).catch(() => {});
+            await sendWelcomeEmail(user.email, emailOpts).catch((error) => {
+              logSafetyEvent({
+                level: "warn",
+                event: "billing_welcome_email_failed",
+                request: req,
+                error_type: "billing",
+                error,
+                details: { stripeEventId: event.id, userId },
+              });
+            });
           }
         }
       }
@@ -236,7 +254,16 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
         const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
           .bind(stripeCustomerId).first<{ email?: string }>();
         if (user?.email) {
-          await sendPaymentSucceededEmail(user.email, emailOpts).catch(() => {});
+          await sendPaymentSucceededEmail(user.email, emailOpts).catch((error) => {
+            logSafetyEvent({
+              level: "warn",
+              event: "billing_payment_succeeded_email_failed",
+              request: req,
+              error_type: "billing",
+              error,
+              details: { stripeEventId: event.id, stripeCustomerId },
+            });
+          });
         }
       }
       break;
@@ -255,7 +282,16 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
         const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
           .bind(stripeCustomerId).first<{ email?: string }>();
         if (user?.email) {
-          await sendPaymentFailedEmail(user.email, emailOpts).catch(() => {});
+          await sendPaymentFailedEmail(user.email, emailOpts).catch((error) => {
+            logSafetyEvent({
+              level: "warn",
+              event: "billing_payment_failed_email_failed",
+              request: req,
+              error_type: "billing",
+              error,
+              details: { stripeEventId: event.id, stripeCustomerId },
+            });
+          });
         }
       }
       break;
@@ -272,7 +308,16 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
         const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
           .bind(stripeCustomerId).first<{ email?: string }>();
         if (user?.email) {
-          await sendCancellationEmail(user.email, emailOpts).catch(() => {});
+          await sendCancellationEmail(user.email, emailOpts).catch((error) => {
+            logSafetyEvent({
+              level: "warn",
+              event: "billing_cancellation_email_failed",
+              request: req,
+              error_type: "billing",
+              error,
+              details: { stripeEventId: event.id, stripeCustomerId },
+            });
+          });
         }
       }
       break;

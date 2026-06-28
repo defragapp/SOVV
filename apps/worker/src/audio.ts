@@ -2,6 +2,7 @@ import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
 import { parseJsonBody, validateTextInput } from "./safety-validation.js";
+import { logSafetyEvent } from "./safety.js";
 
 export function registerAudioRoute(router: any, getEnv: () => Env) {
   router.post("/api/audio", async (request: Request) => {
@@ -49,7 +50,13 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
       });
 
     } catch (e: any) {
-      console.error(e);
+      logSafetyEvent({
+        level: "error",
+        event: "audio_generation_failed",
+        request,
+        error_type: "system",
+        error: e,
+      });
       return new Response(JSON.stringify({ error: "Failed to process audio", details: e.message }), { status: 500 });
     }
   });

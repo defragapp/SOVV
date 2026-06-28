@@ -15,6 +15,7 @@ import { registerDeriveProfileRoutes } from "./derive-profile.js";
 import { registerInviteRoutes } from "./invite.js";
 import { registerAuthExtendedRoutes } from "./routes/auth-extended.js";
 import { registerInviteSystemRoutes } from "./routes/invite.js";
+import { classifyErrorType, getRequestContext, logSafetyEvent } from "./safety.js";
 
 const router = Router();
 let currentEnv: Env;
@@ -33,7 +34,8 @@ export function getCorsHeaders(request: Request): Record<string, string> {
   const origin = request.headers.get('Origin') || '';
   const headers: Record<string, string> = {
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-request-id, x-endpoint',
+    'Access-Control-Expose-Headers': 'x-request-id, x-endpoint',
     'Vary': 'Origin',
   };
 
@@ -42,6 +44,159 @@ export function getCorsHeaders(request: Request): Record<string, string> {
   }
 
   return headers;
+}
+
+function createDiagnosticRequest(request: Request) {
+  const endpoint = `${request.method} ${new URL(request.url).pathname}`;
+  const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();
+  const headers = new Headers(request.headers);
+  headers.set("x-request-id", requestId);
+  headers.set("x-endpoint", endpoint);
+
+  return {
+    request: new Request(request, { headers }),
+    requestId,
+    endpoint,
+    startedAt: Date.now(),
+  };
+}
+
+function tryParseJson(rawText: string): unknown | null {
+  if (!rawText) return null;
+  try {
+    return JSON.parse(rawText);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeSuccessPayload(rawText: string, contentType: string, requestId: string): Record<string, unknown> {
+  const parsed = contentType.includes("application/json") ? tryParseJson(rawText) : null;
+
+  if (Array.isArray(parsed)) {
+    return { success: true, requestId, data: parsed };
+  }
+
+  if (parsed && typeof parsed === "object") {
+    return { ...(parsed as Record<string, unknown>), success: true, requestId };
+  }
+
+  if (rawText.trim().length > 0) {
+    return { success: true, requestId, message: rawText.trim() };
+  }
+
+  return { success: true, requestId };
+}
+
+function normalizeFailurePayload(rawText: string, contentType: string, requestId: string, statusText: string): Record<string, unknown> {
+  const parsed = contentType.includes("application/json") ? tryParseJson(rawText) : null;
+
+  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+    const payload = parsed as Record<string, unknown>;
+    const error = typeof payload.error === "string"
+      ? payload.error
+      : typeof payload.message === "string"
+        ? payload.message
+        : statusText || "Request failed";
+    return { ...payload, success: false, error, requestId };
+  }
+
+  const textError = rawText.trim() || statusText || "Request failed";
+  return { success: false, error: textError, requestId };
+}
+
+function applyResponseHeaders(headers: Headers, request: Request): void {
+  const cors = getCorsHeaders(request);
+  Object.entries(cors).forEach(([key, value]) => {
+    headers.set(key, value);
+  });
+
+  const securityHeaders = {
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+    'X-Frame-Options': 'DENY',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    'Content-Security-Policy': "default-src 'none'; connect-src 'self' https://api.stripe.com https://challenges.cloudflare.com; frame-src https://js.stripe.com https://challenges.cloudflare.com; script-src 'self' https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; object-src 'none'; base-uri 'self'",
+  };
+
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    headers.set(key, value);
+  });
+
+  const { requestId, endpoint } = getRequestContext(request);
+  headers.set("x-request-id", requestId);
+  headers.set("x-endpoint", endpoint);
+}
+
+async function finalizeResponse(request: Request, response: Response, startedAt: number): Promise<Response> {
+  const headers = new Headers(response.headers);
+  applyResponseHeaders(headers, request);
+
+  const durationMs = Date.now() - startedAt;
+  const contentType = (headers.get("content-type") ?? "").toLowerCase();
+  const status = response.status;
+  const statusText = response.statusText;
+  const { endpoint } = getRequestContext(request);
+
+  if (status === 204 || response.body === null) {
+    logSafetyEvent({
+      event: "request_completed",
+      request,
+      status,
+      duration_ms: durationMs,
+    });
+    return new Response(null, { status, statusText, headers });
+  }
+
+  if (contentType.startsWith("audio/") || contentType.includes("application/octet-stream")) {
+    logSafetyEvent({
+      event: "request_completed",
+      request,
+      status,
+      duration_ms: durationMs,
+    });
+    return new Response(response.body, { status, statusText, headers });
+  }
+
+  if (status >= 400 || contentType.includes("application/json") || contentType.startsWith("text/plain") || contentType.length === 0) {
+    const rawText = await response.text();
+    const payload = status >= 400
+      ? normalizeFailurePayload(rawText, contentType, getRequestContext(request).requestId, statusText)
+      : normalizeSuccessPayload(rawText, contentType, getRequestContext(request).requestId);
+
+    headers.set("Content-Type", "application/json");
+
+    if (status >= 400) {
+      const errorMessage = typeof payload.error === "string" ? payload.error : statusText;
+      logSafetyEvent({
+        level: status >= 500 ? "error" : "warn",
+        event: "request_failed",
+        request,
+        error_type: classifyErrorType({ endpoint, status, error: errorMessage }),
+        status,
+        duration_ms: durationMs,
+        error: errorMessage,
+      });
+    } else {
+      logSafetyEvent({
+        event: "request_completed",
+        request,
+        status,
+        duration_ms: durationMs,
+      });
+    }
+
+    return new Response(JSON.stringify(payload), { status, statusText, headers });
+  }
+
+  logSafetyEvent({
+    event: "request_completed",
+    request,
+    status,
+    duration_ms: durationMs,
+  });
+  return new Response(response.body, { status, statusText, headers });
 }
 
 // === NATAL ROUTES ===
@@ -81,7 +236,16 @@ function registerNatalRoutes(router: any, getEnv: () => Env) {
       });
     }
 
-    const body = await request.json().catch(() => null) as Record<string, any> | null;
+    const body = await request.json().catch((error) => {
+      logSafetyEvent({
+        level: "warn",
+        event: "natal_save_invalid_json",
+        request,
+        error_type: "validation",
+        error,
+      });
+      return null;
+    }) as Record<string, any> | null;
     if (!body || typeof body !== 'object') {
       return new Response(JSON.stringify({ error: "Invalid body" }), {
         status: 400,
@@ -209,7 +373,13 @@ router.get("/api/stripe/prices", async (request: Request) => {
       headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
     });
   } catch (error) {
-    console.error("[STRIPE_PRICES]", error);
+    logSafetyEvent({
+      level: "error",
+      event: "stripe_prices_fetch_failed",
+      request,
+      error_type: "billing",
+      error,
+    });
     return new Response(JSON.stringify([]), {
       status: 200,
       headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
@@ -255,56 +425,50 @@ async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: stri
       text,
       html,
     });
-    console.log(`[EMAIL] Auto-reply sent to ${ticket.sender}`);
+    logSafetyEvent({
+      event: "email_auto_reply_sent",
+      endpoint: "email:auto-reply",
+      requestId: ticket.id,
+      details: { recipient: ticket.sender },
+    });
   } catch (replyErr) {
-    console.error("[EMAIL] Auto-reply failed:", replyErr);
+    logSafetyEvent({
+      level: "error",
+      event: "email_auto_reply_failed",
+      endpoint: "email:auto-reply",
+      requestId: ticket.id,
+      error_type: "system",
+      error: replyErr,
+      details: { recipient: ticket.sender },
+    });
   }
 }
 
 router.all("*", () => new Response("Not Found", { status: 404 }));
 
 async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext) {
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: getCorsHeaders(request) });
+  const diagnostic = createDiagnosticRequest(request);
+  const tracedRequest = diagnostic.request;
+
+  if (tracedRequest.method === 'OPTIONS') {
+    const headers = new Headers();
+    applyResponseHeaders(headers, tracedRequest);
+    return new Response(null, { status: 204, headers });
   }
   
   if (env.RATE_LIMITER) {
-    const ip = request.headers.get('cf-connecting-ip') || 'unknown-ip';
+    const ip = tracedRequest.headers.get('cf-connecting-ip') || 'unknown-ip';
     const { success } = await env.RATE_LIMITER.limit({ key: ip });
     if (!success) {
-      return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+      return finalizeResponse(tracedRequest, new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
         status: 429,
-        headers: { 'Content-Type': 'application/json', ...getCorsHeaders(request) }
-      });
+        headers: { 'Content-Type': 'application/json' }
+      }), diagnostic.startedAt);
     }
   }
   
-  const response = await router.fetch(request, env, ctx);
-  
-  const corsResponse = new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: response.headers,
-  });
-  
-  const cors = getCorsHeaders(request);
-  Object.entries(cors).forEach(([key, value]) => {
-    corsResponse.headers.set(key, value);
-  });
-  
-  const securityHeaders = {
-    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-    'X-Frame-Options': 'DENY',
-    'X-Content-Type-Options': 'nosniff',
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-    'Content-Security-Policy': "default-src 'none'; connect-src 'self' https://api.stripe.com https://challenges.cloudflare.com; frame-src https://js.stripe.com https://challenges.cloudflare.com; script-src 'self' https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; object-src 'none'; base-uri 'self'",
-  };
-  Object.entries(securityHeaders).forEach(([key, value]) => {
-    corsResponse.headers.set(key, value);
-  });
-  
-  return corsResponse;
+  const response = await router.fetch(tracedRequest, env, ctx);
+  return finalizeResponse(tracedRequest, response, diagnostic.startedAt);
 }
 
 export default {
@@ -313,8 +477,22 @@ export default {
     try {
       return await handleWithCors(request, env, ctx);
     } catch (error) {
-      console.error("[INTERNAL]", error);
-      return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: { "Content-Type": "application/json" } });
+      const diagnostic = createDiagnosticRequest(request);
+      logSafetyEvent({
+        level: "error",
+        event: "request_crashed",
+        request: diagnostic.request,
+        error_type: "system",
+        error,
+      });
+      return finalizeResponse(
+        diagnostic.request,
+        new Response(JSON.stringify({ error: "Internal server error" }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }),
+        diagnostic.startedAt,
+      );
     }
   },
 
@@ -324,7 +502,14 @@ export default {
       const sessionId = body?.sessionId;
       const interactionId = body?.interactionId;
       if (!sessionId || !interactionId) {
-        console.error("Queue: invalid message body");
+        logSafetyEvent({
+          level: "error",
+          event: "queue_invalid_message",
+          endpoint: "queue:patterns",
+          requestId: interactionId ?? "missing",
+          error_type: "system",
+          details: { sessionId: sessionId ?? null },
+        });
         message.ack();
         return;
       }
@@ -332,7 +517,15 @@ export default {
         await extractPatterns(env, sessionId, interactionId);
         message.ack();
       } catch (err) {
-        console.error("Queue: pattern extraction failed for", interactionId, err);
+        logSafetyEvent({
+          level: "error",
+          event: "queue_pattern_extraction_failed",
+          endpoint: "queue:patterns",
+          requestId: interactionId,
+          error_type: "system",
+          error: err,
+          details: { sessionId },
+        });
         message.retry();
       }
     }));
@@ -348,14 +541,28 @@ export default {
                           message.headers.get("X-Auto-Response-Suppress")?.toLowerCase() === "all" || 
                           message.headers.get("Precedence")?.toLowerCase() === "bulk";
       if (isAutomated) {
-        console.log(`[EMAIL] Skipping automated message from ${sender}`);
+        logSafetyEvent({
+          event: "email_skipped_automated_sender",
+          endpoint: "email:inbound",
+          requestId: sender,
+          details: { sender },
+        });
         return;
       }
       let bodyPreview = "";
       try {
         const raw = await new Response(message.raw as unknown as BodyInit).text();
         bodyPreview = raw.substring(0, 500);
-      } catch {
+      } catch (error) {
+        logSafetyEvent({
+          level: "warn",
+          event: "email_body_preview_failed",
+          endpoint: "email:inbound",
+          requestId: sender,
+          error_type: "system",
+          error,
+          details: { sender },
+        });
         bodyPreview = "(unable to read body)";
       }
       const ticketId = `SV-${crypto.randomUUID()}`;
@@ -366,23 +573,54 @@ export default {
         subject,
         body_preview: bodyPreview,
       });
-      console.log(`[EMAIL] Ticket created: ${ticketId} from ${sender}`);
+      logSafetyEvent({
+        event: "email_ticket_created",
+        endpoint: "email:inbound",
+        requestId: ticketId,
+        details: { sender },
+      });
       if (!isAutomated) {
         await sendSupportAutoReply(env, { id: ticketId, sender, subject });
       }
       if (env.EMAIL_FORWARD_ADDRESS) {
         await message.forward(env.EMAIL_FORWARD_ADDRESS);
-        console.log(`[EMAIL] Forwarded to configured address.`);
+        logSafetyEvent({
+          event: "email_forwarded",
+          endpoint: "email:inbound",
+          requestId: ticketId,
+          details: { sender },
+        });
       } else {
-        console.warn("[EMAIL] EMAIL_FORWARD_ADDRESS secret not set. Cannot forward email.");
+        logSafetyEvent({
+          level: "warn",
+          event: "email_forward_address_missing",
+          endpoint: "email:inbound",
+          requestId: ticketId,
+          error_type: "system",
+          details: { sender },
+        });
       }
     } catch (err) {
-      console.error("[EMAIL] Handler failed:", err);
+      logSafetyEvent({
+        level: "error",
+        event: "email_handler_failed",
+        endpoint: "email:inbound",
+        requestId: message.from ?? "unknown",
+        error_type: "system",
+        error: err,
+      });
       if (env.EMAIL_FORWARD_ADDRESS) {
         try {
           await message.forward(env.EMAIL_FORWARD_ADDRESS);
         } catch (forwardErr) {
-          console.error("[EMAIL] Forward failed:", forwardErr);
+          logSafetyEvent({
+            level: "error",
+            event: "email_forward_failed",
+            endpoint: "email:inbound",
+            requestId: message.from ?? "unknown",
+            error_type: "system",
+            error: forwardErr,
+          });
         }
       }
     }

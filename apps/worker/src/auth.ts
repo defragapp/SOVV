@@ -110,6 +110,7 @@ export function getSessionToken(request: Request): string | null {
 import type { D1Database } from "@cloudflare/workers-types";
 import { getCorsHeaders } from "./cors.js";
 import { getSessionId } from "./plan.js";
+import { logSafetyEvent } from "./safety.js";
 
 export function jsonResponse(data: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(data), {
@@ -150,7 +151,15 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
 
   // Update last_active non-blocking
   DB.prepare("UPDATE sessions SET last_active = ? WHERE token = ?")
-    .bind(Date.now(), token).run().catch(() => {})
+    .bind(Date.now(), token).run().catch((error) => {
+      logSafetyEvent({
+        level: "warn",
+        event: "session_last_active_update_failed",
+        request,
+        error_type: "auth",
+        error,
+      })
+    })
 
   const s = session as { id: string; email: string; tier: string; role: string; stripe_customer_id: string | null; subscription_status: string }
   return { ...s, role: s.role || "user", subscription_status: s.subscription_status || "free" }
@@ -176,10 +185,15 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       if (typeof email === "string" && !email.includes("@")) return jsonResponse({ error: "Invalid email address" }, 400)
 
       if (env.TURNSTILE_SECRET_KEY) {
-        const isHuman = await verifyTurnstile(String(turnstileToken ?? ""), env.TURNSTILE_SECRET_KEY)
+        const isHuman = await verifyTurnstile(String(turnstileToken ?? ""), env.TURNSTILE_SECRET_KEY, request)
         if (!isHuman) return jsonResponse({ error: "Bot verification failed" }, 403)
       } else {
-        console.warn("Turnstile secret key missing — bypassing bot verification.")
+        logSafetyEvent({
+          level: "warn",
+          event: "turnstile_secret_missing",
+          request,
+          error_type: "auth",
+        })
       }
 
       const password_hash = await hashPassword(password)
@@ -198,13 +212,27 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       // Send welcome email via queue (non-blocking)
       if (env.QUEUE) {
         void env.QUEUE.send({ type: "welcome", to: email }).catch((err: unknown) =>
-          console.warn("[auth] Failed to queue welcome email:", err)
+          logSafetyEvent({
+            level: "warn",
+            event: "auth_welcome_email_queue_failed",
+            request,
+            error_type: "auth",
+            error: err,
+            details: { recipient: email },
+          })
         )
       } else if (env.RESEND_API_KEY) {
         // Fallback: send directly if no queue
         const { sendWelcomeEmail } = await import("./email.js")
         void sendWelcomeEmail(email, { resendApiKey: env.RESEND_API_KEY }).catch((err: unknown) =>
-          console.warn("[auth] Failed to send welcome email:", err)
+          logSafetyEvent({
+            level: "warn",
+            event: "auth_welcome_email_failed",
+            request,
+            error_type: "auth",
+            error: err,
+            details: { recipient: email },
+          })
         )
       }
 
@@ -215,7 +243,16 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
           method: "POST",
           headers: { "Content-Type": "application/json", "Cookie": `session=${token}` },
           body: JSON.stringify({ email }),
-        }).catch(() => {})
+        }).catch((error) => {
+          logSafetyEvent({
+            level: "warn",
+            event: "auth_send_verification_trigger_failed",
+            request,
+            error_type: "auth",
+            error,
+            details: { recipient: email },
+          })
+        })
       }
 
       return jsonResponse({ success: true, token }, 200, {
@@ -223,7 +260,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       })
     } catch (e: any) {
       if (e?.message?.includes("UNIQUE")) return jsonResponse({ error: "Email exists" }, 400)
-      console.error("Registration failed", e)
+      logSafetyEvent({ level: "error", event: "auth_registration_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Registration failed" }, 500)
     }
   })
@@ -256,7 +293,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         "Set-Cookie": sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN),
       })
     } catch (e: any) {
-      console.error("Login failed", e)
+      logSafetyEvent({ level: "error", event: "auth_login_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Login failed" }, 500)
     }
   })
@@ -278,11 +315,26 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
     if (user.role !== "ambassador" && user.role !== "owner") {
-      console.warn("Attempted ambassador access blocked for role: " + user.role);
+      logSafetyEvent({
+        level: "warn",
+        event: "ambassador_access_blocked",
+        request,
+        error_type: "auth",
+        details: { role: user.role },
+      });
       return jsonResponse({ error: "Forbidden" }, 403)
     }
 
-    const body = await request.json().catch(() => ({})) as any
+    const body = await request.json().catch((error) => {
+      logSafetyEvent({
+        level: "warn",
+        event: "promo_code_create_invalid_json",
+        request,
+        error_type: "validation",
+        error,
+      })
+      return {}
+    }) as any
     let discount_percent = typeof body.discount_percent === "number" ? body.discount_percent : 0
     let max_uses = typeof body.max_uses === "number" ? body.max_uses : 10
 
@@ -303,7 +355,16 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   // POST /api/promo/redeem
   router.post("/api/promo/redeem", async (request: Request) => {
     const env = getEnv()
-    const body = await request.json().catch(() => ({})) as any
+    const body = await request.json().catch((error) => {
+      logSafetyEvent({
+        level: "warn",
+        event: "promo_redeem_invalid_json",
+        request,
+        error_type: "validation",
+        error,
+      })
+      return {}
+    }) as any
     const code = typeof body?.code === "string" ? body.code.trim().toUpperCase() : ""
     if (!code) return jsonResponse({ error: "Missing code" }, 400)
 
@@ -385,7 +446,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       return jsonResponse({ success: true })
     } catch (e) {
-      console.error("[CHANGE_PASSWORD]", e)
+      logSafetyEvent({ level: "error", event: "auth_change_password_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Failed to change password" }, 500)
     }
   })
@@ -425,7 +486,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         },
       })
     } catch (e) {
-      console.error("[EXPORT]", e)
+      logSafetyEvent({ level: "error", event: "auth_export_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Failed to export data" }, 500)
     }
   })
@@ -448,8 +509,26 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       ])
 
       // Clear KV data
-      await env.KV.delete(`natal:${user.id}`).catch(() => {})
-      await env.KV.delete(`baseline:${user.id}`).catch(() => {})
+      await env.KV.delete(`natal:${user.id}`).catch((error) => {
+        logSafetyEvent({
+          level: "warn",
+          event: "auth_delete_account_natal_cleanup_failed",
+          request,
+          error_type: "auth",
+          error,
+          details: { userId: user.id },
+        })
+      })
+      await env.KV.delete(`baseline:${user.id}`).catch((error) => {
+        logSafetyEvent({
+          level: "warn",
+          event: "auth_delete_account_baseline_cleanup_failed",
+          request,
+          error_type: "auth",
+          error,
+          details: { userId: user.id },
+        })
+      })
 
       const cookieDomain = env.COOKIE_DOMAIN || undefined
       return new Response(JSON.stringify({ success: true }), {
@@ -461,7 +540,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         },
       })
     } catch (e) {
-      console.error("[DELETE_ACCOUNT]", e)
+      logSafetyEvent({ level: "error", event: "auth_delete_account_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Failed to delete account" }, 500)
     }
   })
@@ -487,6 +566,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       return jsonResponse({ sessions })
     } catch (e) {
+      logSafetyEvent({ level: "error", event: "auth_sessions_fetch_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Failed to fetch sessions" }, 500)
     }
   })
@@ -525,7 +605,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         },
       })
     } catch (e) {
-      console.error("[REFRESH]", e)
+      logSafetyEvent({ level: "error", event: "auth_refresh_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Failed to refresh session" }, 500)
     }
   })
@@ -538,7 +618,9 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     try {
       await env.DB.prepare("DELETE FROM sessions WHERE expires_at < ?")
         .bind(Date.now()).run()
-    } catch { /* non-blocking */ }
+    } catch (error) {
+      logSafetyEvent({ level: "warn", event: "auth_logout_cleanup_failed", request, error_type: "auth", error })
+    }
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: {
@@ -556,7 +638,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
 
     const people = await env.DB.prepare("SELECT * FROM people WHERE user_id = ?").bind(user.id).all()
-    return jsonResponse(people.results)
+    return jsonResponse({ people: people.results ?? [] })
   })
 
   // POST /api/people — add a person
@@ -577,11 +659,20 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       // Update relation if provided (column added in migration 0018)
       if (relation?.trim()) {
         await env.DB.prepare("UPDATE people SET relation = ? WHERE id = ?")
-          .bind(relation.trim(), id).run().catch(() => {})
+          .bind(relation.trim(), id).run().catch((error) => {
+            logSafetyEvent({
+              level: "warn",
+              event: "people_relation_update_failed",
+              request,
+              error_type: "system",
+              error,
+              details: { personId: id },
+            })
+          })
       }
       return jsonResponse({ success: true, id, name: name.trim() })
     } catch (e) {
-      console.error("[PEOPLE_CREATE]", e)
+      logSafetyEvent({ level: "error", event: "people_create_failed", request, error_type: "system", error: e })
       return jsonResponse({ error: "Failed to create person" }, 500)
     }
   })
@@ -599,6 +690,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         .bind(id, user.id).run()
       return jsonResponse({ success: true })
     } catch (e) {
+      logSafetyEvent({ level: "error", event: "people_delete_failed", request, error_type: "system", error: e, details: { personId: id } })
       return jsonResponse({ error: "Failed to delete person" }, 500)
     }
   })
@@ -661,8 +753,7 @@ function decodeJwt(token: string): { header: any; payload: any } | null {
       header: JSON.parse(headerStr),
       payload: JSON.parse(payloadStr),
     };
-  } catch (e) {
-    console.error("Failed to decode JWT", e);
+  } catch {
     return null;
   }
 }
@@ -718,13 +809,13 @@ export async function verifyAccessJWT(request: Request, env: { TEAM_DOMAIN?: str
 
     return null; // Token is valid
   } catch (err: any) {
-    console.error("JWT Verification failed:", err.stack);
+    logSafetyEvent({ level: "error", event: "auth_jwt_verification_failed", request, error_type: "auth", error: err });
     return jsonResponse({ error: "JWT verification failed" }, 500);
   }
 }
 
 // Turnstile bot verification
-export async function verifyTurnstile(token: string, secretKey: string): Promise<boolean> {
+export async function verifyTurnstile(token: string, secretKey: string, request?: Request): Promise<boolean> {
   if (!token) return false;
   try {
     const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -734,7 +825,14 @@ export async function verifyTurnstile(token: string, secretKey: string): Promise
     });
     const data = await response.json() as { success: boolean };
     return data.success;
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "turnstile_verification_failed",
+      request,
+      error_type: "auth",
+      error,
+    });
     return false;
   }
 }

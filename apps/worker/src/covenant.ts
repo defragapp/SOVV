@@ -5,6 +5,7 @@ import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { checkProLimit } from "./plan.js";
 import { SYSTEM_COVENANT } from "./prompts.js";
 import { parseJsonBody, validateTextInput } from "./safety-validation.js";
+import { logSafetyEvent } from "./safety.js";
 import {
   selectActiveSignals,
   buildTimingSignals,
@@ -91,7 +92,15 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
       try {
         const match = rawText.trim().match(/\{[\s\S]*\}/);
         if (match) parsed = JSON.parse(match[0]);
-      } catch {}
+      } catch (error) {
+        logSafetyEvent({
+          level: "warn",
+          event: "covenant_response_parse_failed",
+          request,
+          error_type: "system",
+          error,
+        });
+      }
 
       // Add media capabilities for Pro users (subscription gate already passed)
       const responseWithMedia = { ...parsed, media: { audioOverviewAvailable: true } };
@@ -100,7 +109,13 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
         headers: { "Content-Type": "application/json" }
       });
     } catch (error: any) {
-      console.error("Covenant route error:", error);
+      logSafetyEvent({
+        level: "error",
+        event: "covenant_request_failed",
+        request,
+        error_type: "system",
+        error,
+      });
       return new Response(JSON.stringify({ error: "Failed to process" }), { status: 500, headers: { "Content-Type": "application/json" } });
     }
   });

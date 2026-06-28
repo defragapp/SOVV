@@ -9,6 +9,7 @@ import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
 import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
+import { logSafetyEvent } from "./safety.js";
 import {
   selectActiveSignals,
   buildBaselineSignature,
@@ -233,7 +234,17 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   const patterns = await getPatterns(env.DB, sid);
   // Use computed dataset if available, fallback to raw baseline format
-  const baselineText = await getBaselineForAI(env, sid, "defrag").catch(() => formatBaseline(baseline));
+  const baselineText = await getBaselineForAI(env, sid, "defrag").catch((error) => {
+    logSafetyEvent({
+      level: "warn",
+      event: "defrag_baseline_context_unavailable",
+      request: req,
+      error_type: "system",
+      error,
+      details: { sessionId: sid },
+    });
+    return formatBaseline(baseline);
+  });
   const patternText = formatPatternsForPrompt(patterns);
   const targetBaseline =
     relational && target
@@ -243,7 +254,17 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   // ── Active signal selection ───────────────────────────────────────────────
   // Derive reduced behavioral signals from full compute.
   // Only active signals reach the AI — full compute stays server-side.
-  const dataset = await getBaselineDataset(env, sid).catch(() => null);
+  const dataset = await getBaselineDataset(env, sid).catch((error) => {
+    logSafetyEvent({
+      level: "warn",
+      event: "defrag_dataset_unavailable",
+      request: req,
+      error_type: "system",
+      error,
+      details: { sessionId: sid },
+    });
+    return null;
+  });
   let activeSignalsText = "";
   let railData = null;
   let signatureLine = "";
@@ -333,8 +354,23 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     await env.QUEUE.send({ sessionId: sid, interactionId: interactionId });
   } else {
     // Fallback for local dev or if queue is not configured.
-    console.warn("QUEUE binding not found. Running pattern extraction in a non-blocking way, but this may be unreliable.");
-    void extractPatterns(env, sid, interactionId);
+    logSafetyEvent({
+      level: "warn",
+      event: "pattern_queue_binding_missing",
+      request: req,
+      error_type: "system",
+      details: { sessionId: sid, interactionId },
+    });
+    void extractPatterns(env, sid, interactionId).catch((error) => {
+      logSafetyEvent({
+        level: "error",
+        event: "pattern_fallback_extraction_failed",
+        request: req,
+        error_type: "system",
+        error,
+        details: { sessionId: sid, interactionId },
+      });
+    });
   }
 
   return jsonResponse(result, 200, {

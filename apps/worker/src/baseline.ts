@@ -4,6 +4,7 @@ import { getSessionId, cookieHeader } from "./plan.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import { compileBaselineDataset, formatDatasetForAI, formatDatasetForApp, type BaselineDesignDataset } from "./baseline-compiler.js";
 import { buildHumanBehaviorTranslation } from "./human-translation.js";
+import { logSafetyEvent } from "./safety.js";
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const DATASET_KEY  = (sid: string) => `baseline-dataset:${sid}`;
@@ -114,7 +115,16 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
   if (authErr) return authErr;
 
   const sid = await getSessionId(req);
-  const body = (await req.json().catch(() => null)) as unknown;
+  const body = (await req.json().catch((error) => {
+    logSafetyEvent({
+      level: "warn",
+      event: "baseline_save_invalid_json",
+      request: req,
+      error_type: "validation",
+      error,
+    });
+    return null;
+  })) as unknown;
 
   if (!isValidBaseline(body)) {
     return new Response(JSON.stringify({ error: "Invalid baseline data." }), {
@@ -153,7 +163,13 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
       );
       await env.KV.put(DATASET_KEY(sid), JSON.stringify(dataset));
     } catch (err) {
-      console.error("[baseline-compiler] failed:", err);
+      logSafetyEvent({
+        level: "error",
+        event: "baseline_compile_failed",
+        request: req,
+        error_type: "system",
+        error: err,
+      });
       const failedDataset: BaselineDesignDataset = {
         ...pendingDataset,
         status: "failed",
@@ -164,7 +180,15 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
   };
 
   // Fire and forget — don't await, don't block the response
-  compileAndStore().catch(console.error);
+  compileAndStore().catch((error) => {
+    logSafetyEvent({
+      level: "error",
+      event: "baseline_compile_background_failed",
+      request: req,
+      error_type: "system",
+      error,
+    });
+  });
 
   return Response.json(
     { baseline, datasetStatus: "pending" },
@@ -190,7 +214,16 @@ export function registerBaselineRoutes(router: any, getEnv: () => Env) {
     const user = await getAuthUser(req, env.DB);
     if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
 
-    const body = await req.json().catch(() => ({})) as any;
+    const body = await req.json().catch((error) => {
+      logSafetyEvent({
+        level: "warn",
+        event: "baseline_translate_invalid_json",
+        request: req,
+        error_type: "validation",
+        error,
+      });
+      return {};
+    }) as any;
     const app = body.app as "alignment" | "defrag" | "covenant";
     if (!["alignment", "defrag", "covenant"].includes(app)) {
       return new Response(JSON.stringify({ error: "Invalid app" }), { status: 400 });

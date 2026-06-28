@@ -19,6 +19,7 @@
 
 import type { IRequest } from "itty-router"
 import { getAuthUser, jsonResponse } from "./auth.js"
+import { logSafetyEvent } from "./safety.js"
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -90,7 +91,13 @@ export async function handleDeriveProfile(
       ? (aiResponse as { response: string }).response
       : ""
   } catch (err) {
-    console.error("[derive-profile] AI error:", err)
+    logSafetyEvent({
+      level: "error",
+      event: "derive_profile_ai_failed",
+      request: request as unknown as Request,
+      error_type: "system",
+      error: err,
+    })
     return jsonResponse({ error: "ai_error", message: "Failed to generate profile." }, 500)
   }
 
