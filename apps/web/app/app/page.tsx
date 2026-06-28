@@ -15,12 +15,8 @@ export default function LibraryPage() {
   const [loadingMore, setLoadingMore] = React.useState(false)
   const PAGE_SIZE = 20
 
-  const filteredItems = items.filter(item => {
-    const matchesFilter = activeFilter === "ALL" || item.workspace_source === activeFilter
-    const matchesSearch = !searchQuery || 
-      (item.title || "").toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesFilter && matchesSearch
-  })
+  // Server handles filtering — client just renders what's returned
+  const filteredItems = items
 
   const loadMore = async () => {
     setLoadingMore(true)
@@ -52,14 +48,22 @@ export default function LibraryPage() {
   const [isLoading, setIsLoading] = React.useState(true)
 
   React.useEffect(() => {
-    fetch("/api/library")
+    const params = new URLSearchParams()
+    params.set("limit", String(PAGE_SIZE))
+    params.set("offset", "0")
+    if (searchQuery) params.set("q", searchQuery)
+    if (activeFilter !== "ALL") params.set("workspace_source", activeFilter)
+    fetch(`/api/library?${params.toString()}`, { credentials: "include" })
       .then(r => r.json())
-      .then(d => {
-        setItems(d.items || [])
+      .then((d: any) => {
+        const fetched = d.items || []
+        setItems(fetched)
+        setHasMore(fetched.length === PAGE_SIZE)
+        setPage(0)
       })
       .catch(() => {})
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [saveSuccess, searchQuery, activeFilter])
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-[#0c0a0d]">

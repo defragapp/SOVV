@@ -101,15 +101,26 @@ export async function handleGetLibrary(req: Request, env: Env) {
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "20", 10), 50);
   const offset = parseInt(url.searchParams.get("offset") || "0", 10);
   const workspaceSource = url.searchParams.get("workspace_source");
+  const searchQuery = url.searchParams.get("q")?.trim();
 
   try {
     let query: string;
     let bindings: unknown[];
 
     if (workspaceSource && ["DEFRAG", "COVENANT", "ALIGNMENT"].includes(workspaceSource)) {
-      // Filter by space — uses idx_library_user_id_source index
-      query = "SELECT * FROM library WHERE user_id = ? AND workspace_source = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
-      bindings = [user.id, workspaceSource, limit, offset];
+      if (searchQuery) {
+        // Filter by space + search title
+        query = "SELECT * FROM library WHERE user_id = ? AND workspace_source = ? AND title LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        bindings = [user.id, workspaceSource, `%${searchQuery}%`, limit, offset];
+      } else {
+        // Filter by space only — uses idx_library_user_id_source index
+        query = "SELECT * FROM library WHERE user_id = ? AND workspace_source = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        bindings = [user.id, workspaceSource, limit, offset];
+      }
+    } else if (searchQuery) {
+      // Search all spaces
+      query = "SELECT * FROM library WHERE user_id = ? AND title LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
+      bindings = [user.id, `%${searchQuery}%`, limit, offset];
     } else {
       query = "SELECT * FROM library WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
       bindings = [user.id, limit, offset];
