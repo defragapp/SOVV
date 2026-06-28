@@ -39,6 +39,104 @@ const inputBase =
   "disabled:opacity-30 disabled:cursor-not-allowed " +
   "[color-scheme:dark]";
 
+
+function ChangePasswordForm() {
+  const [currentPassword, setCurrentPassword] = React.useState("")
+  const [newPassword, setNewPassword] = React.useState("")
+  const [confirmPassword, setConfirmPassword] = React.useState("")
+  const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState("")
+  const [success, setSuccess] = React.useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (newPassword !== confirmPassword) {
+      setError("New passwords do not match")
+      return
+    }
+    if (newPassword.length < 8) {
+      setError("New password must be at least 8 characters")
+      return
+    }
+    setLoading(true)
+    setError("")
+    setSuccess(false)
+    try {
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      })
+      const data = await res.json() as { success?: boolean; error?: string }
+      if (!res.ok) {
+        setError(data.error || "Failed to change password")
+        return
+      }
+      setSuccess(true)
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+    } catch {
+      setError("Connection failed. Try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
+      <div>
+        <label className="sovv-label">Current password</label>
+        <input
+          type="password"
+          value={currentPassword}
+          onChange={e => setCurrentPassword(e.target.value)}
+          required
+          autoComplete="current-password"
+          className="sovv-input w-full"
+          placeholder="••••••••"
+        />
+      </div>
+      <div>
+        <label className="sovv-label">New password</label>
+        <input
+          type="password"
+          value={newPassword}
+          onChange={e => setNewPassword(e.target.value)}
+          required
+          minLength={8}
+          autoComplete="new-password"
+          className="sovv-input w-full"
+          placeholder="••••••••"
+        />
+      </div>
+      <div>
+        <label className="sovv-label">Confirm new password</label>
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={e => setConfirmPassword(e.target.value)}
+          required
+          minLength={8}
+          autoComplete="new-password"
+          className="sovv-input w-full"
+          placeholder="••••••••"
+        />
+      </div>
+      {error && <p className="text-[12px] text-red-400/70">{error}</p>}
+      {success && <p className="text-[12px] text-[#76716b]">Password updated successfully.</p>}
+      <button
+        type="submit"
+        disabled={loading || !currentPassword || !newPassword || !confirmPassword}
+        className="btn-secondary h-10 px-6 text-[12px] disabled:opacity-30"
+      >
+        {loading ? "Updating…" : "Update password"}
+      </button>
+    </form>
+  )
+}
+
 export default function SettingsPage() {
   const [baseline, setBaseline] = useState<BaselineRequest>(initialState);
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
@@ -277,6 +375,14 @@ export default function SettingsPage() {
               </li>
             ))}
           </ul>
+        </div>
+
+        {/* Change Password */}
+        <div className="bg-white/[0.02] border border-white/[0.08] rounded-[14px] p-8 md:p-10 mt-14">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-6">
+            Change Password
+          </p>
+          <ChangePasswordForm />
         </div>
 
       </main>
