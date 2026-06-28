@@ -41,7 +41,8 @@ import type {
   ThreadMeta,
 } from "@sovereign/core";
 
-import { getCorsHeaders } from "./cors.js";
+import { getCorsHeaders } from "./cors.js"
+import { safetyMode, supportResponse } from "./safety.js";
 
 
 // SYSTEM_SELF and SYSTEM_RELATIONAL removed — use SYSTEM_DEFRAG / SYSTEM_DEFRAG_RELATIONAL from prompts.ts
@@ -171,6 +172,14 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const message = String(body.message ?? body.question ?? body.text ?? "").trim();
   if (!message) {
     return jsonResponse({ error: "message_required" }, 400, {
+      ...getCorsHeaders(req),
+      "set-cookie": cookieHeader(sid),
+    });
+  }
+
+  // Safety check — intercept crisis signals before AI processing
+  if (safetyMode(message) === "support") {
+    return jsonResponse(supportResponse(), 200, {
       ...getCorsHeaders(req),
       "set-cookie": cookieHeader(sid),
     });

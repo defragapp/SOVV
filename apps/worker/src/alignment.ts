@@ -1,5 +1,6 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
+import { safetyMode, supportResponse } from "./safety.js"
 import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { SYSTEM_ALIGNMENT, SECURITY_PREFIX } from "./prompts.js";
@@ -300,6 +301,12 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
       // ── WORKSPACE MODE (preserved exactly) ─────────────────────────────
       const message = body.message;
+
+      // Safety check
+      if (message && safetyMode(message) === "support") {
+        return Response.json(supportResponse(), { status: 200 })
+      }
+
       if (!message) {
         return new Response(JSON.stringify({ error: "Message is required" }), {
           status: 400, headers: { "Content-Type": "application/json" }
