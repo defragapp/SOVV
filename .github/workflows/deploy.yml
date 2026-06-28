@@ -17,7 +17,7 @@ jobs:
           node-version: 22
       - name: Install worker deps
         working-directory: apps/worker
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --ignore-scripts
       - name: Check worker types
         working-directory: apps/worker
         run: npx tsc --noEmit
@@ -36,7 +36,7 @@ jobs:
           node-version: 22
       - name: Install worker deps
         working-directory: apps/worker
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --ignore-scripts
       - name: Deploy sovereign-os-api
         working-directory: apps/worker
         run: npx wrangler deploy
@@ -55,7 +55,7 @@ jobs:
           node-version: 22
       - name: Install worker deps
         working-directory: apps/worker-session
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --ignore-scripts
       - name: Deploy worker-session
         working-directory: apps/worker-session
         run: npx wrangler deploy --env production
@@ -74,7 +74,7 @@ jobs:
           node-version: 22
       - name: Install worker deps
         working-directory: apps/worker-ai
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --ignore-scripts
       - name: Deploy worker-ai
         working-directory: apps/worker-ai
         run: npx wrangler deploy --env production
@@ -92,7 +92,7 @@ jobs:
         with:
           node-version: 22
       - name: Install pnpm (required by OpenNext)
-        run: npm install --legacy-peer-deps -g pnpm
+        run: npm install -g pnpm
       - name: Install web deps
         working-directory: apps/web
         run: npm install --legacy-peer-deps
@@ -125,7 +125,7 @@ jobs:
           node-version: 22
       - name: Install deps
         working-directory: apps/developer
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --ignore-scripts
       - name: Deploy developer
         working-directory: apps/developer
         run: npx wrangler deploy --env production
@@ -144,7 +144,7 @@ jobs:
           node-version: 22
       - name: Install deps
         working-directory: apps/sovereign-build-agent
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --ignore-scripts
       - name: Deploy sovereign-build-agent
         working-directory: apps/sovereign-build-agent
         run: npx wrangler deploy --env production
@@ -163,7 +163,7 @@ jobs:
           node-version: 22
       - name: Install deps
         working-directory: apps/sovereign-code-agent
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --ignore-scripts
       - name: Deploy sovereign-code-agent
         working-directory: apps/sovereign-code-agent
         run: npx wrangler deploy --env production
