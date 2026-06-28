@@ -1,0 +1,38 @@
+name: Repo Guards
+
+on:
+  pull_request:
+
+jobs:
+  lockfile-policy:
+    name: Enforce npm lockfile policy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require npm metadata only
+        run: |
+          test -f package-lock.json || { echo "package-lock.json is required"; exit 1; }
+          test ! -f pnpm-lock.yaml || { echo "pnpm-lock.yaml is not allowed"; exit 1; }
+          test ! -f yarn.lock || { echo "yarn.lock is not allowed"; exit 1; }
+      - name: Require root packageManager to point at npm
+        run: |
+          node -e "const pkg=require('./package.json'); if (!pkg.packageManager || !pkg.packageManager.startsWith('npm@')) { console.error('Root package.json must declare an npm packageManager'); process.exit(1) }"
+
+  forbidden-artifacts:
+    name: Reject transient artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check PR diff for forbidden files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          BAD_FILES="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -E '(^|/)\.impeccable/|(^|/)\.wrangler/|(^|/)\.open-next/|\.cache\.json$' || true)"
+          if [ -n "$BAD_FILES" ]; then
+            echo "Forbidden transient files detected:"
+            echo "$BAD_FILES"
+            exit 1
+          fi

@@ -9,13 +9,13 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "cd apps/web && pnpm dev",
+    "dev": "npm run -w apps/web dev",
     "dev:api": "wrangler dev --config apps/worker/wrangler.toml --local",
     "dev:ai": "wrangler dev --config apps/worker-ai/wrangler.toml --local",
     "dev:session": "wrangler dev --config apps/worker-session/wrangler.toml --local",
     "dev:web": "wrangler dev --config apps/web/wrangler.json --local",
     "dev:all": "concurrently \"npm run dev:api\" \"npm run dev:ai\" \"npm run dev:session\" \"npm run dev:web\"",
-    "build": "npm --workspace=web exec opennextjs-cloudflare build",
+    "build": "npm run -w apps/web build:worker",
     "deploy:api": "cd apps/worker && wrangler deploy --env production",
     "deploy:ai": "cd apps/worker-ai && wrangler deploy --env production",
     "deploy:session": "cd apps/worker-session && wrangler deploy --env production",

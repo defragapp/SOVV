@@ -30,7 +30,7 @@ SOVV (monorepo)
 ### Prerequisites
 
 - **Node.js 22** (see `.nvmrc`)
-- **pnpm 9+** for monorepo management
+- **npm 10+** for workspace management
 - **Cloudflare account** for worker deployment (optional for local dev)
 
 ### Setup
@@ -39,7 +39,7 @@ SOVV (monorepo)
    ```bash
    git clone https://github.com/defragapp/SOVV.git
    cd SOVV
-   pnpm install
+   npm ci
    ```
 
 2. **Configure environment**
@@ -54,20 +54,20 @@ SOVV (monorepo)
 3. **Run locally**
    ```bash
    # Start all apps in watch mode (requires turbo)
-   pnpm dev
+   npm run dev
    
    # Or run individual apps
-   pnpm -F @app/web dev
-   pnpm -F @app/worker dev
+   npm run -w apps/web dev
+   npm run -w apps/worker dev
    ```
 
 4. **Run tests**
    ```bash
    # All tests
-   pnpm test
+   npm run verify
    
    # Specific workspace
-   pnpm -F @app/worker test
+   npm run -w apps/worker test
    ```
 
 ## 📦 Package Structure
@@ -117,7 +117,7 @@ The `deploy.yml` workflow:
 
 - Worker logic: Vitest with unit test coverage
 - Web frontend: [Test framework] (see `apps/web/package.json`)
-- Run full suite before pushing: `pnpm test`
+- Run full suite before pushing: `npm run verify`
 
 ### Code Quality
 
@@ -165,7 +165,7 @@ All safety middleware is tested with comprehensive unit tests covering edge case
 |------|---------|
 | `.gitignore` | Version control exclusions (clean, deduplicated) |
 | `.env.example` | Template for required environment variables |
-| `pnpm-workspace.yaml` | Defines monorepo workspace boundaries |
+| `package-lock.json` | Locks npm workspace dependency resolution |
 | `turbo.json` | Turbo build orchestration & caching |
 | `.github/workflows/deploy.yml` | Automated deployment pipeline |
 
@@ -200,15 +200,15 @@ All safety middleware is tested with comprehensive unit tests covering edge case
 ### Development Server Issues
 
 ```bash
-# Clear pnpm cache
-pnpm store prune
+# Verify npm cache
+npm cache verify
 
 # Reinstall dependencies
-rm -rf node_modules pnpm-lock.yaml
-pnpm install
+rm -rf node_modules
+npm ci
 
 # Start from scratch
-pnpm clean && pnpm install && pnpm dev
+rm -rf node_modules && npm ci && npm run dev
 ```
 
 ## 📚 Development Workflow
@@ -227,8 +227,8 @@ pnpm clean && pnpm install && pnpm dev
 
 3. **Type check and test**
    ```bash
-   pnpm typecheck
-   pnpm test
+   npm run lint
+   npm run -w apps/worker test
    ```
 
 4. **Create pull request** with clear description
@@ -247,7 +247,7 @@ pnpm clean && pnpm install && pnpm dev
 - **Environment Variables**: Use `.env.local` for secrets (never committed)
 - **Billing Webhook**: Uses HMAC signature verification + idempotency checks for authenticity
 - **API Tokens**: Rotate `CLOUDFLARE_API_TOKEN` quarterly
-- **Dependencies**: Run `pnpm audit` before major releases
+- **Dependencies**: Run `npm audit` before major releases
 - **Audit Logging**: Safety events (validation errors, rate limits, risk words) logged with request IDs for traceability
 
 ## 📞 Support & Contributing

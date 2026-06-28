@@ -11,21 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install worker deps
-        working-directory: apps/worker
-        run: npm install --legacy-peer-deps
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install monorepo deps
+        run: npm ci
       - name: Check worker types
         working-directory: apps/worker
-        run: npx tsc --noEmit
+        run: npm run typecheck
       - name: Run worker tests
         working-directory: apps/worker
-        run: npx vitest run --reporter=verbose
+        run: npm run test -- --reporter=verbose
 
   deploy-api:
     needs: typecheck
@@ -33,18 +31,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install worker deps
-        working-directory: apps/worker
-        run: npm install --legacy-peer-deps
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install monorepo deps
+        run: npm ci
       - name: Deploy sovereign-os-api
         working-directory: apps/worker
-        run: npx wrangler deploy
+        run: npm run deploy -- --env production
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
@@ -55,18 +51,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install worker deps
-        working-directory: apps/worker-session
-        run: npm install --legacy-peer-deps
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install monorepo deps
+        run: npm ci
       - name: Deploy worker-session
         working-directory: apps/worker-session
-        run: npx wrangler deploy --env production
+        run: npm run deploy -- --env production
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
@@ -77,18 +71,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install worker deps
-        working-directory: apps/worker-ai
-        run: npm install --legacy-peer-deps
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install monorepo deps
+        run: npm ci
       - name: Deploy worker-ai
         working-directory: apps/worker-ai
-        run: npx wrangler deploy --env production
+        run: npm run deploy -- --env production
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
@@ -102,11 +94,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install pnpm (required by OpenNext)
-        run: npm install --legacy-peer-deps -g pnpm
-      - name: Install web deps
-        working-directory: apps/web
-        run: npm install --legacy-peer-deps
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install monorepo deps
+        run: npm ci
       - name: Build Next.js
         working-directory: apps/web
         run: npm run build 2>&1 | tee /tmp/nextbuild.txt; exit ${PIPESTATUS[0]}
@@ -134,12 +125,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install deps
-        working-directory: apps/developer
-        run: npm install --legacy-peer-deps
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install monorepo deps
+        run: npm ci
       - name: Deploy developer
-        working-directory: apps/developer
-        run: npx wrangler deploy --env production
+        run: npx wrangler deploy --config apps/developer/wrangler.toml --env production
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
@@ -153,12 +144,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install deps
-        working-directory: apps/sovereign-build-agent
-        run: npm install --legacy-peer-deps
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install monorepo deps
+        run: npm ci
       - name: Deploy sovereign-build-agent
-        working-directory: apps/sovereign-build-agent
-        run: npx wrangler deploy --env production
+        run: npx wrangler deploy --config apps/sovereign-build-agent/wrangler.toml --env production
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
@@ -172,13 +163,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install deps
-        working-directory: apps/sovereign-code-agent
-        run: npm install --legacy-peer-deps
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install monorepo deps
+        run: npm ci
       - name: Deploy sovereign-code-agent
-        working-directory: apps/sovereign-code-agent
-        run: npx wrangler deploy --env production
+        run: npx wrangler deploy --config apps/sovereign-code-agent/wrangler.toml --env production
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-

@@ -7,7 +7,7 @@ echo "=== Sovereign Platform Setup ==="
 npm install -g wrangler
 
 # 2. Install monorepo dependencies
-npm install
+npm ci
 
 # Secure token handling — never log, never commit
 if [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then

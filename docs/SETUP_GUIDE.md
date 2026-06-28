@@ -16,7 +16,7 @@
 ### Prerequisites
 
 - **Node.js 22** (see `.nvmrc`)
-- **pnpm 9+** for monorepo management
+- **npm 10+** for workspace management
 - **Cloudflare account** with API token (for deployment)
 
 ### Initial Setup
@@ -27,7 +27,7 @@ git clone https://github.com/defragapp/SOVV.git
 cd SOVV
 
 # Install all dependencies
-pnpm install
+npm ci
 
 # Copy environment template
 cp .env.example .env.local
@@ -40,16 +40,16 @@ echo "CLOUDFLARE_API_TOKEN=<your-token>" >> .env.local
 
 ```bash
 # Type-check all packages
-pnpm typecheck
+npm run lint
 
 # Run all tests
-pnpm test
+npm run -w apps/worker test
 
 # Build all apps
-pnpm build
+npm run build
 
 # Start development server (all apps)
-pnpm dev
+npm run dev
 ```
 
 ---
@@ -78,17 +78,19 @@ CLOUDFLARE_API_TOKEN=<your-api-token>
 ### Local Development
 
 ```bash
-# Install dependencies
-pnpm install
+# From the repository root, install dependencies once
+npm ci
+
+cd apps/worker
 
 # Start in watch mode (with Wrangler)
-pnpm dev
+npm run dev
 
 # Type-check
 npx tsc --noEmit
 
 # Run tests
-pnpm test
+npm test
 ```
 
 ### Testing
@@ -98,7 +100,7 @@ pnpm test
 npx vitest run --reporter=verbose
 
 # Run specific test file
-npx vitest run src/__tests__/safety.test.ts
+npx vitest run tests/safety.test.ts
 
 # Watch mode (re-run on changes)
 npx vitest watch
@@ -167,8 +169,10 @@ CLOUDFLARE_ACCOUNT_ID=<your-account-id>
 ### Local Development
 
 ```bash
-# Install dependencies
-npm install --legacy-peer-deps
+# From the repository root, install dependencies once
+npm ci
+
+cd apps/web
 
 # Start development server
 npm run dev
@@ -195,7 +199,8 @@ npx @opennextjs/cloudflare preview
 # Deploy via wrangler
 npx wrangler deploy
 
-# Or use automated deploy script
+# Or use the automated deploy script from the repository root
+cd ../..
 bash scripts/deploy.sh
 ```
 
@@ -229,8 +234,10 @@ CLOUDFLARE_API_TOKEN=<your-token>
 ### Local Development
 
 ```bash
-pnpm install
-pnpm dev
+cd ../..
+npm ci
+cd apps/worker-session
+npm run dev
 ```
 
 ### Deployment
@@ -259,8 +266,10 @@ cd apps/worker-ai
 ### Local Development
 
 ```bash
-pnpm install
-pnpm dev
+cd ../..
+npm ci
+cd apps/worker-ai
+npm run dev
 ```
 
 ### Deployment
@@ -308,8 +317,7 @@ cd packages/core
 # No build step needed (used directly during dev)
 # During production builds, Next.js/Wrangler will transpile
 
-# Run tests (if any)
-pnpm test
+# No package-specific test script is currently defined.
 ```
 
 ---
@@ -320,27 +328,27 @@ pnpm test
 
 ```bash
 # Run command in specific workspace
-pnpm -F @app/worker test
-pnpm -F @app/web build
+npm run -w apps/worker test
+npm run -w apps/web build
 
 # Run tests across all apps
-pnpm test
+npm run verify
 
 # Type-check everything
-pnpm typecheck
+npm run lint
 
 # Clean all build artifacts
-pnpm clean
+rm -rf apps/web/.next apps/web/.open-next
 ```
 
 ### Development Server Management
 
 ```bash
 # Start all apps in watch mode
-pnpm dev
+npm run dev
 
 # Start only specific app
-pnpm -F @app/web dev
+npm run -w apps/web dev
 
 # Kill all dev servers
 pkill -f "next dev|wrangler dev"
@@ -350,15 +358,15 @@ pkill -f "next dev|wrangler dev"
 
 ```bash
 # Add package to specific workspace
-pnpm add -w -D typescript @types/node  # Root
-pnpm add lodash -F @app/worker         # Worker app
-pnpm add react-query -F @app/web       # Web app
+npm install --save-dev typescript @types/node
+npm install -w apps/worker lodash
+npm install -w apps/web react-query
 
 # Update all dependencies
-pnpm update
+npm update --workspaces
 
 # Check for vulnerabilities
-pnpm audit
+npm audit
 ```
 
 ---
@@ -369,19 +377,19 @@ pnpm audit
 
 ```bash
 # Clear all caches
-pnpm store prune
-rm -rf node_modules pnpm-lock.yaml
-pnpm install
+npm cache verify
+rm -rf node_modules
+npm ci
 
 # Rebuild from scratch
-pnpm clean && pnpm install && pnpm build
+rm -rf node_modules apps/web/.next apps/web/.open-next && npm ci && npm run build
 ```
 
 ### TypeScript Errors
 
 ```bash
 # Check all TypeScript errors
-pnpm typecheck
+npm run lint
 
 # Fix errors in specific app
 cd apps/worker
@@ -416,7 +424,7 @@ kill -9 <PID>
 
 ## 📞 Getting Help
 
-- **Type errors:** Run `pnpm typecheck` — all TS errors are blocking
-- **Test failures:** Run `pnpm test` — all tests must pass before deployment
+- **Type errors:** Run `npm run lint` — worker type errors are blocking
+- **Test failures:** Run `npm run -w apps/worker test` — worker tests must pass before deployment
 - **Deployment issues:** Check `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
-- **Build issues:** Clear cache with `pnpm store prune` and `pnpm install`
+- **Build issues:** Clear cache with `npm cache verify` and `npm ci`
