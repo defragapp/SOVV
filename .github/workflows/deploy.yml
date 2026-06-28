@@ -19,7 +19,7 @@ jobs:
           node-version: 22
       - name: Install worker deps
         working-directory: apps/worker
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --ignore-scripts
       - name: Check worker types
         working-directory: apps/worker
         run: npx tsc --noEmit
