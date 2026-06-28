@@ -305,6 +305,32 @@ export function registerInviteRoutes(router: any, getEnv: () => Env) {
   // Create invite
   router.post("/api/invite", (req: Request) => handleCreateInvite(req, getEnv()));
 
+  // DELETE /api/invite/:token — revoke an invite (owner only)
+  router.delete("/api/invite/:token", async (req: Request, params: any) => {
+    const env = getEnv()
+    const { getAuthUser } = await import("./auth.js")
+    const user = await getAuthUser(req, env.DB)
+    if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 })
+
+    const token = params?.token
+    if (!token) return new Response(JSON.stringify({ error: "Missing token" }), { status: 400 })
+
+    try {
+      // Only the owner can revoke
+      const result = await env.DB.prepare(
+        "UPDATE invites_v2 SET status = 'revoked' WHERE token = ? AND owner_id = ?"
+      ).bind(token, user.id).run()
+
+      if (result.meta?.changes === 0) {
+        return new Response(JSON.stringify({ error: "Invite not found or not yours" }), { status: 404 })
+      }
+
+      return new Response(JSON.stringify({ success: true }), { status: 200 })
+    } catch (e) {
+      return new Response(JSON.stringify({ error: "Failed to revoke invite" }), { status: 500 })
+    }
+  });
+
   // Get invite (public-safe)
   router.get("/api/invite/:token", (req: Request, params: any) =>
     handleGetInvite(params.token, getEnv())

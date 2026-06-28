@@ -338,6 +338,41 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     })
   })
 
+  // POST /api/auth/change-password
+  router.post("/api/auth/change-password", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    try {
+      const { currentPassword, newPassword } = await request.json() as { currentPassword?: string; newPassword?: string }
+      if (!currentPassword || !newPassword) return jsonResponse({ error: "Missing fields" }, 400)
+      if (newPassword.length < 8) return jsonResponse({ error: "New password must be at least 8 characters" }, 400)
+
+      // Verify current password
+      const dbUser = await env.DB.prepare("SELECT password_hash FROM users WHERE id = ?")
+        .bind(user.id).first<{ password_hash: string }>()
+      if (!dbUser) return jsonResponse({ error: "User not found" }, 404)
+
+      const valid = await verifyPassword(currentPassword, dbUser.password_hash)
+      if (!valid) return jsonResponse({ error: "Current password is incorrect" }, 401)
+
+      // Hash and update new password
+      const newHash = await hashPassword(newPassword)
+      await env.DB.prepare("UPDATE users SET password_hash = ? WHERE id = ?")
+        .bind(newHash, user.id).run()
+
+      // Invalidate all other sessions for security
+      await env.DB.prepare("DELETE FROM sessions WHERE user_id = ? AND token != ?")
+        .bind(user.id, request.headers.get("cookie")?.match(/session=([^;]+)/)?.[1] || "").run()
+
+      return jsonResponse({ success: true })
+    } catch (e) {
+      console.error("[CHANGE_PASSWORD]", e)
+      return jsonResponse({ error: "Failed to change password" }, 500)
+    }
+  })
+
   // DELETE /api/auth/account — permanently delete user account and all data
   router.delete("/api/auth/account", async (request: Request) => {
     const env = getEnv()

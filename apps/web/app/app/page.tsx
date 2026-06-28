@@ -7,6 +7,20 @@ import Link from "next/link"
 
 export default function LibraryPage() {
   const [items, setItems] = React.useState<any[]>([])
+  const [deletingId, setDeletingId] = React.useState<string | null>(null)
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!confirm("Remove this item from your Library?")) return
+    setDeletingId(id)
+    try {
+      await fetch(`/api/library/${id}`, { method: "DELETE", credentials: "include" })
+      setItems(prev => prev.filter(item => item.id !== id))
+    } catch { /* silent */ } finally {
+      setDeletingId(null)
+    }
+  }
   const [isLoading, setIsLoading] = React.useState(true)
 
   React.useEffect(() => {
@@ -81,9 +95,19 @@ export default function LibraryPage() {
                          </span>
                          <h3 className="text-base text-[#f4efe9] font-medium tracking-tight">{item.title || "Untitled"}</h3>
                       </div>
-                      <span className="text-xs text-[#52525B] font-sans font-medium">
-                         {new Date(item.created_at).toLocaleDateString()}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-[#52525B] font-sans font-medium">
+                           {new Date(item.created_at).toLocaleDateString()}
+                        </span>
+                        <button
+                          onClick={(e) => handleDelete(e, item.id)}
+                          disabled={deletingId === item.id}
+                          className="text-[10px] font-mono uppercase tracking-[0.1em] text-[#4f4b47] hover:text-[#a8a29a] transition-colors disabled:opacity-30"
+                          aria-label="Delete item"
+                        >
+                          {deletingId === item.id ? "…" : "×"}
+                        </button>
+                      </div>
                    </div>
                    {item.payload && (
                       <p className="text-sm text-[#a8a29a] font-sans font-medium leading-relaxed line-clamp-3">
