@@ -11,9 +11,11 @@ export interface SafetyEvent {
     | "risk_word_detected"
     | "rate_limit_exceeded"
     | "validation_error"
-    | "support_response_sent";
+    | "support_response_sent"
+    | "system_error";
   details: {
     message?: string;
+    error?: string;
     riskWord?: string;
     endpoint?: string;
     validation_field?: string;
