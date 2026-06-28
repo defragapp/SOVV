@@ -125,6 +125,40 @@ The `deploy.yml` workflow:
 - **Formatting**: Prettier (auto-applied)
 - **Type Safety**: TypeScript strict mode
 
+## 🔒 Safety & Security Hardening
+
+All AI-facing endpoints are protected by a shared safety layer integrated at the request boundary. This includes:
+
+### Request Validation
+- **Content-Type enforcement**: Only `application/json` accepted
+- **Body size limits**: Configurable per endpoint (50KB–100KB)
+- **Schema validation**: Zod schemas for request structure and type safety
+
+### Rate Limiting
+- **Sliding window algorithm** with per-user/IP-based keying
+- **Presets**: `loose`, `normal`, `strict`, `perSecond`
+- **Configurable TTL**: KV-backed with 1-week retention for metrics
+
+### Risk Detection & Logging
+- **Crisis signal detection**: Keywords checked non-blocking against known risk patterns (suicide, self-harm language)
+- **Safety events logged**: Validation errors, rate limit breaches, risk word detections, system errors
+- **Request correlation**: UUID requestId included in all logs for audit trails
+- **Event aggregation**: Daily KV storage with 7-day retention and metrics export
+
+### Protected Endpoints
+- `/api/alignment` — Alignment brief generation (entry/workspace modes)
+- `/api/covenant` — Covenant biblical reframing
+- `/api/audio` — Text-to-speech synthesis
+- `/api/explain` — Behavioral pattern explanation (Defrag LLM)
+
+### Verification
+```bash
+cd apps/worker
+npm test -- tests/safety*.test.ts tests/*-request.test.ts tests/rate-limiter.test.ts tests/safety-logger.test.ts
+```
+
+All safety middleware is tested with comprehensive unit tests covering edge cases, concurrency, and failure modes.
+
 ## 📋 Important Files & Conventions
 
 | File | Purpose |
@@ -209,10 +243,12 @@ pnpm clean && pnpm install && pnpm dev
 
 ## 🔐 Security Considerations
 
+- **API Safety Layer**: All AI-facing endpoints have request validation, rate limiting, and risk detection (see [Safety & Security Hardening](#-safety--security-hardening))
 - **Environment Variables**: Use `.env.local` for secrets (never committed)
-- **Billing Webhook**: Uses HMAC signature verification for authenticity
+- **Billing Webhook**: Uses HMAC signature verification + idempotency checks for authenticity
 - **API Tokens**: Rotate `CLOUDFLARE_API_TOKEN` quarterly
 - **Dependencies**: Run `pnpm audit` before major releases
+- **Audit Logging**: Safety events (validation errors, rate limits, risk words) logged with request IDs for traceability
 
 ## 📞 Support & Contributing
 
