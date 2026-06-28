@@ -143,6 +143,8 @@ router.get("/api/user/me", async (request: Request) => {
     email: user.email,
     tier: user.tier,
     role: user.role,
+    stripeCustomerId: (user as any).stripe_customer_id || null,
+    subscriptionStatus: (user as any).subscription_status || null,
   }), { status: 200, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
 });
 
@@ -224,12 +226,13 @@ router.get('/', () => {
 });
 
 // Health check
-router.get('/health', () => {
+router.get('/health', (request: Request) => {
   return new Response(JSON.stringify({
     ok: true,
     service: 'sovereign-os-api',
     timestamp: new Date().toISOString(),
-  }), { headers: { 'Content-Type': 'application/json' } });
+    version: typeof process !== 'undefined' ? process.env.CF_VERSION_METADATA : undefined,
+  }), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders(request) } });
 });
 
 async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: string; subject: string } ): Promise<void> {
@@ -295,6 +298,7 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
     'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    'Content-Security-Policy': "default-src 'none'; connect-src 'self' https://api.stripe.com https://challenges.cloudflare.com; frame-src https://js.stripe.com https://challenges.cloudflare.com; script-src 'self' https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; object-src 'none'; base-uri 'self'",
   };
   Object.entries(securityHeaders).forEach(([key, value]) => {
     corsResponse.headers.set(key, value);

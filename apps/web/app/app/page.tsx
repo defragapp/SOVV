@@ -8,6 +8,25 @@ import Link from "next/link"
 export default function LibraryPage() {
   const [items, setItems] = React.useState<any[]>([])
   const [deletingId, setDeletingId] = React.useState<string | null>(null)
+  const [page, setPage] = React.useState(0)
+  const [hasMore, setHasMore] = React.useState(false)
+  const [loadingMore, setLoadingMore] = React.useState(false)
+  const PAGE_SIZE = 20
+
+  const loadMore = async () => {
+    setLoadingMore(true)
+    try {
+      const nextPage = page + 1
+      const res = await fetch(`/api/library?limit=${PAGE_SIZE}&offset=${nextPage * PAGE_SIZE}`, { credentials: "include" })
+      const d = await res.json() as { items?: any[] }
+      const newItems = d.items || []
+      setItems(prev => [...prev, ...newItems])
+      setHasMore(newItems.length === PAGE_SIZE)
+      setPage(nextPage)
+    } catch { /* silent */ } finally {
+      setLoadingMore(false)
+    }
+  }
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.preventDefault()
@@ -117,6 +136,16 @@ export default function LibraryPage() {
                 </Link>
              ))
 
+          )}
+
+          {hasMore && (
+            <button
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="w-full py-4 font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] hover:text-[#76716b] transition-colors disabled:opacity-30"
+            >
+              {loadingMore ? "Loading…" : "Load more"}
+            </button>
           )}
        </div>
     </div>
