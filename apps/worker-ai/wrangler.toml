@@ -22,7 +22,7 @@ head_sampling_rate = 1
 invocation_logs = true
 
 [build]
-command = "pnpm run build"
+command = "npm run build"
 
 [env.production]
 name = "worker-ai"
