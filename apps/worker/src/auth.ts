@@ -162,7 +162,8 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         const { success } = await env.RATE_LIMITER.limit({ key: `register:${ip}` })
         if (!success) return jsonResponse({ error: "Too many registration attempts. Please wait before trying again." }, 429)
       }
-      const { email, password, turnstileToken } = await request.json() as any
+      const { email: rawRegEmail, password, turnstileToken } = await request.json() as any
+      const email = typeof rawRegEmail === "string" ? rawRegEmail.toLowerCase().trim() : ""
       if (!email || !password) return jsonResponse({ error: "Missing fields" }, 400)
       if (typeof password === "string" && password.length < 8) return jsonResponse({ error: "Password must be at least 8 characters" }, 400)
       if (typeof email === "string" && !email.includes("@")) return jsonResponse({ error: "Invalid email address" }, 400)
@@ -346,6 +347,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       headers: {
         "Content-Type": "application/json",
         "Set-Cookie": clearCookie(),
+        ...getCorsHeaders(request),
       },
     })
   })
