@@ -65,15 +65,42 @@ export async function logSafetyEvent(env: Env, event: SafetyEvent): Promise<void
 
   if (event.type === "request_lifecycle" && event.metadata.stage === "end") {
     metricKeys.push(`ops:metrics:${endpoint}:requests_processed`);
+    if (event.metadata.aiExecuted === true) {
+      metricKeys.push(`ops:metrics:${endpoint}:ai_calls`);
+      if (typeof event.metadata.aiCalls === "number") {
+        metricKeys.push(`ops:metrics:${endpoint}:downstream_ai_calls`);
+      }
+    }
+    if (event.metadata.responsePath === "fallback") {
+      metricKeys.push(`ops:metrics:${endpoint}:fallback_responses`);
+    }
+    if (event.metadata.responsePath === "support-response") {
+      metricKeys.push(`ops:metrics:${endpoint}:support_responses`);
+    }
+    if (event.metadata.degradationState === "DEGRADED") {
+      metricKeys.push(`ops:metrics:${endpoint}:degraded_responses`);
+    }
+    if (event.metadata.degradationState === "PROTECTED") {
+      metricKeys.push(`ops:metrics:${endpoint}:protected_responses`);
+    }
+    if (event.metadata.slowRequest === true) {
+      metricKeys.push(`ops:metrics:${endpoint}:slow_requests`);
+    }
   }
   if (event.type === "rate_limit_exceeded") {
     metricKeys.push(`ops:metrics:${endpoint}:rate_limits_triggered`);
   }
   if (event.type === "validation_error") {
     metricKeys.push(`ops:metrics:${endpoint}:validation_failures`);
+    if (event.metadata.reason === "drift_detected") {
+      metricKeys.push(`ops:metrics:${endpoint}:drift_detections`);
+    }
   }
   if (event.type === "system_error") {
     metricKeys.push(`ops:metrics:${endpoint}:system_errors`);
+    if (event.metadata.reason === "drift_detected") {
+      metricKeys.push(`ops:metrics:${endpoint}:drift_detections`);
+    }
   }
 
   for (const metricKey of metricKeys) {

@@ -19,6 +19,19 @@
 
 import type { IRequest } from "itty-router"
 import { getAuthUser, jsonResponse } from "./auth.js"
+import { logSafetyEvent } from "./safety.js"
+import {
+  evaluateInputClassification,
+  getColdStartMarker,
+  getServiceState,
+  inspectResponseDrift,
+  logDriftDetected,
+  recordServiceOutcome,
+  sampleUserPressure,
+  shouldBypassAi,
+  temporaryUnavailableResponse,
+  tuneTokenBudget,
+} from "./accountability.js"
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -38,6 +51,8 @@ interface Env {
   DB: D1Database
   KV: KVNamespace
   AI: Ai
+  AI_SERVICE: Fetcher
+  SESSION_SERVICE: Fetcher
   AI_MODEL?: string
   RATE_LIMITER?: { limit: (opts: { key: string }) => Promise<{ success: boolean }> }
 }
@@ -48,11 +63,22 @@ export async function handleDeriveProfile(
   request: IRequest,
   env: Env
 ): Promise<Response> {
+  const requestId = crypto.randomUUID()
+  const endpoint = "/api/derive-profile"
+  const startedAt = Date.now()
+  const coldStart = getColdStartMarker()
+
   // 1. Auth — session required
   const authUser = await getAuthUser(request as unknown as Request, env.DB)
   if (!authUser) {
     return jsonResponse({ error: "Unauthorized" }, 401)
   }
+
+  await logSafetyEvent(env, {
+    type: "request_lifecycle",
+    requestId,
+    metadata: { endpoint, stage: "start", userId: authUser.id, coldStart },
+  })
 
   // 2. Read baseline from KV — key format matches baseline.ts
   const kvKey = `baseline:${authUser.id}`
@@ -72,6 +98,55 @@ export async function handleDeriveProfile(
   const model = (env.AI_MODEL as any) ?? "@cf/meta/llama-3.1-8b-instruct-fast"
   const systemPrompt = buildSystemPrompt()
   const userPrompt = buildUserPrompt(baseline)
+  const serviceState = await getServiceState(env, endpoint)
+  const pressure = await sampleUserPressure(env, { endpoint, requestId, userId: authUser.id }, "safe", false, false)
+  const decision = evaluateInputClassification({
+    degradationState: serviceState.state,
+    throttleLevel: pressure.throttleLevel,
+  })
+  await logSafetyEvent(env, {
+    type: "request_lifecycle",
+    requestId,
+    metadata: {
+      endpoint,
+      stage: "validation_passed",
+      userId: authUser.id,
+      inputClassification: decision.classification,
+      guardrailsTriggered: decision.guardrailsTriggered,
+      supportMode: false,
+      throttleLevel: pressure.throttleLevel,
+      degradationState: serviceState.state,
+      coldStart,
+    },
+  })
+
+  if (shouldBypassAi(serviceState.state, "noncritical", pressure.throttleLevel)) {
+    await recordServiceOutcome(env, { endpoint, requestId, userId: authUser.id }, {
+      aiExecuted: false,
+      responsePath: "fallback",
+      aiFallback: true,
+      downstreamAiCalls: 0,
+    })
+    await logSafetyEvent(env, {
+      type: "request_lifecycle",
+      requestId,
+      metadata: {
+        endpoint,
+        stage: "end",
+        userId: authUser.id,
+        inputClassification: decision.classification,
+        guardrailsTriggered: decision.guardrailsTriggered,
+        aiExecuted: false,
+        aiCalls: 0,
+        aiRetries: 0,
+        responsePath: "fallback",
+        degradationState: serviceState.state,
+        throttleLevel: pressure.throttleLevel,
+        coldStart,
+      },
+    })
+    return temporaryUnavailableResponse(requestId)
+  }
 
   // 4. Call AI
   let aiText = ""
@@ -82,7 +157,7 @@ export async function handleDeriveProfile(
         { role: "user", content: userPrompt },
       ],
       temperature: 0.3,
-      max_tokens: 800,
+      max_tokens: tuneTokenBudget(800, serviceState.state, pressure.throttleLevel),
     })
 
     // CF Workers AI returns { response: string } for chat models
@@ -91,11 +166,77 @@ export async function handleDeriveProfile(
       : ""
   } catch (err) {
     console.error("[derive-profile] AI error:", err)
-    return jsonResponse({ error: "ai_error", message: "Failed to generate profile." }, 500)
+    await recordServiceOutcome(env, { endpoint, requestId, userId: authUser.id }, {
+      aiExecuted: false,
+      responsePath: "fallback",
+      aiFallback: true,
+      downstreamAiCalls: 0,
+    })
+    await logSafetyEvent(env, {
+      type: "request_lifecycle",
+      requestId,
+      metadata: {
+        endpoint,
+        stage: "end",
+        userId: authUser.id,
+        inputClassification: decision.classification,
+        guardrailsTriggered: decision.guardrailsTriggered,
+        aiExecuted: false,
+        aiCalls: 0,
+        aiRetries: 0,
+        responsePath: "fallback",
+        degradationState: serviceState.state,
+        throttleLevel: pressure.throttleLevel,
+        coldStart,
+      },
+    })
+    return temporaryUnavailableResponse(requestId)
   }
 
   // 5. Parse structured output
   const statements = parseStatements(aiText)
+
+  const drift = inspectResponseDrift(aiText, { statements }, ["statements"])
+  if (drift.driftDetected) {
+    await logDriftDetected(env, { endpoint, requestId, userId: authUser.id }, {
+      anomalies: drift.anomalies,
+      observedKeys: drift.observedKeys,
+      responseBytes: drift.responseBytes,
+    })
+  }
+
+  const durationMs = Date.now() - startedAt
+  await recordServiceOutcome(env, { endpoint, requestId, userId: authUser.id }, {
+    aiExecuted: true,
+    aiSuccess: statements.length > 0,
+    aiFallback: statements.length === 0,
+    responsePath: statements.length > 0 ? "normal" : "fallback",
+    durationMs,
+    slowRequest: durationMs >= 1800,
+    responseBytes: drift.responseBytes,
+    validationNearFail: drift.driftDetected,
+    downstreamAiCalls: 1,
+  })
+  await logSafetyEvent(env, {
+    type: "request_lifecycle",
+    requestId,
+    metadata: {
+      endpoint,
+      stage: "end",
+      userId: authUser.id,
+      inputClassification: decision.classification,
+      guardrailsTriggered: decision.guardrailsTriggered,
+      aiExecuted: true,
+      aiCalls: 1,
+      aiRetries: 0,
+      responsePath: statements.length > 0 ? "normal" : "fallback",
+      degradationState: serviceState.state,
+      throttleLevel: pressure.throttleLevel,
+      coldStart,
+      slowRequest: durationMs >= 1800,
+      durationMs,
+    },
+  })
 
   return jsonResponse({ statements })
 }

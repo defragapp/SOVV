@@ -43,6 +43,19 @@ import type {
 
 import { getCorsHeaders } from "./cors.js"
 import { safetyMode, supportResponse, logSafetyEvent } from "./safety.js";
+import {
+  evaluateInputClassification,
+  getColdStartMarker,
+  getServiceState,
+  inspectResponseDrift,
+  logDriftDetected,
+  logRequestDecision,
+  recordServiceOutcome,
+  sampleUserPressure,
+  shouldBypassAi,
+  temporaryUnavailableResponse,
+  tuneTokenBudget,
+} from "./accountability.js";
 
 
 // SYSTEM_SELF and SYSTEM_RELATIONAL removed — use SYSTEM_DEFRAG / SYSTEM_DEFRAG_RELATIONAL from prompts.ts
@@ -147,6 +160,8 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const sid = await getSessionId(req);
   const requestId = crypto.randomUUID();
   const endpoint = "/api/explain";
+  const startedAt = Date.now();
+  const coldStart = getColdStartMarker();
   let userId: string | null = null;
 
   const fail = (status: number, error: string, message?: string) =>
@@ -159,7 +174,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   await logSafetyEvent(env, {
     type: "request_lifecycle",
     requestId,
-    metadata: { endpoint, stage: "start", sessionId: sid },
+    metadata: { endpoint, stage: "start", sessionId: sid, coldStart },
   });
 
   try {
@@ -210,6 +225,20 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
         type: "request_lifecycle",
         requestId,
         metadata: { endpoint, stage: "validation_passed", sessionId: sid, userId, safetyMode: "support" },
+      });
+      await logRequestDecision(env, { endpoint, requestId, userId, sessionId: sid }, {
+        classification: "elevated",
+        guardrailsTriggered: ["risk_words"],
+        supportMode: true,
+        throttleLevel: 0,
+        degradationState: "NORMAL",
+        coldStart,
+      });
+      await recordServiceOutcome(env, { endpoint, requestId, userId, sessionId: sid }, {
+        aiExecuted: false,
+        responsePath: "support-response",
+        supportResponse: true,
+        downstreamAiCalls: 0,
       });
       await logSafetyEvent(env, {
         type: "request_lifecycle",
@@ -263,6 +292,34 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       requestId,
       metadata: { endpoint, stage: "business_start", sessionId: sid, userId, mode },
     });
+    const serviceState = await getServiceState(env, endpoint);
+    const supportMode = safetyMode(message) === "support";
+    const preliminary = evaluateInputClassification({
+      degradationState: serviceState.state,
+      supportMode,
+    });
+    const pressure = await sampleUserPressure(env, { endpoint, requestId, userId, sessionId: sid }, preliminary.classification, supportMode, false);
+    const decision = evaluateInputClassification({
+      degradationState: serviceState.state,
+      supportMode,
+      throttleLevel: pressure.throttleLevel,
+    });
+    await logRequestDecision(env, { endpoint, requestId, userId, sessionId: sid }, {
+      ...decision,
+      supportMode,
+      throttleLevel: pressure.throttleLevel,
+      degradationState: serviceState.state,
+      coldStart,
+    });
+    if (shouldBypassAi(serviceState.state, "critical", pressure.throttleLevel)) {
+      await recordServiceOutcome(env, { endpoint, requestId, userId, sessionId: sid }, {
+        aiExecuted: false,
+        responsePath: "fallback",
+        aiFallback: true,
+        downstreamAiCalls: 0,
+      });
+      return temporaryUnavailableResponse(requestId);
+    }
 
     const baseline = await getBaseline(env, sid);
     if (!baseline || !baseline.dob || !baseline.tob?.value || !baseline.pob) {
@@ -326,7 +383,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
         { role: "user", content: userPrompt },
       ],
       temperature: 0.35,
-      max_tokens: 900,
+      max_tokens: tuneTokenBudget(900, serviceState.state, pressure.throttleLevel),
     }, {
       gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" }
     });
@@ -358,6 +415,40 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       })(),
     };
 
+    const durationMs = Date.now() - startedAt;
+    const parsedSuccessfully = Object.keys(parsed).length > 0;
+    const drift = inspectResponseDrift(rawText, parsedSuccessfully ? parsed : null, [
+      "summary",
+      "activePattern",
+      "theRepeat",
+      "oldRole",
+      "whatYouLearnedToCarry",
+      "strainPattern",
+      "giftUnderStrain",
+      "alignment",
+      "bestNextResponse",
+      "conversationalSteering",
+    ]);
+    if (drift.driftDetected) {
+      await logDriftDetected(env, { endpoint, requestId, userId, sessionId: sid }, {
+        mode,
+        anomalies: drift.anomalies,
+        observedKeys: drift.observedKeys,
+        responseBytes: drift.responseBytes,
+      });
+    }
+    await recordServiceOutcome(env, { endpoint, requestId, userId, sessionId: sid }, {
+      aiExecuted: true,
+      aiSuccess: parsedSuccessfully,
+      aiFallback: !parsedSuccessfully,
+      responsePath: parsedSuccessfully ? "normal" : "fallback",
+      durationMs,
+      slowRequest: durationMs >= 1800,
+      responseBytes: drift.responseBytes,
+      validationNearFail: drift.driftDetected,
+      downstreamAiCalls: 1,
+    });
+
     const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
     const confidence: Confidence = "Medium";
 
@@ -384,12 +475,46 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     await logSafetyEvent(env, {
       type: "request_lifecycle",
       requestId,
-      metadata: { endpoint, stage: "business_end", sessionId: sid, userId, mode },
+      metadata: {
+        endpoint,
+        stage: "business_end",
+        sessionId: sid,
+        userId,
+        mode,
+        inputClassification: decision.classification,
+        guardrailsTriggered: decision.guardrailsTriggered,
+        aiExecuted: true,
+        aiCalls: 1,
+        aiRetries: 0,
+        responsePath: parsedSuccessfully ? "normal" : "fallback",
+        degradationState: serviceState.state,
+        throttleLevel: pressure.throttleLevel,
+        coldStart,
+        slowRequest: durationMs >= 1800,
+        durationMs,
+      },
     });
     await logSafetyEvent(env, {
       type: "request_lifecycle",
       requestId,
-      metadata: { endpoint, stage: "end", sessionId: sid, userId, mode },
+      metadata: {
+        endpoint,
+        stage: "end",
+        sessionId: sid,
+        userId,
+        mode,
+        inputClassification: decision.classification,
+        guardrailsTriggered: decision.guardrailsTriggered,
+        aiExecuted: true,
+        aiCalls: 1,
+        aiRetries: 0,
+        responsePath: parsedSuccessfully ? "normal" : "fallback",
+        degradationState: serviceState.state,
+        throttleLevel: pressure.throttleLevel,
+        coldStart,
+        slowRequest: durationMs >= 1800,
+        durationMs,
+      },
     });
 
     return jsonResponse(result, 200, {
@@ -408,7 +533,14 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
         error: error instanceof Error ? error.message : String(error),
       },
     });
-    return fail(503, "temporary_failure");
+    await recordServiceOutcome(env, { endpoint, requestId, userId, sessionId: sid }, {
+      aiExecuted: false,
+      responsePath: "fallback",
+      aiFallback: true,
+      slowRequest: Date.now() - startedAt >= 1800,
+      downstreamAiCalls: 0,
+    });
+    return temporaryUnavailableResponse(requestId);
   }
 }
 

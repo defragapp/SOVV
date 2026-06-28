@@ -2,17 +2,30 @@ import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
 import { logSafetyEvent } from "./safety.js";
+import {
+  evaluateInputClassification,
+  getColdStartMarker,
+  getServiceState,
+  logRequestDecision,
+  recordServiceOutcome,
+  sampleUserPressure,
+  shouldBypassAi,
+  temporaryUnavailableResponse,
+  tuneTokenBudget,
+} from "./accountability.js";
 
 export function registerAudioRoute(router: any, getEnv: () => Env) {
   router.post("/api/audio", async (request: Request) => {
     const env = getEnv();
     const requestId = crypto.randomUUID();
     const endpoint = "/api/audio";
+    const startedAt = Date.now();
+    const coldStart = getColdStartMarker();
     const user = await getAuthUser(request, env.DB);
     await logSafetyEvent(env, {
       type: "request_lifecycle",
       requestId,
-      metadata: { endpoint, stage: "start", userId: user?.id ?? null },
+      metadata: { endpoint, stage: "start", userId: user?.id ?? null, coldStart },
     });
 
     const errorJson = (status: number, error: string, message?: string) =>
@@ -66,6 +79,20 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
         requestId,
         metadata: { endpoint, stage: "validation_passed", userId: user.id },
       });
+      const serviceState = await getServiceState(env, endpoint);
+      const preliminary = evaluateInputClassification({ degradationState: serviceState.state });
+      const pressure = await sampleUserPressure(env, { endpoint, requestId, userId: user.id }, preliminary.classification, false, false);
+      const decision = evaluateInputClassification({
+        degradationState: serviceState.state,
+        throttleLevel: pressure.throttleLevel,
+      });
+      await logRequestDecision(env, { endpoint, requestId, userId: user.id }, {
+        ...decision,
+        supportMode: false,
+        throttleLevel: pressure.throttleLevel,
+        degradationState: serviceState.state,
+        coldStart,
+      });
 
       // Use Cloudflare's native AI TTS proxy model (which is free/included in Workers AI limits)
       // This allows us to generate basic audio without an external ElevenLabs key.
@@ -75,7 +102,23 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
           requestId,
           metadata: { endpoint, reason: "ai_binding_missing", userId: user.id },
         });
-        return errorJson(503, "ai_not_configured", "Cloudflare AI binding is not configured.");
+        await recordServiceOutcome(env, { endpoint, requestId, userId: user.id }, {
+          aiExecuted: false,
+          responsePath: "fallback",
+          aiFallback: true,
+          downstreamAiCalls: 0,
+        });
+        return temporaryUnavailableResponse(requestId);
+      }
+
+      if (shouldBypassAi(serviceState.state, "noncritical", pressure.throttleLevel)) {
+        await recordServiceOutcome(env, { endpoint, requestId, userId: user.id }, {
+          aiExecuted: false,
+          responsePath: "fallback",
+          aiFallback: true,
+          downstreamAiCalls: 0,
+        });
+        return temporaryUnavailableResponse(requestId);
       }
 
       await logSafetyEvent(env, {
@@ -86,19 +129,58 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
 
       // We use @cf/elevenlabs/tts, which Cloudflare provides natively without needing your own API key
       const response = await env.AI.run("@cf/elevenlabs/tts", {
-        text: text
+        text: text,
       });
 
       // It returns a Uint8Array containing the audio data.
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: { endpoint, stage: "business_end", userId: user.id },
+      const durationMs = Date.now() - startedAt;
+      await recordServiceOutcome(env, { endpoint, requestId, userId: user.id }, {
+        aiExecuted: true,
+        aiSuccess: true,
+        responsePath: "normal",
+        durationMs,
+        slowRequest: durationMs >= 1800,
+        downstreamAiCalls: 1,
       });
       await logSafetyEvent(env, {
         type: "request_lifecycle",
         requestId,
-        metadata: { endpoint, stage: "end", userId: user.id },
+        metadata: {
+          endpoint,
+          stage: "business_end",
+          userId: user.id,
+          inputClassification: decision.classification,
+          guardrailsTriggered: decision.guardrailsTriggered,
+          aiExecuted: true,
+          aiCalls: 1,
+          aiRetries: 0,
+          responsePath: "normal",
+          degradationState: serviceState.state,
+          throttleLevel: pressure.throttleLevel,
+          coldStart,
+          slowRequest: durationMs >= 1800,
+          durationMs,
+        },
+      });
+      await logSafetyEvent(env, {
+        type: "request_lifecycle",
+        requestId,
+        metadata: {
+          endpoint,
+          stage: "end",
+          userId: user.id,
+          inputClassification: decision.classification,
+          guardrailsTriggered: decision.guardrailsTriggered,
+          aiExecuted: true,
+          aiCalls: 1,
+          aiRetries: 0,
+          responsePath: "normal",
+          degradationState: serviceState.state,
+          throttleLevel: pressure.throttleLevel,
+          coldStart,
+          slowRequest: durationMs >= 1800,
+          durationMs,
+        },
       });
       return new Response(response as any, {
         headers: {
@@ -113,7 +195,14 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
         requestId,
         metadata: { endpoint, reason: "audio_processing_failed", userId: user.id, error: e?.message || String(e) },
       });
-      return errorJson(500, "audio_processing_failed", "Failed to process audio");
+      await recordServiceOutcome(env, { endpoint, requestId, userId: user.id }, {
+        aiExecuted: false,
+        responsePath: "fallback",
+        aiFallback: true,
+        slowRequest: Date.now() - startedAt >= 1800,
+        downstreamAiCalls: 0,
+      });
+      return temporaryUnavailableResponse(requestId);
     }
   });
 }

@@ -11,6 +11,19 @@ import {
   buildTimingSignals,
   formatActiveSignalsForPrompt,
 } from "./active-signals.js";
+import {
+  evaluateInputClassification,
+  getColdStartMarker,
+  getServiceState,
+  inspectResponseDrift,
+  logDriftDetected,
+  logRequestDecision,
+  recordServiceOutcome,
+  sampleUserPressure,
+  shouldBypassAi,
+  temporaryUnavailableResponse,
+  tuneTokenBudget,
+} from "./accountability.js";
 
 /**
  * CRITICAL SYSTEM RULE
@@ -41,11 +54,13 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
     const env = getEnv();
     const requestId = crypto.randomUUID();
     const endpoint = "/api/covenant";
+    const startedAt = Date.now();
+    const coldStart = getColdStartMarker();
     const user = await getAuthUser(request, env.DB);
     await logSafetyEvent(env, {
       type: "request_lifecycle",
       requestId,
-      metadata: { endpoint, stage: "start", userId: user?.id ?? null },
+      metadata: { endpoint, stage: "start", userId: user?.id ?? null, coldStart },
     });
 
     const errorJson = (status: number, error: string, message?: string) =>
@@ -109,10 +124,28 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
           requestId,
           metadata: { endpoint, stage: "validation_passed", userId: user.id, safetyMode: "support" },
         });
+        await recordServiceOutcome(env, { endpoint, requestId, userId: user.id }, {
+          aiExecuted: false,
+          responsePath: "support-response",
+          supportResponse: true,
+          downstreamAiCalls: 0,
+        });
         await logSafetyEvent(env, {
           type: "request_lifecycle",
           requestId,
-          metadata: { endpoint, stage: "end", userId: user.id },
+          metadata: {
+            endpoint,
+            stage: "end",
+            userId: user.id,
+            inputClassification: "elevated",
+            guardrailsTriggered: ["risk_words"],
+            aiExecuted: false,
+            aiCalls: 0,
+            aiRetries: 0,
+            responsePath: "support-response",
+            degradationState: "NORMAL",
+            coldStart,
+          },
         });
         return Response.json(supportResponse(), { status: 200, headers: getCorsHeaders(request) })
       }
@@ -155,12 +188,56 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
         requestId,
         metadata: { endpoint, stage: "business_start", userId: user.id },
       });
-
-      
+      const serviceState = await getServiceState(env, endpoint);
+      const supportMode = message ? safetyMode(message) === "support" : false;
+      const preliminary = evaluateInputClassification({
+        degradationState: serviceState.state,
+        supportMode,
+      });
+      const pressure = await sampleUserPressure(env, { endpoint, requestId, userId: user.id }, preliminary.classification, supportMode, false);
+      const decision = evaluateInputClassification({
+        degradationState: serviceState.state,
+        supportMode,
+        throttleLevel: pressure.throttleLevel,
+      });
+      await logRequestDecision(env, { endpoint, requestId, userId: user.id }, {
+        ...decision,
+        supportMode,
+        throttleLevel: pressure.throttleLevel,
+        degradationState: serviceState.state,
+        coldStart,
+      });
+      if (shouldBypassAi(serviceState.state, "critical", pressure.throttleLevel)) {
+        await recordServiceOutcome(env, { endpoint, requestId, userId: user.id }, {
+          aiExecuted: false,
+          responsePath: "fallback",
+          aiFallback: true,
+          downstreamAiCalls: 0,
+        });
+        await logSafetyEvent(env, {
+          type: "request_lifecycle",
+          requestId,
+          metadata: {
+            endpoint,
+            stage: "end",
+            userId: user.id,
+            inputClassification: decision.classification,
+            guardrailsTriggered: decision.guardrailsTriggered,
+            aiExecuted: false,
+            aiCalls: 0,
+            aiRetries: 0,
+            responsePath: "fallback",
+            degradationState: serviceState.state,
+            throttleLevel: pressure.throttleLevel,
+            coldStart,
+          },
+        });
+        return temporaryUnavailableResponse(requestId);
+      }
 
       const aiResponse = await env.AI.run(
         (env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast") as any,
-        {  temperature: 0.3, max_tokens: 800 }
+        {  temperature: 0.3, max_tokens: tuneTokenBudget(800, serviceState.state, pressure.throttleLevel) }
       );
 
       const rawText = (aiResponse as any).response ?? String(aiResponse);
@@ -172,15 +249,71 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
 
       // Add media capabilities for Pro users (subscription gate already passed)
       const responseWithMedia = { ...parsed, media: { audioOverviewAvailable: true } };
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: { endpoint, stage: "business_end", userId: user.id },
+      const durationMs = Date.now() - startedAt;
+      const parsedSuccessfully = Object.keys(parsed).length > 0;
+      const drift = inspectResponseDrift(rawText, parsedSuccessfully ? parsed : null, [
+        "figure",
+        "story",
+        "forYou",
+        "nextStep",
+      ]);
+      if (drift.driftDetected) {
+        await logDriftDetected(env, { endpoint, requestId, userId: user.id }, {
+          anomalies: drift.anomalies,
+          observedKeys: drift.observedKeys,
+          responseBytes: drift.responseBytes,
+        });
+      }
+      await recordServiceOutcome(env, { endpoint, requestId, userId: user.id }, {
+        aiExecuted: true,
+        aiSuccess: parsedSuccessfully,
+        aiFallback: !parsedSuccessfully,
+        responsePath: parsedSuccessfully ? "normal" : "fallback",
+        durationMs,
+        slowRequest: durationMs >= 1800,
+        responseBytes: drift.responseBytes,
+        validationNearFail: drift.driftDetected,
+        downstreamAiCalls: 1,
       });
       await logSafetyEvent(env, {
         type: "request_lifecycle",
         requestId,
-        metadata: { endpoint, stage: "end", userId: user.id },
+        metadata: {
+          endpoint,
+          stage: "business_end",
+          userId: user.id,
+          inputClassification: decision.classification,
+          guardrailsTriggered: decision.guardrailsTriggered,
+          aiExecuted: true,
+          aiCalls: 1,
+          aiRetries: 0,
+          responsePath: parsedSuccessfully ? "normal" : "fallback",
+          degradationState: serviceState.state,
+          throttleLevel: pressure.throttleLevel,
+          coldStart,
+          slowRequest: durationMs >= 1800,
+          durationMs,
+        },
+      });
+      await logSafetyEvent(env, {
+        type: "request_lifecycle",
+        requestId,
+        metadata: {
+          endpoint,
+          stage: "end",
+          userId: user.id,
+          inputClassification: decision.classification,
+          guardrailsTriggered: decision.guardrailsTriggered,
+          aiExecuted: true,
+          aiCalls: 1,
+          aiRetries: 0,
+          responsePath: parsedSuccessfully ? "normal" : "fallback",
+          degradationState: serviceState.state,
+          throttleLevel: pressure.throttleLevel,
+          coldStart,
+          slowRequest: durationMs >= 1800,
+          durationMs,
+        },
       });
       return new Response(JSON.stringify(responseWithMedia), {
         status: 200,
@@ -192,7 +325,14 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
         requestId,
         metadata: { endpoint, reason: "covenant_route_error", userId: user.id, error: error?.message || String(error) },
       });
-      return errorJson(500, "failed_to_process", "Failed to process");
+      await recordServiceOutcome(env, { endpoint, requestId, userId: user.id }, {
+        aiExecuted: false,
+        responsePath: "fallback",
+        aiFallback: true,
+        slowRequest: Date.now() - startedAt >= 1800,
+        downstreamAiCalls: 0,
+      });
+      return temporaryUnavailableResponse(requestId);
     }
   });
 }
