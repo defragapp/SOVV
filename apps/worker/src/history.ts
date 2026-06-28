@@ -199,6 +199,27 @@ export async function handleDeleteLibraryItem(req: Request, env: Env) {
   }
 }
 
+export async function handleGetLibraryStats(req: Request, env: Env) {
+  const user = await getAuthUser(req, env.DB);
+  if (!user) return new Response("Unauthorized", { status: 401 });
+
+  try {
+    const { results } = await env.DB.prepare(
+      "SELECT workspace_source, COUNT(*) as count FROM library WHERE user_id = ? GROUP BY workspace_source"
+    ).bind(user.id).all();
+
+    const stats: Record<string, number> = { DEFRAG: 0, COVENANT: 0, ALIGNMENT: 0, total: 0 };
+    for (const row of (results || []) as any[]) {
+      stats[row.workspace_source] = row.count;
+      stats.total += row.count;
+    }
+
+    return Response.json({ stats });
+  } catch (e) {
+    return Response.json({ stats: { DEFRAG: 0, COVENANT: 0, ALIGNMENT: 0, total: 0 } });
+  }
+}
+
 export function registerHistoryRoute(router: any, getEnv: () => Env) {
   router.get("/api/history", async (req: Request) => {
     const env = getEnv();
@@ -218,6 +239,11 @@ export function registerHistoryRoute(router: any, getEnv: () => Env) {
   router.delete("/api/library/:id", async (req: Request) => {
     const env = getEnv();
     return handleDeleteLibraryItem(req, env);
+  });
+
+  router.get("/api/library/stats", async (req: Request) => {
+    const env = getEnv();
+    return handleGetLibraryStats(req, env);
   });
 
   router.post("/api/history", async (req: Request) => {

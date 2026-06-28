@@ -217,6 +217,11 @@ router.get("/api/user/me", async (request: Request) => {
   const env = getEnv();
   const user = await getAuthUser(request, env.DB);
   if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
+  // Check email verification status
+  const emailVerified = await env.DB.prepare(
+    "SELECT verified_at FROM email_verification_tokens WHERE user_id = ? AND verified_at IS NOT NULL LIMIT 1"
+  ).bind(user.id).first().catch(() => null)
+
   return new Response(JSON.stringify({
     id: user.id,
     email: user.email,
@@ -224,6 +229,7 @@ router.get("/api/user/me", async (request: Request) => {
     role: user.role,
     stripeCustomerId: (user as any).stripe_customer_id || null,
     subscriptionStatus: (user as any).subscription_status || null,
+    emailVerified: Boolean(emailVerified),
   }), { status: 200, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
 });
 
