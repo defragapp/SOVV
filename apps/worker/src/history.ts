@@ -111,7 +111,7 @@ export async function handleGetLibrary(req: Request, env: Env) {
       if (searchQuery) {
         // Filter by space + search title
         query = "SELECT * FROM library WHERE user_id = ? AND workspace_source = ? AND title LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
-        bindings = [user.id, workspaceSource, `%${searchQuery}%`, limit, offset];
+        bindings = [user.id, workspaceSource, `%${searchQuery ?? ""}%`, limit, offset];
       } else {
         // Filter by space only — uses idx_library_user_id_source index
         query = "SELECT * FROM library WHERE user_id = ? AND workspace_source = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
@@ -120,7 +120,7 @@ export async function handleGetLibrary(req: Request, env: Env) {
     } else if (searchQuery) {
       // Search all spaces
       query = "SELECT * FROM library WHERE user_id = ? AND title LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
-      bindings = [user.id, `%${searchQuery}%`, limit, offset];
+      bindings = [user.id, `%${searchQuery ?? ""}%`, limit, offset];
     } else {
       query = "SELECT * FROM library WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
       bindings = [user.id, limit, offset];
