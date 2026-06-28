@@ -317,8 +317,9 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       // SAFETY LAYER 3: RISK DETECTION (non-blocking)
       // ════════════════════════════════════════════════════════════════════════
       const body = validationResult.data as any;
+      const recentPatterns = body?.context?.recent_patterns;
       const textFieldsToCheck = [
-        body?.context?.recent_patterns?.join(" "),
+        Array.isArray(recentPatterns) ? recentPatterns.join(" ") : undefined,
       ].filter(Boolean);
 
       for (const text of textFieldsToCheck) {
