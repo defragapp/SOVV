@@ -156,6 +156,19 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
   if (env.EMAIL) emailOpts.emailBinding = env.EMAIL;
   if (env.RESEND_API_KEY) emailOpts.resendApiKey = env.RESEND_API_KEY;
 
+  // Idempotency check — skip already-processed events
+  try {
+    const existing = await env.DB.prepare("SELECT id FROM stripe_events WHERE id = ?")
+      .bind(event.id).first()
+    if (existing) {
+      return new Response(JSON.stringify({ received: true, skipped: true }), { status: 200 })
+    }
+    await env.DB.prepare("INSERT INTO stripe_events (id, type, processed_at) VALUES (?, ?, CURRENT_TIMESTAMP)")
+      .bind(event.id, event.type).run()
+  } catch {
+    // If stripe_events table doesn't exist yet, continue without idempotency
+  }
+
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object;
@@ -174,6 +187,17 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
             await sendWelcomeEmail(user.email, emailOpts).catch(() => {});
           }
         }
+      }
+      break;
+    }
+    case "customer.subscription.created": {
+      // Subscription created — ensure tier is set to pro
+      const sub = event.data.object as any;
+      const stripeCustomerId = sub.customer;
+      if (stripeCustomerId && sub.status === "active") {
+        await env.DB.prepare(
+          "UPDATE users SET tier = 'pro', subscription_status = 'active', stripe_subscription_id = ?, subscription_updated_at = ? WHERE stripe_customer_id = ?"
+        ).bind(sub.id, Date.now(), stripeCustomerId).run();
       }
       break;
     }
