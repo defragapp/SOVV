@@ -152,7 +152,8 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
   DB.prepare("UPDATE sessions SET last_active = ? WHERE token = ?")
     .bind(Date.now(), token).run().catch(() => {})
 
-  return { ...session, role: session.role || "user", subscription_status: session.subscription_status || "free" }
+  const s = session as { id: string; email: string; tier: string; role: string; stripe_customer_id: string | null; subscription_status: string }
+  return { ...s, role: s.role || "user", subscription_status: s.subscription_status || "free" }
 }
 
 const SESSION_TTL = 7 * 24 * 60 * 60
@@ -474,7 +475,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     try {
       const { results } = await env.DB.prepare(
         "SELECT token, created_at, expires_at FROM sessions WHERE user_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 10"
-      ).bind(user.id, Date.now()).all<{ token: string; created_at: number; expires_at: number }>()
+      ).bind(user.id, Date.now()).all()
 
       // Mask tokens for security — only show last 6 chars
       const sessions = (results || []).map(s => ({
