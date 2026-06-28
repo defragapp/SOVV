@@ -97,6 +97,8 @@ export default function DefragWorkspacePage() {
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
   const [patterns, setPatterns] = React.useState<Array<{ key: string; value: string }>>([])
+  const [sessionResultCount, setSessionResultCount] = React.useState(0)
+  const [showUpgradeNudge, setShowUpgradeNudge] = React.useState(false)
 
   // Load baseline
   // Prefill composer from ?prompt= query param
@@ -167,6 +169,12 @@ export default function DefragWorkspacePage() {
         return
       }
       setResult(pResult.output.meta as any)
+      // Show upgrade nudge after 3rd result on free tier
+      setSessionResultCount(prev => {
+        const next = prev + 1
+        if (next === 3) setShowUpgradeNudge(true)
+        return next
+      })
     } catch {
       setError("Unable to connect. Check your connection and try again.")
     } finally {
@@ -404,6 +412,20 @@ export default function DefragWorkspacePage() {
 
         {error && error !== "needs_baseline" && (
           <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">{error}</p>
+        )}
+
+        {showUpgradeNudge && (
+          <div className="mx-6 mb-4 border border-[#e0743a]/20 bg-[#e0743a]/[0.04] px-4 py-3 flex items-center justify-between" style={{ borderRadius: 8 }}>
+            <p className="text-[12px] text-[#a8a29a] leading-relaxed">
+              Unlock Covenant, Alignment, and unlimited sessions.
+            </p>
+            <a
+              href="/pricing"
+              className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#e0743a]/70 hover:text-[#e0743a] transition-colors ml-4 shrink-0"
+            >
+              Upgrade →
+            </a>
+          </div>
         )}
 
         {result && (

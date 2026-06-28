@@ -46,6 +46,8 @@ export function ResultCard({
   onInvite,
 }: ResultCardProps) {
   const [copied, setCopied] = React.useState(false)
+  const [sharing, setSharing] = React.useState(false)
+  const [shareUrl, setShareUrl] = React.useState("")
   const [streamedPrimary, setStreamedPrimary] = React.useState("")
   const [streamedResponse, setStreamedResponse] = React.useState("")
 
@@ -317,6 +319,13 @@ export function ResultCard({
             <path d="M1 8V1h7" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
           </svg>
           {copied ? "Copied" : "Copy all"}
+        </button>
+        <button
+          onClick={handleShare}
+          disabled={sharing}
+          className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.15em] text-[#4f4b47] hover:text-[#76716b] transition-colors disabled:opacity-30"
+        >
+          {shareUrl || "Share"}
         </button>
         {onInvite && (
           <button
