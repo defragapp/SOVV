@@ -1,11 +1,10 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
-import { safetyMode, supportResponse } from "./safety.js"
-import { getCorsHeaders } from "./cors.js"
 import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { checkProLimit } from "./plan.js";
 import { SYSTEM_COVENANT } from "./prompts.js";
+import { parseJsonBody, validateTextInput } from "./safety-validation.js";
 import {
   selectActiveSignals,
   buildTimingSignals,
@@ -62,27 +61,23 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
     }
 
     try {
-      const body = await request.json().catch(() => ({})) as any;
+      const parsedBody = await parseJsonBody(request);
+      if (parsedBody.ok === false) return parsedBody.response;
+
+      const body = parsedBody.value;
       // Accept both "message" and "moment" for compatibility
-      const message = body.message || body.moment;
+      const messageValidation = validateTextInput({
+        request,
+        body,
+        fields: ["message", "moment"],
+        requiredPayload: { error: "Message is required" },
+        tooLongPayload: { error: "Input too long. Please keep your message under 2000 characters." },
+        maxLength: 2000,
+        supportMode: true,
+      });
+      if (messageValidation.ok === false) return messageValidation.response;
 
-      // Safety check
-      if (message && safetyMode(message) === "support") {
-        return Response.json(supportResponse(), { status: 200, headers: getCorsHeaders(request) })
-      }
-
-      // Input length limit
-      if (message && message.length > 2000) {
-        return Response.json({ error: "Input too long. Please keep your message under 2000 characters." }, { status: 400 })
-      }
-
-      if (!message) {
-        return new Response(JSON.stringify({ error: "Message is required" }), { status: 400, headers: { "Content-Type": "application/json" } });
-      }
-      // Input length validation — prevent abuse
-      if (typeof message === "string" && message.length > 3000) {
-        return new Response(JSON.stringify({ error: "Message too long. Please keep it under 3000 characters." }), { status: 400, headers: { "Content-Type": "application/json" } });
-      }
+      const { text: message } = messageValidation.value;
 
       
 

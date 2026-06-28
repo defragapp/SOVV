@@ -1,6 +1,7 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
+import { parseJsonBody, validateTextInput } from "./safety-validation.js";
 
 export function registerAudioRoute(router: any, getEnv: () => Env) {
   router.post("/api/audio", async (request: Request) => {
@@ -16,12 +17,18 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
     if (subGate) return subGate;
 
     try {
-      const body = await request.json().catch(() => ({})) as any;
-      const { text } = body;
+      const parsedBody = await parseJsonBody(request);
+      if (parsedBody.ok === false) return parsedBody.response;
 
-      if (!text) {
-        return new Response(JSON.stringify({ error: "Text is required" }), { status: 400 });
-      }
+      const textValidation = validateTextInput({
+        request,
+        body: parsedBody.value,
+        fields: ["text"],
+        requiredPayload: { error: "Text is required" },
+      });
+      if (textValidation.ok === false) return textValidation.response;
+
+      const { text } = textValidation.value;
 
       // Use Cloudflare's native AI TTS proxy model (which is free/included in Workers AI limits)
       // This allows us to generate basic audio without an external ElevenLabs key.

@@ -9,7 +9,6 @@ import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
 import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
-import { requireActiveSubscription } from "./billing.js";
 import {
   selectActiveSignals,
   buildBaselineSignature,
@@ -42,7 +41,7 @@ import type {
 } from "@sovereign/core";
 
 import { getCorsHeaders } from "./cors.js"
-import { safetyMode, supportResponse } from "./safety.js";
+import { parseJsonBody, validateTextInput } from "./safety-validation.js";
 
 
 // SYSTEM_SELF and SYSTEM_RELATIONAL removed — use SYSTEM_DEFRAG / SYSTEM_DEFRAG_RELATIONAL from prompts.ts
@@ -140,18 +139,16 @@ function buildUserPrompt(args: {
 }
 
 export async function handleExplain(req: Request, env: Env): Promise<Response> {
-  let subGate: any;
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: getCorsHeaders(req) });
   }
 
-  
-  if (subGate) return subGate;
-
   const sid = await getSessionId(req);
+  const user = await getAuthUser(req, env.DB);
+  const responseHeaders = { "set-cookie": cookieHeader(sid) };
+  const isPro = user?.subscription_status === "active" || user?.tier === "pro";
 
   // Free tier daily usage limit check
-  const isPro = ({} as any).subscription_status === "active" || ({} as any).tier === "pro";
   if (!isPro) {
     const limit = await checkFreeLimit(env, sid);
     if (!limit.allowed) {
@@ -159,60 +156,69 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
         error: "daily_limit_reached",
         message: "You've reached your free daily limit. Upgrade to Pro for unlimited usage.",
         remaining: 0,
-      }, 429, { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) });
+      }, 429, { ...getCorsHeaders(req), ...responseHeaders });
     }
   }
-  const body = (await req.json().catch(() => ({}))) as Partial<ExplainRequest> & {
+
+  const parsedBody = await parseJsonBody(req, {
+    headers: responseHeaders,
+    invalidJsonPayload: { error: "invalid_json", message: "Invalid JSON body." },
+  });
+  if (parsedBody.ok === false) return parsedBody.response;
+
+  const body = parsedBody.value as Partial<ExplainRequest> & {
     question?: string;
     text?: string;
     mode?: string;
     people?: Array<{ id: string; relation?: string; name?: string }>;
   };
 
-  const message = String(body.message ?? body.question ?? body.text ?? "").trim();
-  if (!message) {
-    return jsonResponse({ error: "message_required" }, 400, {
-      ...getCorsHeaders(req),
-      "set-cookie": cookieHeader(sid),
-    });
-  }
+  const messageValidation = validateTextInput({
+    request: req,
+    body,
+    fields: ["message", "question", "text"],
+    requiredPayload: { error: "message_required" },
+    tooLongPayload: { error: "Input too long. Please keep your message under 2000 characters." },
+    maxLength: 2000,
+    headers: responseHeaders,
+    supportMode: true,
+  });
+  if (messageValidation.ok === false) return messageValidation.response;
 
-  // Safety check — intercept crisis signals before AI processing
-  if (safetyMode(message) === "support") {
-    return jsonResponse(supportResponse(), 200, {
-      ...getCorsHeaders(req),
-      "set-cookie": cookieHeader(sid),
-    });
-  }
+  const { text: message } = messageValidation.value;
 
   // Per-user rate limit on AI calls (prevents burst abuse)
   if (env.RATE_LIMITER) {
-    const { success } = await env.RATE_LIMITER.limit({ key: `explain:${sid}` })
+    const { success } = await env.RATE_LIMITER.limit({ key: `explain:${user?.id ?? sid}` })
     if (!success) {
       return jsonResponse({ error: "Too many requests. Please wait a moment before trying again." }, 429, {
         ...getCorsHeaders(req),
-        "set-cookie": cookieHeader(sid),
+        ...responseHeaders,
       })
     }
   }
 
-  // Input length limit — prevent abuse and control AI costs
-  if (message.length > 2000) {
-    return jsonResponse({ error: "Input too long. Please keep your message under 2000 characters." }, 400, {
-      ...getCorsHeaders(req),
-      "set-cookie": cookieHeader(sid),
-    });
-  }
-
-  const target = body.target;
+  const rawTarget = (body as Record<string, unknown>).target;
+  const targetCandidate =
+    rawTarget && typeof rawTarget === "object" && !Array.isArray(rawTarget)
+      ? rawTarget as Record<string, unknown>
+      : null;
+  const target =
+    targetCandidate && typeof targetCandidate.id === "string"
+      ? {
+          id: targetCandidate.id,
+          relation: typeof targetCandidate.relation === "string" ? targetCandidate.relation : undefined,
+          name: typeof targetCandidate.name === "string" ? targetCandidate.name : undefined,
+        }
+      : undefined;
   const relational = Boolean(target);
   const mode = (body.mode ?? (relational ? "pair" : "self")) as string;
 
-  if (relational && ({} as any).tier === "free") {
+  if (relational && !isPro) {
     return jsonResponse(
       { error: "Relational analysis requires Pro" },
       403,
-      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
+      { ...getCorsHeaders(req), ...responseHeaders }
     );
   }
 
@@ -231,7 +237,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const patternText = formatPatternsForPrompt(patterns);
   const targetBaseline =
     relational && target
-      ? await env.KV.get(`baseline:${({} as any).id}:person:${target.id}`, "json")
+      ? await env.KV.get(`baseline:${user?.id ?? sid}:person:${target.id}`, "json")
       : null;
 
   // ── Active signal selection ───────────────────────────────────────────────
@@ -264,7 +270,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     baselineText,
     patternText,
     activeSignalsText: activeSignalsText || undefined,
-    targetName: target ? target.relation : undefined,
+    targetName: target ? (target.relation ?? target.name) : undefined,
     targetBaseline,
   });
 
@@ -333,7 +339,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   return jsonResponse(result, 200, {
     ...getCorsHeaders(req),
-    "set-cookie": cookieHeader(sid),
+    ...responseHeaders,
   });
 }
 

@@ -1,11 +1,10 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
-import { safetyMode, supportResponse } from "./safety.js"
-import { getCorsHeaders } from "./cors.js"
 import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { SYSTEM_ALIGNMENT, SECURITY_PREFIX } from "./prompts.js";
 import { checkProLimit } from "./plan.js";
+import { parseJsonBody, validateTextInput } from "./safety-validation.js";
 import {
   selectActiveSignals,
   buildTimingSignals,
@@ -246,8 +245,11 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
     }
 
     try {
-      const body = await request.json().catch(() => ({})) as any;
-      const mode = body.mode ?? "workspace";
+      const parsedBody = await parseJsonBody(request);
+      if (parsedBody.ok === false) return parsedBody.response;
+
+      const body = parsedBody.value;
+      const mode = typeof body.mode === "string" ? body.mode : "workspace";
 
       // ── ENTRY MODE ──────────────────────────────────────────────────────
       if (mode === "entry") {
@@ -269,9 +271,20 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
             content: [
               baselineContext ? `User Baseline Design:\n${baselineContext}` : "No baseline data available.",
               `Current date: ${dateStr}`,
-              body.context?.recent_patterns?.length
-                ? `Recent patterns: ${body.context.recent_patterns.join(", ")}`
-                : "",
+              (() => {
+                const context = body.context;
+                if (!context || typeof context !== "object" || Array.isArray(context)) {
+                  return "";
+                }
+                const recentPatterns = (context as { recent_patterns?: unknown }).recent_patterns;
+                if (!Array.isArray(recentPatterns) || recentPatterns.length === 0) {
+                  return "";
+                }
+                const normalizedPatterns = recentPatterns
+                  .filter((pattern): pattern is string => typeof pattern === "string" && pattern.trim().length > 0)
+                  .map((pattern) => pattern.trim());
+                return normalizedPatterns.length > 0 ? `Recent patterns: ${normalizedPatterns.join(", ")}` : "";
+              })(),
             ].filter(Boolean).join("\n\n")
           }
         ];
@@ -301,26 +314,18 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       }
 
       // ── WORKSPACE MODE (preserved exactly) ─────────────────────────────
-      const message = body.message;
+      const messageValidation = validateTextInput({
+        request,
+        body,
+        fields: ["message"],
+        requiredPayload: { error: "Message is required" },
+        tooLongPayload: { error: "Input too long. Please keep your message under 2000 characters." },
+        maxLength: 2000,
+        supportMode: true,
+      });
+      if (messageValidation.ok === false) return messageValidation.response;
 
-      // Safety check
-      if (message && safetyMode(message) === "support") {
-        return Response.json(supportResponse(), { status: 200, headers: getCorsHeaders(request) })
-      }
-
-      // Input length limit
-      if (message && message.length > 2000) {
-        return Response.json({ error: "Input too long. Please keep your message under 2000 characters." }, { status: 400 })
-      }
-
-      if (!message) {
-        return new Response(JSON.stringify({ error: "Message is required" }), {
-          status: 400, headers: { "Content-Type": "application/json" }
-        });
-      }
-        if (typeof message === "string" && message.length > 3000) {
-          return new Response(JSON.stringify({ error: "Message too long. Please keep it under 3000 characters." }), { status: 400, headers: { "Content-Type": "application/json" } });
-        }
+      const { text: message } = messageValidation.value;
 
       let baselineContext = "";
       try {

@@ -368,7 +368,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       // Verify current password
       const dbUser = await env.DB.prepare("SELECT password_hash FROM users WHERE id = ?")
-        .bind(user.id).first()
+        .bind(user.id).first() as { password_hash: string } | null
       if (!dbUser) return jsonResponse({ error: "User not found" }, 404)
 
       const valid = await verifyPassword(currentPassword, dbUser.password_hash)
@@ -473,9 +473,10 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
 
     try {
-      const { results } = await env.DB.prepare(
+      const sessionQuery = await env.DB.prepare(
         "SELECT token, created_at, expires_at FROM sessions WHERE user_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 10"
       ).bind(user.id, Date.now()).all()
+      const results = sessionQuery.results as Array<{ token: string; created_at: number; expires_at: number }> | undefined
 
       // Mask tokens for security — only show last 6 chars
       const sessions = (results || []).map(s => ({
