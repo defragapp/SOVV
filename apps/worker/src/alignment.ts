@@ -1,6 +1,6 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
-import { safetyMode, supportResponse, logSafetyEvent } from "./safety.js"
+import { safetyMode, supportResponse, RISK_WORDS } from "./safety.js"
 import { getCorsHeaders } from "./cors.js"
 import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
@@ -11,6 +11,11 @@ import {
   buildTimingSignals,
   formatActiveSignalsForPrompt,
 } from "./active-signals.js";
+import { validateRequest } from "./middleware/validate-request.js";
+import { RateLimiter, extractRateLimitKey, RATE_LIMIT_PRESETS } from "./middleware/rate-limiter.js";
+import { KVSafetyLogger, createSafetyEvent } from "./middleware/safety-logger.js";
+import { generateRequestId } from "./utils/request-id.js";
+import { z } from "zod";
 
 /**
  * CRITICAL SYSTEM RULE
@@ -221,78 +226,134 @@ function sanitizeBrief(brief: AlignmentBrief): void {
 export function registerAlignmentRoute(router: any, getEnv: () => Env) {
   router.post("/api/alignment", async (request: Request) => {
     const env = getEnv();
-    const requestId = crypto.randomUUID();
-    const endpoint = "/api/alignment";
-    const user = await getAuthUser(request, env.DB);
-    await logSafetyEvent(env, {
-      type: "request_lifecycle",
-      requestId,
-      metadata: { endpoint, stage: "start", userId: user?.id ?? null },
-    });
-
-    const errorJson = (status: number, error: string, message?: string) =>
-      new Response(JSON.stringify({ error, ...(message ? { message } : {}), requestId }), {
-        status,
-        headers: { "Content-Type": "application/json", "x-request-id": requestId },
-      });
-
-    if (!user) {
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: { endpoint, stage: "auth_failed", userId: null },
-      });
-      return errorJson(401, "unauthorized");
-    }
-
-    const subGate = await requireActiveSubscription(user, request, requestId);
-    if (subGate) {
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: { endpoint, stage: "authz_failed", userId: user.id },
-      });
-      return subGate;
-    }
-
-    // Per-user Pro daily soft cap (200/day)
-    if (env.KV) {
-      const limitCheck = await checkProLimit(env.KV, user.id);
-      if (!limitCheck.allowed) {
-        await logSafetyEvent(env, {
-          type: "rate_limit_exceeded",
-          requestId,
-          metadata: { endpoint, stage: "rate_limit_triggered", userId: user.id, limit: limitCheck.limit },
-        });
-        return new Response(JSON.stringify({
-          error: "daily_limit_reached",
-          message: "You've reached your daily Alignment limit. It resets at midnight UTC.",
-          remaining: 0,
-          limit: limitCheck.limit,
-          requestId,
-        }), { status: 429, headers: { "Content-Type": "application/json", "x-request-id": requestId } });
-      }
-    }
+    const requestId = generateRequestId();
+    let safetyLogger: KVSafetyLogger | null = null;
+    let rateLimiter: RateLimiter | null = null;
+    let user: any = null;
 
     try {
-      const body = await request.json().catch(() => ({})) as Record<string, unknown>;
+      // Initialize safety infrastructure
+      if (env.KV) {
+        safetyLogger = new KVSafetyLogger(env.KV);
+        rateLimiter = new RateLimiter(env.KV, RATE_LIMIT_PRESETS.normal);
+      }
+
+      user = await getAuthUser(request, env.DB);
+
+      if (!user) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401, headers: { "Content-Type": "application/json" }
+        });
+      }
+
+      const subGate = await requireActiveSubscription(user, request);
+      if (subGate) return subGate;
+
+      // ════════════════════════════════════════════════════════════════════════
+      // SAFETY LAYER 1: REQUEST VALIDATION
+      // ════════════════════════════════════════════════════════════════════════
+      const validationSchema = z.object({
+        mode: z.enum(["entry", "workspace", "explore"]).optional(),
+        context: z.any().optional(),
+      });
+
+      const validationResult = await validateRequest(request, validationSchema, {
+        validateContentType: true,
+        maxBodySize: 100 * 1024, // 100KB
+      });
+
+      if (!validationResult.valid) {
+        const errorResult = validationResult as { valid: false; error: any };
+        if (safetyLogger && user) {
+          await safetyLogger.log(
+            createSafetyEvent(user.id, "validation_error", "low", {
+              validation_field: errorResult.error.field,
+              endpoint: "/api/alignment",
+            }, { requestId })
+          );
+        }
+        return new Response(JSON.stringify({
+          error: errorResult.error.field,
+          message: errorResult.error.error,
+        }), {
+          status: errorResult.error.status,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // ════════════════════════════════════════════════════════════════════════
+      // SAFETY LAYER 2: RATE LIMITING
+      // ════════════════════════════════════════════════════════════════════════
+      if (rateLimiter) {
+        const rateLimitKey = extractRateLimitKey(request, user.id);
+        const limitResult = await rateLimiter.checkLimit(rateLimitKey);
+
+        if (!limitResult.allowed) {
+          if (safetyLogger) {
+            await safetyLogger.log(
+              createSafetyEvent(user.id, "rate_limit_exceeded", "low", {
+                endpoint: "/api/alignment",
+              }, { requestId })
+            );
+          }
+          return new Response(
+            JSON.stringify({
+              error: "rate_limit_exceeded",
+              message: "Too many requests",
+              retryAfter: limitResult.retryAfter,
+            }),
+            {
+              status: 429,
+              headers: {
+                "Content-Type": "application/json",
+                "Retry-After": String(limitResult.retryAfter),
+              },
+            }
+          );
+        }
+      }
+
+      // ════════════════════════════════════════════════════════════════════════
+      // SAFETY LAYER 3: RISK DETECTION (non-blocking)
+      // ════════════════════════════════════════════════════════════════════════
+      const body = validationResult.data as any;
+      const recentPatterns = body?.context?.recent_patterns;
+      const textFieldsToCheck = [
+        Array.isArray(recentPatterns) ? recentPatterns.join(" ") : undefined,
+      ].filter(Boolean);
+
+      for (const text of textFieldsToCheck) {
+        if (text && safetyMode(text) === "support") {
+          if (safetyLogger) {
+            // Find which risk word was detected
+            const detectedWord = RISK_WORDS.find((w) => text.toLowerCase().includes(w));
+            await safetyLogger.log(
+              createSafetyEvent(user.id, "risk_word_detected", "high", {
+                riskWord: detectedWord,
+                endpoint: "/api/alignment",
+              }, { requestId })
+            );
+          }
+        }
+      }
+
+      // Per-user Pro daily soft cap (200/day)
+      if (env.KV) {
+        const limitCheck = await checkProLimit(env.KV, user.id);
+        if (!limitCheck.allowed) {
+          return new Response(JSON.stringify({
+            error: "daily_limit_reached",
+            message: "You've reached your daily Alignment limit. It resets at midnight UTC.",
+            remaining: 0,
+            limit: limitCheck.limit,
+          }), { status: 429, headers: { "Content-Type": "application/json" } });
+        }
+      }
+
       const mode = body.mode ?? "workspace";
-      const context = (body.context && typeof body.context === "object")
-        ? (body.context as { recent_patterns?: string[] })
-        : undefined;
 
       // ── ENTRY MODE ──────────────────────────────────────────────────────
       if (mode === "entry") {
-        await logSafetyEvent(env, {
-          type: "request_lifecycle",
-          requestId,
-          metadata: { endpoint, stage: "validation_passed", userId: user.id, mode },
-        });
-        await logSafetyEvent(env, {
-          type: "request_lifecycle",
-          requestId,
-          metadata: { endpoint, stage: "business_start", userId: user.id, mode },
-        });
         // Load computed baseline dataset (or fallback to raw baseline)
         // getBaselineForAI returns the full aiDataset context if compiled,
         // or raw DOB/TOB/POB if dataset is still pending
@@ -311,8 +372,8 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
             content: [
               baselineContext ? `User Baseline Design:\n${baselineContext}` : "No baseline data available.",
               `Current date: ${dateStr}`,
-              context?.recent_patterns?.length
-                ? `Recent patterns: ${context.recent_patterns.join(", ")}`
+              body.context?.recent_patterns?.length
+                ? `Recent patterns: ${body.context.recent_patterns.join(", ")}`
                 : "",
             ].filter(Boolean).join("\n\n")
           }
@@ -337,76 +398,32 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
         sanitizeBrief(brief);
 
-        await logSafetyEvent(env, {
-          type: "request_lifecycle",
-          requestId,
-          metadata: { endpoint, stage: "business_end", userId: user.id, mode },
-        });
-        await logSafetyEvent(env, {
-          type: "request_lifecycle",
-          requestId,
-          metadata: { endpoint, stage: "end", userId: user.id, mode },
-        });
         return new Response(JSON.stringify(brief), {
           status: 200, headers: { "Content-Type": "application/json" }
         });
       }
 
       // ── WORKSPACE MODE (preserved exactly) ─────────────────────────────
-      const message = typeof body.message === "string" ? body.message : "";
+      const message = body.message;
 
       // Safety check
       if (message && safetyMode(message) === "support") {
-        await logSafetyEvent(env, {
-          type: "request_lifecycle",
-          requestId,
-          metadata: { endpoint, stage: "validation_passed", userId: user.id, mode: "workspace", safetyMode: "support" },
-        });
-        await logSafetyEvent(env, {
-          type: "request_lifecycle",
-          requestId,
-          metadata: { endpoint, stage: "end", userId: user.id, mode: "workspace" },
-        });
         return Response.json(supportResponse(), { status: 200, headers: getCorsHeaders(request) })
       }
 
       // Input length limit
       if (message && message.length > 2000) {
-        await logSafetyEvent(env, {
-          type: "validation_error",
-          requestId,
-          metadata: { endpoint, reason: "input_too_long", userId: user.id, mode: "workspace" },
-        });
-        return errorJson(400, "input_too_long", "Input too long. Please keep your message under 2000 characters.");
+        return Response.json({ error: "Input too long. Please keep your message under 2000 characters." }, { status: 400 })
       }
 
       if (!message) {
-        await logSafetyEvent(env, {
-          type: "validation_error",
-          requestId,
-          metadata: { endpoint, reason: "message_required", userId: user.id, mode: "workspace" },
+        return new Response(JSON.stringify({ error: "Message is required" }), {
+          status: 400, headers: { "Content-Type": "application/json" }
         });
-        return errorJson(400, "message_required", "Message is required");
       }
         if (typeof message === "string" && message.length > 3000) {
-          await logSafetyEvent(env, {
-            type: "validation_error",
-            requestId,
-            metadata: { endpoint, reason: "message_too_long", userId: user.id, mode: "workspace" },
-          });
-          return errorJson(400, "message_too_long", "Message too long. Please keep it under 3000 characters.");
+          return new Response(JSON.stringify({ error: "Message too long. Please keep it under 3000 characters." }), { status: 400, headers: { "Content-Type": "application/json" } });
         }
-
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: { endpoint, stage: "validation_passed", userId: user.id, mode: "workspace" },
-      });
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: { endpoint, stage: "business_start", userId: user.id, mode: "workspace" },
-      });
 
       let baselineContext = "";
       try {
@@ -457,27 +474,23 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
       // Add media capabilities for Pro users
       const responseWithMedia = { ...parsed, media: { audioOverviewAvailable: true } };
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: { endpoint, stage: "business_end", userId: user.id, mode: "workspace" },
-      });
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: { endpoint, stage: "end", userId: user.id, mode: "workspace" },
-      });
       return new Response(JSON.stringify(responseWithMedia), {
         status: 200, headers: { "Content-Type": "application/json" }
       });
 
     } catch (e: any) {
-      await logSafetyEvent(env, {
-        type: "system_error",
-        requestId,
-        metadata: { endpoint, reason: "alignment_route_error", userId: user.id, error: e?.message || String(e) },
+      console.error("Alignment route error:", e);
+      if (user && safetyLogger) {
+        await safetyLogger.log(
+          createSafetyEvent(user.id, "system_error", "medium", {
+            error: e?.message || "Unknown error",
+            endpoint: "/api/alignment",
+          }, { requestId })
+        ).catch((err) => console.error("Failed to log safety event:", err));
+      }
+      return new Response(JSON.stringify({ error: "Failed to process" }), {
+        status: 500, headers: { "Content-Type": "application/json" }
       });
-      return errorJson(500, "failed_to_process", "Failed to process");
     }
   });
 }
