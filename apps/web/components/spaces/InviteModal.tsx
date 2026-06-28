@@ -18,11 +18,21 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
   const [inviteUrl, setInviteUrl] = React.useState("")
   const [inviteToken, setInviteToken] = React.useState("")
   const [revoking, setRevoking] = React.useState(false)
+  const [pendingInvites, setPendingInvites] = React.useState<Array<{ token: string; status: string; created_at: string }>>([])
   const [copied, setCopied] = React.useState(false)
   const [error, setError] = React.useState("")
 
   React.useEffect(() => {
     if (open) { setStep("idle"); setInviteUrl(""); setCopied(false); setError("") }
+  }, [open])
+
+  // Load pending invites when modal opens
+  React.useEffect(() => {
+    if (!open) return
+    fetch("/api/invite/list", { credentials: "include" })
+      .then(r => r.ok ? r.json() : { invites: [] })
+      .then((d: any) => setPendingInvites((d.invites || []).filter((i: any) => i.status === 'pending').slice(0, 3)))
+      .catch(() => {})
   }, [open])
 
   const createInvite = async () => {
