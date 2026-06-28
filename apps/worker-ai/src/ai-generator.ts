@@ -1,7 +1,10 @@
-import { DefragResultSchema, DefragResult } from '@sovereign/prompts';
+import { DefragResultSchema } from '@sovereign/prompts';
+import type { DefragResult } from '@sovereign/prompts';
+import type { Env } from "./index";
+import { boundedAiText, runAiWithResilience } from "./runtime-resilience";
 
 export async function generateDefragWithRetry(
-  aiContext: any,
+  env: Env,
   systemPrompt: string,
   userPrompt: string,
   maxRetries = 2
@@ -12,15 +15,13 @@ export async function generateDefragWithRetry(
   while (attempt <= maxRetries) {
     try {
       // 1. First Pass (Structure)
-      const rawResponse = await aiContext.run('@cf/meta/llama-3.1-8b-instruct-fast', {
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ]
-      });
+      const responseText = await runAiWithResilience(env, [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ]);
 
       // Parse JSON from markdown block if needed
-      const jsonStr = extractJson(rawResponse.response);
+      const jsonStr = extractJson(boundedAiText(responseText));
       const parsedData = JSON.parse(jsonStr);
 
       // 2. Validate against strict schema
@@ -46,7 +47,7 @@ export async function generateDefragWithRetry(
 
 function extractJson(text: string): string {
   const match = text.match(/```json\n([\s\S]*?)\n```/);
-  return match ? match[1] : text;
+  return match?.[1] ?? text;
 }
 
 function applyLengthConstraints(data: DefragResult): DefragResult {

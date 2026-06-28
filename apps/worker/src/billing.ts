@@ -9,6 +9,7 @@ import {
   sendPaymentFailedEmail,
   sendCancellationEmail,
 } from "./email.js";
+import { fetchWithTimeout, withLimitedRetry } from "./runtime-resilience.js";
 
 const WEBHOOK_TOLERANCE_SECONDS = 300;
 const IDEMPOTENCY_TTL_SECONDS = 60 * 60 * 24 * 7;
@@ -195,14 +196,24 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
   params.set("client_reference_id", userId);
   params.set("subscription_data[metadata][userId]", userId);
 
-  const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: params.toString(),
-  });
+  const res = await withLimitedRetry(
+    "stripe_checkout_create",
+    () =>
+      fetchWithTimeout(
+        "https://api.stripe.com/v1/checkout/sessions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: params.toString(),
+        },
+        10_000
+      ),
+    2,
+    10_000
+  );
 
   const data = await res.json() as Record<string, unknown>;
   if (!res.ok || typeof data["url"] !== "string") {
@@ -644,14 +655,24 @@ export async function handlePortal(req: Request, env: Env): Promise<Response> {
   params.set("customer", user.stripe_customer_id);
   params.set("return_url", `${env.APP_URL}/app`);
 
-  const res = await fetch("https://api.stripe.com/v1/billing_portal/sessions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: params.toString(),
-  });
+  const res = await withLimitedRetry(
+    "stripe_portal_create",
+    () =>
+      fetchWithTimeout(
+        "https://api.stripe.com/v1/billing_portal/sessions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: params.toString(),
+        },
+        10_000
+      ),
+    2,
+    10_000
+  );
 
   const data = await res.json() as Record<string, unknown>;
   if (!res.ok || typeof data["url"] !== "string") {
