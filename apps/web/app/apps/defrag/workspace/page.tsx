@@ -96,6 +96,7 @@ export default function DefragWorkspacePage() {
   // Library
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
+  const [patterns, setPatterns] = React.useState<Array<{ key: string; value: string }>>([])
 
   // Load baseline
   // Prefill composer from ?prompt= query param
@@ -281,6 +282,20 @@ export default function DefragWorkspacePage() {
           <p className="text-[12px] text-[#76716b] leading-relaxed">Past patterns will appear here after your first result.</p>
         )}
       </div>
+
+      {/* Pattern history */}
+      {patterns.length > 0 && (
+        <div className="px-5 pt-5 pb-5 border-b border-white/[0.05]">
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">Patterns</p>
+          <div className="flex flex-col gap-2">
+            {patterns.map((p, i) => (
+              <p key={i} className="text-[11px] text-[#76716b] leading-relaxed line-clamp-2">
+                {p.value}
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Back to entry */}
       <div className="px-5 pt-5">
