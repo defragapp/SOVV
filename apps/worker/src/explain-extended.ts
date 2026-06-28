@@ -270,9 +270,14 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     giftUnderStrain: parsed.giftUnderStrain || "This section needs more context.",
     alignment: parsed.alignment || "This section needs more context.",
     bestNextResponse: parsed.bestNextResponse || { summary: "This section needs more context.", phrasing: [] },
-    conversationalSteering: parsed.conversationalSteering || { do: [], avoid: [] }
-  };
-    
+    conversationalSteering: (() => {
+      const cs = parsed.conversationalSteering
+      if (!cs || typeof cs !== "object") return { do: [], avoid: [] }
+      return {
+        do: Array.isArray((cs as any).do) ? (cs as any).do : [],
+        avoid: Array.isArray((cs as any).avoid) ? (cs as any).avoid : [],
+      }
+    })(),
   };
 
   const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
