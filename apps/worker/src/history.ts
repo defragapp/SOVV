@@ -100,13 +100,22 @@ export async function handleGetLibrary(req: Request, env: Env) {
   const url = new URL(req.url);
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "20", 10), 50);
   const offset = parseInt(url.searchParams.get("offset") || "0", 10);
+  const workspaceSource = url.searchParams.get("workspace_source");
 
   try {
-    const { results } = await env.DB.prepare(
-      "SELECT * FROM library WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?"
-    )
-    .bind(user.id, limit, offset)
-    .all();
+    let query: string;
+    let bindings: unknown[];
+
+    if (workspaceSource && ["DEFRAG", "COVENANT", "ALIGNMENT"].includes(workspaceSource)) {
+      // Filter by space — uses idx_library_user_id_source index
+      query = "SELECT * FROM library WHERE user_id = ? AND workspace_source = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
+      bindings = [user.id, workspaceSource, limit, offset];
+    } else {
+      query = "SELECT * FROM library WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
+      bindings = [user.id, limit, offset];
+    }
+
+    const { results } = await env.DB.prepare(query).bind(...bindings).all();
 
     return Response.json({ items: results || [] });
   } catch (e) {
