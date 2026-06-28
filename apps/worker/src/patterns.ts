@@ -84,6 +84,23 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
 }
 
 export function registerPatternsRoutes(router: any, getEnv: () => Env) {
+  router.delete("/api/patterns", async (request: Request) => {
+    const env = getEnv();
+    const { getAuthUser } = await import("./auth.js");
+    const user = await getAuthUser(request, env.DB);
+    if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+
+    try {
+      // Clear all patterns for this user's sessions
+      await env.DB.prepare(
+        "DELETE FROM patterns WHERE session_id IN (SELECT token FROM sessions WHERE user_id = ?)"
+      ).bind(user.id).run();
+      return new Response(JSON.stringify({ success: true }), { status: 200 });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: "Failed to clear patterns" }), { status: 500 });
+    }
+  });
+
   router.get("/api/patterns", async (request: Request) => {
     const env = getEnv();
     
