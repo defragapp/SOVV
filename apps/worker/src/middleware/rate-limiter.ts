@@ -39,7 +39,15 @@ export class RateLimiter {
 
     // Get current request count and timestamps
     const stored = await this.kv.get(prefixedKey);
-    let timestamps: number[] = stored ? JSON.parse(stored) : [];
+    let timestamps: number[] = [];
+    if (stored) {
+      try {
+        timestamps = JSON.parse(stored);
+        if (!Array.isArray(timestamps)) timestamps = [];
+      } catch {
+        timestamps = [];
+      }
+    }
 
     // Remove expired timestamps (outside the window)
     timestamps = timestamps.filter((ts) => ts > windowStart);
