@@ -99,6 +99,8 @@ export default function DefragWorkspacePage() {
   const [patterns, setPatterns] = React.useState<Array<{ key: string; value: string }>>([])
   const [sessionResultCount, setSessionResultCount] = React.useState(0)
   const [showUpgradeNudge, setShowUpgradeNudge] = React.useState(false)
+  const [compareMode, setCompareMode] = React.useState(false)
+  const [compareName, setCompareName] = React.useState("")
 
   // Load baseline
   // Prefill composer from ?prompt= query param
@@ -163,6 +165,10 @@ export default function DefragWorkspacePage() {
       const pResult = await processInput({
         space: "defrag",
         message: input,
+        ...(compareMode && compareName.trim() ? {
+          target: { id: "compare", relation: compareName.trim() },
+          context: { targetName: compareName.trim() },
+        } : {}),
       })
       if (!pResult.ok) {
         setError(pResult.error)
@@ -443,6 +449,17 @@ export default function DefragWorkspacePage() {
 
       <div className={`flex-none px-6 pb-6 ${!baseline ? "opacity-40 pointer-events-none" : ""}`}>
         <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: 16 }}>
+          {compareMode && (
+            <div className="px-5 pt-4 pb-0 border-b border-white/[0.05]">
+              <input
+                type="text"
+                value={compareName}
+                onChange={e => setCompareName(e.target.value)}
+                placeholder="Who are you comparing with? (name or relation)"
+                className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] outline-none text-[13px] pb-3"
+              />
+            </div>
+          )}
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
@@ -454,6 +471,13 @@ export default function DefragWorkspacePage() {
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
             <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => { setCompareMode(m => !m); setCompareName("") }}
+                className={`font-mono text-[9px] uppercase tracking-[0.1em] transition-colors ${compareMode ? 'text-[#e0743a]/70' : 'text-[#4f4b47] hover:text-[#76716b]'}`}
+              >
+                {compareMode ? "Solo" : "Compare"}
+              </button>
               <span className={`font-mono text-[9px] tracking-[0.08em] transition-colors ${input.length > 1800 ? 'text-[#e0743a]/60' : 'text-[#4f4b47]/60'}`}>
                 {input.length > 0 ? `${input.length}/2000` : ''}
               </span>
