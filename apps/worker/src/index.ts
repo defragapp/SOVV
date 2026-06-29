@@ -152,7 +152,7 @@ function applyResponseHeaders(headers: Headers, request: Request): void {
   headers.set("x-endpoint", endpoint);
 }
 
-async function finalizeResponse(request: Request, response: Response, startedAt: number, env: Env): Promise<Response> {
+export async function finalizeResponse(request: Request, response: Response, startedAt: number, env: Env, ctx: ExecutionContext): Promise<Response> {
   const headers = new Headers(response.headers);
   applyResponseHeaders(headers, request);
 
@@ -162,9 +162,20 @@ async function finalizeResponse(request: Request, response: Response, startedAt:
   const statusText = response.statusText;
   const { endpoint } = getRequestContext(request);
   const activeProtectionLevel = getProtectionLevel(request);
-  const runtimeProtectionLevel = await trackRuntimeOutcome(env, request, { status, durationMs });
-  if (runtimeProtectionLevel > 0) {
-    headers.set("x-protection-level", String(runtimeProtectionLevel));
+  ctx.waitUntil(trackRuntimeOutcome(env, request, { status, durationMs }).catch((error) => {
+    logSafetyEvent({
+      level: "warn",
+      event: "runtime_outcome_tracking_failed",
+      request,
+      reason: "unknown_failure",
+      error_type: "system",
+      error,
+    });
+  }));
+  // Report the protection level that was active when this request began.
+  // Newly detected escalations are persisted asynchronously and are visible on subsequent requests.
+  if (activeProtectionLevel > 0) {
+    headers.set("x-protection-level", String(activeProtectionLevel));
   }
 
   if (status === 204 || response.body === null) {
@@ -189,7 +200,7 @@ async function finalizeResponse(request: Request, response: Response, startedAt:
     return new Response(response.body, { status, statusText, headers });
   }
 
-  if (status >= 400 || contentType.includes("application/json") || contentType.startsWith("text/plain") || contentType.length === 0) {
+  if (status >= 400 || (status < 300 && (contentType.includes("application/json") || contentType.startsWith("text/plain") || contentType.length === 0))) {
     const rawText = await response.text();
     const payload = status >= 400
       ? normalizeFailurePayload(rawText, contentType, getRequestContext(request).requestId, statusText)
@@ -216,7 +227,7 @@ async function finalizeResponse(request: Request, response: Response, startedAt:
         status,
         duration_ms: durationMs,
         protection_level: activeProtectionLevel,
-        details: activeProtectionLevel > 0 ? { runtime_protection_level: runtimeProtectionLevel } : undefined,
+        details: activeProtectionLevel > 0 ? { runtime_protection_level: activeProtectionLevel } : undefined,
       });
     }
 
@@ -500,7 +511,7 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
       }), {
         status: 429,
         headers: { "Content-Type": "application/json" },
-      }), diagnostic.startedAt, env);
+      }), diagnostic.startedAt, env, ctx);
     }
   }
   
@@ -511,12 +522,12 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
       return finalizeResponse(tracedRequest, new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
         status: 429,
         headers: { 'Content-Type': 'application/json' }
-      }), diagnostic.startedAt, env);
+      }), diagnostic.startedAt, env, ctx);
     }
   }
   
   const response = await router.fetch(tracedRequest, env, ctx);
-  return finalizeResponse(tracedRequest, response, diagnostic.startedAt, env);
+  return finalizeResponse(tracedRequest, response, diagnostic.startedAt, env, ctx);
 }
 
 export default {
@@ -541,6 +552,7 @@ export default {
         }),
         diagnostic.startedAt,
         env,
+        ctx,
       );
     }
   },

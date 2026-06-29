@@ -530,7 +530,7 @@ export async function trackRuntimeOutcome(
         },
       });
       state.last_recovery_minute = minute;
-    } else if (nextLevel > 0) {
+    } else if (nextLevel > previousLevel) {
       logSafetyEvent({
         level: "warn",
         event: "runtime_protection_escalated",
@@ -545,6 +545,21 @@ export async function trackRuntimeOutcome(
         },
       });
       state.last_escalation_minute = minute;
+    } else if (nextLevel < previousLevel) {
+      logSafetyEvent({
+        level: "info",
+        event: "runtime_protection_deescalated",
+        request,
+        reason: "protection_deescalation",
+        error_type: "system",
+        protection_level: nextLevel,
+        details: {
+          previous_level: previousLevel,
+          counters: cloneObject(counters),
+          average_duration_ms: avgDuration,
+        },
+      });
+      state.last_recovery_minute = minute;
     }
   }
 
