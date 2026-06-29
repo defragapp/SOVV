@@ -366,7 +366,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
         const aiResponse = await env.AI.run(
           (env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast") as any,
-          { messages, temperature: 0.3, max_tokens: tuneTokenBudget(900, serviceState.state, pressure.throttleLevel) }
+          { messages, temperature: 0.3, max_tokens: 900 }
         );
 
         const rawText = (aiResponse as any).response ?? String(aiResponse);
@@ -399,7 +399,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
       const aiResponse = await env.AI.run(
         (env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast") as any,
-        { messages, temperature: 0.3, max_tokens: tuneTokenBudget(700, serviceState.state, pressure.throttleLevel) }
+        { messages, temperature: 0.3, max_tokens: 700 }
       );
 
       const rawText = (aiResponse as any).response ?? String(aiResponse);
