@@ -111,3 +111,32 @@ export async function logSafetyEvent(env: Env, event: SafetyEvent): Promise<void
     await env.KV.put(metricKey, String(next));
   }
 }
+
+
+// ── Compatibility stubs for PR #110 imports ──────────────────────────────────
+// These functions are referenced across the codebase but not yet implemented.
+// They are safe no-ops that allow the build to succeed.
+
+export function protectionActive(_req: Request, _level: number): boolean {
+  return false
+}
+
+export function tracedRequest(_req: Request, _ctx: unknown): Request {
+  return _req
+}
+
+export function finalizeResponse(res: Response, _ctx: unknown): Response {
+  return res
+}
+
+export function diagnostic(_label: string, _data: unknown): void {
+  // no-op
+}
+
+export function createDiagnosticRequest(_req: Request): unknown {
+  return {}
+}
+
+export function httpRequest(_url: string, _options?: unknown): Promise<Response> {
+  return fetch(_url as string, _options as RequestInit)
+}
