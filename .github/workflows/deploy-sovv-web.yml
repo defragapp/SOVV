@@ -21,10 +21,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Install web deps
+        working-directory: apps/web
+        run: npm install --legacy-peer-deps
+      - name: Build Next.js
+        working-directory: apps/web
+        run: npm run build
+        env:
+          NODE_ENV: production
+      - name: Build OpenNext
+        working-directory: apps/web
+        run: npx @opennextjs/cloudflare build
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
       - name: Deploy sovv-web
         working-directory: apps/web
-        run: npm run deploy
-        continue-on-error: true
+        run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
