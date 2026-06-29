@@ -635,7 +635,7 @@ export async function buildHumanBehaviorTranslation(
         { role: "user", content: userPrompt },
       ],
       temperature: 0.25,
-      max_tokens: tuneTokenBudget(1000, serviceState.state, pressure.throttleLevel),
+      max_tokens: 1000,
     })
 
     const rawText = (aiResponse as any).response ?? String(aiResponse)
@@ -644,6 +644,9 @@ export async function buildHumanBehaviorTranslation(
       appRender = JSON.parse(match[0])
       aiSucceeded = true
     }
+  }
+  } catch (err) {
+    console.error("[human-translation] AI error:", err)
   }
 
   // Fallback if AI failed
