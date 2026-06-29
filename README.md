@@ -62,7 +62,7 @@ Launch copy, short-video concepts, caption guidance, and campaign operating docs
    npm run dev
    
    # Or run individual apps
-   npm run dev
+   npm run dev -w apps/web
    npm run dev:api
    ```
 
