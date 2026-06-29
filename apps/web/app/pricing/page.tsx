@@ -1,11 +1,9 @@
-"use client"
-
 import type { Metadata } from "next"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
 import Link from "next/link"
-import * as React from "react"
 import { AnimatedHeading, TextReveal } from "@/components/marketing/animated-elements"
+import { PricingUpgradeButton } from "@/components/marketing/PricingUpgradeButton"
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -25,7 +23,7 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
 
 const FREE_FEATURES = [
   "Baseline Design",
-  "Defrag space — full access",
+  "Defrag space \u2014 full access",
   "5 sessions per day",
   "Structured results",
   "Clear next responses",
@@ -43,64 +41,10 @@ const PRO_FEATURES = [
   "Full Library depth",
 ]
 
-function UpgradeButton() {
-  const [loading, setLoading] = React.useState(false)
-  const [error, setError] = React.useState("")
-
-  const handleUpgrade = async () => {
-    setLoading(true)
-    setError("")
-    try {
-      const res = await fetch("/api/billing/checkout", {
-        method: "POST",
-        credentials: "include",
-      })
-
-      if (res.status === 401) {
-        // Not logged in — send to login with return URL
-        window.location.href = "/app/login?return=/pricing"
-        return
-      }
-
-      const data = await res.json() as { url?: string; error?: string }
-
-      if (!res.ok || !data.url) {
-        setError(data.error === "billing_not_configured"
-          ? "Checkout is not available right now."
-          : "Something went wrong. Please try again.")
-        return
-      }
-
-      window.location.href = data.url
-    } catch {
-      setError("Connection failed. Please try again.")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div className="flex flex-col gap-2">
-      <button
-        type="button"
-        onClick={handleUpgrade}
-        disabled={loading}
-        className="btn-primary w-full text-center relative disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {loading ? "···" : "Upgrade to Pro"}
-      </button>
-      {error && (
-        <p className="text-[11px] text-red-400/80 text-center leading-relaxed">{error}</p>
-      )}
-    </div>
-  )
-}
-
 export default function PricingPage() {
   return (
     <SiteShell>
 
-      {/* ── HERO ── */}
       <section className="relative w-full pt-32 pb-16 md:pt-40 md:pb-20 bg-[#08070a] overflow-hidden">
         <div className="light-beam opacity-50" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
@@ -116,12 +60,10 @@ export default function PricingPage() {
         </Container>
       </section>
 
-      {/* ── PLANS ── */}
       <section className="w-full py-16 md:py-20 bg-[#08070a]">
         <Container>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
 
-            {/* Free */}
             <div className="border border-white/[0.08] bg-[#0c0a0d] p-8 flex flex-col" style={{ borderRadius: 16 }}>
               <div className="mb-8">
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Free</p>
@@ -131,22 +73,19 @@ export default function PricingPage() {
                 </div>
                 <p className="text-sm text-[#a8a29a] leading-relaxed">Start understanding the pattern.</p>
               </div>
-
               <div className="flex flex-col gap-3 flex-1 mb-8">
                 {FREE_FEATURES.map(f => (
                   <div key={f} className="flex items-start gap-3">
-                    <span className="text-[#e0743a]/60 text-sm shrink-0 mt-0.5">✓</span>
+                    <span className="text-[#e0743a]/60 text-sm shrink-0 mt-0.5">\u2713</span>
                     <span className="text-sm text-[#a8a29a]">{f}</span>
                   </div>
                 ))}
               </div>
-
               <Link href={APP_URL} className="btn-secondary w-full text-center">
                 Start Free
               </Link>
             </div>
 
-            {/* Pro */}
             <div className="border border-[#e0743a]/30 bg-[#0c0a0d] p-8 flex flex-col relative overflow-hidden" style={{ borderRadius: 16 }}>
               <div
                 className="pointer-events-none absolute inset-0"
@@ -166,31 +105,27 @@ export default function PricingPage() {
                 </div>
                 <p className="text-sm text-[#a8a29a] leading-relaxed">For patterns that need continuity.</p>
               </div>
-
               <div className="relative flex flex-col gap-3 flex-1 mb-8">
                 {PRO_FEATURES.map(f => (
                   <div key={f} className="flex items-start gap-3">
-                    <span className="text-[#e0743a]/60 text-sm shrink-0 mt-0.5">✓</span>
+                    <span className="text-[#e0743a]/60 text-sm shrink-0 mt-0.5">\u2713</span>
                     <span className="text-sm text-[#a8a29a]">{f}</span>
                   </div>
                 ))}
               </div>
-
-              <UpgradeButton />
+              <PricingUpgradeButton />
             </div>
 
           </div>
         </Container>
       </section>
 
-      {/* ── COMPARISON ── */}
       <section className="w-full py-16 md:py-20 bg-[#0c0a0d] border-t border-white/5">
         <Container className="max-w-3xl">
-          <MetaLabel>What's included</MetaLabel>
+          <MetaLabel>What&apos;s included</MetaLabel>
           <AnimatedHeading className="text-3xl md:text-4xl tracking-[-0.02em] leading-tight mb-12">
             Feature by feature.
           </AnimatedHeading>
-
           <div className="flex flex-col gap-0">
             <div className="grid grid-cols-3 pb-4 border-b border-white/[0.08]">
               <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Feature</span>
@@ -212,17 +147,13 @@ export default function PricingPage() {
                 <span className="text-sm text-[#a8a29a]">{row.feature}</span>
                 <span className="text-center">
                   {typeof row.free === "boolean"
-                    ? row.free
-                      ? <span className="text-[#e0743a]/60 text-sm">✓</span>
-                      : <span className="text-[#4f4b47] text-sm">—</span>
+                    ? row.free ? <span className="text-[#e0743a]/60 text-sm">\u2713</span> : <span className="text-[#4f4b47] text-sm">&mdash;</span>
                     : <span className="text-sm text-[#a8a29a]">{row.free}</span>
                   }
                 </span>
                 <span className="text-center">
                   {typeof row.pro === "boolean"
-                    ? row.pro
-                      ? <span className="text-[#e0743a]/60 text-sm">✓</span>
-                      : <span className="text-[#4f4b47] text-sm">—</span>
+                    ? row.pro ? <span className="text-[#e0743a]/60 text-sm">\u2713</span> : <span className="text-[#4f4b47] text-sm">&mdash;</span>
                     : <span className="text-sm text-[#a8a29a]">{row.pro}</span>
                   }
                 </span>
@@ -232,15 +163,14 @@ export default function PricingPage() {
         </Container>
       </section>
 
-      {/* ── FAQ ── */}
       <section className="w-full py-16 md:py-20 bg-[#08070a] border-t border-white/5">
         <Container className="max-w-2xl">
           <MetaLabel>Questions</MetaLabel>
           <div className="flex flex-col">
             {[
               { q: "Can I cancel anytime?", a: "Yes. Cancel from your account settings at any time. Your Pro access continues until the end of the billing period." },
-              { q: "What happens to my Library if I downgrade?", a: "Your saved results are preserved. You won't be able to add new ones on the free plan, but everything you saved stays in your account." },
-              { q: "Is there a free trial for Pro?", a: "Defrag is free with no time limit. If you want to try Covenant or Alignment, upgrade to Pro — you can cancel anytime." },
+              { q: "What happens to my Library if I downgrade?", a: "Your saved results are preserved. You won\u2019t be able to add new ones on the free plan, but everything you saved stays in your account." },
+              { q: "Is there a free trial for Pro?", a: "Defrag is free with no time limit. If you want to try Covenant or Alignment, upgrade to Pro \u2014 you can cancel anytime." },
               { q: "Do you offer promo codes?", a: "Yes. Enter a promo code at checkout. If you have one, it will be applied before your first charge." },
             ].map((item, i) => (
               <details key={i} className="group border-b border-white/[0.08] py-6 cursor-pointer">
