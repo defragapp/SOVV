@@ -644,8 +644,6 @@ export async function buildHumanBehaviorTranslation(
       appRender = JSON.parse(match[0])
       aiSucceeded = true
     }
-  } catch (err) {
-    console.error("[human-translation] AI error:", err)
   }
 
   // Fallback if AI failed

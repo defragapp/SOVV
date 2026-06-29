@@ -386,13 +386,13 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
   }
   
   if (env.RATE_LIMITER) {
-    const ip = request.headers.get('cf-connecting-ip') || 'unknown-ip';
+    const ip = tracedRequest.headers.get('cf-connecting-ip') || 'unknown-ip';
     const { success } = await env.RATE_LIMITER.limit({ key: ip });
     if (!success) {
-      return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+      return finalizeResponse(tracedRequest, new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
         status: 429,
-        headers: { 'Content-Type': 'application/json', ...getCorsHeaders(request) }
-      });
+        headers: { 'Content-Type': 'application/json' }
+      }), diagnostic.startedAt, env, ctx);
     }
   }
   
