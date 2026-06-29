@@ -14,14 +14,14 @@ export default function Home() {
             Sovereign.os
           </p>
           <h1 className="font-serif text-[#f4efe9] text-balance leading-[1.02] tracking-[-0.035em] text-[clamp(3rem,8vw,7.5rem)] max-w-5xl">
-            Healing isn&apos;t optional.
+            You are not broken. You are patterned.
           </h1>
           <p className="mt-7 max-w-xl text-[#a8a29a] leading-relaxed text-base md:text-lg">
-            Defrag helps you see the moment clearly, separate the pattern from the pressure, and choose the next move that does not add more harm.
+            Sovereign.os helps you see the loop, separate the pattern from the pressure, and choose the next move with more clarity and less harm.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-3 items-center">
             <Link href={APP_URL} className="btn-primary">
-              Enter Sovereign.os
+              Start with your baseline
             </Link>
             <Link href="/product/defrag" className="btn-secondary">
               Open Defrag
