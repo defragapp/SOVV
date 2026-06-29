@@ -49,9 +49,10 @@ export type SafetyEvent = {
 };
 
 export async function logSafetyEvent(envOrEvent: Env | SafetyEvent, event?: SafetyEvent): Promise<void> {
-  const env = event ? envOrEvent as Env : undefined
+  // Accept both (env, event) and (event) call signatures
+  const env = event ? envOrEvent as Env : null
   const safetyEvent = event ?? envOrEvent as SafetyEvent
-  if (!env) { console.warn("[safety] logSafetyEvent called without env", safetyEvent); return }
+  if (!env) { console.warn("[safety] logSafetyEvent called without env", safetyEvent?.type); return }
   const payload = {
     channel: "safety",
     timestamp: new Date().toISOString(),
