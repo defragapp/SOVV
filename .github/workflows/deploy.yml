@@ -17,7 +17,7 @@ jobs:
           node-version: 22
       - name: Install worker deps
         working-directory: apps/worker
-        run: npm install
+        run: npm install --legacy-peer-deps
       - name: Check worker types
         working-directory: apps/worker
         run: npx tsc --noEmit 2>&1 || echo "TypeScript errors found - non-blocking"
