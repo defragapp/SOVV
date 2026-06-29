@@ -12,7 +12,46 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4name: Deploy SOVV Web
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/web/**'
+      - 'packages/core/**'
+      - '.github/workflows/deploy.yml'
+jobs:
+  deploy-web:
+    name: Deploy Web to Cloudflare
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/web
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - name: Install Dependencies
+        working-directory: .
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck & Build
+        run: |
+          pnpm run typecheck
+          pnpm run build
+      - name: Deploy to Cloudflare
+        run: ./scripts/deploy.sh
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CI: true
+
         with:
           node-version: 22
       - name: Install worker deps
