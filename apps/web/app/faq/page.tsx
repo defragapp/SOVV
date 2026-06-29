@@ -3,7 +3,7 @@ import { SiteShell } from "@/components/marketing/site-shell";
 import { Container, Section } from "@/components/ui/layout-primitives";
 
 export const metadata: Metadata = {
-  title: "FAQ — Sovereign.os",
+  title: "FAQ",
   description: "Common questions about Sovereign.os, Baseline Design, Defrag, Covenant, and the Sovereign.os Library.",
 };
 

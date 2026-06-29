@@ -5,7 +5,7 @@ import Link from "next/link"
 import { AnimatedHeading, TextReveal } from "@/components/marketing/animated-elements"
 
 export const metadata: Metadata = {
-  title: "Pricing — Sovereign.os",
+  title: "Pricing",
   description: "Start free. Upgrade when you need continuity.",
 }
 
@@ -49,9 +49,9 @@ export default function PricingPage() {
         <div className="light-beam opacity-50" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <MetaLabel>Pricing</MetaLabel>
-          <AnimatedHeading className="text-4xl md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
+          <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
             Start free. Upgrade when you need continuity.
-          </AnimatedHeading>
+          </h1>
           <TextReveal delay={200}>
             <p className="mt-5 max-w-md text-base text-[#a8a29a] leading-relaxed">
               Defrag is free. Covenant, Alignment, and your Library require Pro.

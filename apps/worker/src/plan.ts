@@ -46,7 +46,7 @@ export async function checkFreeLimit(env: Env, sid: string): Promise<{ allowed: 
   const now = Date.now();
   const endOfDay = new Date();
   endOfDay.setUTCHours(23, 59, 59, 999);
-  const ttl = Math.floor((endOfDay.getTime() - now) / 1000);
+  const ttl = Math.max(60, Math.floor((endOfDay.getTime() - now) / 1000));
 
   await withLimitedRetry(
     "kv_free_limit_put",

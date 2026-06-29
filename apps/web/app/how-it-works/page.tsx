@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/layout-primitives"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "How It Works — Sovereign.os",
+  title: "How It Works",
   description: "Sovereign.os guides you from the moment that won't leave you alone toward a clearer way through.",
 }
 
