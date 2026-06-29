@@ -200,7 +200,7 @@ export async function finalizeResponse(request: Request, response: Response, sta
     return new Response(response.body, { status, statusText, headers });
   }
 
-  if (status >= 400 || (status < 300 && (contentType.includes("application/json") || contentType.startsWith("text/plain") || contentType.length === 0))) {
+  if (status >= 400 || (status >= 200 && status < 300 && (contentType.includes("application/json") || contentType.startsWith("text/plain") || contentType.length === 0))) {
     const rawText = await response.text();
     const payload = status >= 400
       ? normalizeFailurePayload(rawText, contentType, getRequestContext(request).requestId, statusText)
