@@ -14,7 +14,7 @@ export default function DefragProductPage() {
             Defrag
           </p>
           <h1 className="font-serif text-[#f4efe9] text-balance leading-[1.02] tracking-[-0.035em] text-[clamp(3rem,8vw,7.5rem)] max-w-5xl">
-            See the loop before it runs you.
+            See the loop before it runs you again.
           </h1>
           <p className="mt-7 max-w-xl text-[#a8a29a] leading-relaxed text-base md:text-lg">
             Defrag helps you separate the moment from the pattern, name the pressure, and choose a clearer next move.
