@@ -110,7 +110,7 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
 
       // We use @cf/elevenlabs/tts, which Cloudflare provides natively without needing your own API key
       const response = await env.AI.run("@cf/elevenlabs/tts", {
-        text: text
+        text: text,
       });
 
       // It returns a Uint8Array containing the audio data.

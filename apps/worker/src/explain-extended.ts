@@ -344,7 +344,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
         { role: "user", content: userPrompt },
       ],
       temperature: 0.35,
-      max_tokens: 900,
+      max_tokens: tuneTokenBudget(900, serviceState.state, pressure.throttleLevel),
     }, {
       gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" }
     });
