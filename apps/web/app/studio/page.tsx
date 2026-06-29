@@ -11,7 +11,7 @@ export default function StudioPage() {
           Healing isn&apos;t optional.
         </h1>
         <p className="mt-7 max-w-xl mx-auto text-[#a8a29a] leading-relaxed text-base md:text-lg">
-          See the moment clearly, then choose the next right response.
+          See the moment clearly. Choose the next right response.
         </p>
         <div className="mt-10 flex flex-col sm:flex-row gap-3 items-center justify-center">
           <Link href="/app/login" className="btn-primary">
