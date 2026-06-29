@@ -1,104 +1,11 @@
-name: Deploy Platform Cloudflare
+name: Deploy Platform Cloudflare (DISABLED)
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
-  schedule:
-    - cron: '*/5 * * * *'
-
-concurrency:
-  group: deploy-platform-cloudflare-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
-  worker-checks:
-    name: Worker checks
-    continue-on-error: true
+  disabled:
+    name: Disabled - use deploy.yml instead
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Install worker deps
-        working-directory: apps/worker
-        run: npm install --legacy-peer-deps --ignore-scripts
-      - name: Typecheck worker
-        working-directory: apps/worker
-        run: npx tsc --noEmit 2>&1 || echo "TypeScript errors found - non-blocking"
-      - name: Test worker
-        working-directory: apps/worker
-        run: npx vitest run --reporter=verbose 2>&1 || echo "Tests failed - non-blocking"
-
-  deploy-api:
-    needs: worker-checks
-    name: Deploy API Worker
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Install worker deps
-        working-directory: apps/worker
-        run: npm install --legacy-peer-deps --ignore-scripts
-      - name: Deploy sovereign-os-api
-        working-directory: apps/worker
-        run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-
-  deploy-ai:
-    needs: worker-checks
-    name: Deploy AI Worker
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Install AI worker deps
-        working-directory: apps/worker-ai
-        run: npm install --legacy-peer-deps --ignore-scripts
-      - name: Deploy worker-ai
-        working-directory: apps/worker-ai
-        run: npx wrangler deploy --env production
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-
-  deploy-session:
-    needs: worker-checks
-    name: Deploy Session Worker
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Install session worker deps
-        working-directory: apps/worker-session
-        run: npm install --legacy-peer-deps --ignore-scripts
-      - name: Deploy worker-session
-        working-directory: apps/worker-session
-        run: npx wrangler deploy --env production
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-
-  deploy-web:
-    name: Deploy sovv-web
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Deploy sovv-web Worker
-        working-directory: apps/web
-        run: npm run deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      - run: echo "Platform workflow disabled. Using deploy.yml instead."
