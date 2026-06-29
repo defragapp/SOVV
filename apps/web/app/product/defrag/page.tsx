@@ -17,11 +17,11 @@ export default function DefragProductPage() {
             See the loop before it runs you again.
           </h1>
           <p className="mt-7 max-w-xl text-[#a8a29a] leading-relaxed text-base md:text-lg">
-            Defrag shows you what is active beneath the argument, the silence, the message, or the grief — and gives you the clearest next response.
+            Defrag helps you separate the moment from the pattern, name the pressure, and choose a clearer next move.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-3 items-center">
             <Link href={APP_URL} className="btn-primary">
-              Open Defrag
+              Start with your baseline
             </Link>
             <Link href="/pricing" className="btn-secondary">
               See plans

@@ -6,6 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: base, lastModified: now, changeFrequency: "weekly", priority: 1.0 },
+    { url: `${base}/campaign/sovereign-os`, lastModified: now, changeFrequency: "weekly", priority: 0.95 },
     { url: `${base}/product/defrag`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/product/covenant`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/product/alignment`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
