@@ -57,10 +57,23 @@ async function enforceRequestSize(request: Request): Promise<Response | null> {
     }
   }
 
-  const cloned = request.clone();
-  const bytes = (await cloned.arrayBuffer()).byteLength;
-  if (bytes > limit) {
-    return Response.json({ ok: false, error: "payload_too_large" }, { status: 413 });
+  const requestBody = request.clone().body;
+  if (requestBody) {
+    const reader = requestBody.getReader();
+    let bytesRead = 0;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        bytesRead += value.byteLength;
+        if (bytesRead > limit) {
+          await reader.cancel();
+          return Response.json({ ok: false, error: "payload_too_large" }, { status: 413 });
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
   }
   return null;
 }
