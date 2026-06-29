@@ -147,7 +147,8 @@ function normalizeBodyText(bodyText: string): string {
 }
 
 function computeRepetitionScore(bodyText: string): number {
-  const normalized = normalizeBodyText(bodyText);
+  const limitedBody = bodyText.slice(0, 1000);
+  const normalized = normalizeBodyText(limitedBody);
   if (!normalized) return 0;
   const tokens = normalized.split(" ").filter(Boolean);
   if (tokens.length === 0) return 0;
