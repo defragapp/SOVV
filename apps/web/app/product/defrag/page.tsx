@@ -14,14 +14,14 @@ export default function DefragProductPage() {
             Defrag
           </p>
           <h1 className="font-serif text-[#f4efe9] text-balance leading-[1.02] tracking-[-0.035em] text-[clamp(3rem,8vw,7.5rem)] max-w-5xl">
-            Healing isn&apos;t optional.
+            See the loop before it runs you.
           </h1>
           <p className="mt-7 max-w-xl text-[#a8a29a] leading-relaxed text-base md:text-lg">
-            Defrag shows you what is active beneath the argument, the silence, the message, or the grief — and gives you the clearest next response.
+            Defrag helps you separate the moment from the pattern, name the pressure, and choose a clearer next move.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-3 items-center">
             <Link href={APP_URL} className="btn-primary">
-              Open Defrag
+              Start with your baseline
             </Link>
             <Link href="/pricing" className="btn-secondary">
               See plans

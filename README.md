@@ -25,12 +25,17 @@ SOVV (monorepo)
 - **Web App** (`apps/web`): Next.js application providing UI for workspace, studio, and marketplace
 - **Shared Packages** (`packages/`): Reusable components, utilities, and domain logic
 
+
+## 📣 Sovereign.os Marketing
+
+Launch copy, short-video concepts, caption guidance, and campaign operating docs live in [`docs/marketing`](docs/marketing/README.md). Current campaign language centers on "You are not broken. You are patterned," "The personal operating system for relational intelligence," and the primary CTA "Start with your baseline."
+
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 - **Node.js 22** (see `.nvmrc`)
-- **pnpm 9+** for monorepo management
+- **npm 10+** for monorepo management
 - **Cloudflare account** for worker deployment (optional for local dev)
 
 ### Setup
@@ -39,7 +44,7 @@ SOVV (monorepo)
    ```bash
    git clone https://github.com/defragapp/SOVV.git
    cd SOVV
-   pnpm install
+   npm install
    ```
 
 2. **Configure environment**
@@ -54,20 +59,20 @@ SOVV (monorepo)
 3. **Run locally**
    ```bash
    # Start all apps in watch mode (requires turbo)
-   pnpm dev
+   npm run dev
    
    # Or run individual apps
-   pnpm -F @app/web dev
-   pnpm -F @app/worker dev
+   npm run dev
+   npm run dev:api
    ```
 
 4. **Run tests**
    ```bash
    # All tests
-   pnpm test
+   npm run verify
    
    # Specific workspace
-   pnpm -F @app/worker test
+   npm run -w apps/worker test
    ```
 
 ## 📦 Package Structure
@@ -228,7 +233,7 @@ pnpm clean && pnpm install && pnpm dev
 3. **Type check and test**
    ```bash
    pnpm typecheck
-   pnpm test
+   npm run verify
    ```
 
 4. **Create pull request** with clear description

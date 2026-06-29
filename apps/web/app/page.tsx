@@ -23,8 +23,8 @@ export default function Home() {
             <Link href={APP_URL} className="btn-primary">
               Start with your baseline
             </Link>
-            <Link href="/product/defrag" className="btn-secondary">
-              Open Defrag
+            <Link href="/campaign/sovereign-os" className="btn-secondary">
+              Explore the campaign
             </Link>
           </div>
         </Container>

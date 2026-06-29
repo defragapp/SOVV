@@ -7,6 +7,9 @@ This directory contains campaign materials for Sovereign.os launch creative.
 - `sovereign-os-short-video-campaign.md` — complete short-form video campaign brief with scripts, shot lists, voiceovers, on-screen text, end cards, launch order, and editing notes.
 - `video-production-prompts.md` — reusable generative video prompts, b-roll prompts, motion text prompts, end-card direction, music direction, and export checklist.
 - `caption-pack.md` — organic captions, paid ad hooks, CTAs, hashtags, thumbnail headlines, and comment reply prompts.
+- `launch-checklist.md` — pre-launch, production, publishing, metrics, and safety review checklist.
+- `video-asset-manifest.json` — structured manifest for the seven short-video concepts.
+- `video-asset-manifest.md` — guidance for using the manifest in an editing or AI-video workflow.
 
 ## Campaign center
 
