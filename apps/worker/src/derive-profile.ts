@@ -69,7 +69,7 @@ export async function handleDeriveProfile(
   const coldStart = getColdStartMarker()
 
   // 1. Auth — session required
-  const authUser = await getAuthUser(request as unknown as Request, env.DB)
+  const authUser = await getAuthUser(httpRequest, env.DB)
   if (!authUser) {
     return jsonResponse({ error: "Unauthorized" }, 401)
   }
@@ -90,7 +90,15 @@ export async function handleDeriveProfile(
   let baseline: Baseline
   try {
     baseline = JSON.parse(raw) as Baseline
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "error",
+      event: "derive_profile_invalid_baseline",
+      request: httpRequest,
+      reason: "unknown_failure",
+      error_type: "system",
+      error,
+    })
     return jsonResponse({ error: "invalid_baseline" }, 500)
   }
 
@@ -146,6 +154,26 @@ export async function handleDeriveProfile(
       },
     })
     return temporaryUnavailableResponse(requestId)
+  }
+
+  if (protectionActive(httpRequest, 2)) {
+    logSafetyEvent({
+      level: "warn",
+      event: "derive_profile_protective_fallback",
+      request: httpRequest,
+      reason: "protection_escalation",
+      error_type: "system",
+      protection_level: 2,
+    })
+    return jsonResponse({
+      statements: [
+        { statement: "I make better decisions when I slow down long enough to notice what is actually true.", chips: ["Baseline active"] },
+        { statement: "I operate best when I stop carrying outcomes that do not belong to me.", chips: ["Pattern under load"] },
+        { statement: "I communicate more clearly when I do not manage the other person's reaction.", chips: ["Communication"] },
+        { statement: "I get cleaner results when I make one real move instead of solving everything at once.", chips: ["Decision timing"] },
+        { statement: "I can use this moment to return to what is mine instead of amplifying pressure.", chips: ["Recovery"] },
+      ],
+    })
   }
 
   // 4. Call AI

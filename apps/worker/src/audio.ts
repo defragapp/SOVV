@@ -102,6 +102,20 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
         return new Response(JSON.stringify({ error: "Text is required" }), { status: 400 });
       }
 
+      if (protectionActive(request, 2)) {
+        logSafetyEvent({
+          level: "warn",
+          event: "audio_protective_fallback",
+          request,
+          reason: "protection_escalation",
+          error_type: "system",
+          protection_level: 2,
+        });
+        return new Response(JSON.stringify({
+          error: "Audio overview is temporarily unavailable while the system stabilizes.",
+        }), { status: 503, headers: { "Content-Type": "application/json" } });
+      }
+
       // Use Cloudflare's native AI TTS proxy model (which is free/included in Workers AI limits)
       // This allows us to generate basic audio without an external ElevenLabs key.
       if (!env.AI) {

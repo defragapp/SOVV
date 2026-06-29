@@ -264,6 +264,13 @@ export function registerPatternsRoutes(router: any, getEnv: () => Env) {
         headers: { "Content-Type": "application/json" }
       });
     } catch (err: any) {
+      logSafetyEvent({
+        level: "error",
+        event: "patterns_fetch_failed",
+        request,
+        error_type: "system",
+        error: err,
+      });
       return new Response(JSON.stringify({ error: err.message }), {
         status: 500,
         headers: { "Content-Type": "application/json" }

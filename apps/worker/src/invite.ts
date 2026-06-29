@@ -64,7 +64,16 @@ async function handleCreateInvite(req: Request, env: Env): Promise<Response> {
     await env.KV.put(inviteKey, String(count + 1), { expirationTtl: 86400 });
   }
 
-  const body = await req.json().catch(() => ({})) as any;
+  const body = await req.json().catch((error) => {
+    logSafetyEvent({
+      level: "warn",
+      event: "invite_create_invalid_json",
+      request: req,
+      error_type: "validation",
+      error,
+    });
+    return {};
+  }) as any;
   const { workspace_source, library_id, invite_mode, result_context } = body;
 
   if (typeof result_context === "string" && result_context.length > 3000) {
@@ -96,13 +105,27 @@ async function handleCreateInvite(req: Request, env: Env): Promise<Response> {
        VALUES (?, ?, ?, ?, ?, 'pending', ?, datetime('now', '+7 days'))`
     ).bind(token, user.id, library_id || null, workspace_source, invite_mode || "reflection", now).run();
   } catch (err: any) {
+    logSafetyEvent({
+      level: "warn",
+      event: "invite_create_primary_insert_failed",
+      request: req,
+      error_type: "system",
+      error: err,
+    });
     // If library_id FK fails, try without FK constraint
     try {
       await env.DB.prepare(
         `INSERT OR IGNORE INTO invites_v2 (token, owner_id, status, created_at)
          VALUES (?, ?, 'pending', ?)`
       ).bind(token, user.id, now).run();
-    } catch {
+    } catch (fallbackError) {
+      logSafetyEvent({
+        level: "error",
+        event: "invite_create_fallback_insert_failed",
+        request: req,
+        error_type: "system",
+        error: fallbackError,
+      });
       return jsonResponse({ error: "Failed to create invite" }, 500);
     }
   }
@@ -127,13 +150,29 @@ async function handleGetInvite(token: string, env: Env): Promise<Response> {
     invite = await env.DB.prepare(
       "SELECT token, owner_id, status, created_at FROM invites_v2 WHERE token = ?"
     ).bind(token).first<{ token: string; owner_id: string; status: string; created_at: string }>();
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "invite_lookup_v2_failed",
+      endpoint: "GET /api/invite/:token",
+      requestId: token,
+      error_type: "system",
+      error,
+    });
     // invites_v2 table may not exist yet — try legacy invites table
     try {
       invite = await env.DB.prepare(
         "SELECT token, owner_id, status, created_at FROM invites WHERE token = ?"
       ).bind(token).first<{ token: string; owner_id: string; status: string; created_at: string }>();
-    } catch {
+    } catch (fallbackError) {
+      logSafetyEvent({
+        level: "warn",
+        event: "invite_lookup_legacy_failed",
+        endpoint: "GET /api/invite/:token",
+        requestId: token,
+        error_type: "system",
+        error: fallbackError,
+      });
       return jsonResponse({ error: "Invite not found" }, 404);
     }
   }
@@ -171,12 +210,28 @@ async function handleAcceptInvite(token: string, req: Request, env: Env): Promis
     invite = await env.DB.prepare(
       "SELECT token, owner_id, status, invitee_id FROM invites_v2 WHERE token = ?"
     ).bind(token).first<{ token: string; owner_id: string; status: string; invitee_id: string | null }>();
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "invite_accept_lookup_v2_failed",
+      request: req,
+      error_type: "system",
+      error,
+      details: { inviteToken: token },
+    });
     try {
       invite = await env.DB.prepare(
         "SELECT token, owner_id, status, invitee_id FROM invites WHERE token = ?"
       ).bind(token).first<{ token: string; owner_id: string; status: string; invitee_id: string | null }>();
-    } catch {
+    } catch (fallbackError) {
+      logSafetyEvent({
+        level: "warn",
+        event: "invite_accept_lookup_legacy_failed",
+        request: req,
+        error_type: "system",
+        error: fallbackError,
+        details: { inviteToken: token },
+      });
       return jsonResponse({ error: "Invite not found" }, 404);
     }
   }
@@ -186,7 +241,17 @@ async function handleAcceptInvite(token: string, req: Request, env: Env): Promis
   if (invite.status === "completed") return jsonResponse({ error: "Invite already completed" }, 400);
 
   // Check consent in request body
-  const body = await req.json().catch(() => ({})) as any;
+  const body = await req.json().catch((error) => {
+    logSafetyEvent({
+      level: "warn",
+      event: "invite_accept_invalid_json",
+      request: req,
+      error_type: "validation",
+      error,
+      details: { inviteToken: token },
+    });
+    return {};
+  }) as any;
   if (!body.consent) return jsonResponse({ error: "Consent required" }, 400);
 
   // Check if invitee has baseline
@@ -224,12 +289,28 @@ async function handleInviteResult(token: string, req: Request, env: Env): Promis
     invite = await env.DB.prepare(
       "SELECT token, owner_id, invitee_id, status, comparison_result FROM invites_v2 WHERE token = ?"
     ).bind(token).first<{ token: string; owner_id: string; invitee_id: string | null; status: string; comparison_result: string | null }>();
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "invite_result_lookup_v2_failed",
+      request: req,
+      error_type: "system",
+      error,
+      details: { inviteToken: token },
+    });
     try {
       invite = await env.DB.prepare(
         "SELECT token, owner_id, invitee_id, status, comparison_result FROM invites WHERE token = ?"
       ).bind(token).first<{ token: string; owner_id: string; invitee_id: string | null; status: string; comparison_result: string | null }>();
-    } catch {
+    } catch (fallbackError) {
+      logSafetyEvent({
+        level: "warn",
+        event: "invite_result_lookup_legacy_failed",
+        request: req,
+        error_type: "system",
+        error: fallbackError,
+        details: { inviteToken: token },
+      });
       return jsonResponse({ error: "Invite not found" }, 404);
     }
   }
@@ -242,7 +323,16 @@ async function handleInviteResult(token: string, req: Request, env: Env): Promis
   if (invite.comparison_result) {
     try {
       return jsonResponse(JSON.parse(invite.comparison_result), 200);
-    } catch {}
+    } catch (error) {
+      logSafetyEvent({
+        level: "warn",
+        event: "invite_cached_result_parse_failed",
+        request: req,
+        error_type: "system",
+        error,
+        details: { inviteToken: token },
+      });
+    }
   }
 
   // Check invitee baseline
@@ -252,7 +342,17 @@ async function handleInviteResult(token: string, req: Request, env: Env): Promis
   }
 
   // Load invitee's AI-ready baseline context (no raw data)
-  const inviteeContext = await getBaselineForAI(env, user.id, "defrag").catch(() => "");
+  const inviteeContext = await getBaselineForAI(env, user.id, "defrag").catch((error) => {
+    logSafetyEvent({
+      level: "warn",
+      event: "invite_result_baseline_context_unavailable",
+      request: req,
+      error_type: "system",
+      error,
+      details: { inviteToken: token },
+    });
+    return "";
+  });
 
   // Generate reflection result using AI
   const aiModel = (env as any).AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
@@ -411,7 +511,16 @@ Return JSON only:
     await env.DB.prepare(
       "UPDATE invites_v2 SET comparison_result = ?, status = 'completed' WHERE token = ?"
     ).bind(JSON.stringify(result), token).run();
-  } catch {}
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "invite_result_cache_failed",
+      request: req,
+      error_type: "system",
+      error,
+      details: { inviteToken: token },
+    });
+  }
 
   return jsonResponse(result, 200);
 }
@@ -439,6 +548,13 @@ export function registerInviteRoutes(router: any, getEnv: () => Env) {
         headers: { "Content-Type": "application/json" },
       })
     } catch (e) {
+      logSafetyEvent({
+        level: "error",
+        event: "invite_list_fetch_failed",
+        request: req,
+        error_type: "system",
+        error: e,
+      })
       return new Response(JSON.stringify({ error: "Failed to fetch invites" }), { status: 500 })
     }
   });

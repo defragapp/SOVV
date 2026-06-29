@@ -5,6 +5,7 @@ import type { Interaction } from "@sovereign/core";
 import { getAuthUser, verifyAccessJWT } from "./auth";
 import { mapInteraction, type InteractionRow } from "./db";
 import { requireActiveSubscription } from "./billing";
+import { logSafetyEvent } from "./safety.js";
 
 async function requireSessionAuth(req: Request, env: Env): Promise<Response | null> {
   const user = await getAuthUser(req, env.DB);
@@ -46,7 +47,13 @@ export async function handleHistory(req: Request, env: Env) {
       headers: { "set-cookie": cookieHeader(sid) }
     });
   } catch (e) {
-    console.error("Failed to fetch history", String(e));
+    logSafetyEvent({
+      level: "error",
+      event: "history_fetch_failed",
+      request: req,
+      error_type: "system",
+      error: e,
+    });
     return Response.json({ interactions: [] });
   }
 }
@@ -58,7 +65,16 @@ export async function handleSaveToLibrary(req: Request, env: Env) {
   }
 
   try {
-    const body = await req.json().catch(() => ({})) as any;
+    const body = await req.json().catch((error) => {
+      logSafetyEvent({
+        level: "warn",
+        event: "library_save_invalid_json",
+        request: req,
+        error_type: "validation",
+        error,
+      });
+      return {};
+    }) as any;
     const { title, content, payload, workspace_source } = body;
 
     if (typeof title !== "string" || typeof workspace_source !== "string") {
@@ -86,7 +102,13 @@ export async function handleSaveToLibrary(req: Request, env: Env) {
 
     return Response.json({ success: true, id });
   } catch (e) {
-    console.error("Failed to save to library", String(e));
+    logSafetyEvent({
+      level: "error",
+      event: "library_save_failed",
+      request: req,
+      error_type: "system",
+      error: e,
+    });
     return new Response("Internal Server Error", { status: 500 });
   }
 }
@@ -131,7 +153,13 @@ export async function handleGetLibrary(req: Request, env: Env) {
 
     return Response.json({ items: results || [] });
   } catch (e) {
-    console.error("Failed to fetch library", String(e));
+    logSafetyEvent({
+      level: "error",
+      event: "library_fetch_failed",
+      request: req,
+      error_type: "system",
+      error: e,
+    });
     return Response.json({ items: [] });
   }
 }
@@ -164,7 +192,13 @@ export async function handleGetLibraryItem(req: Request, env: Env) {
 
     return Response.json(item);
   } catch (e) {
-    console.error("Failed to fetch library item", String(e));
+    logSafetyEvent({
+      level: "error",
+      event: "library_item_fetch_failed",
+      request: req,
+      error_type: "system",
+      error: e,
+    });
     return new Response("Internal error", { status: 500 });
   }
 }
@@ -195,7 +229,13 @@ export async function handleDeleteLibraryItem(req: Request, env: Env) {
 
     return Response.json({ success: true });
   } catch (e) {
-    console.error("Failed to delete library item", String(e));
+    logSafetyEvent({
+      level: "error",
+      event: "library_item_delete_failed",
+      request: req,
+      error_type: "system",
+      error: e,
+    });
     return new Response("Internal Server Error", { status: 500 });
   }
 }

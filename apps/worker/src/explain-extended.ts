@@ -64,7 +64,15 @@ function parseJsonFromText(text: string): Record<string, any> {
 
   try {
     return JSON.parse(match[0]) as Record<string, any>;
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "defrag_response_parse_failed",
+      endpoint: "defrag",
+      requestId: "internal",
+      reason: "unknown_failure",
+      error,
+    });
     return {};
   }
 }
@@ -142,6 +150,31 @@ function buildUserPrompt(args: {
   ].filter(Boolean).join("\n\n");
 
   return `${contextSection ? `Context:\n${contextSection}\n\n` : ""}Message:\n${args.message}${targetSection}`;
+}
+
+function buildProtectiveFallbackResult(message: string) {
+  return {
+    id: crypto.randomUUID(),
+    workspaceSource: "DEFRAG",
+    createdAt: new Date().toISOString(),
+    title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
+    summary: "The system is stabilizing under elevated traffic. Stay with the cleanest next move instead of solving everything at once.",
+    activePattern: "Pressure rises when urgency starts making decisions for you.",
+    theRepeat: "The loop is trying to turn this moment into something bigger than it is.",
+    oldRole: "You may be stepping into responsibility that is not fully yours.",
+    whatYouLearnedToCarry: "The reflex is to carry more than the moment actually requires.",
+    strainPattern: "Overwork, overexplaining, or overmanaging will add weight here.",
+    giftUnderStrain: "Clarity returns when you narrow the move to what is actually yours.",
+    alignment: "A smaller, cleaner response gives you a better chance than a faster one.",
+    bestNextResponse: {
+      summary: "Name the next honest action and keep it contained.",
+      phrasing: ["Here is what is mine to do next.", "I am not going to carry the whole outcome right now."],
+    },
+    conversationalSteering: {
+      do: ["Stay concrete.", "Separate facts from pressure."],
+      avoid: ["Do not solve the whole story.", "Do not manage the other person's reaction."],
+    },
+  };
 }
 
 export async function handleExplain(req: Request, env: Env): Promise<Response> {
@@ -396,8 +429,23 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     await env.QUEUE.send({ sessionId: sid, interactionId: interactionId });
   } else {
     // Fallback for local dev or if queue is not configured.
-    console.warn("QUEUE binding not found. Running pattern extraction in a non-blocking way, but this may be unreliable.");
-    void extractPatterns(env, sid, interactionId);
+    logSafetyEvent({
+      level: "warn",
+      event: "pattern_queue_binding_missing",
+      request: req,
+      error_type: "system",
+      details: { sessionId: sid, interactionId },
+    });
+    void extractPatterns(env, sid, interactionId).catch((error) => {
+      logSafetyEvent({
+        level: "error",
+        event: "pattern_fallback_extraction_failed",
+        request: req,
+        error_type: "system",
+        error,
+        details: { sessionId: sid, interactionId },
+      });
+    });
   }
 
   return jsonResponse(result, 200, {

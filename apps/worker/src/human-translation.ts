@@ -451,7 +451,7 @@ export async function buildHumanBehaviorTranslation(
   env: Env,
   userId: string,
   app: "alignment" | "defrag" | "covenant",
-  context?: { liveSky?: LiveSkyContext; recentPatterns?: string[]; refresh?: boolean }
+  context?: { liveSky?: LiveSkyContext; recentPatterns?: string[]; refresh?: boolean; protectiveMode?: boolean }
 ): Promise<HumanBehaviorTranslation> {
   const startedAt = Date.now()
   const requestId = crypto.randomUUID()
@@ -495,7 +495,16 @@ export async function buildHumanBehaviorTranslation(
           return parsed
         }
       }
-    } catch {}
+    } catch (error) {
+      logSafetyEvent({
+        level: "warn",
+        event: "translation_cache_read_failed",
+        endpoint: `translation:${app}`,
+        requestId: userId,
+        reason: "unknown_failure",
+        error,
+      })
+    }
   }
 
   // Load computed dataset
@@ -635,8 +644,6 @@ export async function buildHumanBehaviorTranslation(
       appRender = JSON.parse(match[0])
       aiSucceeded = true
     }
-  } catch (err) {
-    console.error("[human-translation] AI error:", err)
   }
 
   // Fallback if AI failed
@@ -661,7 +668,15 @@ export async function buildHumanBehaviorTranslation(
   // Validate
   const { valid, violations } = validateHumanBehaviorTranslation(translation)
   if (!valid) {
-    console.warn("[human-translation] validation violations:", violations)
+    logSafetyEvent({
+      level: "warn",
+      event: "translation_validation_violations",
+      endpoint: `translation:${app}`,
+      requestId: userId,
+      reason: "unknown_failure",
+      error_type: "system",
+      details: { violations },
+    })
     translation.status = "partial"
   }
 
@@ -713,7 +728,16 @@ export async function buildHumanBehaviorTranslation(
   // Cache result
   try {
     await env.KV.put(cacheKey, JSON.stringify(translation), { expirationTtl: TRANSLATION_TTL })
-  } catch {}
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "translation_cache_write_failed",
+      endpoint: `translation:${app}`,
+      requestId: userId,
+      reason: "unknown_failure",
+      error,
+    })
+  }
 
   return translation
 }
