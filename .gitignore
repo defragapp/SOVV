@@ -95,3 +95,4 @@ coverage/
 test-results/
 playwright-report/
 .vitest/
+.impeccable/

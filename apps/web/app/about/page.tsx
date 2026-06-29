@@ -84,7 +84,7 @@ export default function AboutPage() {
           <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-8 text-balance">
             The way through is already here.
           </h2>
-          <Link href="https://app.defrag.app/app/login" className="btn-primary">
+          <Link href="/app/login" className="btn-primary">
             Enter Sovereign.os
           </Link>
         </Container>

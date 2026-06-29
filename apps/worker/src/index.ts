@@ -16,19 +16,18 @@ import { registerInviteRoutes } from "./invite.js";
 import { registerAuthExtendedRoutes } from "./routes/auth-extended.js";
 import { registerInviteSystemRoutes } from "./routes/invite.js";
 import {
-  classifyErrorType,
-  enforceProtectiveRateLimit,
-  getEndpointProtectionLevel,
-  getProtectionLevel,
-  getRequestContext,
-  logSafetyEvent,
-  observeRequestFingerprint,
-  trackRuntimeOutcome,
-} from "./safety.js";
+  ensureRequiredEnv,
+  fetchWithTimeout,
+  logSystemError,
+  withLimitedRetry,
+} from "./runtime-resilience.js";
 
 const router = Router();
 let currentEnv: Env;
 const getEnv = () => currentEnv;
+let envValidated = false;
+const MAX_REQUEST_BYTES = 256 * 1024;
+const MAX_RESPONSE_BYTES = 512 * 1024;
 
 // === CORS CONFIGURATION ===
 const ALLOWED_ORIGINS = [
@@ -55,193 +54,74 @@ export function getCorsHeaders(request: Request): Record<string, string> {
   return headers;
 }
 
-function createDiagnosticRequest(request: Request) {
-  const endpoint = `${request.method} ${new URL(request.url).pathname}`;
-  const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();
-  const headers = new Headers(request.headers);
-  headers.set("x-request-id", requestId);
-  headers.set("x-endpoint", endpoint);
-
-  return {
-    request: new Request(request, { headers }),
-    requestId,
-    endpoint,
-    startedAt: Date.now(),
-  };
+function validateRuntimeEnv(env: Env): void {
+  if (envValidated) {
+    return;
+  }
+  ensureRequiredEnv(env as unknown as Record<string, unknown>, [
+    "DB",
+    "KV",
+    "AI",
+    "AI_SERVICE",
+    "SESSION_SERVICE",
+    "FREE_DAILY_LIMIT",
+    "APP_URL",
+  ]);
+  envValidated = true;
 }
 
-function withProtectionLevel(request: Request, protectionLevel: number): Request {
-  const headers = new Headers(request.headers);
-  headers.set("x-protection-level", String(protectionLevel));
-  return new Request(request, { headers });
-}
-
-function tryParseJson(rawText: string): unknown | null {
-  if (!rawText) return null;
-  try {
-    return JSON.parse(rawText);
-  } catch (error) {
-    logSafetyEvent({
-      level: "warn",
-      event: "response_json_parse_failed",
-      endpoint: "index",
-      requestId: "internal",
-      reason: "unknown_failure",
-      error,
-    });
+async function enforceRequestSize(request: Request): Promise<Response | null> {
+  if (!["POST", "PUT", "PATCH"].includes(request.method)) {
     return null;
   }
-}
-
-function normalizeSuccessPayload(rawText: string, contentType: string, requestId: string): Record<string, unknown> {
-  const parsed = contentType.includes("application/json") ? tryParseJson(rawText) : null;
-
-  if (Array.isArray(parsed)) {
-    return { success: true, requestId, data: parsed };
-  }
-
-  if (parsed && typeof parsed === "object") {
-    return { ...(parsed as Record<string, unknown>), success: true, requestId };
-  }
-
-  if (rawText.trim().length > 0) {
-    return { success: true, requestId, message: rawText.trim() };
-  }
-
-  return { success: true, requestId };
-}
-
-function normalizeFailurePayload(rawText: string, contentType: string, requestId: string, statusText: string): Record<string, unknown> {
-  const parsed = contentType.includes("application/json") ? tryParseJson(rawText) : null;
-
-  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-    const payload = parsed as Record<string, unknown>;
-    const error = typeof payload.error === "string"
-      ? payload.error
-      : typeof payload.message === "string"
-        ? payload.message
-        : statusText || "Request failed";
-    return { ...payload, success: false, error, requestId };
-  }
-
-  const textError = rawText.trim() || statusText || "Request failed";
-  return { success: false, error: textError, requestId };
-}
-
-function applyResponseHeaders(headers: Headers, request: Request): void {
-  const cors = getCorsHeaders(request);
-  Object.entries(cors).forEach(([key, value]) => {
-    headers.set(key, value);
-  });
-
-  const securityHeaders = {
-    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-    'X-Frame-Options': 'DENY',
-    'X-Content-Type-Options': 'nosniff',
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-    'Content-Security-Policy': "default-src 'none'; connect-src 'self' https://api.stripe.com https://challenges.cloudflare.com; frame-src https://js.stripe.com https://challenges.cloudflare.com; script-src 'self' https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; object-src 'none'; base-uri 'self'",
-  };
-
-  Object.entries(securityHeaders).forEach(([key, value]) => {
-    headers.set(key, value);
-  });
-
-  const { requestId, endpoint } = getRequestContext(request);
-  headers.set("x-request-id", requestId);
-  headers.set("x-endpoint", endpoint);
-}
-
-export async function finalizeResponse(request: Request, response: Response, startedAt: number, env: Env, ctx: ExecutionContext): Promise<Response> {
-  const headers = new Headers(response.headers);
-  applyResponseHeaders(headers, request);
-
-  const durationMs = Date.now() - startedAt;
-  const contentType = (headers.get("content-type") ?? "").toLowerCase();
-  const status = response.status;
-  const statusText = response.statusText;
-  const { endpoint } = getRequestContext(request);
-  const activeProtectionLevel = getProtectionLevel(request);
-  ctx?.waitUntil?.(trackRuntimeOutcome(env, request, { status, durationMs }).catch((error) => {
-    logSafetyEvent({
-      level: "warn",
-      event: "runtime_outcome_tracking_failed",
-      request,
-      reason: "unknown_failure",
-      error_type: "system",
-      error,
-    });
-  }));
-  // Report the protection level that was active when this request began.
-  // Newly detected escalations are persisted asynchronously and are visible on subsequent requests.
-  if (activeProtectionLevel > 0) {
-    headers.set("x-protection-level", String(activeProtectionLevel));
-  }
-
-  if (status === 204 || response.body === null) {
-    logSafetyEvent({
-      event: "request_completed",
-      request,
-      status,
-      duration_ms: durationMs,
-      protection_level: activeProtectionLevel,
-    });
-    return new Response(null, { status, statusText, headers });
-  }
-
-  if (contentType.startsWith("audio/") || contentType.includes("application/octet-stream")) {
-    logSafetyEvent({
-      event: "request_completed",
-      request,
-      status,
-      duration_ms: durationMs,
-      protection_level: activeProtectionLevel,
-    });
-    return new Response(response.body, { status, statusText, headers });
-  }
-
-  if (status >= 400 || (status >= 200 && status < 300 && (contentType.includes("application/json") || contentType.startsWith("text/plain") || contentType.length === 0))) {
-    const rawText = await response.text();
-    const payload = status >= 400
-      ? normalizeFailurePayload(rawText, contentType, getRequestContext(request).requestId, statusText)
-      : normalizeSuccessPayload(rawText, contentType, getRequestContext(request).requestId);
-
-    headers.set("Content-Type", "application/json");
-
-    if (status >= 400) {
-      const errorMessage = typeof payload.error === "string" ? payload.error : statusText;
-      logSafetyEvent({
-        level: status >= 500 ? "error" : "warn",
-        event: "request_failed",
-        request,
-        error_type: classifyErrorType({ endpoint, status, error: errorMessage }),
-        status,
-        duration_ms: durationMs,
-        protection_level: activeProtectionLevel,
-        error: errorMessage,
-      });
-    } else {
-      logSafetyEvent({
-        event: "request_completed",
-        request,
-        status,
-        duration_ms: durationMs,
-        protection_level: activeProtectionLevel,
-        details: activeProtectionLevel > 0 ? { runtime_protection_level: activeProtectionLevel } : undefined,
+  const contentLengthHeader = request.headers.get("content-length");
+  if (contentLengthHeader) {
+    const contentLength = Number(contentLengthHeader);
+    if (!Number.isNaN(contentLength) && contentLength > MAX_REQUEST_BYTES) {
+      return new Response(JSON.stringify({ error: "payload_too_large" }), {
+        status: 413,
+        headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
       });
     }
-
-    return new Response(JSON.stringify(payload), { status, statusText, headers });
   }
 
-  logSafetyEvent({
-    event: "request_completed",
-    request,
-    status,
-    duration_ms: durationMs,
-    protection_level: activeProtectionLevel,
+  const requestBody = request.clone().body;
+  if (requestBody) {
+    const reader = requestBody.getReader();
+    let bytesRead = 0;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        bytesRead += value.byteLength;
+        if (bytesRead > MAX_REQUEST_BYTES) {
+          await reader.cancel();
+          return new Response(JSON.stringify({ error: "payload_too_large" }), {
+            status: 413,
+            headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
+          });
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  }
+  return null;
+}
+
+async function enforceResponseSize(response: Response, request: Request): Promise<Response> {
+  if (response.status === 101 || response.body === null) {
+    return response;
+  }
+  const bytes = (await response.clone().arrayBuffer()).byteLength;
+  if (bytes <= MAX_RESPONSE_BYTES) {
+    return response;
+  }
+  logSystemError("response_too_large", { bytes, maxBytes: MAX_RESPONSE_BYTES });
+  return new Response(JSON.stringify({ error: "response_too_large" }), {
+    status: 502,
+    headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
   });
-  return new Response(response.body, { status, statusText, headers });
 }
 
 // === NATAL ROUTES ===
@@ -347,6 +227,11 @@ router.get("/api/user/me", async (request: Request) => {
   const env = getEnv();
   const user = await getAuthUser(request, env.DB);
   if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
+  // Check email verification status
+  const emailVerified = await env.DB.prepare(
+    "SELECT verified_at FROM email_verification_tokens WHERE user_id = ? AND verified_at IS NOT NULL LIMIT 1"
+  ).bind(user.id).first().catch(() => null)
+
   return new Response(JSON.stringify({
     id: user.id,
     email: user.email,
@@ -354,6 +239,7 @@ router.get("/api/user/me", async (request: Request) => {
     role: user.role,
     stripeCustomerId: (user as any).stripe_customer_id || null,
     subscriptionStatus: (user as any).subscription_status || null,
+    emailVerified: Boolean(emailVerified),
   }), { status: 200, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
 });
 
@@ -387,11 +273,21 @@ router.get("/api/stripe/prices", async (request: Request) => {
   }
 
   try {
-    const response = await fetch("https://api.stripe.com/v1/prices?active=true&expand[]=data.product", {
-      headers: {
-        Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
-      },
-    });
+    const response = await withLimitedRetry(
+      "stripe_prices_fetch",
+      () =>
+        fetchWithTimeout(
+          "https://api.stripe.com/v1/prices?active=true&expand[]=data.product",
+          {
+            headers: {
+              Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+            },
+          },
+          8_000
+        ),
+      2,
+      8_000
+    );
 
     const payload = await response.json() as { data?: Array<Record<string, any>> };
     const prices = Array.isArray(payload.data)
@@ -492,27 +388,13 @@ async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: stri
 router.all("*", () => new Response("Not Found", { status: 404 }));
 
 async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext) {
-  const diagnostic = createDiagnosticRequest(request);
-  const protectionLevel = await getEndpointProtectionLevel(env, diagnostic.endpoint);
-  const tracedRequest = withProtectionLevel(diagnostic.request, protectionLevel);
-  await observeRequestFingerprint(env, tracedRequest);
-
-  if (tracedRequest.method === 'OPTIONS') {
-    const headers = new Headers();
-    applyResponseHeaders(headers, tracedRequest);
-    return new Response(null, { status: 204, headers });
+  const oversizedRequest = await enforceRequestSize(request);
+  if (oversizedRequest) {
+    return oversizedRequest;
   }
 
-  if (protectionLevel >= 2) {
-    const protectiveLimitAllowed = await enforceProtectiveRateLimit(env, tracedRequest);
-    if (!protectiveLimitAllowed) {
-      return finalizeResponse(tracedRequest, new Response(JSON.stringify({
-        error: "Protective rate limit active. Please retry in a moment.",
-      }), {
-        status: 429,
-        headers: { "Content-Type": "application/json" },
-      }), diagnostic.startedAt, env, ctx);
-    }
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: getCorsHeaders(request) });
   }
   
   if (env.RATE_LIMITER) {
@@ -526,12 +408,37 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
     }
   }
   
-  const response = await router.fetch(tracedRequest, env, ctx);
-  return finalizeResponse(tracedRequest, response, diagnostic.startedAt, env, ctx);
+  const response = await router.fetch(request, env, ctx);
+  
+  const corsResponse = new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  });
+  
+  const cors = getCorsHeaders(request);
+  Object.entries(cors).forEach(([key, value]) => {
+    corsResponse.headers.set(key, value);
+  });
+  
+  const securityHeaders = {
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+    'X-Frame-Options': 'DENY',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    'Content-Security-Policy': "default-src 'none'; connect-src 'self' https://api.stripe.com https://challenges.cloudflare.com; frame-src https://js.stripe.com https://challenges.cloudflare.com; script-src 'self' https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; object-src 'none'; base-uri 'self'",
+  };
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    corsResponse.headers.set(key, value);
+  });
+  
+  return enforceResponseSize(corsResponse, request);
 }
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    validateRuntimeEnv(env);
     currentEnv = env;
     try {
       return await handleWithCors(request, env, ctx);
