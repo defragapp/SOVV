@@ -48,7 +48,10 @@ export type SafetyEvent = {
   metadata: Record<string, unknown>;
 };
 
-export async function logSafetyEvent(env: Env, event: SafetyEvent): Promise<void> {
+export async function logSafetyEvent(envOrEvent: Env | SafetyEvent, event?: SafetyEvent): Promise<void> {
+  const env = event ? envOrEvent as Env : undefined
+  const safetyEvent = event ?? envOrEvent as SafetyEvent
+  if (!env) { console.warn("[safety] logSafetyEvent called without env", safetyEvent); return }
   const payload = {
     channel: "safety",
     timestamp: new Date().toISOString(),
