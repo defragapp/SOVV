@@ -86,8 +86,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
 
   deploy-web:
-    needs: worker-checks
-    name: Build web for Cloudflare
+    name: Deploy sovv-web
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
