@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://defrag.app"),
   title: {
     default: "Sovereign.os — Relational Intelligence for Real Life",
-    template: "%s — Sovereign.os",
+    template: "Sovereign.os — %s",
   },
   description:
     "Sovereign.os helps you see the loop, separate the pattern from the pressure, and start from your baseline.",
