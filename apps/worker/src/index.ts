@@ -162,7 +162,7 @@ export async function finalizeResponse(request: Request, response: Response, sta
   const statusText = response.statusText;
   const { endpoint } = getRequestContext(request);
   const activeProtectionLevel = getProtectionLevel(request);
-  ctx.waitUntil(trackRuntimeOutcome(env, request, { status, durationMs }).catch((error) => {
+  ctx?.waitUntil?.(trackRuntimeOutcome(env, request, { status, durationMs }).catch((error) => {
     logSafetyEvent({
       level: "warn",
       event: "runtime_outcome_tracking_failed",
