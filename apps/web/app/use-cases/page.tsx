@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/layout-primitives"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Use Cases — Sovereign.os",
+  title: "Use Cases",
   description: "When to use Sovereign.os. Defrag supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics.",
 }
 
