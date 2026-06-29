@@ -21,7 +21,7 @@ export async function generateDefragWithRetry(
       ]);
 
       // Parse JSON from markdown block if needed
-      const jsonStr = extractJson(responseText);
+      const jsonStr = extractJson(boundedAiText(responseText));
       const parsedData = JSON.parse(jsonStr);
 
       // 2. Validate against strict schema

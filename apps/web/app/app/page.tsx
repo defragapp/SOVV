@@ -8,6 +8,7 @@ import Link from "next/link"
 export default function LibraryPage() {
   const [items, setItems] = React.useState<any[]>([])
   const [deletingId, setDeletingId] = React.useState<string | null>(null)
+  const [stats, setStats] = React.useState<{ DEFRAG: number; COVENANT: number; ALIGNMENT: number; total: number } | null>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [activeFilter, setActiveFilter] = React.useState<"ALL" | "DEFRAG" | "COVENANT" | "ALIGNMENT">("ALL")
   const [page, setPage] = React.useState(0)
@@ -15,12 +16,8 @@ export default function LibraryPage() {
   const [loadingMore, setLoadingMore] = React.useState(false)
   const PAGE_SIZE = 20
 
-  const filteredItems = items.filter(item => {
-    const matchesFilter = activeFilter === "ALL" || item.workspace_source === activeFilter
-    const matchesSearch = !searchQuery || 
-      (item.title || "").toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesFilter && matchesSearch
-  })
+  // Server handles filtering — client just renders what's returned
+  const filteredItems = items
 
   const loadMore = async () => {
     setLoadingMore(true)
@@ -52,14 +49,28 @@ export default function LibraryPage() {
   const [isLoading, setIsLoading] = React.useState(true)
 
   React.useEffect(() => {
-    fetch("/api/library")
+    const params = new URLSearchParams()
+    params.set("limit", String(PAGE_SIZE))
+    params.set("offset", "0")
+    if (searchQuery) params.set("q", searchQuery)
+    if (activeFilter !== "ALL") params.set("workspace_source", activeFilter)
+    fetch(`/api/library?${params.toString()}`, { credentials: "include" })
       .then(r => r.json())
-      .then(d => {
-        setItems(d.items || [])
+      .then((d: any) => {
+        const fetched = d.items || []
+        setItems(fetched)
+        setHasMore(fetched.length === PAGE_SIZE)
+        setPage(0)
       })
       .catch(() => {})
       .finally(() => setIsLoading(false))
-  }, [])
+
+    // Load library stats
+    fetch("/api/library/stats", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then((d: any) => d?.stats && setStats(d.stats))
+      .catch(() => {})
+  }, [searchQuery, activeFilter])
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-[#0c0a0d]">
@@ -114,7 +125,22 @@ export default function LibraryPage() {
              </div>
           ) : (
 
-             filteredItems.map(item => (
+             <>
+             {stats && stats.total > 0 && (
+               <div className="flex gap-4 mb-2 px-1">
+                 {[
+                   { label: "Defrag", count: stats.DEFRAG },
+                   { label: "Covenant", count: stats.COVENANT },
+                   { label: "Alignment", count: stats.ALIGNMENT },
+                 ].filter(s => s.count > 0).map(s => (
+                   <div key={s.label} className="flex items-center gap-1.5">
+                     <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#4f4b47]">{s.label}</span>
+                     <span className="font-mono text-[9px] text-[#76716b]">{s.count}</span>
+                   </div>
+                 ))}
+               </div>
+             )}
+             {filteredItems.map(item => (
                 <Link href={`/apps/defrag/${item.id}`} key={item.id} className="block border border-white/[0.08] bg-white/[0.02] p-6 flex flex-col gap-4 hover:border-border transition-colors cursor-pointer">
                    <div className="flex justify-between items-start">
                       <div className="flex flex-col gap-1">
@@ -143,7 +169,8 @@ export default function LibraryPage() {
                       </p>
                    )}
                 </Link>
-             ))
+             ))}
+             </>
 
           )}
 

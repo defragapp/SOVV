@@ -14,6 +14,7 @@
  */
 
 import type { Env } from "../types-env.js";
+import { logSafetyEvent } from "../safety.js";
 
 export interface InboundEmailMessage {
   from: string;
@@ -71,7 +72,16 @@ export async function handleInboundEmail(
         size: message.rawSize,
         timestamp: Date.now(),
       });
-    } catch {
+    } catch (error) {
+      logSafetyEvent({
+        level: "warn",
+        event: "inbound_email_queue_failed",
+        endpoint: "email:inbound",
+        requestId: message.from,
+        error_type: "system",
+        error,
+        details: { recipient: message.to },
+      });
       // Queue failure is non-fatal — do not reject the message
     }
   }

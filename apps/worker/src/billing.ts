@@ -195,6 +195,10 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
   params.set("cancel_url", `${env.APP_URL}/app?canceled=1`);
   params.set("client_reference_id", userId);
   params.set("subscription_data[metadata][userId]", userId);
+  // Pre-fill email so Stripe checkout doesn't ask for it again
+  if (user?.email) {
+    params.set("customer_email", user.email);
+  }
 
   const res = await withLimitedRetry(
     "stripe_checkout_create",

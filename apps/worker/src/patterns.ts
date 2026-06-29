@@ -6,6 +6,17 @@ import { getRecentInteractions, upsertPatterns, getPatterns } from "./db.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import { getSessionId, cookieHeader } from "./plan.js";
 import { requireActiveSubscription } from "./billing.js";
+import { logSafetyEvent } from "./safety.js";
+import {
+  evaluateInputClassification,
+  getColdStartMarker,
+  getServiceState,
+  inspectResponseDrift,
+  logDriftDetected,
+  recordServiceOutcome,
+  shouldBypassAi,
+  tuneTokenBudget,
+} from "./accountability.js";
 
 export interface Pattern {
   type: "trigger" | "dynamic" | "defense" | "repetition" | "growth";
@@ -29,11 +40,41 @@ const PATTERN_SYSTEM_PROMPT = `You are a pattern recognition engine. Analyze the
 
 export async function extractPatterns(env: Env, sessionId: string, newInteractionId: string): Promise<void> {
   console.log(`[Queue] Starting pattern extraction for session: ${sessionId}`);
+  const requestId = newInteractionId;
+  const endpoint = "/queue/pattern-extraction";
+  const coldStart = getColdStartMarker();
+  await logSafetyEvent(env, {
+    type: "request_lifecycle",
+    requestId,
+    metadata: { endpoint, stage: "start", sessionId, coldStart },
+  });
 
   // 1. Get recent contextual data
   const interactions = await getRecentInteractions(env.DB, sessionId, 15);
   if (interactions.length < 2) {
     console.log("[Queue] Insufficient interactions to calculate recursive behavior.");
+    await recordServiceOutcome(env, { endpoint, requestId, sessionId }, {
+      aiExecuted: false,
+      responsePath: "fallback",
+      aiFallback: true,
+      downstreamAiCalls: 0,
+    });
+    await logSafetyEvent(env, {
+      type: "request_lifecycle",
+      requestId,
+      metadata: {
+        endpoint,
+        stage: "end",
+        sessionId,
+        inputClassification: "safe",
+        guardrailsTriggered: [],
+        aiExecuted: false,
+        aiCalls: 0,
+        aiRetries: 0,
+        responsePath: "fallback",
+        coldStart,
+      },
+    });
     return;
   }
 
@@ -47,10 +88,42 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
 
   if (!env.AI) {
     console.error("[Queue] Cloudflare AI binding unavailable.");
+    await recordServiceOutcome(env, { endpoint, requestId, sessionId }, {
+      aiExecuted: false,
+      responsePath: "fallback",
+      aiFallback: true,
+      downstreamAiCalls: 0,
+    });
+    await logSafetyEvent(env, {
+      type: "request_lifecycle",
+      requestId,
+      metadata: {
+        endpoint,
+        stage: "end",
+        sessionId,
+        inputClassification: "safe",
+        guardrailsTriggered: [],
+        aiExecuted: false,
+        aiCalls: 0,
+        aiRetries: 0,
+        responsePath: "fallback",
+        coldStart,
+      },
+    });
     return;
   }
 
   try {
+    const serviceState = await getServiceState(env, endpoint);
+    if (shouldBypassAi(serviceState.state, "noncritical", 0)) {
+      await recordServiceOutcome(env, { endpoint, requestId, sessionId }, {
+        aiExecuted: false,
+        responsePath: "fallback",
+        aiFallback: true,
+        downstreamAiCalls: 0,
+      });
+      return;
+    }
     const response = await env.AI.run("@cf/meta/llama-3-8b-instruct", {
       messages: [
         { role: "system", content: PATTERN_SYSTEM_PROMPT },
@@ -64,6 +137,14 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
     const text = (response as { response?: string }).response || "{}";
     const ai = JSON.parse(text);
     const patterns: Pattern[] = ai.patterns || [];
+    const drift = inspectResponseDrift(text, ai, ["patterns"]);
+    if (drift.driftDetected) {
+      await logDriftDetected(env, { endpoint, requestId, sessionId }, {
+        anomalies: drift.anomalies,
+        observedKeys: drift.observedKeys,
+        responseBytes: drift.responseBytes,
+      });
+    }
 
     // 3. Commit elements atomic to DB via batch
     const patternPayloads = patterns.map((pattern) => ({
@@ -76,14 +157,78 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
       verified: 0,
     }));
     await upsertPatterns(env.DB, patternPayloads);
+    await recordServiceOutcome(env, { endpoint, requestId, sessionId }, {
+      aiExecuted: true,
+      aiSuccess: true,
+      responsePath: "normal",
+      responseBytes: drift.responseBytes,
+      validationNearFail: drift.driftDetected,
+      downstreamAiCalls: 1,
+    });
+    await logSafetyEvent(env, {
+      type: "request_lifecycle",
+      requestId,
+      metadata: {
+        endpoint,
+        stage: "end",
+        sessionId,
+        inputClassification: "safe",
+        guardrailsTriggered: [],
+        aiExecuted: true,
+        aiCalls: 1,
+        aiRetries: 0,
+        responsePath: "normal",
+        degradationState: serviceState.state,
+        coldStart,
+      },
+    });
     console.log(`[Queue] Successfully stored ${patterns.length} isolated tracks.`);
   } catch (err) {
     console.error("[Queue] Inference pipeline execution failure:", err);
+    await recordServiceOutcome(env, { endpoint, requestId, sessionId }, {
+      aiExecuted: false,
+      responsePath: "fallback",
+      aiFallback: true,
+      downstreamAiCalls: 0,
+    });
+    await logSafetyEvent(env, {
+      type: "request_lifecycle",
+      requestId,
+      metadata: {
+        endpoint,
+        stage: "end",
+        sessionId,
+        inputClassification: "safe",
+        guardrailsTriggered: [],
+        aiExecuted: false,
+        aiCalls: 0,
+        aiRetries: 0,
+        responsePath: "fallback",
+        coldStart,
+      },
+    });
     throw err;
   }
 }
 
 export function registerPatternsRoutes(router: any, getEnv: () => Env) {
+  router.delete("/api/patterns", async (request: Request) => {
+    const env = getEnv();
+    const { getAuthUser } = await import("./auth.js");
+    const user = await getAuthUser(request, env.DB);
+    if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+
+    try {
+      // Clear all patterns for this user's sessions
+      await env.DB.prepare(
+        "DELETE FROM patterns WHERE session_id IN (SELECT token FROM sessions WHERE user_id = ?)"
+      ).bind(user.id).run();
+      return new Response(JSON.stringify({ success: true }), { status: 200 });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: "Failed to clear patterns" }), { status: 500 });
+    }
+  });
+
   router.get("/api/patterns", async (request: Request) => {
     const env = getEnv();
     
@@ -119,6 +264,13 @@ export function registerPatternsRoutes(router: any, getEnv: () => Env) {
         headers: { "Content-Type": "application/json" }
       });
     } catch (err: any) {
+      logSafetyEvent({
+        level: "error",
+        event: "patterns_fetch_failed",
+        request,
+        error_type: "system",
+        error: err,
+      });
       return new Response(JSON.stringify({ error: err.message }), {
         status: 500,
         headers: { "Content-Type": "application/json" }

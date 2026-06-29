@@ -1,6 +1,6 @@
 import { jsonResponse } from "./auth.js";
 import { getCorsHeaders } from "./cors.js";
-import { safetyMode, supportResponse } from "./safety.js";
+import { logSafetyEvent, safetyMode, supportResponse } from "./safety.js";
 
 export type JsonBody = Record<string, unknown>;
 
@@ -49,7 +49,15 @@ export async function parseJsonBody(
 
   try {
     parsed = await request.json();
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "validation_json_parse_failed",
+      request,
+      error_type: "validation",
+      reason: "invalid_json",
+      error,
+    });
     return failure(
       request,
       400,
