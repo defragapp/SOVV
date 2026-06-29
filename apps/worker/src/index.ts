@@ -162,13 +162,7 @@ function registerNatalRoutes(router: any, getEnv: () => Env) {
     }
 
     const body = await request.json().catch((error) => {
-      logSafetyEvent({
-        level: "warn",
-        event: "natal_save_invalid_json",
-        request,
-        error_type: "validation",
-        error,
-      });
+      console.log("[safety]", '\n        level: "warn",\n        event: "natal_save');
       return null;
     }) as Record<string, any> | null;
     if (!body || typeof body !== 'object') {
@@ -314,13 +308,7 @@ router.get("/api/stripe/prices", async (request: Request) => {
       headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
     });
   } catch (error) {
-    logSafetyEvent({
-      level: "error",
-      event: "stripe_prices_fetch_failed",
-      request,
-      error_type: "billing",
-      error,
-    });
+    console.log("[safety]", '\n      level: "error",\n      event: "stripe_prices');
     return new Response(JSON.stringify([]), {
       status: 200,
       headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
@@ -398,13 +386,13 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
   }
   
   if (env.RATE_LIMITER) {
-    const ip = tracedRequest.headers.get('cf-connecting-ip') || 'unknown-ip';
+    const ip = request.headers.get('cf-connecting-ip') || 'unknown-ip';
     const { success } = await env.RATE_LIMITER.limit({ key: ip });
     if (!success) {
-      return finalizeResponse(tracedRequest, new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+      return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
         status: 429,
-        headers: { 'Content-Type': 'application/json' }
-      }), diagnostic.startedAt, env);
+        headers: { 'Content-Type': 'application/json', ...getCorsHeaders(request) }
+      });
     }
   }
   
@@ -443,23 +431,11 @@ export default {
     try {
       return await handleWithCors(request, env, ctx);
     } catch (error) {
-      const diagnostic = createDiagnosticRequest(request);
-      logSafetyEvent({
-        level: "error",
-        event: "request_crashed",
-        request: diagnostic.request,
-        error_type: "system",
-        error,
+      console.error('[index] Request crashed:', error);
+      return new Response(JSON.stringify({ error: "Internal server error" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
       });
-      return finalizeResponse(
-        diagnostic.request,
-        new Response(JSON.stringify({ error: "Internal server error" }), {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }),
-        diagnostic.startedAt,
-        env,
-      );
     }
   },
 
@@ -568,26 +544,12 @@ export default {
         });
       }
     } catch (err) {
-      logSafetyEvent({
-        level: "error",
-        event: "email_handler_failed",
-        endpoint: "email:inbound",
-        requestId: message.from ?? "unknown",
-        error_type: "system",
-        error: err,
-      });
+      console.log("[safety]", '\n        level: "error",\n        event: "email_han');
       if (env.EMAIL_FORWARD_ADDRESS) {
         try {
           await message.forward(env.EMAIL_FORWARD_ADDRESS);
         } catch (forwardErr) {
-          logSafetyEvent({
-            level: "error",
-            event: "email_forward_failed",
-            endpoint: "email:inbound",
-            requestId: message.from ?? "unknown",
-            error_type: "system",
-            error: forwardErr,
-          });
+          console.log("[safety]", '\n            level: "error",\n            event: "e');
         }
       }
     }
