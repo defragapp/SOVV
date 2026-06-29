@@ -15,10 +15,19 @@ import { registerDeriveProfileRoutes } from "./derive-profile.js";
 import { registerInviteRoutes } from "./invite.js";
 import { registerAuthExtendedRoutes } from "./routes/auth-extended.js";
 import { registerInviteSystemRoutes } from "./routes/invite.js";
+import {
+  ensureRequiredEnv,
+  fetchWithTimeout,
+  logSystemError,
+  withLimitedRetry,
+} from "./runtime-resilience.js";
 
 const router = Router();
 let currentEnv: Env;
 const getEnv = () => currentEnv;
+let envValidated = false;
+const MAX_REQUEST_BYTES = 256 * 1024;
+const MAX_RESPONSE_BYTES = 512 * 1024;
 
 // === CORS CONFIGURATION ===
 const ALLOWED_ORIGINS = [
@@ -42,6 +51,76 @@ export function getCorsHeaders(request: Request): Record<string, string> {
   }
 
   return headers;
+}
+
+function validateRuntimeEnv(env: Env): void {
+  if (envValidated) {
+    return;
+  }
+  ensureRequiredEnv(env as unknown as Record<string, unknown>, [
+    "DB",
+    "KV",
+    "AI",
+    "AI_SERVICE",
+    "SESSION_SERVICE",
+    "FREE_DAILY_LIMIT",
+    "APP_URL",
+  ]);
+  envValidated = true;
+}
+
+async function enforceRequestSize(request: Request): Promise<Response | null> {
+  if (!["POST", "PUT", "PATCH"].includes(request.method)) {
+    return null;
+  }
+  const contentLengthHeader = request.headers.get("content-length");
+  if (contentLengthHeader) {
+    const contentLength = Number(contentLengthHeader);
+    if (!Number.isNaN(contentLength) && contentLength > MAX_REQUEST_BYTES) {
+      return new Response(JSON.stringify({ error: "payload_too_large" }), {
+        status: 413,
+        headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
+      });
+    }
+  }
+
+  const requestBody = request.clone().body;
+  if (requestBody) {
+    const reader = requestBody.getReader();
+    let bytesRead = 0;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        bytesRead += value.byteLength;
+        if (bytesRead > MAX_REQUEST_BYTES) {
+          await reader.cancel();
+          return new Response(JSON.stringify({ error: "payload_too_large" }), {
+            status: 413,
+            headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
+          });
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  }
+  return null;
+}
+
+async function enforceResponseSize(response: Response, request: Request): Promise<Response> {
+  if (response.status === 101 || response.body === null) {
+    return response;
+  }
+  const bytes = (await response.clone().arrayBuffer()).byteLength;
+  if (bytes <= MAX_RESPONSE_BYTES) {
+    return response;
+  }
+  logSystemError("response_too_large", { bytes, maxBytes: MAX_RESPONSE_BYTES });
+  return new Response(JSON.stringify({ error: "response_too_large" }), {
+    status: 502,
+    headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
+  });
 }
 
 // === NATAL ROUTES ===
@@ -138,6 +217,11 @@ router.get("/api/user/me", async (request: Request) => {
   const env = getEnv();
   const user = await getAuthUser(request, env.DB);
   if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
+  // Check email verification status
+  const emailVerified = await env.DB.prepare(
+    "SELECT verified_at FROM email_verification_tokens WHERE user_id = ? AND verified_at IS NOT NULL LIMIT 1"
+  ).bind(user.id).first().catch(() => null)
+
   return new Response(JSON.stringify({
     id: user.id,
     email: user.email,
@@ -145,6 +229,7 @@ router.get("/api/user/me", async (request: Request) => {
     role: user.role,
     stripeCustomerId: (user as any).stripe_customer_id || null,
     subscriptionStatus: (user as any).subscription_status || null,
+    emailVerified: Boolean(emailVerified),
   }), { status: 200, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
 });
 
@@ -178,11 +263,21 @@ router.get("/api/stripe/prices", async (request: Request) => {
   }
 
   try {
-    const response = await fetch("https://api.stripe.com/v1/prices?active=true&expand[]=data.product", {
-      headers: {
-        Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
-      },
-    });
+    const response = await withLimitedRetry(
+      "stripe_prices_fetch",
+      () =>
+        fetchWithTimeout(
+          "https://api.stripe.com/v1/prices?active=true&expand[]=data.product",
+          {
+            headers: {
+              Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+            },
+          },
+          8_000
+        ),
+      2,
+      8_000
+    );
 
     const payload = await response.json() as { data?: Array<Record<string, any>> };
     const prices = Array.isArray(payload.data)
@@ -264,6 +359,11 @@ async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: stri
 router.all("*", () => new Response("Not Found", { status: 404 }));
 
 async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext) {
+  const oversizedRequest = await enforceRequestSize(request);
+  if (oversizedRequest) {
+    return oversizedRequest;
+  }
+
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: getCorsHeaders(request) });
   }
@@ -304,11 +404,12 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
     corsResponse.headers.set(key, value);
   });
   
-  return corsResponse;
+  return enforceResponseSize(corsResponse, request);
 }
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    validateRuntimeEnv(env);
     currentEnv = env;
     try {
       return await handleWithCors(request, env, ctx);

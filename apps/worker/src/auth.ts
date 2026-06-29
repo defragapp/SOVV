@@ -141,7 +141,7 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
   if (!token) return null
 
   const session = await DB.prepare(
-    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires > ?"
+    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
   )
     .bind(token, Date.now())
     .first<{
@@ -204,7 +204,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         .run()
 
       const token = generateSessionToken()
-      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
         .bind(token, userId, now + SESSION_TTL * 1000, now)
         .run()
 
@@ -261,7 +261,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       const token = generateSessionToken()
       const now = Date.now()
-      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
         .bind(token, user.id, now + SESSION_TTL * 1000, now)
         .run()
 
@@ -476,6 +476,38 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     } catch (e) {
       console.error("[DELETE_ACCOUNT]", e)
       return jsonResponse({ error: "Failed to delete account" }, 500)
+    }
+  })
+
+  // DELETE /api/auth/sessions/:token — revoke a specific session
+  router.delete("/api/auth/sessions/:token", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    const url = new URL(request.url)
+    const tokenSuffix = url.pathname.split('/').pop()
+    if (!tokenSuffix) return jsonResponse({ error: "Missing token" }, 400)
+
+    try {
+      // Find and delete session by last 6 chars of token (masked ID)
+      // This prevents exposing full tokens while still allowing revocation
+      const { results } = await env.DB.prepare(
+        "SELECT token FROM sessions WHERE user_id = ? AND expires_at > ?"
+      ).bind(user.id, Date.now()).all()
+
+      const session = (results || []).find((s: any) => 
+        String(s.token).slice(-6) === tokenSuffix
+      )
+
+      if (!session) return jsonResponse({ error: "Session not found" }, 404)
+
+      await env.DB.prepare("DELETE FROM sessions WHERE token = ? AND user_id = ?")
+        .bind((session as any).token, user.id).run()
+
+      return jsonResponse({ success: true })
+    } catch (e) {
+      return jsonResponse({ error: "Failed to revoke session" }, 500)
     }
   })
 

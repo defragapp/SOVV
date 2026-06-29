@@ -1,131 +1,112 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
-import { logSafetyEvent } from "./safety.js";
-import {
-  evaluateInputClassification,
-  getColdStartMarker,
-  getServiceState,
-  logRequestDecision,
-  recordServiceOutcome,
-  sampleUserPressure,
-  shouldBypassAi,
-  temporaryUnavailableResponse,
-  tuneTokenBudget,
-} from "./accountability.js";
+import { validateRequest } from "./middleware/validate-request.js";
+import { RateLimiter, extractRateLimitKey, RATE_LIMIT_PRESETS } from "./middleware/rate-limiter.js";
+import { KVSafetyLogger, createSafetyEvent } from "./middleware/safety-logger.js";
+import { generateRequestId } from "./utils/request-id.js";
+import { z } from "zod";
 
 export function registerAudioRoute(router: any, getEnv: () => Env) {
   router.post("/api/audio", async (request: Request) => {
     const env = getEnv();
-    const requestId = crypto.randomUUID();
-    const endpoint = "/api/audio";
-    const startedAt = Date.now();
-    const coldStart = getColdStartMarker();
-    const user = await getAuthUser(request, env.DB);
-    await logSafetyEvent(env, {
-      type: "request_lifecycle",
-      requestId,
-      metadata: { endpoint, stage: "start", userId: user?.id ?? null, coldStart },
-    });
-
-    const errorJson = (status: number, error: string, message?: string) =>
-      new Response(JSON.stringify({ error, ...(message ? { message } : {}), requestId }), {
-        status,
-        headers: { "Content-Type": "application/json", "x-request-id": requestId },
-      });
-    
-    if (!user) {
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: { endpoint, stage: "auth_failed", userId: null },
-      });
-      return errorJson(401, "unauthorized");
-    }
-
-    // Subscription gate: Audio Overview requires active Pro subscription
-    const subGate = await requireActiveSubscription(user, request, requestId);
-    if (subGate) {
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: { endpoint, stage: "authz_failed", userId: user.id },
-      });
-      return subGate;
-    }
+    const requestId = generateRequestId();
+    let safetyLogger: KVSafetyLogger | null = null;
+    let rateLimiter: RateLimiter | null = null;
+    let user: any = null;
 
     try {
-      const body = await request.json().catch(() => ({})) as Record<string, unknown>;
-      const text = body.text;
+      // Initialize safety infrastructure
+      if (env.KV) {
+        safetyLogger = new KVSafetyLogger(env.KV);
+        rateLimiter = new RateLimiter(env.KV, RATE_LIMIT_PRESETS.normal);
+      }
 
-      if (typeof text !== "string" || !text.trim()) {
-        await logSafetyEvent(env, {
-          type: "validation_error",
-          requestId,
-          metadata: { endpoint, reason: "text_required", userId: user.id },
-        });
-        return errorJson(400, "text_required", "Text is required");
+      user = await getAuthUser(request, env.DB);
+      
+      if (!user) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
       }
-      if (text.length > 6000) {
-        await logSafetyEvent(env, {
-          type: "validation_error",
-          requestId,
-          metadata: { endpoint, reason: "text_too_long", userId: user.id },
+
+      // Subscription gate: Audio Overview requires active Pro subscription
+      const subGate = await requireActiveSubscription(user, request);
+      if (subGate) return subGate;
+
+      // ════════════════════════════════════════════════════════════════════════
+      // SAFETY LAYER 1: REQUEST VALIDATION
+      // ════════════════════════════════════════════════════════════════════════
+      const validationSchema = z.object({
+        text: z.string(),
+      });
+
+      const validationResult = await validateRequest(request, validationSchema, {
+        validateContentType: true,
+        maxBodySize: 50 * 1024, // 50KB
+      });
+
+      if (!validationResult.valid) {
+        const errorResult = validationResult as { valid: false; error: any };
+        if (safetyLogger && user) {
+          await safetyLogger.log(
+            createSafetyEvent(user.id, "validation_error", "low", {
+              validation_field: errorResult.error.field,
+              endpoint: "/api/audio",
+            }, { requestId })
+          );
+        }
+        return new Response(JSON.stringify({
+          error: errorResult.error.field,
+          message: errorResult.error.error,
+        }), {
+          status: errorResult.error.status,
+          headers: { "Content-Type": "application/json" },
         });
-        return errorJson(400, "text_too_long", "Text too long. Please keep it under 6000 characters.");
       }
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: { endpoint, stage: "validation_passed", userId: user.id },
-      });
-      const serviceState = await getServiceState(env, endpoint);
-      const preliminary = evaluateInputClassification({ degradationState: serviceState.state });
-      const pressure = await sampleUserPressure(env, { endpoint, requestId, userId: user.id }, preliminary.classification, false, false);
-      const decision = evaluateInputClassification({
-        degradationState: serviceState.state,
-        throttleLevel: pressure.throttleLevel,
-      });
-      await logRequestDecision(env, { endpoint, requestId, userId: user.id }, {
-        ...decision,
-        supportMode: false,
-        throttleLevel: pressure.throttleLevel,
-        degradationState: serviceState.state,
-        coldStart,
-      });
+
+      // ════════════════════════════════════════════════════════════════════════
+      // SAFETY LAYER 2: RATE LIMITING
+      // ════════════════════════════════════════════════════════════════════════
+      if (rateLimiter) {
+        const rateLimitKey = extractRateLimitKey(request, user.id);
+        const limitResult = await rateLimiter.checkLimit(rateLimitKey);
+
+        if (!limitResult.allowed) {
+          if (safetyLogger) {
+            await safetyLogger.log(
+              createSafetyEvent(user.id, "rate_limit_exceeded", "low", {
+                endpoint: "/api/audio",
+              }, { requestId })
+            );
+          }
+          return new Response(
+            JSON.stringify({
+              error: "rate_limit_exceeded",
+              message: "Too many requests",
+              retryAfter: limitResult.retryAfter,
+            }),
+            {
+              status: 429,
+              headers: {
+                "Content-Type": "application/json",
+                "Retry-After": String(limitResult.retryAfter),
+              },
+            }
+          );
+        }
+      }
+
+      const body = validationResult.data as any;
+      const { text } = body;
+
+      if (!text) {
+        return new Response(JSON.stringify({ error: "Text is required" }), { status: 400 });
+      }
 
       // Use Cloudflare's native AI TTS proxy model (which is free/included in Workers AI limits)
       // This allows us to generate basic audio without an external ElevenLabs key.
       if (!env.AI) {
-        await logSafetyEvent(env, {
-          type: "system_error",
-          requestId,
-          metadata: { endpoint, reason: "ai_binding_missing", userId: user.id },
-        });
-        await recordServiceOutcome(env, { endpoint, requestId, userId: user.id }, {
-          aiExecuted: false,
-          responsePath: "fallback",
-          aiFallback: true,
-          downstreamAiCalls: 0,
-        });
-        return temporaryUnavailableResponse(requestId);
+        return new Response(JSON.stringify({ error: "Cloudflare AI binding is not configured." }), { status: 503 });
       }
-
-      if (shouldBypassAi(serviceState.state, "noncritical", pressure.throttleLevel)) {
-        await recordServiceOutcome(env, { endpoint, requestId, userId: user.id }, {
-          aiExecuted: false,
-          responsePath: "fallback",
-          aiFallback: true,
-          downstreamAiCalls: 0,
-        });
-        return temporaryUnavailableResponse(requestId);
-      }
-
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: { endpoint, stage: "business_start", userId: user.id },
-      });
 
       // We use @cf/elevenlabs/tts, which Cloudflare provides natively without needing your own API key
       const response = await env.AI.run("@cf/elevenlabs/tts", {
@@ -133,76 +114,23 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
       });
 
       // It returns a Uint8Array containing the audio data.
-      const durationMs = Date.now() - startedAt;
-      await recordServiceOutcome(env, { endpoint, requestId, userId: user.id }, {
-        aiExecuted: true,
-        aiSuccess: true,
-        responsePath: "normal",
-        durationMs,
-        slowRequest: durationMs >= 1800,
-        downstreamAiCalls: 1,
-      });
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: {
-          endpoint,
-          stage: "business_end",
-          userId: user.id,
-          inputClassification: decision.classification,
-          guardrailsTriggered: decision.guardrailsTriggered,
-          aiExecuted: true,
-          aiCalls: 1,
-          aiRetries: 0,
-          responsePath: "normal",
-          degradationState: serviceState.state,
-          throttleLevel: pressure.throttleLevel,
-          coldStart,
-          slowRequest: durationMs >= 1800,
-          durationMs,
-        },
-      });
-      await logSafetyEvent(env, {
-        type: "request_lifecycle",
-        requestId,
-        metadata: {
-          endpoint,
-          stage: "end",
-          userId: user.id,
-          inputClassification: decision.classification,
-          guardrailsTriggered: decision.guardrailsTriggered,
-          aiExecuted: true,
-          aiCalls: 1,
-          aiRetries: 0,
-          responsePath: "normal",
-          degradationState: serviceState.state,
-          throttleLevel: pressure.throttleLevel,
-          coldStart,
-          slowRequest: durationMs >= 1800,
-          durationMs,
-        },
-      });
       return new Response(response as any, {
         headers: {
           "Content-Type": "audio/mpeg",
-          "x-request-id": requestId,
         },
       });
 
     } catch (e: any) {
-      await logSafetyEvent(env, {
-        type: "system_error",
-        requestId,
-        metadata: { endpoint, reason: "audio_processing_failed", userId: user.id, error: e?.message || String(e) },
-      });
-      await recordServiceOutcome(env, { endpoint, requestId, userId: user.id }, {
-        aiExecuted: false,
-        responsePath: "fallback",
-        aiFallback: true,
-        slowRequest: Date.now() - startedAt >= 1800,
-        downstreamAiCalls: 0,
-      });
-      return temporaryUnavailableResponse(requestId);
+      console.error(e);
+      if (user && safetyLogger) {
+        await safetyLogger.log(
+          createSafetyEvent(user.id, "system_error", "medium", {
+            error: e?.message || "Unknown error",
+            endpoint: "/api/audio",
+          }, { requestId })
+        ).catch((err) => console.error("Failed to log safety event:", err));
+      }
+      return new Response(JSON.stringify({ error: "Failed to process audio", details: e.message }), { status: 500 });
     }
   });
 }

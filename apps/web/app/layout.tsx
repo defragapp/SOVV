@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
 import { GeistSans } from "geist/font/sans"
-import { Fraunces } from "next/font/google"
 import "./globals.css"
 
 const jetBrainsMono = localFont({
@@ -9,12 +8,6 @@ const jetBrainsMono = localFont({
   variable: "--font-jetbrains-mono",
 })
 
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  display: "swap",
-  axes: ["opsz", "SOFT"],
-})
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://defrag.app"),
@@ -114,7 +107,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`antialiased ${jetBrainsMono.variable} ${GeistSans.variable} ${fraunces.variable}`}
+      className={`antialiased ${jetBrainsMono.variable} ${GeistSans.variable}`}
     >
       <head>
         {/* Structured data — Organization */}
