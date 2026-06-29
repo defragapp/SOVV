@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "Start free. Upgrade when you need continuity.",
 }
 
-const APP_URL = "https://app.defrag.app/app/login"
+const APP_URL = "/app/login"
 
 function MetaLabel({ children }: { children: React.ReactNode }) {
   return (

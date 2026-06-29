@@ -9,7 +9,7 @@ import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
 import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
-import { logSafetyEvent, protectionActive } from "./safety.js";
+import { requireActiveSubscription } from "./billing.js";
 import {
   selectActiveSignals,
   buildBaselineSignature,
@@ -18,6 +18,11 @@ import {
   buildRailData,
   formatActiveSignalsForPrompt,
 } from "./active-signals.js";
+import { validateRequest } from "./middleware/validate-request.js";
+import { RateLimiter, extractRateLimitKey, RATE_LIMIT_PRESETS } from "./middleware/rate-limiter.js";
+import { KVSafetyLogger, createSafetyEvent } from "./middleware/safety-logger.js";
+import { generateRequestId } from "./utils/request-id.js";
+import { z } from "zod";
 
 /**
  * CRITICAL SYSTEM RULE
@@ -42,7 +47,7 @@ import type {
 } from "@sovereign/core";
 
 import { getCorsHeaders } from "./cors.js"
-import { parseJsonBody, validateTextInput } from "./safety-validation.js";
+import { safetyMode, supportResponse } from "./safety.js";
 
 
 // SYSTEM_SELF and SYSTEM_RELATIONAL removed — use SYSTEM_DEFRAG / SYSTEM_DEFRAG_RELATIONAL from prompts.ts
@@ -173,213 +178,219 @@ function buildProtectiveFallbackResult(message: string) {
 }
 
 export async function handleExplain(req: Request, env: Env): Promise<Response> {
+  const requestId = generateRequestId();
+  let safetyLogger: KVSafetyLogger | null = null;
+  let rateLimiter: RateLimiter | null = null;
+  let user: any = null;
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: getCorsHeaders(req) });
   }
 
-  const sid = await getSessionId(req);
-  const user = await getAuthUser(req, env.DB);
-  const responseHeaders = { "set-cookie": cookieHeader(sid) };
-  const isPro = user?.subscription_status === "active" || user?.tier === "pro";
+  try {
+    // Initialize safety infrastructure
+    if (env.KV) {
+      safetyLogger = new KVSafetyLogger(env.KV);
+      rateLimiter = new RateLimiter(env.KV, RATE_LIMIT_PRESETS.normal);
+    }
 
-  // Free tier daily usage limit check
-  if (!isPro) {
-    const limit = await checkFreeLimit(env, sid);
-    if (!limit.allowed) {
+    user = await getAuthUser(req, env.DB);
+    const sid = await getSessionId(req);
+
+    // ════════════════════════════════════════════════════════════════════════
+    // SAFETY LAYER 1: REQUEST VALIDATION
+    // ════════════════════════════════════════════════════════════════════════
+    const validationSchema = z.object({
+      message: z.string().optional(),
+      question: z.string().optional(),
+      text: z.string().optional(),
+      mode: z.string().optional(),
+      target: z.any().optional(),
+      people: z.array(z.any()).optional(),
+    });
+
+    const validationResult = await validateRequest(req, validationSchema, {
+      validateContentType: true,
+      maxBodySize: 100 * 1024, // 100KB
+    });
+
+    if (!validationResult.valid) {
+      const errorResult = validationResult as { valid: false; error: any };
+      if (safetyLogger && user) {
+        await safetyLogger.log(
+          createSafetyEvent(user.id, "validation_error", "low", {
+            validation_field: errorResult.error.field,
+            endpoint: "/api/explain",
+          }, { requestId })
+        );
+      }
       return jsonResponse({
-        error: "daily_limit_reached",
-        message: "You've reached your free daily limit. Upgrade to Pro for unlimited usage.",
-        remaining: 0,
-      }, 429, { ...getCorsHeaders(req), ...responseHeaders });
-    }
-  }
-
-  const parsedBody = await parseJsonBody(req, {
-    headers: responseHeaders,
-    invalidJsonPayload: { error: "invalid_json", message: "Invalid JSON body." },
-  });
-  if (parsedBody.ok === false) return parsedBody.response;
-
-  const body = parsedBody.value as Partial<ExplainRequest> & {
-    question?: string;
-    text?: string;
-    mode?: string;
-    people?: Array<{ id: string; relation?: string; name?: string }>;
-  };
-
-  const messageValidation = validateTextInput({
-    request: req,
-    body,
-    fields: ["message", "question", "text"],
-    requiredPayload: { error: "message_required" },
-    tooLongPayload: { error: "Input too long. Please keep your message under 2000 characters." },
-    maxLength: 2000,
-    headers: responseHeaders,
-    supportMode: true,
-  });
-  if (messageValidation.ok === false) return messageValidation.response;
-
-  const { text: message } = messageValidation.value;
-
-  // Per-user rate limit on AI calls (prevents burst abuse)
-  if (env.RATE_LIMITER) {
-    const { success } = await env.RATE_LIMITER.limit({ key: `explain:${user?.id ?? sid}` })
-    if (!success) {
-      return jsonResponse({ error: "Too many requests. Please wait a moment before trying again." }, 429, {
+        error: errorResult.error.field,
+        message: errorResult.error.error,
+      }, errorResult.error.status, {
         ...getCorsHeaders(req),
-        ...responseHeaders,
-      })
+        "set-cookie": cookieHeader(sid),
+      });
     }
-  }
 
-  const rawTarget = (body as Record<string, unknown>).target;
-  const targetCandidate =
-    rawTarget && typeof rawTarget === "object" && !Array.isArray(rawTarget)
-      ? rawTarget as Record<string, unknown>
-      : null;
-  const target =
-    targetCandidate && typeof targetCandidate.id === "string"
-      ? {
-          id: targetCandidate.id,
-          relation: typeof targetCandidate.relation === "string" ? targetCandidate.relation : undefined,
-          name: typeof targetCandidate.name === "string" ? targetCandidate.name : undefined,
+    const body = validationResult.data as any;
+    const message = String(body.message ?? body.question ?? body.text ?? "").trim();
+
+    if (!message) {
+      return jsonResponse({ error: "message_required" }, 400, {
+        ...getCorsHeaders(req),
+        "set-cookie": cookieHeader(sid),
+      });
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // SAFETY LAYER 2: RISK DETECTION (non-blocking)
+    // ════════════════════════════════════════════════════════════════════════
+    if (safetyMode(message) === "support") {
+      if (safetyLogger && user) {
+        await safetyLogger.log(
+          createSafetyEvent(user.id, "risk_word_detected", "high", {
+            endpoint: "/api/explain",
+          }, { requestId })
+        );
+      }
+      return jsonResponse(supportResponse(), 200, {
+        ...getCorsHeaders(req),
+        "set-cookie": cookieHeader(sid),
+      });
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // SAFETY LAYER 3: RATE LIMITING
+    // ════════════════════════════════════════════════════════════════════════
+    if (rateLimiter) {
+      const rateLimitKey = extractRateLimitKey(req, user?.id);
+      const limitResult = await rateLimiter.checkLimit(rateLimitKey);
+
+      if (!limitResult.allowed) {
+        if (safetyLogger) {
+          await safetyLogger.log(
+            createSafetyEvent(user.id, "rate_limit_exceeded", "low", {
+              endpoint: "/api/explain",
+            }, { requestId })
+          );
         }
-      : undefined;
-  const relational = Boolean(target);
-  const mode = (body.mode ?? (relational ? "pair" : "self")) as string;
+        return jsonResponse({
+          error: "rate_limit_exceeded",
+          message: "Too many requests. Please wait a moment before trying again.",
+        }, 429, {
+          ...getCorsHeaders(req),
+          "set-cookie": cookieHeader(sid),
+        });
+      }
+    }
 
-  if (relational && !isPro) {
-    return jsonResponse(
-      { error: "Relational analysis requires Pro" },
-      403,
-      { ...getCorsHeaders(req), ...responseHeaders }
-    );
-  }
+    // Free tier daily usage limit check
+    const isPro = user?.subscription_status === "active" || user?.tier === "pro";
+    if (!isPro) {
+      const limit = await checkFreeLimit(env, sid);
+      if (!limit.allowed) {
+        return jsonResponse({
+          error: "daily_limit_reached",
+          message: "You've reached your free daily limit. Upgrade to Pro for unlimited usage.",
+          remaining: 0,
+        }, 429, { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) });
+      }
+    }
 
-  const baseline = await getBaseline(env, sid);
-  if (!baseline || !baseline.dob || !baseline.tob?.value || !baseline.pob) {
-    return jsonResponse(
-      { type: "needs_baseline" },
-      200,
-      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
-    );
-  }
+    // Input length limit — prevent abuse and control AI costs
+    if (message.length > 2000) {
+      return jsonResponse({ error: "Input too long. Please keep your message under 2000 characters." }, 400, {
+        ...getCorsHeaders(req),
+        "set-cookie": cookieHeader(sid),
+      });
+    }
 
-  const patterns = await getPatterns(env.DB, sid);
-  // Use computed dataset if available, fallback to raw baseline format
-  const baselineText = await getBaselineForAI(env, sid, "defrag").catch((error) => {
-    logSafetyEvent({
-      level: "warn",
-      event: "defrag_baseline_context_unavailable",
-      request: req,
-      error_type: "system",
-      error,
-      details: { sessionId: sid },
-    });
-    return formatBaseline(baseline);
-  });
-  const patternText = formatPatternsForPrompt(patterns);
-  const targetBaseline =
-    relational && target
-      ? await env.KV.get(`baseline:${user?.id ?? sid}:person:${target.id}`, "json")
-      : null;
+    const target = body.target;
+    const relational = Boolean(target);
+    const mode = (body.mode ?? (relational ? "pair" : "self")) as "self" | "pair" | "group" | "situation";
 
-  // ── Active signal selection ───────────────────────────────────────────────
-  // Derive reduced behavioral signals from full compute.
-  // Only active signals reach the AI — full compute stays server-side.
-  const dataset = await getBaselineDataset(env, sid).catch((error) => {
-    logSafetyEvent({
-      level: "warn",
-      event: "defrag_dataset_unavailable",
-      request: req,
-      error_type: "system",
-      error,
-      details: { sessionId: sid },
-    });
-    return null;
-  });
-  let activeSignalsText = "";
-  let railData = null;
-  let signatureLine = "";
+    if (relational && ({} as any).tier === "free") {
+      return jsonResponse(
+        { error: "Relational analysis requires Pro" },
+        403,
+        { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
+      );
+    }
 
-  if (dataset?.status === "ready") {
-    const activeSignals = selectActiveSignals(dataset, {
+    const baseline = await getBaseline(env, sid);
+    if (!baseline || !baseline.dob || !baseline.tob?.value || !baseline.pob) {
+      return jsonResponse(
+        { type: "needs_baseline" },
+        200,
+        { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
+      );
+    }
+
+    const patterns = await getPatterns(env.DB, sid);
+    // Use computed dataset if available, fallback to raw baseline format
+    const baselineText = await getBaselineForAI(env, sid, "defrag").catch(() => formatBaseline(baseline));
+    const patternText = formatPatternsForPrompt(patterns);
+    const targetBaseline =
+      relational && target
+        ? await env.KV.get(`baseline:${user?.id || sid}:person:${target.id}`, "json")
+        : null;
+
+    // ── Active signal selection ───────────────────────────────────────────────
+    // Derive reduced behavioral signals from full compute.
+    // Only active signals reach the AI — full compute stays server-side.
+    const dataset = await getBaselineDataset(env, sid).catch(() => null);
+    let activeSignalsText = "";
+    let railData = null;
+    let signatureLine = "";
+
+    if (dataset?.status === "ready") {
+      const activeSignals = selectActiveSignals(dataset, {
+        message,
+        relational,
+        mode,
+      });
+      const timingSignals = buildTimingSignals(dataset);
+      const signature = buildBaselineSignature(dataset);
+      const overlaySignals = relational
+        ? buildOverlaySignals(activeSignals)
+        : undefined;
+
+      activeSignalsText = formatActiveSignalsForPrompt(activeSignals, timingSignals, overlaySignals);
+      railData = buildRailData(activeSignals, timingSignals, signature, overlaySignals);
+      signatureLine = signature.line;
+    }
+
+    const userPrompt = buildUserPrompt({
       message,
-      relational,
-      mode: (mode as any) ?? (relational ? "pair" : "self"),
-    });
-    const timingSignals = buildTimingSignals(dataset);
-    const signature = buildBaselineSignature(dataset);
-    const overlaySignals = relational
-      ? buildOverlaySignals(activeSignals)
-      : undefined;
-
-    activeSignalsText = formatActiveSignalsForPrompt(activeSignals, timingSignals, overlaySignals);
-    railData = buildRailData(activeSignals, timingSignals, signature, overlaySignals);
-    signatureLine = signature.line;
-  }
-
-  const userPrompt = buildUserPrompt({
-    message,
-    baselineText,
-    patternText,
-    activeSignalsText: activeSignalsText || undefined,
-    targetName: target ? (target.relation ?? target.name) : undefined,
-    targetBaseline,
-  });
-
-  if (protectionActive(req, 2)) {
-    logSafetyEvent({
-      level: "warn",
-      event: "defrag_protective_fallback",
-      request: req,
-      reason: "protection_escalation",
-      error_type: "system",
-      protection_level: 2,
-      details: { sessionId: sid },
-    });
-    const protectedResult = buildProtectiveFallbackResult(message);
-    const interactionId = `int_${crypto.randomUUID().replace(/-/g, "")}`;
-    const confidence: Confidence = "Medium";
-
-    await insertInteraction(env.DB, {
-      id: interactionId,
-      session_id: sid,
-      mode,
-      question: message,
-      text: message,
-      people: target ? [{ id: target.id, relation: target.relation, name: target.relation }] : [],
-      result: protectedResult as unknown as Record<string, unknown>,
-      confidence,
+      baselineText,
+      patternText,
+      activeSignalsText: activeSignalsText || undefined,
+      targetName: target ? target.relation : undefined,
+      targetBaseline,
     });
 
-    return jsonResponse(protectedResult, 200, {
-      ...getCorsHeaders(req),
-      ...responseHeaders,
+    const modelId = env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
+    const ai = await env.AI.run(modelId, {
+      messages: [
+        { role: "system", content: relational ? SYSTEM_DEFRAG_RELATIONAL : SYSTEM_DEFRAG },
+        { role: "user", content: userPrompt },
+      ],
+      temperature: 0.35,
+      max_tokens: tuneTokenBudget(900, serviceState.state, pressure.throttleLevel),
+    }, {
+      gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" }
     });
-  }
 
-  const modelId = env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
-  const ai = await env.AI.run(modelId, {
-    messages: [
-      { role: "system", content: relational ? SYSTEM_DEFRAG_RELATIONAL : SYSTEM_DEFRAG },
-      { role: "user", content: userPrompt },
-    ],
-    temperature: 0.35,
-    max_tokens: 900,
-  }, {
-    gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" }
-  });
-
-  const rawText = asText((ai as any).response ?? ai);
-  const parsed = parseJsonFromText(rawText) as any;
+    const rawText = asText((ai as any).response ?? ai);
+    const parsed = parseJsonFromText(rawText) as any;
 
 
-  const result = {
-    id: crypto.randomUUID(),
-    workspaceSource: "DEFRAG",
-    createdAt: new Date().toISOString(),
-    title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
+    const result = {
+      id: crypto.randomUUID(),
+      workspaceSource: "DEFRAG",
+      createdAt: new Date().toISOString(),
+      title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
     summary: parsed.response || "",
     activePattern: parsed.activePattern || "This section needs more context.",
     theRepeat: parsed.theRepeat || "This section needs more context.",
@@ -439,8 +450,23 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   return jsonResponse(result, 200, {
     ...getCorsHeaders(req),
-    ...responseHeaders,
+    "set-cookie": cookieHeader(sid),
   });
+  } catch (error: any) {
+    console.error("Explain route error:", error);
+    if (user && safetyLogger) {
+      await safetyLogger.log(
+        createSafetyEvent(user.id, "system_error", "medium", {
+          error: error?.message || "Unknown error",
+          endpoint: "/api/explain",
+        }, { requestId })
+      ).catch((err) => console.error("Failed to log safety event:", err));
+    }
+    return jsonResponse({ error: "Failed to process request" }, 500, {
+      ...getCorsHeaders(req),
+      "set-cookie": cookieHeader(await getSessionId(req)),
+    });
+  }
 }
 
 export async function registerExplainRoute(router: any, getEnv: () => Env) {

@@ -17,11 +17,18 @@ async function handleSignOut() {
 
 export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName }: SpaceShellProps) {
   const [activeTab, setActiveTab] = React.useState(mobileTabs[0].id)
+  const [userTier, setUserTier] = React.useState<"free" | "pro" | null>(null)
 
   // Refresh session on mount to extend 7-day expiry
   React.useEffect(() => {
     fetch("/api/auth/refresh", { method: "POST", credentials: "include" })
       .catch(() => {}) // Non-blocking — failure just means session expires naturally
+
+    // Load user tier for display
+    fetch("/api/user/me", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then((d: any) => d?.tier && setUserTier(d.tier))
+      .catch(() => {})
   }, [])
 
   return (
@@ -77,6 +84,15 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
             >
               Your Design
             </Link>
+            {userTier && (
+              <span className={`font-mono text-[9px] uppercase tracking-[0.12em] px-2 py-0.5 ${
+                userTier === "pro"
+                  ? "text-[#e0743a]/70 border border-[#e0743a]/20"
+                  : "text-[#4f4b47] border border-white/[0.06]"
+              }`} style={{ borderRadius: 3 }}>
+                {userTier === "pro" ? "Pro" : "Free"}
+              </span>
+            )}
             <div className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] uppercase text-[#4f4b47]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#e0743a]/40" />
               Secure

@@ -1,6 +1,8 @@
 "use client"
 import * as React from "react"
 import { processInput } from "@/lib/system/processInput"
+import { OsOutput } from "@/components/system/OsOutput"
+import type { SystemOutput } from "@/lib/system/outputContract"
 import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
 import { ResultCard } from "@/components/spaces/ResultCard"
@@ -75,6 +77,7 @@ function GateChip({ label }: { label: string }) {
 export default function DefragWorkspacePage() {
   const [input, setInput] = React.useState("")
   const [result, setResult] = React.useState<DefragResult | null>(null)
+  const [systemOutput, setSystemOutput] = React.useState<SystemOutput | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
   const [error, setError] = React.useState("")
   const [isSaving, setIsSaving] = React.useState(false)
@@ -161,6 +164,7 @@ export default function DefragWorkspacePage() {
     setAudioUrl(null)
     setAudioError("")
     setResult(null)
+    setSystemOutput(null)
     try {
       const pResult = await processInput({
         space: "defrag",
@@ -175,6 +179,7 @@ export default function DefragWorkspacePage() {
         return
       }
       setResult(pResult.output.meta as any)
+      setSystemOutput(pResult.output)
       // Show upgrade nudge after 3rd result on free tier
       setSessionResultCount(prev => {
         const next = prev + 1
@@ -434,15 +439,29 @@ export default function DefragWorkspacePage() {
           </div>
         )}
 
-        {result && (
-          <ResultCard
-            result={result}
-            input={input}
-            spaceName="Defrag"
-            onSave={handleSave}
-            isSaving={isSaving}
-            saveSuccess={saveSuccess}
-            onInvite={() => setInviteOpen(true)}
+        {systemOutput && result && (
+          <OsOutput
+            output={systemOutput}
+            rail={(result as any).rail}
+            flow={(result as any).flow}
+            sourcesUsed={(result as any).sourcesUsed}
+            actions={
+              <div className="px-5 py-3 flex items-center gap-3">
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving || saveSuccess}
+                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors disabled:opacity-40"
+                >
+                  {saveSuccess ? "Saved" : isSaving ? "Saving…" : "Save"}
+                </button>
+                <button
+                  onClick={() => setInviteOpen(true)}
+                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+                >
+                  + Compare
+                </button>
+              </div>
+            }
           />
         )}
       </div>

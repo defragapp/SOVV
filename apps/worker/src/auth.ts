@@ -150,10 +150,17 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
   if (!token) return null
 
   const session = await DB.prepare(
-    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires > ?"
+    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
   )
     .bind(token, Date.now())
-    .first()
+    .first<{
+      id: string
+      email: string
+      tier: string
+      role: string | null
+      stripe_customer_id: string | null
+      subscription_status: string | null
+    }>()
 
   if (!session) return null
 
@@ -169,8 +176,14 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
       })
     })
 
-  const s = session as { id: string; email: string; tier: string; role: string; stripe_customer_id: string | null; subscription_status: string }
-  return { ...s, role: s.role || "user", subscription_status: s.subscription_status || "free" }
+  return {
+    id: session.id,
+    email: session.email,
+    tier: session.tier,
+    role: session.role || "user",
+    stripe_customer_id: session.stripe_customer_id,
+    subscription_status: session.subscription_status || "free",
+  }
 }
 
 const SESSION_TTL = 7 * 24 * 60 * 60
@@ -213,7 +226,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         .run()
 
       const token = generateSessionToken()
-      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
         .bind(token, userId, now + SESSION_TTL * 1000, now)
         .run()
 
@@ -293,7 +306,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       const token = generateSessionToken()
       const now = Date.now()
-      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
         .bind(token, user.id, now + SESSION_TTL * 1000, now)
         .run()
 
@@ -437,7 +450,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       // Verify current password
       const dbUser = await env.DB.prepare("SELECT password_hash FROM users WHERE id = ?")
-        .bind(user.id).first() as { password_hash: string } | null
+        .bind(user.id).first()
       if (!dbUser) return jsonResponse({ error: "User not found" }, 404)
 
       const valid = await verifyPassword(currentPassword, dbUser.password_hash)
@@ -553,6 +566,38 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     }
   })
 
+  // DELETE /api/auth/sessions/:token — revoke a specific session
+  router.delete("/api/auth/sessions/:token", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    const url = new URL(request.url)
+    const tokenSuffix = url.pathname.split('/').pop()
+    if (!tokenSuffix) return jsonResponse({ error: "Missing token" }, 400)
+
+    try {
+      // Find and delete session by last 6 chars of token (masked ID)
+      // This prevents exposing full tokens while still allowing revocation
+      const { results } = await env.DB.prepare(
+        "SELECT token FROM sessions WHERE user_id = ? AND expires_at > ?"
+      ).bind(user.id, Date.now()).all()
+
+      const session = (results || []).find((s: any) => 
+        String(s.token).slice(-6) === tokenSuffix
+      )
+
+      if (!session) return jsonResponse({ error: "Session not found" }, 404)
+
+      await env.DB.prepare("DELETE FROM sessions WHERE token = ? AND user_id = ?")
+        .bind((session as any).token, user.id).run()
+
+      return jsonResponse({ success: true })
+    } catch (e) {
+      return jsonResponse({ error: "Failed to revoke session" }, 500)
+    }
+  })
+
   // GET /api/auth/sessions — list active sessions for current user
   router.get("/api/auth/sessions", async (request: Request) => {
     const env = getEnv()
@@ -560,10 +605,15 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
 
     try {
-      const sessionQuery = await env.DB.prepare(
+      const queryResult = await env.DB.prepare(
         "SELECT token, created_at, expires_at FROM sessions WHERE user_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 10"
       ).bind(user.id, Date.now()).all()
-      const results = sessionQuery.results as Array<{ token: string; created_at: number; expires_at: number }> | undefined
+
+      const results = ((queryResult as { results?: unknown[] })?.results ?? []) as Array<{
+        token: string
+        created_at: number
+        expires_at: number
+      }>
 
       // Mask tokens for security — only show last 6 chars
       const sessions = (results || []).map(s => ({

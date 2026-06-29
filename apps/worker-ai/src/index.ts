@@ -1,10 +1,18 @@
 import { handleEmotionalDrivers } from "./emotional-drivers";
 import { generateDefragWithRetry } from "./ai-generator";
 import { generateDefragPrompt } from "@sovereign/prompts";
+import {
+  ServiceUnavailableError,
+  logSystemError,
+  maxRequestBytes,
+  maxResponseBytes,
+} from "./runtime-resilience";
 
 export interface Env {
   AI: Ai;
 }
+
+let envValidated = false;
 
 const responseHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -27,9 +35,58 @@ function withHeaders(response: Response): Response {
   return newResponse;
 }
 
+function validateEnv(env: Env): void {
+  if (envValidated) return;
+  if (!env.AI) {
+    throw new Error("Missing required binding: AI");
+  }
+  envValidated = true;
+}
+
+async function enforceRequestSize(request: Request): Promise<Response | null> {
+  if (!["POST", "PUT", "PATCH"].includes(request.method)) {
+    return null;
+  }
+
+  const headerValue = request.headers.get("content-length");
+  const limit = maxRequestBytes();
+  if (headerValue) {
+    const contentLength = Number(headerValue);
+    if (!Number.isNaN(contentLength) && contentLength > limit) {
+      return Response.json({ ok: false, error: "payload_too_large" }, { status: 413 });
+    }
+  }
+
+  const cloned = request.clone();
+  const bytes = (await cloned.arrayBuffer()).byteLength;
+  if (bytes > limit) {
+    return Response.json({ ok: false, error: "payload_too_large" }, { status: 413 });
+  }
+  return null;
+}
+
+async function enforceResponseSize(response: Response): Promise<Response> {
+  if (response.status === 101 || response.body === null) {
+    return response;
+  }
+
+  const bytes = (await response.clone().arrayBuffer()).byteLength;
+  if (bytes <= maxResponseBytes()) {
+    return response;
+  }
+  logSystemError("response_too_large", { bytes, maxBytes: maxResponseBytes() });
+  return Response.json({ ok: false, error: "response_too_large" }, { status: 502 });
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    validateEnv(env);
+
     const url = new URL(request.url);
+    const oversizedRequest = await enforceRequestSize(request);
+    if (oversizedRequest) {
+      return withHeaders(oversizedRequest);
+    }
 
     if (request.method === "OPTIONS") {
       return new Response(null, {
@@ -39,8 +96,19 @@ export default {
     }
 
     if (url.pathname === "/emotional-drivers" && request.method === "POST") {
-      const response = await handleEmotionalDrivers(request, env);
-      return withHeaders(response);
+      try {
+        const response = await handleEmotionalDrivers(request, env);
+        return withHeaders(await enforceResponseSize(response));
+      } catch (error) {
+        if (error instanceof ServiceUnavailableError) {
+          return withHeaders(Response.json({ success: false, error: "service_unavailable" }, { status: 503 }));
+        }
+        if (error instanceof Error && error.message === "timeout") {
+          logSystemError("timeout");
+          return withHeaders(Response.json({ success: false, error: "service_unavailable" }, { status: 503 }));
+        }
+        throw error;
+      }
     }
 
     if (url.pathname === "/defrag" && request.method === "POST") {
@@ -48,11 +116,17 @@ export default {
         const body = await request.json() as { baseline: string, context?: string };
         const prompt = generateDefragPrompt(body.baseline, body.context);
 
-        const result = await generateDefragWithRetry(env.AI, prompt.system, prompt.user);
+        const result = await generateDefragWithRetry(env, prompt.system, prompt.user);
 
-        return withHeaders(Response.json({ ok: true, result }));
+        return withHeaders(await enforceResponseSize(Response.json({ ok: true, result })));
       } catch (e: any) {
-         return withHeaders(Response.json({ ok: false, error: e.message }, { status: 500 }));
+        if (e instanceof ServiceUnavailableError || e?.message === "timeout") {
+          if (e?.message === "timeout") {
+            logSystemError("timeout");
+          }
+          return withHeaders(Response.json({ success: false, error: "service_unavailable" }, { status: 503 }));
+        }
+        return withHeaders(Response.json({ ok: false, error: e?.message || "ai_error" }, { status: 500 }));
       }
     }
 
@@ -62,6 +136,6 @@ export default {
       );
     }
 
-    return withHeaders(new Response("Not found", { status: 404 }));
+    return withHeaders(await enforceResponseSize(new Response("Not found", { status: 404 })));
   },
 } satisfies ExportedHandler<Env>;

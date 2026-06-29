@@ -1,4 +1,5 @@
 import type { Env } from "./types-env";
+import { getCorsHeaders } from "./cors.js";
 import { getSessionId, cookieHeader } from "./plan";
 import type { Interaction } from "@sovereign/core";
 import { getAuthUser, verifyAccessJWT } from "./auth";
@@ -123,21 +124,32 @@ export async function handleGetLibrary(req: Request, env: Env) {
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "20", 10), 50);
   const offset = parseInt(url.searchParams.get("offset") || "0", 10);
   const workspaceSource = url.searchParams.get("workspace_source");
+  const searchQuery = url.searchParams.get("q")?.trim();
 
   try {
     let query: string;
-    let bindings: unknown[];
+    let bindings: (string | number)[];
 
     if (workspaceSource && ["DEFRAG", "COVENANT", "ALIGNMENT"].includes(workspaceSource)) {
-      // Filter by space — uses idx_library_user_id_source index
-      query = "SELECT * FROM library WHERE user_id = ? AND workspace_source = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
-      bindings = [user.id, workspaceSource, limit, offset];
+      if (searchQuery) {
+        // Filter by space + search title
+        query = "SELECT * FROM library WHERE user_id = ? AND workspace_source = ? AND title LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        bindings = [user.id, workspaceSource, `%${searchQuery ?? ""}%`, limit, offset];
+      } else {
+        // Filter by space only — uses idx_library_user_id_source index
+        query = "SELECT * FROM library WHERE user_id = ? AND workspace_source = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        bindings = [user.id, workspaceSource, limit, offset];
+      }
+    } else if (searchQuery) {
+      // Search all spaces
+      query = "SELECT * FROM library WHERE user_id = ? AND title LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
+      bindings = [user.id, `%${searchQuery ?? ""}%`, limit, offset];
     } else {
       query = "SELECT * FROM library WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
       bindings = [user.id, limit, offset];
     }
 
-    const { results } = await env.DB.prepare(query).bind(...bindings).all();
+    const { results } = await env.DB.prepare(query).bind(...(bindings as any[])).all();
 
     return Response.json({ items: results || [] });
   } catch (e) {
@@ -228,6 +240,27 @@ export async function handleDeleteLibraryItem(req: Request, env: Env) {
   }
 }
 
+export async function handleGetLibraryStats(req: Request, env: Env) {
+  const user = await getAuthUser(req, env.DB);
+  if (!user) return new Response("Unauthorized", { status: 401 });
+
+  try {
+    const { results } = await env.DB.prepare(
+      "SELECT workspace_source, COUNT(*) as count FROM library WHERE user_id = ? GROUP BY workspace_source"
+    ).bind(user.id).all();
+
+    const stats: Record<string, number> = { DEFRAG: 0, COVENANT: 0, ALIGNMENT: 0, total: 0 };
+    for (const row of (results || []) as any[]) {
+      stats[row.workspace_source] = row.count;
+      stats.total += row.count;
+    }
+
+    return Response.json({ stats }, { headers: getCorsHeaders(req) });
+  } catch (e) {
+    return Response.json({ stats: { DEFRAG: 0, COVENANT: 0, ALIGNMENT: 0, total: 0 } }, { headers: getCorsHeaders(req) });
+  }
+}
+
 export function registerHistoryRoute(router: any, getEnv: () => Env) {
   router.get("/api/history", async (req: Request) => {
     const env = getEnv();
@@ -247,6 +280,11 @@ export function registerHistoryRoute(router: any, getEnv: () => Env) {
   router.delete("/api/library/:id", async (req: Request) => {
     const env = getEnv();
     return handleDeleteLibraryItem(req, env);
+  });
+
+  router.get("/api/library/stats", async (req: Request) => {
+    const env = getEnv();
+    return handleGetLibraryStats(req, env);
   });
 
   router.post("/api/history", async (req: Request) => {

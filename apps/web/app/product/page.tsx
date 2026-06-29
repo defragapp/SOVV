@@ -47,7 +47,7 @@ export default function ProductPage() {
                 href: "/product/defrag",
                 tier: "Free",
                 headline: "Separate the moment from the pattern.",
-                body: "For the argument, the silence, the message, the grief. See what is active beneath the surface and find the clearest next response.",
+                body: "Analyze friction, silence, or recurring dynamics. Identify the structural pattern beneath the surface to determine the clearest next action.",
                 detail: "Relational dynamics · Family roles · Boundaries · Grief · Team pressure",
               },
               {
@@ -56,7 +56,7 @@ export default function ProductPage() {
                 href: "/product/covenant",
                 tier: "Pro",
                 headline: "Faith connected to repair.",
-                body: "For the user who wants faith to stay connected to the work. Plain-language reflection and grounded discernment — so the next step can be honest, not just emotional.",
+                body: "Integrate meaning and grounded discernment into your response process. Formulate a next step based on long-term values rather than immediate emotional pressure.",
                 detail: "Values · Commitments · Relational agreements · Honest next steps",
               },
               {
@@ -146,7 +146,7 @@ export default function ProductPage() {
             Start with Defrag. Free, no time limit.
           </h2>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="https://app.defrag.app/app/login" className="btn-primary">Enter Sovereign.os</Link>
+            <Link href="/app/login" className="btn-primary">Enter Sovereign.os</Link>
             <Link href="/pricing" className="btn-secondary">See plans</Link>
           </div>
         </Container>

@@ -33,7 +33,7 @@ const STEPS = [
   {
     num: "03",
     title: "Receive a structured result",
-    body: "Seven outputs: the active pattern, what keeps happening, your default mode, what shaped it, how it behaves under pressure, what is working, and the clearest next response.",
+    body: "Analyze structural pattern data across seven dimensions: active dynamic, loop recurrence, default behavioral response, origin architecture, pressure mechanics, current utility, and objective next action.",
     note: null,
   },
   {
@@ -45,7 +45,7 @@ const STEPS = [
   {
     num: "05",
     title: "Return before the pattern takes over",
-    body: "The next time the loop tries to form, you do not start from zero. Return to your Library, interrupt the old role, and respond differently.",
+    body: "When the pattern recurs, retrieve prior structural analysis from the Library to interrupt the default response and deploy a calibrated action.",
     note: null,
   },
 ]
@@ -122,7 +122,7 @@ export default function HowItWorksPage() {
           <h2 className="font-serif text-4xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] mb-8 text-balance max-w-2xl mx-auto">
             Ready to interrupt the loop?
           </h2>
-          <Link href="https://app.defrag.app/app/login" className="btn-primary">
+          <Link href="/app/login" className="btn-primary">
             Enter Sovereign.os
           </Link>
         </Container>
