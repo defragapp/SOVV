@@ -1,7 +1,10 @@
+"use client"
+
 import type { Metadata } from "next"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
 import Link from "next/link"
+import * as React from "react"
 import { AnimatedHeading, TextReveal } from "@/components/marketing/animated-elements"
 
 export const metadata: Metadata = {
@@ -39,6 +42,59 @@ const PRO_FEATURES = [
   "Invite Privately",
   "Full Library depth",
 ]
+
+function UpgradeButton() {
+  const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState("")
+
+  const handleUpgrade = async () => {
+    setLoading(true)
+    setError("")
+    try {
+      const res = await fetch("/api/billing/checkout", {
+        method: "POST",
+        credentials: "include",
+      })
+
+      if (res.status === 401) {
+        // Not logged in — send to login with return URL
+        window.location.href = "/app/login?return=/pricing"
+        return
+      }
+
+      const data = await res.json() as { url?: string; error?: string }
+
+      if (!res.ok || !data.url) {
+        setError(data.error === "billing_not_configured"
+          ? "Checkout is not available right now."
+          : "Something went wrong. Please try again.")
+        return
+      }
+
+      window.location.href = data.url
+    } catch {
+      setError("Connection failed. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <button
+        type="button"
+        onClick={handleUpgrade}
+        disabled={loading}
+        className="btn-primary w-full text-center relative disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {loading ? "···" : "Upgrade to Pro"}
+      </button>
+      {error && (
+        <p className="text-[11px] text-red-400/80 text-center leading-relaxed">{error}</p>
+      )}
+    </div>
+  )
+}
 
 export default function PricingPage() {
   return (
@@ -120,9 +176,7 @@ export default function PricingPage() {
                 ))}
               </div>
 
-              <Link href={APP_URL} className="btn-primary w-full text-center relative">
-                Upgrade to Pro
-              </Link>
+              <UpgradeButton />
             </div>
 
           </div>
@@ -138,7 +192,6 @@ export default function PricingPage() {
           </AnimatedHeading>
 
           <div className="flex flex-col gap-0">
-            {/* Header */}
             <div className="grid grid-cols-3 pb-4 border-b border-white/[0.08]">
               <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Feature</span>
               <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] text-center">Free</span>
