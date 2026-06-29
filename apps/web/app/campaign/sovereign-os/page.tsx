@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Sovereign.os — Relational Intelligence for Real Life",
     description: "Sovereign.os helps you see the loop, separate the pattern from the pressure, and start from your baseline.",
-    url: "https://defrag.app/campaign/sovereign-os",
+    url: "/campaign/sovereign-os",
     images: [{ url: "/social-card.png", width: 1200, height: 630, alt: "Sovereign.os — Relational Intelligence for Real Life" }],
   },
   twitter: {
