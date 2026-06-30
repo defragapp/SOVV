@@ -1,12 +1,19 @@
 #!/bin/bash
 set -euo pipefail
-echo "Executing strict deployment for SOVV Web..."
+
+TARGET_WORKER="sovv-web"
+CONFIG_FILE="wrangler.json"
+ENVIRONMENT="production"
+
+echo "Preparing strict deployment for ${TARGET_WORKER}..."
+
 if [ "${CI:-false}" != "true" ]; then
-  read -p "You are deploying WEB to PRODUCTION. Are you sure? (y/n) " -n 1 -r
+  read -p "You are deploying WEB to PRODUCTION target ${TARGET_WORKER}. Continue? (y/n) " -n 1 -r
   echo
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Deployment aborted."
     exit 1
   fi
 fi
-npx wrangler deploy --env production --name sovv-web-production
+
+pnpm exec wrangler deploy --env "${ENVIRONMENT}" --config "${CONFIG_FILE}"
