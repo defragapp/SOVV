@@ -2,265 +2,96 @@
 
 A distributed, multi-app platform for collaborative intelligence built on Cloudflare Workers, Next.js, and a modular package architecture.
 
-## 🏗️ Architecture Overview
+## Architecture overview
 
-```
-SOVV (monorepo)
+```text
+SOVV
 ├── apps/
-│   ├── worker              # Cloudflare Workers API (sovereign-os-api)
-│   ├── web                 # Next.js frontend + studio
-│   └── [other microservices]
+│   ├── web                 # Next.js frontend deployed as sovv-web
+│   ├── worker              # API Worker deployed as sovereign-os-api
+│   ├── worker-ai           # AI inference Worker
+│   └── worker-session      # Session / Durable Object Worker
 ├── packages/
-│   ├── core/               # Shared React components & utilities
-│   ├── db/                 # Database models & migrations
-│   ├── config/             # Shared configuration
-│   └── [domain packages]
-├── scripts/                # Utility scripts for deployment & maintenance
-└── docs/                   # Architecture & runbooks
+│   ├── core                # Shared React components and utilities
+│   └── prompts             # Prompt templates and system prompts
+├── scripts/                # Utility scripts
+├── docs/                   # Architecture, setup, runbooks, platform guides
+└── ops/                    # Point-in-time operational inventories
 ```
 
-### Key Applications
-
-- **API Worker** (`apps/worker`): Cloudflare Worker handling LLM inference, memory management, and billing
-- **Web App** (`apps/web`): Next.js application providing UI for workspace, studio, and marketplace
-- **Shared Packages** (`packages/`): Reusable components, utilities, and domain logic
-
-
-## 📣 Sovereign.os Marketing
+## Marketing docs
 
 Launch copy, short-video concepts, caption guidance, and campaign operating docs live in [`docs/marketing`](docs/marketing/README.md). Current campaign language centers on "You are not broken. You are patterned," "The personal operating system for relational intelligence," and the primary CTA "Start with your baseline."
 
-## 🚀 Getting Started
+## Prerequisites
 
-### Prerequisites
+- Node.js 22 or newer
+- pnpm 9, as declared in `package.json`
+- Cloudflare credentials only when performing authorized release or infrastructure work
 
-- **Node.js 22** (see `.nvmrc`)
-- **npm 10+** for monorepo management
-- **Cloudflare account** for worker deployment (optional for local dev)
-
-### Setup
-
-1. **Clone and install dependencies**
-   ```bash
-   git clone https://github.com/defragapp/SOVV.git
-   cd SOVV
-   npm install
-   ```
-
-2. **Configure environment**
-   ```bash
-   # Copy template and fill in secrets
-   cp .env.example .env.local
-   
-   # Add Cloudflare credentials for worker deployment (if needed)
-   echo "CLOUDFLARE_API_TOKEN=<your-token>" >> .env.local
-   ```
-
-3. **Run locally**
-   ```bash
-   # Start all apps in watch mode (requires turbo)
-   npm run dev
-   
-   # Or run individual apps
-   npm run dev -w apps/web
-   npm run dev:api
-   ```
-
-4. **Run tests**
-   ```bash
-   # All tests
-   npm run verify
-   
-   # Specific workspace
-   npm run -w apps/worker test
-   ```
-
-## 📦 Package Structure
-
-### `packages/core`
-Shared React components used across web frontend:
-- Memory timeline, pattern cards, artifact display
-- Exported from `packages/core/src/index.ts`
-
-### `packages/db`
-Database schema, migrations, and ORM utilities
-
-### `packages/config`
-Shared TypeScript configuration, environment variables, constants
-
-## 🔧 Deployment
-
-### Cloudflare Worker Deployment
+## Setup
 
 ```bash
-cd apps/worker
-npx wrangler deploy
-```
-
-**Requires:**
-- `CLOUDFLARE_API_TOKEN` environment variable
-- Valid `wrangler.toml` configuration
-
-### GitHub Actions CI/CD
-
-The `deploy.yml` workflow:
-1. **TypeScript Check** - Validates type safety (blocking failures)
-2. **Test Suite** - Runs worker unit tests (blocking failures)
-3. **Deploy API** - Deploys to Cloudflare Workers on main branch push
-
-**Important:** TypeScript errors and test failures **block deployment**.
-
-## 🛡️ Build & Development Standards
-
-### TypeScript Configuration
-
-- **Strict mode enabled** across all packages
-- Root `tsconfig.json` enforces strict type checking
-- Type errors in CI/CD are **non-negotiable**
-
-### Testing
-
-- Worker logic: Vitest with unit test coverage
-- Web frontend: [Test framework] (see `apps/web/package.json`)
-- Run full suite before pushing: `pnpm test`
-
-### Code Quality
-
-- **Linting**: ESLint (enforced in CI)
-- **Formatting**: Prettier (auto-applied)
-- **Type Safety**: TypeScript strict mode
-
-## 🔒 Safety & Security Hardening
-
-All AI-facing endpoints are protected by a shared safety layer integrated at the request boundary. This includes:
-
-### Request Validation
-- **Content-Type enforcement**: Only `application/json` accepted
-- **Body size limits**: Configurable per endpoint (50KB–100KB)
-- **Schema validation**: Zod schemas for request structure and type safety
-
-### Rate Limiting
-- **Sliding window algorithm** with per-user/IP-based keying
-- **Presets**: `loose`, `normal`, `strict`, `perSecond`
-- **Configurable TTL**: KV-backed with 1-week retention for metrics
-
-### Risk Detection & Logging
-- **Crisis signal detection**: Keywords checked non-blocking against known risk patterns (suicide, self-harm language)
-- **Safety events logged**: Validation errors, rate limit breaches, risk word detections, system errors
-- **Request correlation**: UUID requestId included in all logs for audit trails
-- **Event aggregation**: Daily KV storage with 7-day retention and metrics export
-
-### Protected Endpoints
-- `/api/alignment` — Alignment brief generation (entry/workspace modes)
-- `/api/covenant` — Covenant biblical reframing
-- `/api/audio` — Text-to-speech synthesis
-- `/api/explain` — Behavioral pattern explanation (Defrag LLM)
-
-### Verification
-```bash
-cd apps/worker
-npm test -- tests/safety*.test.ts tests/*-request.test.ts tests/rate-limiter.test.ts tests/safety-logger.test.ts
-```
-
-All safety middleware is tested with comprehensive unit tests covering edge cases, concurrency, and failure modes.
-
-## 📋 Important Files & Conventions
-
-| File | Purpose |
-|------|---------|
-| `.gitignore` | Version control exclusions (clean, deduplicated) |
-| `.env.example` | Template for required environment variables |
-| `pnpm-workspace.yaml` | Defines monorepo workspace boundaries |
-| `turbo.json` | Turbo build orchestration & caching |
-| `.github/workflows/deploy.yml` | Automated deployment pipeline |
-
-### .gitignore Guidelines
-
-- ✅ Commit source code (even stale components tracked for cleanup)
-- ✅ Commit configuration (wrangler.toml, package.json)
-- ❌ Never commit `.env` files with real secrets
-- ❌ Never commit `node_modules/` or build output
-- ❌ Never commit sensitive scripts (API keys, tokens)
-
-## 🚨 Troubleshooting
-
-### Worker Deployment Fails
-
-1. **Missing CLOUDFLARE_API_TOKEN**
-   ```bash
-   echo "Check: echo $CLOUDFLARE_API_TOKEN"
-   ```
-
-2. **wrangler.toml misconfiguration**
-   ```bash
-   cd apps/worker && npx wrangler whoami
-   ```
-
-3. **Type errors block deployment**
-   ```bash
-   # Check TypeScript errors before deploy
-   npx tsc --noEmit
-   ```
-
-### Development Server Issues
-
-```bash
-# Clear pnpm cache
-pnpm store prune
-
-# Reinstall dependencies
-rm -rf node_modules pnpm-lock.yaml
+git clone https://github.com/defragapp/SOVV.git
+cd SOVV
 pnpm install
-
-# Start from scratch
-pnpm clean && pnpm install && pnpm dev
+cp .env.example .env.local
 ```
 
-## 📚 Development Workflow
+Do not commit `.env`, `.env.local`, `.dev.vars`, tokens, or secret values.
 
-### Making Changes
+## Common commands
 
-1. **Create feature branch** from `main`
-   ```bash
-   git checkout -b feat/your-feature
-   ```
+```bash
+pnpm run dev          # Start the web app
+pnpm run dev:api      # Start the API Worker
+pnpm run dev:ai       # Start the AI Worker
+pnpm run dev:session  # Start the session Worker
+pnpm run dev:all      # Start all local services
+pnpm run verify       # Secret scan, worker tests/typecheck, web lint/build
+```
 
-2. **Make changes across workspace**
-   ```bash
-   # Update packages/core or apps/worker, etc.
-   ```
+## CI and release flow
 
-3. **Type check and test**
-   ```bash
-   pnpm typecheck
-   npm run verify
-   ```
+- `.github/workflows/ci.yml` performs blocking repository verification on PRs and pushes to `main`.
+- `.github/workflows/deploy-sovv-web.yml` is a manual web release workflow for `sovv-web` only.
+- Production releases require explicit authorization and a successful dry-run.
+- The legacy all-worker deploy workflow has been removed to avoid accidental unrelated Worker releases.
 
-4. **Create pull request** with clear description
-   - Reference related issues
-   - Include test results in PR body
+## Cloudflare operations
 
-### Releasing
+Use these docs before changing any Cloudflare Worker, binding, route, or release workflow:
 
-- Merges to `main` trigger GitHub Actions deployment
-- Changes propagate to Cloudflare Workers and web frontend
-- Verify deployment in PR checks
+- [`docs/cloudflare.md`](docs/cloudflare.md) — stable platform conventions
+- [`ops/cloudflare-inventory-2026-06-29.md`](ops/cloudflare-inventory-2026-06-29.md) — point-in-time live inventory and drift report
 
-## 🔐 Security Considerations
+Git is the intended source of truth. Dashboard changes must be backfilled into Wrangler configuration or explicitly documented as managed drift.
 
-- **API Safety Layer**: All AI-facing endpoints have request validation, rate limiting, and risk detection (see [Safety & Security Hardening](#-safety--security-hardening))
-- **Environment Variables**: Use `.env.local` for secrets (never committed)
-- **Billing Webhook**: Uses HMAC signature verification + idempotency checks for authenticity
-- **API Tokens**: Rotate `CLOUDFLARE_API_TOKEN` quarterly
-- **Dependencies**: Run `pnpm audit` before major releases
-- **Audit Logging**: Safety events (validation errors, rate limits, risk words) logged with request IDs for traceability
+## Safety and security hardening
 
-## 📞 Support & Contributing
+AI-facing endpoints are protected by shared request validation, rate limiting, and safety logging. The platform expects:
 
-- **Issues**: Report bugs on GitHub with reproduction steps
-- **Discussions**: Use GitHub Discussions for architecture questions
-- **PRs**: All changes require type checks, tests, and CI approval
+- JSON content-type enforcement
+- bounded request sizes
+- schema validation
+- rate limiting by user/IP where applicable
+- request correlation IDs in logs
+- no secret values in logs, reports, PRs, or commits
 
-## 📄 License
+Run the secret scanner before releasing:
 
-[See LICENSE file]
+```bash
+node scripts/secret-scan.js
+```
+
+## Development workflow
+
+1. Create a feature branch from `main`.
+2. Keep changes scoped to the task.
+3. Run `pnpm run verify` before opening a PR.
+4. Include checks run, files changed, release impact, and secret-scan status in the PR body.
+5. Do not perform production releases from chat, local shell transcripts, or unverified credentials.
+
+## License
+
+See `LICENSE`.
