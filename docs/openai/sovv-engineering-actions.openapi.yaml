@@ -1,0 +1,347 @@
+openapi: 3.1.0
+info:
+  title: SOVV Engineering Chat Actions
+  version: 0.1.0
+  description: >-
+    High-level SOVV Engineering Chat action surface. The Custom GPT calls only
+    these operations. The SOVV Worker facade owns all GitHub, Cloudflare, audit,
+    and approval logic.
+servers:
+  - url: https://sovereign-os-api.workers.dev
+    description: Production SOVV Worker facade
+security:
+  - sovvToolsSecret: []
+tags:
+  - name: Engineering
+    description: Approval-gated SOVV engineering operations
+paths:
+  /tools/audit_repository:
+    post:
+      operationId: audit_repository
+      x-openai-isConsequential: false
+      tags: [Engineering]
+      summary: Audit the SOVV repository and live engineering state
+      description: >-
+        Read-only audit. Inspects repository structure, relevant files, GitHub
+        state, and optionally Cloudflare state through the Worker facade. Does
+        not mutate code or production.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EngineeringToolRequest'
+      responses:
+        '200':
+          description: Repository audit result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EngineeringToolResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /tools/implement_change:
+    post:
+      operationId: implement_change
+      x-openai-isConsequential: true
+      tags: [Engineering]
+      summary: Implement a scoped repository change
+      description: >-
+        Creates or updates an agent branch and prepares a pull request through
+        the Worker facade. Requires explicit approval before mutating repository
+        state.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EngineeringToolRequest'
+      responses:
+        '200':
+          description: Implementation result or approval requirement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EngineeringToolResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /tools/prepare_release:
+    post:
+      operationId: prepare_release
+      x-openai-isConsequential: false
+      tags: [Engineering]
+      summary: Prepare a release gate review
+      description: >-
+        Read-only release preparation. Verifies branch, SHA, changed files,
+        checks, secret scan status, target Worker, route preservation, and risks.
+        Does not deploy.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EngineeringToolRequest'
+      responses:
+        '200':
+          description: Release gate result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EngineeringToolResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /tools/review_pull_request:
+    post:
+      operationId: review_pull_request
+      x-openai-isConsequential: false
+      tags: [Engineering]
+      summary: Review a SOVV pull request
+      description: >-
+        Read-only PR review. Inspects changed files, diffs, checks, comments,
+        and release impact through the Worker facade.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EngineeringToolRequest'
+      responses:
+        '200':
+          description: Pull request review result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EngineeringToolResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /tools/deploy_worker:
+    post:
+      operationId: deploy_worker
+      x-openai-isConsequential: true
+      tags: [Engineering]
+      summary: Deploy a scoped Cloudflare Worker target
+      description: >-
+        Deploys only the explicitly scoped Worker target after release gates pass
+        and explicit approval is provided. The backend must reject unrelated
+        Worker deploys and preserve routes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EngineeringToolRequest'
+                - type: object
+                  properties:
+                    approval:
+                      $ref: '#/components/schemas/ApprovalInput'
+                  required: [approval]
+      responses:
+        '200':
+          description: Deploy result or approval requirement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EngineeringToolResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /tools/verify_production:
+    post:
+      operationId: verify_production
+      x-openai-isConsequential: false
+      tags: [Engineering]
+      summary: Verify live production state
+      description: >-
+        Read-only production verification. Checks live Worker, route, deployment,
+        and URL state through the Worker facade. Does not deploy or mutate state.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EngineeringToolRequest'
+      responses:
+        '200':
+          description: Production verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EngineeringToolResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+components:
+  securitySchemes:
+    sovvToolsSecret:
+      type: apiKey
+      in: header
+      name: x-sovv-tools-secret
+      description: API key configured in GPT Builder Actions auth. Do not place secret values in prompts or schema examples.
+  responses:
+    ErrorResponse:
+      description: Tool error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EngineeringToolError'
+  schemas:
+    EngineeringMode:
+      type: string
+      enum:
+        - architect
+        - developer
+        - reviewer
+        - release
+    EngineeringToolRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        request:
+          type: string
+          description: Natural-language engineering request from the user.
+          minLength: 1
+          maxLength: 8000
+        mode:
+          $ref: '#/components/schemas/EngineeringMode'
+        scope:
+          type: string
+          description: Optional scoped area such as web, api, ai, session, billing, database, prompts, or deployment.
+          maxLength: 2000
+        repository:
+          type: string
+          description: Repository full name. Defaults to defragapp/SOVV on the backend.
+          default: defragapp/SOVV
+        branch:
+          type: string
+          description: Optional branch or SHA to inspect or modify.
+        pullRequestNumber:
+          type: integer
+          description: Pull request number for review or release preparation.
+          minimum: 1
+        workerName:
+          type: string
+          description: Scoped Cloudflare Worker target, for example sovv-web or sovereign-os-api.
+        approval:
+          $ref: '#/components/schemas/ApprovalInput'
+      required:
+        - request
+        - mode
+    ApprovalInput:
+      type: object
+      additionalProperties: false
+      properties:
+        approved:
+          type: boolean
+          description: True only when the user explicitly approved the consequential action.
+        phrase:
+          type: string
+          description: Backend-defined approval phrase for production deploys or other high-risk mutations.
+        reason:
+          type: string
+          description: Short human-readable reason for approval.
+      required:
+        - approved
+    EngineeringToolResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        success:
+          type: boolean
+          description: True when the requested tool completed successfully.
+        summary:
+          type: string
+          description: Human-readable result summary.
+        evidence:
+          type: array
+          description: Verified facts, file references, GitHub checks, Cloudflare state, or command results.
+          items:
+            $ref: '#/components/schemas/EvidenceItem'
+        approvalRequired:
+          type: boolean
+          description: True when the backend requires explicit user approval before continuing.
+        approval:
+          $ref: '#/components/schemas/ApprovalRequirement'
+        nextActions:
+          type: array
+          description: Recommended next actions after this tool result.
+          items:
+            type: string
+        auditId:
+          type: string
+          description: Backend audit log identifier for this tool call.
+        data:
+          type: object
+          description: Structured backend result data.
+          additionalProperties: true
+      required:
+        - success
+        - summary
+        - evidence
+        - approvalRequired
+        - nextActions
+    EvidenceItem:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          enum:
+            - file
+            - github
+            - cloudflare
+            - check
+            - secret_scan
+            - deployment
+            - route
+            - log
+            - assumption
+        title:
+          type: string
+        detail:
+          type: string
+        path:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
+        verifiedAt:
+          type: string
+          format: date-time
+      required:
+        - type
+        - title
+        - detail
+    ApprovalRequirement:
+      type: object
+      additionalProperties: false
+      properties:
+        required:
+          type: boolean
+        reason:
+          type: string
+        phrase:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+      required:
+        - required
+        - reason
+    EngineeringToolError:
+      type: object
+      additionalProperties: false
+      properties:
+        success:
+          type: boolean
+          const: false
+        error:
+          type: string
+        summary:
+          type: string
+        approvalRequired:
+          type: boolean
+      required:
+        - success
+        - error
+        - summary
+        - approvalRequired
