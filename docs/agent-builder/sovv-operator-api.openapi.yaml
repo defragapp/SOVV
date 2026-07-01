@@ -1,0 +1,36 @@
+openapi: 3.1.0
+info:
+  title: SOVV Operator API
+  version: 0.1.0
+  description: Read-only SOVV operating facade for Agent Builder.
+servers:
+  - url: https://sovv-operator-api.your-worker-domain.example
+paths:
+  /state/audit:
+    post:
+      operationId: auditBusinessState
+      summary: Audit SOVV repository, Cloudflare infrastructure, and optional Stripe commercial state.
+      responses:
+        "200":
+          description: Read-only audit result.
+  /github/repo-audit:
+    post:
+      operationId: auditRepository
+      summary: Inspect defragapp/SOVV repository state, branches, PRs, workflow runs, package scripts, and known config files.
+      responses:
+        "200":
+          description: Repository audit result.
+  /cloudflare/audit:
+    post:
+      operationId: auditCloudflare
+      summary: Inspect SOVV Cloudflare Workers, bindings, deployments, routes, DNS, D1, KV, R2, Queues, Durable Objects, and AI Gateway where permissions allow.
+      responses:
+        "200":
+          description: Cloudflare audit result.
+  /stripe/audit:
+    post:
+      operationId: auditStripeCommercialState
+      summary: Inspect Stripe products, prices, payment links, and webhooks.
+      responses:
+        "200":
+          description: Stripe commercial audit result.
