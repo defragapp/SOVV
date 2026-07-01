@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@sovereign/core": "file:../../packages/core",
+    "@sovv/engineering-agent": "file:../engineering-agent",
     "clsx": "^2.1.1",
     "framer-motion": "^11.0.0",
     "geist": "^1.7.2",
