@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev --local",
-    "deploy": "wrangler deploy",
+    "dev": "wrangler dev src/index.ts --name sovv-operator-api --compatibility-date 2026-07-01 --local",
+    "deploy": "wrangler deploy src/index.ts --name sovv-operator-api --compatibility-date 2026-07-01",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
