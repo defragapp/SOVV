@@ -128,7 +128,7 @@ function AlignmentDemo() {
       </div>
 
       {/* Sky + Baseline context */}
-      <div className="border border-white/[0.06] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-[#08070a] to-[#08070a] px-5 py-4 mb-3" style={{ borderRadius: 10 }}>
+      <div className="border border-white/[0.06] bg-[#08070a] px-5 py-4 mb-3" style={{ borderRadius: 10 }}>
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">Baseline Design + Live Sky</p>
         <p className="text-[12px] text-[#76716b] leading-relaxed">{current.context}</p>
       </div>
@@ -176,7 +176,7 @@ export default function AlignmentProductPage() {
     <SiteShell>
 
       {/* ── HERO ── */}
-      <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-[#08070a] to-[#08070a] overflow-hidden border-b border-white/5">
+      <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[#08070a] overflow-hidden border-b border-white/5">
         <div className="light-beam opacity-60" aria-hidden />
         <Container className="relative z-10 max-w-4xl">
           <div className="inline-flex items-center gap-2 mb-6">
@@ -184,7 +184,7 @@ export default function AlignmentProductPage() {
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Alignment · Pro</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
-            <span className="text-glow">Get back</span> into your own lane.
+            <span className="text-glow">Turn recognition</span> into practice.
           </h1>
           <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed animate-fade-up delay-100">
             Life pulls you off course. A conversation, a conflict, a decision — and suddenly you're reacting from somewhere that isn't you. Alignment uses two things to show you the path back: your Baseline Design, and the live sky above you right now.
@@ -241,7 +241,7 @@ export default function AlignmentProductPage() {
       </section>
 
       {/* ── INTERACTIVE DEMO ── */}
-      <section className="w-full py-20 md:py-28 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-[#08070a] to-[#08070a] border-t border-white/5">
+      <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/5">
         <Container>
           <div className="flex flex-col items-center text-center mb-12">
             <div className="inline-flex items-center gap-2 mb-6">

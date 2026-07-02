@@ -42,8 +42,8 @@ export default function SovereignOsCampaignPage() {
           style={{ background: "radial-gradient(circle, rgba(224,116,58,1) 0%, transparent 70%)" }} aria-hidden />
         <Container className="relative z-10 text-center">
           <p className="mb-6 font-mono text-[0.65rem] uppercase tracking-[0.3em] text-[#f4efe9]/30">Sovereign.os campaign</p>
-          <h1 className="mx-auto max-w-5xl text-balance font-serif text-[clamp(3rem,8vw,7rem)] leading-[1.02] tracking-[-0.035em] text-[#f4efe9]">You are not broken. You are patterned.</h1>
-          <p className="mx-auto mt-7 max-w-2xl text-base leading-relaxed text-[#a8a29a] md:text-lg">Sovereign.os is the personal operating system for relational intelligence: a grounded way to see the loop, separate the pattern from the pressure, and start from your baseline.</p>
+          <h1 className="mx-auto max-w-5xl text-balance font-serif text-[clamp(3rem,8vw,7rem)] leading-[1.02] tracking-[-0.035em] text-[#f4efe9]"><span className="text-glow">You are not broken.</span> You are patterned.</h1>
+          <p className="mx-auto mt-7 max-w-2xl text-base leading-relaxed text-[#a8a29a] md:text-lg">Pattern-aware AI for the moments that are hard to read while you're inside them. Sovereign.os helps you understand what's active, what may be repeating, and what next move gives the situation a better chance.</p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href={APP_URL} className="btn-primary">Start with your baseline</Link>
             <Link href="/product/defrag" className="btn-secondary">Open Defrag</Link>
@@ -60,7 +60,7 @@ export default function SovereignOsCampaignPage() {
             {videos.map((video, index) => (
               <article
                 key={video.title}
-                className="group relative border border-white/[0.07] bg-white/[0.02] p-7 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04]"
+                className="group relative border border-white/[0.07] bg-white/[0.02] p-7 glow-card-hover"
                 style={{ borderRadius: "var(--radius-container)" }}
               >
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"

@@ -45,7 +45,7 @@ const PRINCIPLES = [
 export default function PrinciplesPage() {
   return (
     <SiteShell>
-      <section className="relative w-full pt-32 pb-24 md:pt-40 md:pb-32 bg-[#08070a] overflow-hidden">
+      <section className="relative w-full pt-32 pb-24 md:pt-40 md:pb-32 bg-[#08070a] overflow-hidden pattern-field">
 
         {/* Ambient background */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>

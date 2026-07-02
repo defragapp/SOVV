@@ -176,7 +176,7 @@ export default function CovenantProductPage() {
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Covenant · Pro</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
-            <span className="text-glow">Your moment</span> has been walked before.
+            <span className="text-glow">Reflect through faith</span> without performance.
           </h1>
           <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed animate-fade-up delay-100">
             Covenant connects what you're going through to the real human stories in Scripture — not as metaphor, but as lived experience. It finds the biblical figure who walked something like what you're facing, shows you what they learned, and gives you one honest next step.

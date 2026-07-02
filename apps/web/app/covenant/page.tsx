@@ -49,12 +49,12 @@ export default function CovenantPage() {
   return (
     <SiteShell>
       {/* Hero */}
-      <Section className="w-full relative flex flex-col items-center justify-center min-h-[60svh] pt-32 pb-24 overflow-hidden bg-[#08070a] border-b border-white/5">
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[60svh] pt-32 pb-24 overflow-hidden bg-[#08070a] border-b border-white/[0.04] pattern-field">
         <div className="light-beam opacity-60" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center max-w-[800px]">
           <MetaLabel>Covenant space</MetaLabel>
           <h1 className="font-serif text-[clamp(2.6rem,6vw,4.5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
-            Faith, reflection, responsibility,
+            <span className="text-glow">Faith, reflection, responsibility,</span>
             <br />
             and grounded discernment.
           </h1>
