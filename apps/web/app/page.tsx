@@ -404,7 +404,7 @@ export default function Home() {
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section
-        className="relative -mt-16 w-full overflow-hidden bg-[#08070a]"
+        className="relative -mt-[68px] w-full overflow-hidden bg-[#08070a]"
         style={{ minHeight: "100svh" }}
       >
         {/* High-res base image — WebP 2560px with JPEG fallback */}
@@ -496,7 +496,7 @@ export default function Home() {
       </section>
 
       {/* ── THREE SPACES ─────────────────────────────────────────────────── */}
-      <section className="relative w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/[0.05] overflow-hidden">
+      <section className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden">
         <div className="light-beam opacity-50" aria-hidden />
         <Container className="relative z-10">
           <div className="inline-flex items-center gap-2 mb-12">
@@ -542,7 +542,7 @@ export default function Home() {
               <Link
                 key={space.name}
                 href={space.href}
-                className="group flex flex-col gap-5 p-8 md:p-10 bg-[#0c0a0d] hover:bg-[#0f0d10] transition-colors duration-300"
+                className="group flex flex-col gap-5 p-8 md:p-10 bg-[#0c0a0d] glow-card-hover"
               >
                 <div className="flex items-start justify-between">
                   <div
@@ -574,7 +574,7 @@ export default function Home() {
                   >
                     {space.name}
                   </h3>
-                  <p className="text-[15px] text-[#f4efe9]/65 leading-snug font-medium">
+                  <p className="text-[15px] text-[#f4efe9]/65 leading-snug">
                     {space.hook}
                   </p>
                 </div>

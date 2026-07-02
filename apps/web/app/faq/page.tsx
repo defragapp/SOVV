@@ -84,7 +84,7 @@ export default function FaqPage() {
           <div className="flex flex-col">
             {FAQ_ITEMS.map((item, i) => (
               <details key={i} className="group border-b border-white/[0.06] py-6 cursor-pointer">
-                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base md:text-lg font-medium list-none">
+                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base md:text-lg font-normal list-none">
                   {item.q}
                   <span className="flex-none text-xl text-[#e0743a] transition-transform duration-200 group-open:rotate-45 shrink-0">
                     +

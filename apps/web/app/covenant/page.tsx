@@ -86,7 +86,7 @@ export default function CovenantPage() {
               <div key={pt.num} className="flex items-start gap-8 py-10 border-b border-white/[0.06] last:border-0">
                 <span className="font-serif text-3xl text-[#e0743a]/40 shrink-0 w-10">{pt.num}</span>
                 <div>
-                  <h3 className="text-[#f4efe9] font-medium text-base mb-3">{pt.title}</h3>
+                  <h3 className="font-serif text-[1rem] text-[#f4efe9] mb-3">{pt.title}</h3>
                   <p className="text-[15px] text-[#a8a29a] leading-relaxed">{pt.body}</p>
                 </div>
               </div>
