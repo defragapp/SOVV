@@ -184,7 +184,7 @@ export default function AlignmentProductPage() {
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Alignment · Pro</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
-            Get back into your own lane.
+            <span className="text-glow">Get back</span> into your own lane.
           </h1>
           <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed animate-fade-up delay-100">
             Life pulls you off course. A conversation, a conflict, a decision — and suddenly you're reacting from somewhere that isn't you. Alignment uses two things to show you the path back: your Baseline Design, and the live sky above you right now.
