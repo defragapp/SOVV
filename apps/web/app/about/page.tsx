@@ -71,11 +71,20 @@ export default function AboutPage() {
       </section>
 
       {/* The wound */}
-      <section className="w-full py-16 bg-[#08070a] border-t border-white/5">
-        <Container className="max-w-3xl">
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#4f4b47]">
-            The wound is real. So is the choice after it.
-          </p>
+      <section className="relative w-full py-20 md:py-28 bg-[#08070a] border-t border-white/[0.04] overflow-hidden text-center">
+        {/* Alignment rings */}
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] opacity-15" />
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-[0.08]" />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(224,116,58,0.04) 0%, transparent 70%)" }} aria-hidden />
+        <Container className="relative z-10 max-w-2xl">
+          <blockquote
+            className="font-serif text-[#f4efe9] leading-[1.15] tracking-[-0.02em] text-balance"
+            style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.5rem)" }}
+          >
+            <span className="text-glow">The wound is real.</span>
+            <br />
+            <span style={{ color: "rgba(244,239,233,0.45)" }}>So is the choice after it.</span>
+          </blockquote>
         </Container>
       </section>
 
