@@ -497,6 +497,157 @@ export default function Home() {
         </Container>
       </section>
 
+            {/* ── THE PROBLEM ─────────────────────────────────────────────────── */}
+      <section className="relative w-full py-24 md:py-36 bg-[#08070a] border-t border-white/[0.04] overflow-hidden pattern-field">
+        {/* Alignment rings — decorative */}
+        <div className="alignment-ring absolute -right-40 top-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-30" />
+        <div className="alignment-ring absolute -right-60 top-1/2 -translate-y-1/2 w-[700px] h-[700px] opacity-20" />
+        <div className="alignment-ring absolute -right-80 top-1/2 -translate-y-1/2 w-[900px] h-[900px] opacity-10" />
+
+        <Container className="relative z-10">
+          <div className="max-w-2xl mb-16 reveal-up reveal-up-1">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">The pattern beneath</span>
+            </div>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] text-balance"
+              style={{ fontSize: "clamp(2rem, 4.5vw, 3.8rem)" }}
+            >
+              <span className="text-glow">The moment</span> is rarely the whole pattern.
+            </h2>
+            <p className="mt-5 text-[15px] text-[#76716b] leading-relaxed max-w-lg">
+              Most people react to what just happened. Sovereign.os helps you pause, name what is active, and understand what may be repeating underneath the surface.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                label: "The Moment",
+                desc: "What happened now — the message, the silence, the argument, the feeling that won't settle.",
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="3" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5"/>
+                    <circle cx="10" cy="10" r="7" stroke="rgba(224,116,58,0.2)" strokeWidth="1" strokeDasharray="2 3"/>
+                  </svg>
+                ),
+                delay: "reveal-up-2",
+              },
+              {
+                label: "The Pattern",
+                desc: "What keeps returning — the loop beneath the surface that shapes how you respond before you decide to.",
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M3 10 Q7 4 10 10 Q13 16 17 10" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                    <path d="M3 10 Q7 4 10 10 Q13 16 17 10" stroke="rgba(224,116,58,0.15)" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                  </svg>
+                ),
+                delay: "reveal-up-3",
+              },
+              {
+                label: "The Next Move",
+                desc: "What alignment asks for — one specific, proportionate step grounded in how you actually work.",
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M4 10h12M12 6l4 4-4 4" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
+                delay: "reveal-up-4",
+              },
+            ].map((card) => (
+              <div key={card.label} className={`moment-card p-7 flex flex-col gap-5 ${card.delay} reveal-up`}>
+                <div className="w-9 h-9 flex items-center justify-center border border-white/[0.08] bg-white/[0.02]" style={{ borderRadius: 8 }}>
+                  {card.icon}
+                </div>
+                <div>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">{card.label}</p>
+                  <p className="text-[14px] text-[#a8a29a] leading-relaxed">{card.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* ── HOW IT WORKS ────────────────────────────────────────────────── */}
+      <section className="w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.04]">
+        <Container>
+          <div className="flex flex-col items-center text-center mb-16 reveal-up reveal-up-1">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">The process</span>
+            </div>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] text-balance max-w-xl"
+              style={{ fontSize: "clamp(1.9rem, 4vw, 3.2rem)" }}
+            >
+              From reaction to recognition.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.04] border border-white/[0.05] overflow-hidden max-w-4xl mx-auto" style={{ borderRadius: 16 }}>
+            {[
+              {
+                num: "01",
+                title: "Enter the moment",
+                body: "Write what happened, what you feel, or what feels unresolved. No framework required.",
+              },
+              {
+                num: "02",
+                title: "See the pattern",
+                body: "Sovereign.os separates the current situation from the deeper loop — using your Baseline Design as context.",
+              },
+              {
+                num: "03",
+                title: "Return with clarity",
+                body: "Receive one grounded next move that helps you act from alignment instead of reaction.",
+              },
+            ].map((step, i) => (
+              <div key={step.num} className={`bg-[#0c0a0d] p-8 md:p-10 flex flex-col gap-6 reveal-up reveal-up-${i + 2}`}>
+                {/* Step number with signal dot */}
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47]">{step.num}</span>
+                  {i < 2 && (
+                    <div className="flex-1 h-px bg-gradient-to-r from-[#e0743a]/20 to-transparent" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-serif text-[1.15rem] text-[#f4efe9] leading-snug mb-3">{step.title}</h3>
+                  <p className="text-[13px] text-[#76716b] leading-relaxed">{step.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* ── BRAND BELIEF ────────────────────────────────────────────────── */}
+      <section className="relative w-full py-28 md:py-44 bg-[#08070a] border-t border-white/[0.04] overflow-hidden text-center">
+        {/* Alignment rings — centered */}
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] opacity-20" />
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-12" />
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] opacity-[0.06]" />
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] opacity-[0.04]" />
+        {/* Warm center glow */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(224,116,58,0.06) 0%, transparent 70%)" }} aria-hidden />
+
+        <Container className="relative z-10 max-w-2xl">
+          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-8">Clarity is not control</p>
+          <blockquote
+            className="font-serif text-[#f4efe9] leading-[1.15] tracking-[-0.02em] text-balance"
+            style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.5rem)" }}
+          >
+            <span className="text-glow">Clarity is not control.</span>
+            <br />
+            <span style={{ color: "rgba(244,239,233,0.45)" }}>It is return.</span>
+          </blockquote>
+          <p className="mt-8 text-[15px] text-[#76716b] leading-relaxed max-w-md mx-auto">
+            Sovereign.os is built around the belief that the first step is not fixing everything. It is seeing what is active clearly enough to choose differently.
+          </p>
+        </Container>
+      </section>
+
       {/* ── THREE SPACES ─────────────────────────────────────────────────── */}
       <section className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden">
         <div className="light-beam opacity-50" aria-hidden />
@@ -604,22 +755,30 @@ export default function Home() {
       </section>
 
       {/* ── CTA ──────────────────────────────────────────────────────────── */}
-      <section className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.05] overflow-hidden">
-        <div className="light-beam" aria-hidden />
+      <section className="relative w-full py-32 md:py-48 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden">
+        {/* Alignment rings */}
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] opacity-15" />
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] opacity-[0.08]" />
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] opacity-[0.04]" />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(224,116,58,0.05) 0%, transparent 70%)" }} aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
+          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-8">Begin</p>
           <h2
-            className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-3xl text-balance"
-            style={{ fontSize: "clamp(2.2rem, 5.5vw, 5rem)" }}
+            className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] max-w-2xl text-balance"
+            style={{ fontSize: "clamp(2.2rem, 5.5vw, 4.5rem)" }}
           >
-            Return before the pattern takes over.
+            <span className="text-glow">Return before</span> the pattern runs the room.
           </h2>
-          <p className="mt-6 max-w-md text-base md:text-lg text-[#a8a29a] leading-relaxed">
-            Defrag is free. Start understanding the patterns beneath the moments that matter most.
+          <p className="mt-6 max-w-md text-[15px] text-[#76716b] leading-relaxed">
+            Use Sovereign.os as a private place to slow down, understand what is active, and move with more clarity.
           </p>
           <div className="mt-9">
             <Link href={APP_URL} className="btn-primary">
               Enter Sovereign.os
             </Link>
+            <p className="mt-5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
+              Private by design · Free to start
+            </p>
           </div>
         </Container>
       </section>
