@@ -27,7 +27,7 @@ export default function ProductPage() {
         <Container className="relative z-10 max-w-3xl">
           <MetaLabel>Product</MetaLabel>
           <h1 className="font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
-            One platform. Three spaces. One source.
+            <span className="text-glow">One platform.</span> Three spaces. One source.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-lg leading-relaxed">
             Your Baseline Design is active in every session — a private behavioral map that gives the AI context before you type. Defrag, Covenant, and Alignment each do different work — and share the same context.
@@ -72,7 +72,7 @@ export default function ProductPage() {
               <Link
                 key={space.name}
                 href={space.href}
-                className="group flex items-start gap-8 py-10 border-b border-white/[0.06] last:border-0 hover:bg-white/[0.02] transition-colors px-4 -mx-4"
+                className="group flex items-start gap-8 py-10 border-b border-white/[0.06] last:border-0 glow-card-hover px-4 -mx-4"
                 style={{ borderRadius: 12 }}
               >
                 <div className="flex flex-col items-center gap-2 shrink-0 mt-1">
