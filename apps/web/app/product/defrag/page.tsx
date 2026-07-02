@@ -112,7 +112,7 @@ function DefragDemo() {
                   className="px-5 py-4 border-t border-white/[0.05] bg-white/[0.02]"
                 >
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-1.5">Best Next Response</p>
-                  <p className="text-[13px] leading-relaxed text-[#f4efe9] font-medium">{current.result.nextResponse}</p>
+                  <p className="text-[13px] leading-relaxed text-[#f4efe9]">{current.result.nextResponse}</p>
                 </motion.div>
               )}
             </motion.div>

@@ -196,7 +196,7 @@ export default function CovenantProductPage() {
               <div key={i} className="flex flex-col md:flex-row items-baseline gap-4 md:gap-12 py-8 border-b border-white/[0.06] last:border-0">
                 <span className="font-serif text-3xl md:text-5xl text-[#4f4b47] w-12 shrink-0">0{i + 1}</span>
                 <div>
-                  <p className="text-[#f4efe9] font-medium text-sm mb-2">{f.label}</p>
+                  <p className="text-[14px] text-[#f4efe9] mb-2">{f.label}</p>
                   <p className="text-sm text-[#76716b] leading-relaxed max-w-xl">{f.body}</p>
                 </div>
               </div>
