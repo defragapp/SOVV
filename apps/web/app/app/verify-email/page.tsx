@@ -90,7 +90,7 @@ export default function VerifyEmailPage() {
             </div>
           )}
 
-          <h1 className="text-sm font-medium text-[#f4efe9] mb-3">{content.title}</h1>
+          <h1 className="text-[14px] text-[#f4efe9] mb-3">{content.title}</h1>
           <p className="text-sm text-[#76716b] leading-relaxed mb-6">{content.body}</p>
 
           {content.cta && (

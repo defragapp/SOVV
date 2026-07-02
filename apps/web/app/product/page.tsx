@@ -119,7 +119,7 @@ export default function ProductPage() {
             ].map((f, i) => (
               <div key={i} className="py-8 pr-8 border-b border-white/[0.06] md:border-r md:even:border-r-0">
                 <div className="flex items-center gap-2 mb-3">
-                  <p className="font-medium text-[#f4efe9] text-[15px]">{f.name}</p>
+                  <p className="text-[15px] text-[#f4efe9]">{f.name}</p>
                   <span
                     className="font-mono text-[8px] uppercase tracking-[0.12em] border px-1.5 py-0.5"
                     style={{

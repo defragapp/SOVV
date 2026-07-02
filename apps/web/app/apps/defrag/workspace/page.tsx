@@ -288,7 +288,7 @@ export default function DefragWorkspacePage() {
           </>
         ) : (
           <div className="border border-white/[0.08] bg-[#111010] p-4" style={{ borderRadius: 10 }}>
-            <p className="text-[11px] font-medium text-[#a8a29a] mb-1">Required to run</p>
+            <p className="text-[11px] text-[#a8a29a] mb-1">Required to run</p>
             <p className="text-[12px] text-[#76716b] leading-relaxed mb-3">Add your date, time, and place of birth to begin.</p>
             <a href="/settings" className="inline-flex h-8 px-4 bg-[#f4efe9] text-[#08070a] text-[11px] font-medium items-center hover:opacity-90 transition-opacity" style={{ borderRadius: 8 }}>
               Add birth data →
@@ -402,7 +402,7 @@ export default function DefragWorkspacePage() {
 
         {!baselineLoading && !baseline && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-3">
-            <p className="text-[15px] font-medium text-[#a8a29a]">Your Baseline Design is needed to begin.</p>
+            <p className="text-[15px] text-[#a8a29a]">Your Baseline Design is needed to begin.</p>
             <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">Add your date, time, and place of birth in the Context panel on the left.</p>
           </div>
         )}

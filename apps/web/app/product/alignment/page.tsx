@@ -199,13 +199,13 @@ export default function AlignmentProductPage() {
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-6">Two things Alignment uses</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <p className="text-[#f4efe9] font-medium text-sm mb-2">Your Baseline Design</p>
+                <p className="text-[13px] text-[#f4efe9] mb-2">Your Baseline Design</p>
                 <p className="text-sm text-[#76716b] leading-relaxed">
                   Your fixed center. How you tend to process, respond, and return to yourself under pressure. Derived from your birth data. Active in every result. Never changes.
                 </p>
               </div>
               <div>
-                <p className="text-[#f4efe9] font-medium text-sm mb-2">The live sky above you</p>
+                <p className="text-[13px] text-[#f4efe9] mb-2">The live sky above you</p>
                 <p className="text-sm text-[#76716b] leading-relaxed">
                   The current planetary weather — the emotional tone of the moment you're in. Changes daily. Tells Alignment whether this is a moment to move, to wait, or to lead with compassion.
                 </p>

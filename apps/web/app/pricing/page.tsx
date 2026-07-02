@@ -176,7 +176,7 @@ export default function PricingPage() {
               { q: "Do you offer promo codes?", a: "Yes. Enter a promo code at checkout. If you have one, it will be applied before your first charge." },
             ].map((item, i) => (
               <details key={i} className="group border-b border-white/[0.08] py-6 cursor-pointer">
-                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base font-medium list-none">
+                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base font-normal list-none">
                   {item.q}
                   <span className="flex-none text-xl text-[#e0743a] transition-transform duration-300 group-open:rotate-45">+</span>
                 </summary>
