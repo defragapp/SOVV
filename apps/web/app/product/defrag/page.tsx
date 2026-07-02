@@ -128,7 +128,7 @@ export default function DefragProductPage() {
     <SiteShell>
 
       {/* ── HERO ── */}
-      <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-900/10 via-[#08070a] to-[#08070a] overflow-hidden border-b border-white/5">
+      <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[#08070a] pattern-field overflow-hidden border-b border-white/5">
         <div className="light-beam opacity-60" aria-hidden />
         <Container className="relative z-10 max-w-4xl">
           <div className="inline-flex items-center gap-2 mb-6">
@@ -240,7 +240,7 @@ export default function DefragProductPage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="relative w-full py-24 md:py-32 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-900/10 via-[#08070a] to-[#08070a] border-t border-white/5 overflow-hidden">
+      <section className="relative w-full py-24 md:py-32 bg-[#08070a] pattern-field border-t border-white/5 overflow-hidden">
         <div className="light-beam" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <h2 className="font-serif text-4xl md:text-6xl text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
