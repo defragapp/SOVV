@@ -408,16 +408,44 @@ export default function DefragWorkspacePage() {
         )}
 
         {baseline && !result && !isLoading && !error && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-2">
-            <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">Before you move.</p>
-            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">Describe what's happening. Be as specific or as brief as you want.</p>
+          <div className="flex flex-col items-center justify-center text-center h-full gap-6 px-8">
+            <div className="flex flex-col gap-3">
+              <p className="font-serif text-[22px] text-[#f4efe9] leading-snug tracking-[-0.01em]">
+                What's happening right now?
+              </p>
+              <p className="text-[13px] text-[#4f4b47] leading-relaxed max-w-[260px] mx-auto">
+                Describe the moment — the argument, the silence, the message, the pattern. Say it how it actually happened.
+              </p>
+            </div>
+            <div className="flex flex-col gap-1.5 items-center">
+              {[
+                "The conversation that keeps looping",
+                "The message I can't stop thinking about",
+                "The role I keep falling back into",
+              ].map((prompt) => (
+                <button
+                  key={prompt}
+                  onClick={() => setInput(prompt)}
+                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors px-3 py-1.5 border border-white/[0.05] hover:border-white/[0.10]"
+                  style={{ borderRadius: 6 }}
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
         {isLoading && (
-          <div className="flex flex-col items-center justify-center h-full gap-4">
-            <span className="w-5 h-5 border border-white/[0.15] border-t-white/[0.45] rounded-full animate-spin" />
-            <p className="text-[13px] text-[#76716b]">Looking at what's here…</p>
+          <div className="flex flex-col items-center justify-center h-full gap-5">
+            <div className="relative w-8 h-8">
+              <span className="absolute inset-0 border border-white/[0.08] rounded-full" />
+              <span className="absolute inset-0 border border-t-[#e0743a]/40 rounded-full animate-spin" style={{ animationDuration: "1.4s" }} />
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Reading the pattern</p>
+              <p className="text-[11px] text-[#4f4b47]/60">Your Baseline Design is active</p>
+            </div>
           </div>
         )}
 
@@ -482,7 +510,7 @@ export default function DefragWorkspacePage() {
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="I need clarity on something."
+            placeholder="Describe the moment — what happened, what was said, what keeps repeating."
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
@@ -505,7 +533,7 @@ export default function DefragWorkspacePage() {
             <button onClick={handleSubmit} disabled={!input.trim() || isLoading}
               className="h-8 px-5 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
               style={{ borderRadius: 8 }}>
-              {isLoading ? "…" : "Show me what I'm not seeing"}
+              {isLoading ? "…" : "See what's active"}
             </button>
           </div>
         </div>

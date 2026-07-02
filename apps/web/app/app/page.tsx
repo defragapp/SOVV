@@ -148,7 +148,7 @@ export default function LibraryPage() {
                          <p className="text-[14px] text-[#f4efe9] leading-snug mt-1">{item.title || "Untitled"}</p>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs text-[#52525B] font-sans font-medium">
+                        <span className="font-mono text-[9px] text-[#4f4b47]">
                            {new Date(item.created_at).toLocaleDateString()}
                         </span>
                         <button
@@ -162,7 +162,7 @@ export default function LibraryPage() {
                       </div>
                    </div>
                    {item.payload && (
-                      <p className="text-sm text-[#a8a29a] font-sans font-medium leading-relaxed line-clamp-3">
+                      <p className="text-[13px] text-[#76716b] leading-relaxed line-clamp-3">
                          {typeof item.payload === "string" ? (() => { try { return JSON.parse(item.payload).summary || "Result data" } catch { return item.payload }})() : "Result data"}
                       </p>
                    )}

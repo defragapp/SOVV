@@ -131,7 +131,7 @@ export default function LoginScreen() {
           {/* Wordmark */}
           <div className="mb-10 text-center">
             <Link href="/" className="inline-block">
-              <span className="font-mono text-xs tracking-[0.3em] text-[#f4efe9] uppercase font-medium">
+              <span className="font-mono text-[10px] tracking-[0.3em] text-[#f4efe9]/70 uppercase">
                 SOVEREIGN.OS
               </span>
             </Link>
@@ -152,7 +152,7 @@ export default function LoginScreen() {
                   key={m}
                   type="button"
                   onClick={() => { setMode(m); setError(""); setTurnstileToken("") }}
-                  className={`flex-1 pb-4 text-sm font-medium tracking-wide transition-colors duration-200 border-b-2 ${
+                  className={`flex-1 pb-4 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors duration-200 border-b-2 ${
                     mode === m
                       ? "border-[#f4efe9] text-[#f4efe9]"
                       : "border-transparent text-[#76716b] hover:text-[#a8a29a]"

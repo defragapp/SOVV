@@ -40,13 +40,13 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
         style={{ gridTemplateColumns: "260px 1fr 300px", gridTemplateRows: "52px 1fr" }}
       >
         {/* ── Header ── */}
-        <header className="col-span-3 h-[52px] border-b border-white/[0.06] bg-[#08070a]/95 backdrop-blur-md px-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/apps/defrag" className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors">
+        <header className="col-span-3 h-[52px] border-b border-white/[0.05] bg-[#08070a] px-5 flex items-center justify-between" style={{ backdropFilter: "blur(12px)" }}>
+          <div className="flex items-center gap-2.5">
+            <Link href="/" className="font-mono text-[9px] tracking-[0.28em] uppercase text-[#4f4b47] hover:text-[#76716b] transition-colors duration-200">
               Sovereign.os
             </Link>
-            <span className="text-white/20 text-xs">/</span>
-            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#f4efe9]">{spaceName}</span>
+            <span className="text-white/[0.12] text-[10px]">·</span>
+            <span className="font-mono text-[9px] tracking-[0.22em] uppercase text-[#f4efe9]/80">{spaceName}</span>
           </div>
 
           {/* Space switcher */}
@@ -59,10 +59,10 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
               <Link
                 key={s.href}
                 href={s.href}
-                className={`px-3 py-1.5 rounded-lg font-mono text-[10px] tracking-[0.12em] uppercase transition-colors ${
+                className={`px-3 py-1 font-mono text-[9px] tracking-[0.14em] uppercase transition-all duration-200 ${
                   spaceName === s.label
-                    ? "bg-white/[0.08] text-[#f4efe9]"
-                    : "text-[#76716b] hover:text-[#a8a29a] hover:bg-white/[0.04]"
+                    ? "text-[#f4efe9] border-b border-[#f4efe9]/30"
+                    : "text-[#4f4b47] hover:text-[#76716b]"
                 }`}
               >
                 {s.label}
