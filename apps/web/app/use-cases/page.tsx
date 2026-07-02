@@ -42,7 +42,7 @@ const USE_CASES = [
   {
     num: "04",
     title: "High-stakes messages",
-    trigger: "A message activated your nervous system. You don't know how to respond.",
+    trigger: "A message landed harder than expected. You don't know how to respond.",
     space: "Defrag",
     outcome: "Separate the moment from the pattern. Find your best next response before you reply.",
   },
@@ -74,7 +74,7 @@ export default function UseCasesPage() {
         <Container className="relative z-10 max-w-3xl">
           <MetaLabel>Use cases</MetaLabel>
           <h1 className="reveal-up reveal-up-2 font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
-            When to use Sovereign.os.
+            <span className="text-glow">When to use</span> Sovereign.os.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-lg leading-relaxed">
             Use it when the moment requires a grounded response instead of a reactive loop.
@@ -89,7 +89,7 @@ export default function UseCasesPage() {
             {USE_CASES.map((uc, idx) => (
               <div
                 key={uc.num}
-                className={`grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 py-10 border-b border-white/[0.06] last:border-0 items-start reveal-up reveal-up-${Math.min(idx + 1, 6)}`}
+                className={`grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 py-10 border-b border-white/[0.06] last:border-0 items-start reveal-up reveal-up-${Math.min(idx + 1, 6)} glow-card-hover cursor-default`}
               >
                 {/* Left: trigger */}
                 <div>

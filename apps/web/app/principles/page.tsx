@@ -7,38 +7,38 @@ import { Container } from "@/components/ui/layout-primitives"
 const PRINCIPLES = [
   {
     num: "01",
-    title: "Radical Objectivity",
-    body: "Sovereign.os cuts through the emotional noise. It isn't designed to just validate how you feel; it's engineered to give you the exact facts of a dynamic so you can navigate it cleanly.",
+    title: "Pattern over story",
+    body: "You don't need to retell the whole thing. Sovereign.os looks at what's structurally active — the loop, the role, the pressure — not the narrative you've been carrying.",
   },
   {
     num: "02",
-    title: "Data over narrative",
-    body: "You don't need to rehash the entire story. We map the underlying structure of the conflict — identifying what is active, what you may be carrying, and the options still available.",
+    title: "Grounded in how you actually work",
+    body: "Your Baseline Design is the starting point. It shows how you tend to move under pressure, what you protect, and how you return to center — before the moment arrives.",
   },
   {
     num: "03",
-    title: "Mapping, not labeling",
-    body: "We don't pathologize. The system maps your Baseline Design to show you exactly how you operate under pressure, completely free from clinical labels.",
+    title: "No diagnosis. No verdict.",
+    body: "The system names what's active, not what's wrong with you. There are no labels, no scores, no clinical categories. Just a clearer read on what's happening.",
   },
   {
     num: "04",
-    title: "Immediate Utility",
-    body: "Theoretical advice doesn't survive friction. Every output is designed to be instantly recognizable, deeply accurate, and ready to act on right now.",
+    title: "One clear next move",
+    body: "Not a list of options. Not general advice. One specific, proportionate next step — grounded in the pattern, not the pressure.",
   },
   {
     num: "05",
-    title: "Built for the friction point",
-    body: "This isn't a passive journal. It's a precision tool built for the exact moment before you hit send, repeat a cycle, or walk into a difficult room.",
+    title: "Built for the moment before you react",
+    body: "Before you hit send. Before you walk into the room. Before the old response takes over. That's when Sovereign.os is most useful.",
   },
   {
     num: "06",
-    title: "Zero Jargon",
-    body: "Complex relational dynamics, translated into plain language. You don't need to learn a new framework — you just get the answer.",
+    title: "Plain language throughout",
+    body: "No framework jargon. No therapy-coded vocabulary. The output should feel recognized, not explained — like something you already knew but couldn't quite name.",
   },
   {
     num: "07",
-    title: "Edge-Private Security",
-    body: "Your Baseline Design and session inputs are processed securely on Cloudflare edge infrastructure. Your personal data trains nothing. What happens in the workspace stays there.",
+    title: "Private by design",
+    body: "Your Baseline Design and sessions are yours. Nothing is shared, sold, or used to train anything. What you bring here stays here.",
   },
 ]
 

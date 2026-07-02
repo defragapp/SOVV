@@ -37,28 +37,28 @@ type ResultRow = {
 
 const DEMO_RESULT: ResultRow[] = [
   {
-    label: "What's happening",
-    value: "Right now, this feels like something important didn't land.",
+    label: "What's active",
+    value: "You absorbed the silence and went internal — not because you had nothing to say, but because waiting felt safer than pushing.",
     evidence: ["Moon in Pisces", "Gate 55"],
   },
   {
-    label: "What it lands on",
-    value: "Under this is a simple need: to be met.",
+    label: "You",
+    value: "Under this is a simple need: to be met. The checking-your-phone is the loop.",
     evidence: ["Gate 2", "Venus in Taurus"],
   },
   {
-    label: "The other side",
+    label: "Them",
     value: "They may be reacting from a place of protection — not indifference.",
     evidence: ["Gate 38"],
   },
   {
-    label: "The pattern",
+    label: "What forms between you",
     value: "You reach. They pull back. Distance grows. This tends to repeat.",
     evidence: ["Sun in Aries", "Gate 51"],
   },
   {
-    label: "Next step",
-    value: "Name one feeling and one need — in a single sentence. Keep it brief and concrete.",
+    label: "Next move",
+    value: "Name one feeling and one need — in a single sentence. Send it without asking for a response.",
     highlight: true,
   },
 ]
