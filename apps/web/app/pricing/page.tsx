@@ -47,9 +47,11 @@ export default function PricingPage() {
 
       <section className="relative w-full pt-32 pb-16 md:pt-40 md:pb-20 bg-[#08070a] overflow-hidden">
         <div className="light-beam opacity-50" aria-hidden />
+        <div className="ambient-blob absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] opacity-[0.04]"
+          style={{ background: "radial-gradient(circle, rgba(224,116,58,1) 0%, transparent 70%)" }} aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <MetaLabel>Pricing</MetaLabel>
-          <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
+          <h1 className="reveal-up reveal-up-2 font-serif text-[#f4efe9] text-4xl md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
             Start free. Upgrade when you need continuity.
           </h1>
           <TextReveal delay={200}>
@@ -64,7 +66,7 @@ export default function PricingPage() {
         <Container>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
 
-            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8 flex flex-col" style={{ borderRadius: 16 }}>
+            <div className="group border border-white/[0.07] bg-[#0c0a0d] p-8 flex flex-col transition-all duration-300 hover:border-white/[0.12]" style={{ borderRadius: 16 }}>
               <div className="mb-8">
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Free</p>
                 <div className="flex items-baseline gap-1 mb-3">

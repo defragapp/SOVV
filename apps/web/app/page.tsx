@@ -252,7 +252,14 @@ export default function Home() {
           <MetaLabel>Product spaces</MetaLabel>
           <div className="grid gap-px overflow-hidden border border-white/[0.06] bg-white/[0.06] md:grid-cols-2">
             {productSpaces.map((space, index) => (
-              <Link key={space.name} href={space.href} className="group bg-[#0c0a0d] p-8 md:p-10 hover:bg-[#111015] transition-colors">
+              <Link
+                key={space.name}
+                href={space.href}
+                className="group relative bg-[#0c0a0d] p-8 md:p-10 border border-white/[0.05] hover:border-white/[0.10] transition-all duration-300 overflow-hidden"
+                style={{ borderRadius: "var(--radius-container)" }}
+              >
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{ background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(224,116,58,0.04) 0%, transparent 70%)" }} />
                 <div className="mb-10 flex items-center justify-between">
                   <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47]">0{index + 1}</span>
                   <span className="font-mono text-[9px] tracking-[0.18em] uppercase text-[#e0743a]/60">{space.label}</span>
