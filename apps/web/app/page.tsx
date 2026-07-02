@@ -665,31 +665,62 @@ export default function Home() {
                 num: "01",
                 name: "Defrag",
                 tier: "Free",
-                href: "/product",
+                href: "/product/defrag",
                 hook: "Separate the moment from the pattern.",
                 what: "Something happened. You don't know if you overreacted or if this is the same thing that always happens.",
                 cta: "What's actually active — and your clearest next response.",
                 tags: ["Arguments", "Messages", "Family roles", "Boundaries", "Grief"],
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    {/* Defrag: separated layers becoming clear */}
+                    <rect x="3" y="4" width="18" height="3" rx="1" stroke="rgba(224,116,58,0.5)" strokeWidth="1.2"/>
+                    <rect x="3" y="10.5" width="12" height="3" rx="1" stroke="rgba(224,116,58,0.35)" strokeWidth="1.2"/>
+                    <rect x="3" y="17" width="15" height="3" rx="1" stroke="rgba(224,116,58,0.2)" strokeWidth="1.2"/>
+                    <line x1="17" y1="12" x2="21" y2="12" stroke="rgba(224,116,58,0.4)" strokeWidth="1.2" strokeLinecap="round"/>
+                    <path d="M19 10l2 2-2 2" stroke="rgba(224,116,58,0.4)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
               },
               {
                 num: "02",
                 name: "Covenant",
                 tier: "Pro",
-                href: "/covenant",
+                href: "/product/covenant",
                 hook: "Your moment has been walked before.",
                 what: "Covenant connects what you're going through to the real human stories in Scripture.",
                 cta: "One honest next step — grounded in faith, not performance.",
                 tags: ["Faith", "Values", "Commitments", "Repair"],
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    {/* Covenant: connected arc, story bridge */}
+                    <path d="M4 18 Q12 4 20 18" stroke="rgba(224,116,58,0.5)" strokeWidth="1.2" strokeLinecap="round" fill="none"/>
+                    <circle cx="4" cy="18" r="1.5" fill="rgba(224,116,58,0.4)"/>
+                    <circle cx="20" cy="18" r="1.5" fill="rgba(224,116,58,0.4)"/>
+                    <circle cx="12" cy="9" r="1.5" fill="rgba(224,116,58,0.6)"/>
+                    <line x1="4" y1="18" x2="12" y2="9" stroke="rgba(224,116,58,0.15)" strokeWidth="1" strokeDasharray="2 2"/>
+                    <line x1="20" y1="18" x2="12" y2="9" stroke="rgba(224,116,58,0.15)" strokeWidth="1" strokeDasharray="2 2"/>
+                  </svg>
+                ),
               },
               {
                 num: "03",
                 name: "Alignment",
                 tier: "Pro",
-                href: "/product",
-                hook: "Get back into your own lane.",
+                href: "/product/alignment",
+                hook: "Return to your own signal.",
                 what: "A conversation, a conflict, a decision — and suddenly you're reacting from somewhere that isn't you.",
                 cta: "Your Baseline Design shows the path back.",
                 tags: ["After Defrag", "Before a hard conversation", "After a conflict"],
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    {/* Alignment: concentric rings, centered axis */}
+                    <circle cx="12" cy="12" r="2" fill="rgba(224,116,58,0.7)"/>
+                    <circle cx="12" cy="12" r="5" stroke="rgba(224,116,58,0.35)" strokeWidth="1.2" fill="none"/>
+                    <circle cx="12" cy="12" r="8.5" stroke="rgba(224,116,58,0.15)" strokeWidth="1" fill="none" strokeDasharray="2 3"/>
+                    <line x1="12" y1="3" x2="12" y2="21" stroke="rgba(224,116,58,0.1)" strokeWidth="1"/>
+                    <line x1="3" y1="12" x2="21" y2="12" stroke="rgba(224,116,58,0.1)" strokeWidth="1"/>
+                  </svg>
+                ),
               },
             ].map((space) => (
               <Link
@@ -702,10 +733,10 @@ export default function Home() {
                     className="w-10 h-10 flex items-center justify-center border border-white/[0.08]"
                     style={{
                       borderRadius: 8,
-                      color: space.tier === "Pro" ? "#e0743a" : "#76716b",
-                      background: space.tier === "Pro" ? "rgba(224,116,58,0.06)" : "rgba(255,255,255,0.02)",
+                      background: space.tier === "Pro" ? "rgba(224,116,58,0.04)" : "rgba(255,255,255,0.02)",
                     }}
                   >
+                    {space.icon}
                     <span className="font-mono text-[9px] tracking-[0.1em]">{space.num}</span>
                   </div>
                   <span
