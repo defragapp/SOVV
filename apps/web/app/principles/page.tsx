@@ -80,7 +80,7 @@ export default function PrinciplesPage() {
               Principles
             </p>
             <h1 className="font-serif text-[#f4efe9] text-3xl md:text-5xl tracking-[-0.02em] leading-tight mb-5">
-              The architecture of clarity.
+              <span className="text-glow">The architecture</span> of clarity.
             </h1>
             <p className="text-base text-[#76716b] leading-relaxed max-w-lg">
               The core mechanics governing how Sovereign.os processes your inputs and protects your data.
@@ -96,7 +96,7 @@ export default function PrinciplesPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.5, delay: idx * 0.04, ease: [0.16, 1, 0.3, 1] }}
-                className="group flex items-start gap-8 py-8 border-b border-white/[0.05] last:border-0 hover:bg-white/[0.01] transition-colors -mx-4 px-4"
+                className="group flex items-start gap-8 py-8 border-b border-white/[0.05] last:border-0 glow-card-hover -mx-4 px-4"
                 style={{ borderRadius: 2 }}
               >
                 {/* Number */}

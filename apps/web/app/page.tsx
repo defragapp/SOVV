@@ -452,7 +452,7 @@ export default function Home() {
             className="font-serif text-[#f4efe9] text-balance leading-[1.06] tracking-[-0.02em] px-8"
             style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", maxWidth: "22ch" }}
           >
-            Healing isn&apos;t optional.
+            <span className="text-glow">Healing isn&apos;t optional.</span>
             <br />
             <span style={{ color: "rgba(244,239,233,0.48)" }}>
               Holding the pain is.
