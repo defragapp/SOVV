@@ -66,7 +66,7 @@ export default function PricingPage() {
         <Container>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
 
-            <div className="group border border-white/[0.07] bg-[#0c0a0d] p-8 flex flex-col transition-all duration-300 hover:border-white/[0.12]" style={{ borderRadius: 16 }}>
+            <div className="group border border-white/[0.07] bg-[#0c0a0d] p-8 flex flex-col glow-card-hover" style={{ borderRadius: 16 }}>
               <div className="mb-8">
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Free</p>
                 <div className="flex items-baseline gap-1 mb-3">
@@ -88,7 +88,7 @@ export default function PricingPage() {
               </Link>
             </div>
 
-            <div className="border border-[#e0743a]/30 bg-[#0c0a0d] p-8 flex flex-col relative overflow-hidden" style={{ borderRadius: 16 }}>
+            <div className="border border-[#e0743a]/30 bg-[#0c0a0d] p-8 flex flex-col relative overflow-hidden glow-card" style={{ borderRadius: 16 }}>
               <div
                 className="pointer-events-none absolute inset-0"
                 style={{ background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(224,116,58,0.06) 0%, transparent 70%)" }}

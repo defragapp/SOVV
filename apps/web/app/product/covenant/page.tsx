@@ -146,7 +146,7 @@ export default function CovenantProductPage() {
               { label: "One next step", body: "Not a list. Not a lecture. One real, doable thing that fits the story you're in." },
             ].map((f, i) => (
               <div key={i} className="pr-8 pb-6 md:pb-0 border-b md:border-b-0 md:border-r border-white/[0.06] last:border-0 pt-6 md:pt-0 md:pl-8 first:pl-0">
-                <p className="text-[#f4efe9] font-medium text-sm mb-1">{f.label}</p>
+                <p className="text-[14px] text-[#f4efe9] mb-1">{f.label}</p>
                 <p className="text-sm text-[#76716b] leading-relaxed">{f.body}</p>
               </div>
             ))}

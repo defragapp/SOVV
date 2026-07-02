@@ -102,8 +102,8 @@ export default function HowItWorksPage() {
                     )}
                   </div>
                   <div className="flex-1 pb-8">
-                    <h3 className="text-[#f4efe9] font-medium text-lg mb-2">{step.title}</h3>
-                    <p className="text-sm text-[#a8a29a] leading-relaxed mb-3">{step.body}</p>
+                    <h3 className="font-serif text-[1.15rem] text-[#f4efe9] leading-snug mb-3">{step.title}</h3>
+                    <p className="text-[14px] text-[#76716b] leading-relaxed mb-3">{step.body}</p>
                     {step.note && (
                       <p className="text-sm text-[#76716b] leading-relaxed border-l-2 border-[#e0743a]/20 pl-4">
                         {step.note}

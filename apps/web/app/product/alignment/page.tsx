@@ -15,7 +15,7 @@ function BaselineAndSky() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
 
       {/* Baseline Design */}
-      <div className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden" style={{ borderRadius: 14 }}>
+      <div className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden glow-card" style={{ borderRadius: 14 }}>
         <div className="px-5 py-3 border-b border-white/[0.06]">
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]/60">Your Baseline Design</p>
           <p className="text-[11px] text-[#4f4b47] mt-0.5">Apr 3 1990 · 7:42 AM · Chicago</p>
@@ -40,7 +40,7 @@ function BaselineAndSky() {
       </div>
 
       {/* Live sky */}
-      <div className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden" style={{ borderRadius: 14 }}>
+      <div className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden glow-card" style={{ borderRadius: 14 }}>
         <div className="px-5 py-3 border-b border-white/[0.06]">
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]/60">Live Sky · Right Now</p>
           <p className="text-[11px] text-[#4f4b47] mt-0.5">Jun 17 2026 · Your location</p>
@@ -54,7 +54,7 @@ function BaselineAndSky() {
             <div key={i} className="pb-3 border-b border-white/[0.04] last:border-0">
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-1 h-1 rounded-full bg-[#e0743a]/50 shrink-0" />
-                <p className="text-[10px] text-[#f4efe9] font-medium">{item.label}</p>
+                <p className="text-[10px] text-[#f4efe9]">{item.label}</p>
               </div>
               <p className="text-[10px] text-[#76716b] leading-relaxed pl-3">{item.note}</p>
             </div>
