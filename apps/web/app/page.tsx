@@ -418,6 +418,8 @@ export default function Home() {
             style={{ objectPosition: "center 20%", zIndex: 0, opacity: 0.85 }}
             fetchPriority="high"
             decoding="async"
+            width="2560"
+            height="1440"
           />
         </picture>
 
