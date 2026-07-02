@@ -468,14 +468,27 @@ export default function Home() {
             </span>
           </motion.h1>
 
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.38, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-5 max-w-xs text-[#76716b] leading-relaxed px-8"
+            style={{ fontSize: "clamp(0.8rem, 1.6vw, 0.9rem)" }}
+          >
+            Pattern-aware AI for the moments that are hard to read while you&rsquo;re inside them.
+          </motion.p>
+
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-8"
+            transition={{ duration: 0.9, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-8 flex flex-col sm:flex-row gap-3 items-center px-8"
           >
             <Link href={APP_URL} className="btn-primary">
               Enter Sovereign.os
+            </Link>
+            <Link href="/how-it-works" className="btn-secondary" style={{ opacity: 0.70 }}>
+              See how it works
             </Link>
           </motion.div>
         </div>
@@ -499,7 +512,7 @@ export default function Home() {
               <span className="text-glow">A private notebook</span> that turns reflection into direction.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-sm">
-              A real prompt. A real result. Your Baseline Design active in the background.
+              The Clarity Console reads the situation through your Baseline Design — showing what&rsquo;s active, what&rsquo;s repeating, and what next move gives the moment a better chance.
             </p>
           </div>
           <SpacePreview />
@@ -526,7 +539,7 @@ export default function Home() {
               <span className="text-glow">The moment</span> is rarely the whole pattern.
             </h2>
             <p className="mt-5 text-[15px] text-[#76716b] leading-relaxed max-w-lg">
-              Most people react to what just happened. Sovereign.os helps you pause, name what is active, and understand what may be repeating underneath the surface.
+              A text, tone, silence, or conflict can feel bigger than the facts because it is touching a pattern already in motion. Sovereign.os helps you separate the moment from the pattern before you move from pressure.
             </p>
           </div>
 
@@ -534,7 +547,7 @@ export default function Home() {
             {[
               {
                 label: "The Moment",
-                desc: "What happened now — the message, the silence, the argument, the feeling that won't settle.",
+                desc: "What happened on the surface. The text. The conversation. The request. The decision.",
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <circle cx="10" cy="10" r="3" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5"/>
@@ -545,7 +558,7 @@ export default function Home() {
               },
               {
                 label: "The Pattern",
-                desc: "What keeps returning — the loop beneath the surface that shapes how you respond before you decide to.",
+                desc: "What may be repeating underneath. The role, pressure, loop, or meaning that makes the moment feel heavier.",
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M3 10 Q7 4 10 10 Q13 16 17 10" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
@@ -556,7 +569,7 @@ export default function Home() {
               },
               {
                 label: "The Next Move",
-                desc: "What alignment asks for — one specific, proportionate step grounded in how you actually work.",
+                desc: "The response, pause, boundary, or repair that gives the situation a better chance.",
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M4 10h12M12 6l4 4-4 4" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -600,17 +613,17 @@ export default function Home() {
               {
                 num: "01",
                 title: "Enter the moment",
-                body: "Write what happened, what you feel, or what feels unresolved. No framework required.",
+                body: "Start with the situation as it happened — a message, conflict, boundary, grief point, or decision.",
               },
               {
                 num: "02",
                 title: "See the pattern",
-                body: "Sovereign.os separates the current situation from the deeper loop — using your Baseline Design as context.",
+                body: "Sovereign.os uses your Baseline Design to show what's active and what may be repeating underneath.",
               },
               {
                 num: "03",
                 title: "Return with clarity",
-                body: "Receive one grounded next move that helps you act from alignment instead of reaction.",
+                body: "Get a Best Next Response you can use, edit, or Save to Sovereign — before pressure chooses for you.",
               },
             ].map((step, i) => (
               <div key={step.num} className={`bg-[#0c0a0d] p-8 md:p-10 flex flex-col gap-6 reveal-up reveal-up-${i + 2}`}>
@@ -652,7 +665,7 @@ export default function Home() {
             <span style={{ color: "rgba(244,239,233,0.45)" }}>It is return.</span>
           </blockquote>
           <p className="mt-8 text-[15px] text-[#76716b] leading-relaxed max-w-md mx-auto">
-            Sovereign.os is built around the belief that the first step is not fixing everything. It is seeing what is active clearly enough to choose differently.
+            Sovereign.os does not tell you who to be. It gives you enough structure to return to yourself before the pattern runs the room.
           </p>
         </Container>
       </section>
@@ -676,8 +689,8 @@ export default function Home() {
                 tier: "Free",
                 href: "/product/defrag",
                 hook: "Separate the moment from the pattern.",
-                what: "Something happened. You don't know if you overreacted or if this is the same thing that always happens.",
-                cta: "What's actually active — and your clearest next response.",
+                what: "Use Defrag for messages, relational dynamics, family pressure, boundaries, grief, and team dynamics.",
+                cta: "What's active, what may be repeating, and your Best Next Response.",
                 tags: ["Arguments", "Messages", "Family roles", "Boundaries", "Grief"],
                 icon: (
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -695,9 +708,9 @@ export default function Home() {
                 name: "Covenant",
                 tier: "Pro",
                 href: "/product/covenant",
-                hook: "Your moment has been walked before.",
-                what: "Covenant connects what you're going through to the real human stories in Scripture.",
-                cta: "One honest next step — grounded in faith, not performance.",
+                hook: "Reflect through faith without performance.",
+                what: "Use Covenant for truth, repair, forgiveness, responsibility, humility, and discernment.",
+                cta: "One honest next step — grounded in faith, not reaction.",
                 tags: ["Faith", "Values", "Commitments", "Repair"],
                 icon: (
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -716,9 +729,9 @@ export default function Home() {
                 name: "Alignment",
                 tier: "Pro",
                 href: "/product/alignment",
-                hook: "Return to your own signal.",
-                what: "A conversation, a conflict, a decision — and suddenly you're reacting from somewhere that isn't you.",
-                cta: "Your Baseline Design shows the path back.",
+                hook: "Turn recognition into practice.",
+                what: "Use Alignment to shape the response, boundary, pause, or repair that keeps you clear.",
+                cta: "After Defrag. Before the next move. Return to yourself.",
                 tags: ["After Defrag", "Before a hard conversation", "After a conflict"],
                 icon: (
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -810,7 +823,7 @@ export default function Home() {
             <span className="text-glow">Return before</span> the pattern runs the room.
           </h2>
           <p className="mt-6 max-w-md text-[15px] text-[#76716b] leading-relaxed">
-            Use Sovereign.os as a private place to slow down, understand what is active, and move with more clarity.
+            Understand what&rsquo;s active, see what may be repeating, and choose the next move with more context. Start with Defrag. Save what matters. Build your private Library over time.
           </p>
           <div className="mt-9">
             <Link href={APP_URL} className="btn-primary">
