@@ -117,14 +117,23 @@ function SpacePreview() {
         className="pointer-events-none absolute -inset-px"
         style={{
           borderRadius: "var(--radius-container)",
-          background: "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(224,116,58,0.10) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(224,116,58,0.12) 0%, transparent 65%)",
+        }}
+        aria-hidden
+      />
+      {/* Bottom glow */}
+      <div
+        className="pointer-events-none absolute -inset-px"
+        style={{
+          borderRadius: "var(--radius-container)",
+          background: "radial-gradient(ellipse 60% 30% at 50% 100%, rgba(200,194,188,0.04) 0%, transparent 70%)",
         }}
         aria-hidden
       />
 
       <div
-        className="relative border border-white/[0.10] bg-[#0c0a0d] overflow-hidden"
-        style={{ borderRadius: "var(--radius-container)", boxShadow: "0 32px 80px -16px rgba(0,0,0,0.7)" }}
+        className="relative border border-white/[0.10] bg-[#0c0a0d] overflow-hidden scan-lines"
+        style={{ borderRadius: "var(--radius-container)", boxShadow: "0 32px 80px -16px rgba(0,0,0,0.7), 0 0 0 1px rgba(224,116,58,0.04)" }}
       >
         {/* ── Titlebar ── */}
         <div className="h-11 border-b border-white/[0.07] bg-[#08070a]/90 flex items-center px-4 gap-3 shrink-0">
@@ -474,20 +483,20 @@ export default function Home() {
 
 
       {/* ── NOTEBOOK PREVIEW ─────────────────────────────────────────────── */}
-      <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/[0.05]">
+      <section className="w-full py-24 md:py-36 bg-[#08070a] border-t border-white/[0.04] pattern-field">
         <Container>
-          <div className="flex flex-col items-center text-center mb-14">
+          <div className="flex flex-col items-center text-center mb-14 reveal-up reveal-up-1">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-6 bg-[#e0743a]/60" />
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
-                The notebook
+                The clarity console
               </span>
             </div>
             <h2
               className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight text-balance max-w-lg"
               style={{ fontSize: "clamp(1.9rem, 4vw, 3.2rem)" }}
             >
-              This is what you actually get.
+              <span className="text-glow">A private notebook</span> that turns reflection into direction.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-sm">
               A real prompt. A real result. Your Baseline Design active in the background.
