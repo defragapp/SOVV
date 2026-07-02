@@ -1,11 +1,20 @@
+import { NoiseLayer } from "@/components/ui/noise-layer"
 import type { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
 import { GeistSans } from "geist/font/sans"
+import { Fraunces } from "next/font/google"
 import "./globals.css"
 
 const jetBrainsMono = localFont({
   src: "../public/fonts/JetBrainsMono-VariableFont.woff2",
   variable: "--font-jetbrains-mono",
+})
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  display: "swap",
+  axes: ["opsz", "SOFT"],
 })
 
 
@@ -102,7 +111,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`antialiased ${jetBrainsMono.variable} ${GeistSans.variable}`}
+      className={`antialiased ${jetBrainsMono.variable} ${GeistSans.variable} ${fraunces.variable}`}
     >
       <head>
         {/* Structured data — Organization */}
@@ -148,6 +157,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen overflow-x-hidden bg-[#08070a] text-[#f4efe9] overscroll-none selection:bg-white/20 selection:text-white">
+        <NoiseLayer />
         {children}
       </body>
     </html>

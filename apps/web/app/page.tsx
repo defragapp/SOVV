@@ -91,44 +91,113 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
 export default function Home() {
   return (
     <SiteShell>
-      <section className="relative min-h-screen w-full overflow-hidden bg-[#08070a] border-b border-white/[0.06]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/hero-hand.png"
-          alt="An open hand with palm facing upward into a beam of warm light"
-          className="absolute inset-0 w-full h-full object-cover object-center opacity-60"
-          style={{ zIndex: 0 }}
+      <section className="relative min-h-[100svh] w-full overflow-hidden bg-[#08070a]">
+        {/* Base image — cinematic hand with warm light */}
+        <picture>
+          <source srcSet="/hero-hand.webp" type="image/webp" media="(min-width: 768px)" />
+          <img
+            src="/hero-hand.png"
+            alt="An open hand with palm facing upward into a beam of warm light"
+            className="absolute inset-0 w-full h-full object-cover hero-drift"
+            style={{ objectPosition: "center 20%", zIndex: 0, opacity: 0.88 }}
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
+
+        {/* Warm amber light pulse — atmospheric, not decorative */}
+        <motion.div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          animate={{ opacity: [0.6, 1.0, 0.6] }}
+          transition={{ duration: 9, ease: "easeInOut", repeat: Infinity, repeatType: "loop" }}
+          style={{
+            background: "radial-gradient(ellipse 55% 45% at 38% 30%, rgba(224,116,58,0.18) 0%, rgba(240,160,106,0.10) 40%, transparent 75%)",
+          }}
         />
 
-        {/* Hero content — headline + single CTA only. Image breathes. */}
+        {/* Secondary shimmer — offset phase */}
+        <motion.div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          animate={{ opacity: [0.3, 0.7, 0.3] }}
+          transition={{ duration: 7, ease: "easeInOut", repeat: Infinity, repeatType: "loop", delay: 3.5 }}
+          style={{
+            background: "radial-gradient(ellipse 30% 35% at 50% 0%, rgba(255,230,190,0.12) 0%, transparent 65%)",
+          }}
+        />
+
+        {/* Edge vignette — all four sides, cinematic depth */}
+        <div
+          aria-hidden
+          className="absolute inset-0 z-[2] pointer-events-none"
+          style={{
+            background: [
+              "linear-gradient(180deg, rgba(8,7,10,0.72) 0%, rgba(8,7,10,0.20) 16%, transparent 38%)",
+              "linear-gradient(0deg, rgba(8,7,10,1) 0%, rgba(8,7,10,0.90) 18%, rgba(8,7,10,0.40) 42%, transparent 62%)",
+              "linear-gradient(90deg, rgba(8,7,10,0.40) 0%, transparent 20%)",
+              "linear-gradient(270deg, rgba(8,7,10,0.40) 0%, transparent 20%)",
+            ].join(", "),
+          }}
+        />
+
+        {/* Grain texture overlay */}
+        <div
+          aria-hidden
+          className="absolute inset-0 z-[2] pointer-events-none opacity-[0.028] mix-blend-overlay"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          }}
+        />
+
+        {/* Hero content — anchored to bottom, image breathes above */}
         <div
           className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center text-center"
-          style={{ paddingBottom: "max(clamp(3rem, 8vh, 6rem), env(safe-area-inset-bottom, 0px))" }}
+          style={{ paddingBottom: "max(clamp(3.5rem, 9vh, 7rem), env(safe-area-inset-bottom, 0px))" }}
         >
+          {/* Platform label */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            className="font-mono uppercase tracking-[0.3em] text-[#f4efe9]/28 mb-5"
+            style={{ fontSize: "0.6rem" }}
+          >
+            Sovereign.os
+          </motion.p>
+
           <motion.h1
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="font-serif text-[#f4efe9] text-balance leading-[1.06] tracking-[-0.02em] px-8"
-            style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", maxWidth: "22ch" }}
+            transition={{ duration: 1.1, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+            className="font-serif text-[#f4efe9] text-balance leading-[1.05] tracking-[-0.025em] px-8"
+            style={{ fontSize: "clamp(2.4rem, 6vw, 5.5rem)", maxWidth: "20ch" }}
           >
             You are not broken.
             <br />
-            <span style={{ color: "rgba(244,239,233,0.48)" }}>
+            <span style={{ color: "rgba(244,239,233,0.44)" }}>
               You are patterned.
             </span>
           </motion.h1>
 
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-5 max-w-sm text-[#a8a29a] leading-relaxed px-8"
+            style={{ fontSize: "clamp(0.875rem, 1.8vw, 1rem)" }}
+          >
+            See the loop. Name the pattern. Choose the repair.
+          </motion.p>
+
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-8"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.48, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-8 flex flex-col sm:flex-row gap-3 items-center px-8"
           >
             <Link href={APP_URL} className="btn-primary">
               Start with your baseline
             </Link>
-            <Link href="/product" className="btn-secondary">
+            <Link href="/product" className="btn-secondary" style={{ opacity: 0.70 }}>
               Explore the spaces
             </Link>
           </motion.div>
@@ -139,7 +208,7 @@ export default function Home() {
       {/* ── NOTEBOOK PREVIEW ─────────────────────────────────────────────── */}
       <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/[0.05]">
         <Container>
-          <div className="flex flex-col items-center text-center mb-14">
+          <div className="flex flex-col items-center text-center mb-14 reveal-up reveal-up-1">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-6 bg-[#e0743a]/60" />
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
@@ -197,7 +266,10 @@ export default function Home() {
       </section>
 
       {/* ── CTA ──────────────────────────────────────────────────────────── */}
-      <section className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.05] overflow-hidden">
+      <section className="relative w-full py-28 md:py-40 bg-[#08070a] border-t border-white/[0.05] overflow-hidden">
+        {/* Centered warm glow for CTA */}
+        <div className="absolute inset-0 pointer-events-none" aria-hidden
+          style={{ background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(224,116,58,0.06) 0%, transparent 70%)" }} />
         <div className="light-beam" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <h2

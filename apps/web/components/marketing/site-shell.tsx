@@ -14,8 +14,8 @@ export function SiteShell({ children }: SiteShellProps) {
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-base)]">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full backdrop-blur-xl border-b border-white/[0.04] bg-[#0a0a0b]/80">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+      <header className="sticky top-0 z-50 w-full border-b border-white/[0.05]" style={{ backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", background: "rgba(8,7,10,0.88)" }}>
+        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">

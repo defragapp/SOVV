@@ -39,7 +39,7 @@ export default function ProductPage() {
       <section className="w-full py-20 md:py-28 bg-[#0c0a0d]">
         <Container className="max-w-3xl">
           <MetaLabel>The spaces</MetaLabel>
-          <div className="flex flex-col gap-0">
+          <div className="flex flex-col divide-y divide-white/[0.05]">
             {[
               {
                 num: "01",
@@ -81,7 +81,7 @@ export default function ProductPage() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-serif text-2xl text-[#f4efe9] group-hover:text-[#f0a06a] transition-colors">{space.name}</h3>
+                    <h3 className="font-serif text-2xl text-[#f4efe9] group-hover:text-[#f4efe9] transition-colors">{space.name}</h3>
                     <span
                       className="font-mono text-[8px] uppercase tracking-[0.14em] border px-2 py-0.5"
                       style={{
