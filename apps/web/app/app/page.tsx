@@ -1,8 +1,6 @@
 "use client"
 import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 
 export default function LibraryPage() {
@@ -75,10 +73,10 @@ export default function LibraryPage() {
   const sidebarContent = (
     <div className="flex flex-col h-full bg-[#0c0a0d]">
       <div className="px-6 py-5 border-b border-white/[0.06]">
-        <h3 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em]">Sovereign.os Library</h3>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b]">Sovereign.os Library</p>
       </div>
       <div className="flex-1 px-6 py-8">
-        <p className="text-xs font-sans font-medium text-[#76716b] leading-relaxed max-w-[180px]">
+        <p className="text-[12px] text-[#76716b] leading-relaxed max-w-[180px]">
           The private record of what helped. Return here before the moment passes.
         </p>
       </div>
@@ -88,12 +86,12 @@ export default function LibraryPage() {
   const contextContent = (
     <div className="flex flex-col gap-0 h-full bg-[#0c0a0d] border-l border-white/[0.06]">
       <div className="px-6 py-5 border-b border-white/[0.06]">
-        <h3 className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.2em]">Continuity</h3>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b]">Continuity</p>
       </div>
       <div className="p-6">
         <div className="border border-white/[0.08] bg-white/[0.02] p-5 flex flex-col gap-2">
-          <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">Baseline Design</p>
-          <p className="text-xs text-[#a8a29a] leading-relaxed">
+          <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#76716b]">Baseline Design</p>
+          <p className="text-[12px] text-[#76716b] leading-relaxed">
             Your Baseline Design gives the system context before you describe this moment.
           </p>
         </div>
@@ -105,8 +103,8 @@ export default function LibraryPage() {
     <div className="flex flex-col h-full gap-10 max-w-4xl mx-auto w-full pt-4 pb-12">
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          <span className="text-[10px] tracking-[0.1em] uppercase font-sans font-medium text-[#76716b] border border-white/[0.08] px-2.5 py-1 bg-transparent">
-            Continuity Layer
+          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
+            Library
           </span>
         </div>
         <h2 className="font-serif text-[1.6rem] text-[#f4efe9] tracking-[-0.02em]">Your Library</h2>
@@ -119,7 +117,7 @@ export default function LibraryPage() {
              </div>
           ) : items.length === 0 ? (
              <div className="border border-white/[0.08] bg-white/[0.02] flex flex-col items-center justify-center py-24 text-center">
-                <p className="text-[13px] text-[#a8a29a] font-sans font-medium max-w-[280px] leading-relaxed">
+                <p className="text-[13px] text-[#76716b] max-w-[280px] leading-relaxed">
                    Save what helped. Return before the moment passes.
                 </p>
              </div>
@@ -144,10 +142,10 @@ export default function LibraryPage() {
                 <Link href={`/apps/defrag/${item.id}`} key={item.id} className="block border border-white/[0.08] bg-white/[0.02] p-6 flex flex-col gap-4 hover:border-border transition-colors cursor-pointer">
                    <div className="flex justify-between items-start">
                       <div className="flex flex-col gap-1">
-                         <span className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-[0.15em]">
-                            {item.workspace_source === "DEFRAG" ? "Defrag" : item.workspace_source === "COVENANT" ? "Covenant" : item.workspace_source === "ALIGNMENT" ? "Alignment" : "Library item"}
+                         <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#4f4b47]">
+                            {item.workspace_source === "DEFRAG" ? "Defrag" : item.workspace_source === "COVENANT" ? "Covenant" : item.workspace_source === "ALIGNMENT" ? "Alignment" : "Library"}
                          </span>
-                         <h3 className="text-base text-[#f4efe9] font-medium tracking-tight">{item.title || "Untitled"}</h3>
+                         <p className="text-[14px] text-[#f4efe9] leading-snug mt-1">{item.title || "Untitled"}</p>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-xs text-[#52525B] font-sans font-medium">
