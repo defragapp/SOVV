@@ -56,8 +56,8 @@ export default function SovereignOsCampaignPage() {
           </div>
           <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {videos.map((video, index) => (
-              <article key={video.title} className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-2xl shadow-black/20">
-                <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#e0743a]">Video {index + 1}</p>
+              <article key={video.title} className="border border-white/[0.08] bg-white/[0.03] p-6 shadow-2xl shadow-black/20" style={{ borderRadius: "var(--radius-container)" }}>
+                <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#e0743a]/60">Video {index + 1}</p>
                 <h3 className="mt-4 font-serif text-2xl text-[#f4efe9]">{video.title}</h3>
                 <p className="mt-3 text-sm font-medium text-[#f4efe9]/70">{video.purpose}</p>
                 <p className="mt-4 text-sm leading-relaxed text-[#a8a29a]">{video.line}</p>

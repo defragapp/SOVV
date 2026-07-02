@@ -19,10 +19,10 @@ export function SiteShell({ children }: SiteShellProps) {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-md bg-gradient-to-tr from-[#e0743a] to-[#ffb347] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-md bg-white/[0.06] border border-white/[0.10] flex items-center justify-center transition-colors group-hover:bg-white/[0.10]">
               <div className="w-3 h-3 bg-[#0a0a0b] rounded-full" />
             </div>
-            <span className="font-semibold text-lg tracking-tight text-[#e0743a]">
+            <span className="font-semibold text-lg tracking-tight text-[#f4efe9]">
               Sovereign.os
             </span>
           </Link>

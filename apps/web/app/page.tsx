@@ -106,7 +106,7 @@ export default function Home() {
           <h1 className="font-serif text-[#f4efe9] text-balance leading-[1.02] tracking-[-0.035em] text-[clamp(3rem,8vw,7.5rem)] max-w-5xl">
             You are not broken. You are patterned.
           </h1>
-          <p className="mt-6 font-mono uppercase tracking-[0.2em] text-[#e0743a]/70 text-[0.65rem]">
+          <p className="mt-6 font-mono uppercase tracking-[0.2em] text-[#f4efe9]/30 text-[0.65rem]">
             The personal operating system for relational intelligence.
           </p>
           <p className="mt-7 max-w-xl text-[#a8a29a] leading-relaxed text-base md:text-lg">
@@ -152,7 +152,7 @@ export default function Home() {
                   <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47]">0{index + 1}</span>
                   <span className="font-mono text-[9px] tracking-[0.18em] uppercase text-[#e0743a]/60">{space.label}</span>
                 </div>
-                <h3 className="font-serif text-3xl text-[#f4efe9] group-hover:text-[#f0a06a] transition-colors">{space.name}</h3>
+                <h3 className="font-serif text-3xl text-[#f4efe9] group-hover:text-[#f4efe9] transition-colors">{space.name}</h3>
                 <p className="mt-4 text-sm leading-relaxed text-[#a8a29a] max-w-sm">{space.body}</p>
               </Link>
             ))}
