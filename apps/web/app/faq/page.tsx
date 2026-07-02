@@ -49,16 +49,12 @@ const FAQ_ITEMS = [
     a: "Create your space at app.defrag.app. The Free tier gives you access to the Defrag space and your Baseline Design. Pro unlocks all spaces, unlimited sessions, and full Library depth.",
   },
   {
-    question: "Is my data private?",
-    answer: "Yes. Your Baseline Design, sessions, and saved results are private to your account. The AI does not expose your birth data, framework details, or personal information in any output. Nothing is shared with other users.",
+    q: "What if I don't know my exact birth time?",
+    a: "You can enter an approximate time or select a time window (morning, afternoon, evening). The system adjusts for uncertainty. An approximate Baseline Design is still useful — it gives the AI meaningful context even without an exact time.",
   },
   {
-    question: "What if I don't know my exact birth time?",
-    answer: "You can enter an approximate time or select a time window (morning, afternoon, evening). The system adjusts for uncertainty. An approximate Baseline Design is still useful — it gives the AI meaningful context even without an exact time.",
-  },
-  {
-    question: "How does the AI work?",
-    answer: "Sovereign.os uses your Baseline Design as private context that runs beneath every session. When you describe a moment, the AI identifies the active pattern, maps the relational dynamic, and returns a structured result — not generic advice. The AI does not diagnose, predict, or guarantee outcomes.",
+    q: "How does the AI work?",
+    a: "Sovereign.os uses your Baseline Design as private context that runs beneath every session. When you describe a moment, the AI identifies the active pattern, maps the relational dynamic, and returns a structured result — not generic advice. The AI does not diagnose, predict, or guarantee outcomes.",
   },
 ];
 
@@ -96,7 +92,7 @@ export default function FaqPage() {
           <div className="flex flex-col">
             {FAQ_ITEMS.map((item, i) => (
               <details key={i} className={`group border-b border-white/[0.06] py-6 cursor-pointer reveal-up reveal-up-${Math.min(i + 1, 6)}`}>
-                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base md:text-lg font-medium list-none select-none">
+                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base md:text-lg font-normal list-none select-none">
                   {item.q}
                   <span className="flex-none w-6 h-6 flex items-center justify-center border border-white/[0.10] text-[#e0743a]/60 text-sm transition-all duration-200 group-open:rotate-45 group-open:border-[#e0743a]/30 shrink-0" style={{ borderRadius: 4 }}>
                     +
