@@ -48,6 +48,18 @@ const FAQ_ITEMS = [
     q: "How do I get access?",
     a: "Create your space at app.defrag.app. The Free tier gives you access to the Defrag space and your Baseline Design. Pro unlocks all spaces, unlimited sessions, and full Library depth.",
   },
+  {
+    question: "Is my data private?",
+    answer: "Yes. Your Baseline Design, sessions, and saved results are private to your account. The AI does not expose your birth data, framework details, or personal information in any output. Nothing is shared with other users.",
+  },
+  {
+    question: "What if I don't know my exact birth time?",
+    answer: "You can enter an approximate time or select a time window (morning, afternoon, evening). The system adjusts for uncertainty. An approximate Baseline Design is still useful — it gives the AI meaningful context even without an exact time.",
+  },
+  {
+    question: "How does the AI work?",
+    answer: "Sovereign.os uses your Baseline Design as private context that runs beneath every session. When you describe a moment, the AI identifies the active pattern, maps the relational dynamic, and returns a structured result — not generic advice. The AI does not diagnose, predict, or guarantee outcomes.",
+  },
 ];
 
 function MetaLabel({ children }: { children: React.ReactNode }) {

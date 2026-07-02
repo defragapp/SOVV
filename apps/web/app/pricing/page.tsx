@@ -23,8 +23,8 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
 
 const FREE_FEATURES = [
   "Baseline Design",
-  "Defrag space \u2014 full access",
-  "5 sessions per day",
+  "Defrag space — full access",
+  "15 sessions per day",
   "Structured results",
   "Clear next responses",
 ]

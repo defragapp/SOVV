@@ -30,7 +30,7 @@ export default function ProductPage() {
             One platform. Three spaces. One source.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-lg leading-relaxed">
-            Your Baseline Design is active beneath every thread. Defrag, Covenant, and Alignment each do different work — and share the same context.
+            Your Baseline Design is active in every session — a private behavioral map that gives the AI context before you type. Defrag, Covenant, and Alignment each do different work — and share the same context.
           </p>
         </Container>
       </section>
@@ -106,10 +106,10 @@ export default function ProductPage() {
         </Container>
       </section>
 
-      {/* Platform features */}
+      {/* What you get */}
       <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/5">
         <Container className="max-w-3xl">
-          <MetaLabel>Platform features</MetaLabel>
+          <MetaLabel>What you get</MetaLabel>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
             {[
               { name: "Baseline Design", body: "The starting map. Active beneath every thread. Private, never exposed in outputs.", tier: "Free" },

@@ -96,29 +96,62 @@ export default function Home() {
           className="absolute inset-0 w-full h-full object-cover object-center opacity-60"
           style={{ zIndex: 0 }}
         />
-        <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-[#08070a]/60 via-transparent to-[#08070a]" />
-        <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#08070a] via-[#08070a]/20 to-transparent" />
-        <div className="light-beam opacity-40" aria-hidden />
-        <Container className="relative z-10 flex min-h-screen flex-col items-center justify-center text-center py-24">
-          <p className="font-mono uppercase tracking-[0.3em] text-[#f4efe9]/30 mb-6 text-[0.65rem]">
-            Sovereign.os
-          </p>
-          <h1 className="font-serif text-[#f4efe9] text-balance leading-[1.02] tracking-[-0.035em] text-[clamp(3rem,8vw,7.5rem)] max-w-5xl">
-            You are not broken. You are patterned.
-          </h1>
-          <p className="mt-6 font-mono uppercase tracking-[0.2em] text-[#f4efe9]/30 text-[0.65rem]">
-            The personal operating system for relational intelligence.
-          </p>
-          <p className="mt-7 max-w-xl text-[#a8a29a] leading-relaxed text-base md:text-lg">
-            Sovereign.os helps you see the loop, name the pattern, and choose the repair with grounded reflection before the old response takes over.
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-3 items-center">
+
+        {/* Hero content — headline + single CTA only. Image breathes. */}
+        <div
+          className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center text-center"
+          style={{ paddingBottom: "max(clamp(3rem, 8vh, 6rem), env(safe-area-inset-bottom, 0px))" }}
+        >
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="font-serif text-[#f4efe9] text-balance leading-[1.06] tracking-[-0.02em] px-8"
+            style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", maxWidth: "22ch" }}
+          >
+            You are not broken.
+            <br />
+            <span style={{ color: "rgba(244,239,233,0.48)" }}>
+              You are patterned.
+            </span>
+          </motion.h1>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-8"
+          >
             <Link href={APP_URL} className="btn-primary">
               Start with your baseline
             </Link>
             <Link href="/product" className="btn-secondary">
               Explore the spaces
             </Link>
+          </motion.div>
+        </div>
+      </section>
+
+
+      {/* ── NOTEBOOK PREVIEW ─────────────────────────────────────────────── */}
+      <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/[0.05]">
+        <Container>
+          <div className="flex flex-col items-center text-center mb-14">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
+                The notebook
+              </span>
+            </div>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight text-balance max-w-lg"
+              style={{ fontSize: "clamp(1.9rem, 4vw, 3.2rem)" }}
+            >
+              This is what you actually get.
+            </h2>
+            <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-sm">
+              A real moment. A real result — what's active, the pattern beneath it, and the clearest next move. Your Baseline Design active in the background.
+            </p>
           </div>
         </Container>
       </section>
@@ -160,26 +193,23 @@ export default function Home() {
         </Container>
       </section>
 
-      <section className="w-full py-20 md:py-28 bg-[#0c0a0d] border-b border-white/[0.06]">
-        <Container>
-          <div className="mb-12 max-w-2xl">
-            <MetaLabel>Short video campaign</MetaLabel>
-            <h2 className="font-serif text-[clamp(2.2rem,5vw,4rem)] text-[#f4efe9] leading-[1.08] tracking-[-0.02em] text-balance">
-              Seven quiet cuts for the moments people recognize immediately.
-            </h2>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {campaignVideos.map((video, index) => (
-              <article key={video.title} className="card p-6 min-h-[250px] flex flex-col">
-                <div className="flex items-start justify-between gap-4">
-                  <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47]">Video {index + 1}</span>
-                  <span className="font-mono text-[9px] tracking-[0.16em] uppercase text-[#e0743a]/60 text-right">{video.purpose}</span>
-                </div>
-                <h3 className="mt-8 font-serif text-2xl text-[#f4efe9]">{video.title}</h3>
-                <p className="mt-4 text-sm leading-relaxed text-[#a8a29a]">{video.scene}</p>
-                <p className="mt-auto pt-8 text-sm leading-relaxed text-[#f4efe9]/80 border-t border-white/[0.06]">“{video.line}”</p>
-              </article>
-            ))}
+      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      <section className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.05] overflow-hidden">
+        <div className="light-beam" aria-hidden />
+        <Container className="relative z-10 flex flex-col items-center text-center">
+          <h2
+            className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-3xl text-balance"
+            style={{ fontSize: "clamp(2.2rem, 5.5vw, 5rem)" }}
+          >
+            Return before the pattern takes over.
+          </h2>
+          <p className="mt-6 max-w-md text-base md:text-lg text-[#a8a29a] leading-relaxed">
+            Defrag is free. Describe a difficult moment — the argument, the silence, the message — and see what's actually active beneath it.
+          </p>
+          <div className="mt-9">
+            <Link href={APP_URL} className="btn-primary">
+              Enter Sovereign.os
+            </Link>
           </div>
         </Container>
       </section>
