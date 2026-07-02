@@ -89,12 +89,12 @@ export default function UseCasesPage() {
             {USE_CASES.map((uc, idx) => (
               <div
                 key={uc.num}
-                className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 py-10 border-b border-white/[0.06] last:border-0 items-start"
+                className={`grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 py-10 border-b border-white/[0.06] last:border-0 items-start reveal-up reveal-up-${Math.min(idx + 1, 6)}`}
               >
                 {/* Left: trigger */}
                 <div>
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.2em]">{uc.num}</span>
+                    <span className="font-mono text-[9px] text-[#e0743a]/50 tracking-[0.2em]">{uc.num}</span>
                     <h3 className="font-serif text-lg text-[#f4efe9]">{uc.title}</h3>
                   </div>
                   <p className="text-sm text-[#76716b] leading-relaxed italic">"{uc.trigger}"</p>

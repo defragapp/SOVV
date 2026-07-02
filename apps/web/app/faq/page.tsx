@@ -95,10 +95,10 @@ export default function FaqPage() {
         <Container className="max-w-3xl">
           <div className="flex flex-col">
             {FAQ_ITEMS.map((item, i) => (
-              <details key={i} className="group border-b border-white/[0.06] py-6 cursor-pointer">
-                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base md:text-lg font-medium list-none">
+              <details key={i} className={`group border-b border-white/[0.06] py-6 cursor-pointer reveal-up reveal-up-${Math.min(i + 1, 6)}`}>
+                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base md:text-lg font-medium list-none select-none">
                   {item.q}
-                  <span className="flex-none text-xl text-[#e0743a] transition-transform duration-200 group-open:rotate-45 shrink-0">
+                  <span className="flex-none w-6 h-6 flex items-center justify-center border border-white/[0.10] text-[#e0743a]/60 text-sm transition-all duration-200 group-open:rotate-45 group-open:border-[#e0743a]/30 shrink-0" style={{ borderRadius: 4 }}>
                     +
                   </span>
                 </summary>
