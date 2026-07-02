@@ -36,8 +36,10 @@ export const metadata: Metadata = {
 export default function SovereignOsCampaignPage() {
   return (
     <SiteShell>
-      <section className="relative overflow-hidden border-b border-white/[0.06] bg-[#08070a] py-24 md:py-32">
+      <section className="relative overflow-hidden border-b border-white/[0.06] bg-[#08070a] py-28 md:py-40">
         <div className="light-beam opacity-70" aria-hidden />
+        <div className="ambient-blob absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[800px] opacity-[0.04]"
+          style={{ background: "radial-gradient(circle, rgba(224,116,58,1) 0%, transparent 70%)" }} aria-hidden />
         <Container className="relative z-10 text-center">
           <p className="mb-6 font-mono text-[0.65rem] uppercase tracking-[0.3em] text-[#f4efe9]/30">Sovereign.os campaign</p>
           <h1 className="mx-auto max-w-5xl text-balance font-serif text-[clamp(3rem,8vw,7rem)] leading-[1.02] tracking-[-0.035em] text-[#f4efe9]">You are not broken. You are patterned.</h1>
@@ -56,11 +58,19 @@ export default function SovereignOsCampaignPage() {
           </div>
           <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {videos.map((video, index) => (
-              <article key={video.title} className="border border-white/[0.08] bg-white/[0.03] p-6 shadow-2xl shadow-black/20" style={{ borderRadius: "var(--radius-container)" }}>
-                <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#e0743a]/60">Video {index + 1}</p>
-                <h3 className="mt-4 font-serif text-2xl text-[#f4efe9]">{video.title}</h3>
-                <p className="mt-3 text-sm font-medium text-[#f4efe9]/70">{video.purpose}</p>
-                <p className="mt-4 text-sm leading-relaxed text-[#a8a29a]">{video.line}</p>
+              <article
+                key={video.title}
+                className="group relative border border-white/[0.07] bg-white/[0.02] p-7 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04]"
+                style={{ borderRadius: "var(--radius-container)" }}
+              >
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{ borderRadius: "var(--radius-container)", background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(224,116,58,0.05) 0%, transparent 70%)" }} />
+                <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#e0743a]/50 mb-4">
+                  {String(index + 1).padStart(2, "0")}
+                </p>
+                <h3 className="font-serif text-xl text-[#f4efe9] leading-snug mb-2">{video.title}</h3>
+                <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#4f4b47] mb-4">{video.purpose}</p>
+                <p className="text-sm leading-relaxed text-[#76716b]">{video.line}</p>
               </article>
             ))}
           </div>

@@ -69,9 +69,11 @@ export default function HowItWorksPage() {
       {/* Hero */}
       <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[#08070a] overflow-hidden border-b border-white/5">
         <div className="light-beam opacity-50" aria-hidden />
+        <div className="ambient-blob absolute -top-60 -right-60 w-[700px] h-[700px] opacity-[0.03]"
+          style={{ background: "radial-gradient(circle, rgba(224,116,58,1) 0%, transparent 70%)" }} aria-hidden />
         <Container className="relative z-10 max-w-3xl">
           <MetaLabel>The process</MetaLabel>
-          <h1 className="font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
+          <h1 className="reveal-up reveal-up-2 font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
             How Sovereign.os works.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-lg leading-relaxed">
