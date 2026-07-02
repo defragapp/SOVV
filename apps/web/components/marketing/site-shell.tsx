@@ -27,13 +27,39 @@ export function SiteShell({ children }: SiteShellProps) {
             </span>
           </Link>
 
-          <div className="flex items-center gap-6">
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-7">
+            {[
+              { href: "/product", label: "Product" },
+              { href: "/how-it-works", label: "How it works" },
+              { href: "/pricing", label: "Pricing" },
+              { href: "/about", label: "About" },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#76716b] hover:text-[#f4efe9] transition-colors duration-200"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              href="/app/login"
+              className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#f4efe9]/80 hover:text-[#f4efe9] transition-colors duration-200 border border-white/[0.10] px-4 py-2 hover:border-white/[0.20]"
+              style={{ borderRadius: "var(--radius-button)" }}
+            >
+              Sign in
+            </Link>
+          </nav>
+
+          {/* Mobile hamburger */}
+          <div className="flex items-center gap-6 md:hidden">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 -mr-2 text-gray-400 hover:text-white focus:outline-none"
+              className="p-2 -mr-2 text-[#76716b] hover:text-[#f4efe9] focus:outline-none transition-colors"
               aria-label="Toggle menu"
             >
-              {menuOpen ? <X size={24} /> : <Menu size={24} />}
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
@@ -81,9 +107,41 @@ export function SiteShell({ children }: SiteShellProps) {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.04] py-12 mt-20 relative z-10 bg-[#060606]">
-        <div className="container mx-auto px-6 text-center text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} Sovereign.os. All rights reserved.</p>
+      <footer className="border-t border-white/[0.05] py-16 mt-20 relative z-10 bg-[#08070a]">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            {/* Brand */}
+            <div className="flex flex-col items-center md:items-start gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#f4efe9]/60">Sovereign.os</span>
+              <p className="font-mono text-[9px] text-[#4f4b47] tracking-[0.12em]">See the loop. Name the pattern. Choose the repair.</p>
+            </div>
+
+            {/* Nav links */}
+            <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              {[
+                { href: "/product", label: "Product" },
+                { href: "/how-it-works", label: "How it works" },
+                { href: "/pricing", label: "Pricing" },
+                { href: "/about", label: "About" },
+                { href: "/faq", label: "FAQ" },
+                { href: "/privacy", label: "Privacy" },
+                { href: "/terms", label: "Terms" },
+              ].map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </nav>
+
+            {/* Copyright */}
+            <p className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em]">
+              © {new Date().getFullYear()} Sovereign.os
+            </p>
+          </div>
         </div>
       </footer>
     </div>
