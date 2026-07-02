@@ -18,11 +18,8 @@ export function SiteShell({ children }: SiteShellProps) {
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-md bg-white/[0.06] border border-white/[0.10] flex items-center justify-center transition-colors group-hover:bg-white/[0.10]">
-              <div className="w-3 h-3 bg-[#0a0a0b] rounded-full" />
-            </div>
-            <span className="font-semibold text-lg tracking-tight text-[#f4efe9]">
+          <Link href="/" className="flex items-center group">
+            <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#f4efe9]/70 group-hover:text-[#f4efe9] transition-colors duration-200">
               Sovereign.os
             </span>
           </Link>
@@ -67,34 +64,28 @@ export function SiteShell({ children }: SiteShellProps) {
         {/* Mobile Nav */}
         {menuOpen && (
           <div className="md:hidden surface-glass border-t border-white/[0.06] p-6 shadow-2xl">
-            <nav className="flex flex-col gap-5">
-              <Link
-                href="/about"
-                className="text-lg text-gray-300 hover:text-white"
-                onClick={() => setMenuOpen(false)}
-              >
-                Method
-              </Link>
-              <Link
-                href="/pricing"
-                className="text-lg text-gray-300 hover:text-white"
-                onClick={() => setMenuOpen(false)}
-              >
-                Pricing
-              </Link>
-              <Link
-                href="/app/login"
-                className="text-lg text-white font-medium"
-                onClick={() => setMenuOpen(false)}
-              >
-                Sign in
-              </Link>
+            <nav className="flex flex-col gap-1">
+              {[
+                { href: "/product", label: "Product" },
+                { href: "/how-it-works", label: "How it works" },
+                { href: "/pricing", label: "Pricing" },
+                { href: "/about", label: "About" },
+              ].map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#76716b] hover:text-[#f4efe9] transition-colors py-3 border-b border-white/[0.05]"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
               <Link
                 href="/app/login"
-                className="btn-primary text-center mt-2"
+                className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#f4efe9] mt-4 py-3"
                 onClick={() => setMenuOpen(false)}
               >
-                Initialize
+                Sign in →
               </Link>
             </nav>
           </div>

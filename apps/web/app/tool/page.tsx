@@ -10,7 +10,7 @@ export default function ToolLanding() {
         <header className="text-center">
           <p className="text-[10px] font-sans font-medium text-[#4f4b47] tracking-[0.3em] uppercase mb-4">Sovereign.os</p>
           <div className="h-px w-full bg-[#f4efe9]/[0.06] mb-6" />
-          <h1 className="text-2xl font-semibold tracking-tight text-[#f4efe9]">Choose a space</h1>
+          <h1 className="font-serif text-2xl tracking-[-0.02em] text-[#f4efe9]">Choose a space</h1>
           <p className="text-[10px] font-sans font-medium text-[#76716b] uppercase tracking-widest mt-2">Your private platform for relational intelligence.</p>
         </header>
 

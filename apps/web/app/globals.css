@@ -41,10 +41,10 @@
        input:     10px  (text inputs, textareas, selects)
        button:    8px   (all buttons)
        minimal:   4px   (chips, badges, small tags) */
-    --radius-container: 0px;
-    --radius-input:     0px;
-    --radius-button:    0px;
-    --radius-minimal:   0px;
+    --radius-container: 14px;
+    --radius-input:     10px;
+    --radius-button:    8px;
+    --radius-minimal:   4px;
   }
 
   html {

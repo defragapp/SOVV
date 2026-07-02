@@ -109,7 +109,7 @@ export default function LibraryPage() {
             Continuity Layer
           </span>
         </div>
-        <h2 className="text-[28px] font-semibold text-[#f4efe9] tracking-[-0.02em]">Your Library</h2>
+        <h2 className="font-serif text-[1.6rem] text-[#f4efe9] tracking-[-0.02em]">Your Library</h2>
       </div>
        
        <div className="flex flex-col gap-4">
