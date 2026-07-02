@@ -17,7 +17,6 @@ interface LibraryItem {
 
 function Section({ label, value }: { label: string; value?: string }) {
   if (!value) return null
-  if (!value) return null
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}

@@ -208,7 +208,7 @@ export default function Home() {
       {/* ── NOTEBOOK PREVIEW ─────────────────────────────────────────────── */}
       <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/[0.05]">
         <Container>
-          <div className="flex flex-col items-center text-center mb-14 reveal-up reveal-up-1">
+          <div className="flex flex-col items-center text-center mb-12 reveal-up reveal-up-1">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-6 bg-[#e0743a]/60" />
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
@@ -219,11 +219,56 @@ export default function Home() {
               className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight text-balance max-w-lg"
               style={{ fontSize: "clamp(1.9rem, 4vw, 3.2rem)" }}
             >
-              This is what you actually get.
+              A real moment. A real result.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-sm">
-              A real moment. A real result — what's active, the pattern beneath it, and the clearest next move. Your Baseline Design active in the background.
+              Your Baseline Design is active in the background — so every output is grounded in how you actually move through pressure, not a generic read.
             </p>
+          </div>
+
+          {/* Live demo preview */}
+          <div className="max-w-2xl mx-auto reveal-up reveal-up-2">
+            <div
+              className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden"
+              style={{ borderRadius: 14 }}
+            >
+              {/* Input row */}
+              <div className="px-6 py-5 border-b border-white/[0.05]">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Moment</p>
+                <p className="text-[14px] text-[#a8a29a] leading-relaxed italic">
+                  &ldquo;My brother called me out in front of the whole family. I didn&rsquo;t say anything. I&rsquo;ve been replaying it for three days.&rdquo;
+                </p>
+              </div>
+
+              {/* Result rows */}
+              <div className="px-6 py-5 border-b border-white/[0.05]">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">What&rsquo;s active</p>
+                <p className="text-[14px] text-[#f4efe9] leading-[1.7]">You absorbed the hit publicly and went silent — not because you had nothing to say, but because speaking felt more dangerous than the wound itself.</p>
+              </div>
+
+              <div className="px-6 py-5 border-b border-white/[0.05]">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">The pattern</p>
+                <p className="text-[14px] text-[#f4efe9] leading-[1.7]">You protect the room at your own expense, then spend days alone carrying what you didn&rsquo;t say.</p>
+              </div>
+
+              <div className="px-6 py-5 bg-white/[0.015]">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">Next move</p>
+                <p className="text-[14px] text-[#f4efe9] leading-[1.7]">You don&rsquo;t owe your brother a public confrontation. Write down exactly what you would have said. Then decide — not from the wound, but from what&rsquo;s actually true.</p>
+              </div>
+
+              {/* Baseline attribution footer */}
+              <div className="px-6 py-3 border-t border-white/[0.04] flex items-center gap-3">
+                <span className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47]">Baseline Design active</span>
+                <span className="h-px flex-1 bg-white/[0.04]" />
+                <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47]">Birth data ✓</span>
+              </div>
+            </div>
+
+            <div className="mt-6 text-center">
+              <a href={APP_URL} className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b] hover:text-[#f4efe9] transition-colors duration-200">
+                Start with your baseline →
+              </a>
+            </div>
           </div>
         </Container>
       </section>
@@ -247,7 +292,43 @@ export default function Home() {
         </Container>
       </section>
 
-      <section className="relative w-full py-20 md:py-28 bg-[#08070a] border-b border-white/[0.06] overflow-hidden">
+      {/* Campaign videos */}
+      <section className="w-full py-20 md:py-28 bg-[#08070a] border-b border-white/[0.06]">
+        <Container>
+          <div className="mb-12">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">The work</span>
+            </div>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl"
+              style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)" }}
+            >
+              Seven moments. Seven patterns.
+            </h2>
+          </div>
+
+          <div className="grid gap-px bg-white/[0.05] border border-white/[0.05] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 overflow-hidden" style={{ borderRadius: 14 }}>
+            {campaignVideos.slice(0, 6).map((video, i) => (
+              <div key={video.title} className="bg-[#0c0a0d] p-6 flex flex-col gap-4 hover:bg-[#0f0d10] transition-colors duration-300">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">0{i + 1}</span>
+                  <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47] text-right leading-tight">{video.purpose}</span>
+                </div>
+                <div>
+                  <h3 className="font-serif text-[1.1rem] text-[#f4efe9] leading-snug mb-2">{video.title}</h3>
+                  <p className="text-[12px] text-[#76716b] leading-relaxed">{video.scene}</p>
+                </div>
+                <p className="mt-auto font-serif text-[13px] text-[#a8a29a] italic leading-snug border-t border-white/[0.05] pt-4">
+                  &ldquo;{video.line}&rdquo;
+                </p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+            <section className="relative w-full py-20 md:py-28 bg-[#08070a] border-b border-white/[0.06] overflow-hidden">
         <div className="ambient-blob absolute -top-40 -left-40 w-[600px] h-[600px] opacity-[0.04]"
           style={{ background: "radial-gradient(circle, rgba(224,116,58,1) 0%, transparent 70%)" }} aria-hidden />
         <Container>
@@ -302,7 +383,7 @@ export default function Home() {
         <div className="light-beam opacity-50" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center">
           <MetaLabel>Begin</MetaLabel>
-          <h2 className="font-serif text-4xl md:text-6xl text-[#f4efe9] tracking-[-0.025em] mb-6 text-balance max-w-3xl">
+          <h2 className="font-serif text-[clamp(2.2rem,5vw,4.5rem)] text-[#f4efe9] tracking-[-0.025em] mb-6 text-balance max-w-3xl leading-[1.06]">
             See the loop. Name the pattern. Choose the repair.
           </h2>
           <p className="max-w-xl text-[#a8a29a] leading-relaxed mb-10">

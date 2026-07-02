@@ -33,19 +33,19 @@ const STEPS = [
   {
     num: "03",
     title: "Receive a structured result",
-    body: "Analyze structural pattern data across seven dimensions: active dynamic, loop recurrence, default behavioral response, origin architecture, pressure mechanics, current utility, and objective next action.",
+    body: "See what's active, the pattern beneath it, and the clearest next move — grounded in your Baseline Design, not a generic read. The result is specific to how you actually move through pressure.",
     note: null,
   },
   {
     num: "04",
     title: "Save to your Library",
-    body: "Save the result before the moment disappears. Your Library holds what helped.",
+    body: "Save the result before the moment disappears. Your Library holds what helped — so the next time the pattern shows up, you're not starting from scratch.",
     note: null,
   },
   {
     num: "05",
     title: "Return before the pattern takes over",
-    body: "When the pattern recurs, retrieve prior structural analysis from the Library to interrupt the default response and deploy a calibrated action.",
+    body: "When the same moment comes back — and it will — your Library holds what you already worked through. Return to it before the old response takes over.",
     note: null,
   },
 ]

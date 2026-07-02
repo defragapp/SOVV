@@ -17,7 +17,6 @@ interface LibraryItem {
 
 function Section({ label, value }: { label: string; value?: string }) {
   if (!value) return null
-  if (!value) return null
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -287,26 +286,54 @@ export default function CovenantWorkspacePage() {
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
 
         {!result && !isLoading && !error && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-3">
-            <div
-              className="w-10 h-10 flex items-center justify-center border border-[#e0743a]/20 bg-[#e0743a]/5 mb-2"
-              style={{ borderRadius: 10, boxShadow: "0 0 24px rgba(224,116,58,0.08)" }}
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M8 2v12M2 8h12" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
+          <div className="flex flex-col items-center justify-center text-center h-full gap-6 px-8">
+            <div className="flex flex-col gap-3">
+              <p className="font-serif text-[22px] text-[#f4efe9] leading-snug tracking-[-0.01em]">
+                What are you walking through that needs more than analysis?
+              </p>
+              <p className="text-[13px] text-[#4f4b47] leading-relaxed max-w-[260px] mx-auto">
+                Your Baseline Design is active. Describe the moment honestly.
+              </p>
             </div>
-            <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">Before you move.</p>
-            <p className="text-[13px] text-[#4f4b47] leading-relaxed max-w-xs">
-              Your Baseline Design is already active. Describe the moment — Covenant will find the story in Scripture that matches it.
-            </p>
+            <div className="flex flex-col gap-1.5 items-center">
+                              <button
+                  key="A decision that touches my values"
+                  onClick={() => setInput("A decision that touches my values")}
+                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors px-3 py-1.5 border border-white/[0.05] hover:border-white/[0.10]"
+                  style={{ borderRadius: 6 }}
+                >
+                  A decision that touches my values
+                </button>
+                <button
+                  key="A relationship that needs honest discernment"
+                  onClick={() => setInput("A relationship that needs honest discernment")}
+                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors px-3 py-1.5 border border-white/[0.05] hover:border-white/[0.10]"
+                  style={{ borderRadius: 6 }}
+                >
+                  A relationship that needs honest discernment
+                </button>
+                <button
+                  key="Something I'm carrying that I can't name yet"
+                  onClick={() => setInput("Something I'm carrying that I can't name yet")}
+                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors px-3 py-1.5 border border-white/[0.05] hover:border-white/[0.10]"
+                  style={{ borderRadius: 6 }}
+                >
+                  Something I'm carrying that I can't name yet
+                </button>
+            </div>
           </div>
         )}
 
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
-            <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/60 rounded-full animate-spin" />
-            <p className="text-[13px] text-[#4f4b47]">Looking for the story…</p>
+            <div className="relative w-8 h-8">
+              <span className="absolute inset-0 border border-white/[0.08] rounded-full" />
+              <span className="absolute inset-0 border border-t-[#e0743a]/40 rounded-full animate-spin" style={{ animationDuration: "1.4s" }} />
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Finding the story</p>
+              <p className="text-[11px] text-[#4f4b47]/60">Your Baseline Design is active</p>
+            </div>
           </div>
         )}
 
