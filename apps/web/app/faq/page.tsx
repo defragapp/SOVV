@@ -46,7 +46,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "How do I get access?",
-    a: "Create your space at app.defrag.app. The Free tier gives you access to the Defrag space and your Baseline Design. Pro unlocks all spaces, unlimited sessions, and full Library depth.",
+    a: "Create your space at defrag.app. The Free tier gives you access to the Defrag space and your Baseline Design. Pro unlocks all spaces, unlimited sessions, and full Library depth.",
   },
 ];
 

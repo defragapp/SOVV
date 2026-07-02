@@ -145,7 +145,7 @@ function CovenantDemo() {
                     className="p-6 bg-white/[0.02]"
                   >
                     <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">One grounded next step</p>
-                    <p className="text-[13px] text-[#f4efe9] leading-relaxed font-medium">{current.step}</p>
+                    <p className="text-[13px] text-[#f4efe9] leading-relaxed">{current.step}</p>
                   </motion.div>
                 ) : (
                   <div className="p-6"></div>

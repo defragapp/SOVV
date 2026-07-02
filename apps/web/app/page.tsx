@@ -295,7 +295,7 @@ function SpacePreview() {
                               {/* Value */}
                               <p className={`text-[13px] leading-relaxed ${
                                 row.highlight
-                                  ? "text-[#f4efe9] font-medium"
+                                  ? "text-[#f4efe9]"
                                   : "text-[#a8a29a]"
                               }`}>
                                 {row.value}

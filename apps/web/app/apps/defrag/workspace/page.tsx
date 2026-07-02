@@ -297,7 +297,7 @@ export default function DefragWorkspacePage() {
         ) : (
           /* No baseline — prompt to add */
           <div className="border border-white/[0.08] bg-white/[0.02] p-4" style={{ borderRadius: "var(--radius-container)" }}>
-            <p className="text-[12px] font-medium text-[#a8a29a] mb-1">Baseline Design required</p>
+            <p className="text-[12px] text-[#a8a29a] mb-1">Baseline Design required</p>
             <p className="text-[12px] text-[#76716b] leading-relaxed mb-3">
               Add your date, time, and place of birth to begin. This is the private layer that grounds every result.
             </p>
