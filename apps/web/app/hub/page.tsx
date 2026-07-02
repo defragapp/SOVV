@@ -12,7 +12,7 @@ export default function HubLanding() {
             <span className="font-mono text-[10px] text-[#76716b] tracking-[0.2em] uppercase">Sovereign.os</span>
           </div>
           <h1 className="font-serif text-[clamp(2rem,5vw,3.5rem)] tracking-[-0.02em] text-[#f4efe9] text-balance">
-            Your private platform for relational intelligence.
+            Pattern-aware AI for the moments that matter.
           </h1>
         </header>
 
@@ -20,7 +20,7 @@ export default function HubLanding() {
           <div className="bg-[#0c0a0d] p-10 flex flex-col gap-8">
             <h2 className="text-[10px] font-mono text-[#4f4b47] uppercase tracking-[0.2em]">Enter</h2>
             <div className="space-y-4">
-              <a href="https://app.defrag.app/login" className="flex items-center justify-center w-full border border-white/[0.06] bg-white text-black hover:bg-white/90 transition-colors h-10 text-[10px] font-mono uppercase tracking-[0.14em]">
+              <a href="/app/login" className="flex items-center justify-center w-full border border-white/[0.06] bg-white text-black hover:bg-white/90 transition-colors h-10 text-[10px] font-mono uppercase tracking-[0.14em]">
                 Sign In
               </a>
               <a href="/about" className="flex items-center justify-center w-full border border-white/[0.06] bg-transparent text-[#a8a29a] hover:text-[#f4efe9] hover:border-white/[0.06] transition-colors h-10 text-[10px] font-mono uppercase tracking-[0.14em]">
