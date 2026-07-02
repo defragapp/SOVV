@@ -247,7 +247,9 @@ export default function Home() {
         </Container>
       </section>
 
-      <section className="w-full py-20 md:py-28 bg-[#08070a] border-b border-white/[0.06]">
+      <section className="relative w-full py-20 md:py-28 bg-[#08070a] border-b border-white/[0.06] overflow-hidden">
+        <div className="ambient-blob absolute -top-40 -left-40 w-[600px] h-[600px] opacity-[0.04]"
+          style={{ background: "radial-gradient(circle, rgba(224,116,58,1) 0%, transparent 70%)" }} aria-hidden />
         <Container>
           <MetaLabel>Product spaces</MetaLabel>
           <div className="grid gap-px overflow-hidden border border-white/[0.06] bg-white/[0.06] md:grid-cols-2">
