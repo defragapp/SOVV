@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { motion } from "framer-motion"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
 
