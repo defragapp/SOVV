@@ -77,7 +77,7 @@ export default function UseCasesPage() {
             <span className="text-glow">When to use</span> Sovereign.os.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-lg leading-relaxed">
-            Use it when the moment requires a grounded response instead of a reactive loop.
+            Use it when the moment is hard to read while you're inside it — and pressure is about to choose for you.
           </p>
         </Container>
       </section>

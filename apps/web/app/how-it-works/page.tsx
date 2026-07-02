@@ -75,7 +75,7 @@ export default function HowItWorksPage() {
             How Sovereign.os works.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-lg leading-relaxed">
-            The system understands your Baseline Design before you type. Here is the product loop.
+            Sovereign.os uses your Baseline Design to read what's active, identify what may be repeating, and surface a Best Next Response — before pressure chooses for you.
           </p>
         </Container>
       </section>

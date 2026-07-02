@@ -34,7 +34,7 @@ export default function AboutPage() {
             return to yourself first.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-xl leading-relaxed">
-            Not for abstract self-improvement. For the specific, real, sometimes difficult moments of actual life.
+            Pattern-aware AI for the moments that are hard to read while you're inside them. Not abstract self-improvement — specific, real, sometimes difficult moments of actual life.
           </p>
         </Container>
       </section>
@@ -50,7 +50,7 @@ export default function AboutPage() {
               },
               {
                 label: "The structure",
-                body: "Sovereign.os gives those moments structure — without turning them into a diagnosis, a score, or a verdict.",
+                body: "Sovereign.os gives those moments structure — showing what's active, what may be repeating, and what next move gives the situation a better chance.",
               },
               {
                 label: "The platform",
