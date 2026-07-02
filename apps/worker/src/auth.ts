@@ -63,7 +63,15 @@ export async function verifyPassword(password: string, stored: string): Promise<
       diff |= (actualHash[i] ?? 0) ^ (expectedHash[i] ?? 0)
     }
     return diff === 0
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "password_verification_failed",
+      endpoint: "auth",
+      requestId: "internal",
+      reason: "unknown_failure",
+      error,
+    })
     return false
   }
 }
@@ -108,7 +116,9 @@ export function getSessionToken(request: Request): string | null {
 }
 
 import type { D1Database } from "@cloudflare/workers-types";
+import { getCorsHeaders } from "./cors.js";
 import { getSessionId } from "./plan.js";
+import { logSafetyEvent } from "./safety.js";
 
 export function jsonResponse(data: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(data), {
@@ -140,13 +150,40 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
   if (!token) return null
 
   const session = await DB.prepare(
-    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires > ?"
+    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
   )
     .bind(token, Date.now())
-    .first<{ id: string; email: string; tier: string; role: string; stripe_customer_id: string | null; subscription_status: string }>()
+    .first<{
+      id: string
+      email: string
+      tier: string
+      role: string | null
+      stripe_customer_id: string | null
+      subscription_status: string | null
+    }>()
 
   if (!session) return null
-  return { ...session, role: session.role || "user", subscription_status: session.subscription_status || "free" }
+
+  // Update last_active non-blocking
+  DB.prepare("UPDATE sessions SET last_active = ? WHERE token = ?")
+    .bind(Date.now(), token).run().catch((error) => {
+      logSafetyEvent({
+        level: "warn",
+        event: "session_last_active_update_failed",
+        request,
+        error_type: "auth",
+        error,
+      })
+    })
+
+  return {
+    id: session.id,
+    email: session.email,
+    tier: session.tier,
+    role: session.role || "user",
+    stripe_customer_id: session.stripe_customer_id,
+    subscription_status: session.subscription_status || "free",
+  }
 }
 
 const SESSION_TTL = 7 * 24 * 60 * 60
@@ -156,14 +193,28 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   router.post("/api/auth/register", async (request: Request) => {
     const env = getEnv()
     try {
-      const { email, password, turnstileToken } = await request.json() as any
+      // Rate limit registration by IP
+      if (env.RATE_LIMITER) {
+        const ip = request.headers.get("CF-Connecting-IP") || "unknown"
+        const { success } = await env.RATE_LIMITER.limit({ key: `register:${ip}` })
+        if (!success) return jsonResponse({ error: "Too many registration attempts. Please wait before trying again." }, 429)
+      }
+      const { email: rawRegEmail, password, turnstileToken } = await request.json() as any
+      const email = typeof rawRegEmail === "string" ? rawRegEmail.toLowerCase().trim() : ""
       if (!email || !password) return jsonResponse({ error: "Missing fields" }, 400)
+      if (typeof password === "string" && password.length < 8) return jsonResponse({ error: "Password must be at least 8 characters" }, 400)
+      if (typeof email === "string" && !email.includes("@")) return jsonResponse({ error: "Invalid email address" }, 400)
 
       if (env.TURNSTILE_SECRET_KEY) {
-        const isHuman = await verifyTurnstile(String(turnstileToken ?? ""), env.TURNSTILE_SECRET_KEY)
+        const isHuman = await verifyTurnstile(String(turnstileToken ?? ""), env.TURNSTILE_SECRET_KEY, request)
         if (!isHuman) return jsonResponse({ error: "Bot verification failed" }, 403)
       } else {
-        console.warn("Turnstile secret key missing — bypassing bot verification.")
+        logSafetyEvent({
+          level: "warn",
+          event: "turnstile_secret_missing",
+          request,
+          error_type: "auth",
+        })
       }
 
       const password_hash = await hashPassword(password)
@@ -175,21 +226,54 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         .run()
 
       const token = generateSessionToken()
-      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
         .bind(token, userId, now + SESSION_TTL * 1000, now)
         .run()
 
       // Send welcome email via queue (non-blocking)
       if (env.QUEUE) {
         void env.QUEUE.send({ type: "welcome", to: email }).catch((err: unknown) =>
-          console.warn("[auth] Failed to queue welcome email:", err)
+          logSafetyEvent({
+            level: "warn",
+            event: "auth_welcome_email_queue_failed",
+            request,
+            error_type: "auth",
+            error: err,
+            details: { recipient: email },
+          })
         )
       } else if (env.RESEND_API_KEY) {
         // Fallback: send directly if no queue
         const { sendWelcomeEmail } = await import("./email.js")
         void sendWelcomeEmail(email, { resendApiKey: env.RESEND_API_KEY }).catch((err: unknown) =>
-          console.warn("[auth] Failed to send welcome email:", err)
+          logSafetyEvent({
+            level: "warn",
+            event: "auth_welcome_email_failed",
+            request,
+            error_type: "auth",
+            error: err,
+            details: { recipient: email },
+          })
         )
+      }
+
+      // Trigger email verification non-blocking (only if RESEND configured)
+      if (env.RESEND_API_KEY) {
+        const appUrl = env.APP_URL || "https://app.defrag.app"
+        void fetch(`${appUrl}/api/auth/send-verification`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Cookie": `session=${token}` },
+          body: JSON.stringify({ email }),
+        }).catch((error) => {
+          logSafetyEvent({
+            level: "warn",
+            event: "auth_send_verification_trigger_failed",
+            request,
+            error_type: "auth",
+            error,
+            details: { recipient: email },
+          })
+        })
       }
 
       return jsonResponse({ success: true, token }, 200, {
@@ -197,7 +281,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       })
     } catch (e: any) {
       if (e?.message?.includes("UNIQUE")) return jsonResponse({ error: "Email exists" }, 400)
-      console.error("Registration failed", e)
+      logSafetyEvent({ level: "error", event: "auth_registration_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Registration failed" }, 500)
     }
   })
@@ -206,7 +290,14 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   router.post("/api/auth/login", async (request: Request) => {
     const env = getEnv()
     try {
-      const { email, password } = await request.json() as any
+      // Rate limit login attempts by IP
+      if (env.RATE_LIMITER) {
+        const ip = request.headers.get("CF-Connecting-IP") || "unknown"
+        const { success } = await env.RATE_LIMITER.limit({ key: `login:${ip}` })
+        if (!success) return jsonResponse({ error: "Too many login attempts. Please wait before trying again." }, 429)
+      }
+      const { email: rawEmail, password } = await request.json() as any
+      const email = typeof rawEmail === "string" ? rawEmail.toLowerCase().trim() : ""
       const user = await env.DB.prepare("SELECT id, email, password_hash, tier, role FROM users WHERE email = ?").bind(email).first() as any
       if (!user) return jsonResponse({ error: "Invalid credentials" }, 401)
 
@@ -215,7 +306,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       const token = generateSessionToken()
       const now = Date.now()
-      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires, created_at) VALUES (?, ?, ?, ?)")
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
         .bind(token, user.id, now + SESSION_TTL * 1000, now)
         .run()
 
@@ -223,7 +314,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         "Set-Cookie": sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN),
       })
     } catch (e: any) {
-      console.error("Login failed", e)
+      logSafetyEvent({ level: "error", event: "auth_login_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Login failed" }, 500)
     }
   })
@@ -245,11 +336,26 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
     if (user.role !== "ambassador" && user.role !== "owner") {
-      console.warn("Attempted ambassador access blocked for role: " + user.role);
+      logSafetyEvent({
+        level: "warn",
+        event: "ambassador_access_blocked",
+        request,
+        error_type: "auth",
+        details: { role: user.role },
+      });
       return jsonResponse({ error: "Forbidden" }, 403)
     }
 
-    const body = await request.json().catch(() => ({})) as any
+    const body = await request.json().catch((error) => {
+      logSafetyEvent({
+        level: "warn",
+        event: "promo_code_create_invalid_json",
+        request,
+        error_type: "validation",
+        error,
+      })
+      return {}
+    }) as any
     let discount_percent = typeof body.discount_percent === "number" ? body.discount_percent : 0
     let max_uses = typeof body.max_uses === "number" ? body.max_uses : 10
 
@@ -270,7 +376,16 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   // POST /api/promo/redeem
   router.post("/api/promo/redeem", async (request: Request) => {
     const env = getEnv()
-    const body = await request.json().catch(() => ({})) as any
+    const body = await request.json().catch((error) => {
+      logSafetyEvent({
+        level: "warn",
+        event: "promo_redeem_invalid_json",
+        request,
+        error_type: "validation",
+        error,
+      })
+      return {}
+    }) as any
     const code = typeof body?.code === "string" ? body.code.trim().toUpperCase() : ""
     if (!code) return jsonResponse({ error: "Missing code" }, 400)
 
@@ -322,15 +437,254 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     })
   })
 
+  // POST /api/auth/change-password
+  router.post("/api/auth/change-password", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    try {
+      const { currentPassword, newPassword } = await request.json() as { currentPassword?: string; newPassword?: string }
+      if (!currentPassword || !newPassword) return jsonResponse({ error: "Missing fields" }, 400)
+      if (newPassword.length < 8) return jsonResponse({ error: "New password must be at least 8 characters" }, 400)
+
+      // Verify current password
+      const dbUser = await env.DB.prepare("SELECT password_hash FROM users WHERE id = ?")
+        .bind(user.id).first()
+      if (!dbUser) return jsonResponse({ error: "User not found" }, 404)
+
+      const valid = await verifyPassword(currentPassword, dbUser.password_hash)
+      if (!valid) return jsonResponse({ error: "Current password is incorrect" }, 401)
+
+      // Hash and update new password
+      const newHash = await hashPassword(newPassword)
+      await env.DB.prepare("UPDATE users SET password_hash = ? WHERE id = ?")
+        .bind(newHash, user.id).run()
+
+      // Invalidate all other sessions for security
+      await env.DB.prepare("DELETE FROM sessions WHERE user_id = ? AND token != ?")
+        .bind(user.id, request.headers.get("cookie")?.match(/session=([^;]+)/)?.[1] || "").run()
+
+      return jsonResponse({ success: true })
+    } catch (e) {
+      logSafetyEvent({ level: "error", event: "auth_change_password_failed", request, error_type: "auth", error: e })
+      return jsonResponse({ error: "Failed to change password" }, 500)
+    }
+  })
+
+  // GET /api/auth/export — export all user data (GDPR compliance)
+  router.get("/api/auth/export", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    try {
+      // Collect all user data
+      const [library, interactions, people, natal] = await Promise.all([
+        env.DB.prepare("SELECT id, title, workspace_source, created_at FROM library WHERE user_id = ?")
+          .bind(user.id).all(),
+        env.DB.prepare("SELECT id, mode, question, confidence, created_at FROM interactions WHERE session_id IN (SELECT token FROM sessions WHERE user_id = ?)")
+          .bind(user.id).all(),
+        env.DB.prepare("SELECT id, name, relation, created_at FROM people WHERE user_id = ?")
+          .bind(user.id).all(),
+        env.KV.get(`natal:${user.id}`),
+      ])
+
+      const exportData = {
+        exportedAt: new Date().toISOString(),
+        account: { id: user.id, email: user.email, tier: user.tier, createdAt: (user as any).created_at },
+        library: library.results || [],
+        interactions: interactions.results || [],
+        people: people.results || [],
+        baselineDesign: natal ? JSON.parse(natal) : null,
+      }
+
+      return new Response(JSON.stringify(exportData, null, 2), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Disposition": `attachment; filename="sovereign-os-export-${user.id.slice(0, 8)}.json"`,
+        },
+      })
+    } catch (e) {
+      logSafetyEvent({ level: "error", event: "auth_export_failed", request, error_type: "auth", error: e })
+      return jsonResponse({ error: "Failed to export data" }, 500)
+    }
+  })
+
+  // DELETE /api/auth/account — permanently delete user account and all data
+  router.delete("/api/auth/account", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    try {
+      // Delete all user data in order (FK constraints)
+      await env.DB.batch([
+        env.DB.prepare("DELETE FROM sessions WHERE user_id = ?").bind(user.id),
+        env.DB.prepare("DELETE FROM library WHERE user_id = ?").bind(user.id),
+        env.DB.prepare("DELETE FROM interactions WHERE session_id IN (SELECT token FROM sessions WHERE user_id = ?)").bind(user.id),
+        env.DB.prepare("DELETE FROM patterns WHERE session_id IN (SELECT token FROM sessions WHERE user_id = ?)").bind(user.id),
+        env.DB.prepare("DELETE FROM people WHERE user_id = ?").bind(user.id),
+        env.DB.prepare("DELETE FROM users WHERE id = ?").bind(user.id),
+      ])
+
+      // Clear KV data
+      await env.KV.delete(`natal:${user.id}`).catch((error) => {
+        logSafetyEvent({
+          level: "warn",
+          event: "auth_delete_account_natal_cleanup_failed",
+          request,
+          error_type: "auth",
+          error,
+          details: { userId: user.id },
+        })
+      })
+      await env.KV.delete(`baseline:${user.id}`).catch((error) => {
+        logSafetyEvent({
+          level: "warn",
+          event: "auth_delete_account_baseline_cleanup_failed",
+          request,
+          error_type: "auth",
+          error,
+          details: { userId: user.id },
+        })
+      })
+
+      const cookieDomain = env.COOKIE_DOMAIN || undefined
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Set-Cookie": clearCookie(),
+          ...getCorsHeaders(request),
+        },
+      })
+    } catch (e) {
+      logSafetyEvent({ level: "error", event: "auth_delete_account_failed", request, error_type: "auth", error: e })
+      return jsonResponse({ error: "Failed to delete account" }, 500)
+    }
+  })
+
+  // DELETE /api/auth/sessions/:token — revoke a specific session
+  router.delete("/api/auth/sessions/:token", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    const url = new URL(request.url)
+    const tokenSuffix = url.pathname.split('/').pop()
+    if (!tokenSuffix) return jsonResponse({ error: "Missing token" }, 400)
+
+    try {
+      // Find and delete session by last 6 chars of token (masked ID)
+      // This prevents exposing full tokens while still allowing revocation
+      const { results } = await env.DB.prepare(
+        "SELECT token FROM sessions WHERE user_id = ? AND expires_at > ?"
+      ).bind(user.id, Date.now()).all()
+
+      const session = (results || []).find((s: any) => 
+        String(s.token).slice(-6) === tokenSuffix
+      )
+
+      if (!session) return jsonResponse({ error: "Session not found" }, 404)
+
+      await env.DB.prepare("DELETE FROM sessions WHERE token = ? AND user_id = ?")
+        .bind((session as any).token, user.id).run()
+
+      return jsonResponse({ success: true })
+    } catch (e) {
+      return jsonResponse({ error: "Failed to revoke session" }, 500)
+    }
+  })
+
+  // GET /api/auth/sessions — list active sessions for current user
+  router.get("/api/auth/sessions", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    try {
+      const queryResult = await env.DB.prepare(
+        "SELECT token, created_at, expires_at FROM sessions WHERE user_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 10"
+      ).bind(user.id, Date.now()).all()
+
+      const results = ((queryResult as { results?: unknown[] })?.results ?? []) as Array<{
+        token: string
+        created_at: number
+        expires_at: number
+      }>
+
+      // Mask tokens for security — only show last 6 chars
+      const sessions = (results || []).map(s => ({
+        id: s.token.slice(-6),
+        createdAt: new Date(s.created_at).toISOString(),
+        expiresAt: new Date(s.expires_at).toISOString(),
+      }))
+
+      return jsonResponse({ sessions })
+    } catch (e) {
+      logSafetyEvent({ level: "error", event: "auth_sessions_fetch_failed", request, error_type: "auth", error: e })
+      return jsonResponse({ error: "Failed to fetch sessions" }, 500)
+    }
+  })
+
+  // POST /api/auth/refresh — extend session by 7 days if still valid
+  router.post("/api/auth/refresh", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+
+    try {
+      // Generate new session token
+      const newToken = generateSessionToken()
+      const now = Date.now()
+      const SESSION_TTL = 7 * 24 * 60 * 60 // 7 days in seconds
+      const cookieDomain = env.COOKIE_DOMAIN || undefined
+
+      // Get old token from cookie
+      const cookieHeader_val = request.headers.get("cookie") || ""
+      const oldToken = cookieHeader_val.match(/session=([^;]+)/)?.[1]
+
+      // Insert new session
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
+        .bind(newToken, user.id, now + SESSION_TTL * 1000, now).run()
+
+      // Delete old session
+      if (oldToken) {
+        await env.DB.prepare("DELETE FROM sessions WHERE token = ?").bind(oldToken).run()
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Set-Cookie": sessionCookie(newToken, SESSION_TTL, cookieDomain),
+        },
+      })
+    } catch (e) {
+      logSafetyEvent({ level: "error", event: "auth_refresh_failed", request, error_type: "auth", error: e })
+      return jsonResponse({ error: "Failed to refresh session" }, 500)
+    }
+  })
+
   // POST /api/auth/logout
   router.post("/api/auth/logout", async (request: Request) => {
     const env = getEnv()
     const cookieDomain = env.COOKIE_DOMAIN || undefined
+    // Clean up expired sessions opportunistically on logout
+    try {
+      await env.DB.prepare("DELETE FROM sessions WHERE expires_at < ?")
+        .bind(Date.now()).run()
+    } catch (error) {
+      logSafetyEvent({ level: "warn", event: "auth_logout_cleanup_failed", request, error_type: "auth", error })
+    }
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Set-Cookie": clearCookie(cookieDomain),
+        "Set-Cookie": clearCookie(),
+        ...getCorsHeaders(request),
       },
     })
   })
@@ -342,7 +696,61 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
 
     const people = await env.DB.prepare("SELECT * FROM people WHERE user_id = ?").bind(user.id).all()
-    return jsonResponse(people.results)
+    return jsonResponse({ people: people.results ?? [] })
+  })
+
+  // POST /api/people — add a person
+  router.post("/api/people", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    try {
+      const { name, relation } = await request.json() as { name?: string; relation?: string }
+      if (!name || typeof name !== "string" || !name.trim()) {
+        return jsonResponse({ error: "Name is required" }, 400)
+      }
+      const id = crypto.randomUUID()
+      const now = new Date().toISOString()
+      await env.DB.prepare(
+        "INSERT INTO people (id, user_id, name, created_at) VALUES (?, ?, ?, ?)"
+      ).bind(id, user.id, name.trim(), now).run()
+      // Update relation if provided (column added in migration 0018)
+      if (relation?.trim()) {
+        await env.DB.prepare("UPDATE people SET relation = ? WHERE id = ?")
+          .bind(relation.trim(), id).run().catch((error) => {
+            logSafetyEvent({
+              level: "warn",
+              event: "people_relation_update_failed",
+              request,
+              error_type: "system",
+              error,
+              details: { personId: id },
+            })
+          })
+      }
+      return jsonResponse({ success: true, id, name: name.trim() })
+    } catch (e) {
+      logSafetyEvent({ level: "error", event: "people_create_failed", request, error_type: "system", error: e })
+      return jsonResponse({ error: "Failed to create person" }, 500)
+    }
+  })
+
+  // DELETE /api/people/:id — remove a person
+  router.delete("/api/people/:id", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    const url = new URL(request.url)
+    const id = url.pathname.split('/').pop()
+    if (!id) return jsonResponse({ error: "Missing ID" }, 400)
+    try {
+      await env.DB.prepare("DELETE FROM people WHERE id = ? AND user_id = ?")
+        .bind(id, user.id).run()
+      return jsonResponse({ success: true })
+    } catch (e) {
+      logSafetyEvent({ level: "error", event: "people_delete_failed", request, error_type: "system", error: e, details: { personId: id } })
+      return jsonResponse({ error: "Failed to delete person" }, 500)
+    }
   })
 
   // GET /api/user/me — current user profile
@@ -403,8 +811,15 @@ function decodeJwt(token: string): { header: any; payload: any } | null {
       header: JSON.parse(headerStr),
       payload: JSON.parse(payloadStr),
     };
-  } catch (e) {
-    console.error("Failed to decode JWT", e);
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "jwt_decode_failed",
+      endpoint: "auth",
+      requestId: "internal",
+      reason: "unknown_failure",
+      error,
+    })
     return null;
   }
 }
@@ -460,13 +875,13 @@ export async function verifyAccessJWT(request: Request, env: { TEAM_DOMAIN?: str
 
     return null; // Token is valid
   } catch (err: any) {
-    console.error("JWT Verification failed:", err.stack);
+    logSafetyEvent({ level: "error", event: "auth_jwt_verification_failed", request, error_type: "auth", error: err });
     return jsonResponse({ error: "JWT verification failed" }, 500);
   }
 }
 
 // Turnstile bot verification
-export async function verifyTurnstile(token: string, secretKey: string): Promise<boolean> {
+export async function verifyTurnstile(token: string, secretKey: string, request?: Request): Promise<boolean> {
   if (!token) return false;
   try {
     const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -476,7 +891,14 @@ export async function verifyTurnstile(token: string, secretKey: string): Promise
     });
     const data = await response.json() as { success: boolean };
     return data.success;
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "turnstile_verification_failed",
+      request,
+      error_type: "auth",
+      error,
+    });
     return false;
   }
 }

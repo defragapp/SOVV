@@ -46,7 +46,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "How do I get access?",
-    a: "Create your space at app.defrag.app. The Free tier gives you access to the Defrag space and your Baseline Design. Pro unlocks all spaces, unlimited sessions, and full Library depth.",
+    a: "Create your space at defrag.app. The Free tier gives you access to the Defrag space and your Baseline Design. Pro unlocks all spaces, unlimited sessions, and full Library depth.",
   },
 ];
 
@@ -84,7 +84,7 @@ export default function FaqPage() {
           <div className="flex flex-col">
             {FAQ_ITEMS.map((item, i) => (
               <details key={i} className="group border-b border-white/[0.06] py-6 cursor-pointer">
-                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base md:text-lg font-medium list-none">
+                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base md:text-lg font-normal list-none">
                   {item.q}
                   <span className="flex-none text-xl text-[#e0743a] transition-transform duration-200 group-open:rotate-45 shrink-0">
                     +

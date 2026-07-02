@@ -23,6 +23,33 @@
 
 import type { BaselineDesignDataset } from "./baseline-compiler.js"
 
+// Types defined locally to avoid circular dependency with @sovereign/core
+// These match the interfaces in packages/core/src/types.ts
+export type ActiveBaselineSignals = {
+  pace: "fast" | "slow" | "variable" | "unknown"
+  stabilizes: string
+  responds: string
+  protects: string
+  pattern: string
+  evidenceTags: string[]
+  traitLines: string[]
+}
+
+export type TimingSignals = {
+  urgency: "low" | "moderate" | "high"
+  sensitivity: "low" | "moderate" | "high"
+  tolerance: "low" | "moderate" | "high"
+  pacing: "slow" | "normal" | "fast"
+  state: "stable" | "reactive"
+  note?: string
+}
+
+export type OverlaySignals = {
+  loop: string
+  amplifier: string
+  shift: string
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 /** Compressed identity signature — shown once, bottom of result surface */
@@ -437,11 +464,11 @@ export function buildRailData(
       pace: signals.pace,
       stabilizes: signals.stabilizes,
       responds: signals.responds,
-      pattern: signals.pattern,
+      // pattern: signals.pattern,
     },
     sky: {
       urgency: timing.urgency,
-      sensitivity: timing.sensitivity,
+      state: timing.sensitivity,
       tolerance: timing.tolerance,
     },
     pattern: { loop: overlay?.loop ?? signals.pattern ?? "" },

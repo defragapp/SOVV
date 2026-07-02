@@ -145,7 +145,7 @@ function CovenantDemo() {
                     className="p-6 bg-white/[0.02]"
                   >
                     <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">One grounded next step</p>
-                    <p className="text-[13px] text-[#f4efe9] leading-relaxed font-medium">{current.step}</p>
+                    <p className="text-[13px] text-[#f4efe9] leading-relaxed">{current.step}</p>
                   </motion.div>
                 ) : (
                   <div className="p-6"></div>
@@ -176,7 +176,7 @@ export default function CovenantProductPage() {
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Covenant · Pro</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
-            Your moment has been walked before.
+            <span className="text-glow">Your moment</span> has been walked before.
           </h1>
           <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed animate-fade-up delay-100">
             Covenant connects what you're going through to the real human stories in Scripture — not as metaphor, but as lived experience. It finds the biblical figure who walked something like what you're facing, shows you what they learned, and gives you one honest next step.
@@ -196,7 +196,7 @@ export default function CovenantProductPage() {
               <div key={i} className="flex flex-col md:flex-row items-baseline gap-4 md:gap-12 py-8 border-b border-white/[0.06] last:border-0">
                 <span className="font-serif text-3xl md:text-5xl text-[#4f4b47] w-12 shrink-0">0{i + 1}</span>
                 <div>
-                  <p className="text-[#f4efe9] font-medium text-sm mb-2">{f.label}</p>
+                  <p className="text-[14px] text-[#f4efe9] mb-2">{f.label}</p>
                   <p className="text-sm text-[#76716b] leading-relaxed max-w-xl">{f.body}</p>
                 </div>
               </div>

@@ -20,14 +20,15 @@ const fraunces = Fraunces({
   preload: true,
 })
 
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://defrag.app"),
   title: {
-    default: "Sovereign.os — Understand the patterns beneath the moment",
-    template: "%s — Sovereign.os",
+    default: "Sovereign.os — Relational Intelligence for Real Life",
+    template: "Sovereign.os — %s",
   },
   description:
-    "Sovereign.os is a private AI notebook for understanding the patterns that keep showing up in your relationships, family, messages, grief, and decisions. Describe the moment. See what's actually active. Find the clearest way through.",
+    "Sovereign.os helps you see the loop, separate the pattern from the pressure, and start from your baseline.",
   keywords: [
     "relationship patterns",
     "emotional intelligence",
@@ -35,15 +36,10 @@ export const metadata: Metadata = {
     "self awareness",
     "relational dynamics",
     "family patterns",
-    "grief support",
     "boundary setting",
     "AI personal notebook",
     "private AI journal",
     "pattern recognition",
-    "human design",
-    "astrology insights",
-    "faith reflection",
-    "biblical wisdom",
     "alignment",
     "defrag",
     "sovereign os",
@@ -72,15 +68,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://defrag.app",
     siteName: "Sovereign.os",
-    title: "Sovereign.os — Understand the patterns beneath the moment",
+    title: "Sovereign.os — Relational Intelligence for Real Life",
     description:
-      "A private AI notebook for the patterns that keep showing up. Describe the moment. See what's actually active. Find the clearest way through.",
+      "Sovereign.os helps you see the loop, separate the pattern from the pressure, and start from your baseline.",
     images: [
       {
         url: "/social-card.png",
         width: 1200,
         height: 630,
-        alt: "Sovereign.os — Private AI notebook for relational patterns",
+        alt: "Sovereign.os — Relational intelligence for real life",
       },
     ],
   },
@@ -88,9 +84,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@sovereignos",
     creator: "@sovereignos",
-    title: "Sovereign.os — Understand the patterns beneath the moment",
+    title: "Sovereign.os — Relational Intelligence for Real Life",
     description:
-      "A private AI notebook for the patterns that keep showing up in your relationships, family, messages, and grief.",
+      "Sovereign.os helps you see the loop, separate the pattern from the pressure, and start from your baseline.",
     images: ["/social-card.png"],
   },
   icons: {
@@ -103,7 +99,7 @@ export const metadata: Metadata = {
     canonical: "https://defrag.app",
   },
   category: "productivity",
-  classification: "Personal Development, Mental Wellness, AI Tools",
+  classification: "Relational Intelligence, Personal Development, AI Tools",
 }
 
 export const viewport: Viewport = {
@@ -136,7 +132,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "applicationCategory": "LifestyleApplication",
               "operatingSystem": "Web",
               "url": "https://defrag.app",
-              "description": "A private AI notebook for understanding the patterns that keep showing up in your relationships, family, messages, grief, and decisions.",
+              "description": "Sovereign.os helps you see the loop, separate the pattern from the pressure, and start from your baseline.",
               "offers": [
                 {
                   "@type": "Offer",
@@ -157,7 +153,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "featureList": [
                 "Baseline Design — personal pattern map",
                 "Defrag — relational pattern analysis",
-                "Covenant — faith-context reflection",
+                "Covenant — shared-pattern reflection",
                 "Alignment — response integration",
                 "Sovereign.os Library — private saved results",
                 "Audio Overview",

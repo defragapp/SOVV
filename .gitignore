@@ -1,14 +1,42 @@
+# Node & package managers
 node_modules/
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# Build output
+dist/
+build/
 .next/
 .open-next/
-dist/
+.open-next/.build/
+
+# Wrangler & worker-specific
+.wrangler/
+apps/worker/index.js
+apps/worker/index.js.map
+apps/worker/index.d.ts
+apps/worker/index.d.ts.map
+apps/worker/src/*.js.map
+apps/worker/src/*.d.ts.map
+
+# Environment files
 .env
 .env.local
-.DS_Store
-apps/worker/.wrangler/
-logs/
+.env.production
+.dev.vars
 
-# Sensitive / operational files — never commit
+# OS & editor
+.DS_Store
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.clinerules
+.continue/
+
+# Sensitive / operational files (never commit)
 cookies.txt
 apps/worker/cookies.txt
 apps/worker/login.log
@@ -17,33 +45,14 @@ apps/worker/wrangler.log
 cf_audit.txt
 fix_billing.js
 update_index.js
-tatus
 deploy-worker.yml
 apps/worker/src/deploy.yml
 apps/worker/src/deploy-worker.yml
 
-# Stale build artifacts
+# Stale build artifacts & configs
 apps/web/wrangler.old.json
 apps/web/tailwind.config.js
-apps/web/.open-next/.build/
-apps/web/src/
-
-# Compiled worker artifacts (built by wrangler at deploy time)
-apps/worker/index.js
-apps/worker/index.js.map
-apps/worker/index.d.ts
-apps/worker/index.d.ts.map
-apps/worker/src/*.js.map
-apps/worker/src/*.d.ts.map
-
-# Operational files
 apps/web/app/todo.md
-
-# Stale IDE/tool configs
-.clinerules
-.continue/
-
-# Stale web artifacts
 apps/web/config_json.code-search
 apps/web/hero-css-snippets.css
 apps/web/hero.module.css
@@ -53,7 +62,7 @@ apps/web/public/vercel.svg
 apps/web/public/window.svg
 apps/web/public/globe.svg
 
-# Unused root components (superseded by workspace/ and marketing/ components)
+# Unused/superseded components (apps/web)
 apps/web/components/AnimatedOverview.tsx
 apps/web/components/ArtifactList.tsx
 apps/web/components/AudioOverview.tsx
@@ -66,27 +75,24 @@ apps/web/components/StudioPanel.tsx
 apps/web/components/Thread.tsx
 apps/web/lib/storage.ts
 
-# Misplaced worker files
+# Misplaced files
 apps/worker/src/page.tsx
 
-# Duplicate packages/core root files (canonical versions are in packages/core/src/)
+# Duplicate/superseded files (canonical versions in packages/core/src/)
 packages/core/HistoryTimeline.tsx
 packages/core/MemoryPanel.tsx
 packages/core/PatternCard.tsx
 packages/core/memory.ts
 packages/core/page.tsx
-
-# Unused core data files (not exported from packages/core/src/index.ts)
 packages/core/src/geneKeyMeanings.ts
 packages/core/src/geneKeys.ts
-packages/core/src/geneKeyMeanings.ts
-.wrangler/
-.dev.vars
-# Local environment
-.dev.vars
-.env
-.env.local
-.env.production
 
-# Local push/audit scripts (may contain tokens)
+# Python scripts
 *.py
+
+# Test & coverage
+coverage/
+test-results/
+playwright-report/
+.vitest/
+.impeccable/
