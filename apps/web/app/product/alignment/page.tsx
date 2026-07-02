@@ -230,7 +230,7 @@ export default function AlignmentProductPage() {
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Your two inputs</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
-              Your fixed center. The moving sky.
+              <span className="text-glow">Your fixed center.</span> The moving sky.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-lg">
               Your Baseline Design is who you are when you're most yourself. The live sky is the weather you're moving through right now. Alignment holds both — and shows you the path that stays true to you.
@@ -249,7 +249,7 @@ export default function AlignmentProductPage() {
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">See it work</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
-              What Alignment actually returns.
+              <span className="text-glow">What Alignment</span> actually returns.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-md">
               Five outputs — grounded in your Baseline Design and the live sky. What is true, what is yours, what is theirs, one next step, and what to avoid.
@@ -264,7 +264,7 @@ export default function AlignmentProductPage() {
         <div className="light-beam" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <h2 className="font-serif text-4xl md:text-6xl text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
-            Back into your own lane.
+            <span className="text-glow">Back into</span> your own lane.
           </h2>
           <p className="mt-6 max-w-md text-base text-[#a8a29a] leading-relaxed">
             Open Alignment and describe what you're trying to move through. Your Baseline Design and the live sky are already waiting.
