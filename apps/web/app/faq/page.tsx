@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const FAQ_ITEMS = [
   {
     q: "What is Sovereign.os?",
-    a: "Sovereign.os is a private platform that helps you work through the patterns that keep showing up in your relationships, family, messages, grief, and boundaries — then save what you learn before the moment disappears.",
+    a: "Sovereign.os is pattern-aware AI for the moments that are hard to read while you're inside them. It helps you understand what's active, what may be repeating, and what next move gives the situation a better chance — before pressure chooses for you.",
   },
   {
     q: "What is the Baseline Design?",
@@ -18,7 +18,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "What is the Defrag space?",
-    a: "Defrag is the relational intelligence space inside Sovereign.os. It helps you understand what is active in the moment — the Active pattern, the Old Role, the Strain Pattern — and find your Best Next Response. Defrag supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics.",
+    a: "Defrag is the core space inside Sovereign.os. Describe the situation — a message, conflict, boundary, family dynamic, or grief point — and Defrag shows what's active, what may be repeating, and your Best Next Response. Free to use.",
   },
   {
     q: "What is the Covenant space?",
