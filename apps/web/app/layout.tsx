@@ -8,6 +8,8 @@ import "./globals.css"
 const jetBrainsMono = localFont({
   src: "../public/fonts/JetBrainsMono-VariableFont.woff2",
   variable: "--font-jetbrains-mono",
+  display: "swap",
+  preload: true,
 })
 
 const fraunces = Fraunces({
@@ -15,6 +17,7 @@ const fraunces = Fraunces({
   variable: "--font-fraunces",
   display: "swap",
   axes: ["opsz", "SOFT"],
+  preload: true,
 })
 
 export const metadata: Metadata = {
@@ -118,7 +121,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`antialiased ${jetBrainsMono.variable} ${GeistSans.variable} ${fraunces.variable}`}
     >
       <head>
-        {/* Structured data — Organization */}
+        {/* DNS prefetch for external resources */}
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+
+        {/* Structured data — SoftwareApplication */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -161,8 +168,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen overflow-x-hidden bg-[#08070a] text-[#f4efe9] overscroll-none selection:bg-white/20 selection:text-white">
+        {/* Skip to main content — keyboard accessibility */}
+        <a href="#main-content" className="skip-to-main">
+          Skip to main content
+        </a>
         <NoiseLayer />
-        {children}
+        <main id="main-content">
+          {children}
+        </main>
       </body>
     </html>
   )

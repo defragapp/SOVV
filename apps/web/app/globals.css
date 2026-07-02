@@ -410,6 +410,139 @@
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0); }
 .safe-top    { padding-top:    env(safe-area-inset-top, 0); }
 
+
+/* ── Elevation shadow system ──────────────────────────────────────────────── */
+/* Depth through layered shadows, not just borders */
+.elevation-1 {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+}
+.elevation-2 {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
+}
+.elevation-3 {
+  box-shadow: 0 12px 32px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* ── Spring easing ────────────────────────────────────────────────────────── */
+:root {
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-smooth: cubic-bezier(0.25, 1, 0.5, 1);
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-slow: 400ms;
+}
+
+/* ── Skeleton loading states ──────────────────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.03) 25%,
+    rgba(255,255,255,0.06) 50%,
+    rgba(255,255,255,0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+  border-radius: var(--radius-minimal);
+}
+
+.skeleton-text {
+  height: 0.875rem;
+  border-radius: 2px;
+}
+
+.skeleton-heading {
+  height: 1.5rem;
+  border-radius: 2px;
+}
+
+/* ── Focus ring system ────────────────────────────────────────────────────── */
+/* Visible focus rings for keyboard navigation */
+:focus-visible {
+  outline: 2px solid rgba(224,116,58,0.6);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Remove outline for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Skip to main content ─────────────────────────────────────────────────── */
+.skip-to-main {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.75rem 1.5rem;
+  background: #f4efe9;
+  color: #08070a;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius-button);
+  transition: top 200ms ease;
+}
+.skip-to-main:focus {
+  top: 1rem;
+}
+
+/* ── Improved prefers-reduced-motion ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .hero-drift,
+  .ambient-blob,
+  .ambient-blob-2 {
+    animation: none !important;
+  }
+  
+  .glow-card-hover:hover {
+    transform: none !important;
+  }
+  
+  .reveal-up {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ── Gradient text utility ────────────────────────────────────────────────── */
+.text-gradient-warm {
+  background: linear-gradient(135deg, #f4efe9 0%, rgba(224,116,58,0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Interactive surface ──────────────────────────────────────────────────── */
+/* For clickable cards that need clear affordance */
+.interactive-surface {
+  cursor: pointer;
+  transition: background-color var(--duration-base) ease,
+              border-color var(--duration-base) ease,
+              box-shadow var(--duration-slow) ease,
+              transform var(--duration-slow) var(--ease-out-expo);
+}
+.interactive-surface:hover {
+  background-color: rgba(255,255,255,0.02);
+}
+.interactive-surface:active {
+  transform: scale(0.995);
+}
+
 /* ── Scrollbar ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
