@@ -109,7 +109,7 @@ export default function PrinciplesPage() {
 
                 {/* Content */}
                 <div className="flex-1">
-                  <h3 className="text-[#f4efe9] font-medium text-base mb-2 group-hover:text-[#c8c2bc] transition-colors">
+                  <h3 className="font-serif text-[1rem] text-[#f4efe9] mb-2 group-hover:text-[#c8c2bc] transition-colors">
                     {p.title}
                   </h3>
                   <p className="text-[13px] text-[#76716b] leading-[1.7] max-w-xl">

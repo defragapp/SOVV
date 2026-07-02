@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/layout-primitives"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Use Cases — Sovereign.os",
+  title: "Use Cases",
   description: "When to use Sovereign.os. Defrag supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics.",
 }
 
@@ -69,9 +69,11 @@ export default function UseCasesPage() {
       {/* Hero */}
       <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[#08070a] overflow-hidden border-b border-white/5">
         <div className="light-beam opacity-50" aria-hidden />
+        <div className="ambient-blob absolute -top-60 -right-60 w-[700px] h-[700px] opacity-[0.03]"
+          style={{ background: "radial-gradient(circle, rgba(224,116,58,1) 0%, transparent 70%)" }} aria-hidden />
         <Container className="relative z-10 max-w-3xl">
           <MetaLabel>Use cases</MetaLabel>
-          <h1 className="font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
+          <h1 className="reveal-up reveal-up-2 font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
             When to use Sovereign.os.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-lg leading-relaxed">
@@ -87,12 +89,12 @@ export default function UseCasesPage() {
             {USE_CASES.map((uc, idx) => (
               <div
                 key={uc.num}
-                className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 py-10 border-b border-white/[0.06] last:border-0 items-start"
+                className={`grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 py-10 border-b border-white/[0.06] last:border-0 items-start reveal-up reveal-up-${Math.min(idx + 1, 6)}`}
               >
                 {/* Left: trigger */}
                 <div>
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.2em]">{uc.num}</span>
+                    <span className="font-mono text-[9px] text-[#e0743a]/50 tracking-[0.2em]">{uc.num}</span>
                     <h3 className="font-serif text-lg text-[#f4efe9]">{uc.title}</h3>
                   </div>
                   <p className="text-sm text-[#76716b] leading-relaxed italic">"{uc.trigger}"</p>
@@ -128,7 +130,7 @@ export default function UseCasesPage() {
           <h2 className="font-serif text-4xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] mb-8 text-balance max-w-2xl mx-auto">
             Start with your Baseline Design.
           </h2>
-          <Link href="https://app.defrag.app/app/login" className="btn-primary">
+          <Link href="/app/login" className="btn-primary">
             Enter Sovereign.os
           </Link>
         </Container>

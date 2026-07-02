@@ -16,11 +16,23 @@ type Step = "idle" | "creating" | "ready" | "error"
 export function InviteModal({ open, onClose, workspaceSource, libraryId }: InviteModalProps) {
   const [step, setStep] = React.useState<Step>("idle")
   const [inviteUrl, setInviteUrl] = React.useState("")
+  const [inviteToken, setInviteToken] = React.useState("")
+  const [revoking, setRevoking] = React.useState(false)
+  const [pendingInvites, setPendingInvites] = React.useState<Array<{ token: string; status: string; created_at: string }>>([])
   const [copied, setCopied] = React.useState(false)
   const [error, setError] = React.useState("")
 
   React.useEffect(() => {
     if (open) { setStep("idle"); setInviteUrl(""); setCopied(false); setError("") }
+  }, [open])
+
+  // Load pending invites when modal opens
+  React.useEffect(() => {
+    if (!open) return
+    fetch("/api/invite/list", { credentials: "include" })
+      .then(r => r.ok ? r.json() : { invites: [] })
+      .then((d: any) => setPendingInvites((d.invites || []).filter((i: any) => i.status === 'pending').slice(0, 3)))
+      .catch(() => {})
   }, [open])
 
   const createInvite = async () => {
@@ -40,10 +52,24 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
       const data = await res.json() as any
       if (!res.ok) { setError(data.error || "Failed to create invite"); setStep("error"); return }
       setInviteUrl(data.invite_url)
+      setInviteToken(data.token || "")
       setStep("ready")
     } catch {
       setError("Unable to connect. Try again.")
       setStep("error")
+    }
+  }
+
+  const revokeInvite = async () => {
+    if (!inviteToken) return
+    setRevoking(true)
+    try {
+      await fetch(`/api/invite/${inviteToken}`, { method: "DELETE", credentials: "include" })
+      setInviteUrl("")
+      setInviteToken("")
+      setStep("idle")
+    } catch { /* silent */ } finally {
+      setRevoking(false)
     }
   }
 
@@ -163,6 +189,16 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
                         >
                           SMS invite
                         </button>
+                        {inviteToken && (
+                          <button
+                            onClick={revokeInvite}
+                            disabled={revoking}
+                            className="h-10 border border-red-400/20 text-[12px] text-red-400/50 hover:border-red-400/40 hover:text-red-400/70 transition-colors disabled:opacity-30"
+                            style={{ borderRadius: 8 }}
+                          >
+                            {revoking ? "Revoking…" : "Revoke invite"}
+                          </button>
+                        )}
                       </div>
                     </div>
 
