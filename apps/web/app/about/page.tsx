@@ -61,8 +61,8 @@ export default function AboutPage() {
                 body: "Sovereign.os does not diagnose, predict, or guarantee outcomes. It is not a replacement for therapy. It is the space between sessions.",
               },
             ].map((item, i) => (
-              <div key={i} className="py-8 pr-8 border-b border-white/[0.06] md:border-r md:even:border-r-0 last:border-b-0">
-                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">{item.label}</p>
+              <div key={i} className={`py-8 pr-8 border-b border-white/[0.06] md:border-r md:even:border-r-0 last:border-b-0 reveal-up reveal-up-${Math.min(i + 2, 6)}`}>
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50 mb-3">{item.label}</p>
                 <p className="text-[15px] text-[#a8a29a] leading-relaxed">{item.body}</p>
               </div>
             ))}

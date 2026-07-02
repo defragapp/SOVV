@@ -87,15 +87,15 @@ export default function HowItWorksPage() {
         <Container>
           <div className="max-w-2xl mx-auto">
             {STEPS.map((step, i) => (
-              <div key={step.num}>
+              <div key={step.num} className={`reveal-up reveal-up-${Math.min(i + 1, 6)}`}>
                 <div className="flex items-start gap-8 py-8">
                   {/* Number + connector line */}
                   <div className="flex flex-col items-center shrink-0">
                     <div
-                      className="w-10 h-10 flex items-center justify-center border border-white/[0.08] bg-[#0c0a0d]"
+                      className="w-10 h-10 flex items-center justify-center border border-[#e0743a]/20 bg-[#e0743a]/[0.04]"
                       style={{ borderRadius: 8 }}
                     >
-                      <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.2em]">{step.num}</span>
+                      <span className="font-mono text-[10px] text-[#e0743a]/60 tracking-[0.2em]">{step.num}</span>
                     </div>
                     {i < STEPS.length - 1 && (
                       <div className="w-px flex-1 min-h-[32px] bg-white/[0.06] mt-2" />
