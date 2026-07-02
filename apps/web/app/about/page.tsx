@@ -29,7 +29,7 @@ export default function AboutPage() {
         <Container className="relative z-10 max-w-3xl">
           <MetaLabel>About</MetaLabel>
           <h1 className="reveal-up reveal-up-2 font-serif text-[clamp(2.6rem,6vw,4.5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
-            Before you explain yourself again,
+            <span className="text-glow">Before you explain yourself again,</span>
             <br />
             return to yourself first.
           </h1>

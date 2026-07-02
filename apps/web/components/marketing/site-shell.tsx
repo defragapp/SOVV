@@ -1,80 +1,107 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
 
 interface SiteShellProps {
   children: React.ReactNode;
 }
 
+const NAV_LINKS = [
+  { href: "/product", label: "Product" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/about", label: "About" },
+];
+
 export function SiteShell({ children }: SiteShellProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-base)]">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/[0.05]" style={{ backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", background: "rgba(8,7,10,0.88)" }}>
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
+    <div className="min-h-screen flex flex-col bg-[#08070a]">
 
-          {/* Logo */}
-          <Link href="/" className="flex items-center group">
-            <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#f4efe9]/70 group-hover:text-[#f4efe9] transition-colors duration-200">
+      {/* ── Header ─────────────────────────────────────────────── */}
+      <header
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+        style={{
+          background: scrolled
+            ? "rgba(8,7,10,0.82)"
+            : "transparent",
+          backdropFilter: scrolled ? "blur(20px)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
+          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.04)" : "1px solid transparent",
+        }}
+      >
+        <div className="mx-auto max-w-[1280px] px-6 md:px-8 h-[68px] flex items-center justify-between">
+
+          {/* Wordmark */}
+          <Link href="/" className="group flex items-center">
+            <span className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#f4efe9]/50 group-hover:text-[#f4efe9]/80 transition-colors duration-300">
               Sovereign.os
             </span>
           </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-7">
-            {[
-              { href: "/product", label: "Product" },
-              { href: "/how-it-works", label: "How it works" },
-              { href: "/pricing", label: "Pricing" },
-              { href: "/about", label: "About" },
-            ].map((link) => (
+          {/* Desktop nav — centered */}
+          <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+            {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#76716b] hover:text-[#f4efe9] transition-colors duration-200"
+                className="text-[13px] text-[#76716b] hover:text-[#f4efe9] transition-colors duration-200 tracking-[-0.01em]"
               >
                 {link.label}
               </Link>
             ))}
+          </nav>
+
+          {/* Right side */}
+          <div className="hidden md:flex items-center gap-5">
             <Link
               href="/app/login"
-              className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#f4efe9]/80 hover:text-[#f4efe9] transition-colors duration-200 border border-white/[0.10] px-4 py-2 hover:border-white/[0.20]"
-              style={{ borderRadius: "var(--radius-button)" }}
+              className="text-[13px] text-[#a8a29a] hover:text-[#f4efe9] transition-colors duration-200 tracking-[-0.01em]"
             >
               Sign in
             </Link>
-          </nav>
-
-          {/* Mobile hamburger */}
-          <div className="flex items-center gap-6 md:hidden">
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 -mr-2 text-[#76716b] hover:text-[#f4efe9] focus:outline-none transition-colors"
-              aria-label="Toggle menu"
+            <Link
+              href="/app/login"
+              className="inline-flex items-center h-9 px-5 text-[12px] tracking-[-0.01em] bg-[#f4efe9] text-[#08070a] hover:bg-white transition-colors duration-200"
+              style={{ borderRadius: 8 }}
             >
-              {menuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
+              Get started
+            </Link>
           </div>
+
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden flex flex-col gap-[5px] p-2 -mr-2 group"
+            aria-label="Toggle menu"
+          >
+            <span className={`block h-px w-5 bg-[#76716b] group-hover:bg-[#f4efe9] transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
+            <span className={`block h-px w-5 bg-[#76716b] group-hover:bg-[#f4efe9] transition-all duration-300 ${menuOpen ? "opacity-0" : ""}`} />
+            <span className={`block h-px w-5 bg-[#76716b] group-hover:bg-[#f4efe9] transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
+          </button>
         </div>
 
-        {/* Mobile Nav */}
+        {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden surface-glass border-t border-white/[0.06] p-6 shadow-2xl">
-            <nav className="flex flex-col gap-1">
-              {[
-                { href: "/product", label: "Product" },
-                { href: "/how-it-works", label: "How it works" },
-                { href: "/pricing", label: "Pricing" },
-                { href: "/about", label: "About" },
-              ].map((link) => (
+          <div
+            className="md:hidden border-t border-white/[0.05] px-6 py-6"
+            style={{ background: "rgba(8,7,10,0.96)", backdropFilter: "blur(20px)" }}
+          >
+            <nav className="flex flex-col">
+              {NAV_LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#76716b] hover:text-[#f4efe9] transition-colors py-3 border-b border-white/[0.05]"
+                  className="text-[15px] text-[#76716b] hover:text-[#f4efe9] transition-colors py-3.5 border-b border-white/[0.04] tracking-[-0.01em]"
                   onClick={() => setMenuOpen(false)}
                 >
                   {link.label}
@@ -82,10 +109,11 @@ export function SiteShell({ children }: SiteShellProps) {
               ))}
               <Link
                 href="/app/login"
-                className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#f4efe9] mt-4 py-3"
+                className="mt-5 inline-flex items-center justify-center h-11 px-6 text-[13px] bg-[#f4efe9] text-[#08070a] tracking-[-0.01em]"
+                style={{ borderRadius: 8 }}
                 onClick={() => setMenuOpen(false)}
               >
-                Sign in →
+                Get started
               </Link>
             </nav>
           </div>
@@ -97,41 +125,55 @@ export function SiteShell({ children }: SiteShellProps) {
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/[0.05] py-16 mt-20 relative z-10 bg-[#08070a]">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+      {/* ── Footer ─────────────────────────────────────────────── */}
+      <footer className="border-t border-white/[0.05] py-16 relative z-10 bg-[#08070a]">
+        <div className="mx-auto max-w-[1280px] px-6 md:px-8">
+          <div className="flex flex-col md:flex-row items-start justify-between gap-10">
+
             {/* Brand */}
-            <div className="flex flex-col items-center md:items-start gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#f4efe9]/60">Sovereign.os</span>
-              <p className="font-mono text-[9px] text-[#4f4b47] tracking-[0.12em]">See the loop. Name the pattern. Choose the repair.</p>
+            <div className="flex flex-col gap-3">
+              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#f4efe9]/50">Sovereign.os</span>
+              <p className="text-[13px] text-[#4f4b47] leading-relaxed max-w-[220px]">
+                See the loop. Name the pattern. Choose the repair.
+              </p>
             </div>
 
-            {/* Nav links */}
-            <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              {[
-                { href: "/product", label: "Product" },
-                { href: "/how-it-works", label: "How it works" },
-                { href: "/pricing", label: "Pricing" },
-                { href: "/about", label: "About" },
-                { href: "/faq", label: "FAQ" },
-                { href: "/privacy", label: "Privacy" },
-                { href: "/terms", label: "Terms" },
-              ].map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
+            {/* Nav columns */}
+            <div className="flex flex-wrap gap-x-16 gap-y-8">
+              <div className="flex flex-col gap-3">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">Platform</p>
+                {[
+                  { href: "/product", label: "Product" },
+                  { href: "/how-it-works", label: "How it works" },
+                  { href: "/pricing", label: "Pricing" },
+                  { href: "/about", label: "About" },
+                  { href: "/faq", label: "FAQ" },
+                ].map((link) => (
+                  <Link key={link.href} href={link.href} className="text-[13px] text-[#4f4b47] hover:text-[#a8a29a] transition-colors duration-200">
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+              <div className="flex flex-col gap-3">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">Legal</p>
+                {[
+                  { href: "/privacy", label: "Privacy" },
+                  { href: "/terms", label: "Terms" },
+                  { href: "/contact", label: "Contact" },
+                ].map((link) => (
+                  <Link key={link.href} href={link.href} className="text-[13px] text-[#4f4b47] hover:text-[#a8a29a] transition-colors duration-200">
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
 
-            {/* Copyright */}
-            <p className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em]">
-              © {new Date().getFullYear()} Sovereign.os
-            </p>
+          <div className="mt-12 pt-6 border-t border-white/[0.04] flex items-center justify-between">
+            <p className="text-[12px] text-[#4f4b47]">© {new Date().getFullYear()} Sovereign.os</p>
+            <Link href="/app/login" className="text-[12px] text-[#4f4b47] hover:text-[#a8a29a] transition-colors duration-200">
+              Enter →
+            </Link>
           </div>
         </div>
       </footer>

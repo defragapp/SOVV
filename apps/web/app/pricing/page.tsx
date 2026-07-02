@@ -52,7 +52,7 @@ export default function PricingPage() {
         <Container className="relative z-10 flex flex-col items-center text-center">
           <MetaLabel>Pricing</MetaLabel>
           <h1 className="reveal-up reveal-up-2 font-serif text-[#f4efe9] text-4xl md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
-            Start free. Upgrade when you need continuity.
+            <span className="text-glow">Start free.</span> Upgrade when you need continuity.
           </h1>
           <TextReveal delay={200}>
             <p className="mt-5 max-w-md text-base text-[#a8a29a] leading-relaxed">

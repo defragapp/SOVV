@@ -171,7 +171,7 @@ export default function Home() {
             className="font-serif text-[#f4efe9] text-balance leading-[1.05] tracking-[-0.025em] px-8"
             style={{ fontSize: "clamp(2.4rem, 6vw, 5.5rem)", maxWidth: "20ch" }}
           >
-            You are not broken.
+            <span className="text-glow">You are not broken.</span>
             <br />
             <span style={{ color: "rgba(244,239,233,0.44)" }}>
               You are patterned.
@@ -206,7 +206,7 @@ export default function Home() {
 
 
       {/* ── NOTEBOOK PREVIEW ─────────────────────────────────────────────── */}
-      <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/[0.05]">
+      <section className="w-full py-24 md:py-36 bg-[#08070a] border-t border-white/[0.04]">
         <Container>
           <div className="flex flex-col items-center text-center mb-12 reveal-up reveal-up-1">
             <div className="inline-flex items-center gap-2 mb-5">
@@ -273,12 +273,12 @@ export default function Home() {
         </Container>
       </section>
 
-      <section className="w-full py-20 md:py-28 bg-[#0c0a0d] border-b border-white/[0.06]">
+      <section className="w-full py-24 md:py-36 bg-[#08070a] border-b border-white/[0.04]">
         <Container className="max-w-4xl">
           <MetaLabel>Campaign statement</MetaLabel>
           <div className="grid gap-10 md:grid-cols-[1fr_1.2fr] md:items-end">
             <h2 className="font-serif text-[clamp(2.4rem,5vw,4.5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.025em] text-balance">
-              The reaction starts before the reply.
+              <span className="text-glow">The reaction starts</span> before the reply.
             </h2>
             <div className="space-y-5 text-[#a8a29a] leading-relaxed">
               <p>
@@ -329,8 +329,7 @@ export default function Home() {
       </section>
 
             <section className="relative w-full py-20 md:py-28 bg-[#08070a] border-b border-white/[0.06] overflow-hidden">
-        <div className="ambient-blob absolute -top-40 -left-40 w-[600px] h-[600px] opacity-[0.04]"
-          style={{ background: "radial-gradient(circle, rgba(224,116,58,1) 0%, transparent 70%)" }} aria-hidden />
+        <div className="absolute inset-0 ambient-warm opacity-60 pointer-events-none" aria-hidden />
         <Container>
           <MetaLabel>Product spaces</MetaLabel>
           <div className="grid gap-px overflow-hidden border border-white/[0.06] bg-white/[0.06] md:grid-cols-2">
@@ -338,7 +337,7 @@ export default function Home() {
               <Link
                 key={space.name}
                 href={space.href}
-                className="group relative bg-[#0c0a0d] p-8 md:p-10 border border-white/[0.05] hover:border-white/[0.10] transition-all duration-300 overflow-hidden"
+                className="group relative bg-[#0c0a0d] p-8 md:p-10 border border-white/[0.05] glow-card-hover overflow-hidden"
                 style={{ borderRadius: "var(--radius-container)" }}
               >
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
@@ -379,12 +378,13 @@ export default function Home() {
         </Container>
       </section>
 
-      <section className="relative w-full py-24 md:py-32 bg-[#08070a] text-center overflow-hidden">
-        <div className="light-beam opacity-50" aria-hidden />
+      <section className="relative w-full py-32 md:py-44 bg-[#08070a] text-center overflow-hidden">
+        <div className="absolute inset-0 ambient-warm opacity-40 pointer-events-none" aria-hidden />
+        <div className="light-beam opacity-40" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center">
           <MetaLabel>Begin</MetaLabel>
-          <h2 className="font-serif text-[clamp(2.2rem,5vw,4.5rem)] text-[#f4efe9] tracking-[-0.025em] mb-6 text-balance max-w-3xl leading-[1.06]">
-            See the loop. Name the pattern. Choose the repair.
+          <h2 className="font-serif text-[clamp(2.4rem,5.5vw,5rem)] text-[#f4efe9] tracking-[-0.025em] mb-6 text-balance max-w-3xl leading-[1.05]">
+            <span className="text-glow">See the loop.</span> Name the pattern. Choose the repair.
           </h2>
           <p className="max-w-xl text-[#a8a29a] leading-relaxed mb-10">
             Start with the baseline that helps Sovereign.os understand how pressure, choice, conflict, care, and repair tend to move through you.

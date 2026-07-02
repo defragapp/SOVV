@@ -74,7 +74,7 @@ export default function HowItWorksPage() {
         <Container className="relative z-10 max-w-3xl">
           <MetaLabel>The process</MetaLabel>
           <h1 className="reveal-up reveal-up-2 font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
-            How Sovereign.os works.
+            <span className="text-glow">How Sovereign.os works.</span>
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-lg leading-relaxed">
             The system understands your Baseline Design before you type. Here is the product loop.

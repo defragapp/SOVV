@@ -47,7 +47,7 @@ export default function DefragProductPage() {
       {/* Hero */}
       <section className="relative min-h-[80vh] w-full overflow-hidden bg-[#08070a] border-b border-white/[0.06] flex items-center">
         <div className="light-beam opacity-60" aria-hidden />
-        <Container className="relative z-10 py-28 md:py-36">
+        <Container className="relative z-10 pt-36 pb-28 md:pt-44 md:pb-36">
           <p className="font-mono uppercase tracking-[0.3em] text-[#f4efe9]/30 mb-6 text-[0.65rem]">
             Defrag · Free
           </p>
@@ -55,7 +55,7 @@ export default function DefragProductPage() {
             className="font-serif text-[#f4efe9] text-balance leading-[1.02] tracking-[-0.03em] max-w-4xl"
             style={{ fontSize: "clamp(2.8rem, 7vw, 6.5rem)" }}
           >
-            See the loop before it runs you again.
+            <span className="text-glow">See the loop</span> before it runs you again.
           </h1>
           <p className="mt-7 max-w-lg text-[#a8a29a] leading-relaxed text-base md:text-lg">
             Defrag separates the moment from the pattern, names the pressure, and gives you one clear next move — grounded in your Baseline Design.
@@ -89,7 +89,7 @@ export default function DefragProductPage() {
 
           <div className="grid gap-px bg-white/[0.05] border border-white/[0.05] md:grid-cols-3 overflow-hidden" style={{ borderRadius: 14 }}>
             {steps.map((step) => (
-              <div key={step.n} className="bg-[#0c0a0d] p-8 md:p-10">
+              <div key={step.n} className="bg-[#0c0a0d] p-8 md:p-10 glow-card-hover cursor-default">
                 <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47] block mb-8">{step.n}</span>
                 <h3 className="font-serif text-[1.35rem] text-[#f4efe9] leading-snug mb-4">{step.label}</h3>
                 <p className="text-[13px] text-[#76716b] leading-relaxed">{step.body}</p>
@@ -117,7 +117,7 @@ export default function DefragProductPage() {
 
           <div className="flex flex-col divide-y divide-white/[0.05] border border-white/[0.06]" style={{ borderRadius: 14, overflow: "hidden" }}>
             {useCases.map((uc) => (
-              <div key={uc.input} className="grid md:grid-cols-2 gap-0 bg-[#0c0a0d]">
+              <div key={uc.input} className="grid md:grid-cols-2 gap-0 bg-[#0c0a0d] glow-card-hover">
                 <div className="px-6 py-5 border-b md:border-b-0 md:border-r border-white/[0.05]">
                   <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">You bring</p>
                   <p className="text-[14px] text-[#a8a29a] leading-relaxed">{uc.input}</p>
