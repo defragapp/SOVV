@@ -33,7 +33,7 @@ const STEPS = [
   {
     num: "03",
     title: "Receive a structured result",
-    body: "A structured result: what's active, what keeps happening, what shaped it, and the clearest next response. Depth matches the situation — a brief moment gets a focused read, a complex one gets more.",
+    body: "What's active, what may be repeating, and your Best Next Response — grounded in your Baseline Design, not a generic read.",
     note: null,
   },
   {
@@ -45,7 +45,7 @@ const STEPS = [
   {
     num: "05",
     title: "Return before the pattern takes over",
-    body: "The next time the loop tries to form, you do not start from zero. Return to your Library, interrupt the old role, and respond differently.",
+    body: "When the same moment comes back — and it will — your Library holds what you already worked through. Return before the old response takes over.",
     note: null,
   },
 ]
