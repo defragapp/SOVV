@@ -80,6 +80,7 @@ export default function DefragWorkspacePage() {
   const [baselineLoading, setBaselineLoading] = React.useState(true)
   const [baselineStatements, setBaselineStatements] = React.useState<BaselineStatement[]>([])
   const [statementsLoading, setStatementsLoading] = React.useState(false)
+  const [datasetStatus, setDatasetStatus] = React.useState<"none" | "pending" | "ready" | "failed" | null>(null)
   const [recurringPattern, setRecurringPattern] = React.useState<string | null>(null)
   const [sessionCount, setSessionCount] = React.useState(0)
   // Compare With Someone — Pro only
@@ -110,6 +111,31 @@ export default function DefragWorkspacePage() {
       .catch(() => {})
       .finally(() => setBaselineLoading(false))
   }, [])
+
+  // Poll baseline compilation status
+  React.useEffect(() => {
+    if (!baseline) return
+    let active = true
+    const poll = async () => {
+      try {
+        const r = await fetch("/api/baseline/status", { credentials: "include" })
+        if (!r.ok || !active) return
+        const d = await r.json() as any
+        setDatasetStatus(d.status ?? "none")
+        return d.status
+      } catch { return null }
+    }
+    poll().then(status => {
+      if (status === "pending") {
+        const interval = setInterval(async () => {
+          const s = await poll()
+          if (s === "ready" || s === "failed" || !active) clearInterval(interval)
+        }, 5000)
+        return () => { active = false; clearInterval(interval) }
+      }
+    })
+    return () => { active = false }
+  }, [baseline])
 
   // Load derived profile statements
   React.useEffect(() => {
@@ -296,7 +322,15 @@ export default function DefragWorkspacePage() {
 
             {/* Footer */}
             <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/[0.04]">
-              <p className="text-[10px] text-[#4f4b47]">Active in every result. Never exposed in outputs.</p>
+              <div className="flex items-center gap-1.5">
+                {datasetStatus === "ready" && <span className="w-1.5 h-1.5 rounded-full bg-[#e0743a]/50" />}
+                {datasetStatus === "pending" && <span className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />}
+                <p className="text-[10px] text-[#4f4b47]">
+                  {datasetStatus === "ready" ? "Pattern map active." :
+                   datasetStatus === "pending" ? "Compiling…" :
+                   "Active in every result."}
+                </p>
+              </div>
               <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.1em] text-[#76716b] hover:text-[#a8a29a] transition-colors">
                 Edit
               </a>

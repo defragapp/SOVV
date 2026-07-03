@@ -329,7 +329,7 @@ export default function SettingsPage() {
       const result = await apiSaveBaseline(baseline);
       if (result?.baseline) {
         setHasBaseline(true);
-        setMessage({ text: "Baseline Design saved.", ok: true });
+        setMessage({ text: "Baseline Design saved. Your pattern map is compiling — this takes 30–60 seconds.", ok: true });
       } else {
         setMessage({ text: "Unable to save Baseline Design.", ok: false });
       }
