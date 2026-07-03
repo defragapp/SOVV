@@ -151,14 +151,14 @@ function DropZone({
           <button
             type="submit"
             disabled={!inputActive || loading}
-            className="px-5 py-2.5 rounded-2xl font-mono text-[11px] uppercase tracking-[0.12em] transition-all duration-200 disabled:opacity-30"
+            className="px-5 py-2.5 rounded-2xl font-mono text-[11px] uppercase tracking-[0.16em] transition-[opacity,transform] duration-[250ms] active:scale-[0.97] active:duration-0 disabled:opacity-30"
             style={{
               background: inputActive && !loading ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.04)',
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
               color: inputActive && !loading ? '#f4efe9' : '#4f4b47',
               boxShadow: inputActive && !loading
-                ? '0 0 0 1px rgba(255,255,255,0.10) inset'
+                ? '0 0 0 1px rgba(224,116,58,0.22) inset, 0 0 14px rgba(224,116,58,0.07)'
                 : '0 0 0 1px rgba(255,255,255,0.04) inset',
             }}
           >

@@ -110,7 +110,7 @@ export function SiteShell({ children, entranceControlled = false }: SiteShellPro
           background:           scrolled ? "rgba(8,7,10,0.82)" : "transparent",
           backdropFilter:       scrolled ? "blur(24px)" : "none",
           WebkitBackdropFilter: scrolled ? "blur(24px)" : "none",
-          borderBottom:         scrolled ? "1px solid rgba(255,255,255,0.04)" : "1px solid transparent",
+          borderBottom:         scrolled ? "1px solid rgba(224,116,58,0.08)" : "1px solid transparent",
           transition:           "background 500ms ease, border-color 500ms ease, backdrop-filter 500ms ease",
           paddingTop:           "env(safe-area-inset-top)",
         }}

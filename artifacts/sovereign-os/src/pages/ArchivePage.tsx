@@ -88,7 +88,7 @@ function ArchiveDetail({
       <motion.div
         key={`detail-${pattern.id}`}
         {...(!reducedMotion ? { layoutId: `row-${pattern.id}` } : {})}
-        className="fixed inset-x-4 z-50 rounded-3xl ring-1 ring-inset ring-white/[0.06] overflow-hidden"
+        className="fixed inset-x-4 z-50 rounded-3xl ring-1 ring-inset ring-[#e0743a]/12 overflow-hidden"
         style={{
           background: 'rgba(8,7,10,0.95)',
           backdropFilter: 'blur(24px)',

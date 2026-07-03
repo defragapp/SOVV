@@ -134,7 +134,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
 
           {/* Glass panel — modal token: rounded-3xl · surface.glass · blur(24px) */}
           <div
-            className="rounded-3xl ring-1 ring-inset ring-white/[0.06] p-8"
+            className="rounded-3xl ring-1 ring-inset ring-[#e0743a]/12 p-8"
             style={{ background: 'rgba(8,7,10,0.95)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }}
           >
 

@@ -2,6 +2,7 @@
 import * as React from "react"
 import { Link } from "wouter"
 import { FloatingNav } from "./FloatingNav"
+import { SpaceGlow, type SpaceVariant } from "./SpaceGlow"
 
 interface SpaceShellProps {
   sidebar?: React.ReactNode       // LEFT — people / Baseline Design context
@@ -31,16 +32,25 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
       .catch(() => {})
   }, [])
 
+  const spaceVariant: SpaceVariant =
+    spaceName === 'Covenant' ? 'covenant' :
+    spaceName === 'Alignment' ? 'alignment' :
+    spaceName === 'Archive' ? 'archive' :
+    'defrag';
+
   return (
     <div className="flex h-[100dvh] w-screen overflow-hidden bg-[#08070a] text-[#f4efe9] font-sans">
 
+      {/* Per-space ambient color temperature */}
+      <SpaceGlow variant={spaceVariant} />
+
       {/* ── Desktop Layout ─────────────────────────────────────────── */}
       <div
-        className="hidden lg:grid w-full h-full"
+        className="hidden lg:grid w-full h-full relative z-10"
         style={{ gridTemplateColumns: "260px 1fr 300px", gridTemplateRows: "52px 1fr" }}
       >
         {/* ── Header ── */}
-        <header className="col-span-3 h-[52px] border-b border-white/[0.06] bg-[#08070a]/95 backdrop-blur-md px-5 flex items-center justify-between">
+        <header className="col-span-3 h-[52px] border-b border-[#e0743a]/10 bg-[#08070a]/95 backdrop-blur-md px-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/apps/defrag" className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors">
               Sovereign.os
@@ -109,25 +119,34 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
         </header>
 
         {/* ── Left: People / Baseline Design ── */}
-        <aside className="col-start-1 row-start-2 border-r border-white/[0.06] bg-[#0c0a0d] flex flex-col overflow-y-auto">
+        <aside
+          className="col-start-1 row-start-2 border-r border-[#e0743a]/10 flex flex-col overflow-y-auto"
+          style={{ background: 'linear-gradient(180deg, #0c0a0d 0%, #09080b 100%)' }}
+        >
           {sidebar}
         </aside>
 
         {/* ── Center: AI Thread ── */}
-        <main className="col-start-2 row-start-2 flex flex-col bg-[#08070a] overflow-y-auto relative p-6 lg:p-8">
+        <main
+          className="col-start-2 row-start-2 flex flex-col overflow-y-auto relative p-8 lg:p-12"
+          style={{ background: 'linear-gradient(170deg, #08070a 0%, #0a090d 100%)' }}
+        >
           {main}
         </main>
 
         {/* ── Right: Library / Multimedia ── */}
-        <aside className="col-start-3 row-start-2 border-l border-white/[0.06] bg-[#0c0a0d] flex flex-col overflow-y-auto">
+        <aside
+          className="col-start-3 row-start-2 border-l border-[#e0743a]/10 flex flex-col overflow-y-auto"
+          style={{ background: 'linear-gradient(180deg, #0c0a0d 0%, #09080b 100%)' }}
+        >
           {contextPanel}
         </aside>
       </div>
 
       {/* ── Mobile Layout ──────────────────────────────────────────── */}
-      <div className="flex lg:hidden flex-col w-full h-full">
+      <div className="flex lg:hidden flex-col w-full h-full relative z-10">
         <header
-          className="sticky top-0 z-10 bg-[#08070a]/95 backdrop-blur-md border-b border-white/[0.06] px-5 py-3 flex items-center justify-between select-none"
+          className="sticky top-0 z-10 bg-[#08070a]/95 backdrop-blur-md border-b border-[#e0743a]/10 px-5 py-3 flex items-center justify-between select-none"
           style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
         >
           <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.2em] uppercase">
@@ -150,7 +169,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
 
         {/* Content tabs — switch between main content and context panel */}
         {mobileTabs.length > 1 && (
-          <div className="flex px-4 gap-1 overflow-x-auto border-b border-white/[0.06] bg-[#08070a] select-none">
+          <div className="flex px-4 gap-1 overflow-x-auto border-b border-[#e0743a]/10 bg-[#08070a] select-none">
             {mobileTabs.map((tab) => (
               <button
                 key={tab.id}
@@ -178,7 +197,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
         )}
 
         {/* Main content — pb-36 gives clearance above FloatingNav + safe area */}
-        <main ref={contentRef} className="flex-1 overflow-y-auto bg-[#08070a]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 88px)' }}>
+        <main ref={contentRef} className="flex-1 overflow-y-auto" style={{ background: 'linear-gradient(170deg, #08070a 0%, #0a090d 100%)', paddingBottom: 'calc(env(safe-area-inset-bottom) + 88px)' }}>
           {mobileTabs.find((t) => t.id === activeTab)?.content}
         </main>
 

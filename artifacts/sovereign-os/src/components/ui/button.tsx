@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils"
  */
 export const buttonVariants = cva(
   // Base — structural + interaction
-  "inline-flex items-center justify-center gap-2 font-mono uppercase tracking-[0.12em] font-semibold transition-opacity duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e0743a]/30 disabled:opacity-40 disabled:cursor-not-allowed",
+  "inline-flex items-center justify-center gap-2 font-mono uppercase tracking-[0.16em] font-semibold transition-[opacity,transform] duration-[250ms] active:scale-[0.97] active:duration-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e0743a]/30 disabled:opacity-40 disabled:cursor-not-allowed",
   {
     variants: {
       variant: {

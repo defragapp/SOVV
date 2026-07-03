@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Route, Switch, Router as WouterRouter, Redirect, useLocation } from 'wouter';
 import { AnimatePresence } from 'framer-motion';
@@ -45,15 +46,45 @@ function isAppSpace(path: string) {
  * Persistent ambient glow — fixed behind everything, outside AnimatePresence
  * so it never flashes on route change. Marketing routes only.
  */
+/**
+ * Ambient glow that "breathes" — reacts to typing and cursor movement.
+ * When the user is active, blobs expand slightly and brighten.
+ * Marketing routes only; app spaces manage their own SpaceGlow.
+ */
 function AmbientBackground() {
   const [location] = useLocation();
-  // App spaces manage their own backgrounds via SpaceShell
+  const [awake, setAwake] = useState(false);
+  const idleRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => {
+    const wake = () => {
+      setAwake(true);
+      clearTimeout(idleRef.current);
+      idleRef.current = setTimeout(() => setAwake(false), 1800);
+    };
+    window.addEventListener('keydown', wake, { passive: true });
+    window.addEventListener('mousemove', wake, { passive: true });
+    return () => {
+      window.removeEventListener('keydown', wake);
+      window.removeEventListener('mousemove', wake);
+      clearTimeout(idleRef.current);
+    };
+  }, []);
+
   if (location.startsWith('/apps/') || location.startsWith('/app/')) return null;
+
+  const blobStyle = {
+    transform: awake ? 'scale(1.07)' : 'scale(1)',
+    opacity:   awake ? 1 : 0.70,
+    transition: 'transform 900ms cubic-bezier(0.4,0,0.2,1), opacity 900ms ease',
+  };
+
   return (
     <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden" aria-hidden>
       <div
         className="absolute -top-40 right-0 w-[600px] h-[600px]"
         style={{
+          ...blobStyle,
           background: 'radial-gradient(circle, rgba(224,116,58,0.07) 0%, transparent 70%)',
           animation: 'ambientDrift 25s ease-in-out infinite',
         }}
@@ -61,8 +92,10 @@ function AmbientBackground() {
       <div
         className="absolute bottom-0 -left-40 w-[400px] h-[400px]"
         style={{
+          ...blobStyle,
           background: 'radial-gradient(circle, rgba(224,116,58,0.03) 0%, transparent 70%)',
           animation: 'ambientDrift 30s ease-in-out infinite reverse',
+          transitionDelay: '80ms',
         }}
       />
     </div>

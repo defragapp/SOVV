@@ -3,6 +3,47 @@ name: Sovereign.os Architecture Decisions
 description: Space structure, provider tree, motion patterns, ambient layer placement, and baseline/archive design decisions for the Sovereign.os monorepo.
 ---
 
+## Phases 22–24 — Cinematic OS Overhaul
+
+### Ghost Code Removal (Phase 22)
+17 ghost files deleted. Only `design-tokens.ts` was preserved (active source of truth despite no direct imports yet).
+Pre-existing TS errors in `upgrade-banner.tsx` (`@/data/marketing` missing) and `motion-button.tsx` (ref type) — do NOT count as regressions.
+
+### SpaceGlow — Per-Space Color Temperature (Phase 23)
+New component: `src/components/spaces/SpaceGlow.tsx`
+- Defrag: rgba(224,116,58,0.055) — warm amber
+- Covenant: rgba(218,150,55,0.065) — golden-warm
+- Alignment: rgba(80,120,210,0.055) — cool blue-indigo
+- Archive: rgba(100,115,155,0.04) — quiet neutral
+Fixed at `zIndex: 0`; space content wrappers use `relative z-10` above it. Integrated in `space-shell.tsx` via `spaceName` → `SpaceVariant` mapping.
+
+### AmbientBackground Reactive "Breath" (Phase 24)
+`App.tsx`: listens to `keydown` + `mousemove` to set `awake` state. Blobs scale to 1.07 + opacity 1.0 when awake; idle after 1800ms. `useRef<ReturnType<typeof setTimeout> | undefined>(undefined)` — must include the `undefined` initial value to avoid TS2554.
+
+### Amber Light-Leak Borders (Phase 23)
+Border contract changed from `border-white/[0.06]` → `border-[#e0743a]/10` on:
+- SpaceShell desktop header, aside panels, mobile header + tabs
+- FloatingNav inset boxShadow: `rgba(224,116,58,0.12)`
+- Site-shell scrolled nav border: `rgba(224,116,58,0.08)`
+- Modal rings (Archive, Covenant, BaselineEntry): `ring-[#e0743a]/12`
+Hairline content separators (`border-b border-white/[0.08]`) in list rows remain white.
+
+### Action Button Physics (Phase 23–24)
+All glass action buttons: `active:scale-[0.97] active:duration-0 duration-[250ms]`
+Submit button inner-glow: `0 0 0 1px rgba(224,116,58,0.22) inset, 0 0 14px rgba(224,116,58,0.07)` when active.
+Button base class tracking bumped: `tracking-[0.16em]` (was 0.12em).
+
+### Padding Increase (Phase 24)
+SpaceShell main content: `p-8 lg:p-12` (was `p-6 lg:p-8`).
+
+### Depth Gradients (Phase 24)
+SpaceShell backgrounds changed from flat hex to `linear-gradient`:
+- Main: `linear-gradient(170deg, #08070a 0%, #0a090d 100%)`
+- Asides: `linear-gradient(180deg, #0c0a0d 0%, #09080b 100%)`
+
+### Route Transitions (Phase 24)
+PageTransition: push variant gains `y: 8→0` float-in; crossfade gains `y: 6→0`. Both maintain existing x and scale physics.
+
 ## Phase 22 — Design Token System
 Central token file: `src/lib/design-tokens.ts`. Exports: `surface`, `accent`, `text`, `shape`, `physics`, `font`, `glassActionButton`, `creamCta`, `amberCta`.
 Palette rules:
