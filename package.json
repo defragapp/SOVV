@@ -33,6 +33,7 @@
     "wrangler": "^4.97.0"
   },
   "dependencies": {
+    "framer-motion": "^12.42.2",
     "playwright": "^1.60.0"
   },
   "packageManager": "npm@10.8.2"
