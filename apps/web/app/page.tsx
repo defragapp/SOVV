@@ -71,13 +71,15 @@ function SpacePreview() {
   const [typed, setTyped] = React.useState("")
   const [phase, setPhase] = React.useState<Phase>("typing")
   const [visibleRows, setVisibleRows] = React.useState(0)
+  const [promptOpen, setPromptOpen] = React.useState(false)
+  const [baselineOpen, setBaselineOpen] = React.useState(false)
 
-  // Reset and replay when switching to thread tab
   React.useEffect(() => {
     if (active !== "thread") return
     setTyped("")
     setPhase("typing")
     setVisibleRows(0)
+    setPromptOpen(false)
 
     let i = 0
     const typeInterval = setInterval(() => {
@@ -86,10 +88,8 @@ function SpacePreview() {
         i++
       } else {
         clearInterval(typeInterval)
-        // Brief pause, then show loading
         setTimeout(() => {
           setPhase("loading")
-          // Loading for 1.4s, then reveal results row by row
           setTimeout(() => {
             setPhase("result")
             setVisibleRows(0)
@@ -110,6 +110,17 @@ function SpacePreview() {
     { id: "library" as const, label: "Library" },
   ]
 
+  const baselineCategories = [
+    { label: "Identity", count: 12 },
+    { label: "Relationships", count: 18 },
+    { label: "Decision Making", count: 9 },
+    { label: "Communication", count: 14 },
+    { label: "Values", count: 11 },
+    { label: "Emotional Patterns", count: 16 },
+    { label: "Behavior Under Pressure", count: 13 },
+    { label: "Current Timing", count: 4 },
+  ]
+
   return (
     <div className="relative w-full max-w-4xl mx-auto">
       {/* Outer accent glow */}
@@ -117,31 +128,30 @@ function SpacePreview() {
         className="pointer-events-none absolute -inset-px"
         style={{
           borderRadius: "var(--radius-container)",
-          background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(224,116,58,0.12) 0%, transparent 65%)",
+          background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(224,116,58,0.14) 0%, transparent 65%)",
         }}
         aria-hidden
       />
-      {/* Bottom glow */}
       <div
         className="pointer-events-none absolute -inset-px"
         style={{
           borderRadius: "var(--radius-container)",
-          background: "radial-gradient(ellipse 60% 30% at 50% 100%, rgba(200,194,188,0.04) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse 60% 30% at 50% 100%, rgba(200,194,188,0.05) 0%, transparent 70%)",
         }}
         aria-hidden
       />
 
       <div
-        className="relative border border-white/[0.10] bg-[#0c0a0d] overflow-hidden scan-lines"
-        style={{ borderRadius: "var(--radius-container)", boxShadow: "0 32px 80px -16px rgba(0,0,0,0.7), 0 0 0 1px rgba(224,116,58,0.04)" }}
+        className="relative border border-white/[0.12] bg-[#0c0a0d] overflow-hidden scan-lines"
+        style={{ borderRadius: "var(--radius-container)", boxShadow: "0 32px 80px -16px rgba(0,0,0,0.7), 0 0 0 1px rgba(224,116,58,0.06)" }}
       >
         {/* ── Titlebar ── */}
-        <div className="h-11 border-b border-white/[0.07] bg-[#08070a]/90 flex items-center px-4 gap-3 shrink-0">
+        <div className="h-11 border-b border-white/[0.08] bg-[#08070a]/95 flex items-center px-4 gap-3 shrink-0">
           <div className="flex gap-1.5">
-            {[0, 1, 2].map((i) => <span key={i} className="w-2.5 h-2.5 rounded-sm bg-white/[0.08]" />)}
+            {[0, 1, 2].map((i) => <span key={i} className="w-2.5 h-2.5 rounded-sm bg-white/[0.10]" />)}
           </div>
           <div className="flex-1 flex justify-center">
-            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#4f4b47]">Sovereign.os</span>
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#76716b]">Sovereign.os</span>
           </div>
           <div className="flex gap-0.5">
             {panels.map((p) => (
@@ -149,7 +159,7 @@ function SpacePreview() {
                 key={p.id}
                 onClick={() => setActive(p.id)}
                 className={`px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] uppercase transition-all duration-200 ${
-                  active === p.id ? "bg-white/[0.10] text-[#f4efe9]" : "text-[#4f4b47] hover:text-[#76716b]"
+                  active === p.id ? "bg-white/[0.12] text-[#f4efe9]" : "text-[#4f4b47] hover:text-[#76716b]"
                 }`}
                 style={{ borderRadius: 5 }}
               >
@@ -166,24 +176,37 @@ function SpacePreview() {
             {/* ── YOUR DESIGN tab ── */}
             {active === "context" && (
               <motion.div key="context" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-                <div className="px-6 pt-5 pb-2 border-b border-white/[0.05]">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50">{BASELINE.label}</p>
+                {/* Intelligence engine header */}
+                <div className="px-6 pt-5 pb-3 border-b border-white/[0.06] bg-[#e0743a]/[0.03]">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-1.5 h-1.5 rounded-sm bg-[#e0743a]/60" />
+                    <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/70">Baseline Design Active</p>
+                  </div>
+                  <p className="text-[11px] text-[#76716b] leading-relaxed">{BASELINE.label}</p>
                 </div>
-                <div className="px-6 py-2">
+
+                {/* Baseline facts — improved readability */}
+                <div className="px-6 py-1">
                   {BASELINE.facts.map((fact, i) => (
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.08, duration: 0.35, ease }}
-                      className="flex items-start gap-4 py-4 border-b border-white/[0.04] last:border-0"
+                      className="flex items-start gap-4 py-4 border-b border-white/[0.05] last:border-0"
                     >
                       <div className="flex-1">
-                        <p className="text-[13px] text-[#c8c2bc] leading-snug">{fact.text}</p>
+                        {/* Improved text contrast: #c8c2bc → #d4cec8 */}
+                        <p className="text-[13px] text-[#d4cec8] leading-snug">{fact.text}</p>
                       </div>
-                      <div className="flex gap-1.5 flex-wrap justify-end shrink-0 max-w-[140px]">
+                      {/* Improved chips: more padding, better contrast */}
+                      <div className="flex gap-1.5 flex-wrap justify-end shrink-0 max-w-[150px]">
                         {fact.chips.map((c) => (
-                          <span key={c} className="font-mono text-[8px] tracking-[0.1em] px-2 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/60 bg-[#e0743a]/[0.04]" style={{ borderRadius: 3 }}>
+                          <span
+                            key={c}
+                            className="font-mono text-[8px] tracking-[0.1em] px-2.5 py-1 border border-[#e0743a]/30 text-[#e0743a]/70 bg-[#e0743a]/[0.06]"
+                            style={{ borderRadius: 4 }}
+                          >
                             {c}
                           </span>
                         ))}
@@ -191,6 +214,47 @@ function SpacePreview() {
                     </motion.div>
                   ))}
                 </div>
+
+                {/* Expandable: Baseline Design categories */}
+                <div className="border-t border-white/[0.06]">
+                  <button
+                    onClick={() => setBaselineOpen(o => !o)}
+                    className="w-full px-6 py-3 flex items-center justify-between hover:bg-white/[0.02] transition-colors"
+                  >
+                    <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b]">Your Baseline Design</span>
+                    <motion.span
+                      animate={{ rotate: baselineOpen ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="font-mono text-[10px] text-[#4f4b47]"
+                    >
+                      ▾
+                    </motion.span>
+                  </button>
+                  <AnimatePresence>
+                    {baselineOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-6 pb-4 grid grid-cols-2 gap-2">
+                          {baselineCategories.map((cat) => (
+                            <div key={cat.label} className="flex items-center justify-between py-2 border-b border-white/[0.04]">
+                              <span className="text-[12px] text-[#a8a29a]">{cat.label}</span>
+                              <span className="font-mono text-[9px] text-[#4f4b47]">{cat.count} signals</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="px-6 pb-3">
+                          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50">97+ Baseline datapoints active</span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
                 <div className="px-6 py-3 border-t border-white/[0.04]">
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Active in every result · never exposed in outputs</p>
                 </div>
@@ -201,21 +265,20 @@ function SpacePreview() {
             {active === "thread" && (
               <motion.div key="thread" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
 
-                {/* Input area */}
-                <div className="px-6 pt-6 pb-4 border-b border-white/[0.05]">
+                {/* Input area — improved contrast */}
+                <div className="px-6 pt-6 pb-4 border-b border-white/[0.06]">
                   <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-sm bg-white/20 mt-2 shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-sm bg-white/25 mt-2 shrink-0" />
                     <div className="flex-1">
                       <p className="text-[14px] text-[#f4efe9] leading-relaxed" style={{ minHeight: 44 }}>
                         {typed}
                         {phase === "typing" && (
-                          <span className="inline-block w-[2px] h-[15px] bg-[#f4efe9]/60 ml-0.5 align-middle animate-pulse" />
+                          <span className="inline-block w-[2px] h-[15px] bg-[#f4efe9]/70 ml-0.5 align-middle animate-pulse" />
                         )}
                       </p>
                     </div>
                   </div>
 
-                  {/* Send indicator — appears when typing is done */}
                   <AnimatePresence>
                     {phase !== "typing" && (
                       <motion.div
@@ -224,7 +287,7 @@ function SpacePreview() {
                         className="flex items-center justify-end gap-2 mt-3"
                       >
                         <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Sent</span>
-                        <span className="w-1 h-1 rounded-sm bg-[#e0743a]/40" />
+                        <span className="w-1 h-1 rounded-sm bg-[#e0743a]/50" />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -243,27 +306,27 @@ function SpacePreview() {
                         {[0, 1, 2].map((i) => (
                           <motion.span
                             key={i}
-                            className="w-1 h-1 rounded-sm bg-[#e0743a]/50"
+                            className="w-1 h-1 rounded-sm bg-[#e0743a]/60"
                             animate={{ opacity: [0.3, 1, 0.3] }}
                             transition={{ duration: 0.9, delay: i * 0.2, repeat: Infinity }}
                           />
                         ))}
                       </div>
-                      <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">
+                      <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b]">
                         Reading your Baseline Design
                       </span>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                {/* Result rows — appear one at a time */}
+                {/* Result rows */}
                 <AnimatePresence>
                   {phase === "result" && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-                      {/* Baseline Design source bar */}
-                      <div className="px-6 py-2.5 border-b border-white/[0.04] flex items-center gap-2 bg-[#e0743a]/[0.03]">
-                        <span className="w-1 h-1 rounded-sm bg-[#e0743a]/50" />
-                        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50">
+                      {/* Baseline Design source bar — stronger visual separation */}
+                      <div className="px-6 py-3 border-b border-white/[0.06] flex items-center gap-2.5 bg-[#e0743a]/[0.04]">
+                        <span className="w-1.5 h-1.5 rounded-sm bg-[#e0743a]/60" />
+                        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70">
                           Baseline Design active · {BASELINE.label.split("·")[0].trim()}
                         </span>
                       </div>
@@ -275,25 +338,25 @@ function SpacePreview() {
                               initial={{ opacity: 0, y: 6 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.4, ease }}
-                              className={`px-6 py-4 border-b border-white/[0.04] last:border-0 ${
-                                row.highlight ? "bg-[#e0743a]/[0.05]" : ""
+                              className={`px-6 py-4 border-b border-white/[0.05] last:border-0 ${
+                                row.highlight ? "bg-[#e0743a]/[0.06]" : ""
                               }`}
                             >
-                              {/* Label row */}
-                              <div className="flex items-center justify-between mb-2">
+                              {/* Label + chips row */}
+                              <div className="flex items-center justify-between mb-2.5">
                                 <span className={`font-mono text-[9px] uppercase tracking-[0.2em] ${
-                                  row.highlight ? "text-[#e0743a]/80" : "text-[#4f4b47]"
+                                  row.highlight ? "text-[#e0743a]/90" : "text-[#76716b]"
                                 }`}>
                                   {row.label}
                                 </span>
-                                {/* Evidence chips — Baseline Design data points */}
+                                {/* Improved chips */}
                                 {row.evidence && (
-                                  <div className="flex gap-1">
+                                  <div className="flex gap-1.5">
                                     {row.evidence.map((chip) => (
                                       <span
                                         key={chip}
-                                        className="font-mono text-[8px] tracking-[0.1em] px-1.5 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/50 bg-[#e0743a]/[0.04]"
-                                        style={{ borderRadius: 3 }}
+                                        className="font-mono text-[8px] tracking-[0.1em] px-2.5 py-1 border border-[#e0743a]/30 text-[#e0743a]/70 bg-[#e0743a]/[0.06]"
+                                        style={{ borderRadius: 4 }}
                                       >
                                         {chip}
                                       </span>
@@ -301,11 +364,11 @@ function SpacePreview() {
                                   </div>
                                 )}
                               </div>
-                              {/* Value */}
-                              <p className={`text-[13px] leading-relaxed ${
+                              {/* Value — improved contrast */}
+                              <p className={`text-[14px] leading-relaxed ${
                                 row.highlight
                                   ? "text-[#f4efe9]"
-                                  : "text-[#a8a29a]"
+                                  : "text-[#c8c2bc]"
                               }`}>
                                 {row.value}
                               </p>
@@ -313,6 +376,68 @@ function SpacePreview() {
                           )}
                         </AnimatePresence>
                       ))}
+
+                      {/* Expandable: Prompt that built this */}
+                      {visibleRows >= DEMO_RESULT.length && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.4, duration: 0.4 }}
+                          className="border-t border-white/[0.06]"
+                        >
+                          <button
+                            onClick={() => setPromptOpen(o => !o)}
+                            className="w-full px-6 py-3.5 flex items-center justify-between hover:bg-white/[0.02] transition-colors"
+                          >
+                            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Prompt that built this Baseline Design</span>
+                            <motion.span
+                              animate={{ rotate: promptOpen ? 180 : 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="font-mono text-[10px] text-[#4f4b47]"
+                            >
+                              ▾
+                            </motion.span>
+                          </button>
+                          <AnimatePresence>
+                            {promptOpen && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                                className="overflow-hidden"
+                              >
+                                <div className="px-6 pb-5">
+                                  {/* Prompt preview */}
+                                  <div className="border border-white/[0.06] bg-[#08070a] p-4 mb-4" style={{ borderRadius: 8 }}>
+                                    <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">System prompt excerpt</p>
+                                    <p className="text-[12px] text-[#76716b] leading-relaxed font-mono">
+                                      You are Sovereign.os. You work from Baseline Design — a private synthesis of the user&rsquo;s natal data, Human Design, Gene Keys, and behavioral patterns. Translate this into grounded, specific pattern recognition. Never expose raw data. Never diagnose. One clear next move.
+                                    </p>
+                                  </div>
+                                  {/* Built from checklist */}
+                                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-3">Built from this conversation:</p>
+                                  <div className="grid grid-cols-2 gap-1.5">
+                                    {[
+                                      "Identity", "Relationships", "Decision Making",
+                                      "Emotional Patterns", "Values", "Communication Style",
+                                      "Motivations", "Timing", "Pattern Memory",
+                                    ].map((item) => (
+                                      <div key={item} className="flex items-center gap-2">
+                                        <span className="text-[#e0743a]/60 text-[10px]">✓</span>
+                                        <span className="text-[12px] text-[#a8a29a]">{item}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                  <div className="mt-3 pt-3 border-t border-white/[0.04]">
+                                    <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60">97+ Baseline datapoints</span>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -323,10 +448,10 @@ function SpacePreview() {
             {/* ── LIBRARY tab ── */}
             {active === "library" && (
               <motion.div key="library" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-                <div className="px-6 pt-5 pb-2 border-b border-white/[0.05]">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]/40">Saved results</p>
+                <div className="px-6 pt-5 pb-2 border-b border-white/[0.06]">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b]/60">Saved results</p>
                 </div>
-                <div className="px-6 py-2">
+                <div className="px-6 py-1">
                   {[
                     { space: "Defrag", title: "The silence after the argument", date: "Jun 18" },
                     { space: "Alignment", title: "What is mine to carry after the call", date: "Jun 14" },
@@ -338,17 +463,17 @@ function SpacePreview() {
                       initial={{ opacity: 0, x: -6 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.07, duration: 0.3, ease }}
-                      className="flex items-center justify-between py-4 border-b border-white/[0.04] last:border-0 group cursor-pointer"
+                      className="flex items-center justify-between py-4 border-b border-white/[0.05] last:border-0 group cursor-pointer"
                     >
                       <div className="flex items-center gap-4">
                         <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47] w-14 shrink-0">{item.space}</span>
-                        <span className="text-[13px] text-[#76716b] group-hover:text-[#c8c2bc] transition-colors">{item.title}</span>
+                        <span className="text-[13px] text-[#a8a29a] group-hover:text-[#d4cec8] transition-colors">{item.title}</span>
                       </div>
                       <span className="font-mono text-[9px] text-[#4f4b47] shrink-0">{item.date}</span>
                     </motion.div>
                   ))}
                 </div>
-                <div className="px-6 py-3 border-t border-white/[0.04]">
+                <div className="px-6 py-3 border-t border-white/[0.05]">
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Save to Sovereign before the moment disappears</p>
                 </div>
               </motion.div>
@@ -365,9 +490,7 @@ function SpacePreview() {
   )
 }
 
-// ── Hero light pulse ──────────────────────────────────────────────────────────
-// Warm radial glow breathes from top-center — simulates the light beam
-// in the photograph intensifying and receding. Pure CSS, zero artifacts.
+
 function HeroLightBeam() {
   return (
     <>
