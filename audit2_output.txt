@@ -1,0 +1,296 @@
+-----------------------------------
+SECTION 1 — REPOSITORY SHAPE
+-----------------------------------
+
+1. Top-level structure
+FILE: ./audit2.py
+FILE: ./pnpm-workspace.yaml
+FILE: ./.gitignore
+FILE: ./package-lock.json
+DIR: ./.vscode
+FILE: ./.env.example
+DIR: ./docs
+FILE: ./turbo.json
+FILE: ./pnpm-lock.yaml
+DIR: ./scripts
+DIR: ./.devcontainer
+DIR: ./packages
+DIR: ./apps
+DIR: ./.github
+FILE: ./.nvmrc
+FILE: ./audit2_output.txt
+FILE: ./package.json
+FILE: ./blackbox_mcp_settings.json
+
+2. App structure
+DIR: ./apps/sovereign-build-agent
+FILE: ./apps/sovereign-build-agent/wrangler.toml
+DIR: ./apps/sovereign-build-agent/src
+DIR: ./apps/developer
+FILE: ./apps/developer/wrangler.toml
+DIR: ./apps/developer/src
+DIR: ./apps/worker-ai
+FILE: ./apps/worker-ai/wrangler.toml
+DIR: ./apps/worker-ai/src
+FILE: ./apps/worker-ai/.dev.vars
+FILE: ./apps/worker-ai/tsconfig.json
+FILE: ./apps/worker-ai/.dev.vars.example
+FILE: ./apps/worker-ai/package.json
+DIR: ./apps/web
+DIR: ./apps/web/public
+FILE: ./apps/web/.gitignore
+FILE: ./apps/web/.env.local
+DIR: ./apps/web/components
+FILE: ./apps/web/next.config.js
+DIR: ./apps/web/app
+FILE: ./apps/web/playwright.config.ts
+FILE: ./apps/web/wrangler.json
+FILE: ./apps/web/middleware.ts
+DIR: ./apps/web/data
+FILE: ./apps/web/tailwind.config.ts
+FILE: ./apps/web/open-next.config.ts
+FILE: ./apps/web/.open-nextjs.config.json
+FILE: ./apps/web/tokens.json
+FILE: ./apps/web/postcss.config.mjs
+FILE: ./apps/web/.eslintrc.json
+FILE: ./apps/web/tsconfig.json
+DIR: ./apps/web/.wrangler
+FILE: ./apps/web/package.json
+DIR: ./apps/web/lib
+FILE: ./apps/web/next.config.ts
+DIR: ./apps/web/tests
+DIR: ./apps/worker-session
+FILE: ./apps/worker-session/wrangler.toml
+DIR: ./apps/worker-session/src
+FILE: ./apps/worker-session/.dev.vars
+FILE: ./apps/worker-session/tsconfig.json
+FILE: ./apps/worker-session/.dev.vars.example
+FILE: ./apps/worker-session/package.json
+DIR: ./apps/sovereign-control
+FILE: ./apps/sovereign-control/wrangler.toml
+DIR: ./apps/sovereign-control/src
+FILE: ./apps/sovereign-control/tsconfig.json
+FILE: ./apps/sovereign-control/package.json
+DIR: ./apps/sovereign-control-ui
+DIR: ./apps/sovereign-control-ui/src
+FILE: ./apps/sovereign-control-ui/vite.config.ts
+FILE: ./apps/sovereign-control-ui/tsconfig.json
+FILE: ./apps/sovereign-control-ui/package.json
+DIR: ./apps/sovereign-code-agent
+FILE: ./apps/sovereign-code-agent/wrangler.toml
+DIR: ./apps/sovereign-code-agent/src
+DIR: ./apps/worker
+FILE: ./apps/worker/.gitignore
+FILE: ./apps/worker/wrangler.toml
+FILE: ./apps/worker/.env.example
+DIR: ./apps/worker/src
+FILE: ./apps/worker/index.ts
+FILE: ./apps/worker/.dev.vars
+FILE: ./apps/worker/tsconfig.json
+FILE: ./apps/worker/.dev.vars.example
+FILE: ./apps/worker/package.json
+DIR: ./apps/worker/tests
+DIR: ./apps/worker/migrations
+FILE: ./apps/worker/vitest.config.ts
+
+3. Shared packages
+DIR: ./packages/core
+DIR: ./packages/core/src
+FILE: ./packages/core/jest.config.cjs
+FILE: ./packages/core/tsconfig.json
+FILE: ./packages/core/package.json
+DIR: ./packages/prompts
+DIR: ./packages/prompts/src
+FILE: ./packages/prompts/tsconfig.json
+FILE: ./packages/prompts/package.json
+
+4. Key docs and source files
+FILE: ./docs/AI_WIRING_PLAN.md
+FILE: ./docs/IMPLEMENTATION_GAPS.md
+FILE: ./docs/POST_LAUNCH_REVIEW.md
+FILE: ./docs/# Sovereign.os — Full Build Runtime Contract for Cloudflare AI Agents
+FILE: ./docs/CF_WORKER_ROUTE_MAP.md
+FILE: ./docs/CF_PLATFORM_ARCHITECTURE.md
+FILE: ./docs/CF_ROUTE_PLAN.md
+FILE: ./docs/CF_AI_STRATEGY.md
+FILE: ./docs/CF_STORAGE_PLAN.md
+FILE: ./docs/CF_TIERING_AND_BILLING.md
+FILE: ./docs/BILLING_AND_GATING_PLAN.md
+
+-----------------------------------
+SECTION 2 — CLOUDFLARE PLATFORM SHAPE
+-----------------------------------
+
+5. Workers
+Worker: worker-ai
+Config for worker-ai:
+name = "worker-ai"
+main = "./src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+# account_id removed — set CLOUDFLARE_ACCOUNT_ID in CI secrets
+workers_dev = false
+
+[[routes]]
+pattern = "ai.defrag.app"
+custom_domain = true
+
+[ai]
+binding = "AI"
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
+[build]
+command = "npm install && npm run build"
+
+[env.production]
+name = "worker-ai"
+workers_dev = false
+
+[[env.production.routes]]
+pattern = "ai.defrag.app"
+custom_domain = true
+
+[env.production.ai]
+binding = "AI"
+
+[env.production.observability]
+enabled = true
+head_sampling_rate = 1
+
+[env.production.observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
+Worker: worker-session
+Config for worker-session:
+name = "worker-session"
+main = "./src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+# account_id removed — set CLOUDFLARE_ACCOUNT_ID in CI secrets
+workers_dev = false
+
+[ai]
+binding = "AI"
+
+[[services]]
+binding = "AI_SERVICE"
+service = "worker-ai"
+
+[[durable_objects.bindings]]
+name = "CONFLICT_SESSION"
+class_name = "ConflictSessionDO"
+
+[[migrations]]
+tag = "v1"
+new_classes = [ "ConflictSessionDO" ]
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
+[build]
+command = "npm install && npm run build"
+
+[env.production]
+name = "worker-session"
+workers_dev = false
+
+[env.production.ai]
+binding = "AI"
+
+[[env.production.services]]
+binding = "AI_SERVICE"
+service = "worker-ai"
+
+[[env.production.durable_objects.bindings]]
+name = "CONFLICT_SESSION"
+class_name = "ConflictSessionDO"
+
+[env.production.observability]
+enabled = true
+head_sampling_rate = 1
+
+[env.production.observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
+Worker: worker
+Config for worker:
+name = "sovereign-os-api"
+main = "./src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+# account_id removed — set CLOUDFLARE_ACCOUNT_ID in CI secrets
+workers_dev = false
+
+[[routes]]
+pattern = "api.defrag.app"
+custom_domain = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "vibesdk-db"
+database_id = "c8c2fd8d-5297-46fc-8594-7629c8bad74d"
+
+# KV namespace for session state, Baseline Design cache, usage counters, and replay protection
+# Internal identifier: SOVV_DATA (KV namespace title in Cloudflare dashboard)
+[[kv_namespaces]]
+binding = "KV"
+id = "3bd3ff5048a8468e82c574d7d66045c3"
+
+[[r2_buckets]]
+binding = "TEMPLATES"
+bucket_name = "vibesdk-templates"
+
+[[queues.producers]]
+binding = "PATTERN_QUEUE"
+queue = "pattern-extraction-tasks"
+
+[ai]
+binding = "AI"
+
+[[services]]
+binding = "AI_SERVICE"
+service = "worker-ai"
+
+[[services]]
+binding = "SESSION_SERVICE"
+service = "worker-session"
+
+[[unsafe.bindings]]
+name = "RATE_LIMITER"
+type = "ratelimit"
+namespace_id = "100"
+simple = { limit = 15, period = 60 }
+
+[vars]
+FREE_DAILY_LIMIT = "15"
+AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
+APP_URL = "https://app.defrag.app"
+GATEWAY_ID = "sovereign-ai-gateway"
+
+# send_email binding — Cloudflare Email Routing (verified destination: info@defrag.app)
+# Email Routing is active on defrag.app. Destination address verified.
+# Sender must be from defrag.app domain.
+[[email]]
+name = "EMAIL"
+destination_address = "info@defrag.app"
+
+[observability]
+enabled = true

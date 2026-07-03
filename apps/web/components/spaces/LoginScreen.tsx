@@ -96,7 +96,18 @@ export default function LoginScreen() {
         setError(data.error ?? "Authentication failed")
         return
       }
-      window.location.href = "/apps/defrag"
+      // Check if user has baseline, redirect to settings if not
+      fetch("/api/baseline", { credentials: "include" })
+        .then(r => r.ok ? r.json() : { baseline: null })
+        .then((d: any) => {
+          if (d.baseline?.dob) {
+            window.location.href = "/apps/defrag"
+          } else {
+            // New user — go to settings to set up Baseline Design
+            window.location.href = "/settings?onboard=1"
+          }
+        })
+        .catch(() => { window.location.href = "/apps/defrag" })
     } catch {
       setError("Connection failed. Please try again.")
     } finally {

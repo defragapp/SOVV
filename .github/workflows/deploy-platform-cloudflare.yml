@@ -1,0 +1,11 @@
+name: Deploy Platform Cloudflare (DISABLED)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  disabled:
+    name: Disabled - use deploy.yml instead
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Platform workflow disabled. Using deploy.yml instead."

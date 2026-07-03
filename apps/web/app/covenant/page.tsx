@@ -49,12 +49,12 @@ export default function CovenantPage() {
   return (
     <SiteShell>
       {/* Hero */}
-      <Section className="w-full relative flex flex-col items-center justify-center min-h-[60svh] pt-32 pb-24 overflow-hidden bg-[#08070a] border-b border-white/5">
+      <Section className="w-full relative flex flex-col items-center justify-center min-h-[60svh] pt-32 pb-24 overflow-hidden bg-[#08070a] border-b border-white/[0.04] pattern-field">
         <div className="light-beam opacity-60" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center max-w-[800px]">
           <MetaLabel>Covenant space</MetaLabel>
           <h1 className="font-serif text-[clamp(2.6rem,6vw,4.5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
-            Faith, reflection, responsibility,
+            <span className="text-glow">Faith, reflection, responsibility,</span>
             <br />
             and grounded discernment.
           </h1>
@@ -62,7 +62,7 @@ export default function CovenantPage() {
             Covenant helps you bring faith, reflection, and grounded discernment into what you are walking through.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="https://app.defrag.app/apps/covenant" className="btn-primary">
+            <Link href="/apps/covenant" className="btn-primary">
               Enter the Covenant space
             </Link>
             <Link href="/pricing" className="btn-secondary">
@@ -86,7 +86,7 @@ export default function CovenantPage() {
               <div key={pt.num} className="flex items-start gap-8 py-10 border-b border-white/[0.06] last:border-0">
                 <span className="font-serif text-3xl text-[#e0743a]/40 shrink-0 w-10">{pt.num}</span>
                 <div>
-                  <h3 className="text-[#f4efe9] font-medium text-base mb-3">{pt.title}</h3>
+                  <h3 className="font-serif text-[1rem] text-[#f4efe9] mb-3">{pt.title}</h3>
                   <p className="text-[15px] text-[#a8a29a] leading-relaxed">{pt.body}</p>
                 </div>
               </div>
@@ -120,7 +120,7 @@ export default function CovenantPage() {
           <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-8 text-balance">
             Keep faith and repair connected.
           </h2>
-          <Link href="https://app.defrag.app/apps/covenant" className="btn-primary">
+          <Link href="/apps/covenant" className="btn-primary">
             Enter the Covenant space
           </Link>
         </Container>

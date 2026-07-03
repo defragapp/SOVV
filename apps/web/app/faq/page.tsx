@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const FAQ_ITEMS = [
   {
     q: "What is Sovereign.os?",
-    a: "Sovereign.os is a private platform that helps you work through the patterns that keep showing up in your relationships, family, messages, grief, and boundaries — then save what you learn before the moment disappears.",
+    a: "Sovereign.os is pattern-aware AI for the moments that are hard to read while you're inside them. It helps you understand what's active, what may be repeating, and what next move gives the situation a better chance — before pressure chooses for you.",
   },
   {
     q: "What is the Baseline Design?",
@@ -18,7 +18,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "What is the Defrag space?",
-    a: "Defrag is the relational intelligence space inside Sovereign.os. It helps you understand what is active in the moment — the Active pattern, the Old Role, the Strain Pattern — and find your Best Next Response. Defrag supports relational dynamics, family dynamics, boundaries, messages, grief, and team dynamics.",
+    a: "Defrag is the core space inside Sovereign.os. Describe the situation — a message, conflict, boundary, family dynamic, or grief point — and Defrag shows what's active, what may be repeating, and your Best Next Response. Free to use.",
   },
   {
     q: "What is the Covenant space?",
@@ -46,7 +46,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "How do I get access?",
-    a: "Create your space at app.defrag.app. The Free tier gives you access to the Defrag space and your Baseline Design. Pro unlocks all spaces, unlimited sessions, and full Library depth.",
+    a: "Create your space at defrag.app. The Free tier gives you access to the Defrag space and your Baseline Design. Pro unlocks all spaces, unlimited sessions, and full Library depth.",
   },
 ];
 
@@ -84,7 +84,7 @@ export default function FaqPage() {
           <div className="flex flex-col">
             {FAQ_ITEMS.map((item, i) => (
               <details key={i} className="group border-b border-white/[0.06] py-6 cursor-pointer">
-                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base md:text-lg font-medium list-none">
+                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base md:text-lg font-normal list-none">
                   {item.q}
                   <span className="flex-none text-xl text-[#e0743a] transition-transform duration-200 group-open:rotate-45 shrink-0">
                     +

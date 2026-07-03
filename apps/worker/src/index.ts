@@ -1,10 +1,11 @@
 import { Router } from "itty-router";
 import type { Env } from "./types-env.js";
-import { registerAuthRoutes, getAuthUser } from "./auth.js";
+import { registerAuthRoutes, getAuthUser, registerAdminSeedRoute } from "./auth.js";
 import { registerBaselineRoutes } from "./baseline.js";
 import { registerBillingRoutes } from "./billing.js";
 import { registerChipsRoute } from "./chips.js";
 import { registerExplainRoute } from "./explain-extended.js";
+import { registerExplainStreamRoute } from "./routes/explain-stream.js";
 import { registerHistoryRoute } from "./history.js";
 import { registerPatternsRoutes, extractPatterns } from "./patterns.js";
 import { registerCovenantRoute } from "./covenant.js";
@@ -119,11 +120,13 @@ function registerNatalRoutes(router: any, getEnv: () => Env) {
 
 registerAuthRoutes(router, getEnv);
 registerAuthExtendedRoutes(router, getEnv);
+registerAdminSeedRoute(router, getEnv);
 registerInviteSystemRoutes(router, getEnv);
 registerBaselineRoutes(router, getEnv);
 registerBillingRoutes(router, getEnv);
 registerChipsRoute(router, getEnv);
 registerExplainRoute(router, getEnv);
+registerExplainStreamRoute(router, getEnv);
 registerHistoryRoute(router, getEnv);
 registerPatternsRoutes(router, getEnv);
 registerNatalRoutes(router, () => currentEnv);

@@ -1,0 +1,11 @@
+name: Deploy sovv-web (DISABLED)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  disabled:
+    name: Disabled - use deploy.yml instead
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "sovv-web workflow disabled. Using deploy.yml instead."

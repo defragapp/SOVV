@@ -4,10 +4,14 @@ import { getSessionId, cookieHeader } from "./plan.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import { compileBaselineDataset, formatDatasetForAI, formatDatasetForApp, type BaselineDesignDataset } from "./baseline-compiler.js";
 import { buildHumanBehaviorTranslation } from "./human-translation.js";
+import { logSafetyEvent, protectionActive } from "./safety.js";
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const DATASET_KEY  = (sid: string) => `baseline-dataset:${sid}`;
 const USER_KEY     = (sid: string) => `user:${sid}`;
+// User-ID-based keys for persistence across sessions
+const USER_BASELINE_KEY = (uid: string) => `user-baseline:${uid}`;
+const USER_DATASET_KEY  = (uid: string) => `user-dataset:${uid}`;
 
 function isValidBaseline(data: unknown): data is BaselineRequest {
   return (
@@ -37,7 +41,14 @@ export async function getBaseline(env: Env, sid: string): Promise<Baseline | nul
   return safeJsonParse<Baseline>(raw);
 }
 
-export async function getBaselineDataset(env: Env, sid: string): Promise<BaselineDesignDataset | null> {
+export async function getBaselineDataset(env: Env, sid: string, userId?: string): Promise<BaselineDesignDataset | null> {
+  // Try user-ID-based key first (persists across sessions)
+  if (userId) {
+    const userRaw = await env.KV.get(USER_DATASET_KEY(userId));
+    if (userRaw) {
+      try { return JSON.parse(userRaw) as BaselineDesignDataset; } catch { /* fall through */ }
+    }
+  }
   const raw = await env.KV.get(DATASET_KEY(sid));
   if (!raw) return null;
   return safeJsonParse<BaselineDesignDataset>(raw);
@@ -114,7 +125,16 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
   if (authErr) return authErr;
 
   const sid = await getSessionId(req);
-  const body = (await req.json().catch(() => null)) as unknown;
+  const body = (await req.json().catch((error) => {
+    logSafetyEvent({
+      level: "warn",
+      event: "baseline_save_invalid_json",
+      request: req,
+      error_type: "validation",
+      error,
+    });
+    return null;
+  })) as unknown;
 
   if (!isValidBaseline(body)) {
     return new Response(JSON.stringify({ error: "Invalid baseline data." }), {
@@ -128,7 +148,7 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
 
   // Trigger dataset compilation in background (non-blocking)
   // This means the user is never blocked waiting for computation
-  const aiModel = (env as any).AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
+  const aiModel = (env as any).AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 
   // Store a pending dataset record immediately so the UI can show status
   const pendingDataset: BaselineDesignDataset = {
@@ -152,8 +172,18 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
         aiModel
       );
       await env.KV.put(DATASET_KEY(sid), JSON.stringify(dataset));
+      // Also save by user ID for persistence across sessions
+      if (user?.id) {
+        await env.KV.put(USER_DATASET_KEY(user.id), JSON.stringify(dataset));
+      }
     } catch (err) {
-      console.error("[baseline-compiler] failed:", err);
+      logSafetyEvent({
+        level: "error",
+        event: "baseline_compile_failed",
+        request: req,
+        error_type: "system",
+        error: err,
+      });
       const failedDataset: BaselineDesignDataset = {
         ...pendingDataset,
         status: "failed",
@@ -164,7 +194,15 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
   };
 
   // Fire and forget — don't await, don't block the response
-  compileAndStore().catch(console.error);
+  compileAndStore().catch((error) => {
+    logSafetyEvent({
+      level: "error",
+      event: "baseline_compile_background_failed",
+      request: req,
+      error_type: "system",
+      error,
+    });
+  });
 
   return Response.json(
     { baseline, datasetStatus: "pending" },
@@ -181,6 +219,23 @@ export function registerBaselineRoutes(router: any, getEnv: () => Env) {
   router.get("/api/baseline", async (req: Request) => handleGetBaseline(req, getEnv()));
   router.post("/api/baseline", async (req: Request) => handleSaveBaseline(req, getEnv()));
 
+  // GET /api/baseline/status — poll compilation status
+  router.get("/api/baseline/status", async (req: Request) => {
+    const env = getEnv();
+    const user = await getAuthUser(req, env.DB);
+    if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+    const sid = await getSessionId(req);
+    const dataset = await getBaselineDataset(env, sid, user.id);
+    if (!dataset) return Response.json({ status: "none" });
+    return Response.json({
+      status: dataset.status,
+      computedAt: dataset.computedAt,
+      hasAstronomy: Boolean(dataset.astronomy),
+      hasFrameworks: Boolean(dataset.frameworks),
+      hasAiDataset: Boolean(dataset.aiDataset),
+    });
+  });
+
   // Translation endpoint — returns app-specific HumanBehaviorTranslation
   router.post("/api/baseline/translate", async (req: Request) => {
     const env = getEnv();
@@ -190,7 +245,16 @@ export function registerBaselineRoutes(router: any, getEnv: () => Env) {
     const user = await getAuthUser(req, env.DB);
     if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
 
-    const body = await req.json().catch(() => ({})) as any;
+    const body = await req.json().catch((error) => {
+      logSafetyEvent({
+        level: "warn",
+        event: "baseline_translate_invalid_json",
+        request: req,
+        error_type: "validation",
+        error,
+      });
+      return {};
+    }) as any;
     const app = body.app as "alignment" | "defrag" | "covenant";
     if (!["alignment", "defrag", "covenant"].includes(app)) {
       return new Response(JSON.stringify({ error: "Invalid app" }), { status: 400 });
@@ -207,7 +271,7 @@ export function registerBaselineRoutes(router: any, getEnv: () => Env) {
       env,
       user.id,
       app,
-      { refresh: body.refresh === true }
+      { refresh: body.refresh === true, protectiveMode: protectionActive(req, 2) }
     );
 
     return Response.json(translation);

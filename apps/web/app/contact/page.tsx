@@ -27,7 +27,7 @@ export default function ContactPage() {
         <Container className="relative z-10 flex flex-col items-center text-center max-w-[700px]">
           <MetaLabel>Contact</MetaLabel>
           <h1 className="font-serif text-[clamp(2.6rem,6vw,4.5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-6">
-            Get in touch.
+            <span className="text-glow">Get in touch.</span>
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-[500px] text-balance leading-relaxed">
             For product questions, support, or account help.

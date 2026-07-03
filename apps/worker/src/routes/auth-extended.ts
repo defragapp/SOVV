@@ -1,11 +1,7 @@
-/**
- * Extended auth routes — password reset + email verification
- * Sovereign.os
- */
-
 import type { Env } from '../types-env.js'
 import { hashPassword } from '../auth.js'
 import { getCorsHeaders } from '../cors.js'
+import { logSafetyEvent } from '../safety.js'
 
 const APP_URL = 'https://app.defrag.app'
 
@@ -27,24 +23,42 @@ function jsonResponse(data: unknown, status = 200, request?: Request): Response 
   })
 }
 
-async function sendResetEmail(to: string, resetUrl: string, env: Env): Promise<void> {
+async function sendResetEmail(to: string, resetUrl: string, env: Env, request?: Request): Promise<void> {
   if (!env.RESEND_API_KEY) return
   const html = `<div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;padding:48px 32px;background:#08070a;color:#f4efe9;"><p style="font-family:monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(244,239,233,0.3);margin-bottom:32px;">Sovereign.os</p><h1 style="font-size:24px;font-weight:300;margin-bottom:16px;">Reset your password.</h1><p style="color:rgba(244,239,233,0.6);font-size:14px;line-height:1.7;margin-bottom:24px;">Someone requested a password reset for your Sovereign.os account. If this was you, click the link below.</p><a href="${resetUrl}" style="display:inline-block;border:1px solid rgba(244,239,233,0.2);padding:12px 24px;font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#f4efe9;text-decoration:none;margin-bottom:24px;">Reset Password</a><p style="color:rgba(244,239,233,0.3);font-size:12px;">This link expires in 1 hour. If you did not request this, ignore this email.</p></div>`
   await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from: 'Sovereign.os <info@defrag.app>', reply_to: 'info@defrag.app', to: [to], subject: 'Reset your password — Sovereign.os', html }),
-  }).catch(err => console.warn('[auth] Reset email failed:', err))
+  }).catch(err => {
+    logSafetyEvent({
+      level: 'warn',
+      event: 'auth_reset_email_failed',
+      request,
+      error_type: 'auth',
+      error: err,
+      details: { recipient: to },
+    })
+  })
 }
 
-async function sendVerifyEmail(to: string, verifyUrl: string, env: Env): Promise<void> {
+async function sendVerifyEmail(to: string, verifyUrl: string, env: Env, request?: Request): Promise<void> {
   if (!env.RESEND_API_KEY) return
   const html = `<div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;padding:48px 32px;background:#08070a;color:#f4efe9;"><p style="font-family:monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(244,239,233,0.3);margin-bottom:32px;">Sovereign.os</p><h1 style="font-size:24px;font-weight:300;margin-bottom:16px;">Verify your email.</h1><p style="color:rgba(244,239,233,0.6);font-size:14px;line-height:1.7;margin-bottom:24px;">Click the link below to verify your email address and activate your Sovereign.os space.</p><a href="${verifyUrl}" style="display:inline-block;border:1px solid rgba(244,239,233,0.2);padding:12px 24px;font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#f4efe9;text-decoration:none;margin-bottom:24px;">Verify Email</a><p style="color:rgba(244,239,233,0.3);font-size:12px;">This link expires in 24 hours.</p></div>`
   await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from: 'Sovereign.os <info@defrag.app>', reply_to: 'info@defrag.app', to: [to], subject: 'Verify your email — Sovereign.os', html }),
-  }).catch(err => console.warn('[auth] Verify email failed:', err))
+  }).catch(err => {
+    logSafetyEvent({
+      level: 'warn',
+      event: 'auth_verify_email_failed',
+      request,
+      error_type: 'auth',
+      error: err,
+      details: { recipient: to },
+    })
+  })
 }
 
 export function registerAuthExtendedRoutes(router: any, getEnv: () => Env) {
@@ -53,6 +67,12 @@ export function registerAuthExtendedRoutes(router: any, getEnv: () => Env) {
   router.post('/api/auth/forgot-password', async (request: Request) => {
     const env = getEnv()
     try {
+      // Rate limit password reset requests by IP
+      if (env.RATE_LIMITER) {
+        const ip = request.headers.get('CF-Connecting-IP') || 'unknown'
+        const { success } = await env.RATE_LIMITER.limit({ key: `reset:${ip}` })
+        if (!success) return jsonResponse({ error: 'Too many requests. Please wait before trying again.' }, 429, request)
+      }
       const { email } = await request.json() as { email?: string }
       if (!email) return jsonResponse({ error: 'Email required' }, 400, request)
 
@@ -67,10 +87,10 @@ export function registerAuthExtendedRoutes(router: any, getEnv: () => Env) {
       await env.DB.prepare('INSERT INTO password_reset_tokens (id, user_id, token_hash, expires_at) VALUES (?, ?, ?, ?)')
         .bind(crypto.randomUUID(), user.id, tokenHash, expiresAt).run()
 
-      await sendResetEmail(user.email, `${APP_URL}/app/reset-password?token=${token}`, env)
+      await sendResetEmail(user.email, `${APP_URL}/app/reset-password?token=${token}`, env, request)
       return jsonResponse({ success: true, message: 'If that email exists, a reset link has been sent.' }, 200, request)
     } catch (err) {
-      console.error('[auth] Forgot password:', err)
+      logSafetyEvent({ level: 'error', event: 'auth_forgot_password_failed', request, error_type: 'auth', error: err })
       return jsonResponse({ error: 'Internal error' }, 500, request)
     }
   })
@@ -93,13 +113,15 @@ export function registerAuthExtendedRoutes(router: any, getEnv: () => Env) {
       if (resetToken.expires_at < now) return jsonResponse({ error: 'This reset link has expired' }, 400, request)
 
       const password_hash = await hashPassword(password)
-      await env.DB.prepare('UPDATE users SET password_hash = ? WHERE id = ?').bind(password_hash, resetToken.user_id).run()
-      await env.DB.prepare('UPDATE password_reset_tokens SET used_at = ? WHERE id = ?').bind(now, resetToken.id).run()
-      await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(resetToken.user_id).run()
+      await env.DB.batch([
+        env.DB.prepare('UPDATE users SET password_hash = ? WHERE id = ?').bind(password_hash, resetToken.user_id) as any,
+        env.DB.prepare('UPDATE password_reset_tokens SET used_at = ? WHERE id = ?').bind(now, resetToken.id) as any,
+        env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(resetToken.user_id) as any
+      ])
 
       return jsonResponse({ success: true, message: 'Password updated. Please sign in.' }, 200, request)
     } catch (err) {
-      console.error('[auth] Reset password:', err)
+      logSafetyEvent({ level: 'error', event: 'auth_reset_password_failed', request, error_type: 'auth', error: err })
       return jsonResponse({ error: 'Internal error' }, 500, request)
     }
   })
@@ -125,10 +147,10 @@ export function registerAuthExtendedRoutes(router: any, getEnv: () => Env) {
       await env.DB.prepare('INSERT INTO email_verification_tokens (id, user_id, email, token_hash, expires_at) VALUES (?, ?, ?, ?, ?)')
         .bind(crypto.randomUUID(), session.id, session.email, tokenHash, expiresAt).run()
 
-      await sendVerifyEmail(session.email, `${APP_URL}/app/verify-email?token=${token}`, env)
+      await sendVerifyEmail(session.email, `${APP_URL}/app/verify-email?token=${token}`, env, request)
       return jsonResponse({ success: true, message: 'Verification email sent.' }, 200, request)
     } catch (err) {
-      console.error('[auth] Send verification:', err)
+      logSafetyEvent({ level: 'error', event: 'auth_send_verification_failed', request, error_type: 'auth', error: err })
       return jsonResponse({ error: 'Internal error' }, 500, request)
     }
   })
@@ -149,12 +171,14 @@ export function registerAuthExtendedRoutes(router: any, getEnv: () => Env) {
       if (verifyToken.verified_at) return jsonResponse({ success: true, message: 'Email already verified' }, 200, request)
       if (verifyToken.expires_at < now) return jsonResponse({ error: 'Verification link expired' }, 400, request)
 
-      await env.DB.prepare('UPDATE users SET email_verified = 1 WHERE id = ?').bind(verifyToken.user_id).run()
-      await env.DB.prepare('UPDATE email_verification_tokens SET verified_at = ? WHERE id = ?').bind(now, verifyToken.id).run()
+      await env.DB.batch([
+        env.DB.prepare('UPDATE users SET email_verified = 1 WHERE id = ?').bind(verifyToken.user_id) as any,
+        env.DB.prepare('UPDATE email_verification_tokens SET verified_at = ? WHERE id = ?').bind(now, verifyToken.id) as any
+      ])
 
       return jsonResponse({ success: true, message: 'Email verified. Your space is ready.' }, 200, request)
     } catch (err) {
-      console.error('[auth] Verify email:', err)
+      logSafetyEvent({ level: 'error', event: 'auth_verify_email_route_failed', request, error_type: 'auth', error: err })
       return jsonResponse({ error: 'Internal error' }, 500, request)
     }
   })

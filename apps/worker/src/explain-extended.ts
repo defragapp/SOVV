@@ -7,6 +7,7 @@ import { suggestNextSpace, formatFlowSuggestion } from "./flow.js";
 import { getAuthUser, jsonResponse } from "./auth.js";
 import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
 import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } from "./baseline.js";
+import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
 import { requireActiveSubscription } from "./billing.js";
@@ -212,7 +213,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   // ── Active signal selection ───────────────────────────────────────────────
   // Derive reduced behavioral signals from full compute.
   // Only active signals reach the AI — full compute stays server-side.
-  const dataset = await getBaselineDataset(env, sid).catch(() => null);
+  const dataset = await getBaselineDataset(env, sid, user.id).catch(() => null);
   let activeSignalsText = "";
   let railData = null;
   let signatureLine = "";
@@ -223,7 +224,17 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       relational,
       mode: (mode as any) ?? (relational ? "pair" : "self"),
     });
-    const timingSignals = buildTimingSignals(dataset);
+
+    // Fetch live sky positions for current timing context
+    // Uses user's birth location as proxy for current location
+    // Cached in KV for 6 hours to avoid excessive API calls
+    const userLat = dataset.input.latitude ?? 0;
+    const userLng = dataset.input.longitude ?? 0;
+    const liveSky = (userLat !== 0 || userLng !== 0)
+      ? await getCurrentSkySnapshot(env, userLat, userLng).catch(() => null)
+      : null;
+
+    const timingSignals = buildTimingSignals(dataset, liveSky);
     const signature = buildBaselineSignature(dataset);
     const overlaySignals = relational
       ? buildOverlaySignals(activeSignals)
@@ -243,7 +254,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     targetBaseline,
   });
 
-  const modelId = env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
+  const modelId = env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
   const ai = await env.AI.run(modelId, {
     messages: [
       { role: "system", content: relational ? SYSTEM_DEFRAG_RELATIONAL : SYSTEM_DEFRAG },

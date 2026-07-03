@@ -158,7 +158,7 @@ export default function LibraryPage() {
               <Link
                 key={item.id}
                 href={`/apps/defrag/${item.id}`}
-                className="block px-6 py-5 border-b border-white/[0.05] last:border-0 hover:bg-white/[0.02] transition-colors group"
+                className="block px-6 py-5 border-b border-white/[0.05] last:border-0 glow-card-hover group"
               >
                 <div className="flex items-start justify-between gap-4 mb-2">
                   <div className="flex items-center gap-2">

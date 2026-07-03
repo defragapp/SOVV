@@ -1,5 +1,8 @@
 "use client"
 import * as React from "react"
+import { OsOutput } from "@/components/system/OsOutput"
+import type { SystemOutput } from "@/lib/system/outputContract"
+import { processInput } from "@/lib/system/processInput"
 import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
 import { motion, AnimatePresence } from "framer-motion"
@@ -30,6 +33,7 @@ function Section({ label, value }: { label: string; value?: string }) {
 export default function AlignmentWorkspacePage() {
   const [input, setInput] = React.useState("")
   const [result, setResult] = React.useState<any>(null)
+  const [systemOutput, setSystemOutput] = React.useState<SystemOutput | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
@@ -37,6 +41,7 @@ export default function AlignmentWorkspacePage() {
   const [error, setError] = React.useState("")
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
+  const [patterns, setPatterns] = React.useState<Array<{ key: string; value: string }>>([])
   // Audio Overview
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
@@ -66,6 +71,11 @@ export default function AlignmentWorkspacePage() {
       .then((d: any) => setLibrary(d.items || []))
       .catch(() => {})
       .finally(() => setLibraryLoading(false))
+
+    fetch("/api/patterns", { credentials: "include" })
+      .then(r => r.ok ? r.json() : { patterns: [] })
+      .then((d: any) => setPatterns((d.patterns || []).slice(0, 5)))
+      .catch(() => {})
   }, [saveSuccess])
 
   const handleSubmit = async () => {
@@ -74,19 +84,15 @@ export default function AlignmentWorkspacePage() {
     setError("")
     setSaveSuccess(false)
     setResult(null)
+    setSystemOutput(null)
     try {
-      const res = await fetch("/api/alignment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ message: input }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.message || data.error || "Something went wrong.")
+      const pResult = await processInput({ space: "alignment", message: input })
+      if (!pResult.ok) {
+        setError(pResult.error)
         return
       }
-      setResult(data)
+      setResult(pResult.output.meta as any)
+      setSystemOutput(pResult.output)
     } catch {
       setError("Unable to connect. Check your connection and try again.")
     } finally {
@@ -274,34 +280,70 @@ export default function AlignmentWorkspacePage() {
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
 
         {!result && !isLoading && !error && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-3">
-            <div
-              className="w-10 h-10 flex items-center justify-center border border-[#e0743a]/20 bg-[#e0743a]/5 mb-2"
-              style={{ borderRadius: 10, boxShadow: "0 0 24px rgba(224,116,58,0.08)" }}
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M8 1v14M1 8h14" stroke="rgba(224,116,58,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
-                <circle cx="8" cy="8" r="3" stroke="rgba(224,116,58,0.3)" strokeWidth="1"/>
-              </svg>
+          <div className="flex flex-col items-center justify-center text-center h-full gap-6 px-8">
+            <div className="flex flex-col gap-3">
+              <p className="font-serif text-[22px] text-[#f4efe9] leading-snug tracking-[-0.01em]">
+                What insight do you have that needs to become a response?
+              </p>
+              <p className="text-[13px] text-[#4f4b47] leading-relaxed max-w-[260px] mx-auto">
+                Your Baseline Design is active. Describe the moment honestly.
+              </p>
             </div>
-            <p className="text-[16px] text-[#f4efe9] font-normal leading-snug">
-              What's pulling you off course?
-            </p>
-            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
-              Your Baseline Design and the live sky are already here. Describe what's pulling at you — Alignment will show you what belongs to you and what options are still available.
-            </p>
+            <div className="flex flex-col gap-1.5 items-center">
+                              <button
+                  key="I understand what happened but don't know what to do"
+                  onClick={() => setInput("I understand what happened but don't know what to do")}
+                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors px-3 py-1.5 border border-white/[0.05] hover:border-white/[0.10]"
+                  style={{ borderRadius: 6 }}
+                >
+                  I understand what happened but don't know what to do
+                </button>
+                <button
+                  key="I need to respond without making it worse"
+                  onClick={() => setInput("I need to respond without making it worse")}
+                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors px-3 py-1.5 border border-white/[0.05] hover:border-white/[0.10]"
+                  style={{ borderRadius: 6 }}
+                >
+                  I need to respond without making it worse
+                </button>
+                <button
+                  key="I know what's mine to carry — I need the words"
+                  onClick={() => setInput("I know what's mine to carry — I need the words")}
+                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors px-3 py-1.5 border border-white/[0.05] hover:border-white/[0.10]"
+                  style={{ borderRadius: 6 }}
+                >
+                  I know what's mine to carry — I need the words
+                </button>
+            </div>
           </div>
         )}
 
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
-            <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/60 rounded-full animate-spin" />
+            <div className="relative w-8 h-8">
+              <span className="absolute inset-0 border border-white/[0.08] rounded-full" />
+              <span className="absolute inset-0 border border-t-[#e0743a]/40 rounded-full animate-spin" style={{ animationDuration: "1.4s" }} />
+            </div>
             <p className="text-[13px] text-[#76716b]">Finding your path…</p>
           </div>
         )}
 
         {error && (
-          <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">{error}</p>
+          <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">
+              {error === "daily_limit_reached"
+                ? "You've reached your daily limit. Upgrade to Pro for unlimited sessions."
+                : error === "needs_baseline"
+                ? "Add your birth data in Settings to activate your Baseline Design."
+                : error.includes("connect")
+                ? "Connection issue. Check your network and try again."
+                : error || "Something went wrong. Try describing the moment differently."}
+            </p>
+        )}
+
+        {systemOutput && (
+          <div className="mb-4">
+            <OsOutput output={systemOutput} compact />
+          </div>
         )}
 
         <AnimatePresence>
@@ -341,6 +383,7 @@ export default function AlignmentWorkspacePage() {
             onKeyDown={e => {
               if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() }
             }}
+            onFocus={e => { setTimeout(() => e.target.scrollIntoView({ behavior: "smooth", block: "center" }), 300) }}
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
             <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Continue</span>

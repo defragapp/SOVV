@@ -37,28 +37,28 @@ type ResultRow = {
 
 const DEMO_RESULT: ResultRow[] = [
   {
-    label: "What's happening",
-    value: "Right now, this feels like something important didn't land.",
+    label: "What's active",
+    value: "You absorbed the silence and went internal — not because you had nothing to say, but because waiting felt safer than pushing.",
     evidence: ["Moon in Pisces", "Gate 55"],
   },
   {
-    label: "What it lands on",
-    value: "Under this is a simple need: to be met.",
+    label: "You",
+    value: "Under this is a simple need: to be met. The checking-your-phone is the loop.",
     evidence: ["Gate 2", "Venus in Taurus"],
   },
   {
-    label: "The other side",
+    label: "Them",
     value: "They may be reacting from a place of protection — not indifference.",
     evidence: ["Gate 38"],
   },
   {
-    label: "The pattern",
+    label: "What forms between you",
     value: "You reach. They pull back. Distance grows. This tends to repeat.",
     evidence: ["Sun in Aries", "Gate 51"],
   },
   {
-    label: "Next step",
-    value: "Name one feeling and one need — in a single sentence. Keep it brief and concrete.",
+    label: "Next move",
+    value: "Name one feeling and one need — in a single sentence. Send it without asking for a response.",
     highlight: true,
   },
 ]
@@ -117,14 +117,23 @@ function SpacePreview() {
         className="pointer-events-none absolute -inset-px"
         style={{
           borderRadius: "var(--radius-container)",
-          background: "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(224,116,58,0.10) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(224,116,58,0.12) 0%, transparent 65%)",
+        }}
+        aria-hidden
+      />
+      {/* Bottom glow */}
+      <div
+        className="pointer-events-none absolute -inset-px"
+        style={{
+          borderRadius: "var(--radius-container)",
+          background: "radial-gradient(ellipse 60% 30% at 50% 100%, rgba(200,194,188,0.04) 0%, transparent 70%)",
         }}
         aria-hidden
       />
 
       <div
-        className="relative border border-white/[0.10] bg-[#0c0a0d] overflow-hidden"
-        style={{ borderRadius: "var(--radius-container)", boxShadow: "0 32px 80px -16px rgba(0,0,0,0.7)" }}
+        className="relative border border-white/[0.10] bg-[#0c0a0d] overflow-hidden scan-lines"
+        style={{ borderRadius: "var(--radius-container)", boxShadow: "0 32px 80px -16px rgba(0,0,0,0.7), 0 0 0 1px rgba(224,116,58,0.04)" }}
       >
         {/* ── Titlebar ── */}
         <div className="h-11 border-b border-white/[0.07] bg-[#08070a]/90 flex items-center px-4 gap-3 shrink-0">
@@ -295,7 +304,7 @@ function SpacePreview() {
                               {/* Value */}
                               <p className={`text-[13px] leading-relaxed ${
                                 row.highlight
-                                  ? "text-[#f4efe9] font-medium"
+                                  ? "text-[#f4efe9]"
                                   : "text-[#a8a29a]"
                               }`}>
                                 {row.value}
@@ -404,7 +413,7 @@ export default function Home() {
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section
-        className="relative -mt-16 w-full overflow-hidden bg-[#08070a]"
+        className="relative -mt-[68px] w-full overflow-hidden bg-[#08070a]"
         style={{ minHeight: "100svh" }}
       >
         {/* High-res base image — WebP 2560px with JPEG fallback */}
@@ -418,6 +427,8 @@ export default function Home() {
             style={{ objectPosition: "center 20%", zIndex: 0, opacity: 0.85 }}
             fetchPriority="high"
             decoding="async"
+            width="2560"
+            height="1440"
           />
         </picture>
 
@@ -450,21 +461,34 @@ export default function Home() {
             className="font-serif text-[#f4efe9] text-balance leading-[1.06] tracking-[-0.02em] px-8"
             style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", maxWidth: "22ch" }}
           >
-            Healing isn&apos;t optional.
+            <span className="text-glow">Healing isn&apos;t optional.</span>
             <br />
             <span style={{ color: "rgba(244,239,233,0.48)" }}>
               Holding the pain is.
             </span>
           </motion.h1>
 
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.38, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-5 max-w-xs text-[#76716b] leading-relaxed px-8"
+            style={{ fontSize: "clamp(0.8rem, 1.6vw, 0.9rem)" }}
+          >
+            Pattern-aware AI for the moments that are hard to read while you&rsquo;re inside them.
+          </motion.p>
+
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-8"
+            transition={{ duration: 0.9, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-8 flex flex-col sm:flex-row gap-3 items-center px-8"
           >
             <Link href={APP_URL} className="btn-primary">
               Enter Sovereign.os
+            </Link>
+            <Link href="/how-it-works" className="btn-secondary" style={{ opacity: 0.70 }}>
+              See how it works
             </Link>
           </motion.div>
         </div>
@@ -472,31 +496,182 @@ export default function Home() {
 
 
       {/* ── NOTEBOOK PREVIEW ─────────────────────────────────────────────── */}
-      <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/[0.05]">
+      <section className="w-full py-24 md:py-36 bg-[#08070a] border-t border-white/[0.04] pattern-field">
         <Container>
-          <div className="flex flex-col items-center text-center mb-14">
+          <div className="flex flex-col items-center text-center mb-14 reveal-up reveal-up-1">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-6 bg-[#e0743a]/60" />
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
-                The notebook
+                The clarity console
               </span>
             </div>
             <h2
               className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight text-balance max-w-lg"
               style={{ fontSize: "clamp(1.9rem, 4vw, 3.2rem)" }}
             >
-              This is what you actually get.
+              <span className="text-glow">A private notebook</span> that turns reflection into direction.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-sm">
-              A real prompt. A real result. Your Baseline Design active in the background.
+              The Clarity Console reads the situation through your Baseline Design — showing what&rsquo;s active, what&rsquo;s repeating, and what next move gives the moment a better chance.
             </p>
           </div>
           <SpacePreview />
         </Container>
       </section>
 
+            {/* ── THE PROBLEM ─────────────────────────────────────────────────── */}
+      <section className="relative w-full py-24 md:py-36 bg-[#08070a] border-t border-white/[0.04] overflow-hidden pattern-field">
+        {/* Alignment rings — decorative */}
+        <div className="alignment-ring absolute -right-40 top-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-30" />
+        <div className="alignment-ring absolute -right-60 top-1/2 -translate-y-1/2 w-[700px] h-[700px] opacity-20" />
+        <div className="alignment-ring absolute -right-80 top-1/2 -translate-y-1/2 w-[900px] h-[900px] opacity-10" />
+
+        <Container className="relative z-10">
+          <div className="max-w-2xl mb-16 reveal-up reveal-up-1">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">The pattern beneath</span>
+            </div>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] text-balance"
+              style={{ fontSize: "clamp(2rem, 4.5vw, 3.8rem)" }}
+            >
+              <span className="text-glow">The moment</span> is rarely the whole pattern.
+            </h2>
+            <p className="mt-5 text-[15px] text-[#76716b] leading-relaxed max-w-lg">
+              A text, tone, silence, or conflict can feel bigger than the facts because it is touching a pattern already in motion. Sovereign.os helps you separate the moment from the pattern before you move from pressure.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                label: "The Moment",
+                desc: "What happened on the surface. The text. The conversation. The request. The decision.",
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="3" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5"/>
+                    <circle cx="10" cy="10" r="7" stroke="rgba(224,116,58,0.2)" strokeWidth="1" strokeDasharray="2 3"/>
+                  </svg>
+                ),
+                delay: "reveal-up-2",
+              },
+              {
+                label: "The Pattern",
+                desc: "What may be repeating underneath. The role, pressure, loop, or meaning that makes the moment feel heavier.",
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M3 10 Q7 4 10 10 Q13 16 17 10" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                    <path d="M3 10 Q7 4 10 10 Q13 16 17 10" stroke="rgba(224,116,58,0.15)" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                  </svg>
+                ),
+                delay: "reveal-up-3",
+              },
+              {
+                label: "The Next Move",
+                desc: "The response, pause, boundary, or repair that gives the situation a better chance.",
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M4 10h12M12 6l4 4-4 4" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
+                delay: "reveal-up-4",
+              },
+            ].map((card) => (
+              <div key={card.label} className={`moment-card p-7 flex flex-col gap-5 ${card.delay} reveal-up`}>
+                <div className="w-9 h-9 flex items-center justify-center border border-white/[0.08] bg-white/[0.02]" style={{ borderRadius: 8 }}>
+                  {card.icon}
+                </div>
+                <div>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">{card.label}</p>
+                  <p className="text-[14px] text-[#a8a29a] leading-relaxed">{card.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* ── HOW IT WORKS ────────────────────────────────────────────────── */}
+      <section className="w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.04]">
+        <Container>
+          <div className="flex flex-col items-center text-center mb-16 reveal-up reveal-up-1">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">The process</span>
+            </div>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] text-balance max-w-xl"
+              style={{ fontSize: "clamp(1.9rem, 4vw, 3.2rem)" }}
+            >
+              From reaction to recognition.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.04] border border-white/[0.05] overflow-hidden max-w-4xl mx-auto" style={{ borderRadius: 16 }}>
+            {[
+              {
+                num: "01",
+                title: "Enter the moment",
+                body: "Start with the situation as it happened — a message, conflict, boundary, grief point, or decision.",
+              },
+              {
+                num: "02",
+                title: "See the pattern",
+                body: "Sovereign.os uses your Baseline Design to show what's active and what may be repeating underneath.",
+              },
+              {
+                num: "03",
+                title: "Return with clarity",
+                body: "Get a Best Next Response you can use, edit, or Save to Sovereign — before pressure chooses for you.",
+              },
+            ].map((step, i) => (
+              <div key={step.num} className={`bg-[#0c0a0d] p-8 md:p-10 flex flex-col gap-6 reveal-up reveal-up-${i + 2}`}>
+                {/* Step number with signal dot */}
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47]">{step.num}</span>
+                  {i < 2 && (
+                    <div className="flex-1 h-px bg-gradient-to-r from-[#e0743a]/20 to-transparent" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-serif text-[1.15rem] text-[#f4efe9] leading-snug mb-3">{step.title}</h3>
+                  <p className="text-[13px] text-[#76716b] leading-relaxed">{step.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* ── BRAND BELIEF ────────────────────────────────────────────────── */}
+      <section className="relative w-full py-28 md:py-44 bg-[#08070a] border-t border-white/[0.04] overflow-hidden text-center">
+        {/* Alignment rings — centered */}
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] opacity-20" />
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-12" />
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] opacity-[0.06]" />
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] opacity-[0.04]" />
+        {/* Warm center glow */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(224,116,58,0.06) 0%, transparent 70%)" }} aria-hidden />
+
+        <Container className="relative z-10 max-w-2xl">
+          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-8">Clarity is not control</p>
+          <blockquote
+            className="font-serif text-[#f4efe9] leading-[1.15] tracking-[-0.02em] text-balance"
+            style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.5rem)" }}
+          >
+            <span className="text-glow">Clarity is not control.</span>
+            <br />
+            <span style={{ color: "rgba(244,239,233,0.45)" }}>It is return.</span>
+          </blockquote>
+          <p className="mt-8 text-[15px] text-[#76716b] leading-relaxed max-w-md mx-auto">
+            Sovereign.os does not tell you who to be. It gives you enough structure to return to yourself before the pattern runs the room.
+          </p>
+        </Container>
+      </section>
+
       {/* ── THREE SPACES ─────────────────────────────────────────────────── */}
-      <section className="relative w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/[0.05] overflow-hidden">
+      <section className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden">
         <div className="light-beam opacity-50" aria-hidden />
         <Container className="relative z-10">
           <div className="inline-flex items-center gap-2 mb-12">
@@ -512,47 +687,78 @@ export default function Home() {
                 num: "01",
                 name: "Defrag",
                 tier: "Free",
-                href: "/product",
+                href: "/product/defrag",
                 hook: "Separate the moment from the pattern.",
-                what: "Something happened. You don't know if you overreacted or if this is the same thing that always happens.",
-                cta: "What's actually active — and your clearest next response.",
+                what: "Use Defrag for messages, relational dynamics, family pressure, boundaries, grief, and team dynamics.",
+                cta: "What's active, what may be repeating, and your Best Next Response.",
                 tags: ["Arguments", "Messages", "Family roles", "Boundaries", "Grief"],
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    {/* Defrag: separated layers becoming clear */}
+                    <rect x="3" y="4" width="18" height="3" rx="1" stroke="rgba(224,116,58,0.5)" strokeWidth="1.2"/>
+                    <rect x="3" y="10.5" width="12" height="3" rx="1" stroke="rgba(224,116,58,0.35)" strokeWidth="1.2"/>
+                    <rect x="3" y="17" width="15" height="3" rx="1" stroke="rgba(224,116,58,0.2)" strokeWidth="1.2"/>
+                    <line x1="17" y1="12" x2="21" y2="12" stroke="rgba(224,116,58,0.4)" strokeWidth="1.2" strokeLinecap="round"/>
+                    <path d="M19 10l2 2-2 2" stroke="rgba(224,116,58,0.4)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
               },
               {
                 num: "02",
                 name: "Covenant",
                 tier: "Pro",
-                href: "/covenant",
-                hook: "Your moment has been walked before.",
-                what: "Covenant connects what you're going through to the real human stories in Scripture.",
-                cta: "One honest next step — grounded in faith, not performance.",
+                href: "/product/covenant",
+                hook: "Reflect through faith without performance.",
+                what: "Use Covenant for truth, repair, forgiveness, responsibility, humility, and discernment.",
+                cta: "One honest next step — grounded in faith, not reaction.",
                 tags: ["Faith", "Values", "Commitments", "Repair"],
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    {/* Covenant: connected arc, story bridge */}
+                    <path d="M4 18 Q12 4 20 18" stroke="rgba(224,116,58,0.5)" strokeWidth="1.2" strokeLinecap="round" fill="none"/>
+                    <circle cx="4" cy="18" r="1.5" fill="rgba(224,116,58,0.4)"/>
+                    <circle cx="20" cy="18" r="1.5" fill="rgba(224,116,58,0.4)"/>
+                    <circle cx="12" cy="9" r="1.5" fill="rgba(224,116,58,0.6)"/>
+                    <line x1="4" y1="18" x2="12" y2="9" stroke="rgba(224,116,58,0.15)" strokeWidth="1" strokeDasharray="2 2"/>
+                    <line x1="20" y1="18" x2="12" y2="9" stroke="rgba(224,116,58,0.15)" strokeWidth="1" strokeDasharray="2 2"/>
+                  </svg>
+                ),
               },
               {
                 num: "03",
                 name: "Alignment",
                 tier: "Pro",
-                href: "/product",
-                hook: "Get back into your own lane.",
-                what: "A conversation, a conflict, a decision — and suddenly you're reacting from somewhere that isn't you.",
-                cta: "Your Baseline Design shows the path back.",
+                href: "/product/alignment",
+                hook: "Turn recognition into practice.",
+                what: "Use Alignment to shape the response, boundary, pause, or repair that keeps you clear.",
+                cta: "After Defrag. Before the next move. Return to yourself.",
                 tags: ["After Defrag", "Before a hard conversation", "After a conflict"],
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    {/* Alignment: concentric rings, centered axis */}
+                    <circle cx="12" cy="12" r="2" fill="rgba(224,116,58,0.7)"/>
+                    <circle cx="12" cy="12" r="5" stroke="rgba(224,116,58,0.35)" strokeWidth="1.2" fill="none"/>
+                    <circle cx="12" cy="12" r="8.5" stroke="rgba(224,116,58,0.15)" strokeWidth="1" fill="none" strokeDasharray="2 3"/>
+                    <line x1="12" y1="3" x2="12" y2="21" stroke="rgba(224,116,58,0.1)" strokeWidth="1"/>
+                    <line x1="3" y1="12" x2="21" y2="12" stroke="rgba(224,116,58,0.1)" strokeWidth="1"/>
+                  </svg>
+                ),
               },
             ].map((space) => (
               <Link
                 key={space.name}
                 href={space.href}
-                className="group flex flex-col gap-5 p-8 md:p-10 bg-[#0c0a0d] hover:bg-[#0f0d10] transition-colors duration-300"
+                className="group flex flex-col gap-5 p-8 md:p-10 bg-[#0c0a0d] glow-card-hover"
               >
                 <div className="flex items-start justify-between">
                   <div
                     className="w-10 h-10 flex items-center justify-center border border-white/[0.08]"
                     style={{
                       borderRadius: 8,
-                      color: space.tier === "Pro" ? "#e0743a" : "#76716b",
-                      background: space.tier === "Pro" ? "rgba(224,116,58,0.06)" : "rgba(255,255,255,0.02)",
+                      background: space.tier === "Pro" ? "rgba(224,116,58,0.04)" : "rgba(255,255,255,0.02)",
                     }}
                   >
+                    {space.icon}
                     <span className="font-mono text-[9px] tracking-[0.1em]">{space.num}</span>
                   </div>
                   <span
@@ -574,7 +780,7 @@ export default function Home() {
                   >
                     {space.name}
                   </h3>
-                  <p className="text-[15px] text-[#f4efe9]/65 leading-snug font-medium">
+                  <p className="text-[15px] text-[#f4efe9]/65 leading-snug">
                     {space.hook}
                   </p>
                 </div>
@@ -602,22 +808,30 @@ export default function Home() {
       </section>
 
       {/* ── CTA ──────────────────────────────────────────────────────────── */}
-      <section className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.05] overflow-hidden">
-        <div className="light-beam" aria-hidden />
+      <section className="relative w-full py-32 md:py-48 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden">
+        {/* Alignment rings */}
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] opacity-15" />
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] opacity-[0.08]" />
+        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] opacity-[0.04]" />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(224,116,58,0.05) 0%, transparent 70%)" }} aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
+          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-8">Begin</p>
           <h2
-            className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-3xl text-balance"
-            style={{ fontSize: "clamp(2.2rem, 5.5vw, 5rem)" }}
+            className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] max-w-2xl text-balance"
+            style={{ fontSize: "clamp(2.2rem, 5.5vw, 4.5rem)" }}
           >
-            Return before the pattern takes over.
+            <span className="text-glow">Return before</span> the pattern runs the room.
           </h2>
-          <p className="mt-6 max-w-md text-base md:text-lg text-[#a8a29a] leading-relaxed">
-            Defrag is free. Start understanding the patterns beneath the moments that matter most.
+          <p className="mt-6 max-w-md text-[15px] text-[#76716b] leading-relaxed">
+            Understand what&rsquo;s active, see what may be repeating, and choose the next move with more context. Start with Defrag. Save what matters. Build your private Library over time.
           </p>
           <div className="mt-9">
             <Link href={APP_URL} className="btn-primary">
               Enter Sovereign.os
             </Link>
+            <p className="mt-5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
+              Private by design · Free to start
+            </p>
           </div>
         </Container>
       </section>

@@ -306,7 +306,15 @@ export default function CovenantWorkspacePage() {
         )}
 
         {error && (
-          <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">{error}</p>
+          <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">
+              {error === "daily_limit_reached"
+                ? "You've reached your daily limit. Upgrade to Pro for unlimited sessions."
+                : error === "needs_baseline"
+                ? "Add your birth data in Settings to activate your Baseline Design."
+                : error.includes("connect")
+                ? "Connection issue. Check your network and try again."
+                : error || "Something went wrong. Try describing the moment differently."}
+            </p>
         )}
 
         <AnimatePresence>
