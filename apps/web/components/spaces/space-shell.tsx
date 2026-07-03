@@ -17,6 +17,8 @@ async function handleSignOut() {
 
 export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName }: SpaceShellProps) {
   const [activeTab, setActiveTab] = React.useState(mobileTabs[0].id)
+  const scrollPositions = React.useRef<Record<string, number>>({})
+  const contentRef = React.useRef<HTMLDivElement>(null)
 
   return (
     <div className="flex h-[100dvh] w-screen overflow-hidden bg-[#08070a] text-[#f4efe9] font-sans">
@@ -151,7 +153,19 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
           {mobileTabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                // Save current scroll position
+                if (contentRef.current) {
+                  scrollPositions.current[activeTab] = contentRef.current.scrollTop
+                }
+                setActiveTab(tab.id)
+                // Restore scroll position after render
+                requestAnimationFrame(() => {
+                  if (contentRef.current) {
+                    contentRef.current.scrollTop = scrollPositions.current[tab.id] ?? 0
+                  }
+                })
+              }}
               className={`px-4 py-2.5 border-b-2 font-mono text-[10px] tracking-[0.2em] uppercase whitespace-nowrap transition-colors ${
                 activeTab === tab.id
                   ? "border-[#e0743a] text-[#f4efe9]"
@@ -163,7 +177,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
           ))}
         </div>
 
-        <main className="flex-1 overflow-y-auto p-5 pb-24 bg-[#08070a]">
+        <main ref={contentRef} className="flex-1 overflow-y-auto p-5 pb-24 bg-[#08070a]">
           {mobileTabs.find((t) => t.id === activeTab)?.content}
         </main>
       </div>

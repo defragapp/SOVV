@@ -304,6 +304,7 @@ function ChangePasswordForm() {
 }
 
 export default function SettingsPage() {
+  const isOnboarding = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("onboard") === "1"
   const [baseline, setBaseline] = useState<BaselineRequest>(initialState);
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -330,6 +331,22 @@ export default function SettingsPage() {
       if (result?.baseline) {
         setHasBaseline(true);
         setMessage({ text: "Baseline Design saved. Your pattern map is compiling — this takes 30–60 seconds.", ok: true });
+        // Poll for compilation status
+        const pollStatus = async () => {
+          try {
+            const r = await fetch("/api/baseline/status", { credentials: "include" });
+            if (!r.ok) return;
+            const d = await r.json() as any;
+            if (d.status === "ready") {
+              setMessage({ text: "Baseline Design compiled. Your pattern map is active.", ok: true });
+            } else if (d.status === "failed") {
+              setMessage({ text: "Compilation failed. Try saving again.", ok: false });
+            } else if (d.status === "pending") {
+              setTimeout(pollStatus, 5000);
+            }
+          } catch { /* silent */ }
+        };
+        setTimeout(pollStatus, 5000);
       } else {
         setMessage({ text: "Unable to save Baseline Design.", ok: false });
       }
@@ -385,6 +402,14 @@ export default function SettingsPage() {
               )}
             </AnimatePresence>
           </div>
+          {isOnboarding && (
+            <div className="mb-8 border border-[#e0743a]/20 bg-[#e0743a]/[0.04] px-5 py-4" style={{ borderRadius: "var(--radius-container)" }}>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-1">Welcome to Sovereign.os</p>
+              <p className="text-[13px] text-[#a8a29a] leading-relaxed">
+                Add your birth date, time, and place to activate your Baseline Design — the foundation that makes every AI response specific to how you actually move through pressure.
+              </p>
+            </div>
+          )}
 
           <h1 className="font-serif text-3xl md:text-4xl text-[#f4efe9] leading-tight tracking-[-0.02em] mb-5">
             Your Baseline Design is the starting point.

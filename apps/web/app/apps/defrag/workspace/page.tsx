@@ -70,6 +70,7 @@ function EvidenceChip({ label }: { label: string }) {
 export default function DefragWorkspacePage() {
   const [input, setInput] = React.useState("")
   const [result, setResult] = React.useState<DefragResult | null>(null)
+  const [thread, setThread] = React.useState<Array<{input: string; result: DefragResult}>>([])  // conversation history
   const [isLoading, setIsLoading] = React.useState(false)
   const [error, setError] = React.useState("")
   const [isSaving, setIsSaving] = React.useState(false)
@@ -193,6 +194,10 @@ export default function DefragWorkspacePage() {
             target: { id: "compare", relation: "partner" },
             targetName: compareName.trim(),
           } : {}),
+          // Pass recent patterns for conversational continuity
+          ...(thread.length > 0 ? {
+            priorPatterns: thread.slice(-2).map(t => t.result?.activePattern).filter(Boolean),
+          } : {}),
         }),
       })
       const data = await res.json()
@@ -204,6 +209,7 @@ export default function DefragWorkspacePage() {
         return
       }
       setResult(data)
+      setThread(prev => [...prev.slice(-2), { input, result: data }])
     } catch {
       setError("Unable to connect. Check your connection and try again.")
     } finally {
@@ -539,7 +545,13 @@ export default function DefragWorkspacePage() {
         {error && error !== "needs_baseline" && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
             <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">
-              {error.includes("couldn't read") ? "The system couldn't read this moment clearly. Try describing it with more specific detail." : error}
+              {error === "daily_limit_reached" || error.includes("daily limit")
+                ? "You've reached your daily limit. Upgrade to Pro for unlimited sessions."
+                : error.includes("connect") || error.includes("Connection")
+                ? "Connection issue. Check your network and try again."
+                : error.includes("couldn't read") || error.includes("couldn't")
+                ? "The system couldn't read this moment clearly. Try describing it with more specific detail."
+                : error || "Something went wrong. Try again."}
             </p>
             {error.includes("daily limit") && (
               <a
@@ -567,6 +579,20 @@ export default function DefragWorkspacePage() {
             />
 
             {/* Flow suggestion — contextual next space recommendation */}
+            {/* Show Alignment CTA when result has a clear next move */}
+            {result && !((result as any).flow?.nextSpace) && result.alignment && (
+              <div className="mt-4 border border-white/[0.05] bg-white/[0.01] px-5 py-3 flex items-center justify-between gap-4" style={{ borderRadius: "var(--radius-container)" }}>
+                <p className="text-[12px] text-[#4f4b47] leading-snug">
+                  Take this to Alignment — separate what&rsquo;s yours to carry from what isn&rsquo;t.
+                </p>
+                <a
+                  href={`/apps/alignment/workspace?prompt=${encodeURIComponent(result.alignment || "")}`}
+                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors whitespace-nowrap shrink-0"
+                >
+                  Alignment →
+                </a>
+              </div>
+            )}
             {(result as any).flow?.nextSpace && (
               <div className="mt-4 border border-white/[0.06] bg-white/[0.02] px-5 py-4 flex items-center justify-between gap-4" style={{ borderRadius: "var(--radius-container)" }}>
                 <div>
