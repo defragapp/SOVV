@@ -236,4 +236,21 @@ export function registerBaselineRoutes(router: any, getEnv: () => Env) {
       traitCount: dataset.aiDataset?.derivedTraits?.length ?? 0,
     });
   });
+
+  // GET /api/baseline/status — poll compilation status
+  router.get("/api/baseline/status", async (req: Request) => {
+    const env = getEnv();
+    const user = await getAuthUser(req, env.DB);
+    if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+    const sid = await getSessionId(req);
+    const dataset = await getBaselineDataset(env, sid, user.id);
+    if (!dataset) return Response.json({ status: "none" });
+    return Response.json({
+      status: dataset.status,
+      computedAt: dataset.computedAt,
+      hasAstronomy: Boolean(dataset.astronomy),
+      hasFrameworks: Boolean(dataset.frameworks),
+      hasAiDataset: Boolean(dataset.aiDataset),
+    });
+  });
 }
