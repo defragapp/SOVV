@@ -193,7 +193,89 @@ export default function DefragProductPage() {
         </Container>
       </section>
 
-            {/* Interface Preview */}
+            {/* How It Works */}
+      <section className="w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/[0.04]">
+        <Container>
+          <div className="mb-14">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">How it works</span>
+            </div>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl"
+              style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)" }}
+            >
+              Three steps. One clear result.
+            </h2>
+          </div>
+
+          <div className="grid gap-px bg-white/[0.05] border border-white/[0.05] md:grid-cols-3 overflow-hidden" style={{ borderRadius: 14 }}>
+            {[
+              {
+                n: "01",
+                title: "Describe the moment",
+                body: "Type what happened — the argument, the silence, the message you can't stop thinking about. Say it how it actually felt.",
+              },
+              {
+                n: "02",
+                title: "Defrag reads the pattern",
+                body: "Your Baseline Design is already active. Defrag uses it to separate what's yours from what's the situation, and names the loop running beneath the surface.",
+              },
+              {
+                n: "03",
+                title: "Get your Best Next Response",
+                body: "One specific, proportionate next step — grounded in how you actually move through pressure, not a generic response.",
+              },
+            ].map((step) => (
+              <div key={step.n} className="bg-[#0c0a0d] p-8 md:p-10 glow-card-hover cursor-default">
+                <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47] block mb-8">{step.n}</span>
+                <h3 className="font-serif text-[1.15rem] text-[#f4efe9] leading-snug mb-3">{step.title}</h3>
+                <p className="text-[13px] text-[#76716b] leading-relaxed">{step.body}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* Use Cases */}
+      <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/[0.04]">
+        <Container className="max-w-3xl">
+          <div className="mb-12">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">What you bring</span>
+            </div>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl"
+              style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)" }}
+            >
+              Any moment that keeps repeating.
+            </h2>
+          </div>
+
+          <div className="flex flex-col divide-y divide-white/[0.05] border border-white/[0.06]" style={{ borderRadius: 14, overflow: "hidden" }}>
+            {[
+              { input: "The conversation that keeps looping", output: "Name the pattern driving the loop before you re-enter it." },
+              { input: "The message I can't stop thinking about", output: "Separate what the message touched from what it actually said." },
+              { input: "The role I keep falling back into", output: "See what you learned to carry — and what you can set down." },
+              { input: "The silence after a hard moment", output: "Understand what the silence is protecting before you break it." },
+            ].map((uc) => (
+              <div key={uc.input} className="grid md:grid-cols-2 gap-0 bg-[#0c0a0d] glow-card-hover">
+                <div className="px-6 py-5 border-b md:border-b-0 md:border-r border-white/[0.05]">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">You bring</p>
+                  <p className="text-[14px] text-[#a8a29a] leading-relaxed">{uc.input}</p>
+                </div>
+                <div className="px-6 py-5">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50 mb-2">Defrag gives you</p>
+                  <p className="text-[14px] text-[#f4efe9] leading-relaxed">{uc.output}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* Interface Preview */}
       <section className="w-full py-24 md:py-32 bg-[#08070a] border-t border-white/[0.04] pattern-field">
         <Container className="max-w-3xl">
           <div className="mb-12">
