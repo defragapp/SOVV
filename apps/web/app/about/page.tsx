@@ -34,7 +34,7 @@ export default function AboutPage() {
             return to yourself first.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-xl leading-relaxed">
-            Pattern-aware AI for the moments that are hard to read while you're inside them. Not abstract self-improvement — specific, real, sometimes difficult moments of actual life.
+            Pattern-aware AI for the moments that are hard to read while you're inside them.
           </p>
         </Container>
       </section>
@@ -49,11 +49,11 @@ export default function AboutPage() {
                 body: "The message that unsettled you. The family role you keep falling back into. The boundary you keep negotiating with yourself. The grief that changes the room.",
               },
               {
-                label: "The structure",
+                label: "What it does",
                 body: "Sovereign.os gives those moments structure — showing what's active, what may be repeating, and what next move gives the situation a better chance.",
               },
               {
-                label: "The platform",
+                label: "How it works",
                 body: "Your Baseline Design is the starting map. Defrag, Covenant, and Alignment are the spaces where the work happens. The Library is where you save what helped.",
               },
               {

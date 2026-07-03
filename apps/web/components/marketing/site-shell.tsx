@@ -77,7 +77,7 @@ export function SiteShell({ children }: SiteShellProps) {
 
           {/* Wordmark */}
           <Link href="/" className="group flex items-center" aria-label="Sovereign.os — Home">
-            <span className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#f4efe9]/50 group-hover:text-[#f4efe9]/80 transition-colors duration-300">
+            <span className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#f4efe9]/60 group-hover:text-[#f4efe9]/90 transition-colors duration-300">
               Sovereign.os
             </span>
           </Link>
@@ -108,7 +108,7 @@ export function SiteShell({ children }: SiteShellProps) {
               className="inline-flex items-center h-9 px-5 text-[12px] tracking-[-0.01em] bg-[#f4efe9] text-[#08070a] hover:bg-white transition-colors duration-200"
               style={{ borderRadius: 8 }}
             >
-              Get started
+              Enter
             </Link>
           </div>
 
@@ -171,7 +171,7 @@ export function SiteShell({ children }: SiteShellProps) {
             <div className="flex flex-col gap-3">
               <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#f4efe9]/50">Sovereign.os</span>
               <p className="text-[13px] text-[#4f4b47] leading-relaxed max-w-[220px]">
-                See the loop. Name the pattern. Choose the repair.
+                Pattern-aware AI for the moments that matter.
               </p>
               <p className="text-[11px] text-[#4f4b47]/60 leading-relaxed max-w-[220px] mt-1">
                 Not a replacement for therapy or professional support.
