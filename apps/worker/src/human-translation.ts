@@ -12,6 +12,18 @@
 
 import type { Env } from "./types-env.js";
 import type { BaselineDesignDataset } from "./baseline-compiler.js";
+import { logSafetyEvent } from "./safety.js";
+import {
+  evaluateInputClassification,
+  getColdStartMarker,
+  getServiceState,
+  inspectResponseDrift,
+  logDriftDetected,
+  recordServiceOutcome,
+  sampleUserPressure,
+  shouldBypassAi,
+  tuneTokenBudget,
+} from "./accountability.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -439,8 +451,17 @@ export async function buildHumanBehaviorTranslation(
   env: Env,
   userId: string,
   app: "alignment" | "defrag" | "covenant",
-  context?: { liveSky?: LiveSkyContext; recentPatterns?: string[]; refresh?: boolean }
+  context?: { liveSky?: LiveSkyContext; recentPatterns?: string[]; refresh?: boolean; protectiveMode?: boolean }
 ): Promise<HumanBehaviorTranslation> {
+  const startedAt = Date.now()
+  const requestId = crypto.randomUUID()
+  const endpoint = `/api/baseline/translate:${app}`
+  const coldStart = getColdStartMarker()
+  await logSafetyEvent(env, {
+    type: "request_lifecycle",
+    requestId,
+    metadata: { endpoint, stage: "start", userId, coldStart },
+  })
   const cacheKey = TRANSLATION_KEY(userId, app)
 
   // Check cache (unless refresh requested)
@@ -449,9 +470,41 @@ export async function buildHumanBehaviorTranslation(
       const cached = await env.KV.get(cacheKey)
       if (cached) {
         const parsed = JSON.parse(cached) as HumanBehaviorTranslation
-        if (parsed.status === "ready") return parsed
+        if (parsed.status === "ready") {
+          await recordServiceOutcome(env, { endpoint, requestId, userId }, {
+            aiExecuted: false,
+            responsePath: "normal",
+            downstreamAiCalls: 0,
+          })
+          await logSafetyEvent(env, {
+            type: "request_lifecycle",
+            requestId,
+            metadata: {
+              endpoint,
+              stage: "end",
+              userId,
+              aiExecuted: false,
+              aiCalls: 0,
+              aiRetries: 0,
+              responsePath: "normal",
+              inputClassification: "safe",
+              guardrailsTriggered: [],
+              coldStart,
+            },
+          })
+          return parsed
+        }
       }
-    } catch {}
+    } catch (error) {
+      logSafetyEvent({
+        level: "warn",
+        event: "translation_cache_read_failed",
+        endpoint: `translation:${app}`,
+        requestId: userId,
+        reason: "unknown_failure",
+        error,
+      })
+    }
   }
 
   // Load computed dataset
@@ -468,6 +521,28 @@ export async function buildHumanBehaviorTranslation(
       ? buildDefragFallback(dataset ?? { version: "baseline.v2", status: "pending", input: { dob: "", tob: "", tobType: "exact", pob: "" } })
       : buildCovenantFallback(dataset ?? { version: "baseline.v2", status: "pending", input: { dob: "", tob: "", tobType: "exact", pob: "" } })
 
+    await recordServiceOutcome(env, { endpoint, requestId, userId }, {
+      aiExecuted: false,
+      responsePath: "fallback",
+      aiFallback: true,
+      downstreamAiCalls: 0,
+    })
+    await logSafetyEvent(env, {
+      type: "request_lifecycle",
+      requestId,
+      metadata: {
+        endpoint,
+        stage: "end",
+        userId,
+        aiExecuted: false,
+        aiCalls: 0,
+        aiRetries: 0,
+        responsePath: "fallback",
+        inputClassification: "safe",
+        guardrailsTriggered: [],
+        coldStart,
+      },
+    })
     return {
       version: "translation.v1",
       status: "partial",
@@ -487,8 +562,71 @@ export async function buildHumanBehaviorTranslation(
     : buildCovenantPrompt(dataset)
 
   const aiModel = (env as any).AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast"
+  const serviceState = await getServiceState(env, endpoint)
+  const pressure = await sampleUserPressure(env, { endpoint, requestId, userId }, "safe", false, false)
+  const decision = evaluateInputClassification({
+    degradationState: serviceState.state,
+    throttleLevel: pressure.throttleLevel,
+  })
+  await logSafetyEvent(env, {
+    type: "request_lifecycle",
+    requestId,
+    metadata: {
+      endpoint,
+      stage: "validation_passed",
+      userId,
+      inputClassification: decision.classification,
+      guardrailsTriggered: decision.guardrailsTriggered,
+      supportMode: false,
+      throttleLevel: pressure.throttleLevel,
+      degradationState: serviceState.state,
+      coldStart,
+    },
+  })
 
   let appRender: AlignmentEntryTranslation | DefragEntryTranslation | CovenantEntryTranslation | null = null
+  let aiSucceeded = false
+
+  if (shouldBypassAi(serviceState.state, "noncritical", pressure.throttleLevel)) {
+    const fallback = app === "alignment"
+      ? buildAlignmentFallback(dataset)
+      : app === "defrag"
+      ? buildDefragFallback(dataset)
+      : buildCovenantFallback(dataset)
+    await recordServiceOutcome(env, { endpoint, requestId, userId }, {
+      aiExecuted: false,
+      responsePath: "fallback",
+      aiFallback: true,
+      downstreamAiCalls: 0,
+    })
+    await logSafetyEvent(env, {
+      type: "request_lifecycle",
+      requestId,
+      metadata: {
+        endpoint,
+        stage: "end",
+        userId,
+        inputClassification: decision.classification,
+        guardrailsTriggered: decision.guardrailsTriggered,
+        aiExecuted: false,
+        aiCalls: 0,
+        aiRetries: 0,
+        responsePath: "fallback",
+        degradationState: serviceState.state,
+        throttleLevel: pressure.throttleLevel,
+        coldStart,
+      },
+    })
+    return {
+      version: "translation.v1",
+      status: "partial",
+      computedAt: new Date().toISOString(),
+      userId,
+      app,
+      appRender: fallback,
+      sourceEvidence,
+    }
+  }
 
   try {
     const aiResponse = await (env as any).AI.run(aiModel, {
@@ -504,6 +642,7 @@ export async function buildHumanBehaviorTranslation(
     const match = rawText.trim().match(/\{[\s\S]*\}/)
     if (match) {
       appRender = JSON.parse(match[0])
+      aiSucceeded = true
     }
   } catch (err) {
     console.error("[human-translation] AI error:", err)
@@ -531,14 +670,76 @@ export async function buildHumanBehaviorTranslation(
   // Validate
   const { valid, violations } = validateHumanBehaviorTranslation(translation)
   if (!valid) {
-    console.warn("[human-translation] validation violations:", violations)
+    logSafetyEvent({
+      level: "warn",
+      event: "translation_validation_violations",
+      endpoint: `translation:${app}`,
+      requestId: userId,
+      reason: "unknown_failure",
+      error_type: "system",
+      details: { violations },
+    })
     translation.status = "partial"
   }
+
+  const durationMs = Date.now() - startedAt
+  const parsedSuccessfully = aiSucceeded
+  const drift = inspectResponseDrift(JSON.stringify(appRender ?? {}), appRender as unknown as Record<string, unknown> | null, [])
+  if (drift.driftDetected) {
+    await logDriftDetected(env, { endpoint, requestId, userId }, {
+      app,
+      anomalies: drift.anomalies,
+      observedKeys: drift.observedKeys,
+      responseBytes: drift.responseBytes,
+    })
+  }
+
+  await recordServiceOutcome(env, { endpoint, requestId, userId }, {
+    aiExecuted: !shouldBypassAi(serviceState.state, "noncritical", pressure.throttleLevel),
+    aiSuccess: parsedSuccessfully,
+    aiFallback: !parsedSuccessfully,
+    responsePath: parsedSuccessfully ? "normal" : "fallback",
+    durationMs,
+    slowRequest: durationMs >= 1800,
+    responseBytes: drift.responseBytes,
+    validationNearFail: drift.driftDetected,
+    downstreamAiCalls: shouldBypassAi(serviceState.state, "noncritical", pressure.throttleLevel) ? 0 : 1,
+  })
+
+  await logSafetyEvent(env, {
+    type: "request_lifecycle",
+    requestId,
+    metadata: {
+      endpoint,
+      stage: "end",
+      userId,
+      inputClassification: decision.classification,
+      guardrailsTriggered: decision.guardrailsTriggered,
+      aiExecuted: !shouldBypassAi(serviceState.state, "noncritical", pressure.throttleLevel),
+      aiCalls: shouldBypassAi(serviceState.state, "noncritical", pressure.throttleLevel) ? 0 : 1,
+      aiRetries: 0,
+      responsePath: parsedSuccessfully ? "normal" : "fallback",
+      degradationState: serviceState.state,
+      throttleLevel: pressure.throttleLevel,
+      coldStart,
+      slowRequest: durationMs >= 1800,
+      durationMs,
+    },
+  })
 
   // Cache result
   try {
     await env.KV.put(cacheKey, JSON.stringify(translation), { expirationTtl: TRANSLATION_TTL })
-  } catch {}
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "translation_cache_write_failed",
+      endpoint: `translation:${app}`,
+      requestId: userId,
+      reason: "unknown_failure",
+      error,
+    })
+  }
 
   return translation
 }

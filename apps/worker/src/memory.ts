@@ -11,6 +11,7 @@
  */
 
 import type { Env } from "./types-env.js"
+import { logSafetyEvent } from "./safety.js"
 
 export interface PatternMemory {
   id: string
@@ -120,7 +121,14 @@ export async function savePatternMemory(
     const trimmed = memories.slice(0, 20)
     await env.KV.put(MEMORY_KEY(userId), JSON.stringify(trimmed), { expirationTtl: MEMORY_TTL })
   } catch (err) {
-    console.error("savePatternMemory error:", String(err))
+    logSafetyEvent({
+      level: "error",
+      event: "pattern_memory_save_failed",
+      endpoint: "memory",
+      requestId: userId,
+      reason: "unknown_failure",
+      error: err,
+    })
   }
 }
 
@@ -154,7 +162,15 @@ export async function loadMemoryContext(
       recurringPattern: recurring?.pattern,
       sessionCount: filtered.reduce((sum, m) => sum + m.sessionCount, 0),
     }
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "pattern_memory_load_failed",
+      endpoint: "memory",
+      requestId: userId,
+      reason: "unknown_failure",
+      error,
+    })
     return { recentPatterns: [], sessionCount: 0 }
   }
 }

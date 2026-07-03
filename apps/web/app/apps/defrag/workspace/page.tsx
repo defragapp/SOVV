@@ -256,7 +256,11 @@ export default function DefragWorkspacePage() {
       <div className="px-5 pt-5 pb-5 border-b border-white/[0.05]">
 
         {baselineLoading ? (
-          <span className="w-3.5 h-3.5 border border-white/[0.15] border-t-white/40 rounded-full animate-spin block" />
+          <div className="flex flex-col gap-2.5 py-1">
+            <div className="skeleton skeleton-text w-full" />
+            <div className="skeleton skeleton-text w-4/5" />
+            <div className="skeleton skeleton-text w-3/5" />
+          </div>
         ) : baseline ? (
           <>
             {/* Birth summary — compact, low priority */}
@@ -266,7 +270,11 @@ export default function DefragWorkspacePage() {
 
             {/* Derived behavioral statements with evidence chips */}
             {statementsLoading ? (
-              <span className="w-3.5 h-3.5 border border-white/[0.15] border-t-white/40 rounded-full animate-spin block" />
+              <div className="flex flex-col gap-2.5 py-1">
+            <div className="skeleton skeleton-text w-full" />
+            <div className="skeleton skeleton-text w-4/5" />
+            <div className="skeleton skeleton-text w-3/5" />
+          </div>
             ) : baselineStatements.length > 0 ? (
               <div className="flex flex-col gap-0">
                 {baselineStatements.map(({ statement, chips }, i) => (
@@ -297,7 +305,7 @@ export default function DefragWorkspacePage() {
         ) : (
           /* No baseline — prompt to add */
           <div className="border border-white/[0.08] bg-white/[0.02] p-4" style={{ borderRadius: "var(--radius-container)" }}>
-            <p className="text-[12px] font-medium text-[#a8a29a] mb-1">Baseline Design required</p>
+            <p className="text-[12px] text-[#a8a29a] mb-1">Baseline Design required</p>
             <p className="text-[12px] text-[#76716b] leading-relaxed mb-3">
               Add your date, time, and place of birth to begin. This is the private layer that grounds every result.
             </p>

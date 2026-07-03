@@ -388,11 +388,11 @@ export default function AlignmentEntryPage() {
         </div>
         <div className="border-t border-white/[0.04] pt-5 flex flex-col gap-4">
           <div>
-            <p className="text-[11px] text-[#4f4b47] font-medium mb-1">Baseline Design</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] mb-1">Baseline Design</p>
             <p className="text-[11px] text-[#4f4b47] leading-relaxed">Your fixed center. How you naturally operate.</p>
           </div>
           <div>
-            <p className="text-[11px] text-[#4f4b47] font-medium mb-1">Live sky</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] mb-1">Live sky</p>
             <p className="text-[11px] text-[#4f4b47] leading-relaxed">The emotional weather you're moving through right now.</p>
           </div>
         </div>

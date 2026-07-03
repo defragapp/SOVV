@@ -112,7 +112,7 @@ function DefragDemo() {
                   className="px-5 py-4 border-t border-white/[0.05] bg-white/[0.02]"
                 >
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-1.5">Best Next Response</p>
-                  <p className="text-[13px] leading-relaxed text-[#f4efe9] font-medium">{current.result.nextResponse}</p>
+                  <p className="text-[13px] leading-relaxed text-[#f4efe9]">{current.result.nextResponse}</p>
                 </motion.div>
               )}
             </motion.div>
@@ -128,7 +128,7 @@ export default function DefragProductPage() {
     <SiteShell>
 
       {/* ── HERO ── */}
-      <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-900/10 via-[#08070a] to-[#08070a] overflow-hidden border-b border-white/5">
+      <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[#08070a] pattern-field overflow-hidden border-b border-white/5">
         <div className="light-beam opacity-60" aria-hidden />
         <Container className="relative z-10 max-w-4xl">
           <div className="inline-flex items-center gap-2 mb-6">
@@ -192,8 +192,55 @@ export default function DefragProductPage() {
         </Container>
       </section>
 
+            {/* Interface Preview */}
+      <section className="w-full py-24 md:py-32 bg-[#08070a] border-t border-white/[0.04] pattern-field">
+        <Container className="max-w-3xl">
+          <div className="mb-12">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">What it looks like</span>
+            </div>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl"
+              style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)" }}
+            >
+              A real moment. A real result.
+            </h2>
+          </div>
+
+          <div
+            className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden scan-lines"
+            style={{ borderRadius: 14, boxShadow: "0 24px 60px -16px rgba(0,0,0,0.6), 0 0 0 1px rgba(224,116,58,0.04)" }}
+          >
+            <div className="px-6 py-5 border-b border-white/[0.05]">
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Moment</p>
+              <p className="text-[14px] text-[#76716b] leading-relaxed italic">
+                &ldquo;I keep replaying the same conversation and reacting before I understand why.&rdquo;
+              </p>
+            </div>
+            <div className="px-6 py-5 border-b border-white/[0.05]">
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">What&rsquo;s active</p>
+              <p className="text-[14px] text-[#f4efe9] leading-[1.7]">This may not only be about the conversation. The active pattern is seeking certainty before trust has time to form.</p>
+            </div>
+            <div className="px-6 py-5 border-b border-white/[0.05]">
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">The pattern</p>
+              <p className="text-[14px] text-[#f4efe9] leading-[1.7]">You replay because the loop hasn&rsquo;t resolved. The replaying is the pattern trying to find the exit it didn&rsquo;t take.</p>
+            </div>
+            <div className="px-6 py-5 bg-white/[0.015]">
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">Next move</p>
+              <p className="text-[14px] text-[#f4efe9] leading-[1.7]">Pause the response. Name the need. Choose one honest sentence instead of defending the whole story.</p>
+            </div>
+            <div className="px-6 py-3 border-t border-white/[0.04] flex items-center gap-3">
+              <span className="font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f4b47]">Baseline Design active</span>
+              <span className="h-px flex-1 bg-white/[0.04]" />
+              <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47]">Birth data ✓</span>
+            </div>
+          </div>
+        </Container>
+      </section>
+
       {/* ── CTA ── */}
-      <section className="relative w-full py-24 md:py-32 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-900/10 via-[#08070a] to-[#08070a] border-t border-white/5 overflow-hidden">
+      <section className="relative w-full py-24 md:py-32 bg-[#08070a] pattern-field border-t border-white/5 overflow-hidden">
         <div className="light-beam" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <h2 className="font-serif text-4xl md:text-6xl text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">

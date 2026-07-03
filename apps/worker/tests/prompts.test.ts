@@ -62,8 +62,9 @@ describe("Defrag prompt", () => {
   })
 
   it("blocks therapy language", () => {
-    expect(SYSTEM_DEFRAG).toContain("it sounds like")
-    expect(SYSTEM_DEFRAG).toContain("I hear that")
+    expect(SYSTEM_DEFRAG).toContain("Generic emotional validation or vague self-help")
+    expect(SYSTEM_DEFRAG).toContain('"It sounds like", "I hear that", "you may be feeling"')
+    expect(SYSTEM_DEFRAG).toContain("therapy-style mirroring")
   })
 
   it("contains output contract fields", () => {
@@ -94,7 +95,8 @@ describe("Covenant prompt", () => {
 
   it("blocks condemnation language", () => {
     expect(SYSTEM_COVENANT).toContain("condemnation")
-    expect(SYSTEM_COVENANT).toContain("God told you")
+    expect(SYSTEM_COVENANT).toContain("Never claim to know what God is doing or saying")
+    expect(SYSTEM_COVENANT).toContain("Never use language of condemnation or spiritual pressure")
   })
 
   it("enforces presence not rescue", () => {

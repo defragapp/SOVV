@@ -70,7 +70,7 @@ export default function TermsPage() {
         <Container className="relative z-10 flex flex-col items-center text-center max-w-[700px]">
           <MetaLabel>Terms of service</MetaLabel>
           <h1 className="font-serif text-[clamp(2.6rem,6vw,4.5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-6">
-            Terms of Service
+            <span className="text-glow"><span className="text-glow">Terms of Service</span></span>
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-[500px] text-balance leading-relaxed">
             By using Sovereign.os, you agree to these terms.

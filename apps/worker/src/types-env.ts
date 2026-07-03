@@ -70,6 +70,10 @@ export interface Env {
   FREE_DAILY_LIMIT?: string
   APP_URL?: string
   AI_MODEL?: string
-GATEWAY_ID?: string
+  GATEWAY_ID?: string
+  ENABLE_NEW_FLOW?: string
+  ENABLE_MEMORY?: string
+  ENABLE_FLOW_SUGGESTION?: string
+  CF_VERSION_METADATA?: string
   ELEVENLABS_API_KEY?: string
 }

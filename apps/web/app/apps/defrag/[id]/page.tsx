@@ -27,7 +27,7 @@ function Section({ label, value, highlight = false }: { label: string; value: st
       <p className={`font-mono text-[9px] uppercase tracking-[0.2em] mb-2 ${highlight ? "text-[#e0743a]/60" : "text-[#4f4b47]"}`}>
         {label}
       </p>
-      <p className={`text-[14px] leading-[1.7] ${highlight ? "text-[#f4efe9] font-medium" : "text-[#f4efe9]"}`}>
+      <p className={`text-[14px] leading-[1.7] ${highlight ? "text-[#f4efe9]" : "text-[#f4efe9]"}`}>
         {value}
       </p>
     </motion.div>
@@ -246,7 +246,7 @@ export default function DefragItemPage() {
                   className="border-t border-white/[0.06] pt-5 mt-5"
                 >
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">Next move</p>
-                  <p className="text-[14px] text-[#f4efe9] font-medium leading-[1.7]">
+                  <p className="text-[14px] text-[#f4efe9] leading-[1.7]">
                     {typeof result.bestNextResponse === "string"
                       ? result.bestNextResponse
                       : result.bestNextResponse.summary}

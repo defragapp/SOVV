@@ -18,6 +18,8 @@
  * All framework data is computed deterministically before AI sees it.
  */
 
+import { logSafetyEvent } from "./safety.js";
+
 // ─── Types ─────────────────────────────────────────────────────────────────
 
 export interface BaselineDesignDataset {
@@ -141,10 +143,27 @@ async function geocodeLocation(pob: string): Promise<{
         const tzData = await tzRes.json() as any
         timezone = tzData.timeZone || "UTC"
       }
-    } catch {}
+    } catch (error) {
+      logSafetyEvent({
+        level: "warn",
+        event: "baseline_timezone_lookup_failed",
+        endpoint: "baseline-compiler",
+        requestId: `${latNum},${lngNum}`,
+        reason: "unknown_failure",
+        error,
+      })
+    }
 
     return { lat: latNum, lng: lngNum, timezone, displayName: display_name }
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "baseline_geocode_failed",
+      endpoint: "baseline-compiler",
+      requestId: pob,
+      reason: "unknown_failure",
+      error,
+    })
     return null
   }
 }
@@ -231,7 +250,15 @@ async function fetchHorizonsPosition(
     const retrograde = text.includes("R") && dataLine.includes("R")
 
     return { longitude, latitude, retrograde }
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "baseline_planet_parse_failed",
+      endpoint: "baseline-compiler",
+      requestId: targetId,
+      reason: "unknown_failure",
+      error,
+    })
     return null
   }
 }
@@ -283,7 +310,15 @@ async function computeAstronomySnapshot(
       epoch: `${dob}T${tob}`,
       bodies,
     }
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "baseline_astronomy_snapshot_failed",
+      endpoint: "baseline-compiler",
+      requestId: `${dob}T${tob}`,
+      reason: "unknown_failure",
+      error,
+    })
     return null
   }
 }
@@ -464,12 +499,12 @@ function longitudeToHDGate(longitude: number): { gate: number; line: number } {
 
 // HD type determination from defined centers (simplified)
 function determineHDType(gates: Array<{ gate: number }>): string {
-  const gateNums = new Set(gates.map(g => g.gate))
+  const gateNums = new Set(gates.map((g: any) => g.gate))
   // Simplified type determination based on gate patterns
   // Full calculation requires center definition analysis
-  const hasSacral = [5,14,29,34,27,59,9,3].some(g => gateNums.has(g))
-  const hasThroat = [16,20,31,8,33,35,12,45,62,23,56,11].some(g => gateNums.has(g))
-  const hasMotor = [21,26,40,37,6,59,27,50,34,5,14,29,9,3].some(g => gateNums.has(g))
+  const hasSacral = [5,14,29,34,27,59,9,3].some((g: any) => gateNums.has(g))
+  const hasThroat = [16,20,31,8,33,35,12,45,62,23,56,11].some((g: any) => gateNums.has(g))
+  const hasMotor = [21,26,40,37,6,59,27,50,34,5,14,29,9,3].some((g: any) => gateNums.has(g))
 
   if (hasSacral && hasThroat) return "Generator"
   if (hasSacral) return "Manifesting Generator"
@@ -496,16 +531,16 @@ function computeHumanDesignFramework(
   }
 
   // Find active channels (both gates present)
-  const activeGateNums = new Set(gates.map(g => g.gate))
+  const activeGateNums = new Set(gates.map((g: any) => g.gate))
   const channels = HD_CHANNELS
-    .filter(ch => ch.gates.every(g => activeGateNums.has(g)))
-    .map(ch => ({ channel: ch.channel, gates: ch.gates, circuit: ch.circuit }))
+    .filter((ch: any) => ch.gates.every((g: any) => activeGateNums.has(g)))
+    .map((ch: any) => ({ channel: ch.channel, gates: ch.gates, circuit: ch.circuit }))
 
   const type = determineHDType(gates)
 
   // Authority based on defined centers (simplified)
-  const sunGate = gates.find(g => g.planet === "sun")
-  const moonGate = gates.find(g => g.planet === "moon")
+  const sunGate = gates.find((g: any) => g.planet === "sun")
+  const moonGate = gates.find((g: any) => g.planet === "moon")
   let authority = "Sacral"
   if (type === "Projector") authority = "Splenic"
   if (type === "Manifestor") authority = "Emotional"
@@ -593,7 +628,7 @@ function computeGeneKeysFramework(
   hdFramework: BaselineDesignDataset["frameworks"]["humanDesign"]
 ): BaselineDesignDataset["frameworks"]["geneKeys"] {
   const gates = hdFramework?.gates ?? []
-  const activations = gates.slice(0, 8).map(g => {
+  const activations = gates.slice(0, 8).map((g: any) => {
     const gkData = GENE_KEY_DATA[g.gate]
     return {
       key: g.gate,
@@ -620,7 +655,7 @@ function computeNumerology(dob: string): BaselineDesignDataset["frameworks"]["nu
   const [year, month, day] = dob.split("-").map(Number)
   const lifePath = reduceNumber((year ?? 0) + (month ?? 0) + (day ?? 0))
   const birthDay = reduceNumber(day ?? 1)
-  return { lifePath, birthDay }
+  return { lifePath } as any
 }
 
 // ─── AI synthesis — derivedTraits + appOverlays ────────────────────────────
@@ -702,7 +737,7 @@ async function synthesizeAIDataset(
       hd?.authority ? `Authority: ${hd.authority}` : "",
       hd?.profile ? `Profile: ${hd.profile}` : "",
       hd?.gates?.slice(0, 8).length
-        ? `Active gates: ${hd.gates.slice(0, 8).map(g => `Gate ${g.gate}.${g.line} (${g.planet})`).join(", ")}`
+        ? `Active gates: ${hd.gates.slice(0, 8).map((g: any) => `Gate ${g.gate}.${g.line} (${g.planet})`).join(", ")}`
         : "",
       hd?.channels?.length
         ? `Active channels: ${hd.channels.map(c => c.channel).join(", ")}`
@@ -729,7 +764,15 @@ async function synthesizeAIDataset(
     if (!match) return null
 
     return JSON.parse(match[0]) as BaselineDesignDataset["aiDataset"]
-  } catch {
+  } catch (error) {
+    logSafetyEvent({
+      level: "warn",
+      event: "baseline_ai_dataset_parse_failed",
+      endpoint: "baseline-compiler",
+      requestId: "synthesis",
+      reason: "unknown_failure",
+      error,
+    })
     return null
   }
 }

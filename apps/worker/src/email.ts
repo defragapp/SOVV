@@ -14,6 +14,7 @@
  */
 
 import type { SendEmail } from "@cloudflare/workers-types";
+import { logSafetyEvent } from "./safety.js";
 
 const FROM = "Sovereign.os <info@defrag.app>";
 const REPLY_TO = "info@defrag.app";
@@ -105,10 +106,15 @@ async function sendEmail(
       return;
     } catch (err) {
       // Fall through to Resend if binding fails, but log the underlying error.
-      console.warn(
-        "[email] EMAIL binding failed; falling back to Resend:",
-        err,
-      );
+      logSafetyEvent({
+        level: "warn",
+        event: "email_binding_failed_fallback_to_resend",
+        endpoint: "email",
+        requestId: payload.to,
+        reason: "unknown_failure",
+        error_type: "system",
+        error: err,
+      });
     }
   }
 

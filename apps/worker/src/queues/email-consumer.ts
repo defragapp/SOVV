@@ -22,6 +22,7 @@
  */
 
 import type { Env } from "../types-env.js";
+import { logSafetyEvent } from "../safety.js";
 import {
   sendWelcomeEmail,
   sendPaymentSucceededEmail,
@@ -58,8 +59,14 @@ const opts = {
   switch (job.type) {
     case "welcome":
       if (!job.to) {
-        console.warn("[email-consumer] welcome job missing 'to':", {
-          from: job.from,
+        logSafetyEvent({
+          level: "warn",
+          event: "email_consumer_missing_recipient",
+          endpoint: "queue:email",
+          requestId: job.from ?? "unknown",
+          reason: "unknown_failure",
+          error_type: "system",
+          details: { jobType: "welcome", from: job.from },
         });
         return;
       }
@@ -68,8 +75,14 @@ const opts = {
 
     case "payment_success":
       if (!job.to) {
-        console.warn("[email-consumer] payment_success job missing 'to':", {
-          from: job.from,
+        logSafetyEvent({
+          level: "warn",
+          event: "email_consumer_missing_recipient",
+          endpoint: "queue:email",
+          requestId: job.from ?? "unknown",
+          reason: "unknown_failure",
+          error_type: "system",
+          details: { jobType: "payment_success", from: job.from },
         });
         return;
       }
@@ -78,8 +91,14 @@ const opts = {
 
     case "payment_failed":
       if (!job.to) {
-        console.warn("[email-consumer] payment_failed job missing 'to':", {
-          from: job.from,
+        logSafetyEvent({
+          level: "warn",
+          event: "email_consumer_missing_recipient",
+          endpoint: "queue:email",
+          requestId: job.from ?? "unknown",
+          reason: "unknown_failure",
+          error_type: "system",
+          details: { jobType: "payment_failed", from: job.from },
         });
         return;
       }
@@ -88,8 +107,14 @@ const opts = {
 
     case "canceled":
       if (!job.to) {
-        console.warn("[email-consumer] canceled job missing 'to':", {
-          from: job.from,
+        logSafetyEvent({
+          level: "warn",
+          event: "email_consumer_missing_recipient",
+          endpoint: "queue:email",
+          requestId: job.from ?? "unknown",
+          reason: "unknown_failure",
+          error_type: "system",
+          details: { jobType: "canceled", from: job.from },
         });
         return;
       }
@@ -99,18 +124,24 @@ const opts = {
     case "inbound_email":
       // Internal notification only — no outbound send.
       // Log for operator awareness. Future: create support ticket in D1.
-      console.log(
-        "[inbound_email] from=%s to=%s size=%s",
-        job.from,
-        job.to,
-        job.size,
-      );
+      logSafetyEvent({
+        event: "email_consumer_inbound_notification",
+        endpoint: "queue:email",
+        requestId: job.from ?? "unknown",
+        details: { from: job.from, to: job.to, size: job.size },
+      });
       return;
 
     default: {
       // Defensive: avoid `as any` at boundaries.
-      console.warn("[email-consumer] Unknown job type:", {
-        type: (job as unknown as { type?: unknown }).type,
+      logSafetyEvent({
+        level: "warn",
+        event: "email_consumer_unknown_job_type",
+        endpoint: "queue:email",
+        requestId: "unknown",
+        reason: "unknown_failure",
+        error_type: "system",
+        details: { type: (job as unknown as { type?: unknown }).type },
       });
       return;
     }

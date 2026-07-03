@@ -37,7 +37,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
           </div>
 
           {/* Space switcher */}
-          <div className="flex items-center gap-1">
+          <nav aria-label="Space navigation" className="flex items-center gap-1">
             {[
               { href: "/apps/defrag", label: "Defrag" },
               { href: "/apps/covenant", label: "Covenant" },
@@ -56,7 +56,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
                 {s.label}
               </Link>
             ))}
-          </div>
+          </nav>
 
           {/* Right nav */}
           <div className="flex items-center gap-4">

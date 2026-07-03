@@ -20,7 +20,7 @@ export function FadeUp({
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay }}
       className={className}
     >
-      {children}
+      {children as any}
     </motion.div>
   );
 }
@@ -42,7 +42,7 @@ export function FadeIn({
       transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay }}
       className={className}
     >
-      {children}
+      {children as any}
     </motion.div>
   );
 }
