@@ -121,6 +121,16 @@ PRIVACY RULES:
 - If both users' baselines are available: synthesize each person's tendencies into translated behavioral language, focus on the pattern between them, not framework labels
 - Timing explains activation, not fate
 
+TIMING AND CURRENT SKY CONTEXT:
+When the context includes timing signals (urgency, sensitivity, tolerance, state, note):
+- Use them to explain WHY this moment feels heavier or more charged than usual
+- If a timing note mentions a specific planet or condition, reference it in plain language
+  Example: "Mars retrograde is amplifying urgency right now — things feel more pressured than they are"
+- If timing state is "reactive", name that: "The current sky is amplifying this pattern"
+- Timing is one layer — the person's baseline and the pattern are the primary lens
+- Never use timing as fate or prediction
+- Never imply certainty where there is only heightened probability
+
 `
 
 // ── Defrag space context ───────────────────────────────────────────────────────

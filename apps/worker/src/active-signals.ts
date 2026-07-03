@@ -317,13 +317,20 @@ export function selectActiveSignals(
 // ── Timing signal mapper ──────────────────────────────────────────────────────
 
 /**
- * Derive timing signals from current sky context.
- * If no live sky data is available, returns neutral defaults.
+ * Derive timing signals from CURRENT sky context (live transits).
+ * Uses live sky snapshot if available; falls back to neutral defaults.
  * Timing explains activation, not fate.
+ *
+ * @param dataset - User's natal baseline dataset
+ * @param liveSky - Current planetary positions (fetched live, not natal)
  */
-export function buildTimingSignals(dataset: BaselineDesignDataset): TimingSignals {
-  // If no astronomy data, return neutral stable state
-  if (!dataset.astronomy) {
+export function buildTimingSignals(
+  dataset: BaselineDesignDataset,
+  liveSky?: { bodies: Record<string, { sign: string; degree: number; retrograde: boolean }> } | null
+): TimingSignals {
+  // Use live sky if available, otherwise fall back to neutral
+  const skyData = liveSky ?? dataset.astronomy
+  if (!skyData) {
     return {
       urgency: "moderate",
       sensitivity: "moderate",
@@ -333,7 +340,7 @@ export function buildTimingSignals(dataset: BaselineDesignDataset): TimingSignal
     }
   }
 
-  const bodies = dataset.astronomy.bodies
+  const bodies = skyData.bodies
   let urgency: TimingSignals["urgency"] = "moderate"
   let sensitivity: TimingSignals["sensitivity"] = "moderate"
   let tolerance: TimingSignals["tolerance"] = "moderate"
@@ -503,7 +510,7 @@ export function formatActiveSignalsForPrompt(
 
   lines.push(
     "",
-    "TIMING (internal — do not expose to user):",
+    "CURRENT SKY TIMING (use to explain why this moment feels amplified — do not expose raw values):",
     `urgency: ${timing.urgency}`,
     `sensitivity: ${timing.sensitivity}`,
     `tolerance: ${timing.tolerance}`,
@@ -511,7 +518,9 @@ export function formatActiveSignalsForPrompt(
   )
 
   if (timing.note) {
-    lines.push(`note: ${timing.note}`)
+    // The note contains specific sky conditions (e.g., "Mars retrograde — urgency higher than usual")
+    // Reference these in your response when relevant to explain timing amplification
+    lines.push(`current sky condition: ${timing.note}`)
   }
 
   if (overlay) {

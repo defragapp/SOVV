@@ -18,6 +18,7 @@
  * All framework data is computed deterministically before AI sees it.
  */
 
+import type { KVNamespace } from "@cloudflare/workers-types";
 import { logSafetyEvent } from "./safety.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -319,6 +320,107 @@ async function computeAstronomySnapshot(
       reason: "unknown_failure",
       error,
     })
+    return null
+  }
+}
+
+
+// ─── Live Sky Snapshot ──────────────────────────────────────────────────────
+// Fetches CURRENT planetary positions for timing/transit analysis.
+// This is different from the natal chart (birth positions).
+// Cached in KV for 6 hours to avoid excessive API calls.
+
+export interface LiveSkySnapshot {
+  fetchedAt: string
+  epoch: string
+  lat: number
+  lng: number
+  bodies: Record<string, {
+    longitude: number
+    latitude: number
+    sign: string
+    degree: number
+    retrograde: boolean
+  }>
+}
+
+/**
+ * Get current planetary positions for a given location.
+ * Used for transit analysis and timing signals.
+ * Cached in KV for 6 hours.
+ */
+export async function getCurrentSkySnapshot(
+  env: { KV: KVNamespace },
+  lat: number,
+  lng: number
+): Promise<LiveSkySnapshot | null> {
+  // Round lat/lng to 1 decimal for cache key (city-level precision is enough)
+  const latKey = lat.toFixed(1)
+  const lngKey = lng.toFixed(1)
+  const cacheKey = `live_sky:${latKey}:${lngKey}`
+
+  // Check cache first (6 hour TTL)
+  try {
+    const cached = await env.KV.get(cacheKey, 'json') as LiveSkySnapshot | null
+    if (cached) {
+      const age = Date.now() - new Date(cached.fetchedAt).getTime()
+      if (age < 6 * 60 * 60 * 1000) return cached
+    }
+  } catch { /* cache miss */ }
+
+  // Fetch current positions
+  const now = new Date()
+  const year = now.getUTCFullYear()
+  const month = String(now.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(now.getUTCDate()).padStart(2, '0')
+  const hour = String(now.getUTCHours()).padStart(2, '0')
+  const min = String(now.getUTCMinutes()).padStart(2, '0')
+  
+  const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+  const monthName = monthNames[now.getUTCMonth()] ?? "Jan"
+  const datetime = `${year}-${monthName}-${day} ${hour}:${min}`
+
+  const bodies: LiveSkySnapshot['bodies'] = {}
+
+  try {
+    const planetEntries = Object.entries(PLANET_IDS)
+    const results = await Promise.allSettled(
+      planetEntries.map(([name, id]) =>
+        fetchHorizonsPosition(id, datetime, lat, lng)
+          .then(pos => ({ name, pos }))
+      )
+    )
+
+    for (const result of results) {
+      if (result.status === 'fulfilled' && result.value.pos) {
+        const { name, pos } = result.value
+        const { sign, degree } = eclipticLongitudeToSign(pos.longitude)
+        bodies[name] = {
+          longitude: pos.longitude,
+          latitude: pos.latitude,
+          sign,
+          degree,
+          retrograde: pos.retrograde,
+        }
+      }
+    }
+
+    if (Object.keys(bodies).length === 0) return null
+
+    const snapshot: LiveSkySnapshot = {
+      fetchedAt: now.toISOString(),
+      epoch: `${year}-${month}-${day}T${hour}:${min}Z`,
+      lat,
+      lng,
+      bodies,
+    }
+
+    // Cache for 6 hours
+    await env.KV.put(cacheKey, JSON.stringify(snapshot), { expirationTtl: 6 * 60 * 60 })
+
+    return snapshot
+  } catch (err) {
+    console.warn('[live-sky] Failed to fetch current sky:', err)
     return null
   }
 }
