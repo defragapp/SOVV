@@ -226,8 +226,8 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         .run()
 
       const token = generateSessionToken()
-      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
-        .bind(token, userId, now + SESSION_TTL * 1000, now)
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)")
+        .bind(token, userId, now + SESSION_TTL * 1000)
         .run()
 
       // Send welcome email via queue (non-blocking)
@@ -306,8 +306,8 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       const token = generateSessionToken()
       const now = Date.now()
-      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
-        .bind(token, user.id, now + SESSION_TTL * 1000, now)
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)")
+        .bind(token, user.id, now + SESSION_TTL * 1000)
         .run()
 
       return jsonResponse({ success: true, token }, 200, {
@@ -647,8 +647,8 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       const oldToken = cookieHeader_val.match(/session=([^;]+)/)?.[1]
 
       // Insert new session
-      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
-        .bind(newToken, user.id, now + SESSION_TTL * 1000, now).run()
+      await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)")
+        .bind(newToken, user.id, now + SESSION_TTL * 1000).run()
 
       // Delete old session
       if (oldToken) {
