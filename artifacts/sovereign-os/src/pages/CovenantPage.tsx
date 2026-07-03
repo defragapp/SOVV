@@ -32,20 +32,23 @@ function CovenantRow({
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-1 py-4 text-left transition-opacity hover:opacity-80 ${
+      className={`group w-full flex items-center justify-between px-1 py-4 text-left transition-colors duration-[350ms] ${
         isLast ? '' : 'border-b border-white/[0.08]'
       }`}
     >
       <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-4">
-        <span className="text-[14px] text-[#d4cec8] font-sans leading-tight truncate">
+        <span className="text-[14px] text-[#d4cec8] group-hover:text-[#f4efe9] font-sans leading-tight truncate transition-colors duration-[350ms]">
           {covenant.relationship}
         </span>
-        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60">
+        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/55 group-hover:text-[#e0743a]/85 transition-colors duration-[350ms]">
           [{covenant.trigger}]
         </span>
       </div>
-      {/* Chevron */}
-      <svg width="7" height="12" viewBox="0 0 7 12" fill="none" className="shrink-0 text-white/20">
+      {/* Chevron — warms and nudges on hover */}
+      <svg
+        width="7" height="12" viewBox="0 0 7 12" fill="none"
+        className="shrink-0 text-white/[0.18] group-hover:text-[#e0743a]/45 transition-all duration-[350ms] group-hover:translate-x-[2px]"
+      >
         <path d="M1 1l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     </button>
@@ -113,6 +116,7 @@ function CovenantDetail({
 function DraftingEngine({ onSeal }: { onSeal: (c: Omit<Covenant, 'id' | 'sealed'>) => void }) {
   const [relationship, setRelationship] = useState('');
   const [boundary, setBoundary] = useState('');
+  const [focusedField, setFocusedField] = useState<'relationship' | 'boundary' | null>(null);
   const isActive = relationship.trim().length > 0 || boundary.trim().length > 0;
   const canSeal = relationship.trim().length > 0 && boundary.trim().length > 0;
 
@@ -132,27 +136,37 @@ function DraftingEngine({ onSeal }: { onSeal: (c: Omit<Covenant, 'id' | 'sealed'
     <div className="px-4 pb-4 pt-2 shrink-0">
       <form onSubmit={handleSeal}>
         <div className="overflow-hidden">
-          {/* Relationship input */}
-          <div className="border-b border-white/[0.05]">
+          {/* Relationship input — hairline warms on focus */}
+          <div
+            className="border-b transition-colors duration-700"
+            style={{ borderColor: focusedField === 'relationship' ? 'rgba(224,116,58,0.45)' : 'rgba(255,255,255,0.05)' }}
+          >
             <input
               type="text"
               value={relationship}
               onChange={e => setRelationship(e.target.value)}
               placeholder="Target relationship or dynamic..."
-              className="w-full px-5 pt-5 pb-4 bg-transparent text-[17px] text-[#f4efe9] placeholder:text-[#4f4b47] outline-none border-none"
+              className="w-full px-5 pt-5 pb-4 bg-transparent text-[17px] text-[#f4efe9] placeholder:text-[#4f4b47] placeholder:transition-opacity placeholder:duration-500 focus:placeholder:opacity-40 outline-none border-none"
               style={{ fontFamily: 'var(--app-font-sans)' }}
+              onFocus={() => setFocusedField('relationship')}
+              onBlur={() => setFocusedField(null)}
             />
           </div>
 
-          {/* Boundary textarea */}
-          <div className="border-b border-white/[0.05]">
+          {/* Boundary textarea — hairline warms on focus */}
+          <div
+            className="border-b transition-colors duration-700"
+            style={{ borderColor: focusedField === 'boundary' ? 'rgba(224,116,58,0.45)' : 'rgba(255,255,255,0.05)' }}
+          >
             <textarea
               value={boundary}
               onChange={e => setBoundary(e.target.value)}
               placeholder="Define the structural boundary..."
               rows={3}
-              className="w-full px-5 pt-4 pb-4 bg-transparent text-[17px] text-[#f4efe9] placeholder:text-[#4f4b47] outline-none border-none resize-none leading-relaxed"
+              className="w-full px-5 pt-4 pb-4 bg-transparent text-[17px] text-[#f4efe9] placeholder:text-[#4f4b47] placeholder:transition-opacity placeholder:duration-500 focus:placeholder:opacity-40 outline-none border-none resize-none leading-relaxed"
               style={{ fontFamily: 'var(--app-font-sans)' }}
+              onFocus={() => setFocusedField('boundary')}
+              onBlur={() => setFocusedField(null)}
             />
           </div>
 

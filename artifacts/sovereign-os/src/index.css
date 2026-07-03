@@ -122,6 +122,7 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-smooth: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-cinema: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --duration-fast: 150ms;
   --duration-base: 220ms;
   --duration-slow: 400ms;
@@ -231,6 +232,7 @@
   }
   html {
     background-color: #08070a;
+    scroll-behavior: smooth;
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
@@ -238,10 +240,13 @@
     color: #f4efe9;
     overflow-x: hidden;
     overscroll-behavior: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   ::selection {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
+    background: rgba(224, 116, 58, 0.28);
+    color: #f4efe9;
   }
 }
 
@@ -337,25 +342,25 @@
 .ambient-blob   { animation: ambientDrift 25s ease-in-out infinite; pointer-events: none; }
 .ambient-blob-2 { animation: ambientDrift 30s ease-in-out infinite reverse; pointer-events: none; }
 
-.reveal-up { animation: revealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+.reveal-up { animation: revealUp 0.72s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
 .reveal-up-1 { animation-delay: 0ms; }
-.reveal-up-2 { animation-delay: 80ms; }
-.reveal-up-3 { animation-delay: 160ms; }
-.reveal-up-4 { animation-delay: 240ms; }
-.reveal-up-5 { animation-delay: 320ms; }
-.reveal-up-6 { animation-delay: 400ms; }
-.reveal-up-7 { animation-delay: 480ms; }
+.reveal-up-2 { animation-delay: 130ms; }
+.reveal-up-3 { animation-delay: 260ms; }
+.reveal-up-4 { animation-delay: 390ms; }
+.reveal-up-5 { animation-delay: 520ms; }
+.reveal-up-6 { animation-delay: 650ms; }
+.reveal-up-7 { animation-delay: 780ms; }
 
 /* ── Skeleton ─────────────────────────────────────────────────────────────── */
 .skeleton {
   background: linear-gradient(
     90deg,
-    rgba(255,255,255,0.03) 25%,
-    rgba(255,255,255,0.06) 50%,
-    rgba(255,255,255,0.03) 75%
+    rgba(224,116,58,0.04) 25%,
+    rgba(224,116,58,0.09) 50%,
+    rgba(224,116,58,0.04) 75%
   );
   background-size: 200% 100%;
-  animation: shimmer 1.8s ease-in-out infinite;
+  animation: shimmer 2.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
   border-radius: var(--radius-minimal);
 }
 
@@ -448,8 +453,8 @@
   transition: background 220ms ease, border-color 220ms ease;
 }
 .card:hover {
-  background: rgba(255,255,255,0.035);
-  border-color: var(--border-medium);
+  background: rgba(255,255,255,0.030);
+  border-color: rgba(224,116,58,0.16);
 }
 .glow-sm { box-shadow: 0 0 40px rgba(224,116,58,0.2); }
 .glow-card-hover {
@@ -603,9 +608,9 @@
   transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
 }
 .moment-card:hover {
-  border-color: rgba(255,255,255,0.12);
-  box-shadow: 0 1px rgba(224,116,58,0.08) inset, 0 0 0 1px rgba(224,116,58,0.06), 0 20px 50px -20px rgba(0,0,0,0.5);
-  transform: translateY(-2px);
+  border-color: rgba(224,116,58,0.12);
+  box-shadow: 0 2px rgba(224,116,58,0.06) inset, 0 0 0 1px rgba(224,116,58,0.08), 0 24px 60px -20px rgba(0,0,0,0.6);
+  transform: translateY(-3px);
 }
 .ios-panel {
   background: rgba(255, 255, 255, 0.02);
@@ -643,8 +648,8 @@
 /* ── Scrollbar ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+::-webkit-scrollbar-thumb { background: rgba(224,116,58,0.18); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(224,116,58,0.32); transition: background 250ms ease; }
 
 /* ── Reduced motion ──────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {

@@ -34,26 +34,29 @@ function ArchiveRow({
     <motion.button
       {...(!reducedMotion ? { layoutId: `row-${pattern.id}` } : {})}
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-1 py-4 text-left transition-opacity hover:opacity-80 ${
+      className={`group w-full flex items-center justify-between px-1 py-4 text-left transition-colors duration-[350ms] ${
         isLast ? '' : 'border-b border-white/[0.08]'
       }`}
     >
       <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-4">
         {/* Timestamp */}
-        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
+        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] group-hover:text-[#76716b] transition-colors duration-[350ms]">
           {fmtDate(pattern.savedAtFull)}
         </span>
         {/* Snippet */}
-        <span className="text-[14px] text-[#d4cec8] font-sans leading-snug line-clamp-1">
+        <span className="text-[14px] text-[#d4cec8] group-hover:text-[#f4efe9] font-sans leading-snug line-clamp-1 transition-colors duration-[350ms]">
           {pattern.whatsActive}
         </span>
         {/* Tag */}
-        <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#e0743a]/60">
+        <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#e0743a]/55 group-hover:text-[#e0743a]/85 transition-colors duration-[350ms]">
           [{pattern.activePattern}]
         </span>
       </div>
-      {/* Chevron */}
-      <svg width="7" height="12" viewBox="0 0 7 12" fill="none" className="shrink-0 text-white/20">
+      {/* Chevron — warms and nudges on hover */}
+      <svg
+        width="7" height="12" viewBox="0 0 7 12" fill="none"
+        className="shrink-0 text-white/[0.18] group-hover:text-[#e0743a]/45 transition-all duration-[350ms] group-hover:translate-x-[2px]"
+      >
         <path d="M1 1l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     </motion.button>

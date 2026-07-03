@@ -12,35 +12,40 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 
 // ── Skeleton pulse ────────────────────────────────────────────────────────────
-function SkeletonCard({ lines = 2 }: { lines?: number }) {
+function SkeletonCard({ lines = 2, delay = 0 }: { lines?: number; delay?: number }) {
   return (
-    <div className="py-5">
+    <motion.div
+      className="py-5"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
+    >
       <div className="flex items-center justify-between mb-3">
-        <div className="h-2 w-24 rounded-sm bg-white/[0.06] animate-pulse" />
-        <div className="w-1.5 h-1.5 rounded-full bg-white/[0.06] animate-pulse" />
+        <div className="h-2 w-24 rounded-sm skeleton" />
+        <div className="w-1.5 h-1.5 rounded-full skeleton" />
       </div>
       <div className="flex flex-col gap-2.5">
         {Array.from({ length: lines }).map((_, i) => (
           <div
             key={i}
-            className="h-3 rounded-sm bg-white/[0.04] animate-pulse"
-            style={{ width: i === lines - 1 ? '60%' : '100%', animationDelay: `${i * 80}ms` }}
+            className="h-3 rounded-sm skeleton"
+            style={{ width: i === lines - 1 ? '60%' : '100%', animationDelay: `${i * 220}ms` }}
           />
         ))}
       </div>
-      <div className="mt-5 h-px bg-white/[0.05]" />
-    </div>
+      <div className="mt-5 h-px bg-[#e0743a]/[0.06]" />
+    </motion.div>
   );
 }
 
 function SkeletonOutput() {
   return (
     <div className="flex flex-col px-6 py-4">
-      <SkeletonCard lines={1} />
-      <SkeletonCard lines={3} />
-      <SkeletonCard lines={2} />
-      <SkeletonCard lines={3} />
-      <SkeletonCard lines={2} />
+      <SkeletonCard lines={1} delay={0} />
+      <SkeletonCard lines={3} delay={0.12} />
+      <SkeletonCard lines={2} delay={0.24} />
+      <SkeletonCard lines={3} delay={0.36} />
+      <SkeletonCard lines={2} delay={0.48} />
     </div>
   );
 }
@@ -55,6 +60,7 @@ function DropZone({
 }) {
   const [value, setValue] = useState('');
   const [mode, setMode] = useState<Mode>('self');
+  const [focused, setFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const chips = CHIP_GROUPS[mode]?.[0]?.chips ?? [];
 
@@ -103,8 +109,11 @@ function DropZone({
 
       {/* Drop zone — zero-edge, textarea floats on canvas */}
       <form onSubmit={handleSubmit}>
-        {/* Top hairline */}
-        <div className="h-px bg-white/[0.06] mb-4" />
+        {/* Top hairline — warms to amber when the field is active */}
+        <div
+          className="h-px mb-4 transition-colors duration-700"
+          style={{ background: focused ? 'rgba(224,116,58,0.45)' : 'rgba(255,255,255,0.06)' }}
+        />
 
         {/* Textarea — directly on canvas */}
         <textarea
@@ -114,8 +123,10 @@ function DropZone({
           placeholder="Describe the moment. What happened? What was said?"
           rows={4}
           disabled={loading}
-          className="w-full resize-none bg-transparent text-[17px] text-[#f4efe9] placeholder:text-[#4f4b47] outline-none border-none ring-0 leading-relaxed disabled:opacity-50"
+          className="w-full resize-none bg-transparent text-[17px] text-[#f4efe9] placeholder:text-[#4f4b47] placeholder:transition-opacity placeholder:duration-500 focus:placeholder:opacity-40 outline-none border-none ring-0 leading-relaxed disabled:opacity-50"
           style={{ fontFamily: 'var(--app-font-sans)' }}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
           onKeyDown={e => {
             if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
               handleSubmit(e as unknown as React.FormEvent);
@@ -181,9 +192,9 @@ function DiagnosticCard({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease, delay }}
+      transition={{ duration: 0.58, ease: [0.25, 0.46, 0.45, 0.94], delay }}
     >
       {/* Mono label anchors the section — no container */}
       <div className="flex items-center justify-between mb-3">
@@ -209,8 +220,8 @@ function DiagnosticCard({
       </div>
       {/* Content floats directly on canvas */}
       <div className="pb-8">{children}</div>
-      {/* Hairline separator */}
-      <div className="h-px bg-white/[0.06]" />
+      {/* Hairline separator — amber-tinted */}
+      <div className="h-px bg-[#e0743a]/[0.07]" />
     </motion.div>
   );
 }
@@ -246,7 +257,7 @@ function DiagnosticOutput({ result }: { result: DiagnosticResult }) {
       )}
 
       {result.whatsActive && (
-        <DiagnosticCard tag="[What's Active]" delay={0.06}>
+        <DiagnosticCard tag="[What's Active]" delay={0.11}>
           <p className="text-[15px] text-[#d4cec8] leading-relaxed font-sans">
             {result.whatsActive}
           </p>
@@ -254,7 +265,7 @@ function DiagnosticOutput({ result }: { result: DiagnosticResult }) {
       )}
 
       {result.defenseMechanism && (
-        <DiagnosticCard tag="[Defense Mechanism]" delay={0.12}>
+        <DiagnosticCard tag="[Defense Mechanism]" delay={0.22}>
           <p className="text-[15px] text-[#d4cec8] leading-relaxed font-sans">
             {result.defenseMechanism}
           </p>
@@ -262,7 +273,7 @@ function DiagnosticOutput({ result }: { result: DiagnosticResult }) {
       )}
 
       {Array.isArray(result.resolutionSteps) && result.resolutionSteps.length > 0 && (
-        <DiagnosticCard tag="[Resolution Steps]" delay={0.18}>
+        <DiagnosticCard tag="[Resolution Steps]" delay={0.33}>
           <div className="flex flex-col gap-3">
             {result.resolutionSteps.map((step, i) => (
               <div key={i} className="flex gap-3">

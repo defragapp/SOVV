@@ -70,12 +70,16 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
                 key={s.href}
                 href={s.href}
                 aria-current={spaceName === s.label ? "page" : undefined}
-                className={`px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] uppercase transition-colors ${
+                className={`px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] uppercase transition-all duration-300 ${
                   spaceName === s.label
-                    ? "bg-white/[0.08] text-[#f4efe9]"
+                    ? "text-[#f4efe9]"
                     : "text-[#76716b] hover:text-[#a8a29a] hover:bg-white/[0.04]"
                 }`}
-                style={{ borderRadius: "var(--radius-minimal)" }}
+                style={{
+                  borderRadius: "var(--radius-minimal)",
+                  background: spaceName === s.label ? 'rgba(224,116,58,0.08)' : undefined,
+                  boxShadow: spaceName === s.label ? 'inset 0 0 0 1px rgba(224,116,58,0.15)' : undefined,
+                }}
               >
                 {s.label}
               </Link>
