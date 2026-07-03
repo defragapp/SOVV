@@ -24,8 +24,8 @@ const FREE_FEATURES = [
   "Baseline Design",
   "Defrag space — full access",
   "5 sessions per day",
-  "Structured results",
-  "Clear next responses",
+  "Pattern recognition output",
+  "Best Next Response",
 ]
 
 const PRO_FEATURES = [

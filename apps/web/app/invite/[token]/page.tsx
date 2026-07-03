@@ -28,43 +28,31 @@ type Step = "preview" | "accepting" | "accepted" | "result" | "needs_baseline" |
 export default function InvitePage() {
   const params = useParams()
   const router = useRouter()
-  const token = params.token as string
-
-  const [invite, setInvite] = React.useState<InviteData | null>(null)
-  const [loading, setLoading] = React.useState(true)
-  const [error, setError] = React.useState("")
+  const token = params?.token as string
   const [step, setStep] = React.useState<Step>("preview")
+  const [invite, setInvite] = React.useState<InviteData | null>(null)
   const [result, setResult] = React.useState<InviteResult | null>(null)
+  const [error, setError] = React.useState("")
+  const [loading, setLoading] = React.useState(true)
   const [saving, setSaving] = React.useState(false)
   const [saved, setSaved] = React.useState(false)
 
   React.useEffect(() => {
     if (!token) return
-    fetch("/api/invite/" + token)
-      .then(r => r.ok ? r.json() : null)
-      .then((d: InviteData | null) => {
-        if (d) setInvite(d)
-        else setError("This invite link is invalid or has expired.")
-      })
-      .catch(() => setError("Unable to load invite."))
-      .finally(() => setLoading(false))
+    fetch(`/api/invite/${token}`, { credentials: "include" })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then((d: InviteData) => { setInvite(d); setLoading(false) })
+      .catch(() => { setStep("error"); setError("Invalid or expired invite."); setLoading(false) })
   }, [token])
 
-  const handleAccept = async () => {
+  const acceptInvite = async () => {
     setStep("accepting")
     try {
-      const res = await fetch("/api/invite/" + token + "/accept", {
-        method: "POST",
+      const res = await fetch(`/api/invite/${token}/accept`, {
+        method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ consent: true }),
       })
       const data = await res.json() as any
-
-      if (res.status === 401) {
-        router.push("/app/login?return=/invite/" + token)
-        return
-      }
       if (data.needs_baseline) { setStep("needs_baseline"); return }
       if (data.accepted) { setStep("accepted"); generateResult() }
       else { setError(data.error || "Failed to accept invite"); setStep("error") }
@@ -73,6 +61,8 @@ export default function InvitePage() {
       setStep("preview")
     }
   }
+
+  const handleAccept = acceptInvite
 
   const generateResult = async () => {
     try {

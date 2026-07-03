@@ -122,6 +122,18 @@ export default function PrinciplesPage() {
 
         </Container>
       </section>
+      {/* CTA */}
+      <section className="relative w-full py-20 bg-[#08070a] border-t border-white/[0.04] text-center overflow-hidden">
+        <div className="light-beam opacity-40" aria-hidden />
+        <div className="mx-auto max-w-[1280px] px-6 relative z-10 flex flex-col items-center">
+          <h2 className="font-serif text-[clamp(1.8rem,4vw,3rem)] text-[#f4efe9] tracking-[-0.02em] mb-5 text-balance max-w-xl leading-tight">
+            See the pattern. Choose the repair.
+          </h2>
+          <a href="/app/login" className="btn-primary">
+            Enter Sovereign.os
+          </a>
+        </div>
+      </section>
     </SiteShell>
   )
 }

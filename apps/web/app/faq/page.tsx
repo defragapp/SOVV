@@ -98,6 +98,21 @@ export default function FaqPage() {
           </div>
         </Container>
       </Section>
+      {/* CTA */}
+      <Section className="w-full py-16 md:py-20 bg-[#08070a] border-t border-white/[0.04] text-center">
+        <Container className="relative z-10 flex flex-col items-center">
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-5">Start here</p>
+          <h2 className="font-serif text-[clamp(1.8rem,4vw,3rem)] text-[#f4efe9] tracking-[-0.02em] mb-5 text-balance max-w-xl leading-tight">
+            Defrag is free. Start with one moment.
+          </h2>
+          <p className="text-[14px] text-[#76716b] leading-relaxed mb-8 max-w-sm">
+            Add your birth data, describe what&rsquo;s happening, and see what&rsquo;s actually active beneath it.
+          </p>
+          <a href="/app/login" className="btn-primary">
+            Enter Sovereign.os
+          </a>
+        </Container>
+      </Section>
     </SiteShell>
   );
 }

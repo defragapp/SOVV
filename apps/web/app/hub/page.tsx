@@ -1,3 +1,10 @@
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Sovereign.os — Pattern-aware AI for the moments that matter",
+  description: "Pattern-aware AI for the moments that are hard to read while you're inside them.",
+}
+
 // sovereign.defrag.app hub — Sovereign.os platform entry
 // This page serves as the transitional landing for sovereign.defrag.app
 // It presents Sovereign.os as the parent platform with Defrag and Covenant as spaces.

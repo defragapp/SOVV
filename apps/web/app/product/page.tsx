@@ -5,7 +5,7 @@ import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Product — Sovereign.os",
-  description: "Sovereign.os helps you work through the patterns that keep showing up. Your Baseline Design is the source.",
+  description: "Pattern-aware AI for the moments that matter. Defrag, Covenant, and Alignment — three spaces, one Baseline Design.",
 }
 
 function MetaLabel({ children }: { children: React.ReactNode }) {

@@ -1,4 +1,10 @@
+import type { Metadata } from "next"
 import Link from "next/link"
+
+export const metadata: Metadata = {
+  title: "Page not found — Sovereign.os",
+  description: "This page doesn't exist. Return to Sovereign.os.",
+}
 import { SiteShell } from "@/components/marketing/site-shell"
 
 export default function NotFound() {
