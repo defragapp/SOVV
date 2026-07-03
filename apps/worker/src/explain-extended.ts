@@ -144,8 +144,11 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     return new Response(null, { headers: getCorsHeaders(req) });
   }
 
-  
-  if (subGate) return subGate;
+  // Auth check
+  const user = await getAuthUser(req, env.DB);
+  if (!user) {
+    return jsonResponse({ error: "Unauthorized" }, 401, getCorsHeaders(req));
+  }
 
   const sid = await getSessionId(req);
 
@@ -179,6 +182,12 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const target = body.target;
   const relational = Boolean(target);
   const mode = (body.mode ?? (relational ? "pair" : "self")) as string;
+
+  // Relational mode requires Pro subscription
+  if (relational) {
+    const subGate = await requireActiveSubscription(user, req);
+    if (subGate) return subGate;
+  }
 
   if (relational && user.tier === "free") {
     return jsonResponse(
