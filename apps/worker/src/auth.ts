@@ -796,6 +796,43 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   })
 }
 
+// POST /api/auth/admin-seed — standalone route registration
+// Called separately from registerAuthRoutes to avoid placement issues
+export function registerAdminSeedRoute(router: any, getEnv: () => any) {
+  router.post("/api/auth/admin-seed", async (request: Request) => {
+    const env = getEnv()
+    try {
+      const { secret, email, password } = await request.json() as any
+      if (!env.ADMIN_SEED_SECRET) return new Response(JSON.stringify({ error: "Not configured" }), { status: 403, headers: { "Content-Type": "application/json" } })
+      if (secret !== env.ADMIN_SEED_SECRET) return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { "Content-Type": "application/json" } })
+      if (!email || !password) return new Response(JSON.stringify({ error: "Missing fields" }), { status: 400, headers: { "Content-Type": "application/json" } })
+      if (password.length < 8) return new Response(JSON.stringify({ error: "Password too short" }), { status: 400, headers: { "Content-Type": "application/json" } })
+      const normalizedEmail = email.toLowerCase().trim()
+      const password_hash = await hashPassword(password)
+      const now = Date.now()
+      const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?")
+        .bind(normalizedEmail).first<{ id: string }>()
+      if (existing) {
+        await env.DB.prepare("UPDATE users SET password_hash = ?, role = 'owner' WHERE id = ?")
+          .bind(password_hash, existing.id).run()
+        await env.DB.prepare("DELETE FROM sessions WHERE user_id = ?")
+          .bind(existing.id).run()
+        return new Response(JSON.stringify({ success: true, action: "updated", email: normalizedEmail }), { headers: { "Content-Type": "application/json" } })
+      } else {
+        const userId = crypto.randomUUID()
+        await env.DB.prepare(
+          "INSERT INTO users (id, email, password_hash, created_at, role, email_verified) VALUES (?, ?, ?, ?, 'owner', 1)"
+        ).bind(userId, normalizedEmail, password_hash, now).run()
+        return new Response(JSON.stringify({ success: true, action: "created", email: normalizedEmail }), { headers: { "Content-Type": "application/json" } })
+      }
+    } catch (err) {
+      console.error("[auth] Admin seed:", err)
+      return new Response(JSON.stringify({ error: "Internal error" }), { status: 500, headers: { "Content-Type": "application/json" } })
+    }
+  })
+}
+
+
 /**
  * Decodes a JWT token without verification.
  * @param token The JWT token string.
@@ -901,48 +938,5 @@ export async function verifyTurnstile(token: string, secretKey: string, request?
     });
     return false;
   }
-  // POST /api/auth/admin-seed — one-time admin account creation/reset
-  // Protected by ADMIN_SEED_SECRET env var. Remove after use.
-  router.post("/api/auth/admin-seed", async (request: Request) => {
-    const env = getEnv()
-    try {
-      const { secret, email, password } = await request.json() as any
-      
-      // Must have ADMIN_SEED_SECRET configured and match
-      if (!env.ADMIN_SEED_SECRET) return jsonResponse({ error: "Not configured" }, 403)
-      if (secret !== env.ADMIN_SEED_SECRET) return jsonResponse({ error: "Forbidden" }, 403)
-      if (!email || !password) return jsonResponse({ error: "Missing fields" }, 400)
-      if (password.length < 8) return jsonResponse({ error: "Password too short" }, 400)
-      
-      const normalizedEmail = email.toLowerCase().trim()
-      const password_hash = await hashPassword(password)
-      const now = Date.now()
-      
-      // Check if user exists
-      const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?")
-        .bind(normalizedEmail).first<{ id: string }>()
-      
-      if (existing) {
-        // Update password and set role to owner
-        await env.DB.prepare("UPDATE users SET password_hash = ?, role = 'owner' WHERE id = ?")
-          .bind(password_hash, existing.id).run()
-        // Clear all sessions
-        await env.DB.prepare("DELETE FROM sessions WHERE user_id = ?")
-          .bind(existing.id).run()
-        return jsonResponse({ success: true, action: "updated", email: normalizedEmail })
-      } else {
-        // Create new owner account
-        const userId = crypto.randomUUID()
-        await env.DB.prepare(
-          "INSERT INTO users (id, email, password_hash, created_at, role, email_verified) VALUES (?, ?, ?, ?, 'owner', 1)"
-        ).bind(userId, normalizedEmail, password_hash, now).run()
-        return jsonResponse({ success: true, action: "created", email: normalizedEmail })
-      }
-    } catch (err) {
-      console.error("[auth] Admin seed:", err)
-      return jsonResponse({ error: "Internal error" }, 500)
-    }
-  })
-
 
 }

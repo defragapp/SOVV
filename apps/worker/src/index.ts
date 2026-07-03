@@ -1,6 +1,6 @@
 import { Router } from "itty-router";
 import type { Env } from "./types-env.js";
-import { registerAuthRoutes, getAuthUser } from "./auth.js";
+import { registerAuthRoutes, getAuthUser, registerAdminSeedRoute } from "./auth.js";
 import { registerBaselineRoutes } from "./baseline.js";
 import { registerBillingRoutes } from "./billing.js";
 import { registerChipsRoute } from "./chips.js";
@@ -119,6 +119,7 @@ function registerNatalRoutes(router: any, getEnv: () => Env) {
 
 registerAuthRoutes(router, getEnv);
 registerAuthExtendedRoutes(router, getEnv);
+registerAdminSeedRoute(router, getEnv);
 registerInviteSystemRoutes(router, getEnv);
 registerBaselineRoutes(router, getEnv);
 registerBillingRoutes(router, getEnv);
