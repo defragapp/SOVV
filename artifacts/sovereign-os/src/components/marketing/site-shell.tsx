@@ -105,13 +105,14 @@ export function SiteShell({ children, entranceControlled = false }: SiteShellPro
       <header
         ref={headerRef}
         role="banner"
-        className="fixed top-0 left-0 right-0 z-50"
+        className="fixed top-0 left-0 right-0 z-50 select-none"
         style={{
           background:           scrolled ? "rgba(8,7,10,0.82)" : "transparent",
           backdropFilter:       scrolled ? "blur(20px)" : "none",
           WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
           borderBottom:         scrolled ? "1px solid rgba(255,255,255,0.04)" : "1px solid transparent",
           transition:           "background 500ms ease, border-color 500ms ease, backdrop-filter 500ms ease",
+          paddingTop:           "env(safe-area-inset-top)",
         }}
       >
         <div className="mx-auto max-w-[1280px] px-6 md:px-8 h-[68px] flex items-center justify-between">

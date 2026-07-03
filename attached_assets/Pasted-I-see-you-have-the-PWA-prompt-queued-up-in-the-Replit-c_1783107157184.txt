@@ -1,0 +1,50 @@
+I see you have the PWA prompt queued up in the Replit chat box. Once the agent finishes locking in those safe areas and the manifest, the very next step is to kill the hard web reloads.
+
+A native iOS app doesn't blink or flash when you change screens; it pushes and pops views with physical weight. The agent already suggested "Smooth transitions when navigating between pages"—this prompt hijack will force it to build those transitions using strict iOS mechanics rather than generic web fades.
+
+Here is **Phase 5**. Feed this to the agent right after the PWA build completes.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 5: iOS-Native View Transitions & State Fluidity
+
+## Core Objective
+Eliminate all hard page reloads and standard web navigation flashes. Implement fluid, app-like view transitions across the entire platform using Framer Motion. Sovereign.os must feel like a compiled iOS application where views physically push and pop from the navigation stack.
+
+## Strict Constraints
+1. **The Easing Curve:** All page transitions must use the established grounded ease curve: `ease: [0.16, 1, 0.3, 1]`. No bouncy spring animations.
+2. **Persistent Architecture:** The SiteShell (nav) and the floating dynamic island must NOT reload or animate out during route changes. Only the main page content should transition. 
+3. **Motion Fallback:** Always respect `prefers-reduced-motion`. If true, collapse all transitions to an instant swap or a 0.1s opacity fade.
+
+---
+
+## Execution Steps
+
+### 1. Global Router Setup (App.tsx)
+- Wrap your main route configuration in Framer Motion's `<AnimatePresence mode="wait">`. 
+- Ensure that you are passing a unique `key` (usually the current route path `location.pathname`) to the immediate child of `AnimatePresence` so Framer Motion knows when a route changes.
+
+### 2. The iOS "Push/Pop" Page Wrapper
+- Create a reusable `<PageTransition>` wrapper component to wrap the content of `HomePage`, `DefragSpace`, etc.
+- **Initial State:** `opacity: 0, x: 20` (Slightly offset to the right, mimicking an iOS push).
+- **Animate State:** `opacity: 1, x: 0` (Resting state).
+- **Exit State:** `opacity: 0, x: -20` (Exiting to the left).
+- **Timing:** `duration: 0.4` using the strict easing curve defined above.
+
+### 3. Space-to-Space Crossfades
+- When navigating specifically between the interior spaces (e.g., Defrag to Covenant), do not use the horizontal push/pop. 
+- Instead, use a subtle `opacity` crossfade and a slight `scale` shift (`0.98` to `1.0`). This communicates that the user is switching context *within* the same environment, rather than moving deeper into a navigation stack.
+
+### 4. Link Pre-fetching (Zero-Latency Feel)
+- Ensure all navigation links (React Router `<Link>` or equivalent) are pre-fetching their target routes on hover or touch-start. The transition animation should mask any data loading, resulting in a perceived zero-latency experience.
+
+Execute these updates and ensure the DOM does not overlap during transitions.
+
+```
+
+---
+
+Are you using standard React Router (`react-router-dom`) for handling the navigation between the Home page and the Defrag space, or is it a custom state-based router?

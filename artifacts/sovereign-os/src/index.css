@@ -84,6 +84,18 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ── iOS safe-area env vars ──────────────────────────────────────────────── */
+:root {
+  --safe-top:    env(safe-area-inset-top, 44px);
+  --safe-bottom: env(safe-area-inset-bottom, 34px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
+}
+
+.ios-safe-top    { padding-top:    var(--safe-top); }
+.ios-safe-bottom { padding-bottom: var(--safe-bottom); }
+.safe-bottom     { padding-bottom: var(--safe-bottom); }
+
 /* ── Sovereign dark theme (dark-only app) ─────────────────────────────────── */
 :root {
   --button-outline: rgba(255, 255, 255, 0.1);
