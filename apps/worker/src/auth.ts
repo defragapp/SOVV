@@ -821,7 +821,7 @@ export function registerAdminSeedRoute(router: any, getEnv: () => any) {
       } else {
         const userId = crypto.randomUUID()
         await env.DB.prepare(
-          "INSERT INTO users (id, email, password_hash, created_at, role, email_verified) VALUES (?, ?, ?, ?, 'owner', 1)"
+          "INSERT INTO users (id, email, password_hash, created_at, role) VALUES (?, ?, ?, ?, 'owner')"
         ).bind(userId, normalizedEmail, password_hash, now).run()
         return new Response(JSON.stringify({ success: true, action: "created", email: normalizedEmail }), { headers: { "Content-Type": "application/json" } })
       }
