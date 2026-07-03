@@ -25,11 +25,11 @@ const proxy = createProxyMiddleware({
 });
 
 // Proxy all routes handled by the upstream API
+// NOTE: /explain is handled locally by the AI route — do NOT add it here
 proxyRouter.use(
   [
     "/auth",
     "/user",
-    "/explain",
     "/baseline",
     "/chips",
     "/history",

@@ -7,27 +7,58 @@ import type { Mode } from '@/lib/core/types';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-// ── Mock diagnostic result shown on first load ────────────────────────────────
+// ── Mock data shown on first load ────────────────────────────────────────────
 const MOCK_RESULT = {
-  summary:
-    'An established pattern of emotional withdrawal is active. When conflict registers as unresolvable, the system routes around it — reducing presence to avoid the cost of engagement. This is protective in the short term and corrosive in the long term.',
   activePattern: 'Withdrawal / Avoidance',
-  defenseMechanism: 'The pattern surfaces as physical distance, reduced verbal response, and a cognitive shift to "not worth it" framing. It prevents rupture in the moment by preventing contact entirely.',
+  whatsActive:
+    'An established pattern of emotional withdrawal is active. When conflict registers as unresolvable, the system routes around it — reducing presence to avoid the cost of engagement.',
+  defenseMechanism:
+    'The pattern surfaces as physical distance, reduced verbal response, and a cognitive shift to "not worth it" framing. It prevents rupture in the moment by preventing contact entirely.',
   resolutionSteps: [
     "Name what is happening before leaving: \"I need ten minutes — I'm not done with this conversation.\"",
     'Distinguish between a boundary (healthy) and a disappearance (pattern).',
     'Return with a specific re-entry: start with a factual statement, not a position.',
   ],
-  bestNextResponse: {
-    summary:
-      'Reconnect before repairing. A bid for connection — even a small one — resets the nervous system faster than an apology.',
-    phrasing: [
-      "\u201CI got flooded. I\u2019m back.\u201D",
-      "\u201CI don\u2019t want to leave it like that.\u201D",
-      "\u201CCan we try that part again?\u201D",
-    ],
-  },
+  bestNextResponse: "I got flooded. I'm back — can we try that part again?",
 };
+
+// ── Skeleton pulse card ───────────────────────────────────────────────────────
+function SkeletonCard({ lines = 2 }: { lines?: number }) {
+  return (
+    <div
+      className="rounded-2xl ring-1 ring-inset ring-white/[0.05] overflow-hidden"
+      style={{ background: '#1C1C1E' }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.05]">
+        <div className="h-2 w-32 rounded-full bg-white/[0.06] animate-pulse" />
+        <div className="w-2 h-2 rounded-full bg-white/[0.06] animate-pulse" />
+      </div>
+      {/* Body */}
+      <div className="px-5 py-4 flex flex-col gap-2">
+        {Array.from({ length: lines }).map((_, i) => (
+          <div
+            key={i}
+            className="h-3 rounded-full bg-white/[0.04] animate-pulse"
+            style={{ width: i === lines - 1 ? '60%' : '100%', animationDelay: `${i * 80}ms` }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SkeletonOutput() {
+  return (
+    <div className="flex flex-col gap-3 px-4 py-4">
+      <SkeletonCard lines={1} />
+      <SkeletonCard lines={3} />
+      <SkeletonCard lines={2} />
+      <SkeletonCard lines={3} />
+      <SkeletonCard lines={2} />
+    </div>
+  );
+}
 
 // ── Drop Zone input ───────────────────────────────────────────────────────────
 function DropZone({
@@ -98,7 +129,8 @@ function DropZone({
             onChange={e => setValue(e.target.value)}
             placeholder="Describe the moment. What happened? What was said?"
             rows={4}
-            className="w-full resize-none bg-transparent text-[17px] text-white placeholder:text-[#4f4b47] outline-none border-none ring-0 leading-relaxed"
+            disabled={loading}
+            className="w-full resize-none bg-transparent text-[17px] text-white placeholder:text-[#4f4b47] outline-none border-none ring-0 leading-relaxed disabled:opacity-50"
             style={{ fontFamily: 'var(--app-font-sans)' }}
             onKeyDown={e => {
               if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
@@ -109,9 +141,17 @@ function DropZone({
 
           {/* Action footer */}
           <div className="flex items-center justify-between border-t border-white/[0.05] pt-4">
-            <span className="font-mono text-[10px] tracking-[0.18em] text-[#4f4b47]">
-              {inputActive ? 'INPUT ACTIVE' : 'WAITING'}
-            </span>
+            {/* Status tag — switches to MAPPING PATTERN when loading */}
+            <div className="flex items-center gap-2">
+              {loading && (
+                <span
+                  className="w-1.5 h-1.5 rounded-full bg-[#e0743a] animate-pulse"
+                />
+              )}
+              <span className="font-mono text-[10px] tracking-[0.18em] text-[#4f4b47]">
+                {loading ? 'MAPPING PATTERN...' : inputActive ? 'INPUT ACTIVE' : 'WAITING'}
+              </span>
+            </div>
 
             <button
               type="submit"
@@ -122,10 +162,12 @@ function DropZone({
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
                 color: inputActive && !loading ? '#f4efe9' : '#4f4b47',
-                boxShadow: inputActive && !loading ? '0 0 0 1px rgba(255,255,255,0.10) inset' : '0 0 0 1px rgba(255,255,255,0.04) inset',
+                boxShadow: inputActive && !loading
+                  ? '0 0 0 1px rgba(255,255,255,0.10) inset'
+                  : '0 0 0 1px rgba(255,255,255,0.04) inset',
               }}
             >
-              {loading ? '···' : 'Map Pattern'}
+              Map Pattern
             </button>
           </div>
         </div>
@@ -136,11 +178,11 @@ function DropZone({
 
 // ── Diagnostic output cards ───────────────────────────────────────────────────
 interface DiagnosticResult {
-  summary?: string;
   activePattern?: string;
+  whatsActive?: string;
   defenseMechanism?: string;
   resolutionSteps?: string[];
-  bestNextResponse?: { summary?: string; phrasing?: string[] };
+  bestNextResponse?: string;
   [key: string]: unknown;
 }
 
@@ -161,7 +203,6 @@ function DiagnosticCard({
       className="rounded-2xl ring-1 ring-inset ring-white/[0.05] overflow-hidden"
       style={{ background: '#1C1C1E' }}
     >
-      {/* Card header */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.05]">
         <span className="font-mono text-[10px] tracking-[0.18em] text-[#4f4b47] uppercase">
           {tag}
@@ -171,9 +212,28 @@ function DiagnosticCard({
           style={{ background: '#e0743a', boxShadow: '0 0 6px rgba(224,116,58,0.6)' }}
         />
       </div>
-
-      {/* Card body */}
       <div className="px-5 py-4">{children}</div>
+    </motion.div>
+  );
+}
+
+function ErrorCard({ message }: { message: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease }}
+      className="rounded-2xl ring-1 ring-inset ring-red-500/20 overflow-hidden mx-4 mt-4"
+      style={{ background: '#1C1C1E' }}
+    >
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-red-500/10">
+        <span className="font-mono text-[10px] tracking-[0.16em] text-red-400/70 uppercase">
+          [SYSTEM_ERROR: UNABLE TO MAP PATTERN]
+        </span>
+      </div>
+      <div className="px-5 py-4">
+        <p className="text-[14px] text-[#76716b] font-sans leading-relaxed">{message} Try describing the moment again.</p>
+      </div>
     </motion.div>
   );
 }
@@ -181,7 +241,6 @@ function DiagnosticCard({
 function DiagnosticOutput({ result }: { result: DiagnosticResult }) {
   return (
     <div className="flex flex-col gap-3 px-4 py-4">
-      {/* Pattern name */}
       {result.activePattern && (
         <DiagnosticCard tag="[Active Pattern]" delay={0}>
           <p className="font-mono text-[15px] text-[#f4efe9] tracking-[0.04em]">
@@ -190,16 +249,14 @@ function DiagnosticOutput({ result }: { result: DiagnosticResult }) {
         </DiagnosticCard>
       )}
 
-      {/* What's active */}
-      {result.summary && (
+      {result.whatsActive && (
         <DiagnosticCard tag="[What's Active]" delay={0.06}>
           <p className="text-[15px] text-[#d4cec8] leading-relaxed font-sans">
-            {result.summary}
+            {result.whatsActive}
           </p>
         </DiagnosticCard>
       )}
 
-      {/* Defense mechanism */}
       {result.defenseMechanism && (
         <DiagnosticCard tag="[Defense Mechanism]" delay={0.12}>
           <p className="text-[15px] text-[#d4cec8] leading-relaxed font-sans">
@@ -208,8 +265,7 @@ function DiagnosticOutput({ result }: { result: DiagnosticResult }) {
         </DiagnosticCard>
       )}
 
-      {/* Resolution steps */}
-      {result.resolutionSteps && result.resolutionSteps.length > 0 && (
+      {Array.isArray(result.resolutionSteps) && result.resolutionSteps.length > 0 && (
         <DiagnosticCard tag="[Resolution Steps]" delay={0.18}>
           <div className="flex flex-col gap-3">
             {result.resolutionSteps.map((step, i) => (
@@ -224,22 +280,11 @@ function DiagnosticOutput({ result }: { result: DiagnosticResult }) {
         </DiagnosticCard>
       )}
 
-      {/* Best next response */}
       {result.bestNextResponse && (
         <DiagnosticCard tag="[Best Next Response]" delay={0.24}>
-          {result.bestNextResponse.summary && (
-            <p className="text-[14px] text-[#a8a29a] leading-relaxed mb-4 font-sans">
-              {result.bestNextResponse.summary}
-            </p>
-          )}
-          {result.bestNextResponse.phrasing?.map((p, i) => (
-            <p
-              key={i}
-              className="text-[14px] text-[#76716b] border-l border-[#e0743a]/25 pl-4 py-1 mb-2 last:mb-0 font-sans italic"
-            >
-              {p}
-            </p>
-          ))}
+          <p className="text-[14px] text-[#76716b] border-l border-[#e0743a]/25 pl-4 py-1 font-sans italic leading-relaxed">
+            {result.bestNextResponse}
+          </p>
         </DiagnosticCard>
       )}
     </div>
@@ -315,14 +360,8 @@ export function DefragPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex items-center justify-center h-full"
             >
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-8 h-px bg-[#e0743a]/40 animate-pulse" />
-                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">
-                  Reading the pattern…
-                </p>
-              </div>
+              <SkeletonOutput />
             </motion.div>
           )}
 
@@ -332,9 +371,8 @@ export function DefragPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="px-6 py-10"
             >
-              <p className="text-sm text-red-400/80">{error}</p>
+              <ErrorCard message={error} />
             </motion.div>
           )}
 
