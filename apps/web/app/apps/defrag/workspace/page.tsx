@@ -72,6 +72,7 @@ export default function DefragWorkspacePage() {
   const [result, setResult] = React.useState<DefragResult | null>(null)
   const [thread, setThread] = React.useState<Array<{input: string; result: DefragResult}>>([])  // conversation history
   const [isLoading, setIsLoading] = React.useState(false)
+  const [streamingText, setStreamingText] = React.useState("")  // progressive AI output
   const [error, setError] = React.useState("")
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
@@ -182,7 +183,38 @@ export default function DefragWorkspacePage() {
     setAudioUrl(null)
     setAudioError("")
     setResult(null)
+    setStreamingText("")  // clear previous stream
     try {
+      // Start streaming for progressive display
+      const streamController = new AbortController()
+      fetch("/api/explain/stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        signal: streamController.signal,
+        body: JSON.stringify({ message: input }),
+      }).then(async (streamRes) => {
+        if (!streamRes.ok || !streamRes.body) return
+        const reader = streamRes.body.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ""
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          buffer += decoder.decode(value, { stream: true })
+          const evtLines = buffer.split("\n\n")
+          buffer = evtLines.pop() ?? ""
+          for (const line of evtLines) {
+            if (!line.startsWith("data: ")) continue
+            try {
+              const d = JSON.parse(line.slice(6))
+              if (d.token) setStreamingText(prev => prev + d.token)
+              if (d.done || d.error) break
+            } catch { /* ignore */ }
+          }
+        }
+      }).catch(() => { /* stream failed, main fetch will handle */ })
+
       const res = await fetch("/api/explain", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -208,6 +240,7 @@ export default function DefragWorkspacePage() {
           : data.message || data.error || "Something went wrong.")
         return
       }
+      setStreamingText("")  // clear stream, show structured result
       setResult(data)
       setThread(prev => [...prev.slice(-2), { input, result: data }])
     } catch {
@@ -535,10 +568,25 @@ export default function DefragWorkspacePage() {
 
         {/* Loading */}
         {isLoading && (
-          <div className="flex flex-col items-center justify-center h-full gap-4">
-            <span className="w-5 h-5 border border-white/[0.15] border-t-white/[0.45] rounded-full animate-spin" />
-            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Reading the pattern…</p>
-          </div>
+          streamingText ? (
+            <div className="px-6 pt-6 pb-4">
+              <div className="border border-white/[0.06] bg-white/[0.01] p-6 scan-lines" style={{ borderRadius: "var(--radius-container)" }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#e0743a]/50 animate-pulse" />
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Reading the pattern</p>
+                </div>
+                <p className="text-[14px] text-[#f4efe9]/70 leading-[1.7] whitespace-pre-wrap">
+                  {streamingText}
+                  <span className="inline-block w-0.5 h-4 bg-[#e0743a]/40 ml-0.5 animate-pulse align-middle" />
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/40 rounded-full animate-spin" />
+              <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Reading the pattern…</p>
+            </div>
+          )
         )}
 
         {/* Error */}
