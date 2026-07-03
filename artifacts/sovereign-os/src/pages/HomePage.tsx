@@ -1,12 +1,14 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'wouter';
 import { SiteShell } from '@/components/marketing/site-shell';
 import { Container } from '@/components/ui/layout-primitives';
+import { useHeroEntrance } from '@/hooks/useHeroEntrance';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const APP_URL = '/app/login';
 
+// ── Data ─────────────────────────────────────────────────────────────────────
 const BASELINE = {
   label: 'Your Baseline Design is active beneath every thread.',
   facts: [
@@ -22,22 +24,26 @@ const RESULT = {
 };
 
 const SPACES = [
-  { id: 'defrag', label: 'Defrag', description: 'The pattern recognition space. Bring the moment — message, conflict, boundary, grief — and read what\'s actually happening beneath it.', href: APP_URL, tags: ['free', 'core', 'pattern recognition'] },
-  { id: 'covenant', label: 'Covenant', description: 'Faith-context reflection. Not certainty — the next honest step, held by something larger than the pattern.', href: APP_URL, tags: ['pro', 'faith', 'repair'] },
-  { id: 'alignment', label: 'Alignment', description: 'Response integration. What is yours to carry. What belongs to the other side. The cleaner move.', href: APP_URL, tags: ['pro', 'action', 'response'] },
+  { id: 'defrag',    label: 'Defrag',    description: "The pattern recognition space. Bring the moment — message, conflict, boundary, grief — and read what's actually happening beneath it.", href: APP_URL, tags: ['free', 'core', 'pattern recognition'] },
+  { id: 'covenant',  label: 'Covenant',  description: 'Faith-context reflection. Not certainty — the next honest step, held by something larger than the pattern.',                            href: APP_URL, tags: ['pro', 'faith', 'repair'] },
+  { id: 'alignment', label: 'Alignment', description: 'Response integration. What is yours to carry. What belongs to the other side. The cleaner move.',                                     href: APP_URL, tags: ['pro', 'action', 'response'] },
 ];
 
+// ── SpacePreview ──────────────────────────────────────────────────────────────
 function SpacePreview() {
   const [active, setActive] = useState<'context' | 'result'>('context');
-  const panels = [
-    { id: 'context' as const, label: 'Design' },
-    { id: 'result' as const, label: 'Result' },
-  ];
 
   return (
     <div className="relative w-full max-w-lg mx-auto">
-      <div className="pointer-events-none absolute -inset-px" style={{ borderRadius: 'var(--radius-container)', background: 'radial-gradient(ellipse 60% 30% at 50% 100%, rgba(200,194,188,0.05) 0%, transparent 70%)' }} aria-hidden />
-      <div className="relative border border-white/[0.12] bg-[#0c0a0d] overflow-hidden scan-lines" style={{ borderRadius: 'var(--radius-container)', boxShadow: '0 32px 80px -16px rgba(0,0,0,0.7), 0 0 0 1px rgba(224,116,58,0.06)' }}>
+      <div
+        className="pointer-events-none absolute -inset-px"
+        style={{ borderRadius: 'var(--radius-container)', background: 'radial-gradient(ellipse 60% 30% at 50% 100%, rgba(200,194,188,0.05) 0%, transparent 70%)' }}
+        aria-hidden
+      />
+      <div
+        className="relative border border-white/[0.12] bg-[#0c0a0d] overflow-hidden scan-lines"
+        style={{ borderRadius: 'var(--radius-container)', boxShadow: '0 32px 80px -16px rgba(0,0,0,0.7), 0 0 0 1px rgba(224,116,58,0.06)' }}
+      >
         {/* Titlebar */}
         <div className="h-11 border-b border-white/[0.08] bg-[#08070a]/95 flex items-center px-4 gap-3 shrink-0">
           <div className="flex gap-1.5">
@@ -47,8 +53,13 @@ function SpacePreview() {
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#76716b]">Sovereign.os</span>
           </div>
           <div className="flex gap-0.5">
-            {panels.map(p => (
-              <button key={p.id} onClick={() => setActive(p.id)} className={`px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] uppercase transition-all duration-200 ${active === p.id ? 'bg-white/[0.12] text-[#f4efe9]' : 'text-[#4f4b47] hover:text-[#76716b]'}`} style={{ borderRadius: 5 }}>
+            {([{ id: 'context' as const, label: 'Design' }, { id: 'result' as const, label: 'Result' }]).map(p => (
+              <button
+                key={p.id}
+                onClick={() => setActive(p.id)}
+                className={`px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] uppercase transition-all duration-200 ${active === p.id ? 'bg-white/[0.12] text-[#f4efe9]' : 'text-[#4f4b47] hover:text-[#76716b]'}`}
+                style={{ borderRadius: 5 }}
+              >
                 {p.label}
               </button>
             ))}
@@ -82,7 +93,6 @@ function SpacePreview() {
               </div>
             </motion.div>
           )}
-
           {active === 'result' && (
             <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
               <div className="px-6 pt-5 pb-4 border-b border-white/[0.06]">
@@ -102,62 +112,115 @@ function SpacePreview() {
   );
 }
 
+// ── Hero ──────────────────────────────────────────────────────────────────────
+function Hero() {
+  const refs = useHeroEntrance();
+
+  return (
+    <section className="relative w-full min-h-[100svh] flex items-center bg-[#08070a] overflow-hidden">
+
+      {/* Light beam — enters during Phase 1 */}
+      <div ref={refs.lightBeamRef} className="light-beam" aria-hidden />
+
+      {/* Ambient glow — enters during Phase 1 */}
+      <div
+        ref={refs.glowRef}
+        className="ambient-blob absolute -top-60 right-0 w-[600px] h-[600px] pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(224,116,58,1) 0%, transparent 70%)' }}
+        aria-hidden
+      />
+
+      {/* Hero image — clip-path revealed during Phase 2 */}
+      <div
+        ref={refs.imageOuterRef}
+        className="absolute right-0 top-0 w-full h-full pointer-events-none"
+        style={{ willChange: 'clip-path' }}
+      >
+        {/* hero-drift floats independently of the clip transform */}
+        <div className="hero-drift absolute right-0 top-0 h-full w-[55%]">
+          <img
+            src="/hero-hand.webp"
+            alt=""
+            className="object-cover object-left h-full w-full"
+            style={{ objectPosition: '20% center' }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(to right, #08070a 0%, rgba(8,7,10,0.4) 40%, transparent 100%)' }}
+          />
+        </div>
+      </div>
+
+      {/* Text */}
+      <Container className="relative z-10 py-32 md:py-48">
+        <div className="max-w-2xl">
+
+          {/* Eyebrow — Phase 4 */}
+          <p
+            ref={refs.labelRef}
+            className="font-mono text-[9px] uppercase tracking-[0.32em] text-[#4f4b47] mb-10"
+          >
+            Sovereign.os
+          </p>
+
+          {/* Headline — each line mask-revealed independently */}
+          <h1
+            className="font-serif text-[#f4efe9] leading-[1.05] tracking-[-0.025em] text-balance"
+            style={{ fontSize: 'clamp(2.8rem, 7vw, 5.5rem)' }}
+          >
+            {/* Line 1 mask — Phase 5 */}
+            <span className="block overflow-hidden" style={{ lineHeight: 1.12 }}>
+              <span
+                ref={refs.line1Ref}
+                className="block"
+                style={{ willChange: 'transform' }}
+              >
+                Healing isn't optional.
+              </span>
+            </span>
+
+            {/* Line 2 mask — Phase 6 */}
+            <span className="block overflow-hidden" style={{ lineHeight: 1.12 }}>
+              <span
+                ref={refs.line2Ref}
+                className="block"
+                style={{ willChange: 'transform' }}
+              >
+                <span className="text-glow">Holding the pain is.</span>
+              </span>
+            </span>
+          </h1>
+
+          {/* Subtext — Phase 7 */}
+          <p
+            ref={refs.subtextRef}
+            className="mt-7 max-w-md text-[17px] text-[#76716b] leading-relaxed"
+          >
+            Pattern-aware AI for the moments that are hard to read while you're inside them.
+          </p>
+
+          {/* CTA — Phase 8 */}
+          <div
+            ref={refs.ctaRef}
+            className="mt-9 flex items-center gap-5 flex-wrap"
+          >
+            <Link href={APP_URL} className="btn-primary">Enter Sovereign.os</Link>
+            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Free to start</span>
+          </div>
+
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 export function HomePage() {
   return (
-    <SiteShell>
-      {/* ── Hero ───────────────────────────────────────────────────────────── */}
-      <section className="relative w-full min-h-[100svh] flex items-center bg-[#08070a] overflow-hidden">
-        <div className="light-beam" aria-hidden />
-        <div className="ambient-blob absolute -top-60 right-0 w-[600px] h-[600px] opacity-[0.04]" style={{ background: 'radial-gradient(circle, rgba(224,116,58,1) 0%, transparent 70%)' }} aria-hidden />
+    <SiteShell entranceControlled>
+      <Hero />
 
-        {/* Hero image */}
-        <div className="absolute right-0 top-0 w-full h-full overflow-hidden pointer-events-none">
-          <div className="hero-drift absolute right-0 top-0 h-full w-[55%]">
-            <img src="/hero-hand.webp" alt="" className="object-cover object-left h-full w-full" style={{ objectPosition: '20% center' }} />
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, #08070a 0%, rgba(8,7,10,0.4) 40%, transparent 100%)' }} />
-          </div>
-        </div>
-
-        <Container className="relative z-10 py-32 md:py-48">
-          <div className="max-w-2xl">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, ease }}>
-              <p className="font-mono text-[9px] uppercase tracking-[0.32em] text-[#4f4b47] mb-10">Sovereign.os</p>
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.1, ease }}
-              className="font-serif text-[#f4efe9] leading-[1.05] tracking-[-0.025em] text-balance"
-              style={{ fontSize: 'clamp(2.8rem, 7vw, 5.5rem)' }}
-            >
-              Healing isn't optional.<br />
-              <span className="text-glow">Holding the pain is.</span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.25, ease }}
-              className="mt-7 max-w-md text-[17px] text-[#76716b] leading-relaxed"
-            >
-              Pattern-aware AI for the moments that are hard to read while you're inside them.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.4, ease }}
-              className="mt-9 flex items-center gap-5 flex-wrap"
-            >
-              <Link href={APP_URL} className="btn-primary">Enter Sovereign.os</Link>
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Free to start</span>
-            </motion.div>
-          </div>
-        </Container>
-      </section>
-
-      {/* ── Clarity Console ───────────────────────────────────────────────── */}
+      {/* ── Clarity Console ─────────────────────────────────────────────── */}
       <section className="relative w-full py-24 md:py-36 bg-[#08070a] border-t border-white/[0.04] overflow-hidden">
         <div className="light-beam opacity-40" aria-hidden />
         <Container className="relative z-10">
@@ -174,7 +237,7 @@ export function HomePage() {
         </Container>
       </section>
 
-      {/* ── Spaces ────────────────────────────────────────────────────────── */}
+      {/* ── Spaces ──────────────────────────────────────────────────────── */}
       <section className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden">
         <Container className="relative z-10">
           <div className="flex flex-col items-center text-center mb-16">
@@ -183,7 +246,6 @@ export function HomePage() {
               Three contexts. One Baseline Design.
             </h2>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
             {SPACES.map((space, i) => (
               <motion.a
@@ -210,7 +272,7 @@ export function HomePage() {
         </Container>
       </section>
 
-      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      {/* ── CTA ─────────────────────────────────────────────────────────── */}
       <section className="relative w-full py-32 md:py-48 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden">
         <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] opacity-15" />
         <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] opacity-[0.08]" />

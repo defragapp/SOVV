@@ -1,74 +1,117 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
+import { animate } from "framer-motion";
 
 interface SiteShellProps {
   children: React.ReactNode;
+  /**
+   * When true, the nav header starts invisible and waits for the
+   * `sovereign:nav-reveal` custom event before animating in.
+   * Pass only from HomePage to coordinate with the cinematic entrance.
+   */
+  entranceControlled?: boolean;
 }
 
 const NAV_LINKS = [
-  { href: "/product", label: "Product" },
-  { href: "/how-it-works", label: "How it works" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/about", label: "About" },
+  { href: "/product",      label: "Product"      },
+  { href: "/how-it-works", label: "How it works"  },
+  { href: "/pricing",      label: "Pricing"       },
+  { href: "/about",        label: "About"         },
 ];
 
 const FOOTER_COLS = [
   {
     label: "Platform",
     links: [
-      { href: "/product", label: "Product" },
-      { href: "/how-it-works", label: "How it works" },
-      { href: "/pricing", label: "Pricing" },
-      { href: "/about", label: "About" },
-      { href: "/faq", label: "FAQ" },
+      { href: "/product",      label: "Product"      },
+      { href: "/how-it-works", label: "How it works"  },
+      { href: "/pricing",      label: "Pricing"       },
+      { href: "/about",        label: "About"         },
+      { href: "/faq",          label: "FAQ"           },
     ],
   },
   {
     label: "Company",
     links: [
       { href: "/principles", label: "Principles" },
-      { href: "/use-cases", label: "Use cases" },
-      { href: "/contact", label: "Contact" },
+      { href: "/use-cases",  label: "Use cases"  },
+      { href: "/contact",    label: "Contact"    },
     ],
   },
   {
     label: "Legal",
     links: [
       { href: "/privacy", label: "Privacy" },
-      { href: "/terms", label: "Terms" },
+      { href: "/terms",   label: "Terms"   },
     ],
   },
 ];
 
-export function SiteShell({ children }: SiteShellProps) {
+export function SiteShell({ children, entranceControlled = false }: SiteShellProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
+  // Scroll → frosted backdrop
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close menu on escape
+  // Close menu on Escape
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMenuOpen(false); };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
+  // ── Nav entrance (coordinated with hero entrance on homepage) ─────────────
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header || !entranceControlled) return;
+
+    const alreadyPlayed = !!sessionStorage.getItem("sovereign:entrance-played");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (alreadyPlayed || reducedMotion) {
+      // Already played — appear immediately with no animation
+      header.style.opacity   = "1";
+      header.style.transform = "translateY(0)";
+      return;
+    }
+
+    // Start hidden above viewport
+    header.style.opacity   = "0";
+    header.style.transform = "translateY(-20px)";
+
+    const onReveal = (e: Event) => {
+      const instant = (e as CustomEvent<{ instant?: boolean }>).detail?.instant;
+      animate(
+        header,
+        { opacity: 1, y: 0 },
+        { duration: instant ? 0.25 : 0.50, ease: [0.16, 1, 0.3, 1] },
+      );
+    };
+
+    window.addEventListener("sovereign:nav-reveal", onReveal, { once: true });
+    return () => window.removeEventListener("sovereign:nav-reveal", onReveal);
+  }, [entranceControlled]);
+
   return (
     <div className="min-h-[100dvh] flex flex-col bg-[#08070a] text-[#f4efe9]">
 
-      {/* ── Header ─────────────────────────────────────────────── */}
+      {/* ── Header ──────────────────────────────────────────────────── */}
       <header
+        ref={headerRef}
         role="banner"
-        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+        className="fixed top-0 left-0 right-0 z-50"
         style={{
-          background: scrolled ? "rgba(8,7,10,0.82)" : "transparent",
-          backdropFilter: scrolled ? "blur(20px)" : "none",
+          background:           scrolled ? "rgba(8,7,10,0.82)" : "transparent",
+          backdropFilter:       scrolled ? "blur(20px)" : "none",
           WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
-          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.04)" : "1px solid transparent",
+          borderBottom:         scrolled ? "1px solid rgba(255,255,255,0.04)" : "1px solid transparent",
+          transition:           "background 500ms ease, border-color 500ms ease, backdrop-filter 500ms ease",
         }}
       >
         <div className="mx-auto max-w-[1280px] px-6 md:px-8 h-[68px] flex items-center justify-between">
@@ -110,7 +153,7 @@ export function SiteShell({ children }: SiteShellProps) {
             </Link>
           </div>
 
-          {/* Mobile toggle */}
+          {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden flex flex-col gap-[5px] p-2 -mr-2 group"
@@ -124,7 +167,7 @@ export function SiteShell({ children }: SiteShellProps) {
           </button>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile drawer */}
         {menuOpen && (
           <div
             id="mobile-menu"
@@ -155,12 +198,12 @@ export function SiteShell({ children }: SiteShellProps) {
         )}
       </header>
 
-      {/* Content — no pt-16 spacer; hero pages use -mt-[68px] */}
+      {/* Page content */}
       <div className="flex-1 relative z-10">
         {children}
       </div>
 
-      {/* ── Footer ─────────────────────────────────────────────── */}
+      {/* ── Footer ──────────────────────────────────────────────────── */}
       <footer role="contentinfo" className="border-t border-white/[0.05] py-16 relative z-10 bg-[#08070a]">
         <div className="mx-auto max-w-[1280px] px-6 md:px-8">
           <div className="flex flex-col md:flex-row items-start justify-between gap-10">
