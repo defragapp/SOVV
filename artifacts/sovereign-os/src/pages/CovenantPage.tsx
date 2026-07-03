@@ -1,8 +1,29 @@
+import { useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { SpaceShell } from '@/components/spaces/space-shell';
 import Sidebar from '@/components/spaces/Sidebar';
 import { PremiumGate } from '@/components/spaces/PremiumGate';
+import { useUserTier, setLocalPremium } from '@/context/UserContext';
 
 export function CovenantPage() {
+  const { isPremium, refresh } = useUserTier();
+  const [location, setLocation] = useLocation();
+
+  // Detect Stripe success redirect: /apps/covenant?session_id=cs_...
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+    if (sessionId) {
+      // Drop the local tier flag — unlocks the gate immediately on this device
+      setLocalPremium();
+      // Re-fetch the backend session so UserContext reflects the new state
+      refresh();
+      // Clean the URL (remove ?session_id=...) without a full reload
+      setLocation(location.split('?')[0], { replace: true });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const sidebar = (
     <Sidebar
       onSelectPerson={() => {}}
@@ -10,7 +31,16 @@ export function CovenantPage() {
     />
   );
 
-  const main = (
+  const main = isPremium ? (
+    // Pro content placeholder — will be filled in a future phase
+    <div className="flex flex-col items-center justify-center h-full px-6 text-center">
+      <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-4">Covenant</p>
+      <p className="font-serif text-xl text-[#f4efe9] mb-2">Your space is ready.</p>
+      <p className="text-sm text-[#76716b] max-w-xs leading-relaxed">
+        Faith-context reflection and repair work is coming in the next phase.
+      </p>
+    </div>
+  ) : (
     <PremiumGate
       space="Covenant"
       tagline="Faith-context reflection."

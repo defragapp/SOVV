@@ -14,6 +14,26 @@ interface UserContextValue {
   refresh: () => Promise<void>;
 }
 
+const LOCAL_TIER_KEY = 'sovv_tier';
+
+/** Read the local tier flag dropped after a successful Stripe checkout. */
+function readLocalTier(): boolean {
+  try {
+    return localStorage.getItem(LOCAL_TIER_KEY) === 'premium';
+  } catch {
+    return false;
+  }
+}
+
+/** Persist the local tier flag. Call after Stripe success redirect. */
+export function setLocalPremium(): void {
+  try {
+    localStorage.setItem(LOCAL_TIER_KEY, 'premium');
+  } catch {
+    // storage unavailable — ignore
+  }
+}
+
 const UserContext = createContext<UserContextValue>({
   user: null,
   isPremium: false,
@@ -23,6 +43,7 @@ const UserContext = createContext<UserContextValue>({
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [localPremium, setLocalPremiumState] = useState(readLocalTier);
   const [loading, setLoading] = useState(true);
 
   const fetchUser = useCallback(async () => {
@@ -32,11 +53,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       if (res.ok) {
         const data = await res.json() as { id?: string; email?: string; tier?: string };
         if (data.id && data.email) {
-          setUser({
-            id: data.id,
-            email: data.email,
-            tier: data.tier === 'pro' ? 'pro' : 'free',
-          });
+          const tier = data.tier === 'pro' ? 'pro' : 'free';
+          setUser({ id: data.id, email: data.email, tier });
+          // Keep local flag in sync: if backend confirms pro, ensure flag is set
+          if (tier === 'pro') setLocalPremium();
         } else {
           setUser(null);
         }
@@ -50,19 +70,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Also re-read the local flag when provider mounts (handles Stripe success redirect)
   useEffect(() => {
+    setLocalPremiumState(readLocalTier());
     fetchUser();
   }, [fetchUser]);
 
+  const isPremium = user?.tier === 'pro' || localPremium;
+
   return (
-    <UserContext.Provider
-      value={{
-        user,
-        isPremium: user?.tier === 'pro',
-        loading,
-        refresh: fetchUser,
-      }}
-    >
+    <UserContext.Provider value={{ user, isPremium, loading, refresh: fetchUser }}>
       {children}
     </UserContext.Provider>
   );
