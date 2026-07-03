@@ -108,8 +108,8 @@ export function SiteShell({ children, entranceControlled = false }: SiteShellPro
         className="fixed top-0 left-0 right-0 z-50 select-none"
         style={{
           background:           scrolled ? "rgba(8,7,10,0.82)" : "transparent",
-          backdropFilter:       scrolled ? "blur(20px)" : "none",
-          WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
+          backdropFilter:       scrolled ? "blur(24px)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(24px)" : "none",
           borderBottom:         scrolled ? "1px solid rgba(255,255,255,0.04)" : "1px solid transparent",
           transition:           "background 500ms ease, border-color 500ms ease, backdrop-filter 500ms ease",
           paddingTop:           "env(safe-area-inset-top)",
@@ -157,7 +157,7 @@ export function SiteShell({ children, entranceControlled = false }: SiteShellPro
           {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden flex flex-col gap-[5px] p-2 -mr-2 group"
+            className="md:hidden flex flex-col gap-1.5 p-2 -mr-2 group"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"

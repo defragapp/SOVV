@@ -31,7 +31,7 @@ export function ContactPage() {
           <div className="flex flex-col gap-0 rounded-[14px] border border-white/[0.06] overflow-hidden">
             <div className="p-8 md:p-12 space-y-4 border-b border-white/[0.06] bg-[#08070a]">
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b]">Primary contact</p>
-              <a href="mailto:info@defrag.app" className="block font-serif text-2xl text-[#f4efe9] hover:text-[#f0a06a] transition-colors">
+              <a href="mailto:info@defrag.app" className="block font-serif text-2xl text-[#f4efe9] hover:text-[#a8a29a] transition-colors">
                 info@defrag.app
               </a>
               <p className="text-[#a8a29a] text-sm leading-relaxed max-w-xl">

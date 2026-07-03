@@ -101,7 +101,7 @@ function SpacePreview() {
               </div>
               <div className="px-6 py-4">
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">Best next response</p>
-                <p className="text-[12px] font-medium text-[#c8c2bc] mb-1">{RESULT.move.label}</p>
+                <p className="text-[12px] font-medium text-[#a8a29a] mb-1">{RESULT.move.label}</p>
                 <p className="text-[12px] text-[#76716b] leading-relaxed">{RESULT.move.description}</p>
               </div>
             </motion.div>

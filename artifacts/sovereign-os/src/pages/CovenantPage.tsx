@@ -60,7 +60,7 @@ function CovenantRow({
       }`}
     >
       <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-4">
-        <span className="text-[15px] text-[#f4efe9] font-sans leading-tight truncate">
+        <span className="text-[14px] text-[#d4cec8] font-sans leading-tight truncate">
           {covenant.relationship}
         </span>
         <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60">
@@ -89,8 +89,8 @@ function CovenantDetail({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.35, ease }}
-      className="rounded-2xl ring-1 ring-inset ring-white/[0.06] overflow-hidden mx-4 mb-4"
-      style={{ background: 'rgba(8,7,10,0.90)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+      className="rounded-3xl ring-1 ring-inset ring-white/[0.06] overflow-hidden mx-4 mb-4"
+      style={{ background: 'rgba(8,7,10,0.95)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.05]">

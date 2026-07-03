@@ -66,7 +66,7 @@ export function OsOutput({
         </span>
         <div className="flex items-center gap-3">
           {isStreaming && (
-            <span className="w-1 h-1 rounded-full bg-[#c8c2bc]/40 animate-pulse" />
+            <span className="w-1 h-1 rounded-full bg-[#a8a29a]/40 animate-pulse" />
           )}
           <span className="font-mono text-[9px] text-[#4f4b47]">
             {new Date(output.receivedAt).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
@@ -78,7 +78,7 @@ export function OsOutput({
       <div className="px-5 py-5">
         <p className="text-[15px] text-[#f4efe9] leading-[1.75]">
           {streamedPrimary}
-          {isStreaming && <span className="inline-block w-0.5 h-4 bg-[#c8c2bc]/40 ml-0.5 animate-pulse align-middle" />}
+          {isStreaming && <span className="inline-block w-0.5 h-4 bg-[#a8a29a]/40 ml-0.5 animate-pulse align-middle" />}
         </p>
 
         {/* Secondary — shown after streaming completes */}

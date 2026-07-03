@@ -44,7 +44,7 @@ export function TermsPage() {
             <p>Sovereign.os is provided "as is." We make no warranties about the accuracy or completeness of outputs. To the maximum extent permitted by law, we are not liable for any damages arising from your use of the service.</p>
           </Section>
           <Section title="Contact">
-            <p>Questions about these terms: <a href="mailto:info@defrag.app" className="text-[#c8c2bc] hover:text-[#f4efe9] transition-colors">info@defrag.app</a></p>
+            <p>Questions about these terms: <a href="mailto:info@defrag.app" className="text-[#a8a29a] hover:text-[#f4efe9] transition-colors">info@defrag.app</a></p>
           </Section>
         </Container>
       </section>

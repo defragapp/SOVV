@@ -157,7 +157,7 @@ export default function Sidebar({
                 className={`px-6 py-2.5 border-l-2 transition-colors duration-150 font-medium ${
                   active
                     ? "border-[#f4efe9] text-[#f4efe9] bg-white/[0.04]"
-                    : "border-transparent text-[#76716b] hover:text-[#c8c2bc] hover:bg-white/[0.02]"
+                    : "border-transparent text-[#76716b] hover:text-[#a8a29a] hover:bg-white/[0.02]"
                 }`}
               >
                 {link.label}
@@ -221,7 +221,7 @@ function PersonRow({
       className={`flex w-full items-center gap-3 px-6 py-2.5 text-left border-l-2 transition-colors duration-150 ${
         isSelected
           ? "border-[#f4efe9] text-[#f4efe9] bg-white/[0.04]"
-          : "border-transparent text-[#76716b] hover:text-[#c8c2bc] hover:bg-white/[0.02]"
+          : "border-transparent text-[#76716b] hover:text-[#a8a29a] hover:bg-white/[0.02]"
       }`}
     >
       <span className="truncate font-medium">{person.name}</span>

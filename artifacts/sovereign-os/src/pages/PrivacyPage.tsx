@@ -38,7 +38,7 @@ export function PrivacyPage() {
             <p>We use a session cookie to keep you signed in. We do not use tracking or advertising cookies.</p>
           </Section>
           <Section title="Contact">
-            <p>For privacy requests, contact us at <a href="mailto:info@defrag.app" className="text-[#c8c2bc] hover:text-[#f4efe9] transition-colors">info@defrag.app</a>. We respond within 30 days.</p>
+            <p>For privacy requests, contact us at <a href="mailto:info@defrag.app" className="text-[#a8a29a] hover:text-[#f4efe9] transition-colors">info@defrag.app</a>. We respond within 30 days.</p>
           </Section>
         </Container>
       </section>

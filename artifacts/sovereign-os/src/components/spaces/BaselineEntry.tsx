@@ -132,8 +132,11 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
             </span>
           </div>
 
-          {/* Glass panel */}
-          <div className="border border-white/[0.08] bg-[#08070a]/80 backdrop-blur-xl p-8" style={{ borderRadius: "var(--radius-container)" }}>
+          {/* Glass panel — modal token: rounded-3xl · surface.glass · blur(24px) */}
+          <div
+            className="rounded-3xl ring-1 ring-inset ring-white/[0.06] p-8"
+            style={{ background: 'rgba(8,7,10,0.95)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }}
+          >
 
             <AnimatePresence mode="wait">
 
@@ -164,7 +167,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                     className="w-10 h-10 border border-[#e0743a]/30 bg-[#e0743a]/10 flex items-center justify-center"
                     style={{ borderRadius: 10 }}
                   >
-                    <span className="text-[#f0a06a] text-lg">✓</span>
+                    <span className="text-[#e0743a] text-lg">✓</span>
                   </div>
                   <p className="font-serif text-xl text-[#f4efe9]">Your Baseline Design is ready.</p>
                   <p className="text-sm text-[#76716b] leading-relaxed max-w-xs">

@@ -128,7 +128,7 @@ function DropZone({
           placeholder="Describe the moment. What happened? What was said?"
           rows={4}
           disabled={loading}
-          className="w-full resize-none bg-transparent text-[17px] text-white placeholder:text-[#4f4b47] outline-none border-none ring-0 leading-relaxed disabled:opacity-50"
+          className="w-full resize-none bg-transparent text-[17px] text-[#f4efe9] placeholder:text-[#4f4b47] outline-none border-none ring-0 leading-relaxed disabled:opacity-50"
           style={{ fontFamily: 'var(--app-font-sans)' }}
           onKeyDown={e => {
             if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {

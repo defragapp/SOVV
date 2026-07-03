@@ -30,10 +30,10 @@ export function FloatingNav() {
         <div
           className="mb-3 flex items-center gap-1 px-1.5 py-1.5 rounded-2xl shadow-2xl"
           style={{
-            background: 'rgba(0,0,0,0.4)',
-            backdropFilter: 'blur(24px) saturate(150%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(150%)',
-            boxShadow: '0 0 0 1px rgba(255,255,255,0.05) inset, 0 20px 40px rgba(0,0,0,0.6)',
+            background: 'rgba(8,7,10,0.82)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            boxShadow: '0 0 0 1px rgba(255,255,255,0.05) inset, 0 20px 40px rgba(0,0,0,0.5)',
           }}
         >
           {SPACES.map(({ href, label }) => {
@@ -44,8 +44,8 @@ export function FloatingNav() {
                 <span
                   className={`flex items-center gap-1.5 px-5 py-2 rounded-xl font-mono text-[11px] tracking-[0.12em] uppercase transition-all duration-200 cursor-pointer ${
                     active
-                      ? 'text-white'
-                      : 'text-gray-400 hover:text-gray-200'
+                      ? 'text-[#f4efe9]'
+                      : 'text-[#76716b] hover:text-[#a8a29a]'
                   }`}
                   style={active ? {
                     background: 'rgba(255,255,255,0.08)',

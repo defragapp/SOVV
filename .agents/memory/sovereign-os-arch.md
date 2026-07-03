@@ -3,6 +3,17 @@ name: Sovereign.os Architecture Decisions
 description: Space structure, provider tree, motion patterns, ambient layer placement, and baseline/archive design decisions for the Sovereign.os monorepo.
 ---
 
+## Phase 22 — Design Token System
+Central token file: `src/lib/design-tokens.ts`. Exports: `surface`, `accent`, `text`, `shape`, `physics`, `font`, `glassActionButton`, `creamCta`, `amberCta`.
+Palette rules:
+- Approved colors ONLY: #08070a, #0c0a0d, #f4efe9, #e0743a, #a8a29a, #76716b, #4f4b47, #d4cec8 — no #f0a06a, #c8c2bc, #e8e2da
+- button.tsx uses CVA (exports `buttonVariants` for alert-dialog/calendar/pagination compat) — `rounded-2xl` slab for all solid variants, `rounded-xl` for ghost; hover is opacity-based, no fill transitions
+- FloatingNav and site header: identical surface `rgba(8,7,10,0.82)` + `blur(24px)` — no saturate
+- All modals (ArchiveDetail, CovenantDetail, BaselineEntry): `rounded-3xl` + `rgba(8,7,10,0.95)` + `blur(24px)` + `ring-1 ring-inset ring-white/[0.06]`
+- All list rows (Archive, Covenant): `text-[14px] text-[#d4cec8]` + `border-b border-white/[0.08]`
+- Inputs (Defrag, Covenant): text-[#f4efe9], bg-transparent
+- `--accent` CSS variable in index.css: #a8a29a (updated from #c8c2bc)
+
 ## Provider tree order (App.tsx)
 `QueryClientProvider > UserProvider > ArchiveProvider > WouterRouter`
 - `AmbientBackground` and `BaselineGate` live inside `WouterRouter` so they can call `useLocation()`, but outside `AnimatePresence` so they never flash on route change.

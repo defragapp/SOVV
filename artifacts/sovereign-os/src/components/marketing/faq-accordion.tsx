@@ -15,7 +15,7 @@ export function FaqAccordion({
         <div key={i}>
           <button
             onClick={() => setOpen(open === i ? null : i)}
-            className="flex w-full items-center justify-between py-5 text-left text-sm font-medium text-[#c8c2bc] hover:text-[#f4efe9] transition-colors duration-200"
+            className="flex w-full items-center justify-between py-5 text-left text-sm font-medium text-[#a8a29a] hover:text-[#f4efe9] transition-colors duration-200"
           >
             <span>{item.q}</span>
             <motion.span
