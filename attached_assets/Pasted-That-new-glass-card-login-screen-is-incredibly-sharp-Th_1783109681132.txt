@@ -1,0 +1,45 @@
+That new glass card login screen is incredibly sharp. The deep black background with the hairline borders and the Fraunces typography ("Enter your domain.") perfectly nails that premium, iOS-native feel we've been building toward.
+
+Leaving the "Forgot Password" page in the old web aesthetic shatters that illusion instantly. When you are building a cohesive operating system environment, every single room in the house has to have the same lighting and architecture.
+
+Here is **Phase 10**. Drop this directly into the Replit agent to enforce platform-wide cohesion across the remaining auth and system screens.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 10: Platform-Wide Brand Cohesion & Auth Standardization
+
+## Core Objective
+The new `LoginScreen.tsx` aesthetic is the official standard. We must bring the `ForgotPassword` flow (and any other secondary auth screens) up to this exact premium, iOS-native glass card standard. The transition between login, forgot password, and the spaces must feel seamless and structurally identical.
+
+## Strict System Constraints
+1. **The Glass Card Standard:** All auth forms must use the centered glass card container: `bg-[#1C1C1E] rounded-3xl p-8 ring-1 ring-inset ring-white/[0.05]`.
+2. **Typography Standardization:** - Fraunces: Primary greeting/heading only.
+   - Geist (17px): Input fields and standard instructional text.
+   - JetBrains Mono: Status feedback, tags, and tertiary navigation.
+3. **Inputs:** Borderless, transparent background, `text-[17px]` Geist, separated by hairline dividers (`border-b border-white/[0.05]`). No focus rings.
+
+---
+
+## Execution Steps
+
+### 1. Refactor `ForgotPassword` Flow
+- Update the forgot password component to exactly match the structural layout of `LoginScreen.tsx`.
+- **Header:** Use Fraunces for the heading (e.g., "Recover your domain.").
+- **Input:** Single email input matching the borderless/hairline-divider style.
+- **CTA:** Use the same premium button styling from the login screen.
+- **Tertiary Nav:** Ensure the "← BACK TO SOVEREIGN.OS" link is clean, using JetBrains Mono, `text-xs`, and subtle hover opacity changes.
+
+### 2. Premium System Feedback States
+- Stop using standard generic web alerts (no bright green or red boxes) for form success/error states.
+- **Success State (Email Sent):** When the recovery email fires, replace the input form with a minimal success state *inside* the card. Use a glowing amber dot and a JetBrains Mono tag: `[RECOVERY SECURED]`, followed by a Geist text explanation ("A link has been sent to your domain.").
+- **Error State:** Use a JetBrains Mono tag with a faint red/amber hue `[SYSTEM_ERROR: INVALID CREDENTIALS]` without breaking the dark UI container.
+
+### 3. Global CSS & Layout Audit
+- Do a quick scan of the primary layouts to ensure no legacy thick borders (`border-gray-700`, `border-white/20`), toy-like rounded buttons, or non-normalized hover effects are lingering in the UI. Ensure everything respects the `PageTransition` wrapper.
+
+Execute the visual standardization for the forgot password flow and ensure the system feedback states match the premium aesthetic.
+
+```

@@ -3,7 +3,8 @@ import { useLocation } from 'wouter';
 import { SpaceShell } from '@/components/spaces/space-shell';
 import Sidebar from '@/components/spaces/Sidebar';
 import { PremiumGate } from '@/components/spaces/PremiumGate';
-import { useUserTier, setLocalPremium } from '@/context/UserContext';
+import { useUserTier } from '@/context/UserContext';
+import { setLocalPremium } from '@/lib/tier';
 
 export function CovenantPage() {
   const { isPremium, refresh } = useUserTier();
@@ -14,11 +15,9 @@ export function CovenantPage() {
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('session_id');
     if (sessionId) {
-      // Drop the local tier flag — unlocks the gate immediately on this device
       setLocalPremium();
-      // Re-fetch the backend session so UserContext reflects the new state
       refresh();
-      // Clean the URL (remove ?session_id=...) without a full reload
+      // Clean the URL without a full reload
       setLocation(location.split('?')[0], { replace: true });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -32,7 +31,6 @@ export function CovenantPage() {
   );
 
   const main = isPremium ? (
-    // Pro content placeholder — will be filled in a future phase
     <div className="flex flex-col items-center justify-center h-full px-6 text-center">
       <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-4">Covenant</p>
       <p className="font-serif text-xl text-[#f4efe9] mb-2">Your space is ready.</p>

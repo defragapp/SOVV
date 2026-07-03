@@ -12,6 +12,7 @@ export function PremiumGate({ space, tagline, description }: PremiumGateProps) {
   const [error, setError] = useState('');
 
   const handleCheckout = async () => {
+    if (loading) return; // prevent double-click race
     setLoading(true);
     setError('');
     try {

@@ -10,13 +10,26 @@ router.post("/", async (req: Request, res: Response) => {
     return;
   }
 
-  const stripe = new Stripe(secretKey, { apiVersion: "2025-05-28.basil" });
+  const stripe = new Stripe(secretKey, { apiVersion: "2026-06-24.dahlia" });
 
-  // Build absolute URLs from the incoming request origin so this works in
-  // both local dev and production without hardcoding a domain.
-  const origin =
-    (req.headers["origin"] as string | undefined) ||
-    `https://${req.headers["host"] ?? "sovereign.os"}`;
+  // Allowlisted origins — prevents open-redirect abuse via a spoofed Origin header.
+  const ALLOWED_ORIGINS = (process.env["ALLOWED_ORIGINS"] ?? "").split(",").map(s => s.trim()).filter(Boolean);
+
+  const requestOrigin = req.headers["origin"] as string | undefined;
+
+  // Derive the canonical origin: allowlist wins, then fall back to request origin
+  // (acceptable in dev where no allowlist is configured), then the host header.
+  let origin: string;
+  if (ALLOWED_ORIGINS.length > 0) {
+    if (!requestOrigin || !ALLOWED_ORIGINS.includes(requestOrigin)) {
+      res.status(400).json({ error: "Request origin not permitted." });
+      return;
+    }
+    origin = requestOrigin;
+  } else {
+    // No allowlist configured (dev) — use request origin or host
+    origin = requestOrigin || `https://${req.headers["host"] ?? "sovereign.os"}`;
+  }
 
   const successUrl = `${origin}/apps/covenant?session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${origin}/apps/defrag`;
