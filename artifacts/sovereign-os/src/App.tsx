@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Route, Switch, Router as WouterRouter, Redirect, useLocation } from 'wouter';
 import { AnimatePresence } from 'framer-motion';
 import { PageTransition } from '@/components/PageTransition';
+import { UserProvider } from '@/context/UserContext';
 
 // Pages
 import NotFound from '@/pages/not-found';
@@ -99,9 +100,11 @@ function AnimatedRoutes() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-        <AnimatedRoutes />
-      </WouterRouter>
+      <UserProvider>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+          <AnimatedRoutes />
+        </WouterRouter>
+      </UserProvider>
     </QueryClientProvider>
   );
 }

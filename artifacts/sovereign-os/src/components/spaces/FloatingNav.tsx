@@ -1,14 +1,16 @@
 import { Link, useLocation } from 'wouter';
+import { useUserTier } from '@/context/UserContext';
 
 const SPACES = [
-  { href: '/apps/defrag',    label: 'Defrag'    },
-  { href: '/apps/covenant',  label: 'Covenant'  },
-  { href: '/apps/alignment', label: 'Alignment' },
+  { href: '/apps/defrag',    label: 'Defrag',    gated: false },
+  { href: '/apps/covenant',  label: 'Covenant',  gated: true  },
+  { href: '/apps/alignment', label: 'Alignment', gated: true  },
 ] as const;
 
 /** iOS Dynamic Island-style bottom tab bar. Mobile-only (hidden on lg+). */
 export function FloatingNav() {
   const [location] = useLocation();
+  const { isPremium } = useUserTier();
 
   const activeSpace = SPACES.find(s => location.startsWith(s.href))?.href ?? '';
 
@@ -21,7 +23,8 @@ export function FloatingNav() {
         className="pointer-events-auto"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <div className="mb-3 flex items-center gap-0.5 px-1.5 py-1.5 rounded-full shadow-2xl"
+        <div
+          className="mb-3 flex items-center gap-0.5 px-1.5 py-1.5 rounded-full shadow-2xl"
           style={{
             background: 'rgba(0,0,0,0.4)',
             backdropFilter: 'blur(24px) saturate(150%)',
@@ -29,18 +32,26 @@ export function FloatingNav() {
             boxShadow: '0 0 0 1px rgba(255,255,255,0.05) inset, 0 20px 40px rgba(0,0,0,0.6)',
           }}
         >
-          {SPACES.map(({ href, label }) => {
+          {SPACES.map(({ href, label, gated }) => {
             const active = activeSpace === href;
+            const locked = gated && !isPremium;
+
             return (
               <Link key={href} href={href}>
                 <span
-                  className={`block px-5 py-2 rounded-full font-mono text-[11px] tracking-[0.12em] uppercase transition-all duration-200 cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-5 py-2 rounded-full font-mono text-[11px] tracking-[0.12em] uppercase transition-all duration-200 cursor-pointer ${
                     active
                       ? 'bg-white/[0.15] text-white'
                       : 'text-gray-400 hover:text-gray-200'
                   }`}
                 >
                   {label}
+                  {/* Subtle lock pip for gated spaces when not premium */}
+                  {locked && !active && (
+                    <span
+                      className="w-1 h-1 rounded-full bg-[#e0743a]/50 shrink-0"
+                    />
+                  )}
                 </span>
               </Link>
             );

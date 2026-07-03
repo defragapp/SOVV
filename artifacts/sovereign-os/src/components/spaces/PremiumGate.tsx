@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import { useState } from 'react';
 
 interface PremiumGateProps {
   space: 'Covenant' | 'Alignment';
@@ -8,6 +8,31 @@ interface PremiumGateProps {
 
 /** Paywall card shown in pro-gated spaces. */
 export function PremiumGate({ space, tagline, description }: PremiumGateProps) {
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
+
+  const handleUpgrade = async () => {
+    setCheckoutLoading(true);
+    setCheckoutError('');
+    try {
+      const res = await fetch('/api/billing/checkout', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json() as { url?: string; error?: string };
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setCheckoutError(data.error ?? 'Could not start checkout. Please try again.');
+        setCheckoutLoading(false);
+      }
+    } catch {
+      setCheckoutError('Connection failed. Please try again.');
+      setCheckoutLoading(false);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center h-full px-6">
       {/* Outer shell */}
@@ -74,17 +99,37 @@ export function PremiumGate({ space, tagline, description }: PremiumGateProps) {
             {/* Divider */}
             <div className="w-full h-px bg-white/[0.05]" />
 
-            {/* CTA */}
-            <Link
-              href="/pricing"
-              className="w-full py-3.5 rounded-2xl bg-amber-500 text-black font-mono text-[12px] uppercase tracking-[0.14em] font-semibold text-center transition-opacity hover:opacity-90 active:opacity-80 block"
+            {/* CTA — switches to INITIALIZING... while loading */}
+            <button
+              onClick={handleUpgrade}
+              disabled={checkoutLoading}
+              className="w-full py-3.5 rounded-2xl font-mono text-center transition-all duration-200 disabled:cursor-not-allowed"
+              style={{
+                background: checkoutLoading ? 'rgba(245,158,11,0.7)' : 'rgb(245,158,11)',
+                color: '#000',
+              }}
             >
-              Upgrade to Pro
-            </Link>
+              {checkoutLoading ? (
+                <span className="flex items-center justify-center gap-2 text-[10px] tracking-[0.16em] uppercase">
+                  <span className="w-1.5 h-1.5 rounded-full bg-black/40 animate-pulse" />
+                  [INITIALIZING...]
+                </span>
+              ) : (
+                <span className="text-[12px] uppercase tracking-[0.14em] font-semibold">
+                  Upgrade to Pro
+                </span>
+              )}
+            </button>
 
-            <p className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em]">
-              $12 / month · cancel anytime
-            </p>
+            {checkoutError ? (
+              <p className="font-mono text-[9px] text-red-400/70 tracking-[0.1em]">
+                {checkoutError}
+              </p>
+            ) : (
+              <p className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em]">
+                $12 / month · cancel anytime
+              </p>
+            )}
           </div>
         </div>
       </div>
