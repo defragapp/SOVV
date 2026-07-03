@@ -26,7 +26,12 @@ export function HubBillingPage() {
       <div className="max-w-xl mx-auto px-6 py-12">
         <h1 className="font-serif text-2xl text-[#f4efe9] mb-2">Billing</h1>
         <p className="text-sm text-[#76716b] mb-8">Manage your subscription and payment details.</p>
-        <button onClick={openPortal} disabled={loading} className="btn-primary">
+        <button
+          onClick={openPortal}
+          disabled={loading}
+          className="inline-flex items-center justify-center px-6 py-3 rounded-2xl font-mono text-[11px] uppercase tracking-[0.14em] font-semibold transition-opacity hover:opacity-90 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ background: '#f4efe9', color: '#08070a' }}
+        >
           {loading ? '···' : 'Open billing portal'}
         </button>
         <div className="mt-6">

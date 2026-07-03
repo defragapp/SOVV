@@ -120,12 +120,9 @@ function AnimatedRoutes() {
 
           {/* App spaces */}
           <Route path="/apps/defrag"              component={DefragPage} />
-          <Route path="/apps/defrag/workspace"    component={DefragPage} />
           <Route path="/apps/defrag/:id"          component={DefragPage} />
           <Route path="/apps/alignment"           component={AlignmentPage} />
-          <Route path="/apps/alignment/workspace" component={AlignmentPage} />
           <Route path="/apps/covenant"            component={CovenantPage} />
-          <Route path="/apps/covenant/workspace"  component={CovenantPage} />
           <Route path="/apps/archive"             component={ArchivePage} />
 
           {/* Hub (legacy → redirect) */}

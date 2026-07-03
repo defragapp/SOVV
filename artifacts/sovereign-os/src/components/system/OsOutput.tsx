@@ -122,7 +122,7 @@ export function OsOutput({
               : "Covenant finds the story that fits this moment."}
           </p>
           <a
-            href={`/apps/${flow.nextSpace.toLowerCase()}/workspace`}
+            href={`/apps/${flow.nextSpace.toLowerCase()}`}
             className="shrink-0 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-3 py-2 hover:border-white/[0.16]"
             style={{ borderRadius: 6 }}
           >

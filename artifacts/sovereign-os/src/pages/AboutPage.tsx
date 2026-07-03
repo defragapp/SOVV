@@ -106,14 +106,8 @@ export function AboutPage() {
           <div className="mt-9 flex flex-col items-center gap-4">
             <motion.a
               href="/app/login"
-              className="inline-flex items-center justify-center px-8 py-3.5 rounded-2xl font-mono text-[12px] uppercase tracking-[0.12em]"
-              style={{
-                background: 'rgba(224,116,58,0.90)',
-                color: '#08070a',
-                boxShadow: '0 0 0 1px rgba(224,116,58,0.5) inset',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-              }}
+              className="inline-flex items-center justify-center px-8 py-3.5 rounded-2xl font-mono text-[12px] uppercase tracking-[0.12em] font-semibold transition-opacity hover:opacity-90"
+              style={{ background: '#f4efe9', color: '#08070a' }}
               whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
               whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}

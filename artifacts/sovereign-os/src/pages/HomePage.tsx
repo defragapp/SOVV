@@ -249,7 +249,8 @@ function Hero() {
             <div ref={refs.ctaRef} className="mt-9 flex items-center gap-5 flex-wrap">
               <motion.a
                 href={APP_URL}
-                className="btn-primary"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-2xl font-mono text-[11px] uppercase tracking-[0.14em] font-semibold transition-opacity hover:opacity-90"
+                style={{ background: '#f4efe9', color: '#08070a' }}
                 whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                 whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 20 }}
@@ -340,7 +341,8 @@ export function HomePage() {
           <div className="mt-9">
             <motion.a
               href={APP_URL}
-              className="btn-primary"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-2xl font-mono text-[11px] uppercase tracking-[0.14em] font-semibold transition-opacity hover:opacity-90"
+              style={{ background: '#f4efe9', color: '#08070a' }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}

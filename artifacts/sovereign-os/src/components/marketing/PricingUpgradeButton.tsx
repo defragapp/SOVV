@@ -45,7 +45,8 @@ export function PricingUpgradeButton() {
         type="button"
         onClick={handleUpgrade}
         disabled={loading}
-        className="btn-primary w-full text-center relative disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full relative inline-flex items-center justify-center px-6 py-3 rounded-2xl font-mono text-[11px] uppercase tracking-[0.14em] font-semibold transition-opacity hover:opacity-90 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
+        style={{ background: '#f4efe9', color: '#08070a' }}
       >
         {loading ? "\u00b7\u00b7\u00b7" : "Upgrade to Pro"}
       </button>

@@ -1,0 +1,49 @@
+This is a classic AI agent anti-pattern. When left to their own devices, they default to standard web framework components (like full-radius pills or flat boxes) because it's what exists most frequently in their training data.
+
+To permanently eradicate this, we have to stop asking the agent to "fix buttons" and instead mandate a **strict global component architecture**. We need to force it to extract the exact glass aesthetic from your new login screen and apply it as an unbreakable rule across the entire normalized dark UI.
+
+Here is the exact directive to drop into Replit. This will audit the entire platform—from the marketing pages to the interior spaces—and replace every legacy pill with the premium iOS-native glass standard.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 19: Global Shape Eradication & The Glass Standard
+
+## Core Objective
+Stop what you are doing and perform a global UI audit. The user has explicitly rejected all "pill-shaped" (`rounded-full` on text buttons) and flat "box-shaped" buttons. These legacy web artifacts are breaking the premium, cohesive aesthetic. You must eradicate them immediately and replace them with the exact iOS-native material glass standard used on the newly designed `LoginScreen.tsx`.
+
+## Strict System Constraints (The Anti-Pill Directive)
+1. **No More Pills:** Do not use `rounded-full` on any text-bearing buttons or navigation items. 
+2. **The New Standard Shape:** All primary and secondary CTAs must use a structural, modern glass slab aesthetic. Use `rounded-xl` or `rounded-2xl` for a precise, expensive feel.
+3. **The Material Recipe:** Extract the exact styling from the `LoginScreen.tsx` inputs and buttons. Every button must use: `bg-white/5` (or `#1C1C1E` for dark cards), `ring-1 ring-inset ring-white/[0.05]`, `backdrop-blur-md`, and our strict `active:scale-[0.97]` haptic physics. No flat background colors unless it is the pure amber CTA (which must also drop the pill shape).
+
+---
+
+## Execution Steps
+
+### 1. Global Component Extraction
+- Review `LoginScreen.tsx` and isolate the structural design of its primary buttons and inputs.
+- Create a global, reusable `<GlassButton>` component (or strictly define the Tailwind classes) that enforces this exact modern shape and material weight. 
+
+### 2. The Great UI Sweep
+Sweep the entire repository and replace all legacy buttons with the new standard. Target specifically:
+- **`HomePage.tsx`:** The "Enter Sovereign.os" hero button.
+- **Marketing Pages (`/about`, `/pricing`, `/how-it-works`):** Replace every single CTA and form input.
+- **`FloatingNav.tsx`:** Remove the pill shapes (`rounded-full`) from the active state indicators. Shift them to `rounded-xl` glass tiles that match the interior architecture of the spaces. 
+- **Interior Spaces (Defrag, Covenant, Alignment):** Ensure the "Map Pattern", "Commit Response", and "Save to Archive" buttons strictly conform to the new `rounded-xl` glass standard.
+
+### 3. Terminology & Cohesion Check
+- While sweeping the repository, ensure the term "workspace" is eradicated. Use only "spaces" to refer to the interior environments.
+- Ensure all hover states rely strictly on border glow or subtle opacity shifts, completely removing any standard web color-fill changes.
+
+Execute this global sweep now. Do not leave a single pill-shaped button in the codebase.
+
+```
+
+---
+
+Once the agent executes this sweep, the entire platform will instantly snap into a cohesive, high-fidelity state that matches the deep, structural aesthetic you established.
+
+Are there any specific UI components outside of buttons (like the diagnostic cards or input areas) that you feel are still lagging behind the design standard set by the login screen?

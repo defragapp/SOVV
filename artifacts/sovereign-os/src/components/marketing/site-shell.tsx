@@ -147,8 +147,8 @@ export function SiteShell({ children, entranceControlled = false }: SiteShellPro
             </Link>
             <Link
               href="/app/login"
-              className="inline-flex items-center h-9 px-5 text-[12px] tracking-[-0.01em] bg-[#f4efe9] text-[#08070a] hover:bg-white transition-colors duration-200"
-              style={{ borderRadius: 8 }}
+              className="inline-flex items-center h-9 px-5 font-mono text-[11px] uppercase tracking-[0.12em] font-semibold transition-opacity hover:opacity-90 rounded-xl"
+              style={{ background: '#f4efe9', color: '#08070a' }}
             >
               Get started
             </Link>

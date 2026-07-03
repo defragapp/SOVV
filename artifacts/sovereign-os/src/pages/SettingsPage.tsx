@@ -112,7 +112,12 @@ export function SettingsPage() {
           {error && <p className="text-sm text-red-400/80">{error}</p>}
           {saved && <p className="text-sm text-[#e0743a]/80">Baseline Design saved.</p>}
 
-          <button type="submit" disabled={saving} className="btn-primary self-start">
+          <button
+            type="submit"
+            disabled={saving}
+            className="self-start inline-flex items-center justify-center px-6 py-3 rounded-2xl font-mono text-[11px] uppercase tracking-[0.14em] font-semibold transition-opacity hover:opacity-90 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ background: '#f4efe9', color: '#08070a' }}
+          >
             {saving ? '···' : 'Save Baseline Design'}
           </button>
         </form>

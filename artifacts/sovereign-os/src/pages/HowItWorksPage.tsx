@@ -65,7 +65,13 @@ export function HowItWorksPage() {
           <h2 className="font-serif text-4xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] mb-8 text-balance max-w-2xl mx-auto">
             Ready to interrupt the loop?
           </h2>
-          <Link href="/app/login" className="btn-primary">Enter Sovereign.os</Link>
+          <a
+            href="/app/login"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-2xl font-mono text-[11px] uppercase tracking-[0.14em] font-semibold transition-opacity hover:opacity-90 active:scale-[0.97]"
+            style={{ background: '#f4efe9', color: '#08070a' }}
+          >
+            Enter Sovereign.os
+          </a>
         </Container>
       </section>
     </SiteShell>

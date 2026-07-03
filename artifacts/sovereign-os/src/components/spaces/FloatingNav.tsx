@@ -28,7 +28,7 @@ export function FloatingNav() {
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <div
-          className="mb-3 flex items-center gap-0.5 px-1.5 py-1.5 rounded-full shadow-2xl"
+          className="mb-3 flex items-center gap-1 px-1.5 py-1.5 rounded-2xl shadow-2xl"
           style={{
             background: 'rgba(0,0,0,0.4)',
             backdropFilter: 'blur(24px) saturate(150%)',
@@ -42,11 +42,17 @@ export function FloatingNav() {
             return (
               <Link key={href} href={href}>
                 <span
-                  className={`flex items-center gap-1.5 px-5 py-2 rounded-full font-mono text-[11px] tracking-[0.12em] uppercase transition-all duration-200 cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-5 py-2 rounded-xl font-mono text-[11px] tracking-[0.12em] uppercase transition-all duration-200 cursor-pointer ${
                     active
-                      ? 'bg-white/[0.15] text-white'
+                      ? 'text-white'
                       : 'text-gray-400 hover:text-gray-200'
                   }`}
+                  style={active ? {
+                    background: 'rgba(255,255,255,0.08)',
+                    boxShadow: '0 0 0 1px rgba(255,255,255,0.10) inset',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                  } : undefined}
                 >
                   {label}
                 </span>

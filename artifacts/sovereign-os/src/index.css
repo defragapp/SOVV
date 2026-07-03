@@ -127,7 +127,7 @@
   --duration-slow: 400ms;
   --radius-container: 14px;
   --radius-input: 10px;
-  --radius-button: 8px;
+  --radius-button: 12px;
   --radius-minimal: 4px;
 
   /* Tailwind/shadcn HSL vars — Sovereign palette */

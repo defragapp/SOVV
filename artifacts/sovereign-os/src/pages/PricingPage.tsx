@@ -17,13 +17,14 @@ function TactileCTA({ href, label, amber }: { href: string; label: string; amber
   return (
     <motion.a
       href={href}
-      className="w-full flex items-center justify-center px-6 py-3 rounded-2xl font-mono text-[12px] uppercase tracking-[0.12em] transition-colors"
-      style={{
-        background: amber ? 'rgba(224,116,58,0.90)' : 'rgba(255,255,255,0.06)',
-        color: amber ? '#08070a' : '#f4efe9',
-        boxShadow: amber
-          ? '0 0 0 1px rgba(224,116,58,0.5) inset'
-          : '0 0 0 1px rgba(255,255,255,0.08) inset',
+      className="w-full flex items-center justify-center px-6 py-3 rounded-2xl font-mono text-[12px] uppercase tracking-[0.12em] font-semibold transition-opacity hover:opacity-90"
+      style={amber ? {
+        background: '#e0743a',
+        color: '#08070a',
+      } : {
+        background: 'rgba(255,255,255,0.06)',
+        color: '#f4efe9',
+        boxShadow: '0 0 0 1px rgba(255,255,255,0.08) inset',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
       }}

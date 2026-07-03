@@ -29,5 +29,17 @@ Premium-only tabs are **filtered out entirely** (not locked) when `!isPremium` �
 ## explain.ts baselineTriggered coercion
 `validate()` normalises `baselineTriggered`: string `"true"/"false"` → boolean; any other non-boolean type → `false`. Always guaranteed to be boolean in the response, never undefined.
 
-## motion.a vs Link for CTAs on marketing pages
-Marketing CTAs that need physics (whileHover/whileTap) must use `motion.a` with inline styles, NOT `<Link className="btn-primary">`. `btn-primary` is a legacy CSS class — using it alongside Framer Motion props produces a code-review failure. The tactile standard: amber `rgba(224,116,58,0.90)` fill, `color: #08070a`, `scale: 1.02` hover / `scale: 0.97` tap, spring transition.
+## The Glass Standard (Phase 19 — permanent edict)
+**No rounded-full on text buttons or nav items.** `rounded-full` is reserved only for decorative 1–2px glow dots.
+
+Button shape hierarchy:
+- Primary hero CTA ("Enter Sovereign.os"): `rounded-2xl`, `background: #f4efe9`, `color: #08070a`, `hover:opacity-90` — never `hover:bg-*` fill change.
+- Pure amber Pro CTA (Pricing Pro tier only): `rounded-2xl`, `background: #e0743a`, `color: #08070a`, `hover:opacity-90`.
+- Glass secondary (interior actions, "Start Free"): `rounded-2xl`, `background: rgba(255,255,255,0.06)`, `boxShadow: 0 0 0 1px rgba(255,255,255,0.08) inset`, `backdropFilter: blur(12px)`.
+- FloatingNav tabs: outer container `rounded-2xl`, individual tab items `rounded-xl` with glass active state (backdrop-blur + inset ring shadow) — never flat fill.
+
+`GlassButton` component at `src/components/ui/GlassButton.tsx` — use for `<button>` elements; use inline motion.a styles for anchor CTAs.
+
+`--radius-button` in index.css is `12px` (rounded-xl). `btn-primary` / `btn-secondary` CSS classes remain defined but are fully eradicated from all component files.
+
+**"Spaces" not "workspace":** All routes are `/apps/defrag`, `/apps/covenant`, `/apps/alignment` — no `/workspace` suffix. OsOutput.tsx href navigates to `/apps/SPACENAME` directly.
