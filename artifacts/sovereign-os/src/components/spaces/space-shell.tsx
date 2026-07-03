@@ -1,6 +1,7 @@
 
 import * as React from "react"
 import { Link } from "wouter"
+import { FloatingNav } from "./FloatingNav"
 
 interface SpaceShellProps {
   sidebar?: React.ReactNode       // LEFT — people / Baseline Design context
@@ -124,8 +125,11 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
       </div>
 
       {/* ── Mobile Layout ──────────────────────────────────────────── */}
-      <div className="flex lg:hidden flex-col w-full h-full safe-top safe-bottom">
-        <header className="sticky top-0 z-10 bg-[#08070a]/95 backdrop-blur-md border-b border-white/[0.06] px-5 py-3 flex items-center justify-between">
+      <div className="flex lg:hidden flex-col w-full h-full">
+        <header
+          className="sticky top-0 z-10 bg-[#08070a]/95 backdrop-blur-md border-b border-white/[0.06] px-5 py-3 flex items-center justify-between select-none"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
+        >
           <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.2em] uppercase">
             <Link href="/apps/defrag" className="text-[#76716b]">Sovereign.os</Link>
             <span className="text-[#4f4b47]">/</span>
@@ -134,9 +138,6 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
           <div className="flex items-center gap-3">
             <Link href="/app" className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#76716b] hover:text-[#f4efe9] transition-colors">
               Library
-            </Link>
-            <Link href="/settings" className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#76716b] hover:text-[#f4efe9] transition-colors">
-              Baseline Design
             </Link>
             <button
               onClick={handleSignOut}
@@ -147,59 +148,42 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
           </div>
         </header>
 
-        {/* Space switcher mobile */}
-        <div className="flex px-4 pt-2 gap-1 overflow-x-auto border-b border-white/[0.06] bg-[#08070a]">
-          {[
-            { href: "/apps/defrag", label: "Defrag" },
-            { href: "/apps/covenant", label: "Covenant" },
-            { href: "/apps/alignment", label: "Alignment" },
-          ].map((s) => (
-            <Link
-              key={s.href}
-              href={s.href}
-              className={`px-3 py-2.5 border-b-2 font-mono text-[10px] tracking-[0.2em] uppercase whitespace-nowrap transition-colors ${
-                spaceName === s.label
-                  ? "border-[#f4efe9] text-[#f4efe9]"
-                  : "border-transparent text-[#76716b] hover:text-[#a8a29a]"
-              }`}
-            >
-              {s.label}
-            </Link>
-          ))}
-        </div>
-
-        {/* Content tabs */}
-        <div className="flex px-4 gap-1 overflow-x-auto border-b border-white/[0.06] bg-[#08070a]">
-          {mobileTabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => {
-                // Save current scroll position
-                if (contentRef.current) {
-                  scrollPositions.current[activeTab] = contentRef.current.scrollTop
-                }
-                setActiveTab(tab.id)
-                // Restore scroll position after render
-                requestAnimationFrame(() => {
+        {/* Content tabs — switch between main content and context panel */}
+        {mobileTabs.length > 1 && (
+          <div className="flex px-4 gap-1 overflow-x-auto border-b border-white/[0.06] bg-[#08070a] select-none">
+            {mobileTabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => {
                   if (contentRef.current) {
-                    contentRef.current.scrollTop = scrollPositions.current[tab.id] ?? 0
+                    scrollPositions.current[activeTab] = contentRef.current.scrollTop
                   }
-                })
-              }}
-              className={`px-4 py-2.5 border-b-2 font-mono text-[10px] tracking-[0.2em] uppercase whitespace-nowrap transition-colors ${
-                activeTab === tab.id
-                  ? "border-[#e0743a] text-[#f4efe9]"
-                  : "border-transparent text-[#76716b] hover:text-[#a8a29a]"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+                  setActiveTab(tab.id)
+                  requestAnimationFrame(() => {
+                    if (contentRef.current) {
+                      contentRef.current.scrollTop = scrollPositions.current[tab.id] ?? 0
+                    }
+                  })
+                }}
+                className={`px-4 py-2.5 border-b-2 font-mono text-[10px] tracking-[0.2em] uppercase whitespace-nowrap transition-colors ${
+                  activeTab === tab.id
+                    ? "border-[#e0743a] text-[#f4efe9]"
+                    : "border-transparent text-[#76716b] hover:text-[#a8a29a]"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
 
-        <main ref={contentRef} className="flex-1 overflow-y-auto p-5 pb-24 bg-[#08070a]">
+        {/* Main content — pb-36 gives clearance above FloatingNav + safe area */}
+        <main ref={contentRef} className="flex-1 overflow-y-auto bg-[#08070a]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 88px)' }}>
           {mobileTabs.find((t) => t.id === activeTab)?.content}
         </main>
+
+        {/* Floating bottom tab bar — replaces old space switcher */}
+        <FloatingNav />
       </div>
 
     </div>

@@ -1,0 +1,60 @@
+That is a massive win. With the PWA manifest handling the full-screen bleed and the view transitions physically pushing and popping the content, the app now has the baseline weight of a native iOS product.
+
+Now it's time to build the actual interior where the user does the work. Since the shell is ready, we need to construct the **Defrag space**, the **floating navigation**, and the **premium paywall**.
+
+Here is Phase 6. Drop this into the Replit agent to build out the core product interface.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 6: Interior Spaces & Floating Navigation
+
+## Core Objective
+Build the functional interior of the platform: the Defrag space, the floating iOS-style bottom navigation, and the Premium Paywall component. The UI must feel like a precision diagnostic tool—quiet, structural, and strictly utilizing the normalized dark theme. 
+
+## Strict System Constraints
+1. **Terminology:** Use "Spaces" exclusively. Never use "workspace".
+2. **Typography Roles:** - Fraunces: Massive headers only.
+   - Geist (17px): All standard UI, inputs, and human-centric explanations.
+   - JetBrains Mono: System metadata, status tags, and structural data.
+3. **Materials:** Use hairline borders (`ring-1 ring-inset ring-white/[0.05]`). Use the Vibrancy recipe for floating elements (`bg-black/40 backdrop-blur-2xl backdrop-saturate-150`).
+4. **Safe Areas:** All bottom-anchored elements MUST use the `.ios-safe-bottom` class or CSS variable to clear the iPhone home bar.
+
+---
+
+## Execution Steps
+
+### 1. The Floating Navigation (`FloatingNav.tsx`)
+- **Goal:** Replace standard top-nav for logged-in users with an iOS Dynamic Island-style bottom tab bar.
+- **Positioning:** Fixed to bottom center, utilizing `.ios-safe-bottom` padding so it hovers above the home bar.
+- **Styling:** Pill-shaped container using the Vibrancy material recipe.
+- **Items:** Three buttons (Defrag, Covenant, Alignment). The active space gets a `bg-white/15 text-white` pill. Inactive spaces remain `text-gray-400`. 
+
+### 2. The Defrag Space: Drop Zone (`pages/DefragSpace.tsx`)
+- **Goal:** Zero-friction input for a user in the middle of a conflict.
+- **Build:** A massive, full-width `textarea` container taking up the top half of the screen.
+- **Styling:** Container is `bg-[#1C1C1E] rounded-3xl ring-1 ring-white/[0.05] p-6`. The textarea is borderless, `bg-transparent`, `text-[17px] text-white font-geist`, with no focus outlines. 
+- **Footer:** Inside the container, add a bottom action bar with a JetBrains Mono "INPUT ACTIVE" tag and a frosted glass "Map Pattern" button.
+
+### 3. The Defrag Space: Diagnostic Output Cards
+- **Goal:** Break down the AI analysis into readable, objective data points.
+- **Build:** iOS-style grouped list cards rendering below the Drop Zone.
+- **Card Structure:** - Header: Subtle border-bottom, JetBrains Mono tag (e.g., `[DEFENSE MECHANISM]`), and an amber status dot.
+  - Body: `text-[17px] Geist` for the actionable resolution steps. Container uses `bg-[#1C1C1E] rounded-2xl ring-1 ring-white/[0.05]`.
+- *Agent Note: Populate with a piece of mock data detailing a "Withdrawal/Avoidance" pattern for now.*
+
+### 4. The Premium Gate (`PremiumGate.tsx`)
+- **Goal:** A native-feeling paywall to block access to Covenant and Alignment spaces.
+- **Build:** A locked-state card component. 
+- **Styling:** `bg-[#1C1C1E] rounded-3xl p-1`. Inside, a dark glass container (`bg-black/40 backdrop-blur-xl`) with a subtle amber gradient bleed from the top.
+- **Content:** Include a sleek iOS-style lock icon, a Fraunces `text-2xl` header ("Unlock the Full Structure"), and an Amber `bg-amber-500 text-black` primary CTA button.
+
+Execute these structural updates, wire them into the routing, and ensure everything transitions smoothly using the existing `PageTransition` wrapper.
+
+```
+
+---
+
+Once the agent locks in this UI, are you planning to wire up the actual AI backend for the Defrag analysis next, or do you want to tackle user authentication (Stripe/Supabase) first?

@@ -1,1 +1,2 @@
 - [Sovereign.os Vite port](sovereign-os-vite-port.md) — key migration patterns for Next.js→Vite: next/image→img, next/link→wouter Link, use client removal, Image constructor error
+- [Sovereign.os mock data strings](sovereign-os-mock-data.md) — apostrophes in single-quoted mock string literals break Babel parse; use unicode escapes or double-quoted strings
