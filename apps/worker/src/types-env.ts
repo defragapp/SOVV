@@ -54,6 +54,7 @@ export interface Env {
 
   // ── Turnstile ────────────────────────────────────────────────────────────
   TURNSTILE_SECRET_KEY?: string
+  ADMIN_SEED_SECRET?: string
   TURNSTILE_SITE_KEY?: string
 
   // ── Cloudflare Access ────────────────────────────────────────────────────
