@@ -213,7 +213,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   // ── Active signal selection ───────────────────────────────────────────────
   // Derive reduced behavioral signals from full compute.
   // Only active signals reach the AI — full compute stays server-side.
-  const dataset = await getBaselineDataset(env, sid).catch(() => null);
+  const dataset = await getBaselineDataset(env, sid, user.id).catch(() => null);
   let activeSignalsText = "";
   let railData = null;
   let signatureLine = "";

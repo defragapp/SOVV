@@ -9,6 +9,9 @@ import { logSafetyEvent, protectionActive } from "./safety.js";
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const DATASET_KEY  = (sid: string) => `baseline-dataset:${sid}`;
 const USER_KEY     = (sid: string) => `user:${sid}`;
+// User-ID-based keys for persistence across sessions
+const USER_BASELINE_KEY = (uid: string) => `user-baseline:${uid}`;
+const USER_DATASET_KEY  = (uid: string) => `user-dataset:${uid}`;
 
 function isValidBaseline(data: unknown): data is BaselineRequest {
   return (
@@ -38,7 +41,14 @@ export async function getBaseline(env: Env, sid: string): Promise<Baseline | nul
   return safeJsonParse<Baseline>(raw);
 }
 
-export async function getBaselineDataset(env: Env, sid: string): Promise<BaselineDesignDataset | null> {
+export async function getBaselineDataset(env: Env, sid: string, userId?: string): Promise<BaselineDesignDataset | null> {
+  // Try user-ID-based key first (persists across sessions)
+  if (userId) {
+    const userRaw = await env.KV.get(USER_DATASET_KEY(userId));
+    if (userRaw) {
+      try { return JSON.parse(userRaw) as BaselineDesignDataset; } catch { /* fall through */ }
+    }
+  }
   const raw = await env.KV.get(DATASET_KEY(sid));
   if (!raw) return null;
   return safeJsonParse<BaselineDesignDataset>(raw);
@@ -138,7 +148,7 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
 
   // Trigger dataset compilation in background (non-blocking)
   // This means the user is never blocked waiting for computation
-  const aiModel = (env as any).AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
+  const aiModel = (env as any).AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 
   // Store a pending dataset record immediately so the UI can show status
   const pendingDataset: BaselineDesignDataset = {
@@ -162,6 +172,10 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
         aiModel
       );
       await env.KV.put(DATASET_KEY(sid), JSON.stringify(dataset));
+      // Also save by user ID for persistence across sessions
+      if (user?.id) {
+        await env.KV.put(USER_DATASET_KEY(user.id), JSON.stringify(dataset));
+      }
     } catch (err) {
       logSafetyEvent({
         level: "error",
