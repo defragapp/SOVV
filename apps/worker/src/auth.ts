@@ -314,9 +314,8 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         "Set-Cookie": sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN),
       })
     } catch (e: any) {
-      console.error("[auth] Login error:", e?.message ?? e, e?.stack)
       logSafetyEvent({ level: "error", event: "auth_login_failed", request, error_type: "auth", error: e })
-      return jsonResponse({ error: "Login failed", detail: e?.message ?? "unknown" }, 500)
+      return jsonResponse({ error: "Login failed" }, 500)
     }
   })
 

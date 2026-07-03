@@ -51,8 +51,6 @@ FREE_DAILY_LIMIT = "15"
 AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
 APP_URL = "https://app.defrag.app"
 GATEWAY_ID = "sovereign-ai-gateway"
-# Temporary admin seed secret — remove after account recovery
-ADMIN_SEED_SECRET = "sovv-seed-2026-defrag"
 
 # send_email binding — Cloudflare Email Routing (verified destination: info@defrag.app)
 # Email Routing is active on defrag.app. Destination address verified.
