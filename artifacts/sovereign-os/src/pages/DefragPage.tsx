@@ -4,6 +4,8 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CHIP_GROUPS } from '@/lib/core/chips';
 import type { Mode } from '@/lib/core/types';
+import { useArchive } from '@/context/ArchiveContext';
+import { useUserTier } from '@/context/UserContext';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -291,11 +293,90 @@ function DiagnosticOutput({ result }: { result: DiagnosticResult }) {
   );
 }
 
+// ── Save Pattern action bar ───────────────────────────────────────────────────
+type SaveState = 'idle' | 'saving' | 'saved';
+
+function SaveBar({ result }: { result: DiagnosticResult }) {
+  const { save } = useArchive();
+  const [saveState, setSaveState] = useState<SaveState>('idle');
+
+  const handleSave = async () => {
+    if (saveState !== 'idle') return;
+    setSaveState('saving');
+    // Stub: simulate a short async op (real: POST to KV endpoint)
+    await new Promise(r => setTimeout(r, 800));
+    save({
+      activePattern: result.activePattern ?? 'Unknown Pattern',
+      whatsActive: result.whatsActive ?? '',
+      defenseMechanism: result.defenseMechanism,
+      resolutionSteps: result.resolutionSteps,
+      bestNextResponse: result.bestNextResponse,
+    });
+    setSaveState('saved');
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease }}
+      className="mx-4 mb-3"
+    >
+      <div
+        className="flex items-center justify-between px-5 py-3.5 rounded-2xl"
+        style={{
+          background: 'rgba(0,0,0,0.40)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          boxShadow: '0 0 0 1px rgba(255,255,255,0.06) inset',
+        }}
+      >
+        {/* Status tag */}
+        <div className="flex items-center gap-2">
+          {saveState === 'saving' && (
+            <span
+              className="w-1.5 h-1.5 rounded-full bg-[#e0743a] animate-pulse"
+            />
+          )}
+          {saveState === 'saved' && (
+            <span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: '#e0743a', boxShadow: '0 0 6px rgba(224,116,58,0.6)' }}
+            />
+          )}
+          <span className="font-mono text-[10px] tracking-[0.18em] text-[#4f4b47]">
+            {saveState === 'idle' && 'PATTERN MAPPED'}
+            {saveState === 'saving' && 'SAVING...'}
+            {saveState === 'saved' && '[PATTERN SECURED]'}
+          </span>
+        </div>
+
+        {/* Button */}
+        <button
+          onClick={handleSave}
+          disabled={saveState !== 'idle'}
+          className="px-4 py-2 rounded-xl font-mono text-[10px] uppercase tracking-[0.12em] transition-all duration-200 disabled:opacity-40"
+          style={{
+            background: saveState === 'saved' ? 'rgba(224,116,58,0.10)' : 'rgba(255,255,255,0.08)',
+            color: saveState === 'saved' ? '#e0743a' : '#f4efe9',
+            boxShadow: saveState === 'saved'
+              ? '0 0 0 1px rgba(224,116,58,0.15) inset'
+              : '0 0 0 1px rgba(255,255,255,0.08) inset',
+          }}
+        >
+          {saveState === 'saved' ? '✓ Saved to Archive' : 'Save Pattern'}
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 export function DefragPage() {
   const [result, setResult] = useState<DiagnosticResult | null>(MOCK_RESULT);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { isPremium } = useUserTier();
 
   const handleSubmit = async (message: string) => {
     setLoading(true);
@@ -379,6 +460,7 @@ export function DefragPage() {
           {result && !loading && (
             <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <DiagnosticOutput result={result} />
+              {isPremium && <SaveBar result={result} />}
             </motion.div>
           )}
         </AnimatePresence>

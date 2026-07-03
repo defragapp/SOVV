@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 interface PremiumGateProps {
-  space: 'Covenant' | 'Alignment';
+  space: 'Covenant' | 'Alignment' | 'Archive';
   tagline: string;
   description: string;
 }

@@ -1,10 +1,11 @@
 import { Link, useLocation } from 'wouter';
 import { useUserTier } from '@/context/UserContext';
 
-const SPACES = [
+const ALL_SPACES = [
   { href: '/apps/defrag',    label: 'Defrag',    gated: false },
   { href: '/apps/covenant',  label: 'Covenant',  gated: true  },
   { href: '/apps/alignment', label: 'Alignment', gated: true  },
+  { href: '/apps/archive',   label: 'Archive',   gated: true  },
 ] as const;
 
 /** iOS Dynamic Island-style bottom tab bar. Mobile-only (hidden on lg+). */
@@ -12,7 +13,10 @@ export function FloatingNav() {
   const [location] = useLocation();
   const { isPremium } = useUserTier();
 
-  const activeSpace = SPACES.find(s => location.startsWith(s.href))?.href ?? '';
+  // Hide premium-only tabs entirely when not premium (keeps nav clean)
+  const SPACES = ALL_SPACES.filter(s => !s.gated || isPremium);
+
+  const activeSpace = ALL_SPACES.find(s => location.startsWith(s.href))?.href ?? '';
 
   return (
     <div
@@ -32,9 +36,8 @@ export function FloatingNav() {
             boxShadow: '0 0 0 1px rgba(255,255,255,0.05) inset, 0 20px 40px rgba(0,0,0,0.6)',
           }}
         >
-          {SPACES.map(({ href, label, gated }) => {
+          {SPACES.map(({ href, label }) => {
             const active = activeSpace === href;
-            const locked = gated && !isPremium;
 
             return (
               <Link key={href} href={href}>
@@ -46,12 +49,6 @@ export function FloatingNav() {
                   }`}
                 >
                   {label}
-                  {/* Subtle lock pip for gated spaces when not premium */}
-                  {locked && !active && (
-                    <span
-                      className="w-1 h-1 rounded-full bg-[#e0743a]/50 shrink-0"
-                    />
-                  )}
                 </span>
               </Link>
             );

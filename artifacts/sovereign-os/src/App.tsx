@@ -3,6 +3,7 @@ import { Route, Switch, Router as WouterRouter, Redirect, useLocation } from 'wo
 import { AnimatePresence } from 'framer-motion';
 import { PageTransition } from '@/components/PageTransition';
 import { UserProvider } from '@/context/UserContext';
+import { ArchiveProvider } from '@/context/ArchiveContext';
 
 // Pages
 import NotFound from '@/pages/not-found';
@@ -26,6 +27,7 @@ import { CovenantPage }       from '@/pages/CovenantPage';
 import { SettingsPage }       from '@/pages/SettingsPage';
 import { HubBillingPage }     from '@/pages/HubBillingPage';
 import { AdminPage }          from '@/pages/AdminPage';
+import { ArchivePage }        from '@/pages/ArchivePage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -75,6 +77,7 @@ function AnimatedRoutes() {
           <Route path="/apps/alignment/workspace" component={AlignmentPage} />
           <Route path="/apps/covenant"            component={CovenantPage} />
           <Route path="/apps/covenant/workspace"  component={CovenantPage} />
+          <Route path="/apps/archive"             component={ArchivePage} />
 
           {/* Hub (legacy → redirect) */}
           <Route path="/hub/dashboard"><Redirect to="/apps/defrag" /></Route>
@@ -101,9 +104,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <UserProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <AnimatedRoutes />
-        </WouterRouter>
+        <ArchiveProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+            <AnimatedRoutes />
+          </WouterRouter>
+        </ArchiveProvider>
       </UserProvider>
     </QueryClientProvider>
   );

@@ -1,0 +1,53 @@
+That is a massive milestone. The Replit agent executed those Framer Motion hooks flawlessly. By applying `useSpring` to smooth the raw cursor coordinates and using `layoutId` for the Alignment vector, Sovereign.os now moves with actual physical weight. You aren't just loading pages anymore; you are manipulating a tactile, 3D environment.
+
+You have successfully built the surface diagnostic (Defrag), the structural vault (Covenant), and the forward momentum vector (Alignment). The Stripe revenue engine is locked and loaded. The iOS PWA manifest is active.
+
+There is only one major structural piece missing to complete the premium loop: **Memory**.
+
+Right now, if a user pays $12/month, they can access the vault and the vector, but they still need a place to save their Defrag pattern maps so they can see their growth over time. We need to build the **Pattern Archive**.
+
+Here is **Phase 15**. Drop this into the Replit agent to build the final premium space and close the loop on the user experience.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 15: Pattern Memory & The Archive
+
+## Core Objective
+Complete the premium feature loop by building the Pattern Archive. Premium users must be able to save their Defrag outputs and review their historical relational patterns over time. The Archive must maintain the iOS-native, Vault-like architecture established in the Covenant space.
+
+## Strict System Constraints
+1. **The Native Feel:** The Archive must use the iOS-native grouped list architecture (inset hairline dividers, `bg-[#1C1C1E]`, active touch states) rather than generic web tables.
+2. **Typography:** Geist `text-[17px]` for context snippets, JetBrains Mono for the structural tags (`[WITHDRAWAL]`, `[DATE]`). Fraunces is reserved only for the top-level space header.
+3. **Motion:** Use the established Z-axis `<PageTransition>` wrapper for navigation.
+
+---
+
+## Execution Steps
+
+### 1. The "Save to Archive" Action (Defrag Space)
+- **UI Update:** Inside `DefragPage.tsx`, once the AI Diagnostic Cards render successfully, inject a new bottom action bar below the cards.
+- **Styling:** Use a frosted glass material container (`bg-black/40 backdrop-blur-xl`). Include a "Save Pattern" button.
+- **Wiring:** On click, use the `[SAVING...]` JetBrains Mono tag state. (For now, stub the save function to push the pattern to a local React Context or a mock Cloudflare KV endpoint, triggering a `[PATTERN SECURED]` success state).
+
+### 2. The Archive Dashboard (`pages/ArchivePage.tsx`)
+- **Header:** "Archive" in Fraunces `text-4xl`, with Geist subtext ("Your mapped patterns and historical baselines.").
+- **List Architecture:** Render a list of saved patterns mirroring the Covenant list style.
+  - Container: `overflow-hidden rounded-2xl bg-[#1C1C1E] ring-1 ring-white/[0.05]`.
+  - Rows: `border-b border-white/[0.08]`. 
+  - Content: Show a timestamp in JetBrains Mono, a snippet of the `whatsActive` text in Geist, and the primary `activePattern` tag.
+- **Wiring:** Add a new tab to the `FloatingNav` for the Archive, ensuring it respects the premium gate (only visible/accessible to premium users).
+
+### 3. Archive Detail View (Framer Motion `layoutId`)
+- Implement the same cinematic morphing we used in Alignment. 
+- When a user taps an archived pattern row, use `layoutId` to scale that row up into a full-screen review card, dimming the list behind it. Include a `[CLOSE]` mono button to snap it back into the list.
+
+Execute the UI for the Defrag save action and the full Archive page, wiring it into the routing and the floating navigation.
+
+```
+
+---
+
+Once the Archive is built, the core OS is functionally complete. Are you planning to push this to a live domain via Cloudflare next, or do you want to spend some time writing the actual onboarding copy (the "Baseline Design" setup) for new users?

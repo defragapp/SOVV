@@ -1,0 +1,90 @@
+To truly achieve that "one-shot motion, looping 3D feeling," we have to force the Replit agent to use advanced Framer Motion hooks (`useMotionValue`, `useTransform`, `useSpring`, and `layoutId`). If we just ask for "3D," it will likely give us chaotic CSS transforms. If we ask for "physics," it will give us precise, tactile realism.
+
+Here are the next two highly detailed, technical prompts to feed the agent. The first upgrades your landing page into a physical, reactive environment. The second builds out the final space (Alignment) using forward-momentum mechanics.
+
+---
+
+### Prompt 1: The Cinematic Landing (3D Parallax & Physics)
+
+Drop this into Replit to upgrade the hero entrance we built earlier. This will tie the amber light and the typography to the user's cursor/device, creating a "looking through glass" depth-of-field effect.
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 13: Cinematic Landing (Parallax & Depth of Field)
+
+## Core Objective
+Upgrade the `HomePage.tsx` hero section from a flat 2D animation into a continuous, reactive 3D environment. The user should feel like they are holding a physical pane of glass. We will achieve this using Framer Motion's `useMotionValue`, `useTransform`, and `useSpring` tied to mouse coordinates.
+
+## Strict System Constraints
+1. **Subtlety is Mandatory:** The 3D rotation must be extremely subtle (max 2 to 3 degrees of rotation). It should feel like heavy hardware, not a lightweight toy.
+2. **Continuous Breathing:** The ambient light must never be static.
+
+---
+
+## Execution Steps
+
+### 1. The Reactive Viewport (Mouse Tracking)
+- Wrap the main hero content in a Framer Motion `<motion.div>`.
+- Implement `useMotionValue` to track the `clientX` and `clientY` of the user's pointer.
+- Pass these values through a `useSpring` hook (e.g., `stiffness: 50, damping: 20`) to give the movement physical weight and smooth out the data.
+
+### 2. 3D Transforms & Parallax Layers
+- Use `useTransform` to map the smoothed mouse coordinates to `rotateX` and `rotateY` properties on the main container (range: `-2deg` to `2deg`).
+- **The Text Layer (Fraunces):** Translate the headline slightly *forward* on the Z-axis or offset its `x/y` slightly *faster* than the background to create a parallax effect.
+- **The Light Layer (Amber Glow):** Offset the background ambient glow *inversely* to the mouse movement. If the user looks left, the light shifts right, creating the illusion of deep space behind the screen.
+
+### 3. Tactile Glass CTAs
+- Upgrade the "Enter Sovereign.os" CTA. 
+- Do not use standard CSS hover transitions. Wrap it in a `<motion.button>`.
+- **While Hover:** Add a subtle `scale: 1.02` and intensify the hairline border opacity.
+- **While Tap:** Compress it sharply (`scale: 0.97`) to mimic the physical haptic snap of an iOS button. 
+
+Execute these Framer Motion physics on `HomePage.tsx`. Ensure it degrades gracefully to a static view on mobile or when `prefers-reduced-motion` is active.
+
+```
+
+---
+
+### Prompt 2: The Alignment Space (Forward Momentum)
+
+Now we need to build the third and final space. If Defrag is horizontal and Covenant pushes down into a vault, Alignment pushes *forward*.
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 14: The Alignment Space (The Vector)
+
+## Core Objective
+Build the `AlignmentPage.tsx` space. This is the "Response integration" tier. Unlike Covenant (which is a list-based vault), Alignment represents forward momentum and clarity. It must use spatial scaling and layout morphing to focus the user entirely on their next action.
+
+## Strict System Constraints
+1. **The Vector Aesthetic:** Use extreme minimalism. One central focal point. No lists.
+2. **Typography:** Geist `text-[17px]` for the primary action readout. JetBrains Mono for the structural tags (`[RESPONSE VECTOR]`, `[YOURS TO CARRY]`).
+3. **Motion:** Elements enter by scaling *up* from the center (`scale: 0.9` to `1.0`), moving forward on the Z-axis.
+
+---
+
+## Execution Steps
+
+### 1. The Alignment Dashboard (`pages/AlignmentPage.tsx`)
+- **Header:** "Alignment" in Fraunces `text-4xl`, with Geist subtext ("What is yours to carry. The cleaner move.").
+- **Layout:** Instead of a list, render a single, centered `GlassCard` (using the `#1C1C1E` Vibrancy recipe) that acts as the active "Lens."
+
+### 2. The Focus Mechanics (Framer Motion `layoutId`)
+- Inside the active Lens card, display a mock scenario broken into two distinct columns or structural blocks:
+  - **Block A:** `[THEIR PATTERN]` (JetBrains Mono) -> Brief description (Geist).
+  - **Block B:** `[YOUR RESPONSE]` (JetBrains Mono) -> The clear, boundaried action (Geist).
+- **The Micro-interaction:** When the user taps the `[YOUR RESPONSE]` block, use Framer Motion's `layoutId` prop to seamlessly morph that block into a full-screen-width action container, dimming everything else in the background. It must feel like pulling the final answer directly toward the camera.
+
+### 3. Forward Actions
+- Below the Lens, add a premium action bar. 
+- Include a "Commit Response" button. When tapped, it should trigger a fast, expanding amber ring (a ripple effect using `box-shadow` or a border element scaling to `1.5` and fading to `0`) to signify a completed vector.
+
+Execute the UI and motion physics for the Alignment space. Ensure it clears the `FloatingNav` safe areas.
+
+```
+
+---
+
+Which phase do you want to hit first? Should we lock in the cinematic parallax on the homepage, or build out the interior Alignment space so all three apps are fully realized?
