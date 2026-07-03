@@ -15,7 +15,7 @@ async function getAdminUser() {
   const headers = new Headers()
   if (cookieHeader) headers.set("cookie", cookieHeader)
 
-  const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://app.defrag.app"
+  const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || ""
   const res = await fetch(`${base}/api/admin/me`, {
     method: "GET",
     headers,

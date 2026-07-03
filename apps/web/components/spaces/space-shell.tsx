@@ -17,8 +17,18 @@ async function handleSignOut() {
 
 export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName }: SpaceShellProps) {
   const [activeTab, setActiveTab] = React.useState(mobileTabs[0].id)
+  const [userTier, setUserTier] = React.useState<"free" | "pro" | null>(null)
   const scrollPositions = React.useRef<Record<string, number>>({})
   const contentRef = React.useRef<HTMLDivElement>(null)
+
+  // Refresh session on mount + load user tier
+  React.useEffect(() => {
+    fetch("/api/auth/refresh", { method: "POST", credentials: "include" }).catch(() => {})
+    fetch("/api/user/me", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then((d: any) => d?.tier && setUserTier(d.tier))
+      .catch(() => {})
+  }, [])
 
   return (
     <div className="flex h-[100dvh] w-screen overflow-hidden bg-[#08070a] text-[#f4efe9] font-sans">
@@ -48,6 +58,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
               <Link
                 key={s.href}
                 href={s.href}
+                aria-current={spaceName === s.label ? "page" : undefined}
                 className={`px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] uppercase transition-colors ${
                   spaceName === s.label
                     ? "bg-white/[0.08] text-[#f4efe9]"
@@ -62,6 +73,15 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
 
           {/* Right nav */}
           <div className="flex items-center gap-4">
+            {userTier && (
+              <span className={`font-mono text-[9px] uppercase tracking-[0.12em] px-2 py-0.5 ${
+                userTier === "pro"
+                  ? "text-[#e0743a]/70 border border-[#e0743a]/20"
+                  : "text-[#4f4b47] border border-white/[0.06]"
+              }`} style={{ borderRadius: 3 }}>
+                {userTier === "pro" ? "Pro" : "Free"}
+              </span>
+            )}
             <Link
               href="/app"
               className="font-mono text-[10px] tracking-[0.12em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors"
