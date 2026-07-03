@@ -1,3 +1,9 @@
+import type { Metadata } from "next"
+export const metadata: Metadata = {
+  title: "Sovereign.os — Choose a space",
+  description: "Enter Sovereign.os. Pattern-aware AI for the moments that matter.",
+}
+
 // defrag.app tool landing — served when host-based routing sends defrag.app to /tool
 // Note: per platform hierarchy, defrag.app should serve the Sovereign.os platform landing.
 // This page is a fallback for the feat/host-routing branch pattern.

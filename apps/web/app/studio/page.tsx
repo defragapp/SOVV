@@ -1,3 +1,9 @@
+import type { Metadata } from "next"
+export const metadata: Metadata = {
+  title: "Studio — Sovereign.os",
+  description: "Sovereign.os Studio.",
+}
+
 import Link from "next/link"
 
 export default function StudioPage() {
