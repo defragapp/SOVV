@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useCallback } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
 import { Link } from 'wouter';
 import { SiteShell } from '@/components/marketing/site-shell';
 import { Container } from '@/components/ui/layout-primitives';
@@ -115,14 +115,52 @@ function SpacePreview() {
 // ── Hero ──────────────────────────────────────────────────────────────────────
 function Hero() {
   const refs = useHeroEntrance();
+  const prefersReducedMotion = useReducedMotion();
+
+  // Mouse tracking — normalised to [0, 1] with 0.5 = center
+  const rawX = useMotionValue(0.5);
+  const rawY = useMotionValue(0.5);
+
+  // Spring-smoothed: heavy hardware feel
+  const springConfig = { stiffness: 50, damping: 20, mass: 1 };
+  const springX = useSpring(rawX, springConfig);
+  const springY = useSpring(rawY, springConfig);
+
+  // 3D tilt: max ±2 degrees
+  const rotateY = useTransform(springX, [0, 1], prefersReducedMotion ? [0, 0] : [-2, 2]);
+  const rotateX = useTransform(springY, [0, 1], prefersReducedMotion ? [0, 0] : [2, -2]);
+
+  // Text parallax: moves slightly faster than the tilt (forward-Z illusion)
+  const textX = useTransform(springX, [0, 1], prefersReducedMotion ? [0, 0] : [-10, 10]);
+  const textY = useTransform(springY, [0, 1], prefersReducedMotion ? [0, 0] : [-10, 10]);
+
+  // Ambient glow: moves inversely (light source appears behind the glass)
+  const glowX = useTransform(springX, [0, 1], prefersReducedMotion ? [0, 0] : [40, -40]);
+  const glowY = useTransform(springY, [0, 1], prefersReducedMotion ? [0, 0] : [40, -40]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    if (prefersReducedMotion) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    rawX.set((e.clientX - rect.left) / rect.width);
+    rawY.set((e.clientY - rect.top) / rect.height);
+  }, [prefersReducedMotion, rawX, rawY]);
+
+  const handleMouseLeave = useCallback(() => {
+    rawX.set(0.5);
+    rawY.set(0.5);
+  }, [rawX, rawY]);
 
   return (
-    <section className="relative w-full min-h-[100svh] flex items-center bg-[#08070a] overflow-hidden">
-
-      {/* Light beam — enters during Phase 1 */}
+    <section
+      className="relative w-full min-h-[100svh] flex items-center bg-[#08070a] overflow-hidden"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ perspective: '1200px' }}
+    >
+      {/* Light beam — GSAP entrance */}
       <div ref={refs.lightBeamRef} className="light-beam" aria-hidden />
 
-      {/* Ambient glow — enters during Phase 1 */}
+      {/* Ambient glow — GSAP entrance; Framer Motion parallax offset layered via transform */}
       <div
         ref={refs.glowRef}
         className="ambient-blob absolute -top-60 right-0 w-[600px] h-[600px] pointer-events-none"
@@ -130,13 +168,23 @@ function Hero() {
         aria-hidden
       />
 
-      {/* Hero image — clip-path revealed during Phase 2 */}
+      {/* Parallax reactive glow — separate layer, inverse to mouse (light source illusion) */}
+      <motion.div
+        className="absolute -top-60 right-0 w-[600px] h-[600px] pointer-events-none"
+        style={{
+          x: glowX,
+          y: glowY,
+          background: 'radial-gradient(circle, rgba(224,116,58,0.18) 0%, transparent 65%)',
+        }}
+        aria-hidden
+      />
+
+      {/* Hero image — GSAP clip-path entrance */}
       <div
         ref={refs.imageOuterRef}
         className="absolute right-0 top-0 w-full h-full pointer-events-none"
         style={{ willChange: 'clip-path' }}
       >
-        {/* hero-drift floats independently of the clip transform */}
         <div className="hero-drift absolute right-0 top-0 h-full w-[55%]">
           <img
             src="/hero-hand.webp"
@@ -151,65 +199,69 @@ function Hero() {
         </div>
       </div>
 
-      {/* Text */}
-      <Container className="relative z-10 py-32 md:py-48">
-        <div className="max-w-2xl">
+      {/* 3D tilt wrapper — applies rotateX/Y to the entire text + CTA layer */}
+      <motion.div
+        className="relative z-10 w-full"
+        style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
+      >
+        <Container className="py-32 md:py-48">
+          <div className="max-w-2xl">
 
-          {/* Eyebrow — Phase 4 */}
-          <p
-            ref={refs.labelRef}
-            className="font-mono text-[9px] uppercase tracking-[0.32em] text-[#4f4b47] mb-10"
-          >
-            Sovereign.os
-          </p>
+            {/* Eyebrow — GSAP entrance */}
+            <p
+              ref={refs.labelRef}
+              className="font-mono text-[9px] uppercase tracking-[0.32em] text-[#4f4b47] mb-10"
+            >
+              Sovereign.os
+            </p>
 
-          {/* Headline — each line mask-revealed independently */}
-          <h1
-            className="font-serif text-[#f4efe9] leading-[1.05] tracking-[-0.025em] text-balance"
-            style={{ fontSize: 'clamp(2.8rem, 7vw, 5.5rem)' }}
-          >
-            {/* Line 1 mask — Phase 5 */}
-            <span className="block overflow-hidden" style={{ lineHeight: 1.12 }}>
-              <span
-                ref={refs.line1Ref}
-                className="block"
-                style={{ willChange: 'transform' }}
-              >
-                Healing isn't optional.
+            {/* Headline — GSAP mask reveal + Framer Motion parallax translate */}
+            <motion.h1
+              className="font-serif text-[#f4efe9] leading-[1.05] tracking-[-0.025em] text-balance"
+              style={{
+                fontSize: 'clamp(2.8rem, 7vw, 5.5rem)',
+                x: textX,
+                y: textY,
+                translateZ: prefersReducedMotion ? 0 : 20,
+              }}
+            >
+              <span className="block overflow-hidden" style={{ lineHeight: 1.12 }}>
+                <span ref={refs.line1Ref} className="block" style={{ willChange: 'transform' }}>
+                  Healing isn&apos;t optional.
+                </span>
               </span>
-            </span>
-
-            {/* Line 2 mask — Phase 6 */}
-            <span className="block overflow-hidden" style={{ lineHeight: 1.12 }}>
-              <span
-                ref={refs.line2Ref}
-                className="block"
-                style={{ willChange: 'transform' }}
-              >
-                <span className="text-glow">Holding the pain is.</span>
+              <span className="block overflow-hidden" style={{ lineHeight: 1.12 }}>
+                <span ref={refs.line2Ref} className="block" style={{ willChange: 'transform' }}>
+                  <span className="text-glow">Holding the pain is.</span>
+                </span>
               </span>
-            </span>
-          </h1>
+            </motion.h1>
 
-          {/* Subtext — Phase 7 */}
-          <p
-            ref={refs.subtextRef}
-            className="mt-7 max-w-md text-[17px] text-[#76716b] leading-relaxed"
-          >
-            Pattern-aware AI for the moments that are hard to read while you're inside them.
-          </p>
+            {/* Subtext — GSAP entrance */}
+            <p
+              ref={refs.subtextRef}
+              className="mt-7 max-w-md text-[17px] text-[#76716b] leading-relaxed"
+            >
+              Pattern-aware AI for the moments that are hard to read while you&apos;re inside them.
+            </p>
 
-          {/* CTA — Phase 8 */}
-          <div
-            ref={refs.ctaRef}
-            className="mt-9 flex items-center gap-5 flex-wrap"
-          >
-            <Link href={APP_URL} className="btn-primary">Enter Sovereign.os</Link>
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Free to start</span>
+            {/* CTA — tactile glass button */}
+            <div ref={refs.ctaRef} className="mt-9 flex items-center gap-5 flex-wrap">
+              <motion.a
+                href={APP_URL}
+                className="btn-primary"
+                whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              >
+                Enter Sovereign.os
+              </motion.a>
+              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Free to start</span>
+            </div>
+
           </div>
-
-        </div>
-      </Container>
+        </Container>
+      </motion.div>
     </section>
   );
 }
@@ -230,7 +282,7 @@ export function HomePage() {
               Your Baseline Design.<br />Active beneath every thread.
             </h2>
             <p className="mt-5 max-w-sm text-[15px] text-[#76716b] leading-relaxed">
-              Pattern recognition that reads what's active before you reply, react, or withdraw.
+              Pattern recognition that reads what&apos;s active before you reply, react, or withdraw.
             </p>
           </div>
           <SpacePreview />
@@ -283,10 +335,18 @@ export function HomePage() {
             <span className="text-glow">Return before</span> the pattern runs the room.
           </h2>
           <p className="mt-6 max-w-md text-[15px] text-[#76716b] leading-relaxed">
-            Understand what's active, see what may be repeating, and choose the next move with more context.
+            Understand what&apos;s active, see what may be repeating, and choose the next move with more context.
           </p>
           <div className="mt-9">
-            <Link href={APP_URL} className="btn-primary">Enter Sovereign.os</Link>
+            <motion.a
+              href={APP_URL}
+              className="btn-primary"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+            >
+              Enter Sovereign.os
+            </motion.a>
             <p className="mt-5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Private by design · Free to start</p>
           </div>
         </Container>

@@ -1,0 +1,49 @@
+I see the canvas and the exact definitions of the spaces in your viewport. You have perfectly defined the emotional and functional progression of the platform:
+
+1. **Defrag (The Surface / The Diagnostic):** *"Bring the moment... read what's actually happening."* This is the immediate, clinical entry point. It needs to feel fast, sharp, and precise.
+2. **Covenant (The Vault / The Foundation):** *"Faith-context reflection... held by something larger."* This is the deep infrastructure. It shouldn't feel like a web page; it should feel like a heavy, secure vault that sits physically beneath Defrag.
+3. **Alignment (The Vector / The Action):** *"Response integration... The cleaner move."* This is the momentum outward. It needs to feel expansive, clear, and forward-facing.
+
+To get the Replit agent to build this "one-shot, 3D feeling, iOS optimized" environment without it hallucinating chaotic web animations, we have to feed it a strict physical rulebook. We have to tell it *how* to use Framer Motion and your normalized dark UI to create weight and depth.
+
+Here is the master prompt to drop into the Replit agent to lock in this cinematic spatial architecture across the entire platform.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 12: Spatial Architecture & Cinematic Physics
+
+## Core Objective
+Sovereign.os is not a series of flat web pages. It is a 3D, iOS-native environment. We are replacing all standard web page routing with a "One-Shot Cinematic Camera Move." The transition between Defrag, Covenant, and Alignment must feel like the user is physically shifting lenses or moving through the depths of a glass vault on the Z-axis.
+
+## Strict System Constraints
+1. **The Easing Curve:** All spatial transitions and material interactions must use this exact grounded ease curve: `ease: [0.16, 1, 0.3, 1]`. No bouncy springs.
+2. **Normalized Dark UI & Materials:** Maintain deep blacks (`#08070a` / `#1C1C1E`). Use the Vibrancy recipe for layered elements (`backdrop-blur-2xl backdrop-saturate-150`).
+3. **Tactile Physics (No Hovers):** iOS apps don't have mouse hover states; they have physical touch states. Buttons and cards must compress (`scale: 0.98`) instantly on `active` or `whileTap`, mimicking a physical haptic snap.
+
+---
+
+## Execution Steps
+
+### 1. The Volumetric Environment (Background Depth)
+- **Build:** Create an `<AmbientEnvironment>` component that sits fixed at the absolute root (`z-[-1]`), behind all routing.
+- **Motion:** Use Framer Motion to render two massive, highly blurred (`blur-[150px]`) radial gradients (deep charcoal and a very faint amber). 
+- **Loop:** Animate their `scale` and `opacity` on a continuous, infinitely breathing loop (duration: 15 seconds, `ease: "easeInOut"`). This prevents the deep black from feeling flat and dead.
+
+### 2. Z-Axis Space Transitions (The Camera Move)
+- **Build:** Upgrade the `<PageTransition>` wrapper wrapping the router in `App.tsx`.
+- **The Mechanics:** Stop using flat left-to-right slides or basic crossfades for the 3 spaces. Implement Z-axis depth scaling:
+  - **Exit State:** The current space slightly dims (`opacity: 0.4`), scales down (`scale: 0.95`), and pushes backward in 3D space.
+  - **Enter State:** The new space scales up from behind it (`scale: 1.05` to `1.0`), blooming into full opacity (`opacity: 1`) and pushing forward into focus.
+  - **Timing:** Execute over `0.6s` using the strict curve above.
+
+### 3. Space-Specific Material Weight
+- **Defrag (Surface Level):** Ensure the Drop Zone textarea container uses a sharp hairline border (`ring-white/[0.05]`) to feel immediate and clinical.
+- **Covenant (The Vault):** Update the Covenant list items to feel heavier. Add a tight, deep inner shadow (`shadow-inner`) to the glass cards so they feel like they are recessed into the screen.
+- **Alignment (The Vector):** Give the primary action buttons in Alignment a subtle, continuous outer glow (`shadow-[0_0_15px_rgba(245,158,11,0.1)]`) to indicate forward momentum and clarity.
+
+Execute the Ambient Environment component and the Z-Axis transition wrapper, and wire them into the root layout.
+
+```
