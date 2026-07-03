@@ -1,0 +1,53 @@
+The visual architecture is officially locked in. Those diagnostic cards using JetBrains Mono for the structural tags and the dynamic island clearing the iOS home bar are exactly what separates a native tool from a generic web app.
+
+Now we need to turn the brain on.
+
+Before we lock the doors with Stripe and Supabase, the Defrag space needs to actually process a conflict. We need to wire the Drop Zone to an API route and force the AI to return strict, clinical JSON so it populates those cards perfectly without breaking the layout with a wall of text.
+
+Here is **Phase 7**. Drop this to the Replit agent to build the Defrag Engine.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 7: The Defrag Engine (AI Integration & Structured Output)
+
+## Core Objective
+Replace the mock data in the Defrag space by wiring the Drop Zone to a functional AI API route. The backend must enforce a strict JSON schema so the response perfectly maps to the iOS-native Diagnostic Cards without returning conversational fluff. 
+
+## Strict System Constraints
+1. **Structural Output Only:** The AI system prompt must forbid conversational responses. It must return a strict JSON object mapping exactly to the UI schema.
+2. **Native Loading States:** Do not use generic web spinners. Use a subtle pulse effect on skeleton versions of the cards while the system processes the input.
+3. **Typography:** Maintain the strict typographic hierarchy (Geist for human copy, JetBrains Mono for system tags). 
+
+---
+
+## Execution Steps
+
+### 1. The API Route (Serverless Endpoint)
+- Create a new API route (e.g., `api/explain` or `api/defrag`) to receive the user's conflict text.
+- Configure the LLM integration (using your preferred provider/SDK currently in the environment) with a strict system prompt.
+- **The Schema:** Force the AI to return this exact JSON structure:
+  - `activePattern` (string - e.g., "Withdrawal/Avoidance")
+  - `whatsActive` (string - a 2 sentence explanation)
+  - `defenseMechanism` (string)
+  - `resolutionSteps` (array of strings - 2 to 3 actionable steps)
+  - `bestNextResponse` (string - a single, clear sentence to reply with)
+
+### 2. The Loading State (Skeleton Cards)
+- Update the Defrag space UI: When the user clicks "Map Pattern", immediately render a set of blank Diagnostic Cards utilizing `animate-pulse` and a `bg-white/[0.02]` fill.
+- The action bar status tag (JetBrains Mono) inside the Drop Zone should switch from `[INPUT ACTIVE]` to `[MAPPING PATTERN...]` with the amber dot blinking.
+
+### 3. Wiring the Drop Zone & Error Handling
+- Connect the `textarea` submit action to the new API route.
+- **Success:** Map the parsed JSON directly into the `Diagnostic Output Cards` component built in Phase 6.
+- **Error:** If the fetch fails or the JSON is malformed, catch it gracefully. Render a single Diagnostic Card with a JetBrains Mono red/amber tag: `[SYSTEM_ERROR: UNABLE TO MAP PATTERN]` and a brief prompt to try again.
+
+Execute the backend route, wire it to the frontend state, and test it with a sample conflict thread to ensure the layout holds the dynamic data perfectly.
+
+```
+
+---
+
+Let the agent wire up the prompt engineering and the API route. Once it confirms the JSON is mapping correctly to the UI, we can lock down the user accounts and monetization.
