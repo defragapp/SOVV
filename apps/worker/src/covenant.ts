@@ -73,11 +73,44 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
         return new Response(JSON.stringify({ error: "Message too long. Please keep it under 3000 characters." }), { status: 400, headers: { "Content-Type": "application/json" } });
       }
 
-      
+      // Build baseline context and active signals
+      let activeSignalsText = "";
+      let baselineContext = "";
+      try {
+        const dataset = await getBaselineDataset(env, user.id);
+        if (dataset?.status === "ready") {
+          const activeSignals = selectActiveSignals(dataset, {
+            message: typeof message === "string" ? message : "",
+            relational: false,
+            mode: "self",
+          });
+          // Fetch live sky for current timing context
+          const userLat = dataset.input.latitude ?? 0;
+          const userLng = dataset.input.longitude ?? 0;
+          const liveSky = (userLat !== 0 || userLng !== 0)
+            ? await getCurrentSkySnapshot(env, userLat, userLng).catch(() => null)
+            : null;
+          const timingSignals = buildTimingSignals(dataset, liveSky);
+          activeSignalsText = formatActiveSignalsForPrompt(activeSignals, timingSignals);
+        } else {
+          // Fallback to raw baseline text
+          baselineContext = await getBaselineForAI(env, user.id, "covenant").catch(() => "");
+        }
+      } catch { /* non-blocking */ }
+
+      const userContent = [
+        activeSignalsText || (baselineContext ? `User Baseline Design:\n${baselineContext}` : ""),
+        `What they are navigating:\n${message}`
+      ].filter(Boolean).join("\n\n");
+
+      const messages = [
+        { role: "system" as const, content: SYSTEM_COVENANT },
+        { role: "user" as const, content: userContent },
+      ];
 
       const aiResponse = await env.AI.run(
-        (env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast") as any,
-        { messages, temperature: 0.3, max_tokens: 800 }
+        (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
+        { messages, temperature: 0.3, max_tokens: 900 }
       );
 
       let rawText = (aiResponse as any).response ?? String(aiResponse);
@@ -89,7 +122,7 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
       if (validation.shouldRetry) {
         console.warn("[Retry] Covenant output empty — retrying")
         const retryAi = await env.AI.run(
-          (env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast") as any,
+          (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
           { messages: [
               { role: "system", content: SYSTEM_COVENANT },
               { role: "user", content: [activeSignalsText || (baselineContext ? `User Baseline Design:\n${baselineContext}` : ""), `What they are navigating:\n${message}`].filter(Boolean).join("\n\n") },

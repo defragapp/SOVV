@@ -47,7 +47,7 @@ simple = { limit = 15, period = 60 }
 
 [vars]
 FREE_DAILY_LIMIT = "15"
-AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"
+AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 APP_URL = "https://app.defrag.app"
 GATEWAY_ID = "sovereign-ai-gateway"
 

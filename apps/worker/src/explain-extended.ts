@@ -200,6 +200,10 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   // Use computed dataset if available, fallback to raw baseline format
   const baselineText = await getBaselineForAI(env, sid, "defrag").catch(() => formatBaseline(baseline));
   const patternText = formatPatternsForPrompt(patterns);
+
+  // Load memory context — recurring patterns from past sessions
+  const memoryContext = await loadMemoryContext(env, user.id).catch(() => null);
+  const memoryText = memoryContext ? formatMemoryForPrompt(memoryContext) : "";
   const targetBaseline =
     relational && target
       ? await env.KV.get(`baseline:${user.id}:person:${target.id}`, "json")
@@ -233,13 +237,13 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const userPrompt = buildUserPrompt({
     message,
     baselineText,
-    patternText,
+    patternText: [patternText, memoryText].filter(Boolean).join("\n\n"),
     activeSignalsText: activeSignalsText || undefined,
     targetName: target ? target.relation : undefined,
     targetBaseline,
   });
 
-  const modelId = env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast";
+  const modelId = env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
   const ai = await env.AI.run(modelId, {
     messages: [
       { role: "system", content: relational ? SYSTEM_DEFRAG_RELATIONAL : SYSTEM_DEFRAG },
@@ -347,6 +351,14 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     // Fallback for local dev or if queue is not configured.
     console.warn("QUEUE binding not found. Running pattern extraction in a non-blocking way, but this may be unreliable.");
     void extractPatterns(env, sid, interactionId);
+
+    // Save pattern to memory for future sessions (non-blocking)
+    if (parsed.activePattern) {
+      import("./memory.js").then(({ savePatternMemory, extractPatternSignature }) => {
+        const sig = extractPatternSignature(parsed, "DEFRAG");
+        if (sig) savePatternMemory(env, user.id, sig).catch(() => {});
+      }).catch(() => {});
+    }
   }
 
   return jsonResponse(result, 200, {
