@@ -1,0 +1,31 @@
+The foundation here is incredibly strong. The deep black canvas paired with the Fraunces typography gives it that necessary gravity, and the entrance animation you just wired up will set the right cinematic tone.
+
+To push the visual execution from "clean" to a truly premium, recognizable OS environment without slipping out of a normalized dark UI, focus on physical depth, structural anchors, and light.
+
+Here are four precise visual upgrades to elevate the current design:
+
+### 1. Make the Amber Light Reactive
+
+You have the ambient glow set up for the entrance, but light should feel like a physical material in this platform.
+
+* **The Fix:** Tie a subtle, low-opacity amber radial gradient to the user’s cursor position on the hero screen. It shouldn't be a flashlight, just a soft environmental reflection (maybe 5-10% opacity) that makes the deep black background feel like a physical surface rather than an empty hex code.
+
+### 2. Anchor the "OS" with a Faint Structural Grid
+
+Right now, the text is floating in the void. Sovereign OS needs to feel like an infrastructure for mapping patterns.
+
+* **The Fix:** Introduce a very faint, 1px structural grid pattern (or subtle crosshair reticles at the corners of the viewport) in the background. Keep the opacity extremely low (around 3-5%). It grounds the cinematic elements in a technical reality.
+
+### 3. Systematize the Metadata
+
+The "BEGIN" text above the headline is currently getting lost. Assign it a strict functional role to contrast with the emotional weight of the Fraunces headline.
+
+* **The Fix:** Switch the "BEGIN" kicker to **JetBrains Mono**, all caps, tracking wide. Add a 6px amber status dot pulsing slowly next to it. This signals system readiness and reinforces the aesthetic contrast between the machine (OS) and the human (the hard moments).
+
+### 4. Tactile, Grounded CTAs
+
+The solid white "Enter Sovereign.os" button is a bit harsh against the dark layout and draws the eye away from the primary copy.
+
+* **The Fix:** Shift the primary button to a very dark, translucent charcoal (e.g., `bg-white/5` with a `backdrop-blur`) and give it a crisp 1px border (`border-white/10`). On hover, use Framer Motion to sweep a soft amber glow across the border. It makes the CTA feel like a precision instrument rather than a standard web button.
+
+Are you handling the transition from this hero screen into the actual Defrag and Covenant spaces with a hard cut, or are you planning a motion transition to carry the user inside?
