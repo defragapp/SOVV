@@ -6,6 +6,7 @@ import { CHIP_GROUPS } from '@/lib/core/chips';
 import type { Mode } from '@/lib/core/types';
 import { useArchive } from '@/context/ArchiveContext';
 import { useUserTier } from '@/context/UserContext';
+import { readBaseline } from '@/lib/baseline';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -185,6 +186,7 @@ interface DiagnosticResult {
   defenseMechanism?: string;
   resolutionSteps?: string[];
   bestNextResponse?: string;
+  baselineTriggered?: boolean;
   [key: string]: unknown;
 }
 
@@ -192,10 +194,12 @@ function DiagnosticCard({
   tag,
   children,
   delay = 0,
+  baselineTriggered = false,
 }: {
   tag: string;
   children: React.ReactNode;
   delay?: number;
+  baselineTriggered?: boolean;
 }) {
   return (
     <motion.div
@@ -206,12 +210,24 @@ function DiagnosticCard({
       style={{ background: '#1C1C1E' }}
     >
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.05]">
-        <span className="font-mono text-[10px] tracking-[0.18em] text-[#4f4b47] uppercase">
-          {tag}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-[10px] tracking-[0.18em] text-[#4f4b47] uppercase">
+            {tag}
+          </span>
+          {baselineTriggered && (
+            <span className="font-mono text-[9px] tracking-[0.14em] text-[#e0743a] uppercase">
+              [BASELINE TRIGGERED]
+            </span>
+          )}
+        </div>
         <span
-          className="w-2 h-2 rounded-full"
-          style={{ background: '#e0743a', boxShadow: '0 0 6px rgba(224,116,58,0.6)' }}
+          className="w-2 h-2 rounded-full shrink-0"
+          style={{
+            background: '#e0743a',
+            boxShadow: baselineTriggered
+              ? '0 0 10px rgba(224,116,58,0.9)'
+              : '0 0 6px rgba(224,116,58,0.6)',
+          }}
         />
       </div>
       <div className="px-5 py-4">{children}</div>
@@ -244,7 +260,7 @@ function DiagnosticOutput({ result }: { result: DiagnosticResult }) {
   return (
     <div className="flex flex-col gap-3 px-4 py-4">
       {result.activePattern && (
-        <DiagnosticCard tag="[Active Pattern]" delay={0}>
+        <DiagnosticCard tag="[Active Pattern]" delay={0} baselineTriggered={result.baselineTriggered === true}>
           <p className="font-mono text-[15px] text-[#f4efe9] tracking-[0.04em]">
             {result.activePattern}
           </p>
@@ -387,7 +403,7 @@ export function DefragPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, baseline: readBaseline() }),
       });
       if (res.ok) {
         const data = await res.json() as DiagnosticResult;

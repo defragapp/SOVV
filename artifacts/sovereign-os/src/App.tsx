@@ -2,8 +2,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Route, Switch, Router as WouterRouter, Redirect, useLocation } from 'wouter';
 import { AnimatePresence } from 'framer-motion';
 import { PageTransition } from '@/components/PageTransition';
-import { UserProvider } from '@/context/UserContext';
+import { UserProvider, useUserTier } from '@/context/UserContext';
 import { ArchiveProvider } from '@/context/ArchiveContext';
+import { BaselineSetup } from '@/pages/BaselineSetup';
 
 // Pages
 import NotFound from '@/pages/not-found';
@@ -40,6 +41,49 @@ function isAppSpace(path: string) {
   return path.startsWith('/apps/');
 }
 
+/**
+ * Persistent ambient glow — fixed behind everything, outside AnimatePresence
+ * so it never flashes on route change. Marketing routes only.
+ */
+function AmbientBackground() {
+  const [location] = useLocation();
+  // App spaces manage their own backgrounds via SpaceShell
+  if (location.startsWith('/apps/') || location.startsWith('/app/')) return null;
+  return (
+    <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden" aria-hidden>
+      <div
+        className="absolute -top-40 right-0 w-[600px] h-[600px]"
+        style={{
+          background: 'radial-gradient(circle, rgba(224,116,58,0.07) 0%, transparent 70%)',
+          animation: 'ambientDrift 25s ease-in-out infinite',
+        }}
+      />
+      <div
+        className="absolute bottom-0 -left-40 w-[400px] h-[400px]"
+        style={{
+          background: 'radial-gradient(circle, rgba(224,116,58,0.03) 0%, transparent 70%)',
+          animation: 'ambientDrift 30s ease-in-out infinite reverse',
+        }}
+      />
+    </div>
+  );
+}
+
+/**
+ * Baseline gate — renders the BaselineSetup overlay on top of app spaces
+ * when the user hasn't completed onboarding. Falls away once done.
+ */
+function BaselineGate() {
+  const [location] = useLocation();
+  const { hasBaseline, user, loading, setBaselineDone } = useUserTier();
+
+  // Only gate authenticated users inside the app spaces
+  if (!location.startsWith('/apps/')) return null;
+  if (loading || !user || hasBaseline) return null;
+
+  return <BaselineSetup onComplete={setBaselineDone} />;
+}
+
 function AnimatedRoutes() {
   const [location] = useLocation();
   const variant = isAppSpace(location) ? 'crossfade' : 'push';
@@ -68,6 +112,11 @@ function AnimatedRoutes() {
           <Route path="/app/reset-password"  component={ResetPasswordPage} />
           <Route path="/app/verify-email"    component={VerifyEmailPage} />
           <Route path="/app"><Redirect to="/apps/defrag" /></Route>
+
+          {/* Onboarding */}
+          <Route path="/setup">
+            <BaselineSetupRoute />
+          </Route>
 
           {/* App spaces */}
           <Route path="/apps/defrag"              component={DefragPage} />
@@ -100,13 +149,32 @@ function AnimatedRoutes() {
   );
 }
 
+/** Standalone /setup route — redirects to Defrag on completion */
+function BaselineSetupRoute() {
+  const { setBaselineDone, hasBaseline } = useUserTier();
+  const [, navigate] = useLocation();
+  if (hasBaseline) return <Redirect to="/apps/defrag" />;
+  return (
+    <BaselineSetup
+      onComplete={() => {
+        setBaselineDone();
+        navigate('/apps/defrag');
+      }}
+    />
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <UserProvider>
         <ArchiveProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+            {/* Persistent ambient environment — behind all pages, never flashes on nav */}
+            <AmbientBackground />
             <AnimatedRoutes />
+            {/* Baseline onboarding overlay — shows on /apps/* until user completes setup */}
+            <BaselineGate />
           </WouterRouter>
         </ArchiveProvider>
       </UserProvider>

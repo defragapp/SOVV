@@ -1,32 +1,37 @@
-// Baseline translation utilities — stub for Vite migration
-// The real implementation runs server-side via the API
+/** localStorage key for the user's Baseline Design data. */
+const BASELINE_KEY = 'sovv_baseline';
 
-export interface BaselineEntry {
-  label: string;
-  chips: Array<{ text: string; chips: string[] }>;
+export interface BaselineData {
+  defaultRetreat: string;   // Step 1: where they go when conflict spikes
+  coreBoundary: string;     // Step 2: the line that collapses clarity
+  repairMechanic: string;   // Step 3: how they attempt to fix the break
 }
 
-export interface DefragEntryTranslation {
-  hero: { lines: string[]; tags?: string[]; glossary?: Array<{ tag: string; label: string }> };
-  activePattern?: { name?: string; lines: string[]; tags?: string[] };
-  pressureMap?: { starts?: string[]; moves?: string[]; lands?: string[] };
-  loopPreview?: { trigger?: string; reaction?: string; repeat?: string; cost?: string };
-  rolePull?: { lines: string[] };
-  cleanerMove?: { lines: string[] };
-  workspaceHref: string;
-  likelyLoops?: Array<{ key: string; label: string; description: string; trigger: string; tags?: string[] }>;
-  pressurePattern?: { lines: string[]; tags?: string[] };
-  repairMoves?: string[];
+/** Read saved baseline, returns null if not yet completed. */
+export function readBaseline(): BaselineData | null {
+  try {
+    const raw = localStorage.getItem(BASELINE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as BaselineData;
+  } catch {
+    return null;
+  }
 }
 
-/**
- * Client-side stub — actual translation happens in the API response.
- * Components that call getTranslation should use API data directly.
- */
-export function getTranslation(data: unknown): DefragEntryTranslation {
-  const d = data as Record<string, unknown>;
-  return {
-    hero: { lines: [d?.summary as string || 'Processing your moment…'] },
-    workspaceHref: '/apps/defrag/workspace',
-  };
+/** Persist the baseline after onboarding completion. */
+export function saveBaseline(data: BaselineData): void {
+  try {
+    localStorage.setItem(BASELINE_KEY, JSON.stringify(data));
+  } catch {
+    // storage unavailable — ignore
+  }
+}
+
+/** Quick boolean check without parsing. */
+export function checkHasBaseline(): boolean {
+  try {
+    return Boolean(localStorage.getItem(BASELINE_KEY));
+  } catch {
+    return false;
+  }
 }

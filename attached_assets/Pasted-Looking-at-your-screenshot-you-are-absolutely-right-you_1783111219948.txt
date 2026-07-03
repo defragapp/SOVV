@@ -1,0 +1,78 @@
+Looking at your screenshot, you are absolutely right—you are dead center on the root homepage. If the parallax isn't firing there, Replit's internal browser iframe is isolating the `mousemove` events from the DOM. Pop it out into a dedicated Chrome tab when you want to test the physics, but let's not let Replit's preview pane slow down the actual build.
+
+You want to push this to public readiness, improve the visual assets, and ensure nothing in the repo is sitting unused.
+
+Right now, your platform makes a massive promise: **"Your Baseline Design. Active beneath every thread."** But currently, the AI doesn't actually know the user's baseline. It’s just analyzing the text they drop in. To make this a launch-ready product, we have to build the Baseline Onboarding and then *wire that data into the Defrag AI prompt* so the system is genuinely pattern-aware.
+
+Here are the next two phases to drop into the Replit agent.
+
+---
+
+### 1. Build the Baseline Setup (The Visual Onboarding)
+
+This builds the premium onboarding flow for new users and adds a visual "mapping" asset to make it feel like a high-end diagnostic tool.
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 17: Baseline Design (Premium Onboarding Flow)
+
+## Core Objective
+Build the one-time onboarding flow that captures a new user's "Baseline Design." This must feel like a high-end diagnostic tool, utilizing a full-screen takeover and introducing a subtle visual asset (an SVG topology or radar map) that reacts as they answer.
+
+## Strict System Constraints
+1. **Focus Mode:** The flow is a full-screen takeover (`fixed inset-0 z-50 bg-[#08070a]`). 
+2. **Typography:** JetBrains Mono for step indicators (e.g., `[01/03] ACTIVE DEFENSE`). Fraunces `text-3xl` for the core question. Geist `text-[17px]` for the input.
+3. **Motion:** Slide questions in/out horizontally using Framer Motion `AnimatePresence` and our strict `[0.16, 1, 0.3, 1]` curve.
+
+---
+
+## Execution Steps
+
+### 1. The Onboarding Component (`BaselineSetup.tsx`)
+- Build a 3-step sequence managed by local state.
+- **Step 1:** `[01/03] DEFAULT RETREAT` -> "When conflict spikes, where do you instinctively go?"
+- **Step 2:** `[02/03] CORE BOUNDARY` -> "What is the line that, when crossed, collapses your clarity?"
+- **Step 3:** `[03/03] REPAIR MECHANIC` -> "How do you attempt to fix the break?"
+
+### 2. The Visual Asset (Topology Map)
+- In the background of this full-screen flow, implement a highly subtle, slow-moving SVG topology line map (stroke `white/[0.03]`). 
+- As the user advances from step 1 to 3, use Framer Motion to slightly scale and rotate the SVG, giving the visual feedback that their "map" is being generated.
+
+### 3. State & Routing Integration
+- Update the User context/schema to include a `has_baseline` boolean and a `baseline_data` object.
+- **Routing:** If a user logs in and `has_baseline` is false, force-route them to `/setup`. 
+- **Completion:** On Step 3 submission, POST the data to your backend, set the flag to true, and use the spatial Z-axis transition to push them into Defrag.
+
+```
+
+---
+
+### 2. Make the AI "Pattern-Aware" (Using the Repo)
+
+Once the Baseline is built, you have to actually use it. This prompt forces the backend to pull the user's Baseline and inject it directly into the OpenAI system prompt. This is what makes Sovereign.os a defensible product.
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 18: The Pattern-Aware Engine (AI Context Integration)
+
+## Core Objective
+Ensure the existing data structures in the repo are actually being used by the AI. Update the `api/explain` (Defrag) backend route to fetch the user's `baseline_data` and inject it into the OpenAI system prompt. The AI must evaluate the current conflict *against* the user's known baseline.
+
+## Execution Steps
+
+### 1. Backend Context Fetching
+- In the `api/explain` route, extract the user's authentication token/session.
+- Before calling OpenAI, fetch the user's saved `baseline_data` (Default Retreat, Core Boundary, Repair Mechanic) from the database (Cloudflare D1/KV).
+
+### 2. Dynamic System Prompt Injection
+- Rewrite the OpenAI system prompt to conditionally include the Baseline.
+- **Logic:** "You are Sovereign.os, a clinical relational AI. The user has provided a conflict to analyze. Evaluate this conflict through the lens of their established Baseline Design: [INJECT BASELINE DATA HERE]. Does this conflict trigger their default retreat? Are they violating their own repair mechanic?"
+
+### 3. Frontend Readout (The "Active Pattern" Tag)
+- Update the `Diagnostic Cards` on the frontend. If the AI detects that the current conflict perfectly matches their Baseline Design, add a glowing amber `[BASELINE TRIGGERED]` JetBrains Mono tag to the header of the Defrag output card. 
+
+```
+
+Run Phase 17 to get the visual onboarding locked, then hit Phase 18. That closes the loop between the marketing promise and the actual software.

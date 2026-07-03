@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { readLocalTier, setLocalPremium } from '@/lib/tier';
+import { checkHasBaseline } from '@/lib/baseline';
 
 export interface User {
   id: string;
@@ -10,21 +11,27 @@ export interface User {
 interface UserContextValue {
   user: User | null;
   isPremium: boolean;
+  hasBaseline: boolean;
   loading: boolean;
   /** Re-fetch auth state (call after login/logout). Returns a promise you can await. */
   refresh: () => Promise<void>;
+  /** Call after baseline setup completes to update the flag without a full re-fetch. */
+  setBaselineDone: () => void;
 }
 
 const UserContext = createContext<UserContextValue>({
   user: null,
   isPremium: false,
+  hasBaseline: false,
   loading: true,
   refresh: () => Promise.resolve(),
+  setBaselineDone: () => {},
 });
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [localPremium, setLocalPremiumState] = useState(readLocalTier);
+  const [hasBaseline, setHasBaseline] = useState(checkHasBaseline);
   const [loading, setLoading] = useState(true);
 
   const fetchUser = useCallback(async () => {
@@ -36,7 +43,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (data.id && data.email) {
           const tier = data.tier === 'pro' ? 'pro' : 'free';
           setUser({ id: data.id, email: data.email, tier });
-          // Keep local flag in sync: if backend confirms pro, ensure flag is set
           if (tier === 'pro') {
             setLocalPremium();
             setLocalPremiumState(true);
@@ -56,13 +62,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setLocalPremiumState(readLocalTier());
+    setHasBaseline(checkHasBaseline());
     fetchUser();
   }, [fetchUser]);
 
   const isPremium = user?.tier === 'pro' || localPremium;
+  const setBaselineDone = useCallback(() => setHasBaseline(true), []);
 
   return (
-    <UserContext.Provider value={{ user, isPremium, loading, refresh: fetchUser }}>
+    <UserContext.Provider value={{ user, isPremium, hasBaseline, loading, refresh: fetchUser, setBaselineDone }}>
       {children}
     </UserContext.Provider>
   );

@@ -1,6 +1,6 @@
+import { motion, useReducedMotion } from 'framer-motion';
 import { SiteShell } from '@/components/marketing/site-shell';
 import { Container } from '@/components/ui/layout-primitives';
-import { Link } from 'wouter';
 import { CheckoutButton } from '@/components/marketing/checkout-button';
 
 function MetaLabel({ children }: { children: React.ReactNode }) {
@@ -9,6 +9,30 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
       <span className="h-px w-6 bg-[#e0743a]/60" />
       <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">{children}</span>
     </div>
+  );
+}
+
+function TactileCTA({ href, label, amber }: { href: string; label: string; amber?: boolean }) {
+  const prefersReducedMotion = useReducedMotion();
+  return (
+    <motion.a
+      href={href}
+      className="w-full flex items-center justify-center px-6 py-3 rounded-2xl font-mono text-[12px] uppercase tracking-[0.12em] transition-colors"
+      style={{
+        background: amber ? 'rgba(224,116,58,0.90)' : 'rgba(255,255,255,0.06)',
+        color: amber ? '#08070a' : '#f4efe9',
+        boxShadow: amber
+          ? '0 0 0 1px rgba(224,116,58,0.5) inset'
+          : '0 0 0 1px rgba(255,255,255,0.08) inset',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+      }}
+      whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+      whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+    >
+      {label}
+    </motion.a>
   );
 }
 
@@ -82,7 +106,7 @@ export function PricingPage() {
                   </div>
                 ))}
               </div>
-              <Link href="/app/login" className="btn-secondary w-full text-center">Start Free</Link>
+              <TactileCTA href="/app/login" label="Start Free" />
             </div>
 
             {/* Pro */}
@@ -109,7 +133,7 @@ export function PricingPage() {
               {priceId ? (
                 <CheckoutButton priceId={priceId} cta="Upgrade to Pro" />
               ) : (
-                <Link href="/app/login" className="btn-primary w-full text-center">Get started</Link>
+                <TactileCTA href="/app/login" label="Get started" amber />
               )}
             </div>
           </div>

@@ -1,3 +1,4 @@
 - [Sovereign.os Vite port](sovereign-os-vite-port.md) — key migration patterns for Next.js→Vite: next/image→img, next/link→wouter Link, use client removal, Image constructor error
 - [Sovereign.os mock data strings](sovereign-os-mock-data.md) — apostrophes in single-quoted mock string literals break Babel parse; use unicode escapes or double-quoted strings
 - [Stripe checkout patterns](stripe-checkout-patterns.md) — API version derivation, origin allowlisting for open-redirect prevention, local tier gate via localStorage, double-click guard
+- [Sovereign.os architecture decisions](sovereign-os-arch.md) — space structure, context providers, baseline/archive patterns, ambient layer placement

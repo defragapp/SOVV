@@ -3,7 +3,7 @@ import OpenAI from "openai";
 
 const router = Router();
 
-const SYSTEM_PROMPT = `You are a clinical pattern-recognition system. You analyze interpersonal conflict and emotional distress with precision and zero sentiment.
+const BASE_SYSTEM_PROMPT = `You are a clinical pattern-recognition system. You analyze interpersonal conflict and emotional distress with precision and zero sentiment.
 
 You MUST respond with ONLY a valid JSON object — no prose, no markdown, no code fences, no explanation. The JSON must exactly match this schema:
 
@@ -12,7 +12,8 @@ You MUST respond with ONLY a valid JSON object — no prose, no markdown, no cod
   "whatsActive": "string — exactly 2 sentences. First: what is happening systemically. Second: why the pattern exists.",
   "defenseMechanism": "string — 1-2 sentences. The specific protective behavior being deployed and what it is preventing.",
   "resolutionSteps": ["string", "string", "string"],
-  "bestNextResponse": "string — a single sentence the person could speak aloud right now to re-establish contact."
+  "bestNextResponse": "string — a single sentence the person could speak aloud right now to re-establish contact.",
+  "baselineTriggered": true or false — set to true ONLY if the current conflict directly activates or matches the user's stated Baseline Design (defaultRetreat, coreBoundary, or repairMechanic). Set false if no baseline was provided or no match is detected.
 }
 
 Rules:
@@ -20,7 +21,31 @@ Rules:
 - Clinical language only — no therapy-speak, no affirmations, no validation.
 - Each field must be populated. No empty strings. No null values.
 - resolutionSteps must be an array of exactly 3 strings. Each step starts with a verb and describes a concrete behavior.
-- bestNextResponse must be a direct sentence, not a description of what to say.`;
+- bestNextResponse must be a direct sentence, not a description of what to say.
+- baselineTriggered must be a boolean — never a string.`;
+
+interface BaselineData {
+  defaultRetreat?: string;
+  coreBoundary?: string;
+  repairMechanic?: string;
+}
+
+function buildSystemPrompt(baseline: BaselineData | null): string {
+  if (!baseline || (!baseline.defaultRetreat && !baseline.coreBoundary && !baseline.repairMechanic)) {
+    return BASE_SYSTEM_PROMPT;
+  }
+  const parts: string[] = [];
+  if (baseline.defaultRetreat?.trim()) parts.push(`Default Retreat: "${baseline.defaultRetreat.trim()}"`);
+  if (baseline.coreBoundary?.trim()) parts.push(`Core Boundary: "${baseline.coreBoundary.trim()}"`);
+  if (baseline.repairMechanic?.trim()) parts.push(`Repair Mechanic: "${baseline.repairMechanic.trim()}"`);
+  const baselineBlock = `
+  
+USER BASELINE DESIGN (established relational patterns for this user):
+${parts.map(p => `  • ${p}`).join('\n')}
+
+When analyzing the conflict, evaluate it against this Baseline Design. Set "baselineTriggered": true if the conflict directly activates their default retreat, violates their core boundary, or bypasses their repair mechanic.`;
+  return BASE_SYSTEM_PROMPT + baselineBlock;
+}
 
 /** Strict runtime validation of the model's JSON against our UI schema */
 function validate(obj: Record<string, unknown>): string | null {
@@ -38,11 +63,21 @@ function validate(obj: Record<string, unknown>): string | null {
     return "resolutionSteps must be a non-empty array of strings";
   if (typeof obj.bestNextResponse !== "string" || !obj.bestNextResponse.trim())
     return "bestNextResponse must be a non-empty string";
+  // baselineTriggered — coerce string from some models, reject non-boolean non-string
+  if (obj.baselineTriggered !== undefined) {
+    if (typeof obj.baselineTriggered === "string") {
+      obj.baselineTriggered = obj.baselineTriggered === "true";
+    } else if (typeof obj.baselineTriggered !== "boolean") {
+      obj.baselineTriggered = false; // safe fallback — never let a bad type surface to UI
+    }
+  } else {
+    obj.baselineTriggered = false;
+  }
   return null;
 }
 
 router.post("/", async (req: Request, res: Response) => {
-  const { message } = req.body as { message?: string };
+  const { message, baseline } = req.body as { message?: string; baseline?: BaselineData };
 
   if (!message?.trim()) {
     res.status(400).json({ error: "message is required" });
@@ -63,7 +98,7 @@ router.post("/", async (req: Request, res: Response) => {
       max_tokens: 1024,
       response_format: { type: "json_object" },
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: buildSystemPrompt(baseline ?? null) },
         {
           role: "user",
           content: `Analyze this conflict or emotional moment:\n\n${message.trim()}`,
