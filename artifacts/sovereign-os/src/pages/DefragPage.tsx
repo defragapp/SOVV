@@ -10,20 +10,6 @@ import { readBaseline } from '@/lib/baseline';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-// ── Mock data shown on first load ────────────────────────────────────────────
-const MOCK_RESULT = {
-  activePattern: 'Withdrawal / Avoidance',
-  whatsActive:
-    'An established pattern of emotional withdrawal is active. When conflict registers as unresolvable, the system routes around it — reducing presence to avoid the cost of engagement.',
-  defenseMechanism:
-    'The pattern surfaces as physical distance, reduced verbal response, and a cognitive shift to "not worth it" framing. It prevents rupture in the moment by preventing contact entirely.',
-  resolutionSteps: [
-    "Name what is happening before leaving: \"I need ten minutes — I'm not done with this conversation.\"",
-    'Distinguish between a boundary (healthy) and a disappearance (pattern).',
-    'Return with a specific re-entry: start with a factual statement, not a position.',
-  ],
-  bestNextResponse: "I got flooded. I'm back — can we try that part again?",
-};
 
 // ── Skeleton pulse ────────────────────────────────────────────────────────────
 function SkeletonCard({ lines = 2 }: { lines?: number }) {
@@ -304,23 +290,26 @@ function DiagnosticOutput({ result }: { result: DiagnosticResult }) {
 // ── Save Pattern action bar ───────────────────────────────────────────────────
 type SaveState = 'idle' | 'saving' | 'saved';
 
-function SaveBar({ result }: { result: DiagnosticResult }) {
+function SaveBar({ result, inputText }: { result: DiagnosticResult; inputText: string }) {
   const { save } = useArchive();
   const [saveState, setSaveState] = useState<SaveState>('idle');
 
   const handleSave = async () => {
     if (saveState !== 'idle') return;
     setSaveState('saving');
-    // Stub: simulate a short async op (real: POST to KV endpoint)
-    await new Promise(r => setTimeout(r, 800));
-    save({
-      activePattern: result.activePattern ?? 'Unknown Pattern',
-      whatsActive: result.whatsActive ?? '',
-      defenseMechanism: result.defenseMechanism,
-      resolutionSteps: result.resolutionSteps,
-      bestNextResponse: result.bestNextResponse,
-    });
-    setSaveState('saved');
+    try {
+      await save({
+        inputText,
+        activePattern:    result.activePattern ?? 'Unknown Pattern',
+        whatsActive:      result.whatsActive ?? '',
+        defenseMechanism: result.defenseMechanism,
+        resolutionSteps:  result.resolutionSteps,
+        bestNextResponse: result.bestNextResponse,
+      });
+      setSaveState('saved');
+    } catch {
+      setSaveState('idle');
+    }
   };
 
   return (
@@ -381,12 +370,14 @@ function SaveBar({ result }: { result: DiagnosticResult }) {
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 export function DefragPage() {
-  const [result, setResult] = useState<DiagnosticResult | null>(MOCK_RESULT);
+  const [result, setResult] = useState<DiagnosticResult | null>(null);
+  const [lastInput, setLastInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { isPremium } = useUserTier();
 
   const handleSubmit = async (message: string) => {
+    setLastInput(message);
     setLoading(true);
     setError('');
     setResult(null);
@@ -468,7 +459,7 @@ export function DefragPage() {
           {result && !loading && (
             <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <DiagnosticOutput result={result} />
-              {isPremium && <SaveBar result={result} />}
+              {isPremium && <SaveBar result={result} inputText={lastInput} />}
             </motion.div>
           )}
         </AnimatePresence>

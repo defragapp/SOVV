@@ -96,9 +96,9 @@ export default function LoginScreen() {
 
       // Check for baseline → route accordingly
       fetch("/api/baseline", { credentials: "include" })
-        .then(r => r.ok ? r.json() : { baseline: null })
-        .then((d: { baseline?: { dob?: string } }) => {
-          if (d.baseline?.dob) {
+        .then(r => r.ok ? r.json() : null)
+        .then((d: { defaultRetreat?: string } | null) => {
+          if (d?.defaultRetreat) {
             window.location.href = "/apps/defrag"
           } else {
             window.location.href = "/settings?onboard=1"

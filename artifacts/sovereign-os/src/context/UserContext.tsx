@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { readLocalTier, setLocalPremium } from '@/lib/tier';
-import { checkHasBaseline } from '@/lib/baseline';
+import { checkHasBaseline, hydrateBaseline } from '@/lib/baseline';
 
 export interface User {
   id: string;
@@ -47,6 +47,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             setLocalPremium();
             setLocalPremiumState(true);
           }
+          // Hydrate baseline from server if localStorage is empty (cross-device sync)
+          hydrateBaseline().then(() => setHasBaseline(checkHasBaseline())).catch(() => {});
         } else {
           setUser(null);
         }

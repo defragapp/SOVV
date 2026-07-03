@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SpaceShell } from '@/components/spaces/space-shell';
@@ -18,29 +18,6 @@ interface Covenant {
   sealed: string; // ISO date string
 }
 
-const MOCK_COVENANTS: Covenant[] = [
-  {
-    id: '1',
-    relationship: 'Partner — Communication',
-    boundary: 'No conflict escalation after 10pm. Request a pause and resume at a scheduled time.',
-    trigger: 'ESCALATION',
-    sealed: '2026-06-14',
-  },
-  {
-    id: '2',
-    relationship: 'Parent — Boundaries',
-    boundary: 'Financial decisions are not open for unsolicited commentary. Redirect with: "I have it handled."',
-    trigger: 'FINANCIAL INTRUSION',
-    sealed: '2026-06-28',
-  },
-  {
-    id: '3',
-    relationship: 'Colleague — Scope',
-    boundary: 'Work requests outside designated hours receive a response the next business morning only.',
-    trigger: 'AVAILABILITY ASSUMPTION',
-    sealed: '2026-07-01',
-  },
-];
 
 // ── Covenant list row ─────────────────────────────────────────────────────────
 function CovenantRow({
@@ -209,18 +186,60 @@ function DraftingEngine({ onSeal }: { onSeal: (c: Omit<Covenant, 'id' | 'sealed'
 
 // ── Covenant dashboard (pro content) ─────────────────────────────────────────
 function CovenantDashboard() {
-  const [covenants, setCovenants] = useState<Covenant[]>(MOCK_COVENANTS);
+  const [covenants, setCovenants] = useState<Covenant[]>([]);
   const [selected, setSelected] = useState<Covenant | null>(null);
 
-  const handleSeal = (draft: Omit<Covenant, 'id' | 'sealed'>) => {
-    const next: Covenant = {
-      ...draft,
-      id: String(Date.now()),
-      sealed: new Date().toISOString().slice(0, 10),
-    };
+  // Load from API on mount
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch('/api/covenants', { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json() as Array<{
+            id: string; title: string; type: string; boundary: string; sealed: string;
+          }>;
+          setCovenants(data.map(d => ({
+            id: d.id,
+            relationship: d.title,
+            boundary: d.boundary,
+            trigger: d.type,
+            sealed: d.sealed,
+          })));
+        }
+      } catch { /* silently stay empty */ }
+    }
+    load();
+  }, []);
+
+  const handleSeal = useCallback(async (draft: Omit<Covenant, 'id' | 'sealed'>) => {
+    const sealed = new Date().toISOString().slice(0, 10);
+    try {
+      const res = await fetch('/api/covenants', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title:           draft.relationship,
+          type:            draft.trigger || 'USER DEFINED',
+          withWhom:        draft.relationship,
+          boundary:        draft.boundary,
+          costOfViolation: '',
+          sealed,
+        }),
+      });
+      if (res.ok) {
+        const saved = await res.json() as { id: string; sealed: string };
+        const next: Covenant = { ...draft, id: saved.id, sealed: saved.sealed };
+        setCovenants(prev => [next, ...prev]);
+        setSelected(next);
+        return;
+      }
+    } catch { /* fall through to local */ }
+    // Offline / unauthenticated fallback
+    const next: Covenant = { ...draft, id: String(Date.now()), sealed };
     setCovenants(prev => [next, ...prev]);
     setSelected(next);
-  };
+  }, []);
 
   return (
     <div className="flex flex-col h-full">
