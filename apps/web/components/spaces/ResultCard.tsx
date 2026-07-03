@@ -55,11 +55,12 @@ export function ResultCard({
 
   const sections = [
     { label: "What's active",          value: result.activePattern },
-    { label: "You",                    value: result.theRepeat },
-    { label: "Them",                   value: result.oldRole },
-    { label: "What forms between you", value: result.whatYouLearnedToCarry },
-    { label: "Why it's sharper now",   value: result.strainPattern },
-    { label: "What changes this",      value: result.alignment ?? result.giftUnderStrain },
+    { label: "The pattern",            value: result.theRepeat },
+    { label: "The role",               value: result.oldRole },
+    { label: "What shaped this",       value: result.whatYouLearnedToCarry },
+    { label: "Under pressure",         value: result.strainPattern },
+    { label: "What's working",         value: result.giftUnderStrain },
+    { label: "What changes this",      value: result.alignment },
   ].filter(s => s.value)
 
   const handleCopyAll = async () => {

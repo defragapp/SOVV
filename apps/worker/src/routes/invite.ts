@@ -6,6 +6,7 @@
 import type { Env } from '../types-env.js'
 import { getAuthUser } from '../auth.js'
 import { getCorsHeaders } from '../cors.js'
+import { logSafetyEvent } from '../safety.js'
 
 async function sha256hex(input: string): Promise<string> {
   const buf = new TextEncoder().encode(input)
@@ -25,14 +26,23 @@ function jsonResponse(data: unknown, status = 200, request?: Request): Response 
   })
 }
 
-async function sendInviteEmail(to: string, inviteUrl: string, env: Env): Promise<void> {
+async function sendInviteEmail(to: string, inviteUrl: string, env: Env, request?: Request): Promise<void> {
   if (!env.RESEND_API_KEY) return
   const html = `<div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;padding:48px 32px;background:#08070a;color:#f4efe9;"><p style="font-family:monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(244,239,233,0.3);margin-bottom:32px;">Sovereign.os</p><h1 style="font-size:24px;font-weight:300;margin-bottom:16px;">You have been invited.</h1><p style="color:rgba(244,239,233,0.6);font-size:14px;line-height:1.7;margin-bottom:24px;">You have been invited to join Sovereign.os — a private relational intelligence space. Click the link below to create your account.</p><a href="${inviteUrl}" style="display:inline-block;border:1px solid rgba(244,239,233,0.2);padding:12px 24px;font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#f4efe9;text-decoration:none;margin-bottom:24px;">Accept Invitation</a><p style="color:rgba(244,239,233,0.3);font-size:12px;">This invitation expires in 7 days. It can only be used once.</p></div>`
   await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from: 'Sovereign.os <info@defrag.app>', reply_to: 'info@defrag.app', to: [to], subject: 'Your invitation to Sovereign.os', html }),
-  }).catch(err => console.warn('[invite] Email failed:', err))
+  }).catch(err => {
+    logSafetyEvent({
+      level: 'warn',
+      event: 'invite_email_failed',
+      request,
+      error_type: 'system',
+      error: err,
+      details: { recipient: to },
+    })
+  })
 }
 
 export function registerInviteSystemRoutes(router: any, getEnv: () => Env) {
@@ -59,7 +69,7 @@ export function registerInviteSystemRoutes(router: any, getEnv: () => Env) {
       const inviteUrl = `https://app.defrag.app/app/login?invite=${token}`
 
       if (email) {
-        await sendInviteEmail(email, inviteUrl, env)
+        await sendInviteEmail(email, inviteUrl, env, request)
       }
 
       return jsonResponse({
@@ -71,7 +81,7 @@ export function registerInviteSystemRoutes(router: any, getEnv: () => Env) {
         email: email || null,
       }, 200, request)
     } catch (err) {
-      console.error('[invite] Create:', err)
+      logSafetyEvent({ level: 'error', event: 'invite_create_failed', request, error_type: 'system', error: err })
       return jsonResponse({ error: 'Internal error' }, 500, request)
     }
   })
@@ -96,7 +106,7 @@ export function registerInviteSystemRoutes(router: any, getEnv: () => Env) {
 
       return jsonResponse({ valid: true, email: invite.email, invite_id: invite.id }, 200, request)
     } catch (err) {
-      console.error('[invite] Redeem check:', err)
+      logSafetyEvent({ level: 'error', event: 'invite_redeem_failed', request, error_type: 'system', error: err })
       return jsonResponse({ error: 'Internal error' }, 500, request)
     }
   })
@@ -115,7 +125,7 @@ export function registerInviteSystemRoutes(router: any, getEnv: () => Env) {
 
       return jsonResponse({ success: true, invites: invites.results }, 200, request)
     } catch (err) {
-      console.error('[invite] List:', err)
+      logSafetyEvent({ level: 'error', event: 'invite_list_failed', request, error_type: 'system', error: err })
       return jsonResponse({ error: 'Internal error' }, 500, request)
     }
   })

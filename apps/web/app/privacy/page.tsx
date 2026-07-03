@@ -62,7 +62,7 @@ export default function PrivacyPage() {
         <Container className="relative z-10 flex flex-col items-center text-center max-w-[700px]">
           <MetaLabel>Privacy policy</MetaLabel>
           <h1 className="font-serif text-[clamp(2.6rem,6vw,4.5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-6">
-            Your data. Your clarity.
+            <span className="text-glow">Your data.</span> Your clarity.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-[500px] text-balance leading-relaxed">
             Private by design. Here is what we collect, why, and how we protect it.

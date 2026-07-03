@@ -104,7 +104,7 @@ export default function ResetPasswordPage() {
 
           {stage === "form" && (
             <>
-              <h1 className="text-sm font-medium text-[#f4efe9] mb-1">Reset your password.</h1>
+              <h1 className="text-[14px] text-[#f4efe9] mb-1">Reset your password.</h1>
               <p className="text-sm text-[#76716b] leading-relaxed mb-8">
                 Choose a new password for your Sovereign.os account.
               </p>

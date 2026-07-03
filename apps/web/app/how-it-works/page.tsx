@@ -75,7 +75,7 @@ export default function HowItWorksPage() {
             How Sovereign.os works.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-lg leading-relaxed">
-            The system understands your Baseline Design before you type. Here is the product loop.
+            Sovereign.os uses your Baseline Design to read what's active, identify what may be repeating, and surface a Best Next Response — before pressure chooses for you.
           </p>
         </Container>
       </section>
@@ -100,7 +100,7 @@ export default function HowItWorksPage() {
                     )}
                   </div>
                   <div className="flex-1 pb-8">
-                    <h3 className="text-[#f4efe9] font-medium text-lg mb-2">{step.title}</h3>
+                    <h3 className="font-serif text-[1.15rem] text-[#f4efe9] leading-snug mb-3">{step.title}</h3>
                     <p className="text-sm text-[#a8a29a] leading-relaxed mb-3">{step.body}</p>
                     {step.note && (
                       <p className="text-sm text-[#76716b] leading-relaxed border-l-2 border-[#e0743a]/20 pl-4">

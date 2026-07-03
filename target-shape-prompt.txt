@@ -1,0 +1,35 @@
+
+Now compare the current implementation to this target shape:
+
+Target shape:
+- one platform
+- three spaces: Defrag, Alignment, Covenant
+- one shared auth system
+- one shared Baseline Design
+- one shared Library
+- one shared billing truth
+- one frontend worker
+- one API worker
+- one AI worker
+- one session/state worker
+- KV for Baseline Design
+- D1 for users, subscriptions, saved results, and history
+- R2 for larger outputs
+- Queue for async work
+- AI prompts centralized
+- AI outputs structured and stable
+- pages feel like one visual system
+
+Return:
+
+1. What already matches
+2. What does not match
+3. What should be merged
+4. What should be simplified
+5. What should be removed
+6. What should be added first
+7. What is the safest order to fix things
+
+Use simple language.
+Do not invent new features.
+Only compare the current code to the target shape.

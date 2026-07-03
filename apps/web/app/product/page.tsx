@@ -27,10 +27,10 @@ export default function ProductPage() {
         <Container className="relative z-10 max-w-3xl">
           <MetaLabel>Product</MetaLabel>
           <h1 className="font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
-            One platform. Three spaces. One source.
+            <span className="text-glow">One platform.</span> Three spaces. One source.
           </h1>
           <p className="text-[#a8a29a] text-lg max-w-lg leading-relaxed">
-            Your Baseline Design is active beneath every thread. Defrag, Covenant, and Alignment each do different work — and share the same context.
+            Your Baseline Design is active in every session — a private behavioral map that gives the AI context before you type. Defrag, Covenant, and Alignment each do different work — and share the same context.
           </p>
         </Container>
       </section>
@@ -39,7 +39,7 @@ export default function ProductPage() {
       <section className="w-full py-20 md:py-28 bg-[#0c0a0d]">
         <Container className="max-w-3xl">
           <MetaLabel>The spaces</MetaLabel>
-          <div className="flex flex-col gap-0">
+          <div className="flex flex-col divide-y divide-white/[0.05]">
             {[
               {
                 num: "01",
@@ -47,7 +47,7 @@ export default function ProductPage() {
                 href: "/product/defrag",
                 tier: "Free",
                 headline: "Separate the moment from the pattern.",
-                body: "For the argument, the silence, the message, the grief. See what is active beneath the surface and find the clearest next response.",
+                body: "Analyze friction, silence, or recurring dynamics. Identify the structural pattern beneath the surface to determine the clearest next action.",
                 detail: "Relational dynamics · Family roles · Boundaries · Grief · Team pressure",
               },
               {
@@ -56,7 +56,7 @@ export default function ProductPage() {
                 href: "/product/covenant",
                 tier: "Pro",
                 headline: "Faith connected to repair.",
-                body: "For the user who wants faith to stay connected to the work. Plain-language reflection and grounded discernment — so the next step can be honest, not just emotional.",
+                body: "Integrate meaning and grounded discernment into your response process. Formulate a next step based on long-term values rather than immediate emotional pressure.",
                 detail: "Values · Commitments · Relational agreements · Honest next steps",
               },
               {
@@ -72,7 +72,7 @@ export default function ProductPage() {
               <Link
                 key={space.name}
                 href={space.href}
-                className="group flex items-start gap-8 py-10 border-b border-white/[0.06] last:border-0 hover:bg-white/[0.02] transition-colors px-4 -mx-4"
+                className="group flex items-start gap-8 py-10 border-b border-white/[0.06] last:border-0 glow-card-hover px-4 -mx-4"
                 style={{ borderRadius: 12 }}
               >
                 <div className="flex flex-col items-center gap-2 shrink-0 mt-1">
@@ -81,7 +81,7 @@ export default function ProductPage() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-serif text-2xl text-[#f4efe9] group-hover:text-[#f0a06a] transition-colors">{space.name}</h3>
+                    <h3 className="font-serif text-2xl text-[#f4efe9] group-hover:text-[#f4efe9] transition-colors">{space.name}</h3>
                     <span
                       className="font-mono text-[8px] uppercase tracking-[0.14em] border px-2 py-0.5"
                       style={{
@@ -106,10 +106,10 @@ export default function ProductPage() {
         </Container>
       </section>
 
-      {/* Platform features */}
+      {/* What you get */}
       <section className="w-full py-20 md:py-28 bg-[#08070a] border-t border-white/5">
         <Container className="max-w-3xl">
-          <MetaLabel>Platform features</MetaLabel>
+          <MetaLabel>What you get</MetaLabel>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
             {[
               { name: "Baseline Design", body: "The starting map. Active beneath every thread. Private, never exposed in outputs.", tier: "Free" },
@@ -119,7 +119,7 @@ export default function ProductPage() {
             ].map((f, i) => (
               <div key={i} className="py-8 pr-8 border-b border-white/[0.06] md:border-r md:even:border-r-0">
                 <div className="flex items-center gap-2 mb-3">
-                  <p className="font-medium text-[#f4efe9] text-[15px]">{f.name}</p>
+                  <p className="text-[15px] text-[#f4efe9]">{f.name}</p>
                   <span
                     className="font-mono text-[8px] uppercase tracking-[0.12em] border px-1.5 py-0.5"
                     style={{
@@ -146,7 +146,7 @@ export default function ProductPage() {
             Start with Defrag. Free, no time limit.
           </h2>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="https://app.defrag.app/app/login" className="btn-primary">Enter Sovereign.os</Link>
+            <Link href="/app/login" className="btn-primary">Enter Sovereign.os</Link>
             <Link href="/pricing" className="btn-secondary">See plans</Link>
           </div>
         </Container>

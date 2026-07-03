@@ -1,5 +1,7 @@
 "use client";
 
+import * as React from "react";
+import ManageSubscription from "@/components/spaces/ManageSubscription"
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -38,6 +40,268 @@ const inputBase =
   "focus:border-white/25 focus:bg-white/[0.07] " +
   "disabled:opacity-30 disabled:cursor-not-allowed " +
   "[color-scheme:dark]";
+
+
+
+function DeleteAccountSection() {
+  const [confirming, setConfirming] = React.useState(false)
+  const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState("")
+
+  const handleDelete = async () => {
+    setLoading(true)
+    setError("")
+    try {
+      const res = await fetch("/api/auth/account", {
+        method: "DELETE",
+        credentials: "include",
+      })
+      if (!res.ok) {
+        const data = await res.json() as { error?: string }
+        setError(data.error || "Failed to delete account")
+        return
+      }
+      window.location.href = "/"
+    } catch {
+      setError("Connection failed. Try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (!confirming) {
+    return (
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] hover:text-red-400/60 transition-colors"
+      >
+        Delete account
+      </button>
+    )
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-[13px] text-[#a8a29a] leading-relaxed">
+        This will permanently delete your account, all saved results, and your Baseline Design. This cannot be undone.
+      </p>
+      {error && <p className="text-[12px] text-red-400/70">{error}</p>}
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={loading}
+          className="font-mono text-[10px] uppercase tracking-[0.15em] text-red-400/60 hover:text-red-400 transition-colors disabled:opacity-30"
+        >
+          {loading ? "Deleting…" : "Yes, delete my account"}
+        </button>
+        <button
+          type="button"
+          onClick={() => setConfirming(false)}
+          className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
+}
+
+
+
+function ActiveSessionsList() {
+  const [sessions, setSessions] = React.useState<Array<{ id: string; createdAt: string; expiresAt: string }>>([])
+  const [loading, setLoading] = React.useState(true)
+  const [revoking, setRevoking] = React.useState<string | null>(null)
+
+  const loadSessions = () => {
+    fetch("/api/auth/sessions", { credentials: "include" })
+      .then(r => r.ok ? r.json() : { sessions: [] })
+      .then((d: any) => setSessions(d.sessions || []))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }
+
+  React.useEffect(() => { loadSessions() }, [])
+
+  const revokeSession = async (id: string) => {
+    setRevoking(id)
+    try {
+      await fetch(`/api/auth/sessions/${id}`, { method: "DELETE", credentials: "include" })
+      setSessions(prev => prev.filter(s => s.id !== id))
+    } catch { /* silent */ } finally {
+      setRevoking(null)
+    }
+  }
+
+  if (loading) return <span className="font-mono text-[10px] text-[#4f4b47]">Loading…</span>
+  if (sessions.length === 0) return <span className="font-mono text-[10px] text-[#4f4b47]">No active sessions</span>
+
+  return (
+    <div className="flex flex-col gap-2">
+      {sessions.map((s, i) => (
+        <div key={s.id} className="flex items-center justify-between">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-mono text-[10px] text-[#4f4b47]">
+              Session ···{s.id}
+            </span>
+            <span className="font-mono text-[9px] text-[#4f4b47]/60">
+              Expires {new Date(s.expiresAt).toLocaleDateString()}
+            </span>
+          </div>
+          <button
+            onClick={() => revokeSession(s.id)}
+            disabled={revoking === s.id}
+            className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#4f4b47] hover:text-red-400/60 transition-colors disabled:opacity-30"
+          >
+            {revoking === s.id ? "…" : "Revoke"}
+          </button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function EmailVerificationStatus() {
+  const [status, setStatus] = React.useState<"loading" | "verified" | "unverified" | "unknown">("loading")
+  const [sending, setSending] = React.useState(false)
+  const [sent, setSent] = React.useState(false)
+
+  React.useEffect(() => {
+    fetch("/api/user/me", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then((d: any) => {
+        if (!d) { setStatus("unknown"); return }
+        setStatus(d.emailVerified ? "verified" : "unverified")
+      })
+      .catch(() => setStatus("unknown"))
+  }, [])
+
+  const sendVerification = async () => {
+    setSending(true)
+    try {
+      await fetch("/api/auth/send-verification", { method: "POST", credentials: "include" })
+      setSent(true)
+    } catch { /* silent */ } finally {
+      setSending(false)
+    }
+  }
+
+  if (status === "loading") return <span className="font-mono text-[10px] text-[#4f4b47]">Checking…</span>
+  if (status === "verified") return <span className="font-mono text-[10px] text-[#76716b]">Email verified ✓</span>
+  if (status === "unverified") return (
+    <div className="flex items-center gap-4">
+      <span className="font-mono text-[10px] text-[#4f4b47]">Email not verified</span>
+      {!sent ? (
+        <button onClick={sendVerification} disabled={sending}
+          className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] hover:text-[#f4efe9] transition-colors disabled:opacity-30">
+          {sending ? "Sending…" : "Send verification"}
+        </button>
+      ) : (
+        <span className="font-mono text-[10px] text-[#76716b]">Check your email</span>
+      )}
+    </div>
+  )
+  return null
+}
+
+function ChangePasswordForm() {
+  const [currentPassword, setCurrentPassword] = React.useState("")
+  const [newPassword, setNewPassword] = React.useState("")
+  const [confirmPassword, setConfirmPassword] = React.useState("")
+  const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState("")
+  const [success, setSuccess] = React.useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (newPassword !== confirmPassword) {
+      setError("New passwords do not match")
+      return
+    }
+    if (newPassword.length < 8) {
+      setError("New password must be at least 8 characters")
+      return
+    }
+    setLoading(true)
+    setError("")
+    setSuccess(false)
+    try {
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      })
+      const data = await res.json() as { success?: boolean; error?: string }
+      if (!res.ok) {
+        setError(data.error || "Failed to change password")
+        return
+      }
+      setSuccess(true)
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+    } catch {
+      setError("Connection failed. Try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
+      <div>
+        <label className="sovv-label">Current password</label>
+        <input
+          type="password"
+          value={currentPassword}
+          onChange={e => setCurrentPassword(e.target.value)}
+          required
+          autoComplete="current-password"
+          className="sovv-input w-full"
+          placeholder="••••••••"
+        />
+      </div>
+      <div>
+        <label className="sovv-label">New password</label>
+        <input
+          type="password"
+          value={newPassword}
+          onChange={e => setNewPassword(e.target.value)}
+          required
+          minLength={8}
+          autoComplete="new-password"
+          className="sovv-input w-full"
+          placeholder="••••••••"
+        />
+      </div>
+      <div>
+        <label className="sovv-label">Confirm new password</label>
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={e => setConfirmPassword(e.target.value)}
+          required
+          minLength={8}
+          autoComplete="new-password"
+          className="sovv-input w-full"
+          placeholder="••••••••"
+        />
+      </div>
+      {error && <p className="text-[12px] text-red-400/70">{error}</p>}
+      {success && <p className="text-[12px] text-[#76716b]">Password updated successfully.</p>}
+      <button
+        type="submit"
+        disabled={loading || !currentPassword || !newPassword || !confirmPassword}
+        className="btn-secondary h-10 px-6 text-[12px] disabled:opacity-30"
+      >
+        {loading ? "Updating…" : "Update password"}
+      </button>
+    </form>
+  )
+}
 
 export default function SettingsPage() {
   const [baseline, setBaseline] = useState<BaselineRequest>(initialState);
@@ -277,6 +541,51 @@ export default function SettingsPage() {
               </li>
             ))}
           </ul>
+        </div>
+
+        {/* Email verification */}
+        <div className="mt-8 pt-6 border-t border-white/[0.06]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] mb-3">Email</p>
+          <EmailVerificationStatus />
+        </div>
+
+        {/* Active sessions */}
+        <div className="mt-6 pt-6 border-t border-white/[0.06]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] mb-3">Active Sessions</p>
+          <ActiveSessionsList />
+        </div>
+
+        {/* Subscription */}
+        <div className="bg-white/[0.02] border border-white/[0.08] rounded-[14px] p-8 md:p-10 mt-14">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-6">
+            Subscription
+          </p>
+          <ManageSubscription />
+        </div>
+
+        {/* Change Password */}
+        <div className="bg-white/[0.02] border border-white/[0.08] rounded-[14px] p-8 md:p-10 mt-14">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-6">
+            Change Password
+          </p>
+          <ChangePasswordForm />
+        </div>
+
+        {/* Danger zone */}
+        <div className="mt-14 pt-8 border-t border-white/[0.06]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] mb-4">
+            Account
+          </p>
+          <div className="flex flex-col gap-4">
+            <a
+              href="/api/auth/export"
+              download
+              className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+            >
+              Export my data
+            </a>
+            <DeleteAccountSection />
+          </div>
         </div>
 
       </main>
