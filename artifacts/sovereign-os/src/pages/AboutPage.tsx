@@ -3,8 +3,6 @@ import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } fro
 import { SiteShell } from '@/components/marketing/site-shell';
 import { Container } from '@/components/ui/layout-primitives';
 
-const ease = [0.16, 1, 0.3, 1] as const;
-
 function MetaLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="inline-flex items-center gap-2 mb-6">
@@ -13,6 +11,25 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+const OS_LAYERS = [
+  {
+    label: 'Baseline Design',
+    body: 'Your core pattern layer. The private model that helps Sovereign.os understand how you move, react, learn, protect, relate, and repeat. It travels across every app inside Sovereign.os.',
+  },
+  {
+    label: 'Defrag.app',
+    body: 'Untangle the moment. For conversations, conflicts, and inner pressure that feel messy. Defrag shows what\'s happening, what pattern is forming, and what changes it.',
+  },
+  {
+    label: 'Alignment.app',
+    body: 'Choose the cleaner move. For decisions, responses, and next steps. Alignment helps you see what is yours, what is not, and how to move without losing yourself.',
+  },
+  {
+    label: 'Covenant.app',
+    body: 'Understand what the moment belongs to. For reflection and deeper integration. Covenant helps you step back and see the larger pattern.',
+  },
+];
 
 export function AboutPage() {
   const prefersReducedMotion = useReducedMotion();
@@ -61,27 +78,26 @@ export function AboutPage() {
           <Container className="max-w-3xl">
             <MetaLabel>About</MetaLabel>
             <h1 className="reveal-up reveal-up-2 font-serif text-[clamp(2.6rem,6vw,4.5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
-              <span className="text-glow">Before you explain yourself again,</span>
+              The private intelligence layer.
               <br />
-              return to yourself first.
+              <span className="text-glow">Built around who you already are.</span>
             </h1>
             <p className="text-[#a8a29a] text-[17px] max-w-xl leading-relaxed">
-              Pattern-aware AI for the moments that are hard to read while you&apos;re inside them. Not abstract self-improvement — specific, real, sometimes difficult moments of actual life.
+              Sovereign.os isn&apos;t a chatbot. It&apos;s an operating system — one that uses your Baseline Design to read what&apos;s happening before you have to explain it.
+            </p>
+            <p className="mt-5 max-w-sm font-mono text-[10px] tracking-[0.12em] text-[#4f4b47] leading-relaxed border-l border-[#e0743a]/20 pl-4">
+              Most AI responds to what you type. Sovereign.os understands the pattern you&apos;re typing from.
             </p>
           </Container>
         </motion.div>
       </section>
 
-      {/* Detail grid */}
+      {/* OS Layer Architecture */}
       <section className="w-full py-20 md:py-28 bg-[#0c0a0d]">
         <Container className="max-w-3xl">
+          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-12">The OS architecture</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-            {[
-              { label: 'The moment', body: 'The message that unsettled you. The family role you keep falling back into. The boundary you keep negotiating with yourself. The grief that changes the room.' },
-              { label: 'The structure', body: 'Sovereign.os gives those moments structure — showing what\'s active, what may be repeating, and what next move gives the situation a better chance.' },
-              { label: 'The platform', body: 'Your Baseline Design is the starting map. Defrag, Covenant, and Alignment are the spaces where the work happens. The Archive is where you save what helped.' },
-              { label: 'The limit', body: 'Sovereign.os does not diagnose, predict, or guarantee outcomes. It is not a replacement for therapy. It is the space between sessions.' },
-            ].map((item, i) => (
+            {OS_LAYERS.map((item, i) => (
               <div key={i} className={`py-8 pr-8 border-b border-white/[0.06] md:border-r md:even:border-r-0 last:border-b-0 reveal-up reveal-up-${Math.min(i + 2, 6)} glow-card-hover cursor-default`}>
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/50 mb-3">{item.label}</p>
                 <p className="text-[15px] text-[#a8a29a] leading-relaxed">{item.body}</p>
@@ -98,10 +114,12 @@ export function AboutPage() {
         <Container className="relative z-10 flex flex-col items-center">
           <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-8">Begin</p>
           <h2 className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] max-w-2xl text-balance" style={{ fontSize: 'clamp(2.2rem, 5.5vw, 4.5rem)' }}>
-            <span className="text-glow">Return before</span> the pattern runs the room.
+            Start from who you are.
+            <br />
+            <span className="text-glow">Not from a blank prompt.</span>
           </h2>
           <p className="mt-6 max-w-md text-[15px] text-[#76716b] leading-relaxed">
-            Understand what&apos;s active, see what may be repeating, and choose the next move with more context.
+            Your Baseline Design is the foundation. Sovereign.os reads the pattern before you have to explain it.
           </p>
           <div className="mt-9 flex flex-col items-center gap-4">
             <motion.a

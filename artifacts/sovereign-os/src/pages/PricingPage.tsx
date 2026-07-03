@@ -97,7 +97,7 @@ export function PricingPage() {
                   <span className="font-serif text-4xl text-[#f4efe9]">$0</span>
                   <span className="text-sm text-[#76716b]">forever</span>
                 </div>
-                <p className="text-sm text-[#a8a29a] leading-relaxed">Start understanding the pattern.</p>
+                <p className="text-sm text-[#a8a29a] leading-relaxed">Start with one moment. Access Defrag and see how the system reads your patterns — free, forever.</p>
               </div>
               <div className="flex flex-col gap-3 flex-1 mb-8">
                 {FREE_FEATURES.map(f => (
@@ -121,7 +121,7 @@ export function PricingPage() {
                   <span className="font-serif text-4xl text-[#f4efe9]">$12</span>
                   <span className="text-sm text-[#76716b]">/ month</span>
                 </div>
-                <p className="text-sm text-[#a8a29a] leading-relaxed">Unlimited depth. Every space.</p>
+                <p className="text-sm text-[#a8a29a] leading-relaxed">Unlock your operating system. Full Baseline Design, every space, saved Archive history, and unlimited depth.</p>
               </div>
               <div className="flex flex-col gap-3 flex-1 mb-8 relative">
                 {PRO_FEATURES.map(f => (
@@ -134,8 +134,31 @@ export function PricingPage() {
               {priceId ? (
                 <CheckoutButton priceId={priceId} cta="Upgrade to Pro" />
               ) : (
-                <TactileCTA href="/app/login" label="Get started" amber />
+                <TactileCTA href="/app/login" label="Upgrade to Pro" amber />
               )}
+            </div>
+          </div>
+
+          {/* Coming Soon — Relational tier */}
+          <div className="max-w-3xl mx-auto mt-4">
+            <div
+              className="border border-white/[0.04] p-8 flex flex-col md:flex-row md:items-center gap-6 opacity-50"
+              style={{ borderRadius: 'var(--radius-container)', background: 'rgba(255,255,255,0.015)' }}
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-3">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Network</p>
+                  <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#4f4b47] border border-white/[0.06] px-2 py-0.5" style={{ borderRadius: 4 }}>Coming Soon</span>
+                </div>
+                <p className="font-serif text-xl text-[#76716b] mb-2">Relational Intelligence</p>
+                <p className="text-sm text-[#4f4b47] leading-relaxed max-w-md">Bring the system into your relationships. Invite others, compare patterns, and explore shared dynamics — without exposing private Baseline data.</p>
+              </div>
+              <div
+                className="shrink-0 px-6 py-3 rounded-2xl font-mono text-[11px] uppercase tracking-[0.12em] text-[#4f4b47] cursor-not-allowed"
+                style={{ background: 'rgba(255,255,255,0.03)', boxShadow: '0 0 0 1px rgba(255,255,255,0.04) inset' }}
+              >
+                Locked
+              </div>
             </div>
           </div>
         </Container>

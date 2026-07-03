@@ -34,8 +34,8 @@ function ArchiveRow({
     <motion.button
       {...(!reducedMotion ? { layoutId: `row-${pattern.id}` } : {})}
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-5 py-4 text-left transition-colors hover:bg-white/[0.02] ${
-        isLast ? '' : 'border-b border-white/[0.06]'
+      className={`w-full flex items-center justify-between px-1 py-4 text-left transition-opacity hover:opacity-80 ${
+        isLast ? '' : 'border-b border-white/[0.08]'
       }`}
     >
       <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-4">
@@ -88,9 +88,11 @@ function ArchiveDetail({
       <motion.div
         key={`detail-${pattern.id}`}
         {...(!reducedMotion ? { layoutId: `row-${pattern.id}` } : {})}
-        className="fixed inset-x-4 z-50 rounded-3xl ring-1 ring-inset ring-white/[0.08] overflow-hidden"
+        className="fixed inset-x-4 z-50 rounded-3xl ring-1 ring-inset ring-white/[0.06] overflow-hidden"
         style={{
-          background: '#1C1C1E',
+          background: 'rgba(8,7,10,0.95)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
           top: '50%',
           translateY: '-50%',
         }}
@@ -179,22 +181,18 @@ function ArchiveDashboard() {
           </p>
 
           {patterns.length === 0 ? (
-            <div
-              className="rounded-2xl ring-1 ring-inset ring-white/[0.05] px-5 py-8 flex flex-col items-center text-center"
-              style={{ background: '#1C1C1E' }}
-            >
-              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47] mb-2">
+            <div className="py-10 flex flex-col gap-2 border-t border-white/[0.06]">
+              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
                 [ARCHIVE EMPTY]
               </p>
-              <p className="text-[14px] text-[#76716b] font-sans max-w-xs">
+              <p className="text-[14px] text-[#76716b] font-sans">
                 Save a Defrag output to begin your pattern record.
               </p>
             </div>
           ) : (
             <motion.div
               layout
-              className="rounded-2xl overflow-hidden ring-1 ring-inset ring-white/[0.05]"
-              style={{ background: '#1C1C1E' }}
+              className="border-t border-white/[0.06]"
             >
               <AnimatePresence initial={false}>
                 {patterns.map((p, i) => (

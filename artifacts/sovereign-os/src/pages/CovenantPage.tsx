@@ -55,8 +55,8 @@ function CovenantRow({
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-5 py-4 text-left transition-colors hover:bg-white/[0.02] ${
-        isLast ? '' : 'border-b border-white/[0.06]'
+      className={`w-full flex items-center justify-between px-1 py-4 text-left transition-opacity hover:opacity-80 ${
+        isLast ? '' : 'border-b border-white/[0.08]'
       }`}
     >
       <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-4">
@@ -89,8 +89,8 @@ function CovenantDetail({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.35, ease }}
-      className="rounded-2xl ring-1 ring-inset ring-white/[0.05] overflow-hidden mx-4 mb-4"
-      style={{ background: '#1C1C1E' }}
+      className="rounded-2xl ring-1 ring-inset ring-white/[0.06] overflow-hidden mx-4 mb-4"
+      style={{ background: 'rgba(8,7,10,0.90)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.05]">
@@ -154,10 +154,7 @@ function DraftingEngine({ onSeal }: { onSeal: (c: Omit<Covenant, 'id' | 'sealed'
   return (
     <div className="px-4 pb-4 pt-2 shrink-0">
       <form onSubmit={handleSeal}>
-        <div
-          className="rounded-3xl ring-1 ring-inset ring-white/[0.05] overflow-hidden"
-          style={{ background: '#1C1C1E' }}
-        >
+        <div className="overflow-hidden">
           {/* Relationship input */}
           <div className="border-b border-white/[0.05]">
             <input
@@ -246,8 +243,7 @@ function CovenantDashboard() {
           </p>
           <motion.div
             layout
-            className="rounded-2xl overflow-hidden ring-1 ring-inset ring-white/[0.05]"
-            style={{ background: '#1C1C1E' }}
+            className="border-t border-white/[0.06]"
           >
             <AnimatePresence initial={false}>
               {covenants.map((c, i) => (

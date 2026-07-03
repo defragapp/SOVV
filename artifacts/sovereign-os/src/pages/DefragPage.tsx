@@ -25,35 +25,31 @@ const MOCK_RESULT = {
   bestNextResponse: "I got flooded. I'm back — can we try that part again?",
 };
 
-// ── Skeleton pulse card ───────────────────────────────────────────────────────
+// ── Skeleton pulse ────────────────────────────────────────────────────────────
 function SkeletonCard({ lines = 2 }: { lines?: number }) {
   return (
-    <div
-      className="rounded-2xl ring-1 ring-inset ring-white/[0.05] overflow-hidden"
-      style={{ background: '#1C1C1E' }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.05]">
-        <div className="h-2 w-32 rounded-full bg-white/[0.06] animate-pulse" />
-        <div className="w-2 h-2 rounded-full bg-white/[0.06] animate-pulse" />
+    <div className="py-5">
+      <div className="flex items-center justify-between mb-3">
+        <div className="h-2 w-24 rounded-sm bg-white/[0.06] animate-pulse" />
+        <div className="w-1.5 h-1.5 rounded-full bg-white/[0.06] animate-pulse" />
       </div>
-      {/* Body */}
-      <div className="px-5 py-4 flex flex-col gap-2">
+      <div className="flex flex-col gap-2.5">
         {Array.from({ length: lines }).map((_, i) => (
           <div
             key={i}
-            className="h-3 rounded-full bg-white/[0.04] animate-pulse"
+            className="h-3 rounded-sm bg-white/[0.04] animate-pulse"
             style={{ width: i === lines - 1 ? '60%' : '100%', animationDelay: `${i * 80}ms` }}
           />
         ))}
       </div>
+      <div className="mt-5 h-px bg-white/[0.05]" />
     </div>
   );
 }
 
 function SkeletonOutput() {
   return (
-    <div className="flex flex-col gap-3 px-4 py-4">
+    <div className="flex flex-col px-6 py-4">
       <SkeletonCard lines={1} />
       <SkeletonCard lines={3} />
       <SkeletonCard lines={2} />
@@ -119,60 +115,55 @@ function DropZone({
         </div>
       )}
 
-      {/* Drop zone container */}
+      {/* Drop zone — zero-edge, textarea floats on canvas */}
       <form onSubmit={handleSubmit}>
-        <div
-          className="rounded-3xl ring-1 ring-inset ring-white/[0.05] p-5 flex flex-col gap-4"
-          style={{ background: '#1C1C1E' }}
-        >
-          {/* Borderless textarea */}
-          <textarea
-            ref={textareaRef}
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            placeholder="Describe the moment. What happened? What was said?"
-            rows={4}
-            disabled={loading}
-            className="w-full resize-none bg-transparent text-[17px] text-white placeholder:text-[#4f4b47] outline-none border-none ring-0 leading-relaxed disabled:opacity-50"
-            style={{ fontFamily: 'var(--app-font-sans)' }}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                handleSubmit(e as unknown as React.FormEvent);
-              }
-            }}
-          />
+        {/* Top hairline */}
+        <div className="h-px bg-white/[0.06] mb-4" />
 
-          {/* Action footer */}
-          <div className="flex items-center justify-between border-t border-white/[0.05] pt-4">
-            {/* Status tag — switches to MAPPING PATTERN when loading */}
-            <div className="flex items-center gap-2">
-              {loading && (
-                <span
-                  className="w-1.5 h-1.5 rounded-full bg-[#e0743a] animate-pulse"
-                />
-              )}
-              <span className="font-mono text-[10px] tracking-[0.18em] text-[#4f4b47]">
-                {loading ? 'MAPPING PATTERN...' : inputActive ? 'INPUT ACTIVE' : 'WAITING'}
-              </span>
-            </div>
+        {/* Textarea — directly on canvas */}
+        <textarea
+          ref={textareaRef}
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          placeholder="Describe the moment. What happened? What was said?"
+          rows={4}
+          disabled={loading}
+          className="w-full resize-none bg-transparent text-[17px] text-white placeholder:text-[#4f4b47] outline-none border-none ring-0 leading-relaxed disabled:opacity-50"
+          style={{ fontFamily: 'var(--app-font-sans)' }}
+          onKeyDown={e => {
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+              handleSubmit(e as unknown as React.FormEvent);
+            }
+          }}
+        />
 
-            <button
-              type="submit"
-              disabled={!inputActive || loading}
-              className="px-5 py-2.5 rounded-2xl font-mono text-[11px] uppercase tracking-[0.12em] transition-all duration-200 disabled:opacity-30"
-              style={{
-                background: inputActive && !loading ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                color: inputActive && !loading ? '#f4efe9' : '#4f4b47',
-                boxShadow: inputActive && !loading
-                  ? '0 0 0 1px rgba(255,255,255,0.10) inset'
-                  : '0 0 0 1px rgba(255,255,255,0.04) inset',
-              }}
-            >
-              Map Pattern
-            </button>
+        {/* Action footer */}
+        <div className="flex items-center justify-between border-t border-white/[0.05] pt-4 mt-2">
+          <div className="flex items-center gap-2">
+            {loading && (
+              <span className="w-1.5 h-1.5 rounded-full bg-[#e0743a] animate-pulse" />
+            )}
+            <span className="font-mono text-[10px] tracking-[0.18em] text-[#4f4b47]">
+              {loading ? 'MAPPING PATTERN...' : inputActive ? 'INPUT ACTIVE' : 'WAITING'}
+            </span>
           </div>
+
+          <button
+            type="submit"
+            disabled={!inputActive || loading}
+            className="px-5 py-2.5 rounded-2xl font-mono text-[11px] uppercase tracking-[0.12em] transition-all duration-200 disabled:opacity-30"
+            style={{
+              background: inputActive && !loading ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.04)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              color: inputActive && !loading ? '#f4efe9' : '#4f4b47',
+              boxShadow: inputActive && !loading
+                ? '0 0 0 1px rgba(255,255,255,0.10) inset'
+                : '0 0 0 1px rgba(255,255,255,0.04) inset',
+            }}
+          >
+            Map Pattern
+          </button>
         </div>
       </form>
     </div>
@@ -190,6 +181,7 @@ interface DiagnosticResult {
   [key: string]: unknown;
 }
 
+// ── Diagnostic anchor (Zero-Edge) ─────────────────────────────────────────────
 function DiagnosticCard({
   tag,
   children,
@@ -206,10 +198,9 @@ function DiagnosticCard({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease, delay }}
-      className="rounded-2xl ring-1 ring-inset ring-white/[0.05] overflow-hidden"
-      style={{ background: '#1C1C1E' }}
     >
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.05]">
+      {/* Mono label anchors the section — no container */}
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[10px] tracking-[0.18em] text-[#4f4b47] uppercase">
             {tag}
@@ -221,7 +212,7 @@ function DiagnosticCard({
           )}
         </div>
         <span
-          className="w-2 h-2 rounded-full shrink-0"
+          className="w-1.5 h-1.5 rounded-full shrink-0"
           style={{
             background: '#e0743a',
             boxShadow: baselineTriggered
@@ -230,7 +221,10 @@ function DiagnosticCard({
           }}
         />
       </div>
-      <div className="px-5 py-4">{children}</div>
+      {/* Content floats directly on canvas */}
+      <div className="pb-8">{children}</div>
+      {/* Hairline separator */}
+      <div className="h-px bg-white/[0.06]" />
     </motion.div>
   );
 }
@@ -241,24 +235,22 @@ function ErrorCard({ message }: { message: string }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease }}
-      className="rounded-2xl ring-1 ring-inset ring-red-500/20 overflow-hidden mx-4 mt-4"
-      style={{ background: '#1C1C1E' }}
+      className="mt-4"
     >
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-red-500/10">
-        <span className="font-mono text-[10px] tracking-[0.16em] text-red-400/70 uppercase">
-          [SYSTEM_ERROR: UNABLE TO MAP PATTERN]
-        </span>
-      </div>
-      <div className="px-5 py-4">
+      <span className="font-mono text-[10px] tracking-[0.16em] text-red-400/70 uppercase mb-3 block">
+        [SYSTEM_ERROR: UNABLE TO MAP PATTERN]
+      </span>
+      <div className="pb-8">
         <p className="text-[14px] text-[#76716b] font-sans leading-relaxed">{message} Try describing the moment again.</p>
       </div>
+      <div className="h-px bg-white/[0.06]" />
     </motion.div>
   );
 }
 
 function DiagnosticOutput({ result }: { result: DiagnosticResult }) {
   return (
-    <div className="flex flex-col gap-3 px-4 py-4">
+    <div className="flex flex-col px-6 py-6">
       {result.activePattern && (
         <DiagnosticCard tag="[Active Pattern]" delay={0} baselineTriggered={result.baselineTriggered === true}>
           <p className="font-mono text-[15px] text-[#f4efe9] tracking-[0.04em]">

@@ -24,9 +24,9 @@ const RESULT = {
 };
 
 const SPACES = [
-  { id: 'defrag',    label: 'Defrag',    description: "The pattern recognition space. Bring the moment — message, conflict, boundary, grief — and read what's actually happening beneath it.", href: APP_URL, tags: ['free', 'core', 'pattern recognition'] },
-  { id: 'covenant',  label: 'Covenant',  description: 'Faith-context reflection. Not certainty — the next honest step, held by something larger than the pattern.',                            href: APP_URL, tags: ['pro', 'faith', 'repair'] },
-  { id: 'alignment', label: 'Alignment', description: 'Response integration. What is yours to carry. What belongs to the other side. The cleaner move.',                                     href: APP_URL, tags: ['pro', 'action', 'response'] },
+  { id: 'defrag',    label: 'Defrag',    description: 'Untangle the moment. For conversations, conflicts, and inner pressure that feel messy. Defrag shows what\'s happening, what pattern is forming, and what changes it.',           href: APP_URL, tags: ['free', 'core', 'pattern recognition'] },
+  { id: 'alignment', label: 'Alignment', description: 'Choose the cleaner move. For decisions, responses, and next steps. Alignment helps you see what is yours, what is not, and how to move without losing yourself.',              href: APP_URL, tags: ['pro', 'action', 'response'] },
+  { id: 'covenant',  label: 'Covenant',  description: 'Understand what the moment belongs to. For reflection and deeper integration. Covenant helps you step back and see the larger pattern.',                                       href: APP_URL, tags: ['pro', 'reflection', 'integration'] },
 ];
 
 // ── SpacePreview ──────────────────────────────────────────────────────────────
@@ -227,12 +227,17 @@ function Hero() {
             >
               <span className="block overflow-hidden" style={{ lineHeight: 1.12 }}>
                 <span ref={refs.line1Ref} className="block" style={{ willChange: 'transform' }}>
-                  Healing isn&apos;t optional.
+                  Your private operating
                 </span>
               </span>
               <span className="block overflow-hidden" style={{ lineHeight: 1.12 }}>
                 <span ref={refs.line2Ref} className="block" style={{ willChange: 'transform' }}>
-                  <span className="text-glow">Holding the pain is.</span>
+                  <span className="text-glow">system for becoming</span>
+                </span>
+              </span>
+              <span className="block overflow-hidden" style={{ lineHeight: 1.12 }}>
+                <span className="block" style={{ willChange: 'transform' }}>
+                  clear to yourself.
                 </span>
               </span>
             </motion.h1>
@@ -242,7 +247,12 @@ function Hero() {
               ref={refs.subtextRef}
               className="mt-7 max-w-md text-[17px] text-[#76716b] leading-relaxed"
             >
-              Pattern-aware AI for the moments that are hard to read while you&apos;re inside them.
+              Sovereign.os uses your Baseline Design to understand your patterns across relationships, decisions, behavior, learning, and pressure — so guidance starts from who you are, not from a blank prompt.
+            </p>
+
+            {/* Core hook */}
+            <p className="mt-5 max-w-sm font-mono text-[10px] tracking-[0.12em] text-[#4f4b47] leading-relaxed border-l border-[#e0743a]/20 pl-4">
+              Most AI responds to what you type. Sovereign.os understands the pattern you&apos;re typing from.
             </p>
 
             {/* CTA — tactile glass button */}

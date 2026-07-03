@@ -1,6 +1,5 @@
 import { SiteShell } from '@/components/marketing/site-shell';
 import { Container } from '@/components/ui/layout-primitives';
-import { Link } from 'wouter';
 
 function MetaLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -12,11 +11,36 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
 }
 
 const STEPS = [
-  { num: '01', title: 'Set your Baseline Design', body: 'Your date, time, and place of birth. Maps how you tend to process, respond, connect, protect, communicate, and return to center. Active beneath every thread. Private, never exposed in outputs.', note: 'You do not have to explain who you are every time a moment happens.' },
-  { num: '02', title: 'Bring the moment', body: 'Describe the pressure, the message, the dynamic, or the grief. Say it how it actually happened. No framework required.', note: null },
-  { num: '03', title: 'Receive a structured result', body: 'A structured result: what\'s active, what keeps happening, what shaped it, and the clearest next response. Depth matches the situation — a brief moment gets a focused read, a complex one gets more.', note: null },
-  { num: '04', title: 'Save to your Library', body: 'Save the result before the moment disappears. Your Library holds what helped.', note: null },
-  { num: '05', title: 'Return before the pattern takes over', body: 'The next time the loop tries to form, you do not start from zero. Return to your Library, interrupt the old role, and respond differently.', note: null },
+  {
+    num: '01',
+    title: 'Your Baseline Design is set once',
+    body: 'Your core pattern layer. Maps how you process, respond, protect, relate, and return to center — across every app inside Sovereign.os. Active beneath every session. Never exposed in outputs.',
+    note: 'You do not have to explain who you are every time a moment happens.',
+  },
+  {
+    num: '02',
+    title: 'Bring the moment',
+    body: 'Describe the pressure, the message, the dynamic, or the decision. Say it how it actually happened. No framework required.',
+    note: null,
+  },
+  {
+    num: '03',
+    title: 'Receive a structured read',
+    body: 'Active pattern. What keeps forming. What shaped it. The clearest next response. Your Baseline Design is read in full before the output is generated — so the result starts from who you are, not from a blank prompt.',
+    note: null,
+  },
+  {
+    num: '04',
+    title: 'Save to your Archive',
+    body: 'Save the result before the moment disappears. Your Archive holds what helped — a growing record of your mapped patterns over time.',
+    note: null,
+  },
+  {
+    num: '05',
+    title: 'Return before the pattern takes over',
+    body: 'The next time the loop tries to form, you do not start from zero. Return to your Archive, interrupt the old role, and respond differently.',
+    note: null,
+  },
 ];
 
 export function HowItWorksPage() {
@@ -25,12 +49,15 @@ export function HowItWorksPage() {
       <section className="relative w-full pt-32 pb-20 md:pt-40 md:pb-28 bg-[#08070a] overflow-hidden border-b border-white/5">
         <div className="light-beam opacity-50" aria-hidden />
         <Container className="relative z-10 max-w-3xl">
-          <MetaLabel>The process</MetaLabel>
+          <MetaLabel>The OS process</MetaLabel>
           <h1 className="font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-8">
-            How Sovereign.os works.
+            How the operating system works.
           </h1>
-          <p className="text-[#a8a29a] text-lg max-w-lg leading-relaxed">
-            Sovereign.os uses your Baseline Design to read what's active, identify what may be repeating, and surface a Best Next Response — before pressure chooses for you.
+          <p className="text-[#a8a29a] text-[17px] max-w-lg leading-relaxed">
+            Sovereign.os uses your Baseline Design to read what&apos;s active, identify what may be repeating, and surface a structured response — before pressure chooses for you.
+          </p>
+          <p className="mt-5 max-w-sm font-mono text-[10px] tracking-[0.12em] text-[#4f4b47] leading-relaxed border-l border-[#e0743a]/20 pl-4">
+            Most AI responds to what you type. Sovereign.os understands the pattern you&apos;re typing from.
           </p>
         </Container>
       </section>

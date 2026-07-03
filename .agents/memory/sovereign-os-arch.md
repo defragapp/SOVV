@@ -43,3 +43,24 @@ Button shape hierarchy:
 `--radius-button` in index.css is `12px` (rounded-xl). `btn-primary` / `btn-secondary` CSS classes remain defined but are fully eradicated from all component files.
 
 **"Spaces" not "workspace":** All routes are `/apps/defrag`, `/apps/covenant`, `/apps/alignment` — no `/workspace` suffix. OsOutput.tsx href navigates to `/apps/SPACENAME` directly.
+
+## Platform positioning (Phase 20)
+Sovereign.os = **Private Intelligence Operating System** — not a relationship/healing tool. All marketing copy uses OS framing.
+Core hook (present on every marketing page): "Most AI responds to what you type. Sovereign.os understands the pattern you're typing from."
+OS layer architecture (About grid, How It Works steps, Pricing copy):
+- Baseline Design: core pattern layer, travels across all apps
+- Defrag.app: untangle the moment
+- Alignment.app: choose the cleaner move
+- Covenant.app: understand what the moment belongs to
+Pricing tiers: Free = "Start with one moment." / Pro = "Unlock your operating system." / Network = Coming Soon (muted locked card, opacity-50).
+
+## Zero-Edge Architecture — Phase 21 rules
+No `bg-[#1C1C1E]` + `ring-1` card containers inside interior spaces. Content sits directly on the dark canvas.
+- DiagnosticCard → mono label + `pb-8` content + `h-px bg-white/[0.06]` hairline; NO rounded wrapper, NO bg.
+- SkeletonCard → bare div, hairline at bottom; NO bg, NO ring.
+- ErrorCard → mono label + plain text + hairline; NO card.
+- DropZone form → textarea on canvas; `h-px bg-white/[0.06]` top hairline, `border-t border-white/[0.05]` footer.
+- Archive/Covenant list → `border-t border-white/[0.06]` at top only; rows `border-b border-white/[0.08]`.
+- Empty states → mono label + text, no card container.
+- PremiumGate → zero-edge floating: amber line, mono space label, Fraunces `text-3xl` headline (tagline prop), description, cream `rounded-2xl` CTA — no outer card.
+- Full-screen modals (ArchiveDetail, CovenantDetail) → keep `rounded-3xl ring-1` for overlay containment; use `rgba(8,7,10,0.95)` + `backdropFilter: blur(24px)` instead of `#1C1C1E`.
