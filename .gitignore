@@ -1,98 +1,49 @@
-# Node & package managers
-node_modules/
-pnpm-debug.log*
-package-lock.json
-yarn.lock
+# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-# Build output
-dist/
-build/
-.next/
-.open-next/
-.open-next/.build/
+# compiled output
+dist
+tmp
+out-tsc
+*.tsbuildinfo
+.expo
+.expo-shared
 
-# Wrangler & worker-specific
-.wrangler/
-apps/worker/index.js
-apps/worker/index.js.map
-apps/worker/index.d.ts
-apps/worker/index.d.ts.map
-apps/worker/src/*.js.map
-apps/worker/src/*.d.ts.map
+# dependencies
+node_modules
 
-# Environment files
-.env
-.env.local
-.env.production
-.dev.vars
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
 
-# OS & editor
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# System Files
 .DS_Store
-.vscode/settings.json
-.idea/
-*.swp
-*.swo
-*~
-.clinerules
-.continue/
+Thumbs.db
 
-# Sensitive / operational files (never commit)
-cookies.txt
-apps/worker/cookies.txt
-apps/worker/login.log
-apps/worker/login.pid
-apps/worker/wrangler.log
-cf_audit.txt
-fix_billing.js
-update_index.js
-deploy-worker.yml
-apps/worker/src/deploy.yml
-apps/worker/src/deploy-worker.yml
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md
 
-# Stale build artifacts & configs
-apps/web/wrangler.old.json
-apps/web/tailwind.config.js
-apps/web/app/todo.md
-apps/web/config_json.code-search
-apps/web/hero-css-snippets.css
-apps/web/hero.module.css
-apps/web/styles/globals.css
-apps/web/app/landing/page.tsx
-apps/web/public/vercel.svg
-apps/web/public/window.svg
-apps/web/public/globe.svg
-
-# Unused/superseded components (apps/web)
-apps/web/components/AnimatedOverview.tsx
-apps/web/components/ArtifactList.tsx
-apps/web/components/AudioOverview.tsx
-apps/web/components/Chips.tsx
-apps/web/components/Composer.tsx
-apps/web/components/Hero.tsx
-apps/web/components/MemoryInsights.tsx
-apps/web/components/SpotlightLanding.tsx
-apps/web/components/StudioPanel.tsx
-apps/web/components/Thread.tsx
-apps/web/lib/storage.ts
-
-# Misplaced files
-apps/worker/src/page.tsx
-
-# Duplicate/superseded files (canonical versions in packages/core/src/)
-packages/core/HistoryTimeline.tsx
-packages/core/MemoryPanel.tsx
-packages/core/PatternCard.tsx
-packages/core/memory.ts
-packages/core/page.tsx
-packages/core/src/geneKeyMeanings.ts
-packages/core/src/geneKeys.ts
-
-# Python scripts
-*.py
-
-# Test & coverage
-coverage/
-test-results/
-playwright-report/
-.vitest/
-.impeccable/
+# Replit
+.cache/
+.local/
