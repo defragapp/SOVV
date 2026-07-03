@@ -5,7 +5,7 @@ import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
 import { motion, AnimatePresence } from "framer-motion"
 
-const APP_URL = "https://app.defrag.app/app/login"
+const APP_URL = "/app/login"
 const ease = [0.16, 1, 0.3, 1] as const
 
 // ── Sky + Baseline visual ──────────────────────────────────────────────────
@@ -43,7 +43,7 @@ function BaselineAndSky() {
       <div className="border border-white/[0.08] bg-[#0c0a0d] overflow-hidden" style={{ borderRadius: 14 }}>
         <div className="px-5 py-3 border-b border-white/[0.06]">
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]/60">Live Sky · Right Now</p>
-          <p className="text-[11px] text-[#4f4b47] mt-0.5">Jun 17 2026 · Your location</p>
+          <p className="text-[11px] text-[#4f4b47] mt-0.5">{new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} · Your location</p>
         </div>
         <div className="px-5 py-4 flex flex-col gap-3">
           {[

@@ -20,15 +20,14 @@ const fraunces = Fraunces({
   preload: true,
 })
 
-
 export const metadata: Metadata = {
   metadataBase: new URL("https://defrag.app"),
   title: {
-    default: "Sovereign.os — Relational Intelligence for Real Life",
-    template: "Sovereign.os — %s",
+    default: "Sovereign.os — Pattern-aware AI for the moments that matter",
+    template: "%s — Sovereign.os",
   },
   description:
-    "Sovereign.os helps you see the loop, separate the pattern from the pressure, and start from your baseline.",
+    "Sovereign.os is pattern-aware AI for the moments that are hard to read while you're inside them. Understand what's active, what may be repeating, and what next move gives the situation a better chance.",
   keywords: [
     "relationship patterns",
     "emotional intelligence",
@@ -48,6 +47,7 @@ export const metadata: Metadata = {
     "next response",
     "conflict resolution",
     "personal AI assistant",
+    "pattern-aware AI",
   ],
   authors: [{ name: "Sovereign.os", url: "https://defrag.app" }],
   creator: "Sovereign.os",
@@ -68,15 +68,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://defrag.app",
     siteName: "Sovereign.os",
-    title: "Sovereign.os — Relational Intelligence for Real Life",
+    title: "Sovereign.os — Pattern-aware AI for the moments that matter",
     description:
-      "Sovereign.os helps you see the loop, separate the pattern from the pressure, and start from your baseline.",
+      "Pattern-aware AI for the moments that are hard to read while you're inside them.",
     images: [
       {
         url: "/social-card.png",
         width: 1200,
         height: 630,
-        alt: "Sovereign.os — Relational intelligence for real life",
+        alt: "Sovereign.os — Pattern-aware AI for relational patterns",
       },
     ],
   },
@@ -84,9 +84,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@sovereignos",
     creator: "@sovereignos",
-    title: "Sovereign.os — Relational Intelligence for Real Life",
+    title: "Sovereign.os — Pattern-aware AI for the moments that matter",
     description:
-      "Sovereign.os helps you see the loop, separate the pattern from the pressure, and start from your baseline.",
+      "Pattern-aware AI for the moments that are hard to read while you're inside them.",
     images: ["/social-card.png"],
   },
   icons: {
@@ -99,7 +99,6 @@ export const metadata: Metadata = {
     canonical: "https://defrag.app",
   },
   category: "productivity",
-  classification: "Relational Intelligence, Personal Development, AI Tools",
 }
 
 export const viewport: Viewport = {
@@ -132,7 +131,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "applicationCategory": "LifestyleApplication",
               "operatingSystem": "Web",
               "url": "https://defrag.app",
-              "description": "Sovereign.os helps you see the loop, separate the pattern from the pressure, and start from your baseline.",
+              "description": "Pattern-aware AI for the moments that are hard to read while you're inside them.",
               "offers": [
                 {
                   "@type": "Offer",
@@ -152,8 +151,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               ],
               "featureList": [
                 "Baseline Design — personal pattern map",
-                "Defrag — relational pattern analysis",
-                "Covenant — shared-pattern reflection",
+                "Defrag — pattern recognition space",
+                "Covenant — faith-context reflection",
                 "Alignment — response integration",
                 "Sovereign.os Library — private saved results",
                 "Audio Overview",
