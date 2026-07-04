@@ -1,0 +1,89 @@
+To make this web app feel indistinguishable from a native iOS app when saved to the Home Screen, we have to manipulate the browser window itself. We need to tell Safari to get out of the way, hide the URL bar, bleed the dark UI up into the Dynamic Island, and provide a proper app icon.
+
+Here is the exact prompt to feed the Replit agent to lock in the PWA (Progressive Web App) manifest, the iOS meta tags, and the layout spacing to make it feel airy and "hold space" for the user.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 4: iOS Native PWA & Viewport Optimization
+
+## Core Objective
+Upgrade Sovereign.os to function as a Progressive Web App (PWA) optimized specifically for iOS "Add to Home Screen". The app must feel entirely native: full screen, edge-to-edge UI bleeding behind the Dynamic Island, no Safari chrome, and incredibly airy/breathable layout spacing to "hold space" for a stressed user. 
+
+## Strict Constraints
+1. **Viewport:** The viewport must use `viewport-fit=cover` to unlock the area behind the iOS status bar.
+2. **Spacing:** Increase mobile padding significantly. The UI must feel quiet and deliberate. Use generous `gap` and `p` utilities.
+3. **No Web Artifacts:** Disable text selection (`select-none`) on structural UI elements (nav, buttons, headers) to prevent accidental highlighting, which ruins the native illusion.
+
+---
+
+## Execution Steps (Build in Parallel)
+
+### 1. iOS Meta Tags & Viewport (index.html)
+Update `index.html` within the `<head>` tag to include the following strictly required native meta tags:
+- `<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">` (Prevents pinch-to-zoom and bleeds into the notch).
+- `<meta name="apple-mobile-web-app-capable" content="yes">`
+- `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">`
+- `<meta name="theme-color" content="#000000">`
+- Add a link to the manifest: `<link rel="manifest" href="/manifest.json">`
+- Add the Apple touch icon: `<link rel="apple-touch-icon" href="/icon-192.png">`
+
+### 2. The Web App Manifest (public/manifest.json)
+Create or update `public/manifest.json` to enforce standalone mode:
+```json
+{
+  "name": "Sovereign.os",
+  "short_name": "Sovereign",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
+```
+
+*Note for Agent: Generate a simple 512x512 PNG in the public folder to serve as the placeholder app icon (a pure black background with an amber circle/dot in the center is fine for now).*
+
+### 3. Dynamic Island & Safe Area Integration (index.css)
+
+Update the root CSS to map Apple's environment variables so content doesn't get hidden behind the notch or home bar.
+
+```css
+:root {
+  --safe-top: env(safe-area-inset-top, 44px);
+  --safe-bottom: env(safe-area-inset-bottom, 34px);
+}
+
+.ios-safe-top { padding-top: var(--safe-top); }
+.ios-safe-bottom { padding-bottom: var(--safe-bottom); }
+
+```
+
+### 4. "Holding Space" - Layout & Touch Target Updates
+
+Review the primary layouts (HomePage, Defrag Space, Nav) and apply the following utility changes:
+
+* **Prevent text selection:** Add `select-none` to the nav, buttons, and headers.
+* **Airy Padding:** Ensure main content wrappers have a minimum horizontal padding of `px-6` (or `px-8` on larger screens).
+* **Header Clearance:** Ensure the `SiteShell` or top layout components use `pt-[var(--safe-top)]` so the nav sits cleanly below the Dynamic Island.
+* **Floating Nav Clearance:** Ensure the bottom floating island (from Phase 3) uses `pb-[var(--safe-bottom)]` or anchors above it so it is easy to tap without triggering the iOS app switcher.
+
+Execute these changes and ensure the `manifest.json` is properly linked.
+
+```
+
+```

@@ -1,0 +1,75 @@
+Yes — I would answer **yes, stabilize live deployment as a separate track**, but do **not** mix it into #19/#20.
+
+Your agent’s scoping is correct:
+
+```text id="pgmslv"
+#19 / #20 = Replit port, fix-on-port only
+Separate production track = live Cloudflare/Vercel repo stabilization
+```
+
+The live repo has real Baseline code, but the defects are production-risk bugs, not just port concerns. The key confirmed problems are: undefined `user` inside `handleSaveBaseline`, duplicate `/api/baseline/status`, `traitLines` used before declaration, planet casing mismatch, and queue binding mismatch. Those are visible in the worker source and bindings.
+
+Use this as the instruction back to the executor:
+
+Yes — create a separate live production stabilization track.
+
+Do not mix this into #19/#20.
+
+Keep #19 and #20 focused on the Replit port, with fix-on-port corrections only.
+
+Open a separate production stabilization plan for the Cloudflare/Vercel repo.
+
+Scope:
+
+1. Fix `apps/worker/src/baseline.ts`
+
+* Define/load the authenticated user inside `handleSaveBaseline`.
+* Preserve session-based baseline storage.
+* Preserve user-based dataset storage.
+* Remove the duplicate `/api/baseline/status` route.
+* Keep one canonical status handler.
+
+2. Fix `apps/worker/src/active-signals.ts`
+
+* Move `traitLines` initialization before any reads/writes.
+* Normalize all planet/body key access.
+* Choose one canonical casing contract.
+* Update compiler and consumers to match that contract.
+* Make sure active signals cannot throw when optional framework data is missing.
+
+3. Fix Baseline body/placement casing contract
+
+* Ensure compiler output and consumers agree on body names.
+* Avoid mixed `sun` / `Sun` / `Mars` access patterns.
+* Add safe helpers if needed, rather than scattered direct key reads.
+
+4. Fix queue binding mismatch
+
+* Align `wrangler.toml`, `types-env.ts`, and runtime code.
+* Either use `PATTERN_QUEUE` everywhere or rename the binding to `QUEUE`.
+* Verify pattern extraction uses the configured Cloudflare Queue in production.
+
+5. CI/deploy safety
+
+* Remove non-blocking TypeScript/test behavior from the production deploy workflow.
+* Typecheck and tests must fail the workflow.
+* Do not deploy if worker typecheck fails.
+* Keep deployment and migration changes explicit.
+
+6. Do not include out-of-scope port-only changes
+
+* Do not port Replit architecture into the Cloudflare repo.
+* Do not change product behavior beyond stabilizing the existing live implementation.
+* Do not touch credentials, secrets, DNS, Stripe, or production bindings unless specifically required and approved.
+
+Deliverable:
+A small production stabilization PR with:
+
+* exact files changed
+* bugs fixed
+* verification commands
+* CI status
+* explicit note that no secrets were added
+* explicit note that no production deploy was performed unless separately approved
+
+My recommendation: **do the production stabilization before trusting any Baseline-driven marketing/demo flow**, because the current code can make the UI say “Baseline active” while the actual context layer is degraded or failing.

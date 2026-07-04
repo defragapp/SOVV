@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Sovereign.os"
+version = "1.0.0"
+id = "artifacts/sovereign-os"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19003
+
+[services.development]
+run = "pnpm --filter @workspace/sovereign-os run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/sovereign-os", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/sovereign-os/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19003"
+BASE_PATH = "/"

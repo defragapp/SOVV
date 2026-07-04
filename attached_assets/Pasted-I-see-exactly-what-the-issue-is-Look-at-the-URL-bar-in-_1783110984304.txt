@@ -1,0 +1,44 @@
+I see exactly what the issue is. Look at the URL bar in your Replit preview pane—you are currently on the **`/about`** page.
+
+The cinematic entrance wipe, the 3D parallax physics, and the reactive ambient lighting were explicitly built into `HomePage.tsx` (the root `/` route). You are looking at an old marketing page that hasn't been upgraded to the new spatial architecture yet.
+
+To see the physics in action right now, change that URL in the preview pane from `/about` to just `/` (or click the Sovereign.os logo if it routes home).
+
+This actually exposes our next necessary step. If a user lands on the `/about` or `/pricing` page, it can't feel like a flat web template while the homepage feels like an iOS app. We need to extract the physics engine to the root layout so the entire platform shares the same spatial weight.
+
+While the agent finishes building the Pattern Archive, drop this into the chat to unify the rest of the site.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 16: Global Platform Physics & Marketing Cohesion
+
+## Core Objective
+The 3D parallax physics and the cinematic ambient lighting were successfully built into the homepage, but the other public routes (`/about`, `/pricing`, `/how-it-works`) still look and feel like flat, static web pages. We must extract the physics engine to the root layout so the entire Sovereign.os ecosystem shares the same spatial weight and premium dark UI.
+
+## Strict System Constraints
+1. **Global Physics:** The `<AmbientEnvironment>` (the looping 3D volumetric light) must sit at the absolute root of the app, behind the router, so it doesn't reload or jump when navigating between marketing pages.
+2. **Typography Sweep:** The old marketing pages are still using legacy copy and styling. Enforce the strict typographic hierarchy: Fraunces for primary headers, Geist `text-[17px]` for body, and JetBrains Mono for metadata/tags.
+3. **No Legacy Web Artifacts:** Strip out any remaining `btn-primary` standard web buttons on the about/pricing pages. Replace them with the iOS-haptic `<motion.button>` glass CTAs we built in Phase 13.
+
+---
+
+## Execution Steps
+
+### 1. Extract the Volumetric Environment
+- Move the ambient lighting loop out of `HomePage.tsx` and place it in `App.tsx` (or your root layout component) fixed at `z-[-1]`. 
+- Ensure it sits *outside* the `AnimatePresence` page transition wrapper so the background breathes continuously across page loads without flashing.
+
+### 2. Standardize the Marketing Pages
+- **`/about` & `/pricing`:** Refactor these pages to use the same Framer Motion spatial wrappers as the homepage. 
+- Apply the `useMotionValue` and `useTransform` hooks to the hero sections of these pages so they also react to the user's cursor with subtle `rotateX` and `rotateY` parallax.
+- Update the layout containers to use the `bg-[#1C1C1E] ring-1 ring-white/[0.05]` Vibrancy recipe instead of flat transparent or gray backgrounds.
+
+### 3. Button & CTA Audit
+- Scan the marketing pages for legacy buttons. Replace them entirely with the new tactile standard: `bg-white/5 border border-white/10 backdrop-blur-md` with the `scale: 0.97` tap compression.
+
+Execute the extraction of the ambient background and the overhaul of the secondary marketing pages. 
+
+```

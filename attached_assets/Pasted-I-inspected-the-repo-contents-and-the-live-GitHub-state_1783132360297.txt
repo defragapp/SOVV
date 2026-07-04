@@ -1,0 +1,180 @@
+I inspected the repo contents and the live GitHub state.
+
+## Repo shape
+
+This is a **Node 22 monorepo** named `sovereign-platform`, with workspaces under:
+
+```text
+apps/*
+packages/*
+```
+
+The root scripts wire four main deploy targets:
+
+```text
+apps/web
+apps/worker
+apps/worker-ai
+apps/worker-session
+```
+
+The root scripts include local dev, build, deploy, verify, and smoke commands for the API, AI worker, session worker, and web worker.
+
+## Current live repo state
+
+The repo is public, default branch is `main`, and the connected GitHub account has admin/push access. I only inspected; I did not write or deploy anything.
+
+The latest visible commit on `main` is failing its Vercel status check. The GitHub status API shows the current failure context as **Vercel**. The open PRs include several relevant stabilization/agent branches:
+
+* PR #117: read-only SOVV Operator API façade.
+* PR #116: SOVV Engineering Chat vertical slice.
+* PR #115: release/CI/package-manager cleanup.
+* PR #114: agent instructions and worker safety follow-ups.
+
+## Baseline Design is not just a placeholder
+
+The repo already has a real Baseline backend pipeline:
+
+```text
+apps/worker/src/baseline.ts
+apps/worker/src/baseline-compiler.ts
+apps/worker/src/active-signals.ts
+apps/web/app/api/baseline/route.ts
+apps/web/components/spaces/BaselineEntry.tsx
+apps/web/app/settings/page.tsx
+```
+
+The API worker registers `/api/baseline`, `/api/baseline/status`, `/api/baseline/translate`, and `/api/baseline/dataset`. It stores raw baseline data in KV and attempts to compile a richer `BaselineDesignDataset`.
+
+The compiler is ambitious. It attempts:
+
+```text
+birth input
+→ geocoding
+→ timezone lookup
+→ JPL Horizons planetary positions
+→ astrology framework
+→ Human Design gates/channels
+→ Gene Keys
+→ numerology
+→ AI synthesis
+→ fallback AI dataset
+```
+
+That pipeline is described directly in the file header.
+
+## Main problem: the system is real, but likely fragile/broken in production
+
+I found several important issues.
+
+### 1. `handleSaveBaseline` references `user` without defining it
+
+Inside `apps/worker/src/baseline.ts`, the code tries to save the compiled dataset by user ID:
+
+```ts
+if (user?.id) {
+  await env.KV.put(USER_DATASET_KEY(user.id), JSON.stringify(dataset));
+}
+```
+
+But `user` is not defined inside `handleSaveBaseline`. The route only calls `requireSessionAuth`, which returns a response/null, not the user object. That can break background compilation.
+
+### 2. `/api/baseline/status` is registered twice
+
+The same status route appears twice in `registerBaselineRoutes`. That should be cleaned up to one canonical handler.
+
+### 3. Web proxy only supports `/api/baseline`, not `/api/baseline/status`
+
+The Next.js web route exists only at:
+
+```text
+apps/web/app/api/baseline/route.ts
+```
+
+It proxies GET/POST to `/api/baseline`, but I did not find a matching web route for `/api/baseline/status`. Meanwhile the frontend calls `/api/baseline/status` from settings and workspace.
+
+That likely means polling status can 404 on the web app unless OpenNext routes directly through to the API in another layer.
+
+### 4. Active-signals has a real TypeScript/runtime ordering bug
+
+In `active-signals.ts`, `traitLines` is used before it is declared. The compound signal logic checks `traitLines.some(...)` before the `traitLines` array is initialized later.
+
+That is exactly the kind of bug that can make the AI context layer fail even when baseline compilation succeeds.
+
+### 5. Planet name casing is inconsistent
+
+The compiler stores bodies using lowercase keys like `sun`, `moon`, `mars`, etc.
+
+But downstream active-signal and timing code looks for capitalized keys like `"Sun"`, `"Moon"`, `"Mars"`, `"Mercury"`, `"Saturn"`, and `"Venus"`.
+
+That means active signals may silently miss key astrological data even when the dataset has it.
+
+### 6. `derive-profile.ts` appears broken
+
+`derive-profile.ts` references `httpRequest` and `protectionActive`, but the shown code does not define/import them. It also reads the baseline from `baseline:${authUser.id}`, while the main baseline save path stores raw baseline by session ID as `baseline:${sid}`.
+
+The workspace calls `/api/derive-profile`, so this could affect the visible “derived profile statements” UI.
+
+### 7. Queue binding mismatch
+
+`wrangler.toml` binds the queue as `PATTERN_QUEUE`.
+
+But `types-env.ts` defines `QUEUE?: Queue`, and `explain-extended.ts` checks `env.QUEUE`.
+
+So pattern extraction may always fall back to non-blocking local execution instead of the configured Cloudflare Queue.
+
+### 8. CI is intentionally non-blocking where it should be strict
+
+The deploy workflow has `continue-on-error: true`, and the TypeScript/test steps echo failures instead of failing the workflow.
+
+That explains why broken TypeScript can survive in `main`.
+
+## Product/system assessment
+
+The repo already has the bones of the system you want:
+
+```text
+Baseline input UI
+Baseline API
+KV-backed baseline storage
+Compiler pipeline
+AI synthesis
+Active signal reduction
+Defrag workspace integration
+Memory context
+Pattern history
+Cloudflare Worker deployment
+AI Gateway / Workers AI
+```
+
+But it is currently in a **dangerous middle state**:
+
+```text
+Concept: strong
+Architecture: mostly present
+Implementation: partially wired
+Type safety: weak
+Production confidence: low until the broken paths are fixed
+```
+
+## What I would tell the coding agent to do next
+
+The next task should not be “build Baseline Design from scratch.” It should be:
+
+```text
+Stabilize the existing Baseline Design pipeline.
+```
+
+Priority order:
+
+1. Fix `baseline.ts` undefined `user`.
+2. Remove duplicate `/api/baseline/status`.
+3. Add missing Next.js proxy routes for `/api/baseline/status`, `/api/baseline/dataset`, and `/api/baseline/translate`.
+4. Fix `active-signals.ts` variable ordering.
+5. Normalize planet body keys to one casing everywhere.
+6. Fix `derive-profile.ts` undefined variables and baseline key mismatch.
+7. Align `PATTERN_QUEUE` vs `QUEUE`.
+8. Make worker typecheck/test fail CI instead of echoing errors.
+9. Add tests for baseline save, compile, status polling, AI context loading, and no-baseline behavior.
+
+The key correction is this: **Baseline Design exists in the repo, but the production wiring needs a hard stabilization pass before you trust it as the platform’s source-of-truth identity layer.**

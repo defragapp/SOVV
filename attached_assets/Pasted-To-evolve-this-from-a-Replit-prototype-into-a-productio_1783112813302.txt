@@ -1,0 +1,56 @@
+To evolve this from a Replit prototype into a production-grade, public-ready AI platform, you need to stop asking the agent to "fix" and start asking it to **audit and enforce**.
+
+We need to force it to cross-reference the *live code* against the *OS architecture* we just defined.
+
+Here is the master **Architectural Audit & Enforcement** prompt. Drop this into the Replit agent to force it to stop playing around and harden the structure.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 22: Public Readiness & Structural Enforcement Audit
+
+## Core Objective
+Perform a cold-audit of the entire repository. We are transitioning from "prototyping" to "public readiness." You must identify any components, routes, or visual elements that do not meet the enterprise-level "Sovereign.os" standard and either rebuild them or delete them.
+
+## Strict System Constraints (The Enforcement Rules)
+1. **Zero-Fluff Policy:** Any component containing marketing pitches (lists, "01-02-03" features) must be refactored into functional OS interfaces.
+2. **Design Token Parity:** Every UI element must strictly inherit from `tokens.ts`. If an element has a hardcoded color or radius, it is a bug. Fix it.
+3. **Ghost Code Removal:** If a file exists in the repo but is not actively imported by the core routing (App.tsx / router), delete it.
+4. **Resiliency:** All API calls must include `try/catch` and user-facing error states (e.g., [SYSTEM_ERROR]). No silent failures.
+
+---
+
+## Execution Steps
+
+### 1. The Repository Audit
+- **Review:** Read `App.tsx`, the `routes/` directory, and `components/ui/`.
+- **Compare:** Compare the live implementation of `/defrag`, `/covenant`, and `/alignment` against the "Zero-Edge Architecture" constraints (no containers, hairline borders, Geist/Fraunces/Mono typography).
+- **Report:** Output a "Discrepancy Report" identifying every component that still uses pill-shapes, legacy containers, or non-tokenized styles.
+
+### 2. The Enforcement Build
+- **Automated Refactor:** For every item in your report, apply the fix. 
+- **Hardening:**
+    - Ensure all API routes are correctly proxied and authenticated.
+    - Validate that `Stripe` checkout is functional in the current environment.
+    - Ensure the `Baseline Design` data is correctly flowing into the Defrag AI backend prompt.
+
+### 3. Public Platform Readiness Check
+- Check that the PWA manifest is correctly referencing the generated icons.
+- Ensure the `prefers-reduced-motion` logic is globally active across all `motion` components.
+- Confirm that the `About` and `Pricing` pages are fully standardized to the "OS" look and feel.
+
+Execute the audit, generate the Discrepancy Report, and immediately apply the fixes. Do not ask for permission to delete legacy code—if it is not up to standard, purge it.
+
+```
+
+---
+
+### Why this is the right next move:
+
+* **It creates accountability:** By asking for a "Discrepancy Report," the agent has to think critically about the code *before* it starts writing, which prevents it from "cherry-picking" fixes.
+* **It cleans the repo:** By mandating the removal of "Ghost Code," you ensure your final deployment isn't bloated with unused prototypes.
+* **It hardens the API:** It explicitly ties the AI's pattern-recognition (Defrag) back to your Baseline Design data, which is the "killer app" feature that will make the platform defensible.
+
+**Once this audit finishes, the codebase will be lean and hardened.** Do you want the agent to output the final "Public Readiness Checklist" so you know exactly what is left before you trigger that `wrangler pages deploy`?

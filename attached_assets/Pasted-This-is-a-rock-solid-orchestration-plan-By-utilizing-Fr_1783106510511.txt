@@ -1,0 +1,185 @@
+This is a rock-solid orchestration plan. By utilizing Framer Motion's `useAnimate`, you can keep the component tree clean while tightly sequencing the timeline to match that deliberate, normalized dark UI aesthetic.
+
+Here is the implementation to wire up the exact choreography you outlined.
+
+### 1. The Orchestration Hook (`useHeroEntrance.ts`)
+
+Create this hook to manage the timeline, respect `prefers-reduced-motion`, and handle the one-time `sessionStorage` flag.
+
+```typescript
+import { useEffect, useState } from 'react';
+import { useAnimate, useReducedMotion } from 'framer-motion';
+
+export function useHeroEntrance() {
+  const [scope, animate] = useAnimate();
+  const shouldReduceMotion = useReducedMotion();
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const hasPlayed = sessionStorage.getItem('hero-entrance-played');
+    
+    // Fallback for reduced motion or returning visitors
+    if (hasPlayed || shouldReduceMotion) {
+      setIsReady(true);
+      return;
+    }
+
+    const playCinematicEntrance = async () => {
+      // The single continuous ease curve for grounded structural motion
+      const cinematicEase = [0.16, 1, 0.3, 1];
+
+      // 1. Ambient glow ignition (Spark)
+      await animate(
+        ".ambient-glow", 
+        { scale: [0, 1], opacity: [0, 1] }, 
+        { duration: 0.6, ease: "easeOut" }
+      );
+
+      // 2. Image wipe & Nav descend
+      // Start nav descent in parallel, slightly offset
+      animate(
+        ".site-shell-nav", 
+        { y: ["-100%", "0%"], opacity: [0, 1] }, 
+        { duration: 0.5, delay: 0.3, ease: cinematicEase }
+      );
+      
+      await animate(
+        ".hero-image-container", 
+        { clipPath: ["inset(0 100% 0 0)", "inset(0 0% 0 0)"] }, 
+        { duration: 0.7, ease: cinematicEase }
+      );
+
+      // 3. Mask-reveal headline lines
+      await animate(
+        ".headline-line-1", 
+        { y: ["100%", "0%"] }, 
+        { duration: 0.6, ease: cinematicEase }
+      );
+      await animate(
+        ".headline-line-2", 
+        { y: ["100%", "0%"] }, 
+        { duration: 0.6, ease: cinematicEase, delay: -0.2 } // Staggered overlap
+      );
+
+      // 4. Subtext and CTA materialize
+      await animate(
+        ".hero-subtext, .hero-cta", 
+        { opacity: [0, 1], y: [10, 0] }, 
+        { duration: 0.5, ease: "easeOut" }
+      );
+
+      sessionStorage.setItem('hero-entrance-played', 'true');
+      setIsReady(true);
+    };
+
+    playCinematicEntrance();
+  }, [animate, shouldReduceMotion]);
+
+  return { scope, isReady };
+}
+
+```
+
+### 2. Refactoring `HomePage.tsx`
+
+Wrap the hero content in the animation scope. We are ensuring the headline lines have the `overflow-hidden` wrappers for that classic Fraunces display sweep.
+
+```tsx
+import { useHeroEntrance } from '@/hooks/useHeroEntrance'; // Adjust path as needed
+import { SiteShell } from '@/components/marketing/site-shell';
+
+export default function HomePage() {
+  const { scope, isReady } = useHeroEntrance();
+
+  // If the animation is skipped or finished, we remove the starting inline styles 
+  // to prevent CSS conflicts on resize/interaction.
+  const motionSafeClass = isReady ? "entrance-complete" : "entrance-pending";
+
+  return (
+    <div ref={scope} className={`relative min-h-screen ${motionSafeClass}`}>
+      {/* Pass a flag to SiteShell so it knows whether to render in its 
+        final state instantly, or wait for the orchestrator.
+      */}
+      <SiteShell isEntranceComplete={isReady} />
+
+      <main className="relative flex flex-col items-center justify-center pt-32 pb-16">
+        
+        {/* Ambient Glow Ignition */}
+        <div 
+          className="ambient-glow absolute right-1/4 top-1/4 h-96 w-96 rounded-full bg-amber-500/20 blur-[100px]"
+          style={isReady ? {} : { opacity: 0, transform: 'scale(0)' }}
+        />
+
+        {/* Hero Image Container */}
+        <div 
+          className="hero-image-container relative z-0 w-full max-w-5xl"
+          style={isReady ? {} : { clipPath: 'inset(0 100% 0 0)' }}
+        >
+           {/* Your standard image tag here */}
+           <img src="/hero-hand.webp" alt="Sovereign OS" className="w-full" />
+           {/* The hero-drift CSS class can be toggled using isReady */}
+           <div className={`gradient-overlay ${isReady ? 'hero-drift' : ''}`} />
+        </div>
+
+        {/* Mask-Reveal Headline */}
+        <div className="relative z-10 mt-12 text-center">
+          <h1 className="font-fraunces text-6xl font-medium tracking-tight text-white">
+            <span className="block overflow-hidden pb-2">
+              <span 
+                className="headline-line-1 block"
+                style={isReady ? {} : { transform: 'translateY(100%)' }}
+              >
+                Healing isn't optional.
+              </span>
+            </span>
+            <span className="block overflow-hidden">
+              <span 
+                className="headline-line-2 block"
+                style={isReady ? {} : { transform: 'translateY(100%)' }}
+              >
+                Holding the pain is.
+              </span>
+            </span>
+          </h1>
+          
+          <p 
+            className="hero-subtext mt-6 font-geist text-lg text-gray-400"
+            style={isReady ? {} : { opacity: 0 }}
+          >
+            Pattern-aware AI for the moments that are hard to read while you're inside them.
+          </p>
+
+          <div 
+            className="hero-cta mt-8"
+            style={isReady ? {} : { opacity: 0 }}
+          >
+            {/* CTA Button */}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+```
+
+### 3. Refactoring `SiteShell.tsx`
+
+The nav header needs to accept the state from the orchestrator so it doesn't block pointer events while waiting in the wings.
+
+```tsx
+export function SiteShell({ isEntranceComplete }: { isEntranceComplete?: boolean }) {
+  // If the prop isn't passed (on other pages), default to complete so it renders normally.
+  const isReady = isEntranceComplete ?? true;
+
+  return (
+    <header 
+      className="site-shell-nav fixed top-0 z-50 w-full border-b border-white/10 bg-black/50 backdrop-blur-md"
+      style={isReady ? {} : { opacity: 0, transform: 'translateY(-100%)' }}
+    >
+      {/* Nav Content */}
+    </header>
+  );
+}
+
+```

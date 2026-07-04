@@ -1,0 +1,55 @@
+You are absolutely right. The "glass card" metaphor—while premium—is still an artifact of web-container thinking. If this is a true **Operating System**, information shouldn't be trapped in arbitrary boxes; it should exist on the surface itself.
+
+To move to an "App-in-Space" feel, we need to eradicate the containers entirely.
+
+### The New Design Logic: "Surface, Not Container"
+
+We are moving to **Zero-Edge Architecture**:
+
+* **Remove all backgrounds:** `#1C1C1E` backgrounds and `ring-1` borders are gone.
+* **Elevation by Depth:** We establish hierarchy using only typography, spacing, and subtle shadow-leaks (light bleed), not hard-edged containers.
+* **The OS Canvas:** The content sits directly on the global ambient background.
+
+Here is the **"Eradicate the Container"** prompt for the Replit agent.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 21: Zero-Edge Architecture (Eradicating Containers)
+
+## Core Objective
+The UI is still trapped in "card-based" web thinking. We are moving to Zero-Edge Architecture. Every single container, card, and box is hereby banned. All content must exist directly on the global canvas.
+
+## Strict System Constraints
+1. **No Containers:** Remove all `bg-[#1C1C1E]`, `rounded-3xl`, and `ring-1` borders from all components (Defrag cards, Archive rows, Settings panels).
+2. **Hierarchy by Space:** Use whitespace, typography, and indentation to denote structure. 
+3. **Typography Standards:** - Fraunces: Massive headers.
+   - Geist: Standard text.
+   - JetBrains Mono: Structural metadata and labels. 
+   - Use `opacity-50` or `opacity-30` for sub-text to create visual hierarchy instead of using a box.
+
+---
+
+## Execution Steps
+
+### 1. The Great Container Purge
+- **Defrag Space:** Remove the background and border from the "Drop Zone" and diagnostic results. The text should sit directly on the dark canvas. Use a simple, faint horizontal hairline line (1px wide) to separate sections, not a box.
+- **Archive/Covenant:** Remove the `overflow-hidden rounded-2xl` containers. The list rows should be separated only by a clean, full-width `border-b border-white/10`.
+- **PremiumGate:** Do not use a card. Use a centered, elegant Fraunces header with a simple text-based CTA below it, floating in the center of the screen.
+
+### 2. Replacing "Cards" with "Anchors"
+- Instead of wrapping diagnostic patterns in a card, use a simple JetBrains Mono label (`[PATTERN]`) and a clean line break before the Geist text.
+- Use spacing (e.g., `mt-12`) to group related information rather than drawing a boundary around it.
+
+### 3. The "OS Canvas" Feel
+- Ensure the background (the volumetric gradients) is uninterrupted. The UI should look like it is floating *on* the environment, not sitting *on top* of a container *on* the environment.
+
+```
+
+---
+
+Once the agent executes this, the app will stop looking like a website with "stuff in boxes" and start looking like a **Control Panel**.
+
+How does the visual flow look when the containers are stripped away? Does the focus on the typography feel more like the "private intelligence layer" you were aiming for?

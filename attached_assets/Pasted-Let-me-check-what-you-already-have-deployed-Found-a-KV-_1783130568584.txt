@@ -1,0 +1,42 @@
+Let me check what you already have deployed.Found a KV namespace `SOVV_DATA`. The other calls timed out — let me retry them.Good — I can see your full Worker fleet. Let me check the bindings on your API and AI workers to see if a Baseline Design engine is already wired in.Let me check what's in the D1 database for any existing Baseline Design tables or data.Here's what I found across your account. **You have a substantial platform, but I don't see a dedicated Baseline Design computation engine deployed.**
+
+## What exists
+
+| Component | Resource | Purpose |
+|---|---|---|
+| **Main API** | `sovereign-os-api` → `api.defrag.app` | D1, KV, Workers AI, Queues, Stripe, Supabase |
+| **AI Worker** | `worker-ai` → `ai.defrag.app` | Workers AI inference |
+| **Session Worker** | `worker-session` → `session.defrag.app` | `ConflictSessionDO` |
+| **Web App** | `sovv-web` → `defrag.app`, `app.defrag.app`, etc. | Next.js frontend |
+| **Control Panel** | `sovereign-control` → `operator.defrag.app` | `AgentState` DO |
+| **Build/Code Agents** | `sovereign-build-agent`, `sovereign-code-agent` | Dev tooling |
+| **D1 Database** | Bound as `DB` on the API | User data, sessions |
+| **KV** | `SOVV_DATA` | Caching layer |
+| **R2** | `sovereign-images`, `sovv-codebase`, etc. | Assets & code |
+| **Queue** | `pattern-extraction-tasks` | Async pattern processing |
+
+## What's missing for the Baseline Design Engine
+
+Based on the bindings and Workers deployed, I do **not** see:
+
+- **No ephemeris/astrology computation module** — no Worker or binding references ephemeris, planetary positions, houses, harmonics, or transits
+- **No Human Design computation** — no gates/channels/centers logic visible in any Worker name or binding
+- **No Gene Keys / I-Ching mapping** — nothing referencing these systems
+- **No numerology / gematria engine** — no name-based calculation module
+- **No Baseline Design storage** — no R2 bucket or KV namespace dedicated to storing computed baseline designs
+- **No Baseline Design schema in a visible location** — the D1 schema wasn't queryable, but no Worker binding suggests a baseline design table
+
+## What you *do* have that's relevant
+
+- The `PATTERN_QUEUE` (`pattern-extraction-tasks`) suggests some pattern processing pipeline exists — this could be a precursor or partial implementation
+- The D1 database likely has user profile data (DOB/TOB/POB) since you have auth via Supabase
+- The AI stack (Workers AI + AI Gateway) is ready to consume a Baseline Design JSON
+
+## Bottom line
+
+**You have the infrastructure scaffolding but not the computation engine itself.** The Baseline Design pipeline — the part that takes DOB/TOB/POB and deterministically computes the full astrology → Human Design → Gene Keys → numerology stack — still needs to be built and deployed as a Worker (or a module within `sovereign-os-api`).
+
+Want me to:
+1. **Build the Baseline Design Worker** — a new Worker that computes the full stack and stores results in R2/KV?
+2. **Check your D1 schema** to see if there's a partial implementation in the database (you denied the last query — want to retry)?
+3. **Inspect the `sovereign-os-api` source** to check if any computation logic is already embedded there?

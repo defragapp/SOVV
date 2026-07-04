@@ -1,0 +1,57 @@
+The current visual "cherry-picking" occurs because the agent is applying the glass aesthetic component-by-component rather than enforcing a **System-Wide Design Token** architecture. You have a mix of new "Glass Slab" elements and legacy "SaaS Marketing" elements.
+
+To achieve total cohesion, we must stop applying styles to individual files and instead **map every UI element to a centralized design token file.**
+
+### **The "Total Intent" Directive**
+
+Drop this into the Replit agent. It forces a complete abandonment of local styling in favor of global token inheritance.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 22: Total Intent & Design Token Unification
+
+## Core Objective
+Eradicate all "cherry-picked" styling. The UI must feel like a single, monolithic object. You are no longer permitted to apply Tailwind classes to individual components. All visual properties must inherit from a centralized `tokens.ts` (or `theme.css`) file.
+
+## Strict System Constraints
+1. **The Grid/Scale Lockdown:** All spacing must adhere to a strict 4px/8px grid. Remove all arbitrary values (`p-[13px]`, `m-[7px]`).
+2. **The Color Palette:** Eradicate all `bg-white/[0.05]` or similar ad-hoc opacities. All surfaces must use the strict three-tier material system:
+   - **L0 (Background):** `#08070a` (Solid)
+   - **L1 (Surface):** `#1C1C1E` (Glass-treated)
+   - **L2 (Interaction):** `#e0743a` (Amber - Primary) or `#f4efe9` (Cream - Secondary)
+3. **Typography:** All headers must be `Fraunces` (no exceptions). All data/metadata must be `JetBrains Mono` (no exceptions). All prose must be `Geist` (no exceptions).
+
+---
+
+## Execution Steps
+
+### 1. Global Tokenization
+- Create `src/lib/design-tokens.ts`. Define:
+  - `surfaces`: { primary, secondary, glass }
+  - `accents`: { amber, cream }
+  - `shapes`: { slab: 'rounded-2xl', input: 'rounded-xl' }
+  - `physics`: { spring: 'stiffness 50, damping 20' }
+- Force all components to import and apply these tokens via `cn()` or mapped classes.
+
+### 2. The Final Visual Sweep
+- **Target:** Every single `div` that acts as a container.
+- **Action:** Replace every hardcoded style with a token-mapped class. 
+- **Consistency Audit:** If a button exists in the sidebar, it MUST be identical to the button in the Alignment space. If an input exists in the Login form, it MUST be identical to the input in the Defrag Drop Zone. 
+- **Shadow/Light Removal:** If a shadow doesn't contribute to the "Physical Slab" feel, kill it. If a border doesn't enforce the "Hairline Glass" look, kill it.
+
+### 3. Verification
+- After the sweep, the agent must output a single `ThemeReport` listing every component category (Nav, Input, Button, Modal, List) and confirming they share 100% code parity for their visual attributes.
+
+```
+
+---
+
+### Why this works:
+
+* **Removes Agency:** The agent stops guessing about what "looks good" and starts following a strict technical constraint.
+* **Forces Parity:** By forcing a `ThemeReport` at the end, the agent is compelled to look at the UI as a whole, not just the file it is currently editing.
+
+**Once this executes, the platform will have a singular "hand" behind every pixel.** Does this approach feel like the right level of control to force the cohesion you're looking for?

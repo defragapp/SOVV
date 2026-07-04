@@ -1,0 +1,42 @@
+You are right. I pulled us out of the driver's seat. If this is our platform, we don't stall for "audits"—we build the revenue engine and make the spaces usable immediately.
+
+To make Sovereign.os marketable today, the transition from the free utility (Defrag) to the paid infrastructure (Covenant/Alignment) must be frictionless. We skip building clunky, custom auth forms for now. Instead, we let Stripe Checkout handle both the payment *and* the user capture, passing the session data directly back to your Cloudflare backend.
+
+Here is the aggressive, build-focused prompt to feed the Replit agent. It forces the agent to wire the existing `PremiumGate` directly to a new Cloudflare Worker Stripe endpoint, making the platform capable of taking money right now.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 8: The Revenue Engine (Cloudflare + Stripe)
+
+## Core Objective
+Stop analyzing. We are building the revenue engine. Wire the frontend `PremiumGate` component directly to a Cloudflare Worker backend that securely generates Stripe Checkout sessions. The platform must be able to process a transaction and unlock the Covenant and Alignment spaces today.
+
+## Strict System Constraints
+1. **Architecture:** Use ONLY Cloudflare Workers and the official Stripe SDK (or edge-compatible fetch requests to Stripe's API). Do not add any new databases or external auth providers.
+2. **Frictionless UI:** The user should not see a loading spinner. Use native text state changes (e.g., `[INITIALIZING SECURE CHECKOUT...]` in JetBrains Mono) on the Premium Gate button while the CF Worker builds the session.
+
+---
+
+## Execution Steps
+
+### 1. Cloudflare Worker: Stripe Checkout Endpoint
+- Create or update the Cloudflare Worker entry point (e.g., `worker/src/index.ts` or your repo's backend equivalent).
+- Build a `POST /api/checkout` route.
+- **Logic:** Securely call the Stripe API using `STRIPE_SECRET_KEY` from the environment. Create a `checkout.session` for a $12/month subscription.
+- **URLs:** Set the `success_url` to redirect back to `/covenant?session_id={CHECKOUT_SESSION_ID}` and `cancel_url` to return to `/defrag`.
+
+### 2. Frontend Wiring (`PremiumGate.tsx`)
+- Update the "Begin Premium" CTA button to trigger a `POST` request to your new `/api/checkout` endpoint.
+- **Loading State:** On click, change the button text to `[SECURE CHECKOUT]` using the JetBrains Mono font and apply a subtle `animate-pulse`. Disable the button to prevent double-clicks.
+- **Redirect:** When the Cloudflare Worker returns the Stripe `url`, immediately execute `window.location.href = url`.
+
+### 3. State Management (The Local Gate)
+- For this immediate release, when a user successfully returns from Stripe to the `success_url`, drop a secure, HttpOnly cookie or a heavily obfuscated localStorage flag (e.g., `sovv_tier=premium`). 
+- Update the `FloatingNav` and Space routers to read this flag. If true, the `PremiumGate` unmounts, permanently unlocking Covenant and Alignment on the device.
+
+Execute the CF Worker backend code and wire the frontend component. Do not pause.
+
+```

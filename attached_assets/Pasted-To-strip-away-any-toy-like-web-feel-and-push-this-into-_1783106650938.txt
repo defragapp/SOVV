@@ -1,0 +1,67 @@
+To strip away any "toy-like" web feel and push this into a premium, iOS-native tier, we need to stop thinking in terms of standard web hover states and start designing for **touch, glass, and sub-pixel precision.** Premium iOS apps rely on absolute structural rigidity. They don't bounce; they snap. They don't use flat gray boxes; they use translucent materials with physical depth.
+
+Here are the precise visual and structural upgrades to apply to your current UI (like that FAQ list in your screenshot) to make it feel like a native, high-fidelity application.
+
+### 1. iOS-Native List Architecture (The FAQ Refactor)
+
+Looking at your FAQ page in the canvas, the questions feel like standard web accordions. Let's rebuild them using the strict iOS Settings/List architecture.
+
+* **The Inset Divider:** On iOS, list dividers don't span the full width of the screen. They are inset from the left to align with the text, while the right side touches the edge.
+* **The Touch State:** Remove standard web hover effects. Rely on the `active:` state for mobile. When a user taps, the background should instantly flash to a subtle white overlay, and the element should slightly compress.
+
+**The Fix (Tailwind):**
+
+```tsx
+{/* Container for the list to give it the iOS grouped-list card feel */}
+<div className="overflow-hidden rounded-2xl bg-[#1C1C1E]">
+  {/* Individual FAQ Item */}
+  <button className="flex w-full items-center justify-between pl-4 active:bg-white/10 transition-colors duration-75">
+    <div className="flex w-full items-center justify-between border-b border-white/[0.08] py-4 pr-4 group-last:border-none">
+      <span className="font-geist text-[17px] text-white tracking-tight">What is the Defrag space?</span>
+      <span className="text-amber-500 text-xl font-light opacity-80">+</span>
+    </div>
+  </button>
+</div>
+
+```
+
+### 2. Apple’s "Vibrancy" & Material Glass
+
+To stop elements from looking flat, use the iOS "Frosted Glass" recipe for your fixed elements (like the `SiteShell` nav and any bottom action bars). It requires a specific combination of blur, background opacity, and saturation.
+
+* **The Fix:** Update your fixed headers or floating elements with:
+`bg-black/40 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/[0.05]`
+This creates that expensive, thick glass look that lets the ambient amber glow bleed through nicely as you scroll.
+
+### 3. Sub-pixel Borders (Hairlines)
+
+A massive contributor to a "toy-like" feel is thick, clunky borders. Native iOS uses "hairline" borders that are technically 0.5px on high-density Retina displays.
+
+* **The Fix:** Instead of `border-white/20`, drop your border opacities way down to `border-white/[0.08]` or use ring utilities: `ring-1 ring-inset ring-white/[0.05]`. This creates a razor-sharp edge that defines the shape without drawing attention to the line itself.
+
+### 4. Optimize for Mobile Viewports (Safe Areas)
+
+If you are optimizing for iOS, the UI must respect the physical hardware (the notch, the dynamic island, the home indicator bar at the bottom). If your content bleeds under these, it instantly breaks the illusion of a native app.
+
+* **The Fix:** Add CSS safe-area variables to your root layout containers.
+
+```css
+/* Add to your index.css */
+.ios-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+.ios-safe-top {
+  padding-top: env(safe-area-inset-top, 20px);
+}
+
+```
+
+Apply `ios-safe-bottom` to your main layout wrappers so the user is never trying to tap a CTA that is sitting underneath the iPhone home bar.
+
+### 5. Ground the Typography (17px Standard)
+
+Standard web body text is usually 16px. Apple's native body text standard (San Francisco) sits at exactly **17px** with tight tracking.
+
+* **The Fix:** For all UI elements in Geist (like your FAQ questions, inputs, and list items), force the text size to `text-[17px]` and tracking to `tracking-[-0.022em]`. It instantly makes the app feel like a system-level utility rather than a website.
+
+Do you want to apply this iOS list architecture to the FAQ page right now, or are you looking to adjust the main Defrag workspace UI first?

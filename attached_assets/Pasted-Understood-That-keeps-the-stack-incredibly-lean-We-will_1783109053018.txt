@@ -1,0 +1,44 @@
+Understood. That keeps the stack incredibly lean. We will strip Supabase out entirely.
+
+If we are running strictly on Cloudflare, we'll instruct the agent to build the auth UI and wire it up so that your Cloudflare backend (Workers/KV/D1) can handle the session tokens natively alongside the Stripe checkout flow.
+
+Here is the revised **Phase 8** prompt. Drop this directly into the Replit agent to lock the doors using only your exact stack.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 8: Native Authentication & Stripe Monetization Engine
+
+## Core Objective
+Transform Sovereign.os into a fully monetizable platform using strictly Cloudflare and Stripe. Build the native Authentication UI and wire the `PremiumGate` component to a functional Stripe checkout flow. Do NOT use Supabase, Firebase, or any external auth providers. 
+
+## Strict System Constraints
+1. **The Native Feel:** Auth screens (Login/Signup) must utilize the exact same iOS-native design language as the rest of the app: deep blacks, material glass (`bg-black/40 backdrop-blur-2xl`), and sub-pixel borders. No generic white web forms.
+2. **State Management:** The app must globally track whether a user is `authenticated` and `isPremium` using standard JWTs or session cookies designed for a Cloudflare backend.
+3. **Graceful Degradation:** If a user is not logged in, they can still run a baseline Defrag analysis (free tier), but they cannot save the pattern. The Premium Gate must block Covenant and Alignment for both unauthenticated users and free-tier authenticated users.
+
+---
+
+## Execution Steps
+
+### 1. Cloudflare-Native Authentication UI
+- Build a dedicated `/auth` route featuring a unified Login/Signup card component.
+- **Styling:** Use a centered, floating glass card (`bg-[#1C1C1E] rounded-3xl p-8 ring-1 ring-white/[0.05]`). Inputs must be borderless with an underlying hairline divider.
+- **Typography:** Fraunces for the greeting ("Enter your domain."), Geist `text-[17px]` for the inputs.
+- **Backend Wiring Prep:** Set up the frontend form to POST credentials to your `/api/auth` endpoint (which will be handled by Cloudflare). On success, store the returned session token and push the user back to the Defrag space using the existing `PageTransition` logic.
+
+### 2. Stripe Checkout Integration
+- Set up a secure frontend call to your `/api/checkout` endpoint to generate a Stripe Checkout Session URL.
+- Wire the primary CTA button inside the existing `PremiumGate.tsx` component to hit this endpoint.
+- Upon clicking "Begin Premium", transition the button to a loading state (subtle pulsing text or a tiny JetBrains Mono status tag `[INITIALIZING...]`) before redirecting to Stripe.
+
+### 3. Global Auth & Tier State Hook
+- Create a `useUserTier` hook (or React Context) that wraps the application. 
+- It should return: `{ user: User | null, isPremium: boolean, loading: boolean }`.
+- Update the `FloatingNav` and routing logic: If `isPremium` is false, navigating to Covenant or Alignment renders the `PremiumGate` overlay instead of the workspace content.
+
+Execute the Auth UI build, prepare the API calls for the Cloudflare backend, and wire the Premium Gate button to trigger the Stripe flow.
+
+```

@@ -1,0 +1,50 @@
+That is a flawless execution by the agent. By pushing the exact same material glass, typography, and `[SYSTEM_ERROR]` states into the secondary auth flows, the platform now feels like a sealed ecosystem. It doesn't break character.
+
+Now that the doors are locked and the Stripe engine is dropping the `PremiumGate` successfully, you have to deliver the actual product waiting on the other side of that gate.
+
+If Defrag is for *in-the-moment conflict*, **Covenant** is the premium infrastructure for *long-term boundary setting*. It needs to feel like a high-stakes, structural vault.
+
+Here is **Phase 11**. Drop this directly to the Replit agent to build the interior of the Covenant space.
+
+---
+
+**Copy/Paste this to the Replit Agent:**
+
+```markdown
+# Phase 11: The Covenant Space (Premium Infrastructure)
+
+## Core Objective
+With the Premium Gate fully functional, we must build the core value behind it. The Covenant space is where users codify boundaries and relational agreements. It must feel like a secure, structural vault using our strict iOS-native architecture, avoiding any generic web form aesthetics.
+
+## Strict System Constraints
+1. **Structural Consistency:** Maintain the iOS-native list architecture, hairline borders (`ring-1 ring-inset ring-white/[0.05]`), and the deep `#1C1C1E` backgrounds.
+2. **Typography:** Geist `text-[17px]` for human inputs/reads, JetBrains Mono for system tags (e.g., `[BOUNDARY SET]`, `[ACTIVE COVENANT]`). Fraunces is reserved only for the top-level space header.
+3. **Safe Areas:** Ensure all bottom-anchored elements respect `.ios-safe-bottom` and clear the `FloatingNav`.
+
+---
+
+## Execution Steps
+
+### 1. The Covenant Dashboard (`pages/CovenantPage.tsx`)
+- **Header:** "Covenant" in Fraunces `text-4xl`, with a brief Geist subtext ("Codify your relational boundaries.").
+- **Active List:** Render an iOS-style grouped list of existing Covenants.
+  - Container: `overflow-hidden rounded-2xl bg-[#1C1C1E]`.
+  - Rows: `border-b border-white/[0.08]`. 
+  - Content: Show the relationship/subject in Geist, a JetBrains Mono tag representing the core trigger (e.g., `[DEFENSIVENESS]`), and a standard chevron right-icon (`text-white/20`).
+  - *Agent Note: Pre-populate with 2-3 mock items to establish the layout.*
+
+### 2. The Drafting Engine (New UI Component)
+- **UI:** Below the list, implement a floating glass action container (`bg-[#1C1C1E] rounded-3xl p-6 ring-1 ring-white/[0.05]`).
+- **Inputs:** Create a borderless, minimal input stack (similar to the Defrag Drop Zone).
+  - Input 1 (Single line, Geist `text-[17px]`): "Target relationship or dynamic..."
+  - Input 2 (Textarea, Geist `text-[17px]`): "Define the structural boundary..."
+- **Footer:** Add a bottom action bar inside the container with a JetBrains Mono status tag `[AWAITING INPUT]` and a frosted glass "Seal Covenant" button.
+
+### 3. State & Layout Wiring
+- Ensure the premium check from Phase 8 remains intact: if the user is not premium, they see the `PremiumGate`. If they are, they see this new dashboard.
+- Ensure the layout perfectly respects the `PageTransition` wrapper.
+- Use local React state to handle typing in the Drafting Engine (change the status tag to `[DRAFTING...]` when input is active). 
+
+Execute the UI build for the Covenant space to make the premium tier immediately valuable.
+
+```
