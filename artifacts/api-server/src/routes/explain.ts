@@ -4,7 +4,7 @@ import { db, baselines } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
 import { reserveUsage, refundUsage, recordUsage, FREE_DAILY_LIMIT } from "../lib/usage";
-import { toActiveSignals, type BaselineProfile } from "../lib/baseline-engine";
+import { deriveActiveSignalLines } from "../lib/baseline/signals-adapter";
 
 const router = Router();
 
@@ -106,9 +106,10 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
   try {
     // Load the user's Baseline Design and reduce it to behavioral active signals.
     const [row] = await db.select().from(baselines).where(eq(baselines.userId, req.userId!)).limit(1);
-    const activeSignals = toActiveSignals(
-      (row?.computedProfile as BaselineProfile | null) ?? null,
+    const activeSignals = deriveActiveSignalLines(
+      row?.computedProfile ?? null,
       row ? { defaultRetreat: row.defaultRetreat, coreBoundary: row.coreBoundary, repairMechanic: row.repairMechanic } : null,
+      { message: message.trim(), relational: true, mode: "situation" },
     );
 
     const completion = await client.chat.completions.create({

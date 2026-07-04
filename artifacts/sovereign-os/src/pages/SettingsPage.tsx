@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
+import { fetchBaselineStatus, type BaselineStatus } from '../lib/baseline';
 
 interface BaselineApiResponse {
   dob?: string;
@@ -30,6 +31,22 @@ export function SettingsPage() {
   const [saving, setSaving]   = useState(false);
   const [saved, setSaved]     = useState(false);
   const [error, setError]     = useState('');
+  const [status, setStatus]   = useState<BaselineStatus>('none');
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopPolling = () => {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+  };
+
+  // Poll the async compile status until it settles (ready / degraded / failed).
+  const startPolling = () => {
+    stopPolling();
+    pollRef.current = setInterval(async () => {
+      const { status: s } = await fetchBaselineStatus();
+      setStatus(s);
+      if (s !== 'pending') stopPolling();
+    }, 3000);
+  };
 
   useEffect(() => {
     fetch('/api/baseline', { credentials: 'include' })
@@ -41,6 +58,13 @@ export function SettingsPage() {
         setPob(d.pob ?? '');
       })
       .catch(() => {});
+    // Reflect any in-flight compile from a previous visit.
+    fetchBaselineStatus().then(({ status: s }) => {
+      setStatus(s);
+      if (s === 'pending') startPolling();
+    });
+    return stopPolling;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleDobChange = (val: string) => {
@@ -74,6 +98,11 @@ export function SettingsPage() {
       if (res.ok) {
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
+        // Birth data present → backend begins an async compile; poll for it.
+        if (dob.trim()) {
+          setStatus('pending');
+          startPolling();
+        }
       } else {
         const d = await res.json() as { error?: string };
         setError(d.error || 'Save failed');
@@ -172,6 +201,25 @@ export function SettingsPage() {
 
           {error && <p className="text-sm text-red-400/80">{error}</p>}
           {saved && <p className="text-sm text-[#e0743a]/80">Baseline Design saved.</p>}
+
+          {/* Async compile status */}
+          {status === 'pending' && (
+            <div className="flex items-center gap-2.5 text-sm text-[#a8a29a]">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#e0743a] animate-pulse" />
+              <span>Compiling your Baseline Design\u2026 this can take up to a minute.</span>
+            </div>
+          )}
+          {(status === 'ready' || status === 'degraded') && !saved && (
+            <p className="text-sm text-[#a8a29a]">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400/70 mr-2 align-middle" />
+              Baseline Design active beneath every thread.
+            </p>
+          )}
+          {status === 'failed' && (
+            <p className="text-sm text-red-400/80">
+              Compilation didn\u2019t complete. Save again to retry \u2014 your birth data is stored.
+            </p>
+          )}
 
           <button
             type="submit"

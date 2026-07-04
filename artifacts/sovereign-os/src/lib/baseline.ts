@@ -63,6 +63,24 @@ export async function hydrateBaseline(): Promise<void> {
   } catch { /* network error — ignore */ }
 }
 
+/** Public compile status for the user's Baseline Design. */
+export type BaselineStatus = 'none' | 'pending' | 'ready' | 'degraded' | 'failed';
+
+/**
+ * Poll the backend for the async compile status of the Baseline Design.
+ * Returns 'none' when unauthenticated, offline, or no baseline exists.
+ */
+export async function fetchBaselineStatus(): Promise<{ status: BaselineStatus; computedAt: string | null }> {
+  try {
+    const res = await fetch('/api/baseline/status', { credentials: 'include' });
+    if (!res.ok) return { status: 'none', computedAt: null };
+    const data = await res.json() as { status?: BaselineStatus; computedAt?: string | null };
+    return { status: data.status ?? 'none', computedAt: data.computedAt ?? null };
+  } catch {
+    return { status: 'none', computedAt: null };
+  }
+}
+
 /** Quick boolean check: returns true if a completed baseline exists locally. */
 export function checkHasBaseline(): boolean {
   try {

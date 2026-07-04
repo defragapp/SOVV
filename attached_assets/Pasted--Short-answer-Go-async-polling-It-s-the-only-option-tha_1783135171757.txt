@@ -1,0 +1,38 @@
+**Short answer:**  
+Go **async + polling**. It’s the only option that preserves correctness, avoids request‑timeout failures, and matches the architecture of the original Cloudflare engine.
+
+---
+
+## **Decision 1 — Compilation model**  
+**Takeaway:** **Async + polling** is the correct choice for a faithful port and a stable production system.
+
+### Why  
+- **JPL Horizons is slow** — 8–12 sequential ephemeris calls, each ~300–700ms. Total runtime: **3–7 seconds** even with aggressive caching.  
+- **Synchronous requests will routinely exceed your API gateway timeout** (Express default 2 minutes, but your reverse proxy is almost certainly lower).  
+- **Cloudflare’s original design was async** for exactly this reason: save → background compile → poll status.  
+- **Your Postgres schema already supports async** (`baselineStatus`, `computedAt`, `computedProfile`).  
+- **Your frontend already has polling patterns** (Defrag, Alignment, Covenant all poll for model output).  
+- **Background compilation lets you add retries** for flaky external calls without breaking UX.
+
+### What synchronous would cost  
+- You’d need to parallelize Horizons calls (non‑trivial, breaks the original logic).  
+- You’d need to raise timeouts across your stack.  
+- You’d lose resilience: any slow external call = user-facing failure.  
+- You’d block the request thread for seconds, harming throughput.
+
+### What async gives you  
+- **Faithful port** — identical behavior to the Cloudflare engine.  
+- **Robustness** — retries, fallbacks, partial caching.  
+- **Clean UX** — “Baseline compiling…” → “Ready”.  
+- **Future-proofing** — active-signals expansion, multi-pass compilation, caching layers.
+
+---
+
+## **My recommendation**  
+Choose: **Async + polling**  
+It’s the only option that keeps the baseline engine reliable under real-world load and preserves the architecture you already validated.
+
+---
+
+## **Guided next step**  
+Do you want me to proceed with the full port plan using **async compilation** or reconsider **synchronous compilation**?

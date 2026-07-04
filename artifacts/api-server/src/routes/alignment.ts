@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import { db, baselines, archiveEntries, alignmentEntries } from "@workspace/db";
 import { eq, desc, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
-import { toActiveSignals, type BaselineProfile } from "../lib/baseline-engine";
+import { deriveActiveSignalLines } from "../lib/baseline/signals-adapter";
 
 const router = Router();
 
@@ -120,9 +120,10 @@ router.post("/generate", requireAuth, async (req: Request, res: Response) => {
     ]);
 
     const baseline = baselineRows[0] ?? null;
-    const activeSignals = toActiveSignals(
-      (baseline?.computedProfile as BaselineProfile | null) ?? null,
+    const activeSignals = deriveActiveSignalLines(
+      baseline?.computedProfile ?? null,
       baseline ? { defaultRetreat: baseline.defaultRetreat, coreBoundary: baseline.coreBoundary, repairMechanic: baseline.repairMechanic } : null,
+      { message: `Relational dynamic with ${personName}`, relational: true, mode: "pair" },
     );
     const hasContext = activeSignals.length > 0 || patternRows.length > 0;
 
