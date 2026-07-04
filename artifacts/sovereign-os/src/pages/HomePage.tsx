@@ -53,6 +53,45 @@ const SPACES = [
   },
 ];
 
+const FLOW_STEPS = [
+  {
+    n: '01',
+    title: 'Capture The Moment',
+    detail: 'Describe the conflict, decision, or pressure point exactly as it happened.',
+  },
+  {
+    n: '02',
+    title: 'Reveal The Pattern',
+    detail: 'Sovereign.os maps the baseline behavior driving the reaction under stress.',
+  },
+  {
+    n: '03',
+    title: 'Choose The Repair',
+    detail: 'Get one grounded next move aligned with your design instead of impulse.',
+  },
+];
+
+const VALUE_PILLARS = [
+  {
+    n: '01',
+    title: 'Pattern-Native Intelligence',
+    detail:
+      'Sovereign.os interprets the baseline underneath your words, so guidance is anchored to design, not noise.',
+  },
+  {
+    n: '02',
+    title: 'Private By Default',
+    detail:
+      'Your spaces are designed for personal signal work, with explicit boundaries between reflection, decision, and repair.',
+  },
+  {
+    n: '03',
+    title: 'Action Over Abstraction',
+    detail:
+      'Every analysis resolves into one concrete next move you can take in the current moment.',
+  },
+] as const;
+
 // ── CTA Button ────────────────────────────────────────────────────────────────
 function GhostCta({ children, href }: { children: React.ReactNode; href: string }) {
   const prefersReducedMotion = useReducedMotion();
@@ -392,6 +431,34 @@ function Hero() {
           />
 
           <div
+            className="absolute right-[12%] top-[20%] h-[52%] w-[30%] min-w-[210px] max-w-[360px]"
+            style={{
+              borderRadius: 999,
+              border: '1px solid rgba(244,212,182,0.24)',
+              background:
+                'radial-gradient(58% 58% at 50% 50%, rgba(224,116,58,0.18) 0%, rgba(224,116,58,0.06) 42%, rgba(8,7,10,0) 78%)',
+              boxShadow: '0 34px 72px -38px rgba(224,116,58,0.65), inset 0 1px 0 rgba(255,248,240,0.34)',
+            }}
+          >
+            <div
+              className="absolute inset-[16%] rounded-full"
+              style={{ border: '1px dashed rgba(244,212,182,0.22)' }}
+            />
+            <div
+              className="absolute left-[47%] top-[47%] h-2.5 w-2.5 rounded-full"
+              style={{ background: '#ffd7b9', boxShadow: '0 0 14px rgba(255,215,185,0.8)' }}
+            />
+            <div
+              className="absolute left-[16%] top-[58%] h-1.5 w-1.5 rounded-full"
+              style={{ background: 'rgba(255,234,216,0.7)' }}
+            />
+            <div
+              className="absolute right-[16%] top-[30%] h-1.5 w-1.5 rounded-full"
+              style={{ background: 'rgba(255,234,216,0.7)' }}
+            />
+          </div>
+
+          <div
             ref={refs.lightBeamRef}
             className="absolute inset-0"
             style={{
@@ -643,11 +710,102 @@ function SpacesGrid() {
   );
 }
 
+function ProcessRail() {
+  return (
+    <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+      {FLOW_STEPS.map((step, index) => (
+        <motion.article
+          key={step.n}
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-70px' }}
+          transition={{ duration: 0.45, delay: index * 0.07, ease }}
+          className="p-5 md:p-6"
+          style={{
+            borderRadius: 14,
+            border: `1px solid ${index === 1 ? C.amberLine : C.rule}`,
+            background: index === 1 ? 'rgba(224,116,58,0.07)' : C.bgCard,
+          }}
+        >
+          <p className="font-mono text-[9px] uppercase tracking-[0.16em] mb-3" style={{ color: index === 1 ? '#f3b88f' : C.dim }}>
+            Step {step.n}
+          </p>
+          <h3 className="font-serif text-[23px] leading-tight mb-3" style={{ color: C.cream }}>
+            {step.title}
+          </h3>
+          <p className="text-[13px] leading-[1.75]" style={{ color: C.mid }}>
+            {step.detail}
+          </p>
+        </motion.article>
+      ))}
+    </div>
+  );
+}
+
+function ValuePillars() {
+  return (
+    <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+      {VALUE_PILLARS.map((pillar, index) => (
+        <motion.article
+          key={pillar.n}
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-70px' }}
+          transition={{ duration: 0.45, delay: index * 0.06, ease }}
+          className="p-5 md:p-6"
+          style={{
+            borderRadius: 14,
+            border: `1px solid ${index === 0 ? C.amberLine : C.rule}`,
+            borderLeft: index === 0 ? '2px solid rgba(224,116,58,0.5)' : undefined,
+            background: index === 0 ? 'rgba(224,116,58,0.06)' : C.bgCard,
+          }}
+        >
+          <p className="font-mono text-[9px] uppercase tracking-[0.16em] mb-3" style={{ color: index === 0 ? '#f3b88f' : C.dim }}>
+            Pillar {pillar.n}
+          </p>
+          <h3 className="font-serif text-[22px] leading-tight mb-3" style={{ color: C.cream }}>
+            {pillar.title}
+          </h3>
+          <p className="text-[13px] leading-[1.75]" style={{ color: C.mid }}>
+            {pillar.detail}
+          </p>
+        </motion.article>
+      ))}
+    </div>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 export function HomePage() {
   return (
     <SiteShell entranceControlled>
       <Hero />
+
+      {/* ── Value ─────────────────────────────────────────────────── */}
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={sectionViewport}
+        transition={{ duration: 0.62, ease }}
+        className="relative w-full py-20 md:py-32"
+        style={{ background: C.bgLift, borderTop: `1px solid ${C.rule}` }}
+      >
+        <Container>
+          <div className="flex flex-col items-center text-center mb-10 md:mb-12">
+            <SectionLabel>Why Sovereign.os</SectionLabel>
+            <h2
+              className="font-serif tracking-[-0.022em] leading-[1.07] max-w-2xl text-balance"
+              style={{ fontSize: 'clamp(1.9rem, 4.8vw, 3.2rem)', color: C.cream }}
+            >
+              Built for signal, not noise.
+            </h2>
+            <p className="mt-4 max-w-2xl text-[14px] leading-[1.75]" style={{ color: C.mid }}>
+              A clear operating model for understanding your patterns and making cleaner decisions under pressure.
+            </p>
+          </div>
+          <ValuePillars />
+        </Container>
+      </motion.section>
 
       {/* ── Baseline ──────────────────────────────────────────────── */}
       <motion.section
@@ -699,6 +857,32 @@ export function HomePage() {
             <br className="hidden md:block" />
             The clarity can be.
           </motion.blockquote>
+        </Container>
+      </motion.section>
+
+      {/* ── Process ──────────────────────────────────────────────── */}
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={sectionViewport}
+        transition={{ duration: 0.62, ease }}
+        className="relative w-full py-20 md:py-32"
+        style={{ background: C.bg, borderTop: `1px solid ${C.rule}` }}
+      >
+        <Container>
+          <div className="flex flex-col items-center text-center mb-10 md:mb-12">
+            <SectionLabel>The Flow</SectionLabel>
+            <h2
+              className="font-serif tracking-[-0.022em] leading-[1.07] max-w-2xl text-balance"
+              style={{ fontSize: 'clamp(1.9rem, 4.8vw, 3.2rem)', color: C.cream }}
+            >
+              From tension to repair.
+            </h2>
+            <p className="mt-4 max-w-lg text-[14px] leading-[1.75]" style={{ color: C.mid }}>
+              One sequence, repeated across relationships, decisions, and pressure.
+            </p>
+          </div>
+          <ProcessRail />
         </Container>
       </motion.section>
 
