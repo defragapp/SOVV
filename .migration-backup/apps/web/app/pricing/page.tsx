@@ -73,7 +73,7 @@ export default function PricingPage() {
                   <span className="font-serif text-4xl text-[#f4efe9]">$0</span>
                   <span className="text-sm text-[#76716b]">forever</span>
                 </div>
-                <p className="text-sm text-[#a8a29a] leading-relaxed">Start understanding the pattern.</p>
+                <p className="text-sm text-[#a8a29a] leading-relaxed">Start with Defrag — free forever.</p>
               </div>
 
               <div className="flex flex-col gap-3 flex-1 mb-8">
@@ -108,7 +108,7 @@ export default function PricingPage() {
                   <span className="font-serif text-4xl text-[#f4efe9]">$12</span>
                   <span className="text-sm text-[#76716b]">/ month</span>
                 </div>
-                <p className="text-sm text-[#a8a29a] leading-relaxed">For patterns that need continuity.</p>
+                <p className="text-sm text-[#a8a29a] leading-relaxed">Defrag + Covenant + Alignment + Library.</p>
               </div>
 
               <div className="relative flex flex-col gap-3 flex-1 mb-8">
@@ -134,7 +134,7 @@ export default function PricingPage() {
         <Container className="max-w-3xl">
           <MetaLabel>What's included</MetaLabel>
           <AnimatedHeading className="text-3xl md:text-4xl tracking-[-0.02em] leading-tight mb-12">
-            Feature by feature.
+            What each plan includes.
           </AnimatedHeading>
 
           <div className="flex flex-col gap-0">

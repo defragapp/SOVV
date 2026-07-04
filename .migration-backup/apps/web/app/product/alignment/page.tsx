@@ -260,6 +260,43 @@ export default function AlignmentProductPage() {
       </section>
 
       {/* ── CTA ── */}
+      {/* When to use */}
+      <section className="w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/[0.04]">
+        <Container className="max-w-3xl">
+          <div className="mb-10">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">When to use Alignment</span>
+            </div>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl"
+              style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)" }}
+            >
+              After the insight. Before the next move.
+            </h2>
+            <p className="mt-4 text-[15px] text-[#76716b] leading-relaxed max-w-lg">
+              Use Alignment when you understand what happened but need to know how to respond — what's yours to carry, what isn't, and what a clean next step looks like.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[
+              { trigger: "After a Defrag session", desc: "You've seen the pattern. Now shape the response." },
+              { trigger: "Before a hard conversation", desc: "Know what's yours to say and what belongs to the other side." },
+              { trigger: "After a conflict", desc: "Separate what happened from what you're responsible for." },
+              { trigger: "When you've said yes but meant no", desc: "Find the boundary that keeps you clear without hardening." },
+              { trigger: "When you're carrying too much", desc: "See what's actually yours and what you've taken on unnecessarily." },
+              { trigger: "Before a major decision", desc: "Align the choice with your values, not just the pressure." },
+            ].map((item, i) => (
+              <div key={i} className="border border-white/[0.06] bg-[#0c0a0d] p-5 glow-card-hover" style={{ borderRadius: 10 }}>
+                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-2">{item.trigger}</p>
+                <p className="text-[13px] text-[#a8a29a] leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
       <section className="relative w-full py-24 md:py-32 bg-[#0c0a0d] border-t border-white/5 overflow-hidden">
         <div className="light-beam" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">

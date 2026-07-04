@@ -225,6 +225,51 @@ export default function CovenantProductPage() {
       </section>
 
       {/* ── CTA ── */}
+      <section className="w-full py-20 md:py-28 bg-[#0c0a0d] border-t border-white/[0.04]">
+        <Container className="max-w-3xl">
+          <div className="mb-12">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="h-px w-6 bg-[#e0743a]/60" />
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">How it works</span>
+            </div>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl"
+              style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)" }}
+            >
+              Faith connected to the moment.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.05] overflow-hidden" style={{ borderRadius: 14 }}>
+            {[
+              { n: "01", title: "Describe what you're carrying", body: "A relationship, a decision, a grief, a boundary. Say it honestly — Covenant doesn't require spiritual language." },
+              { n: "02", title: "See the story that fits", body: "Covenant finds the biblical figure whose story genuinely illuminates your moment — not as instruction, but as recognition." },
+              { n: "03", title: "Receive one grounded next step", body: "Not a prescription. Not spiritual pressure. One honest move that keeps faith and integrity connected." },
+            ].map((step) => (
+              <div key={step.n} className="bg-[#0c0a0d] p-8 md:p-10 glow-card-hover cursor-default">
+                <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#e0743a]/50 block mb-8">{step.n}</span>
+                <h3 className="font-serif text-[1.15rem] text-[#f4efe9] leading-snug mb-3">{step.title}</h3>
+                <p className="text-[13px] text-[#76716b] leading-relaxed">{step.body}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 border border-white/[0.06] bg-[#0c0a0d] overflow-hidden" style={{ borderRadius: 14 }}>
+            <div className="px-6 py-4 border-b border-white/[0.05]">
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#a8a29a]">When to use Covenant</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2">
+              {["A relationship you are trying to repair", "A grief you are carrying", "A decision that involves your values", "A pattern you keep returning to", "A boundary you are trying to hold with integrity", "A moment where faith and action feel disconnected"].map((item, i) => (
+                <div key={i} className="px-6 py-4 border-b border-white/[0.04] last:border-0 md:odd:border-r flex items-start gap-3">
+                  <span className="text-[#e0743a]/50 text-[10px] mt-0.5 shrink-0">—</span>
+                  <span className="text-[13px] text-[#a8a29a] leading-relaxed">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Container>
+      </section>
+
       <section className="relative w-full py-24 md:py-32 bg-[#08070a] border-t border-white/5 overflow-hidden">
         <div className="light-beam" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">

@@ -577,6 +577,15 @@ export default function Home() {
           className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center text-center"
           style={{ paddingBottom: "max(clamp(3rem, 8vh, 6rem), env(safe-area-inset-bottom, 0px))" }}
         >
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+            className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#f4efe9]/30 mb-5 px-8"
+          >
+            Sovereign.os · Pattern-aware AI
+          </motion.p>
+
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -595,7 +604,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.38, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-5 max-w-xs text-[#76716b] leading-relaxed px-8"
+            className="mt-5 max-w-xs text-[#a8a29a] leading-relaxed px-8"
             style={{ fontSize: "clamp(0.8rem, 1.6vw, 0.9rem)" }}
           >
             Pattern-aware AI for the moments that are hard to read while you&rsquo;re inside them.
@@ -653,7 +662,7 @@ export default function Home() {
           <div className="max-w-2xl mb-16 reveal-up reveal-up-1">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-6 bg-[#e0743a]/60" />
-              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">The pattern beneath</span>
+              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Why it matters</span>
             </div>
             <h2
               className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] text-balance"
@@ -662,7 +671,7 @@ export default function Home() {
               <span className="text-glow">The moment</span> is rarely the whole pattern.
             </h2>
             <p className="mt-5 text-[15px] text-[#76716b] leading-relaxed max-w-lg">
-              A text, tone, silence, or conflict can feel bigger than the facts because it is touching a pattern already in motion. Sovereign.os helps you separate the moment from the pattern before you move from pressure.
+              A text, tone, silence, or conflict can feel bigger than the facts because it is touching a pattern already in motion. Sovereign.os helps you separate the moment from the pattern — before pressure chooses for you.
             </p>
           </div>
 
@@ -707,7 +716,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">{card.label}</p>
-                  <p className="text-[14px] text-[#a8a29a] leading-relaxed">{card.desc}</p>
+                  <p className="text-[14px] text-[#c8c2bc] leading-relaxed">{card.desc}</p>
                 </div>
               </div>
             ))}
@@ -741,7 +750,7 @@ export default function Home() {
               {
                 num: "02",
                 title: "See the pattern",
-                body: "Sovereign.os uses your Baseline Design to show what's active and what may be repeating underneath.",
+                body: "Your Baseline Design is already active. It shows what's running beneath the surface — the loop, the role, the pressure.",
               },
               {
                 num: "03",
@@ -778,7 +787,7 @@ export default function Home() {
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(224,116,58,0.06) 0%, transparent 70%)" }} aria-hidden />
 
         <Container className="relative z-10 max-w-2xl">
-          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-8">Clarity is not control</p>
+          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-8">What we believe</p>
           <blockquote
             className="font-serif text-[#f4efe9] leading-[1.15] tracking-[-0.02em] text-balance"
             style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.5rem)" }}
@@ -800,7 +809,7 @@ export default function Home() {
           <div className="inline-flex items-center gap-2 mb-12">
             <span className="h-px w-6 bg-[#e0743a]/60" />
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
-              Three spaces
+              The spaces
             </span>
           </div>
 
@@ -812,7 +821,7 @@ export default function Home() {
                 tier: "Free",
                 href: "/product/defrag",
                 hook: "Separate the moment from the pattern.",
-                what: "Use Defrag for messages, relational dynamics, family pressure, boundaries, grief, and team dynamics.",
+                what: "For the argument, the silence, the message, the grief — and the pattern beneath all of them.",
                 cta: "What's active, what may be repeating, and your Best Next Response.",
                 tags: ["Arguments", "Messages", "Family roles", "Boundaries", "Grief"],
                 icon: (
@@ -832,7 +841,7 @@ export default function Home() {
                 tier: "Pro",
                 href: "/product/covenant",
                 hook: "Reflect through faith without performance.",
-                what: "Use Covenant for truth, repair, forgiveness, responsibility, humility, and discernment.",
+                what: "For users who want faith connected to the work — not as certainty, but as honest next step.",
                 cta: "One honest next step — grounded in faith, not reaction.",
                 tags: ["Faith", "Values", "Commitments", "Repair"],
                 icon: (
@@ -853,7 +862,7 @@ export default function Home() {
                 tier: "Pro",
                 href: "/product/alignment",
                 hook: "Turn recognition into practice.",
-                what: "Use Alignment to shape the response, boundary, pause, or repair that keeps you clear.",
+                what: "After the insight. Before the next move. See what is yours to carry and what isn't.",
                 cta: "After Defrag. Before the next move. Return to yourself.",
                 tags: ["After Defrag", "Before a hard conversation", "After a conflict"],
                 icon: (
@@ -882,7 +891,6 @@ export default function Home() {
                     }}
                   >
                     {space.icon}
-                    <span className="font-mono text-[9px] tracking-[0.1em]">{space.num}</span>
                   </div>
                   <span
                     className="font-mono text-[8px] uppercase tracking-[0.14em] border px-2 py-0.5 self-start"
@@ -898,7 +906,7 @@ export default function Home() {
 
                 <div>
                   <h3
-                    className="font-serif text-[#f4efe9] mb-2 group-hover:text-[#f0a06a] transition-colors duration-300"
+                    className="font-serif text-[#f4efe9] mb-2 group-hover:text-white transition-colors duration-200"
                     style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.6rem)" }}
                   >
                     {space.name}
@@ -909,8 +917,7 @@ export default function Home() {
                 </div>
 
                 <div className="flex flex-col gap-2 flex-1">
-                  <p className="text-[13px] text-[#76716b] leading-relaxed">{space.what}</p>
-                  <p className="text-[13px] text-[#a8a29a] leading-relaxed">{space.cta}</p>
+                  <p className="text-[13px] text-[#a8a29a] leading-relaxed">{space.what}</p>
                 </div>
 
                 <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.05]">
@@ -938,7 +945,7 @@ export default function Home() {
         <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] opacity-[0.04]" />
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(224,116,58,0.05) 0%, transparent 70%)" }} aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
-          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-8">Begin</p>
+          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-8">Start here</p>
           <h2
             className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] max-w-2xl text-balance"
             style={{ fontSize: "clamp(2.2rem, 5.5vw, 4.5rem)" }}
@@ -946,7 +953,7 @@ export default function Home() {
             <span className="text-glow">Return before</span> the pattern runs the room.
           </h2>
           <p className="mt-6 max-w-md text-[15px] text-[#76716b] leading-relaxed">
-            Understand what&rsquo;s active, see what may be repeating, and choose the next move with more context. Start with Defrag. Save what matters. Build your private Library over time.
+            Defrag is free. Describe the moment — the argument, the silence, the message — and see what&rsquo;s actually active beneath it.
           </p>
           <div className="mt-9">
             <Link href={APP_URL} className="btn-primary">
