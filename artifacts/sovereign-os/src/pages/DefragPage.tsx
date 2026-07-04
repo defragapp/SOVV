@@ -404,8 +404,8 @@ export function DefragPage() {
       } else if (res.status === 401) {
         window.location.href = '/app/login';
       } else {
-        const d = await res.json() as { error?: string };
-        setError(d.error || 'Something went wrong.');
+        const d = await res.json() as { error?: string; message?: string };
+        setError(d.message || d.error || 'Something went wrong.');
       }
     } catch {
       setError('Network error. Please try again.');

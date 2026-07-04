@@ -1,0 +1,104 @@
+Choose **Both**.
+
+That matches the product direction: **birth data creates the baseline map**, and **self-reported pattern fields refine it over time**. Birth data should not replace lived-pattern inputs; it should seed the system, then the app learns from user edits, Defrag sessions, Alignment responses, Covenant reflections, and relational patterns.
+
+Paste this back to the agent:
+
+Answer: Both.
+
+Baseline Design should work as a two-layer system:
+
+1. Computed baseline from birth data
+
+* Use dob / pob / tob as the stable starting map.
+* Build #19 and #20.
+* Compute/store a Baseline Design profile from birth data.
+* Feed only reduced, behavioral active signals into AI prompts.
+* Do not dump raw astrology, Human Design, Gene Keys, or numerology into user-facing output.
+* Treat birth-time uncertainty honestly.
+
+2. User-refined psychological pattern layer
+
+* Keep or restore self-reported fields where useful:
+
+  * default retreat pattern
+  * core boundary
+  * repair mechanic
+  * pressure response
+  * communication preference
+  * relationship triggers
+* These should refine the computed baseline, not replace it.
+* If these fields are missing, AI should still work from the computed baseline.
+* If birth data is missing, AI should still work from self-reported pattern fields.
+
+Product rule:
+Baseline Design is not “astrology content.” It is the private operating map that helps the AI understand how the user tends to process, respond, protect, repair, communicate, and return to center.
+
+Public language:
+Use psychological/product language externally:
+
+* “starting map”
+* “pattern model”
+* “response style”
+* “pressure signals”
+* “repair moves”
+* “relational tendencies”
+
+Internal engine:
+Can use birth-data-derived systems as source inputs, but the output must be translated into clean behavioral signals.
+
+Proceed with this implementation order:
+
+P0 — Fix advertised broken flows first
+
+* Mount/fix `/api/checkout` or redirect all callers to the working `/api/billing/checkout`.
+* Add/fix `/api/user/usage`.
+* Add/fix `/api/auth/people` or remove the frontend call until people are built.
+* Add/fix `/api/promo/redeem` or remove advertised promo redemption.
+* Remove or replace dead AuthGuard calls to missing `/api/auth/session` and `/api/auth/tier`.
+
+P1 — Build/fix Baseline engine
+
+* Implement #19: compute and store Baseline Design from dob/pob/tob.
+* Fix known port bugs while building:
+
+  * undefined `user` in baseline save
+  * duplicate status route
+  * planet/body casing mismatch
+  * status polling correctness
+* Store clear status: not_started, pending, ready, failed, degraded.
+
+P2 — Wire active signals
+
+* Implement #20.
+* Fix `traitLines` initialization before use.
+* Feed active behavioral signals into Defrag, Alignment, and Covenant prompts.
+* Make AI output visibly derived from baseline without exposing raw framework data.
+* Add prompt contract tests showing baseline signals influence output.
+
+P3 — Add refinement layer
+
+* Add optional self-reported pattern fields to onboarding/settings.
+* Allow users to refine/correct the baseline in plain language.
+* Store refinements separately from computed source data.
+* Merge computed baseline + user refinements into the active signal layer.
+
+P4 — Verification
+
+* Create an audit table of every advertised feature and whether it is functional.
+* Add tests for every route the frontend calls.
+* Add at least one full onboarding → baseline compute → AI response test.
+* Add graceful fallback tests for:
+
+  * missing birth time
+  * failed geocoding
+  * failed model call
+  * missing self-reported fields
+  * missing computed baseline
+
+Do not block on OpenAI quota for code fixes, but clearly mark model output as unavailable until billing/quota is restored.
+
+Do not add secrets.
+Do not deploy production without explicit approval.
+
+The important product call is: **birth data is the seed; lived behavior is the calibration layer.** That makes Sovereign.os feel personal immediately without pretending the first computed profile is the whole truth.

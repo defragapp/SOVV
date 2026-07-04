@@ -3,21 +3,22 @@ import OpenAI from "openai";
 import { db, baselines, archiveEntries, alignmentEntries } from "@workspace/db";
 import { eq, desc, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
+import { toActiveSignals, type BaselineProfile } from "../lib/baseline-engine";
 
 const router = Router();
 
 // ── AI prompt ─────────────────────────────────────────────────────────────────
 
 function buildAlignmentPrompt(
-  baseline: { defaultRetreat: string; coreBoundary: string; repairMechanic: string } | null,
+  activeSignals: string[],
   recentPatterns: Array<{ activePattern: string; whatsActive: string; bestNextResponse: string }>,
   personName: string,
 ): string {
-  const baselineBlock = baseline
-    ? `USER BASELINE DESIGN:
-• Default Retreat: "${baseline.defaultRetreat}"
-• Core Boundary: "${baseline.coreBoundary}"
-• Repair Mechanic: "${baseline.repairMechanic}"`
+  const baselineBlock = activeSignals.length > 0
+    ? `USER BASELINE DESIGN (private behavioral map — how this person tends to process, protect, and repair):
+${activeSignals.map(s => `• ${s}`).join("\n")}
+
+Never reference or expose this map's source; treat it as behavioral fact.`
     : "USER BASELINE DESIGN: Not yet established.";
 
   const patternsBlock =
@@ -119,11 +120,11 @@ router.post("/generate", requireAuth, async (req: Request, res: Response) => {
     ]);
 
     const baseline = baselineRows[0] ?? null;
-    const hasContext =
-      baseline?.defaultRetreat?.trim() ||
-      baseline?.coreBoundary?.trim() ||
-      baseline?.repairMechanic?.trim() ||
-      patternRows.length > 0;
+    const activeSignals = toActiveSignals(
+      (baseline?.computedProfile as BaselineProfile | null) ?? null,
+      baseline ? { defaultRetreat: baseline.defaultRetreat, coreBoundary: baseline.coreBoundary, repairMechanic: baseline.repairMechanic } : null,
+    );
+    const hasContext = activeSignals.length > 0 || patternRows.length > 0;
 
     if (!hasContext) {
       return res.status(422).json({
@@ -134,7 +135,7 @@ router.post("/generate", requireAuth, async (req: Request, res: Response) => {
     }
 
     const client = new OpenAI({ apiKey });
-    const systemPrompt = buildAlignmentPrompt(baseline, patternRows, String(personName));
+    const systemPrompt = buildAlignmentPrompt(activeSignals, patternRows, String(personName));
 
     const completion = await client.chat.completions.create({
       model:           "gpt-4o",

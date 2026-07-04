@@ -27,11 +27,23 @@ export const baselines = pgTable("baselines", {
   dob:            text("dob").notNull().default(""),   // YYYY-MM-DD
   tob:            text("tob").notNull().default(""),   // time of birth (approx ok; empty = not provided)
   pob:            text("pob").notNull().default(""),   // place of birth
-  // Psychological pattern fields (legacy, preserved for AI context)
+  // Self-reported pattern fields — the calibration layer that refines the computed map
   defaultRetreat: text("default_retreat").notNull().default(""),
   coreBoundary:   text("core_boundary").notNull().default(""),
   repairMechanic: text("repair_mechanic").notNull().default(""),
-  updatedAt:      timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  // Computed Baseline Design (behavioral signals derived from birth data)
+  computedProfile: jsonb("computed_profile"),
+  baselineStatus:  text("baseline_status").notNull().default("not_started"), // not_started|ready|degraded|failed
+  computedAt:      timestamp("computed_at", { withTimezone: true }),
+  updatedAt:       timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ── Usage events (session metering for tier limits) ───────────────────────────
+export const usageEvents = pgTable("usage_events", {
+  id:        uuid("id").primaryKey().defaultRandom(),
+  userId:    uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  kind:      text("kind").notNull().default("defrag"),  // which space consumed the session
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 // ── Archive Entries (saved Defrag pattern results) ────────────────────────────

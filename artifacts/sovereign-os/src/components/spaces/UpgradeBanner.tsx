@@ -7,28 +7,12 @@ import { motion, AnimatePresence } from "framer-motion"
 export default function UpgradeBanner() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [promoCode, setPromoCode] = useState("")
-  const [showPromo, setShowPromo] = useState(false)
 
   const handleUpgrade = async () => {
     setLoading(true)
     setError("")
 
     try {
-      if (promoCode.trim()) {
-        const promoRes = await fetch("/api/promo/redeem", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code: promoCode.trim().toUpperCase() }),
-        })
-        const promoData = await promoRes.json() as { discount_percent?: number; error?: string }
-        if (!promoRes.ok && promoData.error !== "Invalid or inactive promo code") {
-          setError(promoData.error || "Invalid promo code")
-          return
-        }
-      }
-
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
         credentials: "include",
@@ -95,35 +79,6 @@ export default function UpgradeBanner() {
         >
           {loading ? "···" : "Upgrade to Pro — $12/mo"}
         </button>
-
-        {/* Promo code */}
-        <button
-          type="button"
-          onClick={() => setShowPromo(!showPromo)}
-          className="text-sm text-[#76716b] hover:text-[#a8a29a] transition-colors duration-200 mb-3"
-        >
-          {showPromo ? "Hide promo code" : "Have a promo code?"}
-        </button>
-
-        <AnimatePresence>
-          {showPromo && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden mb-4"
-            >
-              <input
-                type="text"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value)}
-                placeholder="Enter promo code"
-                className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 text-center tracking-[0.2em] uppercase"
-                style={{ borderRadius: "var(--radius-input)" }}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         <AnimatePresence>
           {error && (

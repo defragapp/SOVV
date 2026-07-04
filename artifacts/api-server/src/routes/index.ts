@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import healthRouter    from "./health";
 import proxyRouter     from "./proxy";
 import explainRouter   from "./explain";
+import checkoutRouter  from "./checkout";
 import authRouter      from "./auth";
 import userRouter      from "./user";
 import baselineRouter  from "./baseline";
@@ -17,6 +18,7 @@ router.use(healthRouter);
 
 // ── Local routes — take precedence over proxy ─────────────────────────────────
 router.use("/explain",   explainRouter);
+router.use("/checkout",  checkoutRouter);
 router.use("/auth",      authRouter);
 router.use("/user",      userRouter);
 router.use("/baseline",  baselineRouter);

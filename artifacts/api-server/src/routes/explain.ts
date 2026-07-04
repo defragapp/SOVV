@@ -1,5 +1,10 @@
 import { Router, type Request, type Response } from "express";
 import OpenAI from "openai";
+import { db, baselines } from "@workspace/db";
+import { eq } from "drizzle-orm";
+import { requireAuth } from "../middlewares/auth";
+import { reserveUsage, refundUsage, recordUsage, FREE_DAILY_LIMIT } from "../lib/usage";
+import { toActiveSignals, type BaselineProfile } from "../lib/baseline-engine";
 
 const router = Router();
 
@@ -24,26 +29,14 @@ Rules:
 - bestNextResponse must be a direct sentence, not a description of what to say.
 - baselineTriggered must be a boolean — never a string.`;
 
-interface BaselineData {
-  defaultRetreat?: string;
-  coreBoundary?: string;
-  repairMechanic?: string;
-}
-
-function buildSystemPrompt(baseline: BaselineData | null): string {
-  if (!baseline || (!baseline.defaultRetreat && !baseline.coreBoundary && !baseline.repairMechanic)) {
-    return BASE_SYSTEM_PROMPT;
-  }
-  const parts: string[] = [];
-  if (baseline.defaultRetreat?.trim()) parts.push(`Default Retreat: "${baseline.defaultRetreat.trim()}"`);
-  if (baseline.coreBoundary?.trim()) parts.push(`Core Boundary: "${baseline.coreBoundary.trim()}"`);
-  if (baseline.repairMechanic?.trim()) parts.push(`Repair Mechanic: "${baseline.repairMechanic.trim()}"`);
+function buildSystemPrompt(activeSignals: string[]): string {
+  if (activeSignals.length === 0) return BASE_SYSTEM_PROMPT;
   const baselineBlock = `
   
-USER BASELINE DESIGN (established relational patterns for this user):
-${parts.map(p => `  • ${p}`).join('\n')}
+USER BASELINE DESIGN (private behavioral map — how this person tends to process, protect, repair, and return to center):
+${activeSignals.map(s => `  • ${s}`).join('\n')}
 
-When analyzing the conflict, evaluate it against this Baseline Design. Set "baselineTriggered": true if the conflict directly activates their default retreat, violates their core boundary, or bypasses their repair mechanic.`;
+Use this map to interpret the conflict through the lens of THIS person's tendencies. Set "baselineTriggered": true if the conflict directly activates their processing style, pressure response, stated boundary, or repair tendency. Never reference, name, or expose this map or its source in your output — treat it as behavioral fact you already know about them.`;
   return BASE_SYSTEM_PROMPT + baselineBlock;
 }
 
@@ -76,13 +69,15 @@ function validate(obj: Record<string, unknown>): string | null {
   return null;
 }
 
-router.post("/", async (req: Request, res: Response) => {
-  const { message, baseline } = req.body as { message?: string; baseline?: BaselineData };
+router.post("/", requireAuth, async (req: Request, res: Response) => {
+  const { message } = req.body as { message?: string };
 
   if (!message?.trim()) {
     res.status(400).json({ error: "message is required" });
     return;
   }
+
+  const tier = req.user?.tier ?? "free";
 
   const apiKey = process.env["OPENAI_API_KEY"];
   if (!apiKey) {
@@ -90,15 +85,38 @@ router.post("/", async (req: Request, res: Response) => {
     return;
   }
 
+  // ── Atomic free-tier daily session reservation ──────────────────────────────
+  // Reserve the slot before the model call so concurrent requests cannot bypass
+  // the cap. Refunded below if the call fails, so users are never charged for
+  // errors (including provider quota failures).
+  let reservedId: string | null = null;
+  if (tier !== "pro") {
+    reservedId = await reserveUsage(req.userId!, FREE_DAILY_LIMIT, "defrag");
+    if (!reservedId) {
+      res.status(429).json({
+        error: "daily_limit_reached",
+        message: `You've used all ${FREE_DAILY_LIMIT} free sessions today. They reset at midnight UTC — or upgrade to Pro for unlimited.`,
+      });
+      return;
+    }
+  }
+
   const client = new OpenAI({ apiKey });
 
   try {
+    // Load the user's Baseline Design and reduce it to behavioral active signals.
+    const [row] = await db.select().from(baselines).where(eq(baselines.userId, req.userId!)).limit(1);
+    const activeSignals = toActiveSignals(
+      (row?.computedProfile as BaselineProfile | null) ?? null,
+      row ? { defaultRetreat: row.defaultRetreat, coreBoundary: row.coreBoundary, repairMechanic: row.repairMechanic } : null,
+    );
+
     const completion = await client.chat.completions.create({
       model: "gpt-4o",
       max_tokens: 1024,
       response_format: { type: "json_object" },
       messages: [
-        { role: "system", content: buildSystemPrompt(baseline ?? null) },
+        { role: "system", content: buildSystemPrompt(activeSignals) },
         {
           role: "user",
           content: `Analyze this conflict or emotional moment:\n\n${message.trim()}`,
@@ -113,6 +131,7 @@ router.post("/", async (req: Request, res: Response) => {
       parsed = JSON.parse(raw) as Record<string, unknown>;
     } catch {
       console.error("[explain] JSON parse failed:", raw.slice(0, 200));
+      if (reservedId) { await refundUsage(reservedId); reservedId = null; }
       res.status(500).json({ error: "Model returned malformed JSON. Please try again." });
       return;
     }
@@ -120,12 +139,18 @@ router.post("/", async (req: Request, res: Response) => {
     const validationError = validate(parsed);
     if (validationError) {
       console.error("[explain] Schema validation failed:", validationError, parsed);
+      if (reservedId) { await refundUsage(reservedId); reservedId = null; }
       res.status(500).json({ error: "Incomplete model response. Please try again." });
       return;
     }
 
+    // Free users already reserved their slot above; meter Pro (unlimited) here
+    // so the sidebar counter still reflects activity.
+    if (tier === "pro") await recordUsage(req.userId!, "defrag");
+
     res.json(parsed);
   } catch (err: unknown) {
+    if (reservedId) { await refundUsage(reservedId); reservedId = null; }
     // Surface OpenAI-specific error types explicitly
     if (err instanceof OpenAI.AuthenticationError) {
       console.error("[explain] OpenAI auth error — check OPENAI_API_KEY");

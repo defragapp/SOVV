@@ -2,7 +2,7 @@ import { Router, type Request, type Response } from "express";
 import bcrypt from "bcrypt";
 import { db, users, sessions } from "@workspace/db";
 import { eq } from "drizzle-orm";
-import { SESSION_COOKIE } from "../middlewares/auth";
+import { SESSION_COOKIE, requireAuth } from "../middlewares/auth";
 
 const router = Router();
 
@@ -22,6 +22,15 @@ function cookieOpts() {
 function publicUser(u: { id: string; email: string; tier: string }) {
   return { id: u.id, email: u.email, tier: u.tier };
 }
+
+// ── GET /api/auth/people ──────────────────────────────────────────────────────
+// Minimal Relational Matrix: returns the authenticated user as their own "self"
+// node. Full people management (add/edit others) is a separate feature.
+router.get("/people", requireAuth, (req: Request, res: Response) => {
+  const email = req.user?.email ?? "";
+  const name = email.split("@")[0] || "You";
+  return res.json({ people: [{ id: req.userId!, name, relation: "self" }] });
+});
 
 // ── POST /api/auth/register ───────────────────────────────────────────────────
 router.post("/register", async (req: Request, res: Response) => {

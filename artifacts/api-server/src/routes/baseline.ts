@@ -1,7 +1,8 @@
 import { Router, type Request, type Response } from "express";
 import { db, baselines } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
+import { computeBaseline } from "../lib/baseline-engine";
 
 const router = Router();
 
@@ -24,13 +25,16 @@ router.get("/", requireAuth, async (req: Request, res: Response) => {
     const [row] = await db.select().from(baselines).where(eq(baselines.userId, req.userId!)).limit(1);
     if (!row) return res.json(null);
     return res.json({
-      dob:            row.dob,
-      tob:            row.tob,
-      pob:            row.pob,
-      defaultRetreat: row.defaultRetreat,
-      coreBoundary:   row.coreBoundary,
-      repairMechanic: row.repairMechanic,
-      updatedAt:      row.updatedAt,
+      dob:             row.dob,
+      tob:             row.tob,
+      pob:             row.pob,
+      defaultRetreat:  row.defaultRetreat,
+      coreBoundary:    row.coreBoundary,
+      repairMechanic:  row.repairMechanic,
+      computedProfile: row.computedProfile,
+      baselineStatus:  row.baselineStatus,
+      computedAt:      row.computedAt,
+      updatedAt:       row.updatedAt,
     });
   } catch (err) {
     console.error("[baseline/GET]", err);
@@ -61,29 +65,52 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
   }
 
   try {
-    const existing = await db.select({ id: baselines.id }).from(baselines)
-      .where(eq(baselines.userId, req.userId!)).limit(1);
+    // Serialize per-user so a concurrent partial update can't produce a profile
+    // computed from stale (pre-merge) birth data.
+    const profile = await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${req.userId!}))`);
 
-    // Build update payload — only overwrite fields that were actually sent
-    const setFields: Record<string, unknown> = { updatedAt: new Date() };
-    if (dob            !== "") setFields.dob            = dob;
-    if (tob            !== "") setFields.tob            = tob;
-    if (pob            !== "") setFields.pob            = pob;
-    if (defaultRetreat !== "") setFields.defaultRetreat = defaultRetreat;
-    if (coreBoundary   !== "") setFields.coreBoundary   = coreBoundary;
-    if (repairMechanic !== "") setFields.repairMechanic = repairMechanic;
+      const [existing] = await tx.select().from(baselines)
+        .where(eq(baselines.userId, req.userId!)).limit(1);
 
-    if (existing.length > 0) {
-      await db.update(baselines).set(setFields).where(eq(baselines.userId, req.userId!));
-    } else {
-      await db.insert(baselines).values({
-        userId: req.userId!,
-        dob, tob, pob,
-        defaultRetreat, coreBoundary, repairMechanic,
-      });
-    }
+      // Effective birth data after merge — only sent fields overwrite existing ones.
+      const effDob = dob !== "" ? dob : existing?.dob ?? "";
+      const effTob = tob !== "" ? tob : existing?.tob ?? "";
 
-    return res.json({ ok: true });
+      // Recompute the Baseline Design map from the merged canonical birth data.
+      const computed = computeBaseline({ dob: effDob, tob: effTob });
+      const computedAt = computed.status === "not_started" ? null : new Date();
+
+      // Build update payload — only overwrite fields that were actually sent
+      const setFields: Record<string, unknown> = {
+        updatedAt:       new Date(),
+        computedProfile: computed,
+        baselineStatus:  computed.status,
+        computedAt,
+      };
+      if (dob            !== "") setFields.dob            = dob;
+      if (tob            !== "") setFields.tob            = tob;
+      if (pob            !== "") setFields.pob            = pob;
+      if (defaultRetreat !== "") setFields.defaultRetreat = defaultRetreat;
+      if (coreBoundary   !== "") setFields.coreBoundary   = coreBoundary;
+      if (repairMechanic !== "") setFields.repairMechanic = repairMechanic;
+
+      if (existing) {
+        await tx.update(baselines).set(setFields).where(eq(baselines.userId, req.userId!));
+      } else {
+        await tx.insert(baselines).values({
+          userId: req.userId!,
+          dob, tob, pob,
+          defaultRetreat, coreBoundary, repairMechanic,
+          computedProfile: computed,
+          baselineStatus:  computed.status,
+          computedAt,
+        });
+      }
+      return computed;
+    });
+
+    return res.json({ ok: true, baselineStatus: profile.status, confidence: profile.confidence });
   } catch (err) {
     console.error("[baseline/POST]", err);
     return res.status(500).json({ error: "Failed to save baseline" });

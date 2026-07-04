@@ -4,3 +4,4 @@
 - [Sovereign.os architecture decisions](sovereign-os-arch.md) — space structure, context providers, baseline/archive patterns, ambient layer placement
 - [Sovereign.os backend persistence](sovos-persistence.md) — auth+sessions, baseline/archive/covenants/Stripe all implemented locally replacing broken proxy
 - [Sovereign.os design system rules](sovos-design-rules.md) — amber is intent only; structural dividers use white/5.5%; all action buttons are rounded-full; overlays/cards are rounded-2xl max
+- [Baseline Design product direction](baseline-design-direction.md) — two-layer seed(birth data)+calibration(self-reported); deterministic offline engine; behavioral signals only, never raw astrology; graceful fallback both ways

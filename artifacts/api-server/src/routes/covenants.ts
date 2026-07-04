@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { db, covenants, baselines, archiveEntries } from "@workspace/db";
 import { eq, desc, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
+import { toActiveSignals, type BaselineProfile } from "../lib/baseline-engine";
 
 const router = Router();
 
@@ -37,11 +38,13 @@ router.post("/suggest", requireAuth, async (req: Request, res: Response) => {
     ]);
 
     const baseline = baselineRows[0] ?? null;
+    const activeSignals = toActiveSignals(
+      (baseline?.computedProfile as BaselineProfile | null) ?? null,
+      baseline ? { defaultRetreat: baseline.defaultRetreat, coreBoundary: baseline.coreBoundary, repairMechanic: baseline.repairMechanic } : null,
+    );
 
-    const baselineBlock = baseline?.coreBoundary?.trim()
-      ? `USER BASELINE:\n• Core Boundary: "${baseline.coreBoundary.trim()}"${
-          baseline.defaultRetreat?.trim() ? `\n• Default Retreat: "${baseline.defaultRetreat.trim()}"` : ""
-        }${baseline.repairMechanic?.trim() ? `\n• Repair Mechanic: "${baseline.repairMechanic.trim()}"` : ""}`
+    const baselineBlock = activeSignals.length > 0
+      ? `USER BASELINE (private behavioral map):\n${activeSignals.map(s => `• ${s}`).join("\n")}`
       : "";
 
     const patternsBlock = patternRows.length > 0
