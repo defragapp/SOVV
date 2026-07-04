@@ -94,17 +94,9 @@ export default function LoginScreen() {
         return
       }
 
-      // Check for baseline → route accordingly
-      fetch("/api/baseline", { credentials: "include" })
-        .then(r => r.ok ? r.json() : null)
-        .then((d: { defaultRetreat?: string } | null) => {
-          if (d?.defaultRetreat) {
-            window.location.href = "/apps/defrag"
-          } else {
-            window.location.href = "/settings?onboard=1"
-          }
-        })
-        .catch(() => { window.location.href = "/apps/defrag" })
+      // Always route to the app — BaselineGate handles onboarding overlay
+      // when the user hasn't completed their Baseline Design.
+      window.location.href = "/apps/defrag"
     } catch {
       setError("Connection failed. Please try again.")
     } finally {

@@ -2,38 +2,48 @@
 const BASELINE_KEY = 'sovv_baseline';
 
 export interface BaselineData {
-  defaultRetreat: string;   // Step 1: where they go when conflict spikes
-  coreBoundary: string;     // Step 2: the line that collapses clarity
-  repairMechanic: string;   // Step 3: how they attempt to fix the break
+  /** Date of birth — YYYY-MM-DD — required for baseline computation. */
+  dob: string;
+  /** Place of birth — city/region/country — required. */
+  pob: string;
+  /** Time of birth — approximate ok (e.g. "14:30" or "morning") — optional; empty = not provided. */
+  tob: string;
 }
 
-/** Read saved baseline, returns null if not yet completed. */
+/** Read saved baseline, returns null if onboarding not yet completed. */
 export function readBaseline(): BaselineData | null {
   try {
     const raw = localStorage.getItem(BASELINE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as BaselineData;
+    const parsed = JSON.parse(raw) as Partial<BaselineData>;
+    // Must have at least a dob to be considered complete
+    if (!parsed.dob) return null;
+    return { dob: parsed.dob, pob: parsed.pob ?? '', tob: parsed.tob ?? '' };
   } catch {
     return null;
   }
 }
 
-/** Persist the baseline after onboarding completion. Saves locally and syncs to API. */
-export function saveBaseline(data: BaselineData): void {
+/**
+ * Persist the baseline after onboarding completion.
+ * Saves to localStorage and awaits the API sync so callers can show a loading state.
+ */
+export async function saveBaseline(data: BaselineData): Promise<void> {
   try {
     localStorage.setItem(BASELINE_KEY, JSON.stringify(data));
   } catch {
-    // storage unavailable — ignore
+    // storage unavailable — continue to API sync
   }
-  // Fire-and-forget: sync to backend for cross-device persistence
-  fetch('/api/baseline', {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  }).catch(() => {
+  try {
+    await fetch('/api/baseline', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dob: data.dob, tob: data.tob, pob: data.pob }),
+    });
+  } catch {
     // Offline or unauthenticated — localStorage is the source of truth
-  });
+  }
 }
 
 /**
@@ -45,18 +55,21 @@ export async function hydrateBaseline(): Promise<void> {
   try {
     const res = await fetch('/api/baseline', { credentials: 'include' });
     if (res.ok) {
-      const data = await res.json() as BaselineData | null;
-      if (data?.defaultRetreat) {
+      const data = await res.json() as Partial<BaselineData> | null;
+      if (data?.dob) {
         localStorage.setItem(BASELINE_KEY, JSON.stringify(data));
       }
     }
   } catch { /* network error — ignore */ }
 }
 
-/** Quick boolean check without parsing. */
+/** Quick boolean check: returns true if a completed baseline exists locally. */
 export function checkHasBaseline(): boolean {
   try {
-    return Boolean(localStorage.getItem(BASELINE_KEY));
+    const raw = localStorage.getItem(BASELINE_KEY);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw) as Partial<BaselineData>;
+    return Boolean(parsed.dob);
   } catch {
     return false;
   }

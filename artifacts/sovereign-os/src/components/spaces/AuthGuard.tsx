@@ -61,8 +61,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
         let hasBaseline = false
         if (baselineRes.ok) {
-          const baselineData = await baselineRes.json() as { baseline?: { dob?: string } | null }
-          hasBaseline = Boolean(baselineData?.baseline?.dob)
+          // API returns { dob, tob, pob, ... } directly — not wrapped in a 'baseline' key
+          const baselineData = await baselineRes.json() as { dob?: string } | null
+          hasBaseline = Boolean(baselineData?.dob)
         }
 
         setAuth({

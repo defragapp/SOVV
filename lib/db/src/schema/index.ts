@@ -23,6 +23,11 @@ export const sessions = pgTable("sessions", {
 export const baselines = pgTable("baselines", {
   id:             uuid("id").primaryKey().defaultRandom(),
   userId:         uuid("user_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
+  // Birth data — primary Baseline Design inputs
+  dob:            text("dob").notNull().default(""),   // YYYY-MM-DD
+  tob:            text("tob").notNull().default(""),   // time of birth (approx ok; empty = not provided)
+  pob:            text("pob").notNull().default(""),   // place of birth
+  // Psychological pattern fields (legacy, preserved for AI context)
   defaultRetreat: text("default_retreat").notNull().default(""),
   coreBoundary:   text("core_boundary").notNull().default(""),
   repairMechanic: text("repair_mechanic").notNull().default(""),
