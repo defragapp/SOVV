@@ -1,0 +1,21 @@
+core_entities:
+  - User: Identity and profile management.
+  - Space: Defrag (free), Alignment (pro), Covenant (pro).
+  - Agent: AI agents with specific roles.
+  - Vibe: UI/UX state and theme settings.
+endpoints:
+  - /api/v1/spaces: Manage spaces.
+  - /api/v1/agents: Manage agents.
+baseline_rules:
+  - Encryption at rest for all user data.
+  - Mandatory 2FA for Pro spaces.
+entitlements:
+  - Defrag: Basic search, limited agents.
+  - Alignment: Advanced intelligence, priority workers.
+  - Covenant: Secure collaboration, full encryption control.
+retention:
+  - Free: 30 days history.
+  - Pro: Unlimited/Configurable.
+encryption:
+  - KMS-backed AES-256 for data.
+  - Client-side encryption for Covenant space.
