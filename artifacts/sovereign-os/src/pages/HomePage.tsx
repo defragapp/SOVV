@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
 import { SiteShell } from '@/components/marketing/site-shell';
 import { Container } from '@/components/ui/layout-primitives';
@@ -96,6 +96,21 @@ const TRUST_SIGNALS = [
   'Pattern-aware AI platform',
   'Private by design architecture',
   'Actionable guidance in minutes',
+] as const;
+
+const OUTCOMES = [
+  {
+    title: 'De-escalate conflict faster',
+    detail: 'See the pattern driving escalation before reacting, so hard conversations stay repairable.',
+  },
+  {
+    title: 'Repair with precision',
+    detail: 'Turn emotional noise into one clear next response that rebuilds trust instead of widening distance.',
+  },
+  {
+    title: 'Grow family stability',
+    detail: 'Repeat a healthier response loop across daily pressure, not just one isolated moment.',
+  },
 ] as const;
 
 // ── CTA Button ────────────────────────────────────────────────────────────────
@@ -523,8 +538,8 @@ function Hero() {
 
       {/* Content — subtle x/y parallax, no 3D tilt */}
       <motion.div className="relative z-10 w-full" style={{ x: textX, y: textY }}>
-        <Container className="py-24 md:py-32">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] items-start gap-10 lg:gap-9">
+        <Container className="py-22 md:py-28">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_460px] items-center gap-8 lg:gap-10">
             <div className="max-w-2xl">
 
               {/* Amber hairline */}
@@ -555,21 +570,21 @@ function Hero() {
               {/* Headline */}
               <h1
                 className="font-serif leading-[1.04] tracking-[-0.03em] text-balance"
-                style={{ fontSize: 'clamp(2.25rem, 6.4vw, 5rem)', color: C.cream }}
+                style={{ fontSize: 'clamp(2.2rem, 5.8vw, 4.35rem)', color: C.cream }}
               >
                 <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
                   <span ref={refs.line1Ref} className="block" style={{ willChange: 'transform' }}>
-                    AI operating system
+                    Pattern-aware AI
                   </span>
                 </span>
                 <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
                   <span ref={refs.line2Ref} className="block" style={{ willChange: 'transform' }}>
-                    for pattern-aware
+                    for decisions that
                   </span>
                 </span>
                 <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
                   <span ref={refs.line3Ref} className="block" style={{ willChange: 'transform' }}>
-                    decisions under pressure.
+                    protect relationships.
                   </span>
                 </span>
               </h1>
@@ -580,7 +595,7 @@ function Hero() {
                 className="mt-7 max-w-lg text-[14px] md:text-[15px] leading-[1.75]"
                 style={{ color: '#aba096' }}
               >
-                Sovereign.os turns your messages and decision context into pattern-level AI guidance, so you can see what is happening, why it repeats, and what to do next.
+                Sovereign.os transforms live conversation pressure into practical AI guidance, so you can identify the pattern and choose a response that repairs instead of escalates.
               </p>
 
               {/* Differentiator */}
@@ -599,7 +614,7 @@ function Hero() {
                 </span>
               </div>
 
-              <p className="mt-3 text-[12px] leading-relaxed" style={{ color: '#8e867f' }}>
+              <p className="mt-3 max-w-lg text-[12px] leading-relaxed" style={{ color: '#8e867f' }}>
                 Bring one real conversation, decision, or conflict. Get a concrete next move in minutes.
               </p>
 
@@ -633,7 +648,7 @@ function Hero() {
               </div>
             </div>
 
-            <div className="hidden lg:block lg:pt-12">
+            <div className="hidden lg:block">
               <IntelligencePanel />
             </div>
           </div>
@@ -796,10 +811,138 @@ function ValuePillars() {
   );
 }
 
+function ImpactGrid() {
+  return (
+    <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+      {OUTCOMES.map((outcome, index) => (
+        <motion.article
+          key={outcome.title}
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-70px' }}
+          transition={{ duration: 0.45, delay: index * 0.06, ease }}
+          className="p-5 md:p-6"
+          style={{
+            borderRadius: 14,
+            border: `1px solid ${index === 1 ? C.amberLine : C.rule}`,
+            background: index === 1 ? 'rgba(224,116,58,0.07)' : C.bgCard,
+          }}
+        >
+          <h3 className="font-serif text-[23px] leading-tight mb-3" style={{ color: C.cream }}>
+            {outcome.title}
+          </h3>
+          <p className="text-[13px] leading-[1.75]" style={{ color: C.mid }}>
+            {outcome.detail}
+          </p>
+        </motion.article>
+      ))}
+    </div>
+  );
+}
+
+function LaunchEntry({ active, onComplete }: { active: boolean; onComplete: () => void }) {
+  const prefersReducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (!active) return;
+    if (prefersReducedMotion) {
+      onComplete();
+      return;
+    }
+    const t = window.setTimeout(onComplete, 1700);
+    return () => window.clearTimeout(t);
+  }, [active, onComplete, prefersReducedMotion]);
+
+  return (
+    <AnimatePresence>
+      {active && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.65, ease } }}
+          className="fixed inset-0 z-[120] flex items-center justify-center"
+          style={{ background: 'radial-gradient(130% 90% at 50% 0%, rgba(28,22,19,0.95) 0%, rgba(8,7,10,0.98) 50%, rgba(8,7,10,1) 100%)' }}
+        >
+          <div className="w-full max-w-3xl px-8 text-center">
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease }}
+              className="font-mono text-[10px] uppercase tracking-[0.28em] mb-6"
+              style={{ color: '#9f958d' }}
+            >
+              Sovereign.os · Pattern-aware AI
+            </motion.p>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.08, ease }}
+              className="font-serif leading-[1.04] tracking-[-0.028em]"
+              style={{ fontSize: 'clamp(2.4rem, 6.2vw, 5.2rem)', color: C.cream }}
+            >
+              Clarity that helps
+              <br />
+              relationships heal.
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.16, ease }}
+              className="mt-6 max-w-xl mx-auto text-[14px] leading-[1.75]"
+              style={{ color: '#b2a8a0' }}
+            >
+              Analyze the moment, uncover the pattern, and choose a better next move before damage compounds.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, scaleX: 0.1 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ duration: 0.65, delay: 0.3, ease }}
+              className="h-px mt-10 mx-auto origin-left"
+              style={{ width: 220, background: 'linear-gradient(90deg, rgba(224,116,58,0.9), rgba(244,239,233,0.14))' }}
+            />
+
+            <button
+              type="button"
+              onClick={onComplete}
+              className="mt-8 font-mono text-[9px] uppercase tracking-[0.2em]"
+              style={{ color: '#8f857d' }}
+            >
+              Skip intro
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 export function HomePage() {
+  const [entryActive, setEntryActive] = useState(false);
+
+  useEffect(() => {
+    try {
+      const key = 'sovv:entry-played';
+      const seen = sessionStorage.getItem(key);
+      if (!seen) {
+        setEntryActive(true);
+        sessionStorage.setItem(key, '1');
+      }
+    } catch {
+      setEntryActive(true);
+    }
+  }, []);
+
+  const handleEntryComplete = useCallback(() => {
+    setEntryActive(false);
+  }, []);
+
   return (
     <SiteShell entranceControlled>
+      <LaunchEntry active={entryActive} onComplete={handleEntryComplete} />
       <Hero />
 
       {/* ── Value ─────────────────────────────────────────────────── */}
@@ -876,6 +1019,32 @@ export function HomePage() {
             <br className="hidden md:block" />
             Sovereign.os maps the pattern behind it.
           </motion.blockquote>
+        </Container>
+      </motion.section>
+
+      {/* ── Outcomes ────────────────────────────────────────────── */}
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={sectionViewport}
+        transition={{ duration: 0.62, ease }}
+        className="relative w-full py-20 md:py-28"
+        style={{ background: C.bgLift, borderTop: `1px solid ${C.rule}` }}
+      >
+        <Container>
+          <div className="flex flex-col items-center text-center mb-10 md:mb-12">
+            <SectionLabel>Real-World Outcomes</SectionLabel>
+            <h2
+              className="font-serif tracking-[-0.022em] leading-[1.07] max-w-2xl text-balance"
+              style={{ fontSize: 'clamp(2rem, 4.8vw, 3.3rem)', color: C.cream }}
+            >
+              Built to strengthen families, not just answer prompts.
+            </h2>
+            <p className="mt-4 max-w-2xl text-[14px] leading-[1.75]" style={{ color: C.mid }}>
+              The product goal is practical repair: less escalation, better conversations, and healthier long-term patterns.
+            </p>
+          </div>
+          <ImpactGrid />
         </Container>
       </motion.section>
 
