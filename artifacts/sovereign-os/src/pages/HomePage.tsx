@@ -280,7 +280,7 @@ function IntelligencePanel() {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, delay: 0.18, ease }}
-      className="relative w-full max-w-[390px]"
+      className="relative w-full max-w-[420px]"
       aria-label="Sovereign intelligence panel"
     >
       <div
@@ -523,8 +523,8 @@ function Hero() {
 
       {/* Content — subtle x/y parallax, no 3D tilt */}
       <motion.div className="relative z-10 w-full" style={{ x: textX, y: textY }}>
-        <Container className="py-22 md:py-40">
-          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_390px] items-start gap-10 xl:gap-9">
+        <Container className="py-24 md:py-32">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] items-start gap-10 lg:gap-9">
             <div className="max-w-2xl">
 
               {/* Amber hairline */}
@@ -555,7 +555,7 @@ function Hero() {
               {/* Headline */}
               <h1
                 className="font-serif leading-[1.04] tracking-[-0.03em] text-balance"
-                style={{ fontSize: 'clamp(2.25rem, 7vw, 5.4rem)', color: C.cream }}
+                style={{ fontSize: 'clamp(2.25rem, 6.4vw, 5rem)', color: C.cream }}
               >
                 <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
                   <span ref={refs.line1Ref} className="block" style={{ willChange: 'transform' }}>
@@ -577,7 +577,7 @@ function Hero() {
               {/* Subtext */}
               <p
                 ref={refs.subtextRef}
-                className="mt-7 max-w-md text-[14px] md:text-[15px] leading-[1.75]"
+                className="mt-7 max-w-lg text-[14px] md:text-[15px] leading-[1.75]"
                 style={{ color: '#aba096' }}
               >
                 Sovereign.os turns your messages and decision context into pattern-level AI guidance, so you can see what is happening, why it repeats, and what to do next.
@@ -629,7 +629,7 @@ function Hero() {
               </div>
             </div>
 
-            <div className="hidden xl:block xl:pt-16">
+            <div className="hidden lg:block lg:pt-12">
               <IntelligencePanel />
             </div>
           </div>
@@ -642,7 +642,7 @@ function Hero() {
 // ── Shared section label ──────────────────────────────────────────────────────
 function SectionLabel({ children }: { children: string }) {
   return (
-    <p className="font-mono text-[9px] uppercase tracking-[0.32em] mb-5" style={{ color: C.dim }}>
+    <p className="font-mono text-[9px] uppercase tracking-[0.26em] mb-5" style={{ color: C.dim }}>
       {children}
     </p>
   );
@@ -804,7 +804,7 @@ export function HomePage() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={sectionViewport}
         transition={{ duration: 0.62, ease }}
-        className="relative w-full py-20 md:py-32"
+        className="relative w-full py-20 md:py-28"
         style={{ background: C.bgLift, borderTop: `1px solid ${C.rule}` }}
       >
         <Container>
@@ -812,7 +812,7 @@ export function HomePage() {
             <SectionLabel>What It Does</SectionLabel>
             <h2
               className="font-serif tracking-[-0.022em] leading-[1.07] max-w-2xl text-balance"
-              style={{ fontSize: 'clamp(1.9rem, 4.8vw, 3.2rem)', color: C.cream }}
+              style={{ fontSize: 'clamp(2rem, 4.8vw, 3.3rem)', color: C.cream }}
             >
               AI analysis for high-stakes moments.
             </h2>
@@ -830,15 +830,15 @@ export function HomePage() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={sectionViewport}
         transition={{ duration: 0.62, ease }}
-        className="relative w-full py-20 md:py-36"
+        className="relative w-full py-20 md:py-28"
         style={{ background: C.bg, borderTop: `1px solid ${C.rule}` }}
       >
         <Container>
           <div className="flex flex-col items-center text-center mb-10 md:mb-12">
             <SectionLabel>How It Reasons</SectionLabel>
             <h2
-              className="font-serif italic tracking-[-0.022em] leading-[1.07] max-w-xl text-balance"
-              style={{ fontSize: 'clamp(1.9rem, 4.8vw, 3.2rem)', color: C.cream }}
+              className="font-serif tracking-[-0.022em] leading-[1.07] max-w-2xl text-balance"
+              style={{ fontSize: 'clamp(2rem, 4.8vw, 3.3rem)', color: C.cream }}
             >
               Baseline model + context + response guidance.
             </h2>
@@ -856,7 +856,7 @@ export function HomePage() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={sectionViewport}
         transition={{ duration: 0.62, ease }}
-        className="w-full py-20 md:py-36"
+        className="w-full py-18 md:py-24"
         style={{ background: C.bgLift, borderTop: `1px solid ${C.rule}` }}
       >
         <Container>
@@ -881,7 +881,7 @@ export function HomePage() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={sectionViewport}
         transition={{ duration: 0.62, ease }}
-        className="relative w-full py-20 md:py-32"
+        className="relative w-full py-20 md:py-28"
         style={{ background: C.bg, borderTop: `1px solid ${C.rule}` }}
       >
         <Container>
@@ -889,7 +889,7 @@ export function HomePage() {
             <SectionLabel>How It Works</SectionLabel>
             <h2
               className="font-serif tracking-[-0.022em] leading-[1.07] max-w-2xl text-balance"
-              style={{ fontSize: 'clamp(1.9rem, 4.8vw, 3.2rem)', color: C.cream }}
+              style={{ fontSize: 'clamp(2rem, 4.8vw, 3.3rem)', color: C.cream }}
             >
               From tension to repair.
             </h2>
@@ -907,15 +907,15 @@ export function HomePage() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={sectionViewport}
         transition={{ duration: 0.62, ease }}
-        className="relative w-full py-20 md:py-36"
+        className="relative w-full py-20 md:py-28"
         style={{ background: C.bg, borderTop: `1px solid ${C.rule}` }}
       >
         <Container>
           <div className="flex flex-col items-center text-center mb-10 md:mb-12">
             <SectionLabel>Product Spaces</SectionLabel>
             <h2
-              className="font-serif tracking-[-0.022em] leading-[1.07] max-w-xl text-balance"
-              style={{ fontSize: 'clamp(1.9rem, 4.8vw, 3.2rem)', color: C.cream }}
+              className="font-serif tracking-[-0.022em] leading-[1.07] max-w-2xl text-balance"
+              style={{ fontSize: 'clamp(2rem, 4.8vw, 3.3rem)', color: C.cream }}
             >
               Three AI workspaces. One operating system.
             </h2>
@@ -931,7 +931,7 @@ export function HomePage() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={sectionViewport}
         transition={{ duration: 0.62, ease }}
-        className="relative w-full py-24 md:py-48"
+        className="relative w-full py-24 md:py-32"
         style={{ background: C.bgLift, borderTop: `1px solid ${C.rule}` }}
       >
         <Container className="flex flex-col items-center text-center">
