@@ -92,6 +92,12 @@ const VALUE_PILLARS = [
   },
 ] as const;
 
+const TRUST_SIGNALS = [
+  'Pattern-aware AI platform',
+  'Private by design architecture',
+  'Actionable guidance in minutes',
+] as const;
+
 // ── CTA Button ────────────────────────────────────────────────────────────────
 function GhostCta({ children, href }: { children: React.ReactNode; href: string }) {
   const prefersReducedMotion = useReducedMotion();
@@ -297,7 +303,7 @@ function IntelligencePanel() {
         <div className="relative p-5 md:p-6">
           <div className="flex items-center justify-between mb-3">
             <p className="font-mono text-[9px] uppercase tracking-[0.22em]" style={{ color: 'rgba(244,239,233,0.72)' }}>
-              Pattern Engine
+              Live AI Decision Engine
             </p>
             <span
               className="font-mono text-[8px] uppercase tracking-[0.14em] px-2 py-1"
@@ -326,8 +332,8 @@ function IntelligencePanel() {
 
           <div className="space-y-2.5 mb-4">
             {[
-              'Conflict loop detected through delayed repair impulse.',
-              'Best next move: pause, name, then respond.',
+              'Input: conflict message + emotional pressure context.',
+              'Output: baseline pattern + best next response.',
             ].map((line, i) => (
               <div
                 key={line}
@@ -533,7 +539,7 @@ function Hero() {
                 className="font-mono text-[9px] uppercase tracking-[0.36em] mb-6"
                 style={{ color: C.dim }}
               >
-                Sovereign.os
+                Sovereign.os AI Platform
               </p>
 
               <div
@@ -542,7 +548,7 @@ function Hero() {
               >
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: '#e0743a' }} />
                 <span className="font-mono text-[8px] uppercase tracking-[0.12em]" style={{ color: '#f3c7a3' }}>
-                  Baseline-native reasoning
+                  Pattern-aware AI reasoning
                 </span>
               </div>
 
@@ -553,18 +559,17 @@ function Hero() {
               >
                 <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
                   <span ref={refs.line1Ref} className="block" style={{ willChange: 'transform' }}>
-                    Your private operating
+                    AI operating system
                   </span>
                 </span>
                 <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
                   <span ref={refs.line2Ref} className="block" style={{ willChange: 'transform' }}>
-                    system for{' '}
-                    <em style={{ fontStyle: 'italic' }}>becoming</em>
+                    for pattern-aware
                   </span>
                 </span>
                 <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
                   <span ref={refs.line3Ref} className="block" style={{ willChange: 'transform' }}>
-                    <em style={{ fontStyle: 'italic' }}>clear</em> to yourself.
+                    decisions under pressure.
                   </span>
                 </span>
               </h1>
@@ -575,7 +580,7 @@ function Hero() {
                 className="mt-7 max-w-md text-[14px] md:text-[15px] leading-[1.75]"
                 style={{ color: '#aba096' }}
               >
-                Sovereign.os uses your Baseline Design to understand your patterns across relationships, decisions, and pressure, so guidance starts from who you are, not generic prompts.
+                Sovereign.os turns your messages and decision context into pattern-level AI guidance, so you can see what is happening, why it repeats, and what to do next.
               </p>
 
               {/* Differentiator */}
@@ -583,7 +588,7 @@ function Hero() {
                 className="mt-5 max-w-sm font-mono text-[9px] md:text-[10px] leading-relaxed tracking-[0.1em] pl-3"
                 style={{ color: '#877e76', borderLeft: `1px solid ${C.amberLine}` }}
               >
-                Most AI responds to what you type. Sovereign.os understands the pattern you&apos;re typing from.
+                How it works: capture the moment, model the baseline pattern, choose the best next response.
               </p>
 
               {/* CTA */}
@@ -592,6 +597,18 @@ function Hero() {
                 <span className="font-mono text-[9px] uppercase tracking-[0.2em]" style={{ color: C.dim }}>
                   Free to start
                 </span>
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-2 max-w-xl">
+                {TRUST_SIGNALS.map((signal) => (
+                  <span
+                    key={signal}
+                    className="font-mono text-[8px] uppercase tracking-[0.12em] px-2.5 py-1"
+                    style={{ borderRadius: 999, border: `1px solid ${C.rule}`, color: '#958d86', background: 'rgba(255,255,255,0.02)' }}
+                  >
+                    {signal}
+                  </span>
+                ))}
               </div>
 
               <div className="xl:hidden mt-8 grid grid-cols-3 gap-2.5 max-w-sm">
@@ -792,15 +809,15 @@ export function HomePage() {
       >
         <Container>
           <div className="flex flex-col items-center text-center mb-10 md:mb-12">
-            <SectionLabel>Why Sovereign.os</SectionLabel>
+            <SectionLabel>What It Does</SectionLabel>
             <h2
               className="font-serif tracking-[-0.022em] leading-[1.07] max-w-2xl text-balance"
               style={{ fontSize: 'clamp(1.9rem, 4.8vw, 3.2rem)', color: C.cream }}
             >
-              Built for signal, not noise.
+              AI analysis for high-stakes moments.
             </h2>
             <p className="mt-4 max-w-2xl text-[14px] leading-[1.75]" style={{ color: C.mid }}>
-              A clear operating model for understanding your patterns and making cleaner decisions under pressure.
+              Sovereign.os reads behavioral signal beneath language and returns practical response guidance you can use immediately.
             </p>
           </div>
           <ValuePillars />
@@ -818,15 +835,15 @@ export function HomePage() {
       >
         <Container>
           <div className="flex flex-col items-center text-center mb-10 md:mb-12">
-            <SectionLabel>The Foundation</SectionLabel>
+            <SectionLabel>How It Reasons</SectionLabel>
             <h2
               className="font-serif italic tracking-[-0.022em] leading-[1.07] max-w-xl text-balance"
               style={{ fontSize: 'clamp(1.9rem, 4.8vw, 3.2rem)', color: C.cream }}
             >
-              Your Baseline Design.<br />Active beneath every thread.
+              Baseline model + context + response guidance.
             </h2>
-            <p className="mt-4 max-w-xs text-[14px] leading-[1.75]" style={{ color: C.mid }}>
-              The pattern is already visible. Sovereign.os names it.
+            <p className="mt-4 max-w-lg text-[14px] leading-[1.75]" style={{ color: C.mid }}>
+              The AI identifies recurring behavioral structure, then translates it into a cleaner next move.
             </p>
           </div>
           <BaselinePanel />
@@ -851,11 +868,9 @@ export function HomePage() {
             className="mx-auto max-w-3xl text-center font-serif italic tracking-[-0.02em] leading-[1.14]"
             style={{ fontSize: 'clamp(1.6rem, 4vw, 3rem)', color: C.cream, fontWeight: 300 }}
           >
-            The pattern you are repeating is{' '}
-            <span style={{ color: 'rgba(244,239,233,0.35)' }}>not</span>{' '}
-            new.{' '}
+            Most AI answers the prompt.
             <br className="hidden md:block" />
-            The clarity can be.
+            Sovereign.os maps the pattern behind it.
           </motion.blockquote>
         </Container>
       </motion.section>
@@ -871,7 +886,7 @@ export function HomePage() {
       >
         <Container>
           <div className="flex flex-col items-center text-center mb-10 md:mb-12">
-            <SectionLabel>The Flow</SectionLabel>
+            <SectionLabel>How It Works</SectionLabel>
             <h2
               className="font-serif tracking-[-0.022em] leading-[1.07] max-w-2xl text-balance"
               style={{ fontSize: 'clamp(1.9rem, 4.8vw, 3.2rem)', color: C.cream }}
@@ -897,12 +912,12 @@ export function HomePage() {
       >
         <Container>
           <div className="flex flex-col items-center text-center mb-10 md:mb-12">
-            <SectionLabel>The Spaces</SectionLabel>
+            <SectionLabel>Product Spaces</SectionLabel>
             <h2
               className="font-serif tracking-[-0.022em] leading-[1.07] max-w-xl text-balance"
               style={{ fontSize: 'clamp(1.9rem, 4.8vw, 3.2rem)', color: C.cream }}
             >
-              Where patterns resolve.
+              Three AI workspaces. One operating system.
             </h2>
           </div>
 
@@ -925,9 +940,9 @@ export function HomePage() {
             className="font-serif tracking-[-0.024em] leading-[1.05] max-w-2xl text-balance"
             style={{ fontSize: 'clamp(2.2rem, 5.6vw, 4.4rem)', color: C.cream }}
           >
-            The pattern is not new.<br />
+            Start with one moment.<br />
             <em style={{ fontStyle: 'italic', color: 'rgba(244,239,233,0.7)' }}>
-              The clarity can be.
+              Get AI guidance in minutes.
             </em>
           </h2>
           <p className="mt-6 max-w-xs text-[14px] leading-[1.75]" style={{ color: C.mid }}>
