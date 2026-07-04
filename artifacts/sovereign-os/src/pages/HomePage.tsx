@@ -306,6 +306,43 @@ function IntelligencePanel() {
   );
 }
 
+function IntelligencePanelCompact() {
+  return (
+    <motion.aside
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, delay: 0.12, ease }}
+      className="w-full max-w-[340px]"
+      aria-label="Sovereign compact intelligence panel"
+    >
+      <div
+        className="p-4"
+        style={{
+          borderRadius: 14,
+          border: '1px solid rgba(224,116,58,0.24)',
+          background: 'linear-gradient(160deg, rgba(22,18,18,0.9), rgba(10,9,11,0.96))',
+          boxShadow: '0 26px 54px -34px rgba(0,0,0,0.96), inset 0 1px 0 rgba(255,241,229,0.14)',
+        }}
+      >
+        <div className="flex items-center justify-between mb-2.5">
+          <p className="font-mono text-[8px] uppercase tracking-[0.16em]" style={{ color: '#cbc2b9' }}>
+            Live AI decision engine
+          </p>
+          <span
+            className="font-mono text-[8px] uppercase tracking-[0.14em] px-2 py-0.5"
+            style={{ borderRadius: 999, color: '#f0a16f', border: '1px solid rgba(224,116,58,0.28)', background: 'rgba(224,116,58,0.1)' }}
+          >
+            Live
+          </span>
+        </div>
+        <p className="text-[12px] leading-relaxed" style={{ color: '#e2dad3' }}>
+          Best next response: pause first, name the pattern, then choose one clean sentence.
+        </p>
+      </div>
+    </motion.aside>
+  );
+}
+
 function Hero() {
   const refs = useHeroEntrance();
   const prefersReducedMotion = useReducedMotion();
@@ -332,7 +369,7 @@ function Hero() {
 
   return (
     <section
-      className="relative w-full min-h-[92svh] flex items-center overflow-hidden"
+      className="relative w-full min-h-[84svh] flex items-center overflow-hidden"
       style={{ background: C.bg }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -350,8 +387,8 @@ function Hero() {
       </div>
 
       <motion.div className="relative z-10 w-full" style={{ x: textX, y: textY }}>
-        <Container className="py-20 md:py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_440px] items-center gap-8 lg:gap-10">
+        <Container className="py-18 md:py-22">
+          <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_440px] items-center gap-8 md:gap-7 xl:gap-10">
             <div className="max-w-2xl">
               <span aria-hidden style={{ display: 'block', width: 20, height: 1, background: `${C.amber}80`, marginBottom: '1rem' }} />
               <p ref={refs.labelRef} className="font-mono text-[9px] uppercase tracking-[0.34em] mb-6" style={{ color: C.dim }}>
@@ -382,7 +419,11 @@ function Hero() {
               </div>
             </div>
 
-            <div className="hidden lg:block">
+            <div className="hidden md:block xl:hidden md:justify-self-end">
+              <IntelligencePanelCompact />
+            </div>
+
+            <div className="hidden xl:block">
               <IntelligencePanel />
             </div>
           </div>
@@ -399,7 +440,7 @@ function ProofSection() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={sectionViewport}
       transition={{ duration: 0.62, ease }}
-      className="relative w-full py-20 md:py-24"
+      className="relative w-full py-16 md:py-20"
       style={{ background: C.bgLift, borderTop: `1px solid ${C.rule}` }}
     >
       <Container>
