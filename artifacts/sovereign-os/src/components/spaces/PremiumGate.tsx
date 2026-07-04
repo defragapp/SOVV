@@ -16,11 +16,17 @@ export function PremiumGate({ space, tagline, description }: PremiumGateProps) {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/checkout', {
+      const res = await fetch('/api/billing/checkout', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
       });
+      if (res.status === 401) {
+        // Not signed in — send them to log in so the payment can be attributed
+        // to their account (required for the Pro upgrade to actually apply).
+        window.location.href = '/app/login?next=/pricing';
+        return;
+      }
       const data = await res.json() as { url?: string; error?: string };
       if (data.url) {
         window.location.href = data.url;

@@ -1,0 +1,68 @@
+I checked again. **You did build it.** The Replit agent’s “baseline engine is entirely unbuilt” statement should **not** be applied to the Cloudflare/GitHub repo.
+
+What is true:
+
+**In the GitHub / Cloudflare-origin repo, Baseline Design already exists.** The current repo has `apps/worker/src/baseline-compiler.ts`, and it is not a stub. It explicitly defines the Baseline Design Dataset v2 pipeline: natal input → geocoding → JPL Horizons → astrology → Human Design → Gene Keys → numerology → AI synthesis → KV storage.
+
+It also has the actual dataset shape with `astronomy`, `frameworks`, `aiDataset`, `identityAnchors`, `derivedTraits`, and app overlays for Defrag, Alignment, and Covenant.
+
+The compiler does real work: geocoding, timezone lookup, JPL Horizons calls, body position storage, framework computation, AI synthesis, and fallback dataset generation.
+
+`baseline.ts` imports that compiler and wires it into `/api/baseline`; when a baseline is saved, it stores a pending dataset, calls `compileBaselineDataset`, and writes the completed dataset to KV.
+
+The active-signal layer also exists. It is explicitly designed to reduce the full computed baseline into behavioral signals before the AI sees it.
+
+And `explain-extended.ts` is already wired to load the dataset, select active signals, build timing signals, format them for prompt injection, and pass that into the AI call.
+
+So the correct interpretation is:
+
+```text
+Cloudflare/GitHub repo:
+Baseline engine exists, but has stabilization bugs.
+
+Replit target:
+Baseline engine may not exist yet unless copied/ported over.
+
+Do not rebuild from scratch.
+Port/preserve the existing GitHub engine, then fix-on-port.
+```
+
+The agent log you pasted says it concluded “the baseline engine is entirely unbuilt,” but that appears scoped to the Replit target, not the GitHub/Cloudflare source. 
+
+The important correction back to the agent is:
+
+Correction:
+
+Do not say “Baseline engine is entirely unbuilt” as a general platform claim.
+
+That is only true for the Replit target if the Cloudflare-origin source has not been ported yet.
+
+The GitHub / Cloudflare-origin repo already contains a real Baseline Design engine:
+
+* `apps/worker/src/baseline-compiler.ts`
+* `apps/worker/src/baseline.ts`
+* `apps/worker/src/active-signals.ts`
+* `apps/worker/src/explain-extended.ts`
+
+The correct task is not “invent a new baseline engine.”
+
+The correct task is:
+
+1. Preserve and port the existing Cloudflare/GitHub Baseline Design implementation.
+2. Fix the verified defects while porting:
+
+   * undefined `user` in `handleSaveBaseline`
+   * duplicate `/api/baseline/status`
+   * `traitLines` used before declaration
+   * planet/body casing mismatch
+   * any route/proxy gaps specific to the target runtime
+3. Keep the existing product architecture:
+
+   * birth data creates the computed baseline
+   * full framework data stays server-side
+   * active behavioral signals are the only baseline layer injected into prompts
+   * self-reported fields become calibration/refinement, not a replacement
+4. Do not replace the richer existing engine with a smaller deterministic placeholder unless explicitly approved.
+5. Treat the current GitHub implementation as the source of truth for the baseline system, then stabilize it.
+
+One caveat: I can verify the **GitHub Cloudflare source** from here. I cannot directly confirm what exact code is currently deployed inside the Cloudflare dashboard unless we inspect Cloudflare deployment metadata/logs through an authenticated browser/API session. But the repo source for the Cloudflare Worker is definitely there, and `wrangler.toml` points the worker at `apps/worker/src/index.ts` with Cloudflare AI, KV, D1, queue, and `api.defrag.app` routing.

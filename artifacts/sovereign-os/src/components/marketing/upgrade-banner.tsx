@@ -12,11 +12,17 @@ export function UpgradeBanner() {
     setLoading(true)
     setError("")
     try {
-      const res = await fetch("/api/checkout", {
+      const res = await fetch("/api/billing/checkout", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
       })
+      if (res.status === 401) {
+        // Not signed in — route through login so the payment is attributable to
+        // an account (the webhook needs user_id to grant Pro).
+        window.location.href = "/app/login?next=/pricing"
+        return
+      }
       const data = (await res.json()) as { url?: string; error?: string }
       if (data.url) {
         window.location.href = data.url
