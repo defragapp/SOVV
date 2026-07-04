@@ -361,8 +361,13 @@ function CovenantDashboard() {
     load();
   }, []);
 
+  const [sealError, setSealError] = useState('');
+
   const handleSeal = useCallback(async (draft: Omit<Covenant, 'id' | 'sealed'>) => {
     const sealed = new Date().toISOString().slice(0, 10);
+    setSealError('');
+    let networkFailed = false;
+
     try {
       const res = await fetch('/api/covenants', {
         method:      'POST',
@@ -384,11 +389,24 @@ function CovenantDashboard() {
         setSelected(next);
         return;
       }
-    } catch { /* fall through to local */ }
-    // Offline / unauthenticated fallback
-    const next: Covenant = { ...draft, id: String(Date.now()), sealed };
-    setCovenants(prev => [next, ...prev]);
-    setSelected(next);
+      // Server returned an HTTP error — surface it instead of silently saving locally
+      let msg = 'Failed to seal covenant. Please try again.';
+      try {
+        const body = await res.json() as { error?: string };
+        if (body.error) msg = body.error;
+      } catch { /* ignore parse failures */ }
+      setSealError(msg);
+      return;
+    } catch {
+      // Genuine network failure — fall through to local offline insert
+      networkFailed = true;
+    }
+
+    if (networkFailed) {
+      const next: Covenant = { ...draft, id: String(Date.now()), sealed };
+      setCovenants(prev => [next, ...prev]);
+      setSelected(next);
+    }
   }, []);
 
   return (
@@ -445,6 +463,11 @@ function CovenantDashboard() {
 
       {/* Drafting engine — pinned to bottom */}
       <div style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }} className="lg:pb-0">
+        {sealError && (
+          <p className="font-mono text-[9px] text-red-400/70 tracking-[0.1em] px-5 pb-2">
+            {sealError}
+          </p>
+        )}
         <DraftingEngine onSeal={handleSeal} />
       </div>
     </div>
@@ -460,10 +483,34 @@ export function CovenantPage() {
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('session_id');
     if (sessionId) {
-      setLocalPremium();
-      refresh();
-      setLocation(location.split('?')[0], { replace: true });
+      let cancelled = false;
+
+      void (async () => {
+        try {
+          const res = await fetch(`/api/billing/confirm?session_id=${encodeURIComponent(sessionId)}`, {
+            credentials: 'include',
+          });
+
+          if (!cancelled && res.ok) {
+            setLocalPremium();
+            await refresh();
+          }
+        } catch {
+          // Ignore confirmation errors here; the backend tier will still be
+          // authoritative once the webhook settles.
+        } finally {
+          if (!cancelled) {
+            setLocation(location.split('?')[0], { replace: true });
+          }
+        }
+      })();
+
+      return () => {
+        cancelled = true;
+      };
     }
+
+    return undefined;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

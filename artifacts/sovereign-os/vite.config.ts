@@ -5,13 +5,7 @@ import { defineConfig } from 'vite';
 
 import runtimeErrorOverlay from '@replit/vite-plugin-runtime-error-modal';
 
-const rawPort = process.env.PORT;
-
-if (!rawPort) {
-  throw new Error(
-    'PORT environment variable is required but was not provided.',
-  );
-}
+const rawPort = process.env.PORT ?? '5173';
 
 const port = Number(rawPort);
 
@@ -19,13 +13,14 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-const basePath = process.env.BASE_PATH;
-
-if (!basePath) {
-  throw new Error(
-    'BASE_PATH environment variable is required but was not provided.',
-  );
+const rawBasePath = process.env.BASE_PATH?.trim() || '/';
+if (!rawBasePath.startsWith('/')) {
+  throw new Error(`Invalid BASE_PATH value: "${rawBasePath}". It must start with "/".`);
 }
+const basePath = rawBasePath === '/' || rawBasePath.endsWith('/')
+  ? rawBasePath
+  : `${rawBasePath}/`;
+const apiTarget = process.env.API_TARGET?.trim() || 'http://localhost:5050';
 
 export default defineConfig({
   base: basePath,
@@ -63,12 +58,29 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, 'dist/public'),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined;
+          if (id.includes('framer-motion')) return 'vendor-motion';
+          if (id.includes('@tanstack/react-query')) return 'vendor-query';
+          if (id.includes('react') || id.includes('scheduler')) return 'vendor-react';
+          return 'vendor';
+        },
+      },
+    },
   },
   server: {
     port,
     strictPort: true,
     host: '0.0.0.0',
     allowedHosts: true,
+    proxy: {
+      '/api': {
+        target: apiTarget,
+        changeOrigin: true,
+      },
+    },
     fs: {
       strict: true,
     },

@@ -89,8 +89,16 @@ export default function LoginScreen() {
       })
 
       if (!res.ok) {
-        const data = await res.json() as { error?: string }
-        setError(data.error ?? "Authentication failed")
+        let message = "Authentication failed"
+        const contentType = res.headers.get("content-type") ?? ""
+        if (contentType.includes("application/json")) {
+          const data = await res.json() as { error?: string }
+          if (data.error) message = data.error
+        }
+        if (message === "Authentication failed" && (res.status === 404 || res.status >= 500)) {
+          message = "Authentication service is unavailable. Please try again shortly."
+        }
+        setError(message)
         return
       }
 
@@ -188,7 +196,7 @@ export default function LoginScreen() {
                   required
                   autoComplete="email"
                   placeholder="you@example.com"
-                  className="w-full px-6 pb-4 bg-transparent text-[17px] text-[#f4efe9] placeholder:text-[#4f4b47] outline-none border-none"
+                  className="login-auth-input w-full px-6 pb-4 bg-transparent text-[17px] text-[#f4efe9] placeholder:text-[#4f4b47] outline-none border-none"
                   style={{ fontFamily: 'var(--app-font-sans)' }}
                 />
               </div>
@@ -206,7 +214,7 @@ export default function LoginScreen() {
                   minLength={8}
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                   placeholder="••••••••"
-                  className="w-full px-6 pb-4 bg-transparent text-[17px] text-[#f4efe9] placeholder:text-[#4f4b47] outline-none border-none"
+                  className="login-auth-input w-full px-6 pb-4 bg-transparent text-[17px] text-[#f4efe9] placeholder:text-[#4f4b47] outline-none border-none"
                   style={{ fontFamily: 'var(--app-font-sans)' }}
                 />
               </div>

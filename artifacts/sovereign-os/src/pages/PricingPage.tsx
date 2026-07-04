@@ -3,6 +3,8 @@ import { SiteShell } from '@/components/marketing/site-shell';
 import { Container } from '@/components/ui/layout-primitives';
 import { CheckoutButton } from '@/components/marketing/checkout-button';
 
+const sectionViewport = { once: true, margin: '-90px' } as const;
+
 function MetaLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="inline-flex items-center gap-2 mb-6">
@@ -73,24 +75,43 @@ export function PricingPage() {
 
   return (
     <SiteShell>
-      <section className="relative w-full pt-32 pb-16 md:pt-40 md:pb-20 bg-[#08070a] overflow-hidden">
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={sectionViewport}
+        transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
+        className="relative w-full pt-28 pb-14 md:pt-40 md:pb-20 bg-[#08070a] overflow-hidden"
+      >
         <div className="light-beam opacity-50" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <MetaLabel>Pricing</MetaLabel>
-          <h1 className="font-serif text-4xl md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance text-[#f4efe9]">
+          <h1 className="font-serif text-[2rem] md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance text-[#f4efe9]">
             Start free. Upgrade when you need continuity.
           </h1>
           <p className="mt-5 max-w-md text-base text-[#a8a29a] leading-relaxed">
             Defrag is free. Covenant, Alignment, and your Library require Pro.
           </p>
         </Container>
-      </section>
+      </motion.section>
 
-      <section className="w-full py-16 md:py-20 bg-[#08070a]">
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={sectionViewport}
+        transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full py-14 md:py-20 bg-[#08070a]"
+      >
         <Container>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
             {/* Free */}
-            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8 flex flex-col" style={{ borderRadius: 'var(--radius-container)' }}>
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={sectionViewport}
+              transition={{ duration: 0.52, delay: 0.03, ease: [0.16, 1, 0.3, 1] }}
+              className="border border-white/[0.08] bg-[#0c0a0d] p-6 md:p-8 flex flex-col"
+              style={{ borderRadius: 'var(--radius-container)' }}
+            >
               <div className="mb-8">
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Free</p>
                 <div className="flex items-baseline gap-1 mb-3">
@@ -108,10 +129,17 @@ export function PricingPage() {
                 ))}
               </div>
               <TactileCTA href="/app/login" label="Start Free" />
-            </div>
+            </motion.div>
 
             {/* Pro */}
-            <div className="border border-[#e0743a]/30 bg-[#0c0a0d] p-8 flex flex-col relative overflow-hidden" style={{ borderRadius: 'var(--radius-container)' }}>
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={sectionViewport}
+              transition={{ duration: 0.52, delay: 0.09, ease: [0.16, 1, 0.3, 1] }}
+              className="border border-[#e0743a]/30 bg-[#0c0a0d] p-6 md:p-8 flex flex-col relative overflow-hidden"
+              style={{ borderRadius: 'var(--radius-container)' }}
+            >
               <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(224,116,58,0.06) 0%, transparent 70%)' }} aria-hidden />
               <div className="relative mb-8">
                 <div className="flex items-center gap-2 mb-3">
@@ -136,7 +164,7 @@ export function PricingPage() {
               ) : (
                 <TactileCTA href="/app/login" label="Upgrade to Pro" amber />
               )}
-            </div>
+            </motion.div>
           </div>
 
           {/* Coming Soon — Relational tier */}
@@ -162,10 +190,16 @@ export function PricingPage() {
             </div>
           </div>
         </Container>
-      </section>
+      </motion.section>
 
       {/* Compare table */}
-      <section className="w-full py-12 bg-[#08070a] border-t border-white/[0.04]">
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={sectionViewport}
+        transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full py-12 bg-[#08070a] border-t border-white/[0.04]"
+      >
         <Container className="max-w-3xl">
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-6">Compare plans</p>
           <div className="border border-white/[0.06]" style={{ borderRadius: 'var(--radius-container)', overflow: 'hidden' }}>
@@ -191,10 +225,16 @@ export function PricingPage() {
             ))}
           </div>
         </Container>
-      </section>
+      </motion.section>
 
       {/* FAQ */}
-      <section className="w-full py-16 md:py-20 bg-[#08070a] border-t border-white/5">
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={sectionViewport}
+        transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full py-14 md:py-20 bg-[#08070a] border-t border-white/5"
+      >
         <Container className="max-w-2xl">
           <MetaLabel>Questions</MetaLabel>
           <div className="flex flex-col">
@@ -213,7 +253,7 @@ export function PricingPage() {
             ))}
           </div>
         </Container>
-      </section>
+      </motion.section>
     </SiteShell>
   );
 }

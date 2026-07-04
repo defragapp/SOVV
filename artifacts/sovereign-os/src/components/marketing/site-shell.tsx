@@ -48,6 +48,31 @@ const FOOTER_COLS = [
 ];
 
 const HEADER_H = 60; // px — tighter, more iOS-like
+const BG_VIDEO_MP4 = import.meta.env.VITE_MARKETING_BG_VIDEO_MP4 || '';
+const BG_VIDEO_WEBM = import.meta.env.VITE_MARKETING_BG_VIDEO_WEBM || '';
+const HAS_BG_VIDEO = Boolean(BG_VIDEO_MP4 || BG_VIDEO_WEBM);
+const rawBgStyle = String(import.meta.env.VITE_MARKETING_BG_STYLE || 'editorial').trim().toLowerCase();
+const BG_STYLE = rawBgStyle === 'cinematic' || rawBgStyle === 'editorial' ? rawBgStyle : 'minimal';
+
+const BACKDROP_STYLES = {
+  minimal: {
+    videoOpacity: 0.08,
+    gradient:
+      'radial-gradient(110% 78% at 50% -14%, rgba(122,102,88,0.12) 0%, transparent 62%), linear-gradient(180deg, rgba(8,7,10,0.64) 0%, rgba(8,7,10,0.88) 64%, rgba(8,7,10,0.96) 100%)',
+  },
+  cinematic: {
+    videoOpacity: 0.14,
+    gradient:
+      'radial-gradient(120% 90% at 50% -10%, rgba(224,116,58,0.11) 0%, transparent 58%), radial-gradient(80% 60% at 100% 0%, rgba(102,78,64,0.12) 0%, transparent 70%), linear-gradient(180deg, rgba(8,7,10,0.58) 0%, rgba(8,7,10,0.84) 62%, rgba(8,7,10,0.95) 100%)',
+  },
+  editorial: {
+    videoOpacity: 0.1,
+    gradient:
+      'radial-gradient(120% 95% at 18% -22%, rgba(165,132,109,0.12) 0%, transparent 58%), radial-gradient(95% 78% at 92% 2%, rgba(92,70,58,0.12) 0%, transparent 70%), linear-gradient(180deg, rgba(8,7,10,0.68) 0%, rgba(8,7,10,0.9) 62%, rgba(8,7,10,0.97) 100%)',
+  },
+} as const;
+
+const BACKDROP = BACKDROP_STYLES[BG_STYLE];
 
 export function SiteShell({ children, entranceControlled = false }: SiteShellProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -105,6 +130,30 @@ export function SiteShell({ children, entranceControlled = false }: SiteShellPro
   return (
     <div className="min-h-[100dvh] flex flex-col bg-[#08070a] text-[#f4efe9]">
 
+      {/* ── Cinematic global backdrop ───────────────────────────────────── */}
+      <div aria-hidden className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        {HAS_BG_VIDEO && (
+          <video
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ opacity: BACKDROP.videoOpacity }}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          >
+            {BG_VIDEO_WEBM && <source src={BG_VIDEO_WEBM} type="video/webm" />}
+            {BG_VIDEO_MP4 && <source src={BG_VIDEO_MP4} type="video/mp4" />}
+          </video>
+        )}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: BACKDROP.gradient,
+          }}
+        />
+      </div>
+
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <header
         ref={headerRef}
@@ -136,7 +185,7 @@ export function SiteShell({ children, entranceControlled = false }: SiteShellPro
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[13px] text-[#76716b] hover:text-[#f4efe9] transition-colors duration-200 tracking-[-0.01em]"
+                className="text-[13px] text-[#9a9189] hover:text-[#f4efe9] transition-colors duration-200 tracking-[-0.01em]"
               >
                 {link.label}
               </Link>
@@ -147,7 +196,7 @@ export function SiteShell({ children, entranceControlled = false }: SiteShellPro
           <div className="hidden md:flex items-center gap-5">
             <Link
               href="/app/login"
-              className="text-[13px] text-[#76716b] hover:text-[#f4efe9] transition-colors duration-200 tracking-[-0.01em]"
+              className="text-[13px] text-[#9a9189] hover:text-[#f4efe9] transition-colors duration-200 tracking-[-0.01em]"
             >
               Sign in
             </Link>
@@ -221,7 +270,7 @@ export function SiteShell({ children, entranceControlled = false }: SiteShellPro
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-[15px] text-[#76716b] hover:text-[#f4efe9] transition-colors py-3.5 border-b border-white/[0.04] tracking-[-0.01em]"
+                    className="text-[15px] text-[#9a9189] hover:text-[#f4efe9] transition-colors py-3.5 border-b border-white/[0.04] tracking-[-0.01em]"
                     onClick={() => setMenuOpen(false)}
                   >
                     {link.label}

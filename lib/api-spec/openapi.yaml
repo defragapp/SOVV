@@ -10,6 +10,22 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication and session management
+  - name: user
+    description: User profile and usage metering
+  - name: baseline
+    description: Baseline Design (birth data + async compile)
+  - name: explain
+    description: Defrag — AI pattern analysis
+  - name: archive
+    description: Saved Defrag results
+  - name: covenants
+    description: Relational boundary covenants
+  - name: alignment
+    description: Alignment vectors
+  - name: billing
+    description: Stripe checkout and subscription management
 paths:
   /healthz:
     get:
@@ -24,13 +40,1029 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Create account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthCredentials"
+      responses:
+        "201":
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Log in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthCredentials"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Log out and clear session cookie
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /auth/refresh:
+    post:
+      operationId: refreshSession
+      tags: [auth]
+      summary: Extend session TTL
+      responses:
+        "200":
+          description: Session extended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /auth/forgot-password:
+    post:
+      operationId: forgotPassword
+      tags: [auth]
+      summary: Request a password reset link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required: [email]
+      responses:
+        "200":
+          description: Reset flow accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /auth/reset-password:
+    post:
+      operationId: resetPassword
+      tags: [auth]
+      summary: Reset password using a reset token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                password:
+                  type: string
+                  minLength: 8
+              required: [token, password]
+      responses:
+        "200":
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "503":
+          description: Reset service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/verify-email:
+    post:
+      operationId: verifyEmail
+      tags: [auth]
+      summary: Verify email token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+              required: [token]
+      responses:
+        "200":
+          description: Verified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /auth/people:
+    get:
+      operationId: getPeople
+      tags: [auth]
+      summary: List people (self node)
+      security:
+        - cookie: []
+      responses:
+        "200":
+          description: People list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  people:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Person"
+                required: [people]
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /user/me:
+    get:
+      operationId: getMe
+      tags: [user]
+      summary: Current authenticated user
+      security:
+        - cookie: []
+      responses:
+        "200":
+          description: User object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /user/usage:
+    get:
+      operationId: getUsage
+      tags: [user]
+      summary: Daily session usage for the sidebar counter
+      security:
+        - cookie: []
+      responses:
+        "200":
+          description: Usage summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsageSummary"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /baseline:
+    get:
+      operationId: getBaseline
+      tags: [baseline]
+      summary: Fetch the current user's Baseline Design
+      security:
+        - cookie: []
+      responses:
+        "200":
+          description: Baseline data or null
+          content:
+            application/json:
+              schema:
+                nullable: true
+                oneOf:
+                  - $ref: "#/components/schemas/Baseline"
+                  - type: "null"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      operationId: saveBaseline
+      tags: [baseline]
+      summary: Save / update Baseline Design and trigger async compile
+      security:
+        - cookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BaselineInput"
+      responses:
+        "200":
+          description: Saved and compile queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaselineSaveResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /baseline/status:
+    get:
+      operationId: getBaselineStatus
+      tags: [baseline]
+      summary: Poll the async compile status
+      security:
+        - cookie: []
+      responses:
+        "200":
+          description: Compile status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaselineStatusResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /explain:
+    post:
+      operationId: explain
+      tags: [explain]
+      summary: Analyse a conflict moment with AI
+      security:
+        - cookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+              required: [message]
+      responses:
+        "200":
+          description: Pattern analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExplainResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /archive:
+    get:
+      operationId: listArchive
+      tags: [archive]
+      summary: List saved patterns with pagination and search
+      security:
+        - cookie: []
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: space
+          in: query
+          schema:
+            type: string
+            enum: [all, defrag, covenant, alignment]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        "200":
+          description: Paginated archive
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArchiveListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      operationId: saveArchiveEntry
+      tags: [archive]
+      summary: Save a Defrag result to the archive
+      security:
+        - cookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArchiveEntryInput"
+      responses:
+        "201":
+          description: Saved entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArchiveEntry"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /covenants:
+    get:
+      operationId: listCovenants
+      tags: [covenants]
+      summary: List all covenants for the current user
+      security:
+        - cookie: []
+      responses:
+        "200":
+          description: Covenant list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Covenant"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      operationId: createCovenant
+      tags: [covenants]
+      summary: Create a new covenant
+      security:
+        - cookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CovenantInput"
+      responses:
+        "201":
+          description: Created covenant
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Covenant"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /covenants/{id}:
+    delete:
+      operationId: deleteCovenant
+      tags: [covenants]
+      summary: Delete a covenant
+      security:
+        - cookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /covenants/suggest:
+    post:
+      operationId: suggestCovenant
+      tags: [covenants]
+      summary: AI-generate a structural boundary draft
+      security:
+        - cookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                relationship:
+                  type: string
+                dynamic:
+                  type: string
+              required: [relationship]
+      responses:
+        "200":
+          description: Generated boundary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  boundary:
+                    type: string
+                required: [boundary]
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /alignment/status:
+    get:
+      operationId: getAlignmentStatus
+      tags: [alignment]
+      summary: Get the most recent committed alignment vector for a person
+      security:
+        - cookie: []
+      parameters:
+        - name: personId
+          in: query
+          schema:
+            type: string
+            default: self
+      responses:
+        "200":
+          description: Alignment status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlignmentStatusResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /alignment/generate:
+    post:
+      operationId: generateAlignment
+      tags: [alignment]
+      summary: AI-generate an alignment vector
+      security:
+        - cookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlignmentInput"
+      responses:
+        "200":
+          description: Generated vector
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlignmentVector"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          description: No baseline or patterns available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /alignment/commit:
+    post:
+      operationId: commitAlignment
+      tags: [alignment]
+      summary: Commit an alignment vector
+      security:
+        - cookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/AlignmentInput"
+                - $ref: "#/components/schemas/AlignmentVector"
+      responses:
+        "201":
+          description: Committed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlignmentStatusResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /billing/checkout:
+    post:
+      operationId: createCheckout
+      tags: [billing]
+      summary: Create a Stripe checkout session
+      security:
+        - cookie: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                priceId:
+                  type: string
+                  description: Stripe price ID. Falls back to hard-coded $12/mo when omitted.
+      responses:
+        "200":
+          description: Checkout URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                required: [url]
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /billing/confirm:
+    get:
+      operationId: confirmCheckout
+      tags: [billing]
+      summary: Server-verify a completed Stripe checkout session and upgrade tier
+      security:
+        - cookie: []
+      parameters:
+        - name: session_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Tier upgraded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: Payment not completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /billing/portal:
+    post:
+      operationId: createBillingPortal
+      tags: [billing]
+      summary: Create a Stripe billing portal session
+      security:
+        - cookie: []
+      responses:
+        "200":
+          description: Portal URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                required: [url]
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /stripe/webhook:
+    post:
+      operationId: stripeWebhook
+      tags: [billing]
+      summary: Stripe webhook receiver
+      description: >
+        Receives signed Stripe events. Requires `STRIPE_WEBHOOK_SECRET` in
+        production. Raw body must be preserved (registered before express.json()).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Event received
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                required: [received]
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
 components:
+  securitySchemes:
+    cookie:
+      type: apiKey
+      in: cookie
+      name: sovv_session
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    RateLimited:
+      description: Rate limited / daily cap reached
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
   schemas:
     HealthStatus:
       type: object
       properties:
         status:
           type: string
+      required: [status]
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required: [error]
+
+    OkResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+      required: [ok]
+
+    AuthCredentials:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+      required: [email, password]
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        tier:
+          type: string
+          enum: [free, pro]
+      required: [id, email, tier]
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+      required: [user]
+
+    Person:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        relation:
+          type: string
+      required: [id, name, relation]
+
+    UsageSummary:
+      type: object
+      properties:
+        tier:
+          type: string
+          enum: [free, pro]
+        used:
+          type: integer
+        limit:
+          type: integer
+          nullable: true
+        remaining:
+          type: integer
+          nullable: true
+      required: [tier, used, limit, remaining]
+
+    Baseline:
+      type: object
+      properties:
+        dob:
+          type: string
+        tob:
+          type: string
+        pob:
+          type: string
+        defaultRetreat:
+          type: string
+        coreBoundary:
+          type: string
+        repairMechanic:
+          type: string
+        computedProfile:
+          nullable: true
+        baselineStatus:
+          type: string
+          enum: [not_started, pending, ready, degraded, failed]
+        computedAt:
+          type: string
+          format: date-time
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+      required: [dob, tob, pob, baselineStatus]
+
+    BaselineInput:
+      type: object
+      properties:
+        dob:
+          type: string
+          description: YYYY-MM-DD
+        tob:
+          type: string
+        pob:
+          type: string
+        defaultRetreat:
+          type: string
+        coreBoundary:
+          type: string
+        repairMechanic:
+          type: string
+
+    BaselineSaveResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        baselineStatus:
+          type: string
+          enum: [not_started, pending]
+      required: [ok, baselineStatus]
+
+    BaselineStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [none, pending, ready, degraded, failed]
+        computedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required: [status, computedAt]
+
+    ExplainResult:
+      type: object
+      properties:
+        activePattern:
+          type: string
+        whatsActive:
+          type: string
+        defenseMechanism:
+          type: string
+        resolutionSteps:
+          type: array
+          items:
+            type: string
+          minItems: 3
+          maxItems: 3
+        bestNextResponse:
+          type: string
+        baselineTriggered:
+          type: boolean
       required:
-        - status
+        - activePattern
+        - whatsActive
+        - defenseMechanism
+        - resolutionSteps
+        - bestNextResponse
+        - baselineTriggered
+
+    ArchiveEntryInput:
+      type: object
+      properties:
+        inputText:
+          type: string
+        activePattern:
+          type: string
+        whatsActive:
+          type: string
+        defenseMechanism:
+          type: string
+        resolutionSteps:
+          type: array
+          items:
+            type: string
+        bestNextResponse:
+          type: string
+        baselineTriggered:
+          type: boolean
+        space:
+          type: string
+          enum: [defrag, covenant, alignment]
+      required:
+        - activePattern
+        - whatsActive
+        - defenseMechanism
+        - bestNextResponse
+
+    ArchiveEntry:
+      allOf:
+        - $ref: "#/components/schemas/ArchiveEntryInput"
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            space:
+              type: string
+            savedAt:
+              type: string
+              description: YYYY-MM-DD
+            savedAtFull:
+              type: string
+              format: date-time
+          required: [id, space, savedAt, savedAtFull]
+
+    ArchiveListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ArchiveEntry"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        hasMore:
+          type: boolean
+      required: [items, total, page, limit, hasMore]
+
+    CovenantInput:
+      type: object
+      properties:
+        title:
+          type: string
+        type:
+          type: string
+        withWhom:
+          type: string
+        boundary:
+          type: string
+        costOfViolation:
+          type: string
+        sealed:
+          type: string
+          description: YYYY-MM-DD
+      required: [title, type, withWhom, boundary, sealed]
+
+    Covenant:
+      allOf:
+        - $ref: "#/components/schemas/CovenantInput"
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            createdAt:
+              type: string
+              format: date-time
+          required: [id, createdAt]
+
+    AlignmentInput:
+      type: object
+      properties:
+        personId:
+          type: string
+          default: self
+        personName:
+          type: string
+          default: Self
+
+    AlignmentVector:
+      type: object
+      properties:
+        theirPattern:
+          type: string
+        yourResponse:
+          type: string
+        yourAction:
+          type: string
+      required: [theirPattern, yourResponse, yourAction]
+
+    AlignmentStatusResponse:
+      type: object
+      properties:
+        committed:
+          type: boolean
+        id:
+          type: string
+        personId:
+          type: string
+        personName:
+          type: string
+        theirPattern:
+          type: string
+        yourResponse:
+          type: string
+        yourAction:
+          type: string
+        committedAt:
+          type: string
+          format: date-time
+      required: [committed]
 

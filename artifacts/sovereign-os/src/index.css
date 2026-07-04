@@ -333,6 +333,13 @@
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+@keyframes grainShift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-1.5%, 1%); }
+  50% { transform: translate(1%, -1%); }
+  75% { transform: translate(-0.5%, -1.5%); }
+  100% { transform: translate(0, 0); }
+}
 
 .animate-slide-up { animation: slideUp 0.6s var(--ease-apple) forwards; opacity: 0; }
 .animate-fade-up  { animation: fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
@@ -341,6 +348,38 @@
 .hero-drift { animation: heroDrift 18s ease-in-out infinite; will-change: transform; }
 .ambient-blob   { animation: ambientDrift 25s ease-in-out infinite; pointer-events: none; }
 .ambient-blob-2 { animation: ambientDrift 30s ease-in-out infinite reverse; pointer-events: none; }
+.film-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.05' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.75'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: soft-light;
+  opacity: 0.09;
+  animation: grainShift 8s steps(8) infinite;
+}
+
+.login-auth-input {
+  -webkit-appearance: none;
+  appearance: none;
+  box-shadow: none;
+  caret-color: #f4efe9;
+}
+
+.login-auth-input:focus,
+.login-auth-input:focus-visible,
+.login-auth-input:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+.login-auth-input:-webkit-autofill,
+.login-auth-input:-webkit-autofill:hover,
+.login-auth-input:-webkit-autofill:focus,
+.login-auth-input:-webkit-autofill:active {
+  -webkit-text-fill-color: #f4efe9;
+  -webkit-box-shadow: 0 0 0 1000px #1c1c1e inset;
+  box-shadow: 0 0 0 1000px #1c1c1e inset;
+  transition: background-color 99999s ease-out;
+}
 
 .reveal-up { animation: revealUp 0.72s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
 .reveal-up-1 { animation-delay: 0ms; }

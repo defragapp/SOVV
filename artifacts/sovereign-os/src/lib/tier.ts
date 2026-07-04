@@ -18,3 +18,12 @@ export function setLocalPremium(): void {
     // storage unavailable — ignore
   }
 }
+
+/** Clear the local premium flag. Use when the backend says the user is free. */
+export function clearLocalPremium(): void {
+  try {
+    localStorage.removeItem(LOCAL_TIER_KEY);
+  } catch {
+    // storage unavailable — ignore
+  }
+}

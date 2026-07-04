@@ -217,17 +217,17 @@ function BaselineSetupRoute() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <UserProvider>
-        <ArchiveProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+        <UserProvider>
+          <ArchiveProvider>
             {/* Persistent ambient environment — behind all pages, never flashes on nav */}
             <AmbientBackground />
             <AnimatedRoutes />
             {/* Baseline onboarding overlay — shows on /apps/* until user completes setup */}
             <BaselineGate />
-          </WouterRouter>
-        </ArchiveProvider>
-      </UserProvider>
+          </ArchiveProvider>
+        </UserProvider>
+      </WouterRouter>
     </QueryClientProvider>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
 import { fetchBaselineStatus, type BaselineStatus } from '../lib/baseline';
+import { clearLocalPremium } from '@/lib/tier';
 
 interface BaselineApiResponse {
   dob?: string;
@@ -235,6 +236,7 @@ export function SettingsPage() {
           <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#4f4b47] mb-4">Account</h2>
           <button
             onClick={async () => {
+              clearLocalPremium();
               await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
               window.location.href = '/';
             }}

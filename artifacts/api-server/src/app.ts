@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { isAllowedOrigin } from "./lib/origins";
 
 const app: Express = express();
 
@@ -17,8 +18,19 @@ app.use(
   }),
 );
 
-// CORS — allow credentials from any origin (both same-domain Replit and local dev)
-app.use(cors({ origin: true, credentials: true }));
+// CORS — allow credentials only from configured origins.
+app.use(
+  cors({
+    credentials: true,
+    origin(origin, callback) {
+      // Allow non-browser or same-origin requests without an Origin header.
+      if (!origin) return callback(null, true);
+      if (isAllowedOrigin(origin)) return callback(null, true);
+      logger.warn({ origin }, "Blocked CORS origin");
+      return callback(null, false);
+    },
+  }),
+);
 
 // Raw body for Stripe webhook signature verification — BEFORE express.json()
 app.use("/api/stripe", express.raw({ type: "application/json" }));

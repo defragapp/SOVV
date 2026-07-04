@@ -7,7 +7,7 @@ const router = Router();
 
 // ── POST /api/stripe/webhook ──────────────────────────────────────────────────
 // Raw body — registered BEFORE express.json() in app.ts.
-router.post("/", async (req: Request, res: Response) => {
+router.post("/webhook", async (req: Request, res: Response) => {
   if (!process.env.STRIPE_SECRET_KEY) return res.status(503).json({ error: "Stripe not configured" });
 
   const stripe  = new Stripe(process.env.STRIPE_SECRET_KEY);

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useLocation } from 'wouter';
 
 export interface ArchivedPattern {
   id: string;
@@ -27,12 +28,18 @@ const ArchiveContext = createContext<ArchiveContextValue>({
 });
 
 export function ArchiveProvider({ children }: { children: React.ReactNode }) {
+  const [location] = useLocation();
   const [patterns, setPatterns] = useState<ArchivedPattern[]>([]);
   const [loading, setLoading] = useState(true);
+  const shouldFetchArchive = /^(\/apps|\/hub)(\/|$)/.test(location);
 
   // Fetch on mount — gracefully degrade if unauthenticated
   useEffect(() => {
     let cancelled = false;
+    if (!shouldFetchArchive) {
+      setLoading(false);
+      return;
+    }
     async function load() {
       try {
         const res = await fetch('/api/archive', { credentials: 'include' });
@@ -49,35 +56,45 @@ export function ArchiveProvider({ children }: { children: React.ReactNode }) {
     }
     load();
     return () => { cancelled = true; };
-  }, []);
+  }, [shouldFetchArchive]);
 
   const save = useCallback(async (
     result: Omit<ArchivedPattern, 'id' | 'savedAt' | 'savedAtFull'>,
   ): Promise<ArchivedPattern> => {
+    let res: Response;
     try {
-      const res = await fetch('/api/archive', {
+      res = await fetch('/api/archive', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(result),
       });
-      if (res.ok) {
-        const entry = await res.json() as ArchivedPattern;
-        setPatterns(prev => [entry, ...prev]);
-        return entry;
-      }
-    } catch { /* fall through to local save */ }
+    } catch {
+      // Genuine network failure — local-only fallback
+      const now = new Date();
+      const offline: ArchivedPattern = {
+        ...result,
+        id: `local-${Date.now()}`,
+        savedAt: now.toISOString().slice(0, 10),
+        savedAtFull: now.toISOString(),
+      };
+      setPatterns(prev => [offline, ...prev]);
+      return offline;
+    }
 
-    // Offline / unauthenticated fallback — local only
-    const now = new Date();
-    const entry: ArchivedPattern = {
-      ...result,
-      id: `local-${Date.now()}`,
-      savedAt: now.toISOString().slice(0, 10),
-      savedAtFull: now.toISOString(),
-    };
-    setPatterns(prev => [entry, ...prev]);
-    return entry;
+    if (res.ok) {
+      const entry = await res.json() as ArchivedPattern;
+      setPatterns(prev => [entry, ...prev]);
+      return entry;
+    }
+
+    // Server returned an HTTP error — surface it to the caller
+    let msg = 'Failed to save pattern.';
+    try {
+      const body = await res.json() as { error?: string };
+      if (body.error) msg = body.error;
+    } catch { /* ignore parse failures */ }
+    throw new Error(msg);
   }, []);
 
   return (

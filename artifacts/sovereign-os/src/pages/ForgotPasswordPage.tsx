@@ -24,8 +24,16 @@ export function ForgotPasswordPage() {
       if (res.ok) {
         setSent(true);
       } else {
-        const d = await res.json() as { error?: string };
-        setError(d.error || 'Something went wrong.');
+        let message = 'Something went wrong.';
+        const contentType = res.headers.get('content-type') ?? '';
+        if (contentType.includes('application/json')) {
+          const d = await res.json() as { error?: string };
+          if (d.error) message = d.error;
+        }
+        if (message === 'Something went wrong.' && (res.status === 404 || res.status >= 500)) {
+          message = 'Reset service is unavailable. Please try again shortly.';
+        }
+        setError(message);
       }
     } catch {
       setError('Network error. Please try again.');

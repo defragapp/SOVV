@@ -6,7 +6,6 @@ import { CHIP_GROUPS } from '@/lib/core/chips';
 import type { Mode } from '@/lib/core/types';
 import { useArchive } from '@/context/ArchiveContext';
 import { useUserTier } from '@/context/UserContext';
-import { readBaseline } from '@/lib/baseline';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -298,15 +297,17 @@ function DiagnosticOutput({ result }: { result: DiagnosticResult }) {
 }
 
 // ── Save Pattern action bar ───────────────────────────────────────────────────
-type SaveState = 'idle' | 'saving' | 'saved';
+type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 function SaveBar({ result, inputText }: { result: DiagnosticResult; inputText: string }) {
   const { save } = useArchive();
   const [saveState, setSaveState] = useState<SaveState>('idle');
+  const [saveError, setSaveError] = useState('');
 
   const handleSave = async () => {
-    if (saveState !== 'idle') return;
+    if (saveState !== 'idle' && saveState !== 'error') return;
     setSaveState('saving');
+    setSaveError('');
     try {
       await save({
         inputText,
@@ -317,8 +318,9 @@ function SaveBar({ result, inputText }: { result: DiagnosticResult; inputText: s
         bestNextResponse: result.bestNextResponse,
       });
       setSaveState('saved');
-    } catch {
-      setSaveState('idle');
+    } catch (err) {
+      setSaveState('error');
+      setSaveError(err instanceof Error ? err.message : 'Save failed. Try again.');
     }
   };
 
@@ -339,30 +341,32 @@ function SaveBar({ result, inputText }: { result: DiagnosticResult; inputText: s
         }}
       >
         {/* Status tag */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0 flex-1 pr-3">
           {saveState === 'saving' && (
-            <span
-              className="w-1.5 h-1.5 rounded-full bg-[#e0743a] animate-pulse"
-            />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#e0743a] animate-pulse shrink-0" />
           )}
           {saveState === 'saved' && (
             <span
-              className="w-1.5 h-1.5 rounded-full"
+              className="w-1.5 h-1.5 rounded-full shrink-0"
               style={{ background: '#e0743a', boxShadow: '0 0 6px rgba(224,116,58,0.6)' }}
             />
           )}
-          <span className="font-mono text-[10px] tracking-[0.18em] text-[#4f4b47]">
-            {saveState === 'idle' && 'PATTERN MAPPED'}
+          {saveState === 'error' && (
+            <span className="w-1.5 h-1.5 rounded-full bg-red-400/70 shrink-0" />
+          )}
+          <span className={`font-mono text-[10px] tracking-[0.18em] truncate ${saveState === 'error' ? 'text-red-400/70' : 'text-[#4f4b47]'}`}>
+            {saveState === 'idle'   && 'PATTERN MAPPED'}
             {saveState === 'saving' && 'SAVING...'}
-            {saveState === 'saved' && '[PATTERN SECURED]'}
+            {saveState === 'saved'  && '[PATTERN SECURED]'}
+            {saveState === 'error'  && (saveError || 'SAVE FAILED')}
           </span>
         </div>
 
         {/* Button */}
         <button
           onClick={handleSave}
-          disabled={saveState !== 'idle'}
-          className="px-4 py-2 rounded-full font-mono text-[10px] uppercase tracking-[0.12em] transition-all duration-200 disabled:opacity-40"
+          disabled={saveState === 'saving' || saveState === 'saved'}
+          className="px-4 py-2 rounded-full font-mono text-[10px] uppercase tracking-[0.12em] transition-all duration-200 disabled:opacity-40 shrink-0"
           style={{
             background: saveState === 'saved' ? 'rgba(224,116,58,0.10)' : 'rgba(255,255,255,0.08)',
             color: saveState === 'saved' ? '#e0743a' : '#f4efe9',
@@ -371,7 +375,7 @@ function SaveBar({ result, inputText }: { result: DiagnosticResult; inputText: s
               : '0 0 0 1px rgba(255,255,255,0.08) inset',
           }}
         >
-          {saveState === 'saved' ? '✓ Saved to Archive' : 'Save Pattern'}
+          {saveState === 'saved'  ? '✓ Saved to Archive' : saveState === 'error' ? 'Retry' : 'Save Pattern'}
         </button>
       </div>
     </motion.div>
@@ -396,7 +400,7 @@ export function DefragPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ message, baseline: readBaseline() }),
+        body: JSON.stringify({ message }),
       });
       if (res.ok) {
         const data = await res.json() as DiagnosticResult;

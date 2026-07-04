@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { readLocalTier, setLocalPremium } from '@/lib/tier';
+import { readLocalTier, setLocalPremium, clearLocalPremium } from '@/lib/tier';
 import { checkHasBaseline, hydrateBaseline } from '@/lib/baseline';
+import { useLocation } from 'wouter';
 
 export interface User {
   id: string;
@@ -29,10 +30,13 @@ const UserContext = createContext<UserContextValue>({
 });
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
+  const [location] = useLocation();
   const [user, setUser] = useState<User | null>(null);
   const [localPremium, setLocalPremiumState] = useState(readLocalTier);
   const [hasBaseline, setHasBaseline] = useState(checkHasBaseline);
   const [loading, setLoading] = useState(true);
+  const isAuthEntryRoute = /^(\/app\/(login|register|forgot-password|reset-password)|\/app\/?$)(\/|\?|$)/.test(location);
+  const shouldFetchAuth = /^(\/app|\/apps|\/settings|\/admin|\/hub)(\/|$)/.test(location) && !isAuthEntryRoute;
 
   const fetchUser = useCallback(async () => {
     setLoading(true);
@@ -46,16 +50,25 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           if (tier === 'pro') {
             setLocalPremium();
             setLocalPremiumState(true);
+          } else {
+            clearLocalPremium();
+            setLocalPremiumState(false);
           }
           // Hydrate baseline from server if localStorage is empty (cross-device sync)
           hydrateBaseline().then(() => setHasBaseline(checkHasBaseline())).catch(() => {});
         } else {
+          clearLocalPremium();
+          setLocalPremiumState(false);
           setUser(null);
         }
       } else {
+        clearLocalPremium();
+        setLocalPremiumState(false);
         setUser(null);
       }
     } catch {
+      clearLocalPremium();
+      setLocalPremiumState(false);
       setUser(null);
     } finally {
       setLoading(false);
@@ -65,8 +78,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setLocalPremiumState(readLocalTier());
     setHasBaseline(checkHasBaseline());
+    if (!shouldFetchAuth) {
+      setLoading(false);
+      return;
+    }
     fetchUser();
-  }, [fetchUser]);
+  }, [fetchUser, shouldFetchAuth]);
 
   const isPremium = user?.tier === 'pro' || localPremium;
   const setBaselineDone = useCallback(() => setHasBaseline(true), []);

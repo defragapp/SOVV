@@ -6,6 +6,7 @@ import { useHeroEntrance } from '@/hooks/useHeroEntrance';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const APP_URL = '/app/login';
+const sectionViewport = { once: true, margin: '-90px' } as const;
 
 // ── Palette tokens ────────────────────────────────────────────────────────────
 const C = {
@@ -228,6 +229,101 @@ function BaselinePanel() {
   );
 }
 
+function IntelligencePanel() {
+  return (
+    <motion.aside
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, delay: 0.18, ease }}
+      className="relative w-full max-w-[390px]"
+      aria-label="Sovereign intelligence panel"
+    >
+      <div
+        className="relative overflow-hidden"
+        style={{
+          borderRadius: 18,
+          border: '1px solid rgba(224,116,58,0.2)',
+          background: 'linear-gradient(165deg, rgba(22,18,18,0.86) 0%, rgba(14,12,13,0.9) 52%, rgba(10,9,11,0.95) 100%)',
+          boxShadow: '0 38px 86px -42px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,241,229,0.16)',
+        }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'repeating-linear-gradient(90deg, rgba(224,116,58,0.06) 0 1px, transparent 1px 54px)',
+            opacity: 0.09,
+          }}
+        />
+
+        <div className="relative p-5 md:p-6">
+          <div className="flex items-center justify-between mb-3">
+            <p className="font-mono text-[9px] uppercase tracking-[0.22em]" style={{ color: 'rgba(244,239,233,0.72)' }}>
+              Pattern Engine
+            </p>
+            <span
+              className="font-mono text-[8px] uppercase tracking-[0.14em] px-2 py-1"
+              style={{ borderRadius: 999, color: '#f0a16f', border: '1px solid rgba(224,116,58,0.28)', background: 'rgba(224,116,58,0.1)' }}
+            >
+              Live
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2.5 mb-4">
+            {[
+              ['Clarity', '94'],
+              ['Signal', '88'],
+              ['Drift', '06'],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="px-3 py-2"
+                style={{ borderRadius: 10, border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}
+              >
+                <p className="font-mono text-[8px] uppercase tracking-[0.12em] mb-1" style={{ color: C.dim }}>{label}</p>
+                <p className="font-mono text-[12px]" style={{ color: C.cream }}>{value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-2.5 mb-4">
+            {[
+              'Conflict loop detected through delayed repair impulse.',
+              'Best next move: pause, name, then respond.',
+            ].map((line, i) => (
+              <div
+                key={line}
+                className="flex items-start gap-3 px-3 py-2.5"
+                style={{
+                  borderRadius: 10,
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  background: i === 1 ? 'rgba(224,116,58,0.09)' : 'rgba(255,255,255,0.015)',
+                }}
+              >
+                <span className="mt-1.5 h-1.5 w-1.5 rounded-full" style={{ background: i === 1 ? '#e0743a' : 'rgba(255,255,255,0.32)' }} />
+                <p className="text-[12px] leading-relaxed" style={{ color: i === 1 ? C.cream : '#b8b0a8' }}>{line}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-end gap-1.5 h-7">
+            {[14, 18, 12, 22, 16, 20, 15, 19, 17, 24].map((h, i) => (
+              <span
+                key={i}
+                className="flex-1"
+                style={{
+                  height: `${h}px`,
+                  borderRadius: 3,
+                  background: i > 7 ? 'linear-gradient(180deg, rgba(224,116,58,0.84), rgba(224,116,58,0.3))' : 'linear-gradient(180deg, rgba(244,239,233,0.34), rgba(244,239,233,0.1))',
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </motion.aside>
+  );
+}
+
 // ── Hero ──────────────────────────────────────────────────────────────────────
 function Hero() {
   const refs = useHeroEntrance();
@@ -260,105 +356,198 @@ function Hero() {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* GSAP light beam */}
-      <div ref={refs.lightBeamRef} className="light-beam" aria-hidden />
+      {/* Ultra-minimal premium backdrop */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          ref={refs.imageOuterRef}
+          className="absolute inset-0"
+          style={{
+            willChange: 'clip-path',
+            background:
+              'linear-gradient(138deg, rgba(7,7,9,0.99) 0%, rgba(12,10,12,0.97) 46%, rgba(7,7,9,0.99) 100%)',
+          }}
+        />
 
-      {/* GSAP ambient glow */}
-      <div
-        ref={refs.glowRef}
-        className="ambient-blob absolute -top-60 right-0 w-[540px] h-[540px] pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(224,116,58,0.9) 0%, transparent 70%)' }}
-        aria-hidden
-      />
-
-      {/* Hero image */}
-      <div
-        ref={refs.imageOuterRef}
-        className="absolute right-0 top-0 w-full h-full pointer-events-none"
-        style={{ willChange: 'clip-path' }}
-      >
-        <div ref={refs.imageDriftRef} className="hero-drift absolute right-0 top-0 h-full w-[58%]">
-          <img
-            src="/hero-hand.webp"
-            alt=""
-            className="object-cover object-left h-full w-full"
-            style={{ objectPosition: '20% center', filter: 'sepia(0.14) brightness(0.8)' }}
+        <div
+          ref={refs.imageDriftRef}
+          className="hero-drift absolute inset-0"
+        >
+          <div
+            className="absolute right-[6%] top-[7%] h-[86%] w-[38%]"
+            style={{
+              borderRadius: 34,
+              border: '1px solid rgba(214,180,149,0.18)',
+              background: 'linear-gradient(160deg, rgba(255,250,245,0.07) 0%, rgba(182,142,110,0.04) 44%, rgba(74,55,44,0.16) 100%)',
+              boxShadow: '0 44px 88px -38px rgba(4,6,11,0.95), inset 0 1px 0 rgba(255,255,255,0.22)',
+            }}
           />
+
+          <div
+            className="absolute right-[22%] top-[17%] h-[64%] w-[20%]"
+            style={{
+              borderRadius: 26,
+              border: '1px solid rgba(214,180,149,0.12)',
+              background: 'linear-gradient(170deg, rgba(255,250,245,0.05), rgba(170,132,101,0.03) 52%, rgba(53,40,33,0.16) 100%)',
+            }}
+          />
+
+          <div
+            ref={refs.lightBeamRef}
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(88% 72% at 82% 14%, rgba(228,157,103,0.18) 0%, rgba(154,104,71,0.08) 38%, transparent 65%)',
+              mixBlendMode: 'screen',
+              opacity: 0.72,
+            }}
+          />
+
+          <div
+            ref={refs.glowRef}
+            className="absolute right-[6%] top-[7%] h-[86%] w-[38%]"
+            style={{
+              borderRadius: 34,
+              background:
+                'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(250,223,196,0.2) 4%, rgba(255,255,255,0) 10%)',
+              opacity: 0.68,
+            }}
+          />
+
           <div
             className="absolute inset-0"
-            style={{ background: `linear-gradient(to right, ${C.bg} 0%, rgba(10,7,5,0.65) 36%, rgba(14,9,6,0.15) 68%, transparent 100%)` }}
+            style={{
+              backgroundImage: 'repeating-linear-gradient(90deg, rgba(220,181,143,0.05) 0 1px, transparent 1px 58px)',
+              opacity: 0.2,
+            }}
+          />
+
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(120% 92% at 92% 8%, rgba(244,201,165,0.12) 0%, transparent 54%)',
+              opacity: 0.46,
+            }}
+          />
+
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to right, rgba(8,7,10,0.96) 0%, rgba(8,7,10,0.9) 34%, rgba(8,7,10,0.46) 68%, rgba(8,7,10,0.2) 100%)',
+            }}
           />
         </div>
+
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(8,7,10,0.04) 0%, rgba(8,7,10,0.18) 76%, rgba(8,7,10,0.38) 100%)',
+          }}
+        />
       </div>
 
       {/* Content — subtle x/y parallax, no 3D tilt */}
       <motion.div className="relative z-10 w-full" style={{ x: textX, y: textY }}>
-        <Container className="py-28 md:py-44">
-          <div className="max-w-2xl">
+        <Container className="py-22 md:py-40">
+          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_390px] items-start gap-10 xl:gap-9">
+            <div className="max-w-2xl">
 
-            {/* Amber hairline */}
-            <span
-              aria-hidden
-              style={{ display: 'block', width: 20, height: 1, background: `${C.amber}80`, marginBottom: '1rem' }}
-            />
+              {/* Amber hairline */}
+              <span
+                aria-hidden
+                style={{ display: 'block', width: 20, height: 1, background: `${C.amber}80`, marginBottom: '1rem' }}
+              />
 
-            {/* Eyebrow */}
-            <p
-              ref={refs.labelRef}
-              className="font-mono text-[9px] uppercase tracking-[0.36em] mb-10"
-              style={{ color: C.dim }}
-            >
-              Sovereign.os
-            </p>
+              {/* Eyebrow */}
+              <p
+                ref={refs.labelRef}
+                className="font-mono text-[9px] uppercase tracking-[0.36em] mb-6"
+                style={{ color: C.dim }}
+              >
+                Sovereign.os
+              </p>
 
-            {/* Headline */}
-            <h1
-              className="font-serif leading-[1.04] tracking-[-0.03em] text-balance"
-              style={{ fontSize: 'clamp(2.8rem, 7vw, 5.6rem)', color: C.cream }}
-            >
-              <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
-                <span ref={refs.line1Ref} className="block" style={{ willChange: 'transform' }}>
-                  Your private operating
+              <div
+                className="inline-flex items-center gap-2 mb-6 px-3 py-1.5"
+                style={{ borderRadius: 999, border: '1px solid rgba(224,116,58,0.24)', background: 'rgba(224,116,58,0.08)' }}
+              >
+                <span className="h-1.5 w-1.5 rounded-full" style={{ background: '#e0743a' }} />
+                <span className="font-mono text-[8px] uppercase tracking-[0.12em]" style={{ color: '#f3c7a3' }}>
+                  Baseline-native reasoning
                 </span>
-              </span>
-              <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
-                <span ref={refs.line2Ref} className="block" style={{ willChange: 'transform' }}>
-                  system for{' '}
-                  <em style={{ fontStyle: 'italic' }}>becoming</em>
+              </div>
+
+              {/* Headline */}
+              <h1
+                className="font-serif leading-[1.04] tracking-[-0.03em] text-balance"
+                style={{ fontSize: 'clamp(2.25rem, 7vw, 5.4rem)', color: C.cream }}
+              >
+                <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
+                  <span ref={refs.line1Ref} className="block" style={{ willChange: 'transform' }}>
+                    Your private operating
+                  </span>
                 </span>
-              </span>
-              <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
-                <span ref={refs.line3Ref} className="block" style={{ willChange: 'transform' }}>
-                  <em style={{ fontStyle: 'italic' }}>clear</em> to yourself.
+                <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
+                  <span ref={refs.line2Ref} className="block" style={{ willChange: 'transform' }}>
+                    system for{' '}
+                    <em style={{ fontStyle: 'italic' }}>becoming</em>
+                  </span>
                 </span>
-              </span>
-            </h1>
+                <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
+                  <span ref={refs.line3Ref} className="block" style={{ willChange: 'transform' }}>
+                    <em style={{ fontStyle: 'italic' }}>clear</em> to yourself.
+                  </span>
+                </span>
+              </h1>
 
-            {/* Subtext */}
-            <p
-              ref={refs.subtextRef}
-              className="mt-8 max-w-md text-[15px] leading-[1.75]"
-              style={{ color: C.mid }}
-            >
-              Sovereign.os uses your Baseline Design to understand your patterns across relationships, decisions, and pressure — so guidance starts from who you are.
-            </p>
+              {/* Subtext */}
+              <p
+                ref={refs.subtextRef}
+                className="mt-7 max-w-md text-[14px] md:text-[15px] leading-[1.75]"
+                style={{ color: '#aba096' }}
+              >
+                Sovereign.os uses your Baseline Design to understand your patterns across relationships, decisions, and pressure, so guidance starts from who you are, not generic prompts.
+              </p>
 
-            {/* Differentiator */}
-            <p
-              className="mt-5 max-w-sm font-mono text-[10px] leading-relaxed tracking-[0.1em] pl-3"
-              style={{ color: C.dim, borderLeft: `1px solid ${C.amberLine}` }}
-            >
-              Most AI responds to what you type. Sovereign.os understands the pattern you&apos;re typing from.
-            </p>
+              {/* Differentiator */}
+              <p
+                className="mt-5 max-w-sm font-mono text-[9px] md:text-[10px] leading-relaxed tracking-[0.1em] pl-3"
+                style={{ color: '#877e76', borderLeft: `1px solid ${C.amberLine}` }}
+              >
+                Most AI responds to what you type. Sovereign.os understands the pattern you&apos;re typing from.
+              </p>
 
-            {/* CTA */}
-            <div ref={refs.ctaRef} className="mt-10 flex items-center gap-5 flex-wrap">
-              <GhostCta href={APP_URL}>Enter Sovereign.os</GhostCta>
-              <span className="font-mono text-[9px] uppercase tracking-[0.2em]" style={{ color: C.dim }}>
-                Free to start
-              </span>
+              {/* CTA */}
+              <div ref={refs.ctaRef} className="mt-9 md:mt-10 flex items-center gap-4 md:gap-5 flex-wrap">
+                <GhostCta href={APP_URL}>Enter Sovereign.os</GhostCta>
+                <span className="font-mono text-[9px] uppercase tracking-[0.2em]" style={{ color: C.dim }}>
+                  Free to start
+                </span>
+              </div>
+
+              <div className="xl:hidden mt-8 grid grid-cols-3 gap-2.5 max-w-sm">
+                {[
+                  ['Clarity', '94'],
+                  ['Signal', '88'],
+                  ['Drift', '06'],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="px-3 py-2"
+                    style={{ borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}
+                  >
+                    <p className="font-mono text-[8px] uppercase tracking-[0.12em] mb-1" style={{ color: '#847a72' }}>{label}</p>
+                    <p className="font-mono text-[12px]" style={{ color: C.cream }}>{value}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
+            <div className="hidden xl:block xl:pt-16">
+              <IntelligencePanel />
+            </div>
           </div>
         </Container>
       </motion.div>
@@ -379,6 +568,8 @@ function SectionLabel({ children }: { children: string }) {
 const [defrag, ...restSpaces] = SPACES;
 
 function SpacesGrid() {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <div className="max-w-4xl mx-auto flex flex-col gap-3">
 
@@ -389,7 +580,7 @@ function SpacesGrid() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 0.45, ease }}
-        whileHover={{ y: -2 }}
+        whileHover={prefersReducedMotion ? {} : { y: -2 }}
         className="flex items-start justify-between gap-8 p-6 md:p-8 cursor-pointer"
         style={{
           background: C.bgCard,
@@ -426,7 +617,7 @@ function SpacesGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.45, delay: i * 0.07, ease }}
-            whileHover={{ y: -2 }}
+            whileHover={prefersReducedMotion ? {} : { y: -2 }}
             className="flex flex-col justify-between gap-6 p-6 cursor-pointer"
             style={{ background: C.bgCard, border: `1px solid ${C.rule}`, borderRadius: 14 }}
           >
@@ -459,12 +650,16 @@ export function HomePage() {
       <Hero />
 
       {/* ── Baseline ──────────────────────────────────────────────── */}
-      <section
-        className="relative w-full py-24 md:py-36"
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={sectionViewport}
+        transition={{ duration: 0.62, ease }}
+        className="relative w-full py-20 md:py-36"
         style={{ background: C.bg, borderTop: `1px solid ${C.rule}` }}
       >
         <Container>
-          <div className="flex flex-col items-center text-center mb-12">
+          <div className="flex flex-col items-center text-center mb-10 md:mb-12">
             <SectionLabel>The Foundation</SectionLabel>
             <h2
               className="font-serif italic tracking-[-0.022em] leading-[1.07] max-w-xl text-balance"
@@ -478,11 +673,15 @@ export function HomePage() {
           </div>
           <BaselinePanel />
         </Container>
-      </section>
+      </motion.section>
 
       {/* ── Pull Quote ────────────────────────────────────────────── */}
-      <section
-        className="w-full py-24 md:py-36"
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={sectionViewport}
+        transition={{ duration: 0.62, ease }}
+        className="w-full py-20 md:py-36"
         style={{ background: C.bgLift, borderTop: `1px solid ${C.rule}` }}
       >
         <Container>
@@ -501,15 +700,19 @@ export function HomePage() {
             The clarity can be.
           </motion.blockquote>
         </Container>
-      </section>
+      </motion.section>
 
       {/* ── Spaces ───────────────────────────────────────────────── */}
-      <section
-        className="relative w-full py-24 md:py-36"
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={sectionViewport}
+        transition={{ duration: 0.62, ease }}
+        className="relative w-full py-20 md:py-36"
         style={{ background: C.bg, borderTop: `1px solid ${C.rule}` }}
       >
         <Container>
-          <div className="flex flex-col items-center text-center mb-12">
+          <div className="flex flex-col items-center text-center mb-10 md:mb-12">
             <SectionLabel>The Spaces</SectionLabel>
             <h2
               className="font-serif tracking-[-0.022em] leading-[1.07] max-w-xl text-balance"
@@ -521,11 +724,15 @@ export function HomePage() {
 
           {SpacesGrid()}
         </Container>
-      </section>
+      </motion.section>
 
       {/* ── CTA ──────────────────────────────────────────────────── */}
-      <section
-        className="relative w-full py-32 md:py-48"
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={sectionViewport}
+        transition={{ duration: 0.62, ease }}
+        className="relative w-full py-24 md:py-48"
         style={{ background: C.bgLift, borderTop: `1px solid ${C.rule}` }}
       >
         <Container className="flex flex-col items-center text-center">
@@ -549,7 +756,7 @@ export function HomePage() {
             </p>
           </div>
         </Container>
-      </section>
+      </motion.section>
     </SiteShell>
   );
 }

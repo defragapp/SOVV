@@ -3,6 +3,7 @@ import * as React from "react"
 import { Link } from "wouter"
 import { FloatingNav } from "./FloatingNav"
 import { SpaceGlow, type SpaceVariant } from "./SpaceGlow"
+import { clearLocalPremium } from "@/lib/tier"
 
 interface SpaceShellProps {
   sidebar?: React.ReactNode       // LEFT — people / Baseline Design context
@@ -13,6 +14,7 @@ interface SpaceShellProps {
 }
 
 async function handleSignOut() {
+  clearLocalPremium()
   await fetch("/api/auth/logout", { method: "POST", credentials: "include" })
   window.location.href = "/"
 }
