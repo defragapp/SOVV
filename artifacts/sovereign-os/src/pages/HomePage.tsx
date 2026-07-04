@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useReducedMotion, type TargetAndTransition } from 'framer-motion';
 import { Link } from 'wouter';
 import { SiteShell } from '@/components/marketing/site-shell';
 import { Container } from '@/components/ui/layout-primitives';
@@ -9,100 +9,196 @@ const ease = [0.16, 1, 0.3, 1] as const;
 const APP_URL = '/app/login';
 
 // ── Data ─────────────────────────────────────────────────────────────────────
-const BASELINE = {
-  label: 'Your Baseline Design is active beneath every thread.',
-  facts: [
-    { text: 'You process conflict through withdrawal before re-engagement.', chips: ['DEFENSE', 'DELAY'] },
-    { text: 'Boundaries collapse under sustained pressure from authority figures.', chips: ['PATTERN', 'ROLE'] },
-    { text: 'You repair through over-explanation rather than silence.', chips: ['REPAIR'] },
-  ],
-};
-
-const RESULT = {
-  summary: 'The dynamic is one of accumulated pressure seeking relief through the relationship. The pattern is not new.',
-  move: { label: 'Pause before repair', description: 'Hold the impulse to fix immediately. Name what you noticed before you respond.' },
-};
-
-const SPACES = [
-  { id: 'defrag',    label: 'Defrag',    description: 'Untangle the moment. For conversations, conflicts, and inner pressure that feel messy. Defrag shows what\'s happening, what pattern is forming, and what changes it.',           href: APP_URL, tags: ['free', 'core', 'pattern recognition'] },
-  { id: 'alignment', label: 'Alignment', description: 'Choose the cleaner move. For decisions, responses, and next steps. Alignment helps you see what is yours, what is not, and how to move without losing yourself.',              href: APP_URL, tags: ['pro', 'action', 'response'] },
-  { id: 'covenant',  label: 'Covenant',  description: 'Understand what the moment belongs to. For reflection and deeper integration. Covenant helps you step back and see the larger pattern.',                                       href: APP_URL, tags: ['pro', 'reflection', 'integration'] },
+const BASELINE_FACTS = [
+  { text: 'You process conflict through withdrawal before re-engagement.', chips: ['Defense', 'Delay'] },
+  { text: 'Boundaries collapse under sustained pressure from authority figures.', chips: ['Pattern', 'Role'] },
+  { text: 'You repair through over-explanation rather than silence.', chips: ['Repair'] },
 ];
 
-// ── SpacePreview ──────────────────────────────────────────────────────────────
-function SpacePreview() {
-  const [active, setActive] = useState<'context' | 'result'>('context');
+const SPACES = [
+  {
+    id: 'defrag',
+    n: '01',
+    label: 'Defrag',
+    tier: 'Free',
+    description: "Untangle the moment. For conversations, conflicts, and inner pressure that feel messy. Defrag shows what's happening, what pattern is forming, and what changes it.",
+    accent: true,
+  },
+  {
+    id: 'alignment',
+    n: '02',
+    label: 'Alignment',
+    tier: 'Pro',
+    description: 'Choose the cleaner move. For decisions, responses, and next steps. Alignment helps you see what is yours, what is not, and how to move without losing yourself.',
+    accent: false,
+  },
+  {
+    id: 'covenant',
+    n: '03',
+    label: 'Covenant',
+    tier: 'Pro',
+    description: 'Understand what the moment belongs to. For reflection and deeper integration. Covenant helps you step back and see the larger pattern.',
+    accent: false,
+  },
+];
+
+// ── Ghost CTA button ──────────────────────────────────────────────────────────
+const ghostHover: TargetAndTransition = {
+  backgroundColor: 'rgba(224,116,58,0.16)',
+  boxShadow: '0 0 0 4px rgba(224,116,58,0.10), 0 0 0 10px rgba(224,116,58,0.045)',
+};
+const ghostTap: TargetAndTransition = { scale: 0.97 };
+
+function GhostCta({ children, href }: { children: React.ReactNode; href: string }) {
+  const prefersReducedMotion = useReducedMotion();
+  return (
+    <motion.a
+      href={href}
+      className="inline-flex items-center justify-center px-7 py-3.5 font-mono text-[10px] uppercase tracking-[0.18em] font-semibold text-[#f4efe9]"
+      style={{
+        borderRadius: 100,
+        border: '1px solid rgba(224,116,58,0.38)',
+        background: 'rgba(224,116,58,0.09)',
+        boxShadow: '0 0 0 4px rgba(224,116,58,0.06), 0 0 0 10px rgba(224,116,58,0.025)',
+      }}
+      whileHover={prefersReducedMotion ? {} : ghostHover}
+      whileTap={prefersReducedMotion ? {} : ghostTap}
+      transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+    >
+      {children}
+    </motion.a>
+  );
+}
+
+// ── BaselinePanel ─────────────────────────────────────────────────────────────
+function BaselinePanel() {
+  const [active, setActive] = useState<'design' | 'context'>('design');
 
   return (
     <div className="relative w-full max-w-lg mx-auto">
       <div
         className="pointer-events-none absolute -inset-px"
-        style={{ borderRadius: 'var(--radius-container)', background: 'radial-gradient(ellipse 60% 30% at 50% 100%, rgba(200,194,188,0.05) 0%, transparent 70%)' }}
+        style={{ borderRadius: 18, background: 'radial-gradient(ellipse 60% 30% at 50% 100%, rgba(224,116,58,0.06) 0%, transparent 70%)' }}
         aria-hidden
       />
       <div
-        className="relative border border-white/[0.12] bg-[#0c0a0d] overflow-hidden scan-lines"
-        style={{ borderRadius: 'var(--radius-container)', boxShadow: '0 32px 80px -16px rgba(0,0,0,0.7), 0 0 0 1px rgba(224,116,58,0.06)' }}
+        className="relative bg-[#0d0b0e] overflow-hidden"
+        style={{
+          borderRadius: 18,
+          border: '1px solid rgba(224,116,58,0.14)',
+          boxShadow: '0 50px 120px -24px rgba(0,0,0,0.85), 0 0 0 1px rgba(224,116,58,0.10), 0 0 100px rgba(224,116,58,0.055)',
+        }}
       >
-        {/* Titlebar */}
-        <div className="h-11 border-b border-white/[0.08] bg-[#08070a]/95 flex items-center px-4 gap-3 shrink-0">
-          <div className="flex gap-1.5">
-            {[0, 1, 2].map(i => <span key={i} className="w-2.5 h-2.5 rounded-sm bg-white/[0.10]" />)}
-          </div>
-          <div className="flex-1 flex justify-center">
-            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#76716b]">Sovereign.os</span>
-          </div>
-          <div className="flex gap-0.5">
-            {([{ id: 'context' as const, label: 'Design' }, { id: 'result' as const, label: 'Result' }]).map(p => (
-              <button
-                key={p.id}
-                onClick={() => setActive(p.id)}
-                className={`px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] uppercase transition-all duration-200 ${active === p.id ? 'bg-white/[0.12] text-[#f4efe9]' : 'text-[#4f4b47] hover:text-[#76716b]'}`}
-                style={{ borderRadius: 5 }}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
+        {/* Titlebar / Tab list */}
+        <div
+          role="tablist"
+          aria-label="Baseline panel views"
+          className="flex items-center px-6 gap-6 shrink-0"
+          style={{ height: 48, borderBottom: '1px solid rgba(224,116,58,0.12)', background: 'rgba(8,7,10,0.95)' }}
+        >
+          {([
+            { id: 'design' as const, label: 'Design', panelId: 'baseline-panel-design' },
+            { id: 'context' as const, label: 'Context', panelId: 'baseline-panel-context' },
+          ]).map(tab => (
+            <button
+              key={tab.id}
+              role="tab"
+              id={`baseline-tab-${tab.id}`}
+              aria-selected={active === tab.id}
+              aria-controls={tab.panelId}
+              onClick={() => setActive(tab.id)}
+              className="font-mono text-[10px] uppercase tracking-[0.16em] pb-px transition-all duration-200"
+              style={{
+                color: active === tab.id ? '#f4efe9' : '#4f4b47',
+                borderBottom: active === tab.id ? '1px solid rgba(224,116,58,0.7)' : '1px solid transparent',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* Content */}
+        {/* Tab panels */}
         <AnimatePresence mode="wait">
-          {active === 'context' && (
-            <motion.div key="context" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-              <div className="px-6 pt-5 pb-3 border-b border-white/[0.06] bg-[#e0743a]/[0.03]">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="w-1.5 h-1.5 rounded-sm bg-[#e0743a]/60" />
-                  <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#e0743a]/70">Baseline Design Active</p>
-                </div>
-                <p className="text-[11px] text-[#76716b] leading-relaxed">{BASELINE.label}</p>
-              </div>
+          {active === 'design' && (
+            <motion.div
+              key="design"
+              role="tabpanel"
+              id="baseline-panel-design"
+              aria-labelledby="baseline-tab-design"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
+            >
               <div className="px-6 py-1">
-                {BASELINE.facts.map((fact, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08, duration: 0.35, ease }} className="flex items-start gap-4 py-4 border-b border-white/[0.05] last:border-0">
-                    <div className="flex-1">
-                      <p className="text-[13px] text-[#d4cec8] leading-snug">{fact.text}</p>
-                    </div>
-                    <div className="flex gap-1.5 flex-wrap justify-end shrink-0 max-w-[150px]">
+                {BASELINE_FACTS.map((fact, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.07, duration: 0.3, ease }}
+                    className="relative flex items-start justify-between gap-4 py-4"
+                    style={{ borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.025)' : 'none' }}
+                  >
+                    {/* Amber left accent */}
+                    <span
+                      aria-hidden
+                      style={{
+                        position: 'absolute',
+                        left: -24,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: 2,
+                        height: '60%',
+                        background: 'rgba(224,116,58,0.35)',
+                        borderRadius: 2,
+                      }}
+                    />
+                    <p className="flex-1 text-[13px] text-[#a8a29a] leading-relaxed">{fact.text}</p>
+                    <div className="flex flex-col gap-1.5 items-end shrink-0">
                       {fact.chips.map(c => (
-                        <span key={c} className="font-mono text-[8px] tracking-[0.1em] px-2.5 py-1 border border-[#e0743a]/30 text-[#e0743a]/70 bg-[#e0743a]/[0.06]" style={{ borderRadius: 4 }}>{c}</span>
+                        <span
+                          key={c}
+                          className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] px-2 py-0.5"
+                          style={{ border: '1px solid rgba(255,255,255,0.05)', borderRadius: 3 }}
+                        >
+                          {c}
+                        </span>
                       ))}
                     </div>
                   </motion.div>
                 ))}
               </div>
+
+              {/* Best Next Response */}
+              <div className="mx-6 mb-6 pt-4" style={{ borderTop: '1px solid rgba(224,116,58,0.18)' }}>
+                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a] mb-2">Best Next Response</p>
+                <p className="text-[13px] text-[#f4efe9] font-medium mb-1.5">Pause before repair</p>
+                <p className="text-[13px] text-[#76716b] leading-relaxed">
+                  Hold the impulse to fix immediately. Name what you noticed before you respond.
+                </p>
+              </div>
             </motion.div>
           )}
-          {active === 'result' && (
-            <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-              <div className="px-6 pt-5 pb-4 border-b border-white/[0.06]">
-                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">What's active</p>
-                <p className="text-[13px] text-[#d4cec8] leading-relaxed">{RESULT.summary}</p>
+
+          {active === 'context' && (
+            <motion.div
+              key="context"
+              role="tabpanel"
+              id="baseline-panel-context"
+              aria-labelledby="baseline-tab-context"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
+            >
+              <div className="px-6 py-5 border-b" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">What&apos;s active</p>
+                <p className="text-[13px] text-[#d4cec8] leading-relaxed">
+                  The dynamic is one of accumulated pressure seeking relief through the relationship. The pattern is not new.
+                </p>
               </div>
-              <div className="px-6 py-4">
+              <div className="px-6 py-5">
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">Best next response</p>
-                <p className="text-[12px] font-medium text-[#a8a29a] mb-1">{RESULT.move.label}</p>
-                <p className="text-[12px] text-[#76716b] leading-relaxed">{RESULT.move.description}</p>
+                <p className="text-[12px] font-medium text-[#a8a29a] mb-1">Pause before repair</p>
+                <p className="text-[12px] text-[#76716b] leading-relaxed">
+                  Hold the impulse to fix immediately. Name what you noticed before you respond.
+                </p>
               </div>
             </motion.div>
           )}
@@ -117,24 +213,15 @@ function Hero() {
   const refs = useHeroEntrance();
   const prefersReducedMotion = useReducedMotion();
 
-  // Mouse tracking — normalised to [0, 1] with 0.5 = center
   const rawX = useMotionValue(0.5);
   const rawY = useMotionValue(0.5);
-
-  // Spring-smoothed: heavy hardware feel
   const springConfig = { stiffness: 50, damping: 20, mass: 1 };
   const springX = useSpring(rawX, springConfig);
   const springY = useSpring(rawY, springConfig);
-
-  // 3D tilt: max ±2 degrees
   const rotateY = useTransform(springX, [0, 1], prefersReducedMotion ? [0, 0] : [-2, 2]);
   const rotateX = useTransform(springY, [0, 1], prefersReducedMotion ? [0, 0] : [2, -2]);
-
-  // Text parallax: moves slightly faster than the tilt (forward-Z illusion)
   const textX = useTransform(springX, [0, 1], prefersReducedMotion ? [0, 0] : [-10, 10]);
   const textY = useTransform(springY, [0, 1], prefersReducedMotion ? [0, 0] : [-10, 10]);
-
-  // Ambient glow: moves inversely (light source appears behind the glass)
   const glowX = useTransform(springX, [0, 1], prefersReducedMotion ? [0, 0] : [40, -40]);
   const glowY = useTransform(springY, [0, 1], prefersReducedMotion ? [0, 0] : [40, -40]);
 
@@ -160,7 +247,7 @@ function Hero() {
       {/* Light beam — GSAP entrance */}
       <div ref={refs.lightBeamRef} className="light-beam" aria-hidden />
 
-      {/* Ambient glow — GSAP entrance; Framer Motion parallax offset layered via transform */}
+      {/* Ambient glow — GSAP entrance */}
       <div
         ref={refs.glowRef}
         className="ambient-blob absolute -top-60 right-0 w-[600px] h-[600px] pointer-events-none"
@@ -168,7 +255,7 @@ function Hero() {
         aria-hidden
       />
 
-      {/* Parallax reactive glow — separate layer, inverse to mouse (light source illusion) */}
+      {/* Parallax reactive glow */}
       <motion.div
         className="absolute -top-60 right-0 w-[600px] h-[600px] pointer-events-none"
         style={{
@@ -179,33 +266,40 @@ function Hero() {
         aria-hidden
       />
 
-      {/* Hero image — GSAP clip-path entrance */}
+      {/* Hero image — GSAP clip-path entrance, warmer grade */}
       <div
         ref={refs.imageOuterRef}
         className="absolute right-0 top-0 w-full h-full pointer-events-none"
         style={{ willChange: 'clip-path' }}
       >
-        <div className="hero-drift absolute right-0 top-0 h-full w-[55%]">
+        <div className="hero-drift absolute right-0 top-0 h-full w-[58%]">
           <img
             src="/hero-hand.webp"
             alt=""
             className="object-cover object-left h-full w-full"
-            style={{ objectPosition: '20% center' }}
+            style={{ objectPosition: '20% center', filter: 'sepia(0.18) brightness(0.82)' }}
           />
+          {/* Warmer gradient overlay */}
           <div
             className="absolute inset-0"
-            style={{ background: 'linear-gradient(to right, #08070a 0%, rgba(8,7,10,0.4) 40%, transparent 100%)' }}
+            style={{ background: 'linear-gradient(to right, #08070a 0%, rgba(10,7,5,0.62) 38%, rgba(14,9,6,0.18) 70%, transparent 100%)' }}
           />
         </div>
       </div>
 
-      {/* 3D tilt wrapper — applies rotateX/Y to the entire text + CTA layer */}
+      {/* 3D tilt wrapper */}
       <motion.div
         className="relative z-10 w-full"
         style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
       >
         <Container className="py-32 md:py-48">
           <div className="max-w-2xl">
+
+            {/* Amber hairline rule */}
+            <span
+              aria-hidden
+              style={{ display: 'block', width: 24, height: 1, background: 'rgba(224,116,58,0.5)', marginBottom: '1.125rem' }}
+            />
 
             {/* Eyebrow — GSAP entrance */}
             <p
@@ -215,29 +309,30 @@ function Hero() {
               Sovereign.os
             </p>
 
-            {/* Headline — GSAP mask reveal + Framer Motion parallax translate */}
+            {/* Headline — GSAP mask reveal + Framer Motion parallax */}
             <motion.h1
-              className="font-serif text-[#f4efe9] leading-[1.05] tracking-[-0.025em] text-balance"
+              className="font-serif text-[#f4efe9] leading-[1.05] tracking-[-0.028em] text-balance"
               style={{
-                fontSize: 'clamp(2.8rem, 7vw, 5.5rem)',
+                fontSize: 'clamp(2.9rem, 7.2vw, 5.8rem)',
                 x: textX,
                 y: textY,
                 translateZ: prefersReducedMotion ? 0 : 20,
               }}
             >
-              <span className="block overflow-hidden" style={{ lineHeight: 1.12 }}>
+              <span className="block overflow-hidden" style={{ lineHeight: 1.1 }}>
                 <span ref={refs.line1Ref} className="block" style={{ willChange: 'transform' }}>
                   Your private operating
                 </span>
               </span>
-              <span className="block overflow-hidden" style={{ lineHeight: 1.12 }}>
+              <span className="block overflow-hidden" style={{ lineHeight: 1.1 }}>
                 <span ref={refs.line2Ref} className="block" style={{ willChange: 'transform' }}>
-                  <span className="text-glow">system for becoming</span>
+                  system for{' '}
+                  <em className="not-italic" style={{ fontStyle: 'italic', textShadow: '0 0 40px rgba(224,116,58,0.55)' }}>becoming</em>
                 </span>
               </span>
-              <span className="block overflow-hidden" style={{ lineHeight: 1.12 }}>
+              <span className="block overflow-hidden" style={{ lineHeight: 1.1 }}>
                 <span className="block" style={{ willChange: 'transform' }}>
-                  clear to yourself.
+                  <em className="not-italic" style={{ fontStyle: 'italic', textShadow: '0 0 40px rgba(224,116,58,0.55)' }}>clear</em> to yourself.
                 </span>
               </span>
             </motion.h1>
@@ -247,7 +342,7 @@ function Hero() {
               ref={refs.subtextRef}
               className="mt-7 max-w-md text-[17px] text-[#76716b] leading-relaxed"
             >
-              Sovereign.os uses your Baseline Design to understand your patterns across relationships, decisions, behavior, learning, and pressure — so guidance starts from who you are, not from a blank prompt.
+              Sovereign.os uses your Baseline Design to understand your patterns across relationships, decisions, and pressure — so guidance starts from who you are.
             </p>
 
             {/* Core hook */}
@@ -255,18 +350,9 @@ function Hero() {
               Most AI responds to what you type. Sovereign.os understands the pattern you&apos;re typing from.
             </p>
 
-            {/* CTA — tactile glass button */}
-            <div ref={refs.ctaRef} className="mt-9 flex items-center gap-5 flex-wrap">
-              <motion.a
-                href={APP_URL}
-                className="inline-flex items-center justify-center px-6 py-3 rounded-2xl font-mono text-[11px] uppercase tracking-[0.14em] font-semibold transition-opacity hover:opacity-90"
-                style={{ background: '#f4efe9', color: '#08070a' }}
-                whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
-                whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-              >
-                Enter Sovereign.os
-              </motion.a>
+            {/* CTA */}
+            <div ref={refs.ctaRef} className="mt-10 flex items-center gap-6 flex-wrap">
+              <GhostCta href={APP_URL}>Enter Sovereign.os</GhostCta>
               <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Free to start</span>
             </div>
 
@@ -283,83 +369,168 @@ export function HomePage() {
     <SiteShell entranceControlled>
       <Hero />
 
-      {/* ── Clarity Console ─────────────────────────────────────────────── */}
-      <section className="relative w-full py-24 md:py-36 bg-[#08070a] border-t border-white/[0.04] overflow-hidden">
-        <div className="light-beam opacity-40" aria-hidden />
+      {/* ── Baseline ──────────────────────────────────────────────────── */}
+      <section
+        className="relative w-full py-24 md:py-40 bg-[#08070a] overflow-hidden"
+        style={{ borderTop: '1px solid rgba(224,116,58,0.10)' }}
+      >
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(224,116,58,0.055) 0%, transparent 70%)' }}
+          aria-hidden
+        />
         <Container className="relative z-10">
-          <div className="flex flex-col items-center text-center mb-16">
-            <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#4f4b47] mb-6">How it works</p>
-            <h2 className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-[1.08] max-w-xl text-balance" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
+          <div className="flex flex-col items-center text-center mb-14">
+            <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#4f4b47] mb-6">The Foundation</p>
+            <h2
+              className="font-serif italic text-[#f4efe9] tracking-[-0.02em] leading-[1.08] max-w-xl text-balance"
+              style={{ fontSize: 'clamp(2rem, 5vw, 3.4rem)' }}
+            >
               Your Baseline Design.<br />Active beneath every thread.
             </h2>
             <p className="mt-5 max-w-sm text-[15px] text-[#76716b] leading-relaxed">
-              Pattern recognition that reads what&apos;s active before you reply, react, or withdraw.
+              The dynamic is one of accumulated pressure seeking relief through the relationship. The pattern is not new.
             </p>
           </div>
-          <SpacePreview />
+          <BaselinePanel />
         </Container>
       </section>
 
-      {/* ── Spaces ──────────────────────────────────────────────────────── */}
-      <section className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden">
+      {/* ── Pull Quote ────────────────────────────────────────────────── */}
+      <section
+        className="w-full py-24 md:py-40 bg-[#06050a]"
+        style={{ borderTop: '1px solid rgba(224,116,58,0.08)' }}
+      >
+        <Container>
+          <div className="max-w-4xl mx-auto text-center">
+            <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#4f4b47]/60 mb-10">On pattern</p>
+            <motion.blockquote
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.7, ease }}
+              className="font-serif italic text-[#f4efe9] leading-[1.16] tracking-[-0.018em]"
+              style={{ fontSize: 'clamp(1.65rem, 4.2vw, 3.1rem)', fontWeight: 300 }}
+            >
+              The pattern you are repeating is{' '}
+              <span style={{ color: 'rgba(244,239,233,0.4)' }}>not</span> new.{' '}
+              <br className="hidden md:block" />
+              The clarity can be.
+            </motion.blockquote>
+          </div>
+        </Container>
+      </section>
+
+      {/* ── Spaces ───────────────────────────────────────────────────── */}
+      <section
+        className="relative w-full py-24 md:py-40 bg-[#0c0a0d] overflow-hidden"
+        style={{ borderTop: '1px solid rgba(224,116,58,0.10)' }}
+      >
         <Container className="relative z-10">
-          <div className="flex flex-col items-center text-center mb-16">
-            <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#4f4b47] mb-6">The spaces</p>
-            <h2 className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-[1.08] max-w-xl text-balance" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
-              Three contexts. One Baseline Design.
+          <div className="flex flex-col items-center text-center mb-14">
+            <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#4f4b47] mb-6">The Spaces</p>
+            <h2
+              className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-[1.08] max-w-xl text-balance"
+              style={{ fontSize: 'clamp(2rem, 5vw, 3.4rem)' }}
+            >
+              Where patterns resolve.
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
-            {SPACES.map((space, i) => (
-              <motion.a
-                key={space.id}
-                href={space.href}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08, ease }}
-                className="relative flex flex-col p-7 border border-white/[0.06] bg-[#0c0a0d] hover:border-white/[0.12] hover:bg-white/[0.015] transition-all duration-300 group cursor-pointer"
-                style={{ borderRadius: 'var(--radius-container)' }}
-              >
-                <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#4f4b47] mb-4">{space.id === 'defrag' ? 'Free' : 'Pro'}</p>
-                <h3 className="font-serif text-xl text-[#f4efe9] mb-3 group-hover:text-glow transition-all">{space.label}</h3>
-                <p className="text-[14px] text-[#76716b] leading-relaxed flex-1">{space.description}</p>
-                <div className="flex flex-wrap gap-1.5 pt-5 border-t border-white/[0.05] mt-5">
-                  {space.tags.map(tag => (
-                    <span key={tag} className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] px-2 py-0.5 border border-white/[0.05]" style={{ borderRadius: 3 }}>{tag}</span>
+
+          {(() => {
+            const [defrag, ...rest] = SPACES;
+            const cardHover: TargetAndTransition = { y: -2 };
+            return (
+              <div className="max-w-4xl mx-auto flex flex-col gap-4">
+                {/* Defrag — full width with amber left border */}
+                <motion.a
+                  href={APP_URL}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.5, ease }}
+                  className="flex items-start justify-between gap-8 p-7 bg-[#0c0a0d] cursor-pointer"
+                  style={{
+                    border: '1px solid rgba(224,116,58,0.12)',
+                    borderLeft: '3px solid rgba(224,116,58,0.55)',
+                    borderRadius: 16,
+                  }}
+                  whileHover={cardHover}
+                >
+                  <div className="flex-1">
+                    <div className="flex items-baseline gap-3.5 mb-3">
+                      <span className="font-mono text-[11px] tracking-[0.06em]" style={{ color: 'rgba(224,116,58,0.45)' }}>{defrag.n}</span>
+                      <h3 className="font-serif text-[22px] text-[#f4efe9] font-normal">{defrag.label}</h3>
+                    </div>
+                    <p className="text-[15px] text-[#76716b] leading-[1.72] max-w-2xl">{defrag.description}</p>
+                  </div>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#e0743a]/50 whitespace-nowrap pt-1 shrink-0">
+                    {defrag.tier}
+                  </span>
+                </motion.a>
+
+                {/* Alignment + Covenant — 2-col */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {rest.map((s, i) => (
+                    <motion.a
+                      key={s.id}
+                      href={APP_URL}
+                      initial={{ opacity: 0, y: 16 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: '-60px' }}
+                      transition={{ duration: 0.5, delay: i * 0.08, ease }}
+                      className="flex flex-col justify-between gap-8 p-7 bg-[#0c0a0d] cursor-pointer"
+                      style={{ border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16 }}
+                      whileHover={cardHover}
+                    >
+                      <div>
+                        <div className="flex items-baseline gap-3 mb-2.5">
+                          <span className="font-mono text-[11px] tracking-[0.06em] text-white/15">{s.n}</span>
+                          <h3 className="font-serif text-[19px] text-[#f4efe9] font-normal">{s.label}</h3>
+                        </div>
+                        <p className="text-[13px] text-[#76716b] leading-[1.72]">{s.description}</p>
+                      </div>
+                      <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#4f4b47]">{s.tier}</span>
+                    </motion.a>
                   ))}
                 </div>
-              </motion.a>
-            ))}
-          </div>
+              </div>
+            );
+          })()}
         </Container>
       </section>
 
-      {/* ── CTA ─────────────────────────────────────────────────────────── */}
-      <section className="relative w-full py-32 md:py-48 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden">
-        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] opacity-15" />
-        <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] opacity-[0.08]" />
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(224,116,58,0.05) 0%, transparent 70%)' }} aria-hidden />
+      {/* ── CTA ──────────────────────────────────────────────────────── */}
+      <section
+        className="relative w-full py-32 md:py-52 bg-[#08070a] overflow-hidden"
+        style={{ borderTop: '1px solid rgba(224,116,58,0.10)' }}
+      >
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse 65% 65% at 50% 50%, rgba(224,116,58,0.10) 0%, transparent 68%)' }}
+          animate={{ opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          aria-hidden
+        />
         <Container className="relative z-10 flex flex-col items-center text-center">
-          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-8">Begin</p>
-          <h2 className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] max-w-2xl text-balance" style={{ fontSize: 'clamp(2.2rem, 5.5vw, 4.5rem)' }}>
-            <span className="text-glow">Return before</span> the pattern runs the room.
+          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#4f4b47] mb-10">Begin</p>
+          <h2
+            className="font-serif text-[#f4efe9] tracking-[-0.022em] leading-[1.06] max-w-2xl text-balance"
+            style={{ fontSize: 'clamp(2.2rem, 5.8vw, 4.6rem)' }}
+          >
+            The pattern is not new.<br />
+            <em className="not-italic" style={{ fontStyle: 'italic', textShadow: '0 0 40px rgba(224,116,58,0.52)' }}>
+              The clarity can be.
+            </em>
           </h2>
           <p className="mt-6 max-w-md text-[15px] text-[#76716b] leading-relaxed">
-            Understand what&apos;s active, see what may be repeating, and choose the next move with more context.
+            Sovereign.os helps you integrate what you learn into how you live.
           </p>
-          <div className="mt-9">
-            <motion.a
-              href={APP_URL}
-              className="inline-flex items-center justify-center px-6 py-3 rounded-2xl font-mono text-[11px] uppercase tracking-[0.14em] font-semibold transition-opacity hover:opacity-90"
-              style={{ background: '#f4efe9', color: '#08070a' }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-            >
-              Enter Sovereign.os
-            </motion.a>
-            <p className="mt-5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">Private by design · Free to start</p>
+          <div className="mt-10 flex flex-col items-center gap-5">
+            <GhostCta href={APP_URL}>Enter Sovereign.os</GhostCta>
+            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
+              Private by design · Free to start
+            </p>
           </div>
         </Container>
       </section>
