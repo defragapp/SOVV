@@ -518,9 +518,22 @@ export function formatActiveSignalsForPrompt(
   )
 
   if (timing.note) {
-    // The note contains specific sky conditions (e.g., "Mars retrograde — urgency higher than usual")
-    // Reference these in your response when relevant to explain timing amplification
-    lines.push(`current sky condition: ${timing.note}`)
+    // Translate raw sky conditions into behavioral language only
+    // Never expose framework terms (planet names, retrograde) to the AI
+    const behavioralNote = timing.note
+      .replace(/Mars retrograde[^.—]*/gi, "heightened urgency and lower tolerance")
+      .replace(/Mercury retrograde[^.—]*/gi, "communication sensitivity elevated")
+      .replace(/Saturn retrograde[^.—]*/gi, "slower pacing, pressure to review")
+      .replace(/Venus retrograde[^.—]*/gi, "relational dynamics more charged")
+      .replace(/Saturn in [A-Za-z]+[^.—]*/gi, "structural pressure active")
+      .replace(/Mars in [A-Za-z]+[^.—]*/gi, "action energy elevated")
+      .replace(/Moon in [A-Za-z]+[^.—]*/gi, "emotional sensitivity elevated")
+      .replace(/Jupiter in [A-Za-z]+[^.—]*/gi, "expansion energy, faster pacing")
+      .replace(/[A-Z][a-z]+ (retrograde|in [A-Z][a-z]+)[^.—]*/g, "timing pressure active")
+      .trim()
+    if (behavioralNote) {
+      lines.push(`current timing: ${behavioralNote}`)
+    }
   }
 
   if (overlay) {

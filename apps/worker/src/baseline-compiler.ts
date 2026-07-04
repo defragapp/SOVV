@@ -207,6 +207,14 @@ async function fetchHorizonsPosition(
 ): Promise<{ longitude: number; latitude: number; retrograde: boolean } | null> {
   try {
     // Horizons API parameters for observer-based ecliptic coordinates
+    // Compute stop time = start + 1 day (Horizons returns zero rows when START==STOP)
+    const startDate = new Date(datetime.replace(/-([A-Za-z]+)-/, (_, m) => {
+      const months: Record<string, string> = {Jan:"01",Feb:"02",Mar:"03",Apr:"04",May:"05",Jun:"06",Jul:"07",Aug:"08",Sep:"09",Oct:"10",Nov:"11",Dec:"12"};
+      return `-${months[m] ?? "01"}-`;
+    }));
+    const stopDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+    const stopDatetime = datetime.replace(/\d{4}-[A-Za-z]+-\d+/, `${stopDate.getUTCFullYear()}-${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][stopDate.getUTCMonth()]}-${String(stopDate.getUTCDate()).padStart(2,"0")}`);
+
     const params = new URLSearchParams({
       format: "json",
       COMMAND: `'${targetId}'`,
@@ -215,9 +223,9 @@ async function fetchHorizonsPosition(
       EPHEM_TYPE: "OBSERVER",
       CENTER: `coord@399`,  // Earth geocenter
       COORD_TYPE: "GEODETIC",
-      SITE_COORD: `${lng.toFixed(4)},${lat.toFixed(4)},0`,
+      SITE_COORD: `'${lng.toFixed(4)},${lat.toFixed(4)},0'`,  // Must be quoted
       START_TIME: `'${datetime}'`,
-      STOP_TIME: `'${datetime}'`,
+      STOP_TIME: `'${stopDatetime}'`,  // Must differ from START_TIME
       STEP_SIZE: "1d",
       QUANTITIES: "31",  // Ecliptic longitude and latitude
       CSV_FORMAT: "NO",
@@ -281,27 +289,27 @@ async function computeAstronomySnapshot(
 
     const bodies: BaselineDesignDataset["astronomy"]["bodies"] = {}
 
-    // Fetch positions for all planets (with concurrency limit)
+    // Fetch positions sequentially to avoid Horizons rate limiting
+    // Parallel requests cause 503 errors (Horizons hard-limits concurrency)
     const planetEntries = Object.entries(PLANET_IDS)
-    const results = await Promise.allSettled(
-      planetEntries.map(([name, id]) =>
-        fetchHorizonsPosition(id, datetime, lat, lng)
-          .then(pos => ({ name, pos }))
-      )
-    )
-
-    for (const result of results) {
-      if (result.status === "fulfilled" && result.value.pos) {
-        const { name, pos } = result.value
-        const { sign, degree } = eclipticLongitudeToSign(pos.longitude)
-        bodies[name] = {
-          longitude: pos.longitude,
-          latitude: pos.latitude,
-          sign,
-          degree,
-          retrograde: pos.retrograde,
+    for (const [name, id] of planetEntries) {
+      try {
+        // Add small delay between requests to avoid rate limiting
+        if (Object.keys(bodies).length > 0) {
+          await new Promise(r => setTimeout(r, 150))
         }
-      }
+        const pos = await fetchHorizonsPosition(id, datetime, lat, lng)
+        if (pos) {
+          const { sign, degree } = eclipticLongitudeToSign(pos.longitude)
+          bodies[name] = {
+            longitude: pos.longitude,
+            latitude: pos.latitude,
+            sign,
+            degree,
+            retrograde: pos.retrograde,
+          }
+        }
+      } catch { /* skip this body, continue with others */ }
     }
 
     if (Object.keys(bodies).length === 0) return null
@@ -383,26 +391,23 @@ export async function getCurrentSkySnapshot(
   const bodies: LiveSkySnapshot['bodies'] = {}
 
   try {
+    // Sequential fetch to avoid Horizons rate limiting (503 on concurrent requests)
     const planetEntries = Object.entries(PLANET_IDS)
-    const results = await Promise.allSettled(
-      planetEntries.map(([name, id]) =>
-        fetchHorizonsPosition(id, datetime, lat, lng)
-          .then(pos => ({ name, pos }))
-      )
-    )
-
-    for (const result of results) {
-      if (result.status === 'fulfilled' && result.value.pos) {
-        const { name, pos } = result.value
-        const { sign, degree } = eclipticLongitudeToSign(pos.longitude)
-        bodies[name] = {
-          longitude: pos.longitude,
-          latitude: pos.latitude,
-          sign,
-          degree,
-          retrograde: pos.retrograde,
+    for (const [name, id] of planetEntries) {
+      try {
+        if (Object.keys(bodies).length > 0) await new Promise(r => setTimeout(r, 150))
+        const pos = await fetchHorizonsPosition(id, datetime, lat, lng)
+        if (pos) {
+          const { sign, degree } = eclipticLongitudeToSign(pos.longitude)
+          bodies[name] = {
+            longitude: pos.longitude,
+            latitude: pos.latitude,
+            sign,
+            degree,
+            retrograde: pos.retrograde,
+          }
         }
-      }
+      } catch { /* skip this body */ }
     }
 
     if (Object.keys(bodies).length === 0) return null
