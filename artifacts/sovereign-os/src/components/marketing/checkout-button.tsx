@@ -17,6 +17,10 @@ export function CheckoutButton({ priceId, cta }: { priceId: string; cta: string 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ priceId }),
       })
+      if (res.status === 401) {
+        window.location.href = "/app/login?next=/pricing"
+        return
+      }
       const data = await res.json()
       if (data.url) {
         window.location.href = data.url

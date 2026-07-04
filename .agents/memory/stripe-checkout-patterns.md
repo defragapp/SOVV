@@ -28,3 +28,18 @@ As of Stripe SDK 22.3.0, the version is `"2026-06-24.dahlia"`. Hard-coding a sta
 
 ## Double-click guard
 PremiumGate's `handleCheckout` starts with `if (loading) return;` before `setLoading(true)` to prevent multiple concurrent Stripe session POSTs from rapid clicks.
+
+## Pro upgrade attribution — the money-critical rule
+A paid checkout only grants Pro if the Stripe session carries `metadata.user_id`. The webhook's `checkout.session.completed` handler keys the tier upgrade off `session.metadata.user_id`. Only the **authed** `POST /api/billing/checkout` (requireAuth) sets that metadata; any anonymous checkout endpoint creates a session that takes money and grants nothing.
+
+**Why:** an earlier anonymous `/api/checkout` route was wired to two CTAs (PremiumGate, marketing upgrade banner) — customers could have paid and never been upgraded. That route was removed; every upgrade CTA must go through `/api/billing/checkout` and, on 401, redirect to `/app/login?next=/pricing`.
+
+**How to apply:** never add an anonymous/unauthenticated checkout CTA. Every purchase path must be attributable to a logged-in user before the Stripe session is created.
+
+## Production config required for live monetization (not code — env/dashboard)
+These are unset in this Repl and will silently break paid upgrades in production:
+- `STRIPE_WEBHOOK_SECRET` — webhook.ts rejects all events in production without it (dev accepts unsigned), so no `checkout.session.completed` → no Pro upgrade.
+- A Stripe Dashboard webhook endpoint pointing at `https://<prod-domain>/api/stripe/webhook`.
+- `ALLOWED_ORIGINS` (comma-separated, includes the prod domain) — billing.ts `getAllowedOrigins()` falls back to `REPLIT_DEV_DOMAIN`, then localhost; in production without it, real users get HTTP 403 "Origin not allowed" on checkout.
+
+**Why:** checkout works in dev via `REPLIT_DEV_DOMAIN` and unsigned webhooks, masking these gaps until deploy.
