@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SpaceShell } from '@/components/spaces/space-shell';
@@ -9,7 +9,7 @@ import { setLocalPremium } from '@/lib/tier';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-// ── Mock covenant data ────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────────
 interface Covenant {
   id: string;
   relationship: string;
@@ -18,6 +18,7 @@ interface Covenant {
   sealed: string; // ISO date string
 }
 
+type SuggestStatus = 'idle' | 'loading' | 'error';
 
 // ── Covenant list row ─────────────────────────────────────────────────────────
 function CovenantRow({
@@ -44,7 +45,7 @@ function CovenantRow({
           [{covenant.trigger}]
         </span>
       </div>
-      {/* Chevron — warms and nudges on hover */}
+      {/* Chevron */}
       <svg
         width="7" height="12" viewBox="0 0 7 12" fill="none"
         className="shrink-0 text-white/[0.18] group-hover:text-[#e0743a]/45 transition-all duration-[350ms] group-hover:translate-x-[2px]"
@@ -112,31 +113,133 @@ function CovenantDetail({
   );
 }
 
+// ── Pulsing indicator ─────────────────────────────────────────────────────────
+function PulseDot() {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {[0, 1, 2].map(i => (
+        <motion.span
+          key={i}
+          className="inline-block w-1 h-1 rounded-full"
+          style={{ background: 'rgba(224,116,58,0.6)' }}
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.18, ease: 'easeInOut' }}
+        />
+      ))}
+    </span>
+  );
+}
+
 // ── Drafting engine ───────────────────────────────────────────────────────────
 function DraftingEngine({ onSeal }: { onSeal: (c: Omit<Covenant, 'id' | 'sealed'>) => void }) {
   const [relationship, setRelationship] = useState('');
-  const [boundary, setBoundary] = useState('');
+  const [boundary, setBoundary]         = useState('');
   const [focusedField, setFocusedField] = useState<'relationship' | 'boundary' | null>(null);
+  const [suggestStatus, setSuggestStatus] = useState<SuggestStatus>('idle');
+  const [suggestError, setSuggestError]   = useState('');
+  const suggestAbortRef            = useRef<AbortController | null>(null);
+  // Live ref tracks current relationship so stale responses can be discarded
+  const currentRelationshipRef     = useRef(relationship);
+
+  // Keep live ref in sync so stale responses can detect relationship changes
+  useEffect(() => { currentRelationshipRef.current = relationship; }, [relationship]);
+
+  // Cancel any in-flight suggestion on unmount
+  useEffect(() => () => { suggestAbortRef.current?.abort(); }, []);
+
   const isActive = relationship.trim().length > 0 || boundary.trim().length > 0;
-  const canSeal = relationship.trim().length > 0 && boundary.trim().length > 0;
+  const canSeal  = relationship.trim().length > 0 && boundary.trim().length > 0;
+  const canSuggest = relationship.trim().length > 0 && suggestStatus !== 'loading';
+
+  const handleSuggest = useCallback(async () => {
+    if (!canSuggest) return;
+
+    // Capture input snapshot — used to discard stale responses if user edits relationship mid-flight
+    const capturedRelationship = relationship.trim();
+    const capturedDynamic      = boundary.trim() || undefined;
+
+    // Cancel any prior in-flight suggestion
+    suggestAbortRef.current?.abort();
+    const controller = new AbortController();
+    suggestAbortRef.current = controller;
+
+    setSuggestStatus('loading');
+    setSuggestError('');
+
+    try {
+      const r = await fetch('/api/covenants/suggest', {
+        method:      'POST',
+        headers:     { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        signal:      controller.signal,
+        body:        JSON.stringify({ relationship: capturedRelationship, dynamic: capturedDynamic }),
+      });
+
+      // After every await, verify this is still the active request before touching state
+      if (suggestAbortRef.current !== controller) return;
+
+      let data: Record<string, unknown> = {};
+      const ct = r.headers.get('content-type') ?? '';
+      if (ct.includes('application/json')) {
+        data = await r.json() as Record<string, unknown>;
+      }
+
+      if (suggestAbortRef.current !== controller) return;
+
+      // Staleness check — discard if relationship changed since this request was fired
+      if (capturedRelationship !== currentRelationshipRef.current.trim()) {
+        setSuggestStatus('idle');
+        return;
+      }
+
+      if (!r.ok) {
+        setSuggestStatus('error');
+        setSuggestError((data.error as string) ?? 'Generation failed. Please try again.');
+        return;
+      }
+
+      const suggested = data.boundary as string;
+      if (typeof suggested === 'string' && suggested.trim()) {
+        setBoundary(suggested.trim());
+        setSuggestStatus('idle');
+      } else {
+        setSuggestStatus('error');
+        setSuggestError('Unexpected response format. Please try again.');
+      }
+      // Mark controller as finished to prevent stale state writes from any residual paths
+      suggestAbortRef.current = null;
+    } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
+      // Only surface error if this request is still active
+      if (suggestAbortRef.current === controller) {
+        setSuggestStatus('error');
+        setSuggestError('Network error. Please check your connection and try again.');
+        suggestAbortRef.current = null;
+      }
+    }
+  }, [canSuggest, relationship, boundary]);
 
   const handleSeal = (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSeal) return;
+    // Cancel any in-flight suggestion on seal
+    suggestAbortRef.current?.abort();
     onSeal({
       relationship: relationship.trim(),
-      boundary: boundary.trim(),
-      trigger: 'USER DEFINED',
+      boundary:     boundary.trim(),
+      trigger:      'USER DEFINED',
     });
     setRelationship('');
     setBoundary('');
+    setSuggestStatus('idle');
+    setSuggestError('');
   };
 
   return (
     <div className="px-4 pb-4 pt-2 shrink-0">
       <form onSubmit={handleSeal}>
         <div className="overflow-hidden">
-          {/* Relationship input — hairline warms on focus */}
+          {/* Relationship input */}
           <div
             className="border-b transition-colors duration-700"
             style={{ borderColor: focusedField === 'relationship' ? 'rgba(224,116,58,0.45)' : 'rgba(255,255,255,0.05)' }}
@@ -153,20 +256,54 @@ function DraftingEngine({ onSeal }: { onSeal: (c: Omit<Covenant, 'id' | 'sealed'
             />
           </div>
 
-          {/* Boundary textarea — hairline warms on focus */}
+          {/* Generate draft button — visible once relationship has content */}
+          <AnimatePresence>
+            {relationship.trim().length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25, ease }}
+                className="overflow-hidden"
+              >
+                <div className="flex items-center justify-between px-5 py-2.5 border-b border-white/[0.03]">
+                  <div className="flex items-center gap-2">
+                    {suggestStatus === 'loading' && <PulseDot />}
+                    {suggestStatus === 'error' && (
+                      <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-red-400/70 max-w-[200px] truncate">
+                        {suggestError}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSuggest}
+                    disabled={!canSuggest}
+                    className="font-mono text-[9px] uppercase tracking-[0.16em] transition-colors duration-200 disabled:opacity-40"
+                    style={{ color: suggestStatus === 'loading' ? 'rgba(224,116,58,0.4)' : 'rgba(224,116,58,0.75)' }}
+                  >
+                    {suggestStatus === 'loading' ? 'Generating…' : 'Generate draft →'}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Boundary textarea */}
           <div
             className="border-b transition-colors duration-700"
-            style={{ borderColor: focusedField === 'boundary' ? 'rgba(224,116,58,0.45)' : 'rgba(255,255,255,0.05)' }}
+            style={{ borderColor: focusedField === 'boundary' ? 'rgba(224,116,58,0.45)' : suggestStatus === 'loading' ? 'rgba(224,116,58,0.15)' : 'rgba(255,255,255,0.05)' }}
           >
             <textarea
               value={boundary}
               onChange={e => setBoundary(e.target.value)}
-              placeholder="Define the structural boundary..."
+              placeholder={suggestStatus === 'loading' ? '' : 'Define the structural boundary...'}
               rows={3}
               className="w-full px-5 pt-4 pb-4 bg-transparent text-[17px] text-[#f4efe9] placeholder:text-[#4f4b47] placeholder:transition-opacity placeholder:duration-500 focus:placeholder:opacity-40 outline-none border-none resize-none leading-relaxed"
-              style={{ fontFamily: 'var(--app-font-sans)' }}
+              style={{ fontFamily: 'var(--app-font-sans)', opacity: suggestStatus === 'loading' ? 0.45 : 1, transition: 'opacity 300ms ease' }}
               onFocus={() => setFocusedField('boundary')}
               onBlur={() => setFocusedField(null)}
+              readOnly={suggestStatus === 'loading'}
             />
           </div>
 
@@ -201,9 +338,8 @@ function DraftingEngine({ onSeal }: { onSeal: (c: Omit<Covenant, 'id' | 'sealed'
 // ── Covenant dashboard (pro content) ─────────────────────────────────────────
 function CovenantDashboard() {
   const [covenants, setCovenants] = useState<Covenant[]>([]);
-  const [selected, setSelected] = useState<Covenant | null>(null);
+  const [selected, setSelected]   = useState<Covenant | null>(null);
 
-  // Load from API on mount
   useEffect(() => {
     async function load() {
       try {
@@ -213,11 +349,11 @@ function CovenantDashboard() {
             id: string; title: string; type: string; boundary: string; sealed: string;
           }>;
           setCovenants(data.map(d => ({
-            id: d.id,
+            id:           d.id,
             relationship: d.title,
-            boundary: d.boundary,
-            trigger: d.type,
-            sealed: d.sealed,
+            boundary:     d.boundary,
+            trigger:      d.type,
+            sealed:       d.sealed,
           })));
         }
       } catch { /* silently stay empty */ }
@@ -229,10 +365,10 @@ function CovenantDashboard() {
     const sealed = new Date().toISOString().slice(0, 10);
     try {
       const res = await fetch('/api/covenants', {
-        method: 'POST',
+        method:      'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        headers:     { 'Content-Type': 'application/json' },
+        body:        JSON.stringify({
           title:           draft.relationship,
           type:            draft.trigger || 'USER DEFINED',
           withWhom:        draft.relationship,
@@ -274,10 +410,7 @@ function CovenantDashboard() {
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2 px-1">
             Active — {covenants.length}
           </p>
-          <motion.div
-            layout
-            className="border-t border-white/[0.06]"
-          >
+          <motion.div layout className="border-t border-white/[0.06]">
             <AnimatePresence initial={false}>
               {covenants.map((c, i) => (
                 <motion.div
@@ -310,7 +443,7 @@ function CovenantDashboard() {
         </AnimatePresence>
       </div>
 
-      {/* Drafting engine — pinned to bottom, clears FloatingNav + iOS home bar */}
+      {/* Drafting engine — pinned to bottom */}
       <div style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }} className="lg:pb-0">
         <DraftingEngine onSeal={handleSeal} />
       </div>
@@ -323,7 +456,6 @@ export function CovenantPage() {
   const { isPremium, refresh } = useUserTier();
   const [location, setLocation] = useLocation();
 
-  // Handle Stripe success redirect: /apps/covenant?session_id=cs_...
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('session_id');
@@ -359,7 +491,7 @@ export function CovenantPage() {
       main={main}
       mobileTabs={[
         { id: 'covenant', label: 'Covenant', content: main },
-        { id: 'context', label: 'Context', content: sidebar },
+        { id: 'context',  label: 'Context',  content: sidebar },
       ]}
     />
   );
