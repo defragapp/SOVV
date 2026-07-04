@@ -173,9 +173,13 @@ export function SiteShell({ children, entranceControlled = false }: SiteShellPro
           style={{ height: HEADER_H }}
         >
           {/* Wordmark */}
-          <Link href="/" className="group flex items-center" aria-label="Sovereign.os — Home">
-            <span className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#f4efe9]/70 group-hover:text-[#f4efe9] transition-colors duration-200">
+          <Link href="/" className="group flex items-center gap-3" aria-label="Sovereign.os — Home">
+            <span className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#f4efe9]/78 group-hover:text-[#f4efe9] transition-colors duration-200">
               Sovereign.os
+            </span>
+            <span className="hidden lg:inline-block h-3.5 w-px bg-white/[0.12]" aria-hidden />
+            <span className="hidden lg:inline font-mono text-[8px] uppercase tracking-[0.14em] text-[#a89f97]">
+              Pattern-aware AI platform
             </span>
           </Link>
 
@@ -185,7 +189,7 @@ export function SiteShell({ children, entranceControlled = false }: SiteShellPro
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[13px] text-[#9a9189] hover:text-[#f4efe9] transition-colors duration-200 tracking-[-0.01em]"
+                className="text-[13px] text-[#b5ada5] hover:text-[#f4efe9] transition-colors duration-200 tracking-[-0.01em]"
               >
                 {link.label}
               </Link>
@@ -196,7 +200,7 @@ export function SiteShell({ children, entranceControlled = false }: SiteShellPro
           <div className="hidden md:flex items-center gap-5">
             <Link
               href="/app/login"
-              className="text-[13px] text-[#9a9189] hover:text-[#f4efe9] transition-colors duration-200 tracking-[-0.01em]"
+              className="text-[13px] text-[#b5ada5] hover:text-[#f4efe9] transition-colors duration-200 tracking-[-0.01em]"
             >
               Sign in
             </Link>

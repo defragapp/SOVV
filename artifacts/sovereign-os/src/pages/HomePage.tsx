@@ -595,9 +595,13 @@ function Hero() {
               <div ref={refs.ctaRef} className="mt-9 md:mt-10 flex items-center gap-4 md:gap-5 flex-wrap">
                 <GhostCta href={APP_URL}>Enter Sovereign.os</GhostCta>
                 <span className="font-mono text-[9px] uppercase tracking-[0.2em]" style={{ color: C.dim }}>
-                  Free to start
+                  Guided onboarding · Free to start
                 </span>
               </div>
+
+              <p className="mt-3 text-[12px] leading-relaxed" style={{ color: '#8e867f' }}>
+                Bring one real conversation, decision, or conflict. Get a concrete next move in minutes.
+              </p>
 
               <div className="mt-6 flex flex-wrap gap-2 max-w-xl">
                 {TRUST_SIGNALS.map((signal) => (
