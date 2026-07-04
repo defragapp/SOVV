@@ -277,7 +277,7 @@ function Hero() {
         className="absolute right-0 top-0 w-full h-full pointer-events-none"
         style={{ willChange: 'clip-path' }}
       >
-        <div className="hero-drift absolute right-0 top-0 h-full w-[58%]">
+        <div ref={refs.imageDriftRef} className="hero-drift absolute right-0 top-0 h-full w-[58%]">
           <img
             src="/hero-hand.webp"
             alt=""
@@ -328,7 +328,7 @@ function Hero() {
                 </span>
               </span>
               <span className="block overflow-hidden" style={{ lineHeight: 1.09 }}>
-                <span className="block" style={{ willChange: 'transform' }}>
+                <span ref={refs.line3Ref} className="block" style={{ willChange: 'transform' }}>
                   <em style={{ fontStyle: 'italic' }}>clear</em> to yourself.
                 </span>
               </span>
