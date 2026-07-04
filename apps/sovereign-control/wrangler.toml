@@ -1,0 +1,19 @@
+name = "sovereign-control"
+main = "src/index.ts"
+compatibility_date = "2026-06-19"
+compatibility_flags = ["nodejs_compat"]
+
+[[durable_objects.bindings]]
+name = "AGENT_STATE"
+class_name = "AgentState"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["AgentState"]
+
+[env.production]
+name = "sovereign-control"
+
+[[env.production.durable_objects.bindings]]
+name = "AGENT_STATE"
+class_name = "AgentState"

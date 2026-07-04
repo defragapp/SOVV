@@ -1,0 +1,4 @@
+# Copy to .dev.vars and fill in real values
+APP_URL=http://localhost:3000
+CF_API_TOKEN=your_token_here
+CLOUDFLARE_ACCOUNT_ID=8b1954d216d65077c6480d62583fe2c2

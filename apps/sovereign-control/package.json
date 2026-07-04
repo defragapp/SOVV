@@ -1,0 +1,17 @@
+{
+  "name": "@sovereign/sovereign-control",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "echo \"sovereign-control build ready\"",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260515.0",
+    "typescript": "^5.5.4",
+    "wrangler": "^4.105.0"
+  }
+}

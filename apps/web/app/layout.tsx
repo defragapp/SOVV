@@ -1,0 +1,177 @@
+import { NoiseLayer } from "@/components/ui/noise-layer"
+import type { Metadata, Viewport } from "next"
+import localFont from "next/font/local"
+import { GeistSans } from "geist/font/sans"
+import { Fraunces } from "next/font/google"
+import "./globals.css"
+
+const jetBrainsMono = localFont({
+  src: "../public/fonts/JetBrainsMono-VariableFont.woff2",
+  variable: "--font-jetbrains-mono",
+  display: "swap",
+  preload: true,
+})
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  display: "swap",
+  axes: ["opsz", "SOFT"],
+  preload: true,
+})
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://defrag.app"),
+  title: {
+    default: "Sovereign.os — Pattern-aware AI for the moments that matter",
+    template: "%s — Sovereign.os",
+  },
+  description:
+    "Sovereign.os is pattern-aware AI for the moments that are hard to read while you're inside them. Understand what's active, what may be repeating, and what next move gives the situation a better chance.",
+  keywords: [
+    "relationship patterns",
+    "emotional intelligence",
+    "personal growth",
+    "self awareness",
+    "relational dynamics",
+    "family patterns",
+    "boundary setting",
+    "AI personal notebook",
+    "private AI journal",
+    "pattern recognition",
+    "alignment",
+    "defrag",
+    "sovereign os",
+    "baseline design",
+    "emotional clarity",
+    "next response",
+    "conflict resolution",
+    "personal AI assistant",
+    "pattern-aware AI",
+  ],
+  authors: [{ name: "Sovereign.os", url: "https://defrag.app" }],
+  creator: "Sovereign.os",
+  publisher: "Sovereign.os",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://defrag.app",
+    siteName: "Sovereign.os",
+    title: "Sovereign.os — Pattern-aware AI for the moments that matter",
+    description:
+      "Pattern-aware AI for the moments that are hard to read while you're inside them.",
+    images: [
+      {
+        url: "/social-card.png",
+        width: 1200,
+        height: 630,
+        alt: "Sovereign.os — Pattern-aware AI for relational patterns",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@sovereignos",
+    creator: "@sovereignos",
+    title: "Sovereign.os — Pattern-aware AI for the moments that matter",
+    description:
+      "Pattern-aware AI for the moments that are hard to read while you're inside them.",
+    images: ["/social-card.png"],
+  },
+  icons: {
+    icon: ["/favicon.ico", "/favicon.png", "/brand-mark.svg"],
+    apple: ["/apple-touch-icon.png", "/brand-mark.svg"],
+    shortcut: "/favicon.ico",
+  },
+  manifest: "/manifest.json",
+  alternates: {
+    canonical: "https://defrag.app",
+  },
+  category: "productivity",
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#08070a",
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html
+      lang="en"
+      className={`antialiased ${jetBrainsMono.variable} ${GeistSans.variable} ${fraunces.variable}`}
+    >
+      <head>
+        {/* DNS prefetch for external resources */}
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+
+        {/* Structured data — SoftwareApplication */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": "Sovereign.os",
+              "applicationCategory": "LifestyleApplication",
+              "operatingSystem": "Web",
+              "url": "https://defrag.app",
+              "description": "Pattern-aware AI for the moments that are hard to read while you're inside them.",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "price": "0",
+                  "priceCurrency": "USD",
+                  "name": "Free",
+                  "description": "Defrag space with Baseline Design — free forever"
+                },
+                {
+                  "@type": "Offer",
+                  "price": "12",
+                  "priceCurrency": "USD",
+                  "billingIncrement": "P1M",
+                  "name": "Pro",
+                  "description": "Unlimited sessions, Covenant, Alignment, Library, Audio Overview"
+                }
+              ],
+              "featureList": [
+                "Baseline Design — personal pattern map",
+                "Defrag — pattern recognition space",
+                "Covenant — faith-context reflection",
+                "Alignment — response integration",
+                "Sovereign.os Library — private saved results",
+                "Audio Overview",
+                "Invite Privately"
+              ]
+            })
+          }}
+        />
+      </head>
+      <body className="min-h-screen overflow-x-hidden bg-[#08070a] text-[#f4efe9] overscroll-none selection:bg-white/20 selection:text-white">
+        {/* Skip to main content — keyboard accessibility */}
+        <a href="#main-content" className="skip-to-main">
+          Skip to main content
+        </a>
+        <NoiseLayer />
+        <main id="main-content">
+          {children}
+        </main>
+      </body>
+    </html>
+  )
+}

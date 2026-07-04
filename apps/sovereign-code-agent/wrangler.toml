@@ -1,0 +1,20 @@
+name = "sovereign-code-agent"
+main = "src/index.js"
+compatibility_date = "2026-06-12"
+compatibility_flags = ["nodejs_compat"]
+# account_id removed — set CLOUDFLARE_ACCOUNT_ID in CI secrets
+
+[ai]
+binding = "AI"
+
+[vars]
+ACCOUNT_ID = "8b1954d216d65077c6480d62583fe2c2"
+
+[env.production]
+name = "sovereign-code-agent"
+
+[env.production.ai]
+binding = "AI"
+
+[env.production.vars]
+ACCOUNT_ID = "8b1954d216d65077c6480d62583fe2c2"

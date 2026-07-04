@@ -1,0 +1,63 @@
+name = "sovereign-os-api"
+main = "./src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+# account_id removed — set CLOUDFLARE_ACCOUNT_ID in CI secrets
+workers_dev = false
+
+[[routes]]
+pattern = "api.defrag.app"
+custom_domain = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "vibesdk-db"
+database_id = "c8c2fd8d-5297-46fc-8594-7629c8bad74d"
+migrations_dir = "migrations"
+
+# KV namespace for session state, Baseline Design cache, usage counters, and replay protection
+# Internal identifier: SOVV_DATA (KV namespace title in Cloudflare dashboard)
+[[kv_namespaces]]
+binding = "KV"
+id = "3bd3ff5048a8468e82c574d7d66045c3"
+
+[[r2_buckets]]
+binding = "TEMPLATES"
+bucket_name = "vibesdk-templates"
+
+[[queues.producers]]
+binding = "PATTERN_QUEUE"
+queue = "pattern-extraction-tasks"
+
+[ai]
+binding = "AI"
+
+[[services]]
+binding = "AI_SERVICE"
+service = "worker-ai"
+
+[[services]]
+binding = "SESSION_SERVICE"
+service = "worker-session"
+
+[[unsafe.bindings]]
+name = "RATE_LIMITER"
+type = "ratelimit"
+namespace_id = "100"
+simple = { limit = 15, period = 60 }
+
+[vars]
+FREE_DAILY_LIMIT = "15"
+AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+APP_URL = "https://app.defrag.app"
+GATEWAY_ID = "sovereign-ai-gateway"
+
+# send_email binding — Cloudflare Email Routing (verified destination: info@defrag.app)
+# Email Routing is active on defrag.app. Destination address verified.
+# Sender must be from defrag.app domain.
+[[email]]
+name = "EMAIL"
+destination_address = "info@defrag.app"
+
+[observability]
+enabled = true

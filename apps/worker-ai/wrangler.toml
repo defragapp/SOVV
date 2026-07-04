@@ -1,0 +1,45 @@
+name = "worker-ai"
+main = "./src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+# account_id removed — set CLOUDFLARE_ACCOUNT_ID in CI secrets
+workers_dev = false
+
+[[routes]]
+pattern = "ai.defrag.app"
+custom_domain = true
+
+[ai]
+binding = "AI"
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
+[build]
+command = "npm run build"
+
+[env.production]
+name = "worker-ai"
+workers_dev = false
+
+[[env.production.routes]]
+pattern = "ai.defrag.app"
+custom_domain = true
+
+[env.production.ai]
+binding = "AI"
+
+[env.production.observability]
+enabled = true
+head_sampling_rate = 1
+
+[env.production.observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true

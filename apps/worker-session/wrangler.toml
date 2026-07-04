@@ -1,0 +1,57 @@
+name = "worker-session"
+main = "./src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+# account_id removed — set CLOUDFLARE_ACCOUNT_ID in CI secrets
+workers_dev = false
+
+[ai]
+binding = "AI"
+
+[[services]]
+binding = "AI_SERVICE"
+service = "worker-ai"
+
+[[durable_objects.bindings]]
+name = "CONFLICT_SESSION"
+class_name = "ConflictSessionDO"
+
+[[migrations]]
+tag = "v1"
+new_classes = [ "ConflictSessionDO" ]
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
+[build]
+command = "npm run build"
+
+[env.production]
+name = "worker-session"
+workers_dev = false
+
+[env.production.ai]
+binding = "AI"
+
+[[env.production.services]]
+binding = "AI_SERVICE"
+service = "worker-ai"
+
+[[env.production.durable_objects.bindings]]
+name = "CONFLICT_SESSION"
+class_name = "ConflictSessionDO"
+
+[env.production.observability]
+enabled = true
+head_sampling_rate = 1
+
+[env.production.observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="bm-title bm-desc">
+  <title id="bm-title">Sovereign.os</title>
+  <desc id="bm-desc">Sovereign.os brand mark — geometric structure representing pattern, clarity, and private intelligence.</desc>
+
+  <rect width="1024" height="1024" fill="#020202"/>
+
+  <!-- Subtle gradient glow -->
+  <circle cx="512" cy="512" r="400" fill="url(#core-glow)" opacity="0.4" />
+  <defs>
+    <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <pattern id="scanlines" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="10" cy="10" r="1" fill="#FFFFFF" fill-opacity="0.08"/>
+    </pattern>
+  </defs>
+
+  <!-- Point grid texture -->
+  <rect width="1024" height="1024" fill="url(#scanlines)"/>
+
+  <!-- Geometric frame -->
+  <rect x="128" y="128" width="768" height="768" rx="32" fill="none" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="2"/>
+  <rect x="160" y="160" width="704" height="704" rx="24" fill="none" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="1"/>
+
+  <!-- Inner core rings -->
+  <circle cx="512" cy="512" r="240" fill="none" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="2"/>
+  <circle cx="512" cy="512" r="160" fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="8 8"/>
+  <circle cx="512" cy="512" r="80" fill="none" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="2"/>
+
+  <!-- Axis intersections -->
+  <line x1="512" y1="272" x2="512" y2="752" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="1"/>
+  <line x1="272" y1="512" x2="752" y2="512" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="1"/>
+
+  <!-- Center impact -->
+  <circle cx="512" cy="512" r="8" fill="#FFFFFF" fill-opacity="0.9"/>
+  <circle cx="512" cy="512" r="24" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1"/>
+
+  <!-- High-end accents -->
+  <path d="M512 80 L520 128 L504 128 Z" fill="#FFFFFF" opacity="0.3" />
+  <path d="M512 944 L520 896 L504 896 Z" fill="#FFFFFF" opacity="0.3" />
+  <path d="M80 512 L128 504 L128 520 Z" fill="#FFFFFF" opacity="0.3" />
+  <path d="M944 512 L896 504 L896 520 Z" fill="#FFFFFF" opacity="0.3" />
+</svg>
