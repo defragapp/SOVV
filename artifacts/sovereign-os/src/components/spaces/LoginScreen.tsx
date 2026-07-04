@@ -140,7 +140,7 @@ export default function LoginScreen() {
           {/* Wordmark above card */}
           <div className="mb-8 text-center">
             <Link href="/">
-              <span className="font-mono text-[10px] tracking-[0.28em] text-[#76716b] uppercase">
+              <span className="font-mono text-[10px] tracking-[0.28em] text-[#f4efe9]/70 uppercase hover:text-[#f4efe9] transition-colors duration-200">
                 SOVEREIGN.OS
               </span>
             </Link>
@@ -263,7 +263,7 @@ export default function LoginScreen() {
                 <button
                   type="submit"
                   disabled={loading || !email || !password || (mode === 'register' && !!turnstileSiteKey && !turnstileToken)}
-                  className="w-full py-3.5 rounded-2xl bg-[#f4efe9] text-[#08070a] font-mono text-[11px] uppercase tracking-[0.14em] font-semibold transition-opacity hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-full py-3.5 rounded-full bg-[#f4efe9] text-[#08070a] font-mono text-[11px] uppercase tracking-[0.14em] font-semibold transition-opacity hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   {loading ? '···' : mode === 'login' ? 'Sign In' : 'Create Account'}
                 </button>

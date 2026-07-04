@@ -50,7 +50,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
         style={{ gridTemplateColumns: "260px 1fr 300px", gridTemplateRows: "52px 1fr" }}
       >
         {/* ── Header ── */}
-        <header className="col-span-3 h-[52px] border-b border-[#e0743a]/10 bg-[#08070a]/95 backdrop-blur-md px-5 flex items-center justify-between">
+        <header className="col-span-3 h-[52px] border-b border-white/[0.055] bg-[#08070a]/95 backdrop-blur-md px-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/apps/defrag" className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b] hover:text-[#f4efe9] transition-colors">
               Sovereign.os
@@ -124,8 +124,8 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
 
         {/* ── Left: People / Baseline Design ── */}
         <aside
-          className="col-start-1 row-start-2 border-r border-[#e0743a]/10 flex flex-col overflow-y-auto"
-          style={{ background: 'linear-gradient(180deg, #0c0a0d 0%, #09080b 100%)' }}
+          className="col-start-1 row-start-2 border-r border-white/[0.055] flex flex-col overflow-y-auto"
+          style={{ background: '#0c0a0d' }}
         >
           {sidebar}
         </aside>
@@ -140,8 +140,8 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
 
         {/* ── Right: Library / Multimedia ── */}
         <aside
-          className="col-start-3 row-start-2 border-l border-[#e0743a]/10 flex flex-col overflow-y-auto"
-          style={{ background: 'linear-gradient(180deg, #0c0a0d 0%, #09080b 100%)' }}
+          className="col-start-3 row-start-2 border-l border-white/[0.055] flex flex-col overflow-y-auto"
+          style={{ background: '#0c0a0d' }}
         >
           {contextPanel}
         </aside>
@@ -150,7 +150,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
       {/* ── Mobile Layout ──────────────────────────────────────────── */}
       <div className="flex lg:hidden flex-col w-full h-full relative z-10">
         <header
-          className="sticky top-0 z-10 bg-[#08070a]/95 backdrop-blur-md border-b border-[#e0743a]/10 px-5 py-3 flex items-center justify-between select-none"
+          className="sticky top-0 z-10 bg-[#08070a]/95 backdrop-blur-md border-b border-white/[0.055] px-5 py-3 flex items-center justify-between select-none"
           style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
         >
           <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.2em] uppercase">
@@ -173,7 +173,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
 
         {/* Content tabs — switch between main content and context panel */}
         {mobileTabs.length > 1 && (
-          <div className="flex px-4 gap-1 overflow-x-auto border-b border-[#e0743a]/10 bg-[#08070a] select-none">
+          <div className="flex px-4 gap-1 overflow-x-auto border-b border-white/[0.055] bg-[#08070a] select-none">
             {mobileTabs.map((tab) => (
               <button
                 key={tab.id}

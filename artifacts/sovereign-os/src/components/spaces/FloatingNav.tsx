@@ -33,7 +33,7 @@ export function FloatingNav() {
             background: 'rgba(8,7,10,0.82)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            boxShadow: '0 0 0 1px rgba(224,116,58,0.12) inset, 0 20px 40px rgba(0,0,0,0.5)',
+            boxShadow: '0 0 0 1px rgba(255,255,255,0.07) inset, 0 20px 40px rgba(0,0,0,0.5)',
           }}
         >
           {SPACES.map(({ href, label }) => {

@@ -69,7 +69,7 @@ function CovenantDetail({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.35, ease }}
-      className="rounded-3xl ring-1 ring-inset ring-[#e0743a]/12 overflow-hidden mx-4 mb-4"
+      className="rounded-2xl ring-1 ring-inset ring-white/[0.07] overflow-hidden mx-4 mb-4"
       style={{ background: 'rgba(8,7,10,0.95)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }}
     >
       {/* Header */}
@@ -178,7 +178,7 @@ function DraftingEngine({ onSeal }: { onSeal: (c: Omit<Covenant, 'id' | 'sealed'
             <button
               type="submit"
               disabled={!canSeal}
-              className="px-5 py-2.5 rounded-2xl font-mono text-[11px] uppercase tracking-[0.16em] transition-[opacity,transform] duration-[250ms] active:scale-[0.97] active:duration-0 disabled:opacity-30"
+              className="px-5 py-2.5 rounded-full font-mono text-[11px] uppercase tracking-[0.16em] transition-[opacity,transform] duration-[250ms] active:scale-[0.97] active:duration-0 disabled:opacity-30"
               style={{
                 background: canSeal ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.04)',
                 backdropFilter: 'blur(12px)',

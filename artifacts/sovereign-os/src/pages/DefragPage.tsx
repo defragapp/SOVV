@@ -33,7 +33,7 @@ function SkeletonCard({ lines = 2, delay = 0 }: { lines?: number; delay?: number
           />
         ))}
       </div>
-      <div className="mt-5 h-px bg-[#e0743a]/[0.06]" />
+      <div className="mt-5 h-px bg-white/[0.05]" />
     </motion.div>
   );
 }
@@ -148,7 +148,7 @@ function DropZone({
           <button
             type="submit"
             disabled={!inputActive || loading}
-            className="px-5 py-2.5 rounded-2xl font-mono text-[11px] uppercase tracking-[0.16em] transition-[opacity,transform] duration-[250ms] active:scale-[0.97] active:duration-0 disabled:opacity-30"
+            className="px-5 py-2.5 rounded-full font-mono text-[11px] uppercase tracking-[0.16em] transition-[opacity,transform] duration-[250ms] active:scale-[0.97] active:duration-0 disabled:opacity-30"
             style={{
               background: inputActive && !loading ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.04)',
               backdropFilter: 'blur(12px)',
@@ -220,8 +220,7 @@ function DiagnosticCard({
       </div>
       {/* Content floats directly on canvas */}
       <div className="pb-8">{children}</div>
-      {/* Hairline separator — amber-tinted */}
-      <div className="h-px bg-[#e0743a]/[0.07]" />
+      <div className="h-px bg-white/[0.055]" />
     </motion.div>
   );
 }
@@ -363,7 +362,7 @@ function SaveBar({ result, inputText }: { result: DiagnosticResult; inputText: s
         <button
           onClick={handleSave}
           disabled={saveState !== 'idle'}
-          className="px-4 py-2 rounded-xl font-mono text-[10px] uppercase tracking-[0.12em] transition-all duration-200 disabled:opacity-40"
+          className="px-4 py-2 rounded-full font-mono text-[10px] uppercase tracking-[0.12em] transition-all duration-200 disabled:opacity-40"
           style={{
             background: saveState === 'saved' ? 'rgba(224,116,58,0.10)' : 'rgba(255,255,255,0.08)',
             color: saveState === 'saved' ? '#e0743a' : '#f4efe9',

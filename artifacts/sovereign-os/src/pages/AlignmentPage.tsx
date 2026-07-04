@@ -31,7 +31,7 @@ function RippleRing({ animate }: { animate: boolean }) {
           {[0, 1].map(i => (
             <motion.span
               key={i}
-              className="absolute inset-0 rounded-2xl pointer-events-none"
+              className="absolute inset-0 rounded-full pointer-events-none"
               initial={{ opacity: 0.7, scale: 1 }}
               animate={{ opacity: 0, scale: 1.5 + i * 0.25 }}
               exit={{}}
@@ -141,7 +141,7 @@ function AlignmentDashboard() {
           <motion.button
             onClick={handleCommit}
             disabled={committed}
-            className="w-full py-4 rounded-2xl font-mono text-[11px] uppercase tracking-[0.14em] transition-all duration-300 disabled:cursor-default"
+            className="w-full py-4 rounded-full font-mono text-[11px] uppercase tracking-[0.14em] transition-all duration-300 disabled:cursor-default"
             style={{
               background: committed ? 'rgba(224,116,58,0.12)' : 'rgba(255,255,255,0.08)',
               backdropFilter: 'blur(12px)',
@@ -179,7 +179,7 @@ function AlignmentDashboard() {
             <motion.div
               key="expanded-response"
               {...(!prefersReducedMotion ? { layoutId: 'response-block' } : {})}
-              className="fixed inset-x-4 top-[50%] z-50 -translate-y-1/2 rounded-3xl ring-1 ring-inset ring-white/[0.08] overflow-hidden"
+              className="fixed inset-x-4 top-[50%] z-50 -translate-y-1/2 rounded-2xl ring-1 ring-inset ring-white/[0.08] overflow-hidden"
               style={{ background: '#1C1C1E', translateY: '-50%' }}
               initial={{ opacity: prefersReducedMotion ? 0 : 1, scale: prefersReducedMotion ? 0.96 : 1 }}
               animate={{ opacity: 1, scale: 1 }}
