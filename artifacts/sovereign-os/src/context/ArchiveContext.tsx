@@ -37,8 +37,10 @@ export function ArchiveProvider({ children }: { children: React.ReactNode }) {
       try {
         const res = await fetch('/api/archive', { credentials: 'include' });
         if (res.ok) {
-          const data = await res.json() as ArchivedPattern[];
-          if (!cancelled) setPatterns(data);
+          // API returns { items, total, hasMore } — extract items array
+          const data = await res.json() as { items?: ArchivedPattern[] } | ArchivedPattern[];
+          const items = Array.isArray(data) ? data : (data.items ?? []);
+          if (!cancelled) setPatterns(items);
         }
         // 401 = not logged in — silently stay empty
       } catch { /* network error — stay empty */ } finally {

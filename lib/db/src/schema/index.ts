@@ -33,6 +33,7 @@ export const baselines = pgTable("baselines", {
 export const archiveEntries = pgTable("archive_entries", {
   id:                uuid("id").primaryKey().defaultRandom(),
   userId:            uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  space:             text("space").notNull().default("defrag"),  // 'defrag' | 'covenant' | 'alignment'
   inputText:         text("input_text").notNull().default(""),
   activePattern:     text("active_pattern").notNull(),
   whatsActive:       text("whats_active").notNull(),
