@@ -6,6 +6,7 @@ import authRouter      from "./auth";
 import userRouter      from "./user";
 import baselineRouter  from "./baseline";
 import archiveRouter   from "./archive";
+import alignmentRouter from "./alignment";
 import covenantsRouter from "./covenants";
 import billingRouter   from "./billing";
 import webhookRouter   from "./webhook";
@@ -20,6 +21,7 @@ router.use("/auth",      authRouter);
 router.use("/user",      userRouter);
 router.use("/baseline",  baselineRouter);
 router.use("/archive",   archiveRouter);
+router.use("/alignment", alignmentRouter);
 router.use("/covenants", covenantsRouter);
 router.use("/billing",   billingRouter);
 router.use("/stripe",    webhookRouter);  // POST /api/stripe/webhook

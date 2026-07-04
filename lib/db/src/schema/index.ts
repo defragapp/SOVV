@@ -56,15 +56,29 @@ export const covenants = pgTable("covenants", {
   createdAt:        timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-// ── Inferred types ────────────────────────────────────────────────────────────
-export type User          = typeof users.$inferSelect;
-export type Session       = typeof sessions.$inferSelect;
-export type Baseline      = typeof baselines.$inferSelect;
-export type ArchiveEntry  = typeof archiveEntries.$inferSelect;
-export type Covenant      = typeof covenants.$inferSelect;
+// ── Alignment Entries (committed response vectors) ────────────────────────────
+export const alignmentEntries = pgTable("alignment_entries", {
+  id:           uuid("id").primaryKey().defaultRandom(),
+  userId:       uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  personId:     text("person_id").notNull().default("self"),
+  personName:   text("person_name").notNull().default("Self"),
+  theirPattern: text("their_pattern").notNull(),
+  yourResponse: text("your_response").notNull(),
+  yourAction:   text("your_action").notNull(),
+  createdAt:    timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
 
-export type InsertUser         = typeof users.$inferInsert;
-export type InsertSession      = typeof sessions.$inferInsert;
-export type InsertBaseline     = typeof baselines.$inferInsert;
-export type InsertArchiveEntry = typeof archiveEntries.$inferInsert;
-export type InsertCovenant     = typeof covenants.$inferInsert;
+// ── Inferred types ────────────────────────────────────────────────────────────
+export type User            = typeof users.$inferSelect;
+export type Session         = typeof sessions.$inferSelect;
+export type Baseline        = typeof baselines.$inferSelect;
+export type ArchiveEntry    = typeof archiveEntries.$inferSelect;
+export type Covenant        = typeof covenants.$inferSelect;
+export type AlignmentEntry  = typeof alignmentEntries.$inferSelect;
+
+export type InsertUser           = typeof users.$inferInsert;
+export type InsertSession        = typeof sessions.$inferInsert;
+export type InsertBaseline       = typeof baselines.$inferInsert;
+export type InsertArchiveEntry   = typeof archiveEntries.$inferInsert;
+export type InsertCovenant       = typeof covenants.$inferInsert;
+export type InsertAlignmentEntry = typeof alignmentEntries.$inferInsert;
