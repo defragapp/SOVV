@@ -368,8 +368,8 @@ function Hero() {
   }, [rawX, rawY]);
 
   return (
-    <section
-      className="relative w-full min-h-[84svh] flex items-center overflow-hidden"
+      <section
+      className="relative w-full min-h-[80svh] flex items-center overflow-hidden"
       style={{ background: C.bg }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -383,12 +383,20 @@ function Hero() {
             background: 'linear-gradient(138deg, rgba(7,7,9,0.99) 0%, rgba(12,10,12,0.97) 46%, rgba(7,7,9,0.99) 100%)',
           }}
         />
+        <div
+          className="absolute right-[8%] top-[16%] h-[46%] w-[28%] min-w-[220px]"
+          style={{
+            borderRadius: 999,
+            background: 'radial-gradient(60% 60% at 50% 50%, rgba(224,116,58,0.12) 0%, rgba(224,116,58,0.04) 48%, rgba(8,7,10,0) 80%)',
+            filter: 'blur(2px)',
+          }}
+        />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(8,7,10,0.04) 0%, rgba(8,7,10,0.22) 80%, rgba(8,7,10,0.4) 100%)' }} />
       </div>
 
       <motion.div className="relative z-10 w-full" style={{ x: textX, y: textY }}>
-        <Container className="py-18 md:py-22">
-          <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_440px] items-center gap-8 md:gap-7 xl:gap-10">
+        <Container className="py-16 md:py-20">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_340px] xl:grid-cols-[1fr_440px] items-center gap-8 md:gap-7 xl:gap-10">
             <div className="max-w-2xl">
               <span aria-hidden style={{ display: 'block', width: 20, height: 1, background: `${C.amber}80`, marginBottom: '1rem' }} />
               <p ref={refs.labelRef} className="font-mono text-[9px] uppercase tracking-[0.34em] mb-6" style={{ color: C.dim }}>
