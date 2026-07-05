@@ -63,8 +63,8 @@ destination_address = "info@defrag.app"
 enabled = true
 
 # Cron triggers for maintenance tasks
-[[triggers.crons]]
-cron = "0 3 * * *"  # Daily at 3am UTC — session cleanup
+[triggers]
+crons = ["0 3 * * *"]  # Daily at 3am UTC — session cleanup
 
 # Analytics Engine for custom metrics (AI latency, error rates, entitlement checks)
 # Dataset: sovereign-metrics

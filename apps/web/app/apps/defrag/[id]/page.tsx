@@ -45,6 +45,8 @@ export default function DefragItemPage() {
   const [initialLoading, setInitialLoading] = React.useState(true)
   const [isLoading, setIsLoading] = React.useState(false)
   const [error, setError] = React.useState("")
+  const [isSavingUpdate, setIsSavingUpdate] = React.useState(false)
+  const [saveUpdateSuccess, setSaveUpdateSuccess] = React.useState(false)
 
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
