@@ -209,8 +209,17 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
   params.set("line_items[0][quantity]", "1");
   params.set("success_url", `${env.APP_URL}/app?upgraded=1`);
   params.set("cancel_url", `${env.APP_URL}/app?canceled=1`);
+  // Track checkout start for abandoned checkout recovery
+  if (env.KV && userId !== "unknown") {
+    const checkoutKey = `checkout:started:${userId}`;
+    await env.KV.put(checkoutKey, JSON.stringify({ email: user?.email, startedAt: Date.now() }), {
+      expirationTtl: 48 * 60 * 60, // 48 hours
+    }).catch(() => {});
+  }
   params.set("client_reference_id", userId);
   params.set("subscription_data[metadata][userId]", userId);
+  // 7-day free trial for new subscribers
+  params.set("subscription_data[trial_period_days]", "7");
   // Apply Stripe coupon/discount if provided
   if (couponId) {
     params.set("discounts[0][coupon]", couponId);

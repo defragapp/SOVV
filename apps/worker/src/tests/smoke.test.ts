@@ -170,6 +170,20 @@ async function runTests() {
     assert(src.includes("15 minutes"), "15-minute window not configured");
   });
 
+
+  await test("billing.ts has 7-day trial period in checkout", async () => {
+    const src = readFileSync("src/billing.ts", "utf8");
+    assert(src.includes("trial_period_days"), "7-day trial not configured in checkout");
+    assert(src.includes("allow_promotion_codes"), "promotion codes not enabled");
+  });
+
+  await test("prompts.ts has nextSpace field in Defrag output contract", async () => {
+    const src = readFileSync("src/prompts.ts", "utf8");
+    assert(src.includes("nextSpace"), "nextSpace field missing from Defrag output contract");
+    assert(src.includes("ALIGNMENT"), "ALIGNMENT option missing from nextSpace");
+    assert(src.includes("COVENANT"), "COVENANT option missing from nextSpace");
+  });
+
   console.log("\n✅ All regression tests passed\n");
 }
 

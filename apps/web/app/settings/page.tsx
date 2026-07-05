@@ -615,6 +615,33 @@ export default function SettingsPage() {
           <ActiveSessionsList />
         </div>
 
+        {/* Notification preferences */}
+        <div className="bg-white/[0.02] border border-white/[0.08] rounded-[14px] p-8 md:p-10 mt-14">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-6">
+            Notifications
+          </p>
+          <div className="flex flex-col gap-4">
+            {[
+              { label: "Billing reminders", desc: "Payment due, subscription changes", defaultOn: true },
+              { label: "Product updates", desc: "New spaces, features, and improvements", defaultOn: false },
+              { label: "Pattern insights", desc: "Weekly summary of your recurring patterns", defaultOn: false },
+            ].map((pref) => (
+              <div key={pref.label} className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[13px] text-[#f4efe9]">{pref.label}</p>
+                  <p className="text-[11px] text-[#4f4b47] mt-0.5">{pref.desc}</p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="font-mono text-[9px] text-[#4f4b47]">
+                    {pref.defaultOn ? "On" : "Off"}
+                  </span>
+                  <p className="font-mono text-[9px] text-[#4f4b47]/50">· email info@defrag.app to update</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Subscription */}
         <div className="bg-white/[0.02] border border-white/[0.08] rounded-[14px] p-8 md:p-10 mt-14">
           <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-6">

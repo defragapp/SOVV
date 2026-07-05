@@ -290,6 +290,10 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
             details: { recipient: email },
           })
         )
+        // Schedule nurture emails (Day 3 and Day 7)
+        // These are sent via the queue with a delay — the consumer handles timing
+        void env.QUEUE.send({ type: "nurture_day3", to: email }).catch(() => {})
+        void env.QUEUE.send({ type: "nurture_day7", to: email }).catch(() => {})
       } else if (env.RESEND_API_KEY) {
         // Fallback: send directly if no queue
         const { sendWelcomeEmail } = await import("./email.js")

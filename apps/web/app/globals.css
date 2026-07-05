@@ -751,3 +751,40 @@
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: var(--radius-container);
 }
+
+/* ── Native element dark mode consistency ─────────────────────────────────── */
+
+/* Audio player */
+audio {
+  filter: invert(1) hue-rotate(180deg);
+  opacity: 0.7;
+}
+
+/* Date/time inputs */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
+/* Select elements */
+select {
+  color-scheme: dark;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+

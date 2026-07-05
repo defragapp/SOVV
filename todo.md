@@ -1,35 +1,35 @@
 # Tasks - Platform Wide Scope Round 1
-- [ ] #1: AI model evaluation - check for newer CF Workers AI models
-- [ ] #2: Prompt quality - add confidence floor and short input handling
-- [ ] #3: Baseline compile retry UI - retry button on failure
-- [ ] #4: Pattern memory empty state - guided first session message
-- [ ] #5: Flow suggestion - use AI output field not keyword matching
-- [ ] #6: Audio overview - coherent narrative text not concatenated fields
+- [x] #1: AI model evaluation - check for newer CF Workers AI models
+- [x] #2: Prompt quality - add confidence floor and short input handling
+- [x] #3: Baseline compile retry UI - retry button on failure
+- [x] #4: Pattern memory empty state - guided first session message
+- [x] #5: Flow suggestion - use AI output field not keyword matching
+- [x] #6: Audio overview - coherent narrative text not concatenated fields
 - [ ] #7: Annual pricing option - $99/year Stripe price
 - [ ] #8: Free trial - 7-day Pro trial on registration
-- [ ] #9: Social proof - testimonials on pricing/marketing pages
+- [x] #9: Social proof - testimonials on pricing/marketing pages
 - [ ] #10: Referral mechanic - invite incentive loop
 - [ ] #11: Email nurture sequence - Day 1/3/7 follow-up
 - [ ] #12: Abandoned checkout recovery email
-- [ ] #13: Add Person UI - form in Sidebar
+- [x] #13: Add Person UI - form in Sidebar
 - [ ] #14: Settings - notification preferences
-- [ ] #15: Settings - onboarding completion state
-- [ ] #16: Library - search and filter by space
-- [ ] #17: Library - delete item button
-- [ ] #18: Defrag [id] - save updated result to Library
-- [ ] #19: Covenant - scripture deep links
-- [ ] #20: Alignment - sky data display in sidebar
-- [ ] #21: Session cleanup cron job
-- [ ] #22: D1 database indexes - library, interactions, patterns
+- [x] #15: Settings - onboarding completion state
+- [x] #16: Library - search and filter by space
+- [x] #17: Library - delete item button
+- [x] #18: Defrag [id] - save updated result to Library
+- [x] #19: Covenant - scripture deep links
+- [x] #20: Alignment - sky data display in sidebar
+- [x] #21: Session cleanup cron job
+- [x] #22: D1 database indexes - library, interactions, patterns
 - [ ] #23: KV key namespace collision fix
 - [ ] #24: Worker bundle size audit
 - [ ] #25: Stripe price ID smoke test
-- [ ] #26: D1 migration - library indexes
+- [x] #26: D1 migration - library indexes
 - [ ] #27: Cloudflare zone ID - fully secret-driven
-- [ ] #28: Worker memory leak - KV state TTL fallback
-- [ ] #29: Mobile - Baseline Design entry pill selector
+- [x] #28: Worker memory leak - KV state TTL fallback
+- [x] #29: Mobile - Baseline Design entry pill selector
 - [ ] #30: Dark mode - native element consistency
-- [ ] #31: Loading states - Baseline compile progress
-- [ ] #32: Empty state - Defrag entry page compiling
-- [ ] #33: Keyboard navigation - space shell and switcher
-- [ ] #34: Toast / notification system
+- [x] #31: Loading states - Baseline compile progress
+- [x] #32: Empty state - Defrag entry page compiling
+- [x] #33: Keyboard navigation - space shell and switcher
+- [x] #34: Toast / notification system

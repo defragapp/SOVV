@@ -36,7 +36,10 @@ export interface EmailJob {
     | "payment_success"
     | "payment_failed"
     | "canceled"
-    | "inbound_email";
+    | "inbound_email"
+    | "nurture_day3"
+    | "nurture_day7"
+    | "abandoned_checkout";
   to?: string;
   from?: string;
   size?: number;
