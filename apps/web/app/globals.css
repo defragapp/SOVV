@@ -15,6 +15,27 @@
     --bg-secondary: #0c0a0d;
     --bg-elevated: #131015;
 
+@layer base {
+  :root {
+    color-scheme: dark !important;
+  }
+
+  html, body {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-mono) !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* High-density UI enforcement */
+  * {
+    letter-spacing: -0.01em;
+  }
+}
+
+
     --text-primary: #f4efe9;
     --text-secondary: #a8a29a;
     --text-tertiary: #76716b;
