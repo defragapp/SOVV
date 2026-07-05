@@ -1,0 +1,72 @@
+name: Deploy production web
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type DEPLOY to run the production web deployment
+        required: true
+      production_web_urls:
+        description: Comma-separated URLs to verify after deploy
+        required: false
+        default: https://defrag.app/,https://www.defrag.app/
+      purge_hosts:
+        description: Comma-separated Cloudflare hostnames to purge after deploy
+        required: false
+        default: defrag.app,www.defrag.app,app.defrag.app,sovereign.defrag.app
+      purge_cache:
+        description: Purge Cloudflare cache after deploy
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-web-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy current Sovereign.os web build
+    if: ${{ inputs.confirm == 'DEPLOY' }}
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 30
+    env:
+      CI: true
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      CLOUDFLARE_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+      PRODUCTION_WEB_URLS: ${{ inputs.production_web_urls }}
+      CLOUDFLARE_PURGE_HOSTS: ${{ inputs.purge_hosts }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck deploy scripts
+        run: pnpm --filter @workspace/scripts run typecheck
+
+      - name: Build and deploy web Worker
+        working-directory: apps/web
+        run: pnpm run deploy
+
+      - name: Purge Cloudflare cache
+        if: ${{ inputs.purge_cache }}
+        run: pnpm --filter @workspace/scripts run purge:production-web-cache
+
+      - name: Verify production web surface
+        run: pnpm verify:production-web
