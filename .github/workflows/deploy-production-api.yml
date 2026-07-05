@@ -62,7 +62,7 @@ jobs:
 
       - name: Run worker smoke tests
         working-directory: apps/worker
-        run: node --input-type=module --experimental-vm-modules src/tests/smoke.test.ts 2>/dev/null || node src/tests/smoke.test.ts
+        run: node --experimental-vm-modules src/tests/smoke.test.ts
 
   deploy:
     name: Deploy sovereign-os-api worker
