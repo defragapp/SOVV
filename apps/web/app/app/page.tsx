@@ -126,6 +126,18 @@ export default function LibraryPage() {
         <p className="text-[13px] text-[#76716b] leading-relaxed mt-2">
           Results from Defrag, Alignment, and Covenant. Return before the pattern takes over again.
         </p>
+        {checkoutResult === "upgraded" && (
+          <div className="mt-4 px-4 py-3 border border-[#e0743a]/30 bg-[#e0743a]/[0.05] flex items-center gap-3" style={{ borderRadius: "var(--radius-container)" }}>
+            <span className="w-1.5 h-1.5 rounded-sm bg-[#e0743a]/60 shrink-0" />
+            <p className="text-[13px] text-[#f4efe9]">Welcome to Pro. Your Library, Covenant, and Alignment spaces are now active.</p>
+          </div>
+        )}
+        {checkoutResult === "canceled" && (
+          <div className="mt-4 px-4 py-3 border border-white/[0.06] bg-white/[0.02] flex items-center gap-3" style={{ borderRadius: "var(--radius-container)" }}>
+            <span className="w-1.5 h-1.5 rounded-sm bg-[#4f4b47] shrink-0" />
+            <p className="text-[13px] text-[#76716b]">Checkout canceled. You're still on the free plan.</p>
+          </div>
+        )}
         {recurringPattern && sessionCount >= 3 && (
           <div className="mt-5 px-4 py-3 border border-white/[0.06] bg-white/[0.02]" style={{ borderRadius: "var(--radius-container)" }}>
             <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">
