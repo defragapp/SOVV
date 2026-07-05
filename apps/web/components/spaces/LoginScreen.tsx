@@ -97,17 +97,24 @@ export default function LoginScreen() {
         return
       }
       // Check if user has baseline, redirect to settings if not
+      // Preserve return URL from ?return= or ?next= query param
+      const urlParams = new URLSearchParams(window.location.search)
+      const returnUrl = urlParams.get("return") || urlParams.get("next") || ""
+      const safeReturn = returnUrl.startsWith("/") ? returnUrl : ""
+
       fetch("/api/baseline", { credentials: "include" })
         .then(r => r.ok ? r.json() : { baseline: null })
         .then((d: any) => {
-          if (d.baseline?.dob) {
+          if (safeReturn) {
+            window.location.href = safeReturn
+          } else if (d.baseline?.dob) {
             window.location.href = "/apps/defrag"
           } else {
             // New user — go to settings to set up Baseline Design
             window.location.href = "/settings?onboard=1"
           }
         })
-        .catch(() => { window.location.href = "/apps/defrag" })
+        .catch(() => { window.location.href = safeReturn || "/apps/defrag" })
     } catch {
       setError("Connection failed. Please try again.")
     } finally {
