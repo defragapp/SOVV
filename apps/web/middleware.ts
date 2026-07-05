@@ -28,18 +28,24 @@ export function middleware(request: NextRequest) {
   // before client-side rendering or AuthGuard
   if (isAppShell && !sessionId && !isPublicPath) {
     // If not already on the app shell login page, go there
-    return NextResponse.redirect(new URL('/app/login', request.url));
+    const redirectRes = NextResponse.redirect(new URL('/app/login', request.url));
+    redirectRes.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+    return redirectRes;
   }
 
   if (isAppShell) {
     if (pathname === '/') {
       url.pathname = '/apps/defrag';
-      return NextResponse.rewrite(url);
+      const rewriteRes = NextResponse.rewrite(url);
+      rewriteRes.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+      return rewriteRes;
     }
   }
 
   if (isDefragRoot && sessionId && pathname === '/') {
-    return NextResponse.redirect(new URL('https://app.defrag.app/apps/defrag'));
+    const redirectRes = NextResponse.redirect(new URL('https://app.defrag.app/apps/defrag'));
+    redirectRes.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+    return redirectRes;
   }
 
   return NextResponse.next();
