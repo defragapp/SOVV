@@ -91,6 +91,17 @@ export default function DefragWorkspacePage() {
   // Compare With Someone — Pro only
   const [compareMode, setCompareMode] = React.useState(false)
   const [compareName, setCompareName] = React.useState("")
+  const [people, setPeople] = React.useState<Array<{ id: string; name: string; relation: string }>>([])
+
+  // Load people list for compare mode
+  React.useEffect(() => {
+    if (compareMode && people.length === 0) {
+      fetch("/api/people", { credentials: "include" })
+        .then(r => r.ok ? r.json() : { people: [] })
+        .then((d: any) => { if (d.people?.length) setPeople(d.people) })
+        .catch(() => {})
+    }
+  }, [compareMode])
 
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
@@ -719,9 +730,24 @@ export default function DefragWorkspacePage() {
                 value={compareName}
                 onChange={e => setCompareName(e.target.value)}
                 placeholder="Who are you comparing with? (name or relation)"
-                className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] outline-none text-[13px] pb-3"
+                className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] outline-none text-[13px] pb-2"
                 style={{ fontSize: "16px" }}
               />
+              {people.length > 0 && !compareName && (
+                <div className="flex gap-1.5 flex-wrap pb-3">
+                  {people.slice(0, 5).map(p => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setCompareName(p.name)}
+                      className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] border border-white/[0.07] px-2 py-1 hover:text-[#76716b] hover:border-white/[0.12] transition-colors"
+                      style={{ borderRadius: 3 }}
+                    >
+                      {p.name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
           <textarea

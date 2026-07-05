@@ -40,6 +40,13 @@ export default function LibraryPage() {
   const [checkoutResult, setCheckoutResult] = React.useState<"upgraded" | "canceled" | null>(null)
   const [filterSpace, setFilterSpace] = React.useState<"ALL" | "DEFRAG" | "COVENANT" | "ALIGNMENT">("ALL")
   const [searchQuery, setSearchQuery] = React.useState("")
+  const [debouncedSearch, setDebouncedSearch] = React.useState("")
+
+  // Debounce search query by 400ms
+  React.useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 400)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
   const [deletingId, setDeletingId] = React.useState<string | null>(null)
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
@@ -84,7 +91,7 @@ export default function LibraryPage() {
   React.useEffect(() => {
     const params = new URLSearchParams()
     if (filterSpace !== "ALL") params.set("workspace_source", filterSpace)
-    if (searchQuery.trim()) params.set("q", searchQuery.trim())
+    if (debouncedSearch.trim()) params.set("q", debouncedSearch.trim())
     const url = `/api/library${params.toString() ? "?" + params.toString() : ""}`
     fetch(url, { credentials: "include" })
       .then(r => {
@@ -94,7 +101,7 @@ export default function LibraryPage() {
       .then(d => setItems((d as any).items || []))
       .catch(() => {})
       .finally(() => setIsLoading(false))
-  }, [filterSpace, searchQuery])
+  }, [filterSpace, debouncedSearch])
 
   const sidebar = (
     <div className="flex flex-col h-full">

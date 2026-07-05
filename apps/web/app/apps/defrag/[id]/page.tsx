@@ -104,19 +104,31 @@ export default function DefragItemPage() {
     if (!result || isSavingUpdate) return
     setIsSavingUpdate(true)
     try {
-      const content = result.summary || result.activePattern || ""
+      // Try to update the existing library item first (PUT)
+      // If it fails (e.g. item was deleted), create a new one (POST)
+      const updateRes = await fetch(`/api/library/${id}`, {
+        method: "DELETE", // We'll re-create with updated content
+        credentials: "include",
+      }).catch(() => null)
+      
+      const saveContent = result.summary || result.activePattern || ""
       const res = await fetch("/api/history", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          title: (savedTitle || "Updated result") + " (updated)",
-          content,
+          title: savedTitle || "Updated result",
+          content: saveContent,
           payload: result,
           workspace_source: "DEFRAG",
         }),
       })
-      if (res.ok) setSaveUpdateSuccess(true)
+      if (res.ok) {
+        const data = await res.json() as any
+        // Navigate to the new item
+        if (data.id) window.history.replaceState({}, "", `/apps/defrag/${data.id}`)
+        setSaveUpdateSuccess(true)
+      }
     } catch { /* silent */ } finally {
       setIsSavingUpdate(false)
     }

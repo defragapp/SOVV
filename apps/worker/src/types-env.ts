@@ -81,7 +81,6 @@ export interface Env {
   // Generate with: openssl rand -base64 32
   KMS_SECRET?: string
 
-  // Analytics Engine for custom metrics
-  // Dataset: sovereign-metrics
-  ANALYTICS?: AnalyticsEngineDataset
+  // Analytics Engine: uncomment when dataset is created in CF dashboard
+  // ANALYTICS?: AnalyticsEngineDataset
 }

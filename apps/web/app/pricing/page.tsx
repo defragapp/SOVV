@@ -38,7 +38,6 @@ const PRO_FEATURES = [
 ]
 
 export default function PricingPage() {
-  const [annual, setAnnual] = React.useState(false)
   return (
     <SiteShell>
 
@@ -61,31 +60,6 @@ export default function PricingPage() {
       {/* ── PLANS ── */}
       <section className="w-full py-16 md:py-20 bg-[#08070a]">
         <Container>
-          {/* Billing toggle */}
-          <div className="flex items-center justify-center gap-4 mb-10">
-            <button
-              onClick={() => setAnnual(false)}
-              className={`font-mono text-[10px] uppercase tracking-[0.2em] transition-colors ${!annual ? "text-[#f4efe9]" : "text-[#4f4b47]"}`}
-            >Monthly</button>
-            <button
-              onClick={() => setAnnual(a => !a)}
-              className="relative w-12 h-6 bg-white/[0.08] border border-white/[0.1] cursor-pointer transition-all"
-              style={{ borderRadius: 12, background: annual ? "rgba(224,116,58,0.2)" : undefined, borderColor: annual ? "rgba(224,116,58,0.3)" : undefined }}
-              aria-label="Toggle billing period"
-            >
-              <span
-                className="absolute top-1 w-4 h-4 transition-all duration-200"
-                style={{ borderRadius: "50%", background: annual ? "rgba(224,116,58,0.9)" : "rgba(118,113,107,0.8)", left: annual ? "calc(100% - 20px)" : "4px" }}
-              />
-            </button>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setAnnual(true)}
-                className={`font-mono text-[10px] uppercase tracking-[0.2em] transition-colors ${annual ? "text-[#f4efe9]" : "text-[#4f4b47]"}`}
-              >Annual</button>
-              <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#e0743a]/70 border border-[#e0743a]/30 px-1.5 py-0.5" style={{ borderRadius: 3 }}>Save 31%</span>
-            </div>
-          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
 
             {/* Free */}
@@ -131,10 +105,10 @@ export default function PricingPage() {
                   </span>
                 </div>
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="font-serif text-4xl text-[#f4efe9]">{annual ? "$99" : "$12"}</span>
-                  <span className="text-sm text-[#76716b]">{annual ? "/ year" : "/ month"}</span>
+                  <span className="font-serif text-4xl text-[#f4efe9]">$12</span>
+                  <span className="text-sm text-[#76716b]">/ month</span>
                 </div>
-                <p className="text-[11px] text-[#4f4b47] mb-3">{annual ? "Billed annually — save $45" : "or $99/year (save $45)"}</p>
+
                 <p className="text-sm text-[#a8a29a] leading-relaxed">Defrag + Covenant + Alignment + Library.</p>
                 <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#e0743a]/60 mt-2">7-day free trial included</p>
               </div>

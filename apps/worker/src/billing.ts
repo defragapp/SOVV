@@ -218,8 +218,7 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
   }
   params.set("client_reference_id", userId);
   params.set("subscription_data[metadata][userId]", userId);
-  // 7-day free trial for new subscribers
-  params.set("subscription_data[trial_period_days]", "7");
+  // Trial period: configure in Stripe dashboard when ready
   // Apply Stripe coupon/discount if provided
   if (couponId) {
     params.set("discounts[0][coupon]", couponId);
