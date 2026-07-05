@@ -108,3 +108,5 @@ main().catch((error) => {
   console.error("Production web smoke crashed:", error);
   process.exit(1);
 });
+
+export {};
