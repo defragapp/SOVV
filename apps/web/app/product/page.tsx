@@ -73,7 +73,7 @@ export default function ProductPage() {
                 key={space.name}
                 href={space.href}
                 className="group flex items-start gap-8 py-10 border-b border-white/[0.06] last:border-0 glow-card-hover px-4 -mx-4"
-                style={{ borderRadius: 12 }}
+                style={{ borderRadius: "var(--radius-container)" }}
               >
                 <div className="flex flex-col items-center gap-2 shrink-0 mt-1">
                   <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.2em]">{space.num}</span>
@@ -117,13 +117,13 @@ export default function ProductPage() {
               { name: "Audio Overview", body: "A spoken version of your result. Generated on demand.", tier: "Pro" },
               { name: "Invite Privately", body: "Understand the shared loop without keeping score — when both sides matter.", tier: "Pro" },
             ].map((f, i) => (
-              <div key={i} className="py-8 pr-8 border-b border-white/[0.06] md:border-r md:even:border-r-0">
+              <div key={i} className="py-8 pr-8 border-b border-white/[0.06] md:border-r md:even:border-r-0 glow-card-hover">
                 <div className="flex items-center gap-2 mb-3">
                   <p className="text-[15px] text-[#f4efe9]">{f.name}</p>
                   <span
                     className="font-mono text-[8px] uppercase tracking-[0.12em] border px-1.5 py-0.5"
                     style={{
-                      borderRadius: 3,
+                      borderRadius: "var(--radius-minimal)",
                       color: f.tier === "Free" ? "rgba(168,162,154,0.6)" : "rgba(224,116,58,0.6)",
                       borderColor: f.tier === "Free" ? "rgba(255,255,255,0.06)" : "rgba(224,116,58,0.15)",
                     }}

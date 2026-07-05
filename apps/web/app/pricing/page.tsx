@@ -23,7 +23,7 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
 const FREE_FEATURES = [
   "Baseline Design",
   "Defrag space — full access",
-  "15 sessions per day",
+  "5 sessions per day",
   "Pattern recognition output",
   "Best Next Response",
 ]
@@ -100,7 +100,10 @@ export default function PricingPage() {
               <div className="relative mb-8">
                 <div className="flex items-center justify-between mb-3">
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b]">Pro</p>
-                  <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#e0743a]/80 border border-[#e0743a]/30 px-2 py-0.5" style={{ borderRadius: 4 }}>
+                  <span
+                    className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#e0743a]/80 border border-[#e0743a]/30 px-2 py-0.5"
+                    style={{ borderRadius: "var(--radius-minimal)" }}
+                  >
                     Recommended
                   </span>
                 </div>

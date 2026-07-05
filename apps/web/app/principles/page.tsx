@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Link from "next/link"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
 
@@ -97,7 +98,7 @@ export default function PrinciplesPage() {
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.5, delay: idx * 0.04, ease: [0.16, 1, 0.3, 1] }}
                 className="group flex items-start gap-8 py-8 border-b border-white/[0.05] last:border-0 glow-card-hover -mx-4 px-4"
-                style={{ borderRadius: 2 }}
+                style={{ borderRadius: "var(--radius-button)" }}
               >
                 {/* Number */}
                 <span
@@ -129,9 +130,9 @@ export default function PrinciplesPage() {
           <h2 className="font-serif text-[clamp(1.8rem,4vw,3rem)] text-[#f4efe9] tracking-[-0.02em] mb-5 text-balance max-w-xl leading-tight">
             See the pattern. Choose the repair.
           </h2>
-          <a href="/app/login" className="btn-primary">
+          <Link href="/app/login" className="btn-primary">
             Enter Sovereign.os
-          </a>
+          </Link>
         </div>
       </section>
     </SiteShell>

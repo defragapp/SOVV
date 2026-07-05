@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SiteShell } from "@/components/marketing/site-shell";
 import { Container, Section } from "@/components/ui/layout-primitives";
 
@@ -108,9 +109,9 @@ export default function FaqPage() {
           <p className="text-[14px] text-[#76716b] leading-relaxed mb-8 max-w-sm">
             Add your birth data, describe what&rsquo;s happening, and see what&rsquo;s actually active beneath it.
           </p>
-          <a href="/app/login" className="btn-primary">
+          <Link href="/app/login" className="btn-primary">
             Enter Sovereign.os
-          </a>
+          </Link>
         </Container>
       </Section>
     </SiteShell>
