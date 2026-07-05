@@ -530,6 +530,36 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
 
     try {
+      // Cancel Stripe subscription before deleting account
+      if (user.stripe_customer_id && env.STRIPE_SECRET_KEY) {
+        try {
+          // Get active subscriptions for this customer
+          const subsRes = await fetch(
+            `https://api.stripe.com/v1/subscriptions?customer=${user.stripe_customer_id}&status=active&limit=5`,
+            { headers: { "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}` } }
+          )
+          if (subsRes.ok) {
+            const subsData = await subsRes.json() as { data?: Array<{ id: string }> }
+            for (const sub of subsData.data ?? []) {
+              await fetch(`https://api.stripe.com/v1/subscriptions/${sub.id}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}` },
+              }).catch(() => {})
+            }
+          }
+        } catch {
+          // Non-fatal: log but continue with account deletion
+          logSafetyEvent({
+            level: "warn",
+            event: "auth_delete_account_stripe_cancel_failed",
+            request,
+            error_type: "system",
+            error: "stripe_cancel_failed",
+            details: { userId: user.id },
+          })
+        }
+      }
+
       // Delete all user data in order (FK constraints)
       await env.DB.batch([
         env.DB.prepare("DELETE FROM sessions WHERE user_id = ?").bind(user.id),

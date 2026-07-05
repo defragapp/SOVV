@@ -37,22 +37,28 @@ export async function checkAiRateLimit(opts: AiRateLimitOptions): Promise<Respon
 
   const minuteCheck = await checkRateLimit(minuteLimiter, key);
   if (!minuteCheck.allowed) {
+    const retryAfter = (minuteCheck as any).response
+      ? parseInt((minuteCheck as any).response.headers.get("Retry-After") ?? "60")
+      : 60;
     return new Response(
       JSON.stringify({
         error: "rate_limit_exceeded",
         message: isPro
           ? "You've sent too many requests. Please wait a moment before trying again."
           : "You've reached your request limit. Upgrade to Pro for higher limits.",
-        retryAfter: (minuteCheck as any).response
-          ? parseInt((minuteCheck as any).response.headers.get("Retry-After") ?? "60")
-          : 60,
+        retryAfter,
         isPro,
       }),
       {
         status: 429,
         headers: {
           "Content-Type": "application/json",
-          "Retry-After": "60",
+          "Retry-After": String(retryAfter),
+          "RateLimit-Limit": isPro ? "60" : "15",
+          "RateLimit-Remaining": "0",
+          "RateLimit-Reset": String(Math.floor(Date.now() / 1000) + retryAfter),
+          "X-RateLimit-Limit": isPro ? "60" : "15",
+          "X-RateLimit-Remaining": "0",
         },
       }
     );

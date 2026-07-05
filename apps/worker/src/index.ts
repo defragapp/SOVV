@@ -260,6 +260,8 @@ router.get("/api/user/me", async (request: Request) => {
     email: user.email,
     tier: user.tier || "free",
     subscription_status: user.subscription_status || "free",
+    email_verified: user.email_verified === 1,
+    subscription_current_period_end: user.subscription_current_period_end ?? null,
   }), { status: 200, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
 });
 

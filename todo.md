@@ -1,15 +1,27 @@
-# Tasks - Platform Visual & Completeness Audit
-- [ ] V1: Fix metadata titles - About and Use Cases missing brand suffix
-- [ ] V2: Add metadata to principles, forgot-password, reset-password, verify-email pages
-- [ ] V3: Pricing page - wire Upgrade to Pro CTA to checkout not login
-- [ ] V4: Pricing comparison table - add Free vs Pro column checkmarks
-- [ ] V5: Footer - add Use Cases and Principles to Company column
-- [ ] V6: Auth pages - add ambient light beam to forgot/reset/verify pages
-- [ ] V7: Privacy and Terms - upgrade to structured premium layout
-- [ ] V8: Contact page - add structured contact options
-- [ ] V9: 404 page - polish not-found.tsx
-- [ ] V10: OG metadata - verify all key pages have og:image
-- [ ] V11: Settings page - add email verification status and resend button
-- [ ] V12: Space sidebar - polish free-tier upgrade banner
-- [ ] V13: Defrag workspace - show remaining session count in UI
-- [ ] V14: Nav - add active state indicator for current page
+# Tasks - Full Platform Completion
+- [ ] P1: KMS_SECRET - deploy to live worker
+- [ ] P2: /api/user/me - add email_verified field
+- [ ] P3: patterns.ts - migrate to entitlements system
+- [ ] P4: D1 migration CI step - apply pending migrations
+- [ ] P5: ADMIN_SEED_SECRET - set worker secret
+- [ ] P6: Audio route - verify CF Workers AI TTS binding
+- [ ] P7: Invite result gate - entitlement check on result generation
+- [ ] P8: COOKIE_DOMAIN - verify correct value
+- [ ] P9: Promo code - wire Stripe discount to checkout
+- [ ] P10: Baseline compile - verify end-to-end pipeline
+- [ ] P11: Auth redirect - preserve return URL after login
+- [ ] P12: Library Pro gate UI - clear upgrade prompt
+- [ ] P13: Alignment prefill - verify ?prompt= flow
+- [ ] P14: Covenant scripture chips - null safety
+- [ ] P15: Mobile scroll position preservation in SpaceShell
+- [ ] P16: App shell 404 page
+- [ ] P17: Account deletion - cancel Stripe subscription
+- [ ] P18: Sitemap - add all marketing routes
+- [ ] P19: Welcome email on free registration
+- [ ] P20: ENABLE_MEMORY flag - enable in production
+- [ ] P21: ENABLE_FLOW_SUGGESTION flag - enable in production
+- [ ] P22: Admin panel - verify promo code generation
+- [ ] P23: Hub page - upgrade to premium design
+- [ ] P24: Robots.txt - verify indexing rules
+- [ ] P25: Error boundaries - verify recovery paths
+- [ ] P26: Rate limit headers in API responses

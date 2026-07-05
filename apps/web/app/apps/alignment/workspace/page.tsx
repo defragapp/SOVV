@@ -55,12 +55,22 @@ export default function AlignmentWorkspacePage() {
 
 
   // Prefill composer from ?prompt= query param
+  // If ?autorun=1 is also present, auto-submit after prefill
   React.useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search)
       const prompt = params.get("prompt")
+      const autorun = params.get("autorun") === "1"
       if (prompt) {
-        setInput((prev) => prev || decodeURIComponent(prompt))
+        const decoded = decodeURIComponent(prompt)
+        setInput((prev) => prev || decoded)
+        // Auto-submit after a short delay to allow state to settle
+        if (autorun && decoded) {
+          setTimeout(() => {
+            const submitBtn = document.querySelector<HTMLButtonElement>('[data-submit="alignment"]')
+            if (submitBtn && !submitBtn.disabled) submitBtn.click()
+          }, 300)
+        }
       }
     }
   }, [])

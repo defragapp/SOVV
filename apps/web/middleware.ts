@@ -27,8 +27,12 @@ export function middleware(request: NextRequest) {
   // If no session and route is not public, immediately redirect to login to intercept
   // before client-side rendering or AuthGuard
   if (isAppShell && !sessionId && !isPublicPath) {
-    // If not already on the app shell login page, go there
-    const redirectRes = NextResponse.redirect(new URL('/app/login', request.url));
+    // Redirect to login, preserving the original path as return URL
+    const loginUrl = new URL('/app/login', request.url);
+    if (pathname !== '/' && pathname !== '/app/login') {
+      loginUrl.searchParams.set('return', pathname + (url.search || ''));
+    }
+    const redirectRes = NextResponse.redirect(loginUrl);
     redirectRes.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
     return redirectRes;
   }

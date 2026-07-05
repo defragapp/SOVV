@@ -196,6 +196,13 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
       });
       return errorJson(400, "billing_not_configured", "Checkout is not configured in this environment (STRIPE_SECRET_KEY, STRIPE_PRICE_ID, or APP_URL missing)");
     }
+  // Parse optional promo/coupon from request body
+  let couponId: string | undefined;
+  try {
+    const body = await req.clone().json() as { couponId?: string; promo_code?: string };
+    couponId = body.couponId || body.promo_code;
+  } catch { /* no body */ }
+
   const params = new URLSearchParams();
   params.set("mode", "subscription");
   params.set("line_items[0][price]", env.STRIPE_PRICE_ID);
@@ -204,6 +211,13 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
   params.set("cancel_url", `${env.APP_URL}/app?canceled=1`);
   params.set("client_reference_id", userId);
   params.set("subscription_data[metadata][userId]", userId);
+  // Apply Stripe coupon/discount if provided
+  if (couponId) {
+    params.set("discounts[0][coupon]", couponId);
+  } else {
+    // Allow Stripe promotion codes (user-entered codes at checkout)
+    params.set("allow_promotion_codes", "true");
+  }
   // Pre-fill email so Stripe checkout doesn't ask for it again
   if (user?.email) {
     params.set("customer_email", user.email);

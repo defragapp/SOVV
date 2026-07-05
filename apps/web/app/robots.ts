@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/app/", "/apps/", "/api/", "/hub/", "/admin/", "/settings", "/invite/"],
+        disallow: ["/app/", "/apps/", "/api/", "/hub/", "/admin/", "/settings", "/invite/", "/studio/", "/tool/", "/workspace/", "/campaign/"],
       },
     ],
     sitemap: "https://defrag.app/sitemap.xml",

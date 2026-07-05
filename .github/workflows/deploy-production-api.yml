@@ -92,6 +92,19 @@ jobs:
         working-directory: packages/core
         run: npm install --legacy-peer-deps
 
+      - name: Apply pending D1 migrations
+        working-directory: apps/worker
+        run: |
+          echo "Applying D1 migrations to vibesdk-db..."
+          for migration in migrations/*.sql; do
+            echo "Applying: $migration"
+            npx wrangler d1 migrations apply vibesdk-db --remote 2>&1 || true
+          done
+          echo "Migrations complete"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Deploy sovereign-os-api
         working-directory: apps/worker
         run: npx wrangler deploy

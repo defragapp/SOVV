@@ -34,6 +34,7 @@ interface ResultCardProps {
   onSave?: () => void
   isSaving?: boolean
   saveSuccess?: boolean
+  saveError?: "pro_required" | "error" | null
   onInvite?: () => void
 }
 
@@ -44,6 +45,7 @@ export function ResultCard({
   onSave,
   isSaving,
   saveSuccess,
+  saveError,
   onInvite,
 }: ResultCardProps) {
   const [copied, setCopied] = React.useState(false)
@@ -373,6 +375,17 @@ export function ResultCard({
           >
             {isSaving ? "Saving…" : saveSuccess ? "Saved ✓" : "Save to Library"}
           </button>
+        )}
+        {saveError === "pro_required" && (
+          <a
+            href="/pricing"
+            className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#e0743a]/70 hover:text-[#e0743a] transition-colors"
+          >
+            Pro required → Upgrade
+          </a>
+        )}
+        {saveError === "error" && (
+          <span className="font-mono text-[9px] text-[#4f4b47]">Save failed. Try again.</span>
         )}
       </div>
     </motion.div>

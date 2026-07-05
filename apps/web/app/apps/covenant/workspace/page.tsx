@@ -28,6 +28,7 @@ function Section({ label, value }: { label: string; value?: string }) {
 }
 
 function ScriptureChip({ text }: { text: string }) {
+  if (!text) return null
   return (
     <span
       className="inline-block font-mono text-[8px] uppercase tracking-[0.12em] text-[#76716b] border border-white/[0.08] px-2 py-1"
@@ -364,7 +365,7 @@ export default function CovenantWorkspacePage() {
                   <div className="mt-6 pt-6 border-t border-white/[0.05]">
                     <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#3a3733] mb-3">Scripture to explore</p>
                     <div className="flex flex-wrap gap-2">
-                      {result.scriptures.map((s: string, i: number) => <ScriptureChip key={i} text={s} />)}
+                      {result.scriptures.filter((s: string) => s && typeof s === "string" && s.trim()).map((s: string, i: number) => <ScriptureChip key={i} text={s.trim()} />)}
                     </div>
                   </div>
                 )}

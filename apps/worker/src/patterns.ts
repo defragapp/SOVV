@@ -5,7 +5,7 @@ import type { Env } from "./types-env.js";
 import { getRecentInteractions, upsertPatterns, getPatterns } from "./db.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import { getSessionId, cookieHeader } from "./plan.js";
-import { requireActiveSubscription } from "./billing.js";
+import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
 import { logSafetyEvent } from "./safety.js";
 import {
   evaluateInputClassification,
@@ -236,7 +236,8 @@ export function registerPatternsRoutes(router: any, getEnv: () => Env) {
     const user = await getAuthUser(request, env.DB);
 
     // Subscription gate for workspace route
-    const subGate = await requireActiveSubscription(user, request);
+    const entitlements = resolveEntitlements(user);
+    const subGate = requireEntitlement(entitlements, "canUseLibrary");
     if (subGate) return subGate;
 
     const cookie = request.headers.get("Cookie") || "";

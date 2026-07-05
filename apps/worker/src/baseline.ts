@@ -52,7 +52,8 @@ export async function getBaselineDataset(env: Env, sid: string, userId?: string)
       try { return JSON.parse(userRaw) as BaselineDesignDataset; } catch { /* fall through */ }
     }
   }
-  const raw = await env.KV.get(DATASET_KEY(sid));
+  const rawDatasetEnc = await env.KV.get(DATASET_KEY(sid));
+  const raw = rawDatasetEnc ? await kmsDecryptJson(env.KMS_SECRET, rawDatasetEnc).then(d => JSON.stringify(d)).catch(() => rawDatasetEnc) : null;
   if (!raw) return null;
   return safeJsonParse<BaselineDesignDataset>(raw);
 }
@@ -175,10 +176,12 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
         (env as any).AI,
         aiModel
       );
-      await env.KV.put(DATASET_KEY(sid), JSON.stringify(dataset));
+      const encDataset = await kmsEncryptJson(env.KMS_SECRET, dataset);
+      await env.KV.put(DATASET_KEY(sid), encDataset);
       // Also save by user ID for persistence across sessions
       if (user?.id) {
-        await env.KV.put(USER_DATASET_KEY(user.id), JSON.stringify(dataset));
+        const encUserDataset = await kmsEncryptJson(env.KMS_SECRET, dataset);
+        await env.KV.put(USER_DATASET_KEY(user.id), encUserDataset);
       }
     } catch (err) {
       logSafetyEvent({

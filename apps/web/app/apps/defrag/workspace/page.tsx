@@ -76,6 +76,7 @@ export default function DefragWorkspacePage() {
   const [error, setError] = React.useState("")
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
+  const [saveError, setSaveError] = React.useState<"pro_required" | "error" | null>(null)
   const [inviteOpen, setInviteOpen] = React.useState(false)
   const [limitRemaining, setLimitRemaining] = React.useState<number | null>(null)
   const [limitReached, setLimitReached] = React.useState(false)
@@ -270,9 +271,17 @@ export default function DefragWorkspacePage() {
           workspace_source: "DEFRAG",
         }),
       })
-      if (!res.ok) throw new Error()
+      if (res.status === 403) {
+        setSaveError("pro_required")
+        return
+      }
+      if (!res.ok) {
+        setSaveError("error")
+        return
+      }
       setSaveSuccess(true)
-    } catch { /* silent */ } finally {
+      setSaveError(null)
+    } catch { setSaveError("error") } finally {
       setIsSaving(false)
     }
   }
@@ -640,6 +649,7 @@ export default function DefragWorkspacePage() {
               onSave={handleSave}
               isSaving={isSaving}
               saveSuccess={saveSuccess}
+              saveError={saveError}
               onInvite={() => setInviteOpen(true)}
             />
 
@@ -651,7 +661,7 @@ export default function DefragWorkspacePage() {
                   Take this to Alignment — separate what&rsquo;s yours to carry from what isn&rsquo;t.
                 </p>
                 <a
-                  href={`/apps/alignment/workspace?prompt=${encodeURIComponent(result.alignment || "")}`}
+                  href={`/apps/alignment/workspace?prompt=${encodeURIComponent(result.alignment || "")}&autorun=1`}
                   className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors whitespace-nowrap shrink-0"
                 >
                   Alignment →

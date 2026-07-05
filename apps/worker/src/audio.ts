@@ -123,15 +123,32 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
         return new Response(JSON.stringify({ error: "Cloudflare AI binding is not configured." }), { status: 503 });
       }
 
-      // We use @cf/elevenlabs/tts, which Cloudflare provides natively without needing your own API key
-      const response = await env.AI.run("@cf/elevenlabs/tts", {
-        text: text,
-      });
+      // Use Cloudflare Workers AI TTS - try available models in order of preference
+      // @cf/deepgram/aura-2-en is the highest quality English TTS available
+      let audioResponse: any;
+      let contentType = "audio/mpeg";
+      try {
+        audioResponse = await env.AI.run("@cf/deepgram/aura-2-en" as any, {
+          text: text,
+        });
+      } catch {
+        // Fallback to melotts if aura-2-en is unavailable
+        try {
+          audioResponse = await env.AI.run("@cf/myshell-ai/melotts" as any, {
+            text: text,
+          });
+        } catch {
+          // Final fallback
+          audioResponse = await env.AI.run("@cf/deepgram/aura-1" as any, {
+            text: text,
+          });
+        }
+      }
 
-      // It returns a Uint8Array containing the audio data.
-      return new Response(response as any, {
+      return new Response(audioResponse as any, {
         headers: {
-          "Content-Type": "audio/mpeg",
+          "Content-Type": contentType,
+          "Cache-Control": "no-store",
         },
       });
 

@@ -284,6 +284,12 @@ async function handleInviteResult(token: string, req: Request, env: Env): Promis
   const user = await getAuthUser(req, env.DB);
   if (!user) return jsonResponse({ error: "Unauthorized" }, 401);
 
+  // Invite result generation requires Pro (canInvite entitlement)
+  const { resolveEntitlements, requireEntitlement } = await import("./entitlements.js");
+  const entitlements = resolveEntitlements(user);
+  const inviteGate = requireEntitlement(entitlements, "canInvite");
+  if (inviteGate) return inviteGate;
+
   await logSafetyEvent(env, {
     type: "request_lifecycle",
     requestId,
