@@ -52,7 +52,12 @@ export function middleware(request: NextRequest) {
     return redirectRes;
   }
 
-  return NextResponse.next();
+  const res = NextResponse.next();
+  // Security headers applied to all responses
+  res.headers.set('X-Frame-Options', 'DENY');
+  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  return res;
 }
 
 export const config = {
