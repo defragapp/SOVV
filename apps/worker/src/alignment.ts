@@ -1,6 +1,7 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
+import { logSafetyEvent, protectionActive } from "./safety.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import { SYSTEM_ALIGNMENT, SECURITY_PREFIX } from "./prompts.js";
@@ -366,7 +367,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       let validation = validate(rawText, "alignment")
 
       if (validation.shouldRetry) {
-        console.warn("[Retry] Alignment output empty — retrying")
+        logSafetyEvent({ level: "warn", event: "alignment_retry", error_type: "system" })
         const retryAi = await env.AI.run(
           (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
           { messages: [
@@ -385,7 +386,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
       // Log guardrail violations
       if (!validation.guardrails.passed) {
-        console.warn("[Guardrail] Alignment violations:", validation.guardrails.violations)
+        logSafetyEvent({ level: "warn", event: "alignment_guardrail_violation", details: { violations: validation.guardrails.violations } })
       }
 
       // Empty result guard
@@ -411,7 +412,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       });
 
     } catch (e: any) {
-      console.error("Alignment route error:", e);
+      logSafetyEvent({ level: "error", event: "alignment_route_error", error_type: "system", error: e });
       return new Response(JSON.stringify({ error: "Failed to process" }), {
         status: 500, headers: { "Content-Type": "application/json" }
       });

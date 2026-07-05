@@ -236,6 +236,9 @@ export function selectActiveSignals(
   }
 
   // ── Evidence tags (internal, not shown to user) ───────────────────────────
+
+  const traitLines: string[] = []
+  // traitLines declared here so compound signal blocks can push to it
   // ── Cross-framework synthesis ─────────────────────────────────────────────────
   // Compound signals from multiple frameworks produce stronger behavioral insights
   const gk = dataset.frameworks?.geneKeys
@@ -278,7 +281,6 @@ export function selectActiveSignals(
   }
 
   // ── Trait lines: human-readable for AI context ────────────────────────────
-  const traitLines: string[] = []
   if (aiData?.derivedTraits?.length) {
     // Select top 3 most relevant traits based on context
     const relevantTraits = aiData.derivedTraits

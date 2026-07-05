@@ -6,7 +6,7 @@ import { loadMemoryContext, formatMemoryForPrompt } from "./memory.js"
 import { suggestNextSpace, formatFlowSuggestion } from "./flow.js";
 import { getAuthUser, jsonResponse } from "./auth.js";
 import { checkAiRateLimit } from "./middleware/ai-rate-limit.js";
-import { resolveEntitlements } from "./entitlements.js";
+import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
 import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
 import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getCurrentSkySnapshot } from "./baseline-compiler.js";
@@ -344,7 +344,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     giftUnderStrain: parsed.giftUnderStrain || undefined,
     alignment: parsed.alignment || undefined,
     bestNextResponse: parsed.bestNextResponse || undefined,
-    conversationalSteering: (parsed.conversationalSteering?.do?.length || parsed.conversationalSteering?.avoid?.length)
+    conversationalSteering: ((parsed.conversationalSteering as any)?.do?.length || (parsed.conversationalSteering as any)?.avoid?.length)
       ? parsed.conversationalSteering
       : undefined,
     sourcesUsed: {
@@ -382,9 +382,8 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
     // Save pattern to memory for future sessions (non-blocking)
     if (parsed.activePattern) {
-      import("./memory.js").then(({ savePatternMemory, extractPatternSignature }) => {
-        const sig = extractPatternSignature(parsed, "DEFRAG");
-        if (sig) savePatternMemory(env, user.id, sig).catch(() => {});
+      import("./memory.js").then(({ savePatternMemory }) => {
+        savePatternMemory(env, user.id, parsed as Record<string, unknown>, "DEFRAG").catch(() => {});
       }).catch(() => {});
     }
   }

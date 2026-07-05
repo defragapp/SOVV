@@ -10,7 +10,8 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    // TypeScript errors are now fixed - strict checking re-enabled
+    ignoreBuildErrors: false,
   },
   async headers() {
     return [
@@ -23,6 +24,21 @@ const nextConfig: NextConfig = {
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://js.stripe.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "img-src 'self' data: https: blob:",
+              "connect-src 'self' https://api.defrag.app https://api.stripe.com https://challenges.cloudflare.com",
+              "frame-src https://challenges.cloudflare.com https://js.stripe.com",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join("; "),
           },
         ],
       },

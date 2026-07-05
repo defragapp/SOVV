@@ -19,7 +19,7 @@
 
 import type { IRequest } from "itty-router"
 import { getAuthUser, jsonResponse } from "./auth.js"
-import { logSafetyEvent } from "./safety.js"
+import { logSafetyEvent, protectionActive } from "./safety.js"
 import {
   evaluateInputClassification,
   getColdStartMarker,
@@ -69,7 +69,7 @@ export async function handleDeriveProfile(
   const coldStart = getColdStartMarker()
 
   // 1. Auth — session required
-  const authUser = await getAuthUser(httpRequest, env.DB)
+  const authUser = await getAuthUser(request, env.DB)
   if (!authUser) {
     return jsonResponse({ error: "Unauthorized" }, 401)
   }
@@ -94,7 +94,7 @@ export async function handleDeriveProfile(
     logSafetyEvent({
       level: "error",
       event: "derive_profile_invalid_baseline",
-      request: httpRequest,
+      request: request,
       reason: "unknown_failure",
       error_type: "system",
       error,
@@ -156,11 +156,11 @@ export async function handleDeriveProfile(
     return temporaryUnavailableResponse(requestId)
   }
 
-  if (protectionActive(httpRequest, 2)) {
+  if (protectionActive(request, 2)) {
     logSafetyEvent({
       level: "warn",
       event: "derive_profile_protective_fallback",
-      request: httpRequest,
+      request: request,
       reason: "protection_escalation",
       error_type: "system",
       protection_level: 2,

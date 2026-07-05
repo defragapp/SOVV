@@ -169,6 +169,9 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
   await env.KV.put(DATASET_KEY(sid), JSON.stringify(pendingDataset));
 
   // Compile in background using waitUntil if available, otherwise fire-and-forget
+  // Get user for cross-session persistence
+  const user = await getAuthUser(req, env.DB).catch(() => null);
+
   const compileAndStore = async () => {
     try {
       const dataset = await compileBaselineDataset(

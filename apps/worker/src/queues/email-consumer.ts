@@ -125,6 +125,7 @@ const opts = {
       // Internal notification only — no outbound send.
       // Log for operator awareness. Future: create support ticket in D1.
       logSafetyEvent({
+        level: "info",
         event: "email_consumer_inbound_notification",
         endpoint: "queue:email",
         requestId: job.from ?? "unknown",

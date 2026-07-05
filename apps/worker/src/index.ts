@@ -1,3 +1,4 @@
+import { logSafetyEvent } from "./safety.js";
 import { Router } from "itty-router";
 import type { Env } from "./types-env.js";
 import { registerAuthRoutes, getAuthUser, registerAdminSeedRoute } from "./auth.js";
@@ -197,7 +198,7 @@ router.get("/api/stripe/prices", async (request: Request) => {
       headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
     });
   } catch (error) {
-    console.error("[STRIPE_PRICES]", error);
+    logSafetyEvent({ level: "error", event: "stripe_prices_fetch_failed", error_type: "system", error });
     return new Response(JSON.stringify([]), {
       status: 200,
       headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
@@ -242,9 +243,9 @@ async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: stri
       text,
       html,
     });
-    console.log(`[EMAIL] Auto-reply sent to ${ticket.sender}`);
+    logSafetyEvent({ level: "info", event: "email_auto_reply_sent", details: { recipient: ticket.sender } });
   } catch (replyErr) {
-    console.error("[EMAIL] Auto-reply failed:", replyErr);
+    logSafetyEvent({ level: "warn", event: "email_auto_reply_failed", error_type: "system", error: replyErr });
   }
 }
 
@@ -329,6 +330,18 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
     'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    // CSP: restrict script/style sources, allow Cloudflare Turnstile and Stripe
+    'Content-Security-Policy': [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://js.stripe.com",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: https:",
+      "connect-src 'self' https://api.defrag.app https://api.stripe.com",
+      "frame-src https://challenges.cloudflare.com https://js.stripe.com",
+      "font-src 'self' data:",
+      "object-src 'none'",
+      "base-uri 'self'",
+    ].join('; '),
   };
   Object.entries(securityHeaders).forEach(([key, value]) => {
     corsResponse.headers.set(key, value);
@@ -343,7 +356,7 @@ export default {
     try {
       return await handleWithCors(request, env, ctx);
     } catch (error) {
-      console.error("[INTERNAL]", error);
+      logSafetyEvent({ level: "error", event: "internal_error", error_type: "system", error });
       return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: { "Content-Type": "application/json" } });
     }
   },
@@ -354,7 +367,7 @@ export default {
       const sessionId = body?.sessionId;
       const interactionId = body?.interactionId;
       if (!sessionId || !interactionId) {
-        console.error("Queue: invalid message body");
+        logSafetyEvent({ level: "warn", event: "queue_invalid_message_body", error_type: "validation" });
         message.ack();
         return;
       }
@@ -362,7 +375,7 @@ export default {
         await extractPatterns(env, sessionId, interactionId);
         message.ack();
       } catch (err) {
-        console.error("Queue: pattern extraction failed for", interactionId, err);
+        logSafetyEvent({ level: "error", event: "queue_pattern_extraction_failed", error_type: "system", error: err, details: { interactionId } });
         message.retry();
       }
     }));
@@ -378,7 +391,7 @@ export default {
                           message.headers.get("X-Auto-Response-Suppress")?.toLowerCase() === "all" || 
                           message.headers.get("Precedence")?.toLowerCase() === "bulk";
       if (isAutomated) {
-        console.log(`[EMAIL] Skipping automated message from ${sender}`);
+        logSafetyEvent({ level: "info", event: "email_automated_skipped", details: { sender } });
         return;
       }
       let bodyPreview = "";
@@ -396,23 +409,23 @@ export default {
         subject,
         body_preview: bodyPreview,
       });
-      console.log(`[EMAIL] Ticket created: ${ticketId} from ${sender}`);
+      logSafetyEvent({ level: "info", event: "email_ticket_created", details: { ticketId, sender } });
       if (!isAutomated) {
         await sendSupportAutoReply(env, { id: ticketId, sender, subject });
       }
       if (env.EMAIL_FORWARD_ADDRESS) {
         await message.forward(env.EMAIL_FORWARD_ADDRESS);
-        console.log(`[EMAIL] Forwarded to configured address.`);
+        logSafetyEvent({ level: "info", event: "email_forwarded" });
       } else {
-        console.warn("[EMAIL] EMAIL_FORWARD_ADDRESS secret not set. Cannot forward email.");
+        logSafetyEvent({ level: "warn", event: "email_forward_address_missing", error_type: "system" });
       }
     } catch (err) {
-      console.error("[EMAIL] Handler failed:", err);
+      logSafetyEvent({ level: "error", event: "email_handler_failed", error_type: "system", error: err });
       if (env.EMAIL_FORWARD_ADDRESS) {
         try {
           await message.forward(env.EMAIL_FORWARD_ADDRESS);
         } catch (forwardErr) {
-          console.error("[EMAIL] Forward failed:", forwardErr);
+          logSafetyEvent({ level: "error", event: "email_forward_failed", error_type: "system", error: forwardErr });
         }
       }
     }

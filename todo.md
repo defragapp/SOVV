@@ -1,0 +1,14 @@
+# Tasks - Production Hardening Round 2
+- [ ] #1: lib/auth.ts - use relative URLs through proxy
+- [ ] #2: Fix active-signals.ts traitLines hoisting bug
+- [ ] #3: EMAIL_FORWARD_ADDRESS secret - set on worker
+- [ ] #4: Remove dead Supabase/PAID_USERS_GROUP_ID secrets
+- [ ] #5: Unit tests for entitlements.ts and kms.ts
+- [ ] #6: console.log → logSafetyEvent in worker
+- [ ] #7: Content-Security-Policy header
+- [ ] #8: Auth route rate limiting (register/login)
+- [ ] #9: ENABLE_NEW_FLOW flag - set on worker
+- [ ] #10: lib/chat.ts dead code cleanup
+- [ ] #11: Re-enable TypeScript strict checking (fix pre-existing errors)
+- [ ] #12: Playwright CI integration
+- [ ] #13: Analytics Engine / observability metrics

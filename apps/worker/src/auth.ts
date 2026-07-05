@@ -199,6 +199,32 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
 
 const SESSION_TTL = 7 * 24 * 60 * 60
 
+/**
+ * Strict per-IP rate limiter for auth routes.
+ * 5 attempts per 15 minutes — prevents credential stuffing.
+ * Uses KV for persistence across requests.
+ */
+async function checkAuthRateLimit(
+  kv: KVNamespace,
+  ip: string,
+  action: "login" | "register" | "forgot_password"
+): Promise<{ allowed: boolean; retryAfter: number }> {
+  const window = 15 * 60 // 15 minutes
+  const maxAttempts = action === "register" ? 3 : 5
+  const key = `auth-rate:${action}:${ip}:${new Date().toISOString().slice(0, 13)}` // hourly bucket
+
+  const raw = await kv.get(key).catch(() => null)
+  const count = raw ? parseInt(raw, 10) : 0
+
+  if (count >= maxAttempts) {
+    return { allowed: false, retryAfter: window }
+  }
+
+  await kv.put(key, String(count + 1), { expirationTtl: window }).catch(() => {})
+  return { allowed: true, retryAfter: 0 }
+}
+
+
 export async function registerAuthRoutes(router: any, getEnv: () => any) {
   // POST /api/auth/register
   router.post("/api/auth/register", async (request: Request) => {
@@ -209,6 +235,16 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         const ip = request.headers.get("CF-Connecting-IP") || "unknown"
         const { success } = await env.RATE_LIMITER.limit({ key: `register:${ip}` })
         if (!success) return jsonResponse({ error: "Too many registration attempts. Please wait before trying again." }, 429)
+      }
+      // Stricter KV-based rate limit: 3 registrations per 15 minutes per IP
+      if (env.KV) {
+        const ip = request.headers.get("CF-Connecting-IP") || "unknown"
+        const { allowed, retryAfter } = await checkAuthRateLimit(env.KV, ip, "register")
+        if (!allowed) {
+          return jsonResponse({ error: "Too many registration attempts. Please wait 15 minutes before trying again." }, 429, {
+            "Retry-After": String(retryAfter),
+          })
+        }
       }
       const { email: rawRegEmail, password, turnstileToken } = await request.json() as any
       const email = typeof rawRegEmail === "string" ? rawRegEmail.toLowerCase().trim() : ""
@@ -306,6 +342,16 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         const ip = request.headers.get("CF-Connecting-IP") || "unknown"
         const { success } = await env.RATE_LIMITER.limit({ key: `login:${ip}` })
         if (!success) return jsonResponse({ error: "Too many login attempts. Please wait before trying again." }, 429)
+      }
+      // Stricter KV-based rate limit: 5 attempts per 15 minutes
+      if (env.KV) {
+        const ip = request.headers.get("CF-Connecting-IP") || "unknown"
+        const { allowed, retryAfter } = await checkAuthRateLimit(env.KV, ip, "login")
+        if (!allowed) {
+          return jsonResponse({ error: "Too many login attempts. Please wait 15 minutes before trying again." }, 429, {
+            "Retry-After": String(retryAfter),
+          })
+        }
       }
       const { email: rawEmail, password } = await request.json() as any
       const email = typeof rawEmail === "string" ? rawEmail.toLowerCase().trim() : ""
@@ -902,7 +948,7 @@ export function registerAdminSeedRoute(router: any, getEnv: () => any) {
       const password_hash = await hashPassword(password)
       const now = Date.now()
       const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?")
-        .bind(normalizedEmail).first<{ id: string }>()
+        .bind(normalizedEmail).first() as { id: string } | null
       if (existing) {
         await env.DB.prepare("UPDATE users SET password_hash = ?, role = 'owner' WHERE id = ?")
           .bind(password_hash, existing.id).run()

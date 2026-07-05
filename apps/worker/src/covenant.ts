@@ -5,6 +5,8 @@ import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { checkProLimit } from "./plan.js";
 import { SYSTEM_COVENANT } from "./prompts.js";
 import { checkGuardrails } from "./output-validator.js";
+import { logSafetyEvent } from "./safety.js";
+import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import {
   selectActiveSignals,
   buildTimingSignals,
@@ -122,7 +124,7 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
       let validation = validate(rawText, "covenant")
 
       if (validation.shouldRetry) {
-        console.warn("[Retry] Covenant output empty — retrying")
+        logSafetyEvent({ level: "warn", event: "covenant_retry", error_type: "system" })
         const retryAi = await env.AI.run(
           (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
           { messages: [
@@ -141,7 +143,7 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
 
       // Log guardrail violations
       if (!validation.guardrails.passed) {
-        console.warn("[Guardrail] Covenant violations:", validation.guardrails.violations)
+        logSafetyEvent({ level: "warn", event: "covenant_guardrail_violation", error_type: "system" })
       }
 
       // Empty result guard

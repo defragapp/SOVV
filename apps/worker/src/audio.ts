@@ -1,6 +1,7 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
+import { logSafetyEvent, protectionActive } from "./safety.js";
 import { validateRequest } from "./middleware/validate-request.js";
 import { RateLimiter, extractRateLimitKey, RATE_LIMIT_PRESETS } from "./middleware/rate-limiter.js";
 import { KVSafetyLogger, createSafetyEvent } from "./middleware/safety-logger.js";
