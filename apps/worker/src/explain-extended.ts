@@ -12,7 +12,6 @@ import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } fro
 import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
-import { requireActiveSubscription } from "./billing.js";
 import {
   selectActiveSignals,
   buildBaselineSignature,
@@ -192,13 +191,13 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const relational = Boolean(target);
   const mode = (body.mode ?? (relational ? "pair" : "self")) as string;
 
-  // Relational mode requires Pro subscription
+  // Relational mode requires Pro subscription (uses entitlements)
   if (relational) {
-    const subGate = await requireActiveSubscription(user, req);
-    if (subGate) return subGate;
+    const relGate = requireEntitlement(entitlements, "canInvite");
+    if (relGate) return relGate;
   }
 
-  if (relational && user.tier === "free") {
+  if (relational && entitlements.effectiveTier === "free") {
     return jsonResponse(
       { error: "Relational analysis requires Pro" },
       403,
