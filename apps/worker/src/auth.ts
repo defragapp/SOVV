@@ -429,7 +429,9 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       success: true, 
       code: promo.code,
       discount_percent: promo.discount_percent,
-      applicable_tiers: promo.applicable_tiers ? JSON.parse(promo.applicable_tiers) : null
+      applicable_tiers: promo.applicable_tiers ? JSON.parse(promo.applicable_tiers) : null,
+      stripe_coupon_id: promo.stripe_coupon_id || null,
+      stripe_promotion_code_id: promo.stripe_promotion_code_id || null,
     })
   })
 
