@@ -38,7 +38,10 @@ export default function ContactPage() {
       {/* Content */}
       <Section className="w-full py-24 md:py-32 bg-[#0c0a0d]">
         <Container className="max-w-3xl">
-          <div className="flex flex-col gap-0 rounded-[14px] border border-white/[0.06] overflow-hidden">
+          <div
+            className="flex flex-col gap-0 border border-white/[0.06] overflow-hidden"
+            style={{ borderRadius: "var(--radius-container)" }}
+          >
 
             <div className="p-8 md:p-12 space-y-4 border-b border-white/[0.06] bg-[#08070a]">
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b]">Primary contact</p>
