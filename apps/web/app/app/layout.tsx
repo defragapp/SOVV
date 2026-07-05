@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import AuthGuard from "@/components/spaces/AuthGuard"
+import { ToastProvider } from "@/components/ui/toast-provider"
 
 export const metadata: Metadata = {
   title: "Sovereign.os — Your Space",
@@ -8,5 +9,9 @@ export const metadata: Metadata = {
 }
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  return <AuthGuard>{children}</AuthGuard>
+  return (
+    <ToastProvider>
+      <AuthGuard>{children}</AuthGuard>
+    </ToastProvider>
+  )
 }

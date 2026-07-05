@@ -1,15 +1,35 @@
-# Tasks - Production Hardening Round 2
-- [x] #1: lib/auth.ts - use relative URLs through proxy
-- [x] #2: Fix active-signals.ts traitLines hoisting bug
-- [x] #3: EMAIL_FORWARD_ADDRESS secret - set on worker
-- [x] #4: Remove dead Supabase/PAID_USERS_GROUP_ID secrets
-- [x] #5: Unit tests for entitlements.ts and kms.ts (163 tests total)
-- [x] #6: console.log → logSafetyEvent in worker
-- [x] #7: Content-Security-Policy header
-- [x] #8: Auth route rate limiting (register/login)
-- [x] #9: ENABLE_NEW_FLOW flag - set on worker
-- [x] #10: lib/chat.ts dead code cleanup
-- [x] #11: Re-enable TypeScript strict checking (fixed 0 errors)
-- [x] #12: Playwright CI integration
-- [x] #13: Analytics Engine / observability metrics
-- [x] Security headers - X-Frame-Options in _headers file
+# Tasks - Platform Wide Scope Round 1
+- [ ] #1: AI model evaluation - check for newer CF Workers AI models
+- [ ] #2: Prompt quality - add confidence floor and short input handling
+- [ ] #3: Baseline compile retry UI - retry button on failure
+- [ ] #4: Pattern memory empty state - guided first session message
+- [ ] #5: Flow suggestion - use AI output field not keyword matching
+- [ ] #6: Audio overview - coherent narrative text not concatenated fields
+- [ ] #7: Annual pricing option - $99/year Stripe price
+- [ ] #8: Free trial - 7-day Pro trial on registration
+- [ ] #9: Social proof - testimonials on pricing/marketing pages
+- [ ] #10: Referral mechanic - invite incentive loop
+- [ ] #11: Email nurture sequence - Day 1/3/7 follow-up
+- [ ] #12: Abandoned checkout recovery email
+- [ ] #13: Add Person UI - form in Sidebar
+- [ ] #14: Settings - notification preferences
+- [ ] #15: Settings - onboarding completion state
+- [ ] #16: Library - search and filter by space
+- [ ] #17: Library - delete item button
+- [ ] #18: Defrag [id] - save updated result to Library
+- [ ] #19: Covenant - scripture deep links
+- [ ] #20: Alignment - sky data display in sidebar
+- [ ] #21: Session cleanup cron job
+- [ ] #22: D1 database indexes - library, interactions, patterns
+- [ ] #23: KV key namespace collision fix
+- [ ] #24: Worker bundle size audit
+- [ ] #25: Stripe price ID smoke test
+- [ ] #26: D1 migration - library indexes
+- [ ] #27: Cloudflare zone ID - fully secret-driven
+- [ ] #28: Worker memory leak - KV state TTL fallback
+- [ ] #29: Mobile - Baseline Design entry pill selector
+- [ ] #30: Dark mode - native element consistency
+- [ ] #31: Loading states - Baseline compile progress
+- [ ] #32: Empty state - Defrag entry page compiling
+- [ ] #33: Keyboard navigation - space shell and switcher
+- [ ] #34: Toast / notification system

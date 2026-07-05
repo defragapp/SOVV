@@ -181,11 +181,27 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   };
 
   const message = String(body.message ?? body.question ?? body.text ?? "").trim();
+  
+  // Minimum input quality gate: require at least 10 words for meaningful pattern analysis
+  const wordCount = message.split(/\s+/).filter(Boolean).length;
   if (!message) {
     return jsonResponse({ error: "message_required" }, 400, {
       ...getCorsHeaders(req),
       "set-cookie": cookieHeader(sid),
     });
+  }
+  
+  // Short input guard: very short inputs produce low-quality pattern analysis
+  if (wordCount < 5) {
+    return jsonResponse(
+      { 
+        error: "input_too_short",
+        message: "Please describe the situation in a bit more detail — at least a sentence or two gives the system enough to work with.",
+        type: "input_too_short"
+      },
+      400,
+      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
+    );
   }
 
   const target = body.target;
@@ -328,7 +344,11 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   }
 
   // Flow suggestion — Defrag → Alignment chain
-  const flowSuggestion = suggestNextSpace(parsed)
+  // Use AI's nextSpace field if provided, fall back to keyword matching
+  const aiNextSpace = (parsed as any).nextSpace as "ALIGNMENT" | "COVENANT" | null | undefined
+  const flowSuggestion = aiNextSpace !== undefined
+    ? (aiNextSpace ? { nextSpace: aiNextSpace, reason: "ai_suggested", prefillContext: (parsed as any).alignment || "", urgency: "medium" as const } : null)
+    : suggestNextSpace(parsed)
 
   const result = {
     id: crypto.randomUUID(),

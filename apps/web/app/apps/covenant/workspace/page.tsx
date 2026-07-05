@@ -29,13 +29,19 @@ function Section({ label, value }: { label: string; value?: string }) {
 
 function ScriptureChip({ text }: { text: string }) {
   if (!text) return null
+  // Build a Bible Gateway search URL for the scripture reference
+  const bibleUrl = `https://www.biblegateway.com/passage/?search=${encodeURIComponent(text)}&version=NIV`
   return (
-    <span
-      className="inline-block font-mono text-[8px] uppercase tracking-[0.12em] text-[#76716b] border border-white/[0.08] px-2 py-1"
+    <a
+      href={bibleUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-block font-mono text-[8px] uppercase tracking-[0.12em] text-[#76716b] border border-white/[0.08] px-2 py-1 hover:text-[#a8a29a] hover:border-white/[0.16] transition-colors"
       style={{ borderRadius: 4 }}
+      title={`Read ${text} on Bible Gateway`}
     >
-      {text}
-    </span>
+      {text} ↗
+    </a>
   )
 }
 

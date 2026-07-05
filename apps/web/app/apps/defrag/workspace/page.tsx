@@ -296,14 +296,18 @@ export default function DefragWorkspacePage() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          text: [
-            result.activePattern,
-            result.theRepeat ? `What keeps happening: ${result.theRepeat}` : null,
-            result.alignment ? `What gives this moment a better chance: ${result.alignment}` : null,
-            result.bestNextResponse
-              ? `Next move: ${typeof result.bestNextResponse === "object" ? result.bestNextResponse?.summary : result.bestNextResponse}`
-              : null,
-          ].filter(Boolean).join(". "),
+          text: (() => {
+            const parts: string[] = []
+            if (result.activePattern) parts.push(`Here is what is active right now. ${result.activePattern}.`)
+            if (result.theRepeat) parts.push(`What keeps happening: ${result.theRepeat}.`)
+            if (result.oldRole) parts.push(`The role being pulled into: ${result.oldRole}.`)
+            if (result.strainPattern) parts.push(`Under pressure: ${result.strainPattern}.`)
+            if (result.alignment) parts.push(`What gives this moment a better chance: ${result.alignment}.`)
+            const bnr = result.bestNextResponse
+            const bnrText = typeof bnr === "object" ? bnr?.summary : bnr
+            if (bnrText) parts.push(`The next move: ${bnrText}.`)
+            return parts.join(" ")
+          })(),
         }),
       })
       if (res.status === 403) {
@@ -431,9 +435,14 @@ export default function DefragWorkspacePage() {
               Past patterns were used in this result.
             </p>
           ) : (
-            <p className="text-[11px] text-[#4f4b47] leading-relaxed">
-              Patterns from past sessions will inform future results.
-            </p>
+            <div className="flex flex-col gap-2">
+              <p className="text-[11px] text-[#4f4b47] leading-relaxed">
+                Your first pattern will appear here after your first session.
+              </p>
+              <p className="text-[10px] text-[#4f4b47]/60 leading-relaxed">
+                Each result you run builds a pattern map that makes future results more grounded.
+              </p>
+            </div>
           )}
         </div>
       )}

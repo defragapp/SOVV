@@ -98,6 +98,28 @@ export default function DefragItemPage() {
     }
   }
 
+  const handleSaveUpdate = async () => {
+    if (!result || isSavingUpdate) return
+    setIsSavingUpdate(true)
+    try {
+      const content = result.summary || result.activePattern || ""
+      const res = await fetch("/api/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          title: (savedTitle || "Updated result") + " (updated)",
+          content,
+          payload: result,
+          workspace_source: "DEFRAG",
+        }),
+      })
+      if (res.ok) setSaveUpdateSuccess(true)
+    } catch { /* silent */ } finally {
+      setIsSavingUpdate(false)
+    }
+  }
+
   const handleGenerateAudio = async () => {
     if (!result || isGeneratingAudio) return
     setIsGeneratingAudio(true)

@@ -42,6 +42,7 @@ export default function AlignmentWorkspacePage() {
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
   const [patterns, setPatterns] = React.useState<Array<{ key: string; value: string }>>([])
+  const [skyContext, setSkyContext] = React.useState<string | null>(null)
   // Audio Overview
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
@@ -183,6 +184,12 @@ export default function AlignmentWorkspacePage() {
         <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
           Your Baseline Design is your fixed center — how you naturally operate. The live sky is the emotional weather you're moving through right now. Alignment uses both to show you the path back to yourself.
         </p>
+        {result?.skyContext && (
+          <div className="border border-white/[0.06] bg-white/[0.02] p-3 mb-4" style={{ borderRadius: "var(--radius-container)" }}>
+            <p className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#4f4b47] mb-1.5">Live sky · right now</p>
+            <p className="text-[11px] text-[#76716b] leading-relaxed">{result.skyContext}</p>
+          </div>
+        )}
         <div className="space-y-3">
           {[
             "What is actually true in this situation",

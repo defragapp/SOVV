@@ -131,6 +131,42 @@ export default function PricingPage() {
         </Container>
       </section>
 
+      {/* ── TESTIMONIALS ── */}
+      <section className="w-full py-16 md:py-20 bg-[#08070a] border-t border-white/[0.04]">
+        <Container className="max-w-3xl">
+          <div className="flex flex-col items-center text-center mb-12">
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#4f4b47] mb-4">What people say</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                quote: "I used it before a hard conversation with my dad. It named the loop I'd been in for years. I didn't say everything I planned to — but what I said landed.",
+                name: "Early user",
+                context: "Defrag",
+              },
+              {
+                quote: "The Baseline Design is the part that surprised me. It's not a personality test. It's more like — it knows how I move before I explain it.",
+                name: "Pro subscriber",
+                context: "Baseline Design",
+              },
+              {
+                quote: "I've tried journaling, therapy, and a lot of apps. This is the first thing that gives me a specific next move instead of just reflecting back what I said.",
+                name: "Pro subscriber",
+                context: "Alignment",
+              },
+            ].map((t, i) => (
+              <div key={i} className="border border-white/[0.06] bg-[#0c0a0d] p-6 flex flex-col gap-4" style={{ borderRadius: "var(--radius-container)" }}>
+                <p className="text-[13px] text-[#a8a29a] leading-relaxed italic flex-1">&ldquo;{t.quote}&rdquo;</p>
+                <div className="flex items-center gap-2 pt-2 border-t border-white/[0.04]">
+                  <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47] border border-white/[0.07] px-2 py-0.5" style={{ borderRadius: 3 }}>{t.context}</span>
+                  <span className="text-[11px] text-[#4f4b47]">{t.name}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
       {/* ── COMPARISON ── */}
       <section className="w-full py-16 md:py-20 bg-[#0c0a0d] border-t border-white/5">
         <Container className="max-w-3xl">

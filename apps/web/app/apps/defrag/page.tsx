@@ -340,6 +340,7 @@ export default function DefragEntryPage() {
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState("")
   const [profileStatements, setProfileStatements] = React.useState<Array<{statement: string; chips: string[]}>>([])
+  const [baselineCompiling, setBaselineCompiling] = React.useState(false)
 
   React.useEffect(() => {
     // Load personalized translation (requires compiled dataset)
@@ -354,6 +355,12 @@ export default function DefragEntryPage() {
     fetch("/api/derive-profile", { credentials: "include" })
       .then(r => r.ok ? r.json() : { statements: [] })
       .then((d: any) => { if (Array.isArray(d.statements)) setProfileStatements(d.statements) })
+      .catch(() => {})
+
+    // Check if baseline is still compiling
+    fetch("/api/baseline/status", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then((d: any) => { if (d?.status === "pending") setBaselineCompiling(true) })
       .catch(() => {})
   }, [])
 
@@ -441,6 +448,14 @@ export default function DefragEntryPage() {
         {!loading && !brief && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
             className="flex flex-col gap-6 pt-8">
+            {baselineCompiling && (
+              <div className="flex items-center gap-3 px-4 py-3 border border-[#e0743a]/20 bg-[#e0743a]/[0.03]" style={{ borderRadius: "var(--radius-container)" }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#e0743a]/50 animate-pulse shrink-0" />
+                <p className="text-[12px] text-[#76716b] leading-relaxed">
+                  Your pattern map is compiling — this takes 30–60 seconds. Results will be more grounded once it's ready.
+                </p>
+              </div>
+            )}
             <div>
               <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Defrag</p>
               <p className="text-[22px] text-[#f4efe9] leading-snug mb-3">

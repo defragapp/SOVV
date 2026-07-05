@@ -325,6 +325,7 @@ function ChangePasswordForm() {
 
 export default function SettingsPage() {
   const isOnboarding = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("onboard") === "1"
+  const [onboardingComplete, setOnboardingComplete] = React.useState(false)
   const [baseline, setBaseline] = useState<BaselineRequest>(initialState);
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -360,7 +361,7 @@ export default function SettingsPage() {
             if (d.status === "ready") {
               setMessage({ text: "Baseline Design compiled. Your pattern map is active.", ok: true });
             } else if (d.status === "failed") {
-              setMessage({ text: "Compilation failed. Try saving again.", ok: false });
+              setMessage({ text: "Compilation failed. Your birth data was saved — click 'Save Baseline Design' to retry.", ok: false });
             } else if (d.status === "pending") {
               setTimeout(pollStatus, 5000);
             }
@@ -400,6 +401,20 @@ export default function SettingsPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-6 py-16 md:py-24">
+
+        {/* Onboarding completion */}
+        {isOnboarding && onboardingComplete && (
+          <div className="mb-8 px-6 py-5 border border-[#e0743a]/30 bg-[#e0743a]/[0.04]" style={{ borderRadius: "var(--radius-container)" }}>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70 mb-2">Baseline Design active</p>
+            <p className="text-[15px] text-[#f4efe9] leading-snug mb-3">Your space is ready.</p>
+            <p className="text-[13px] text-[#76716b] leading-relaxed mb-4">
+              Describe what is happening — Defrag will show you what is active beneath it.
+            </p>
+            <a href="/apps/defrag" className="btn-primary inline-flex">
+              Open Defrag →
+            </a>
+          </div>
+        )}
 
         {/* Title */}
         <div className="mb-14">

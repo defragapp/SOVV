@@ -38,6 +38,22 @@ export default function LibraryPage() {
   const [sessionCount, setSessionCount] = React.useState(0)
   const [proGated, setProGated] = React.useState(false)
   const [checkoutResult, setCheckoutResult] = React.useState<"upgraded" | "canceled" | null>(null)
+  const [filterSpace, setFilterSpace] = React.useState<"ALL" | "DEFRAG" | "COVENANT" | "ALIGNMENT">("ALL")
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [deletingId, setDeletingId] = React.useState<string | null>(null)
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!confirm("Delete this saved result?")) return
+    setDeletingId(id)
+    try {
+      await fetch(`/api/library/${id}`, { method: "DELETE", credentials: "include" })
+      setItems(prev => prev.filter(item => item.id !== id))
+    } catch { /* silent */ } finally {
+      setDeletingId(null)
+    }
+  }
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
@@ -66,7 +82,11 @@ export default function LibraryPage() {
   }, [])
 
   React.useEffect(() => {
-    fetch("/api/library", { credentials: "include" })
+    const params = new URLSearchParams()
+    if (filterSpace !== "ALL") params.set("workspace_source", filterSpace)
+    if (searchQuery.trim()) params.set("q", searchQuery.trim())
+    const url = `/api/library${params.toString() ? "?" + params.toString() : ""}`
+    fetch(url, { credentials: "include" })
       .then(r => {
         if (r.status === 403) { setProGated(true); return { items: [] } }
         return r.json()
@@ -74,7 +94,7 @@ export default function LibraryPage() {
       .then(d => setItems((d as any).items || []))
       .catch(() => {})
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [filterSpace, searchQuery])
 
   const sidebar = (
     <div className="flex flex-col h-full">
@@ -119,7 +139,25 @@ export default function LibraryPage() {
     <div className="flex flex-col h-full max-w-3xl mx-auto w-full">
       {/* Header */}
       <div className="mb-8">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Library</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Library</p>
+          <div className="flex items-center gap-1">
+            {(["ALL", "DEFRAG", "COVENANT", "ALIGNMENT"] as const).map(space => (
+              <button
+                key={space}
+                onClick={() => setFilterSpace(space)}
+                className={`font-mono text-[8px] uppercase tracking-[0.1em] px-2 py-1 transition-colors ${
+                  filterSpace === space
+                    ? "text-[#f4efe9] border border-white/[0.12] bg-white/[0.04]"
+                    : "text-[#4f4b47] hover:text-[#76716b]"
+                }`}
+                style={{ borderRadius: 3 }}
+              >
+                {space === "ALL" ? "All" : space.charAt(0) + space.slice(1).toLowerCase()}
+              </button>
+            ))}
+          </div>
+        </div>
         <h1 className="font-serif text-[28px] text-[#f4efe9] leading-tight tracking-[-0.02em]">
           What you've saved.
         </h1>
@@ -202,7 +240,7 @@ export default function LibraryPage() {
               <Link
                 key={item.id}
                 href={`/apps/defrag/${item.id}`}
-                className="block px-6 py-5 border-b border-white/[0.05] last:border-0 glow-card-hover group"
+                className="block px-6 py-5 border-b border-white/[0.05] last:border-0 glow-card-hover group relative"
               >
                 <div className="flex items-start justify-between gap-4 mb-2">
                   <div className="flex items-center gap-2">
@@ -213,7 +251,17 @@ export default function LibraryPage() {
                       {spaceLabel(item.workspace_source)}
                     </span>
                   </div>
-                  <span className="font-mono text-[9px] text-[#4f4b47] shrink-0">{formatDate(item.created_at)}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-[9px] text-[#4f4b47] shrink-0">{formatDate(item.created_at)}</span>
+                    <button
+                      onClick={(e) => handleDelete(item.id, e)}
+                      disabled={deletingId === item.id}
+                      className="opacity-0 group-hover:opacity-100 font-mono text-[8px] text-[#4f4b47] hover:text-red-400/60 transition-all disabled:opacity-30"
+                      title="Delete"
+                    >
+                      {deletingId === item.id ? "…" : "✕"}
+                    </button>
+                  </div>
                 </div>
                 <p className="text-[14px] text-[#c8c2bc] group-hover:text-[#f4efe9] transition-colors leading-snug mb-1">
                   {item.title || "Untitled"}

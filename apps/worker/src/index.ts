@@ -351,6 +351,35 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
 }
 
 export default {
+  // Scheduled cron handler — runs daily at 3am UTC
+  async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
+    currentEnv = env;
+    try {
+      // Clean up expired sessions
+      const result = await env.DB.prepare(
+        "DELETE FROM sessions WHERE expires_at < ?"
+      ).bind(Date.now()).run();
+      logSafetyEvent({ level: "info", event: "cron_session_cleanup", details: { deleted: result.meta?.changes ?? 0 } });
+
+      // Clean up old safety audit logs (older than 30 days)
+      const cutoff = Date.now() - (30 * 24 * 60 * 60 * 1000);
+      const keys = await env.KV.list({ prefix: "safety:audit:" });
+      let kvDeleted = 0;
+      for (const key of keys.keys) {
+        const ts = parseInt(key.name.split(":")[2] ?? "0", 10);
+        if (ts < cutoff) {
+          await env.KV.delete(key.name).catch(() => {});
+          kvDeleted++;
+        }
+      }
+      if (kvDeleted > 0) {
+        logSafetyEvent({ level: "info", event: "cron_kv_cleanup", details: { deleted: kvDeleted } });
+      }
+    } catch (err) {
+      logSafetyEvent({ level: "error", event: "cron_cleanup_failed", error_type: "system", error: err });
+    }
+  },
+
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     currentEnv = env;
     try {
