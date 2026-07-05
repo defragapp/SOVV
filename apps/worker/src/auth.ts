@@ -513,7 +513,10 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       // Invalidate all other sessions for security
       await env.DB.prepare("DELETE FROM sessions WHERE user_id = ? AND token != ?")
-        .bind(user.id, request.headers.get("cookie")?.match(/session=([^;]+)/)?.[1] || "").run()
+        .bind(user.id, 
+          request.headers.get("cookie")?.match(/__sov_session=([^;]+)/)?.[1] ||
+          request.headers.get("cookie")?.match(/session=([^;]+)/)?.[1] || ""
+        ).run()
 
       return jsonResponse({ success: true })
     } catch (e) {
@@ -540,13 +543,24 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         env.KV.get(`natal:${user.id}`),
       ])
 
+      // Decrypt baseline data if KMS-encrypted
+      let baselineDesign = null
+      if (natal) {
+        try {
+          const { kmsDecryptJson } = await import("./kms.js")
+          baselineDesign = await kmsDecryptJson(env.KMS_SECRET, natal)
+        } catch {
+          try { baselineDesign = JSON.parse(natal) } catch { /* skip */ }
+        }
+      }
+
       const exportData = {
         exportedAt: new Date().toISOString(),
         account: { id: user.id, email: user.email, tier: user.tier, createdAt: (user as any).created_at },
         library: library.results || [],
         interactions: interactions.results || [],
         people: people.results || [],
-        baselineDesign: natal ? JSON.parse(natal) : null,
+        baselineDesign,
       }
 
       return new Response(JSON.stringify(exportData, null, 2), {
@@ -722,9 +736,10 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       const SESSION_TTL = 7 * 24 * 60 * 60 // 7 days in seconds
       const cookieDomain = env.COOKIE_DOMAIN || undefined
 
-      // Get old token from cookie
+      // Get old token from cookie (__sov_session is the primary cookie name)
       const cookieHeader_val = request.headers.get("cookie") || ""
-      const oldToken = cookieHeader_val.match(/session=([^;]+)/)?.[1]
+      const oldToken = cookieHeader_val.match(/__sov_session=([^;]+)/)?.[1]
+        || cookieHeader_val.match(/session=([^;]+)/)?.[1]
 
       // Insert new session
       await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, expires, created_at) VALUES (?, ?, ?, ?, ?)")
