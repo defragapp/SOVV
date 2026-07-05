@@ -1,12 +1,5 @@
 "use client"
 
-import type { Metadata } from "next"
-
-export const metadata: Metadata = {
-  title: "Reset Password — Sovereign.os",
-  description: "Reset your Sovereign.os password.",
-}
-
 import Link from "next/link"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"

@@ -1,12 +1,5 @@
 "use client"
 
-import type { Metadata } from "next"
-
-export const metadata: Metadata = {
-  title: "Verify Email — Sovereign.os",
-  description: "Verify your email address to activate your Sovereign.os space.",
-}
-
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
