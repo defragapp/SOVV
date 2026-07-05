@@ -171,10 +171,10 @@ async function runTests() {
   });
 
 
-  await test("billing.ts has 7-day trial period in checkout", async () => {
+  await test("billing.ts has promotion codes enabled in checkout", async () => {
     const src = readFileSync("src/billing.ts", "utf8");
-    assert(src.includes("trial_period_days"), "7-day trial not configured in checkout");
     assert(src.includes("allow_promotion_codes"), "promotion codes not enabled");
+    assert(src.includes("STRIPE_PRICE_ID"), "Stripe price ID not used in checkout");
   });
 
   await test("prompts.ts has nextSpace field in Defrag output contract", async () => {
