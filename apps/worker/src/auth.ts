@@ -191,7 +191,7 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
     tier: session.tier,
     role: session.role || "user",
     stripe_customer_id: session.stripe_customer_id,
-    subscription_status: session.subscription_status || "free",,
+    subscription_status: session.subscription_status || "free",
     subscription_current_period_end: session.subscription_current_period_end ?? null,
     email_verified: session.email_verified ?? 0,
   }
