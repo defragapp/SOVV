@@ -131,7 +131,8 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
               { role: "assistant", content: rawText },
               { role: "user", content: retryPrompt("covenant", validation.missing) },
             ], temperature: 0.2, max_tokens: 800 }
-        )
+        ,
+          { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } })
         rawText = (retryAi as any).response ?? String(retryAi)
         validation = validate(rawText, "covenant")
       }

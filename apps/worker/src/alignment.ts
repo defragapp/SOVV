@@ -356,7 +356,8 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       const aiResponse = await env.AI.run(
         (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
         { messages, temperature: 0.3, max_tokens: 700 }
-      );
+      ,
+          { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } });
 
       let rawText = (aiResponse as any).response ?? String(aiResponse);
 
@@ -374,7 +375,8 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
               { role: "assistant", content: rawText },
               { role: "user", content: retryPrompt("alignment", validation.missing) },
             ], temperature: 0.2, max_tokens: 800 }
-        )
+        ,
+          { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } })
         rawText = (retryAi as any).response ?? String(retryAi)
         validation = validate(rawText, "alignment")
       }

@@ -636,7 +636,8 @@ export async function buildHumanBehaviorTranslation(
       ],
       temperature: 0.25,
       max_tokens: 1000,
-    })
+    },
+      { gateway: { id: (env as any).GATEWAY_ID || "sovereign-ai-gateway" } }))
 
     const rawText = (aiResponse as any).response ?? String(aiResponse)
     const match = rawText.trim().match(/\{[\s\S]*\}/)

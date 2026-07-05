@@ -186,7 +186,7 @@ export async function handleDeriveProfile(
       ],
       temperature: 0.3,
       max_tokens: tuneTokenBudget(800, serviceState.state, pressure.throttleLevel),
-    })
+    }, { gateway: { id: (env as any).GATEWAY_ID || "sovereign-ai-gateway" } })
 
     // CF Workers AI returns { response: string } for chat models
     aiText = typeof aiResponse === "object" && "response" in aiResponse
