@@ -48,7 +48,9 @@ export interface Env {
   STRIPE_SECRET_KEY?: string
   STRIPE_PUBLISHABLE_KEY?: string
   STRIPE_WEBHOOK_SECRET?: string
-  STRIPE_PRICE_ID?: string
+  STRIPE_PRICE_ID?: string           // Legacy / fallback price ID
+  STRIPE_ALIGNMENT_PRICE_ID?: string // Alignment-tier subscription price ID
+  STRIPE_COVENANT_PRICE_ID?: string  // Covenant-tier subscription price ID
   STRIPE_ACCOUNT_ID?: string
   STRIPE_SUPPORT_LINK_URL?: string
 
@@ -65,6 +67,12 @@ export interface Env {
   // Cookie domain apex for cross-subdomain auth. Example: defrag.app
   COOKIE_DOMAIN?: string
 
+
+  // ── KMS ──────────────────────────────────────────────────────────────────
+  // 64-char hex key for AES-256-GCM encryption of Covenant pro-tier spaces.
+  // Generate: openssl rand -hex 32
+  // Deploy: wrangler secret put KMS_ENCRYPTION_KEY
+  KMS_ENCRYPTION_KEY?: string
 
   // ── App config ───────────────────────────────────────────────────────────
   FREE_DAILY_LIMIT?: string

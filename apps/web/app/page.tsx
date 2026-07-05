@@ -5,6 +5,7 @@ import * as React from "react"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
 import { motion, AnimatePresence } from "framer-motion"
+import { MotionSection, MotionGroup, MotionItem, MotionReveal } from "@/components/marketing/motion-section"
 
 const APP_URL = "/app/login"
 const ease = [0.16, 1, 0.3, 1] as const
@@ -628,9 +629,12 @@ export default function Home() {
 
 
       {/* ── NOTEBOOK PREVIEW ─────────────────────────────────────────────── */}
-      <section className="w-full py-24 md:py-36 bg-[#08070a] border-t border-white/[0.04] pattern-field">
+      <MotionSection
+        className="w-full py-24 md:py-36 bg-[#08070a] border-t border-white/[0.04] pattern-field"
+        delay={0.05}
+      >
         <Container>
-          <div className="flex flex-col items-center text-center mb-14 reveal-up reveal-up-1">
+          <div className="flex flex-col items-center text-center mb-14">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-6 bg-[#e0743a]/60" />
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
@@ -649,17 +653,20 @@ export default function Home() {
           </div>
           <SpacePreview />
         </Container>
-      </section>
+      </MotionSection>
 
             {/* ── THE PROBLEM ─────────────────────────────────────────────────── */}
-      <section className="relative w-full py-24 md:py-36 bg-[#08070a] border-t border-white/[0.04] overflow-hidden pattern-field">
+      <MotionSection
+        className="relative w-full py-24 md:py-36 bg-[#08070a] border-t border-white/[0.04] overflow-hidden pattern-field"
+        delay={0.05}
+      >
         {/* Alignment rings — decorative */}
         <div className="alignment-ring absolute -right-40 top-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-30" />
         <div className="alignment-ring absolute -right-60 top-1/2 -translate-y-1/2 w-[700px] h-[700px] opacity-20" />
         <div className="alignment-ring absolute -right-80 top-1/2 -translate-y-1/2 w-[900px] h-[900px] opacity-10" />
 
         <Container className="relative z-10">
-          <div className="max-w-2xl mb-16 reveal-up reveal-up-1">
+          <div className="max-w-2xl mb-16">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-6 bg-[#e0743a]/60" />
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Why it matters</span>
@@ -675,7 +682,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <MotionGroup className="grid grid-cols-1 md:grid-cols-3 gap-4" stagger={0.1}>
             {[
               {
                 label: "The Moment",
@@ -686,7 +693,6 @@ export default function Home() {
                     <circle cx="10" cy="10" r="7" stroke="rgba(224,116,58,0.2)" strokeWidth="1" strokeDasharray="2 3"/>
                   </svg>
                 ),
-                delay: "reveal-up-2",
               },
               {
                 label: "The Pattern",
@@ -697,7 +703,6 @@ export default function Home() {
                     <path d="M3 10 Q7 4 10 10 Q13 16 17 10" stroke="rgba(224,116,58,0.15)" strokeWidth="4" strokeLinecap="round" fill="none"/>
                   </svg>
                 ),
-                delay: "reveal-up-3",
               },
               {
                 label: "The Next Move",
@@ -707,27 +712,28 @@ export default function Home() {
                     <path d="M4 10h12M12 6l4 4-4 4" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 ),
-                delay: "reveal-up-4",
               },
             ].map((card) => (
-              <div key={card.label} className={`moment-card p-7 flex flex-col gap-5 ${card.delay} reveal-up`}>
-                <div className="w-9 h-9 flex items-center justify-center border border-white/[0.08] bg-white/[0.02]" style={{ borderRadius: 8 }}>
-                  {card.icon}
+              <MotionItem key={card.label}>
+                <div className="moment-card p-7 flex flex-col gap-5 h-full">
+                  <div className="w-9 h-9 flex items-center justify-center border border-white/[0.08] bg-white/[0.02]" style={{ borderRadius: 8 }}>
+                    {card.icon}
+                  </div>
+                  <div>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">{card.label}</p>
+                    <p className="text-[14px] text-[#c8c2bc] leading-relaxed">{card.desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">{card.label}</p>
-                  <p className="text-[14px] text-[#c8c2bc] leading-relaxed">{card.desc}</p>
-                </div>
-              </div>
+              </MotionItem>
             ))}
-          </div>
+          </MotionGroup>
         </Container>
-      </section>
+      </MotionSection>
 
       {/* ── HOW IT WORKS ────────────────────────────────────────────────── */}
-      <section className="w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.04]">
+      <MotionSection className="w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.04]" delay={0.05}>
         <Container>
-          <div className="flex flex-col items-center text-center mb-16 reveal-up reveal-up-1">
+          <div className="flex flex-col items-center text-center mb-16">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-6 bg-[#e0743a]/60" />
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">The process</span>
@@ -740,7 +746,11 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.04] border border-white/[0.05] overflow-hidden max-w-4xl mx-auto" style={{ borderRadius: 16 }}>
+          <MotionGroup
+            className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.04] border border-white/[0.05] overflow-hidden max-w-4xl mx-auto"
+            style={{ borderRadius: 16 } as React.CSSProperties}
+            stagger={0.1}
+          >
             {[
               {
                 num: "01",
@@ -758,26 +768,31 @@ export default function Home() {
                 body: "Get a Best Next Response you can use, edit, or Save to Sovereign — before pressure chooses for you.",
               },
             ].map((step, i) => (
-              <div key={step.num} className={`bg-[#0c0a0d] p-8 md:p-10 flex flex-col gap-6 reveal-up reveal-up-${i + 2}`}>
-                {/* Step number with signal dot */}
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47]">{step.num}</span>
-                  {i < 2 && (
-                    <div className="flex-1 h-px bg-gradient-to-r from-[#e0743a]/20 to-transparent" />
-                  )}
+              <MotionItem key={step.num}>
+                <div className="bg-[#0c0a0d] p-8 md:p-10 flex flex-col gap-6 h-full">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-[#4f4b47]">{step.num}</span>
+                    {i < 2 && (
+                      <div className="flex-1 h-px bg-gradient-to-r from-[#e0743a]/20 to-transparent" />
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-[1.15rem] text-[#f4efe9] leading-snug mb-3">{step.title}</h3>
+                    <p className="text-[13px] text-[#76716b] leading-relaxed">{step.body}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-serif text-[1.15rem] text-[#f4efe9] leading-snug mb-3">{step.title}</h3>
-                  <p className="text-[13px] text-[#76716b] leading-relaxed">{step.body}</p>
-                </div>
-              </div>
+              </MotionItem>
             ))}
-          </div>
+          </MotionGroup>
         </Container>
-      </section>
+      </MotionSection>
 
       {/* ── BRAND BELIEF ────────────────────────────────────────────────── */}
-      <section className="relative w-full py-28 md:py-44 bg-[#08070a] border-t border-white/[0.04] overflow-hidden text-center">
+      <MotionSection
+        className="relative w-full py-28 md:py-44 bg-[#08070a] border-t border-white/[0.04] overflow-hidden text-center"
+        variant="fade-in"
+        duration={1.0}
+      >
         {/* Alignment rings — centered */}
         <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] opacity-20" />
         <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-12" />
@@ -800,10 +815,10 @@ export default function Home() {
             Sovereign.os does not tell you who to be. It gives you enough structure to return to yourself before the pattern runs the room.
           </p>
         </Container>
-      </section>
+      </MotionSection>
 
       {/* ── THREE SPACES ─────────────────────────────────────────────────── */}
-      <section className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden">
+      <MotionSection className="relative w-full py-24 md:py-36 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden" delay={0.05}>
         <div className="light-beam opacity-50" aria-hidden />
         <Container className="relative z-10">
           <div className="inline-flex items-center gap-2 mb-12">
@@ -813,7 +828,11 @@ export default function Home() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.06] overflow-hidden" style={{ borderRadius: 16 }}>
+          <MotionGroup
+            className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.06] overflow-hidden"
+            style={{ borderRadius: 16 } as React.CSSProperties}
+            stagger={0.1}
+          >
             {[
               {
                 num: "01",
@@ -826,7 +845,6 @@ export default function Home() {
                 tags: ["Arguments", "Messages", "Family roles", "Boundaries", "Grief"],
                 icon: (
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    {/* Defrag: separated layers becoming clear */}
                     <rect x="3" y="4" width="18" height="3" rx="1" stroke="rgba(224,116,58,0.5)" strokeWidth="1.2"/>
                     <rect x="3" y="10.5" width="12" height="3" rx="1" stroke="rgba(224,116,58,0.35)" strokeWidth="1.2"/>
                     <rect x="3" y="17" width="15" height="3" rx="1" stroke="rgba(224,116,58,0.2)" strokeWidth="1.2"/>
@@ -846,7 +864,6 @@ export default function Home() {
                 tags: ["Faith", "Values", "Commitments", "Repair"],
                 icon: (
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    {/* Covenant: connected arc, story bridge */}
                     <path d="M4 18 Q12 4 20 18" stroke="rgba(224,116,58,0.5)" strokeWidth="1.2" strokeLinecap="round" fill="none"/>
                     <circle cx="4" cy="18" r="1.5" fill="rgba(224,116,58,0.4)"/>
                     <circle cx="20" cy="18" r="1.5" fill="rgba(224,116,58,0.4)"/>
@@ -867,7 +884,6 @@ export default function Home() {
                 tags: ["After Defrag", "Before a hard conversation", "After a conflict"],
                 icon: (
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    {/* Alignment: concentric rings, centered axis */}
                     <circle cx="12" cy="12" r="2" fill="rgba(224,116,58,0.7)"/>
                     <circle cx="12" cy="12" r="5" stroke="rgba(224,116,58,0.35)" strokeWidth="1.2" fill="none"/>
                     <circle cx="12" cy="12" r="8.5" stroke="rgba(224,116,58,0.15)" strokeWidth="1" fill="none" strokeDasharray="2 3"/>
@@ -877,68 +893,73 @@ export default function Home() {
                 ),
               },
             ].map((space) => (
-              <Link
-                key={space.name}
-                href={space.href}
-                className="group flex flex-col gap-5 p-8 md:p-10 bg-[#0c0a0d] glow-card-hover"
-              >
-                <div className="flex items-start justify-between">
-                  <div
-                    className="w-10 h-10 flex items-center justify-center border border-white/[0.08]"
-                    style={{
-                      borderRadius: 8,
-                      background: space.tier === "Pro" ? "rgba(224,116,58,0.04)" : "rgba(255,255,255,0.02)",
-                    }}
-                  >
-                    {space.icon}
-                  </div>
-                  <span
-                    className="font-mono text-[8px] uppercase tracking-[0.14em] border px-2 py-0.5 self-start"
-                    style={{
-                      borderRadius: 3,
-                      color: space.tier === "Free" ? "rgba(168,162,154,0.55)" : "rgba(224,116,58,0.65)",
-                      borderColor: space.tier === "Free" ? "rgba(255,255,255,0.08)" : "rgba(224,116,58,0.22)",
-                    }}
-                  >
-                    {space.tier}
-                  </span>
-                </div>
-
-                <div>
-                  <h3
-                    className="font-serif text-[#f4efe9] mb-2 group-hover:text-white transition-colors duration-200"
-                    style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.6rem)" }}
-                  >
-                    {space.name}
-                  </h3>
-                  <p className="text-[15px] text-[#f4efe9]/65 leading-snug">
-                    {space.hook}
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-2 flex-1">
-                  <p className="text-[13px] text-[#a8a29a] leading-relaxed">{space.what}</p>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.05]">
-                  {space.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] px-2 py-0.5 border border-white/[0.05]"
-                      style={{ borderRadius: 3 }}
+              <MotionItem key={space.name}>
+                <Link
+                  href={space.href}
+                  className="group flex flex-col gap-5 p-8 md:p-10 bg-[#0c0a0d] glow-card-hover h-full"
+                >
+                  <div className="flex items-start justify-between">
+                    <div
+                      className="w-10 h-10 flex items-center justify-center border border-white/[0.08]"
+                      style={{
+                        borderRadius: 8,
+                        background: space.tier === "Pro" ? "rgba(224,116,58,0.04)" : "rgba(255,255,255,0.02)",
+                      }}
                     >
-                      {tag}
+                      {space.icon}
+                    </div>
+                    <span
+                      className="font-mono text-[8px] uppercase tracking-[0.14em] border px-2 py-0.5 self-start"
+                      style={{
+                        borderRadius: 3,
+                        color: space.tier === "Free" ? "rgba(168,162,154,0.55)" : "rgba(224,116,58,0.65)",
+                        borderColor: space.tier === "Free" ? "rgba(255,255,255,0.08)" : "rgba(224,116,58,0.22)",
+                      }}
+                    >
+                      {space.tier}
                     </span>
-                  ))}
-                </div>
-              </Link>
+                  </div>
+
+                  <div>
+                    <h3
+                      className="font-serif text-[#f4efe9] mb-2 group-hover:text-white transition-colors duration-200"
+                      style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.6rem)" }}
+                    >
+                      {space.name}
+                    </h3>
+                    <p className="text-[15px] text-[#f4efe9]/65 leading-snug">
+                      {space.hook}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-2 flex-1">
+                    <p className="text-[13px] text-[#a8a29a] leading-relaxed">{space.what}</p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.05]">
+                    {space.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] px-2 py-0.5 border border-white/[0.05]"
+                        style={{ borderRadius: 3 }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </Link>
+              </MotionItem>
             ))}
-          </div>
+          </MotionGroup>
         </Container>
-      </section>
+      </MotionSection>
 
       {/* ── CTA ──────────────────────────────────────────────────────────── */}
-      <section className="relative w-full py-32 md:py-48 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden">
+      <MotionSection
+        className="relative w-full py-32 md:py-48 bg-[#0c0a0d] border-t border-white/[0.04] overflow-hidden"
+        variant="fade-in"
+        duration={1.0}
+      >
         {/* Alignment rings */}
         <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] opacity-15" />
         <div className="alignment-ring absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] opacity-[0.08]" />
@@ -963,9 +984,7 @@ export default function Home() {
               Private by design · Free to start
             </p>
           </div>
-        </Container>
-      </section>
-
     </SiteShell>
   )
 }
+

@@ -1,7 +1,9 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
-import { requireActiveSubscription } from "./billing.js";
+import { checkEntitlement } from "./entitlements.js";
+import { isKmsConfigured, kmsEncrypt } from "./kms.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
+import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import { checkProLimit } from "./plan.js";
 import { SYSTEM_COVENANT } from "./prompts.js";
 import { checkGuardrails } from "./output-validator.js";
@@ -44,8 +46,8 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
     }
 
-    const subGate = await requireActiveSubscription(user, request);
-    if (subGate) return subGate;
+    const entitlementCheck = checkEntitlement(user, "covenant", env.APP_URL);
+    if (!entitlementCheck.allowed) return entitlementCheck.response;
 
     // Per-user Pro daily soft cap (200/day)
     if (env.KV) {
@@ -159,6 +161,21 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
           strength: covenantConfidence?.certainty === "stable" ? "high" : covenantConfidence?.certainty === "emerging" ? "medium" : "low",
         },
       };
+
+      // KMS: store encrypted covenant session data in KV when key is available
+      if (env.KV && isKmsConfigured(env.KMS_ENCRYPTION_KEY)) {
+        const sessionPayload = JSON.stringify({
+          userId: user.id,
+          ts: Date.now(),
+          response: responseWithMedia,
+        });
+        const encrypted = await kmsEncrypt(sessionPayload, env.KMS_ENCRYPTION_KEY).catch(() => null);
+        if (encrypted) {
+          const key = `covenant:session:${user.id}:${Date.now()}`;
+          await env.KV.put(key, encrypted, { expirationTtl: 60 * 60 * 24 * 30 }).catch(() => {});
+        }
+      }
+
       return new Response(JSON.stringify(responseWithMedia), {
         status: 200,
         headers: { "Content-Type": "application/json" }
