@@ -267,11 +267,13 @@ export function registerBaselineRoutes(router: any, getEnv: () => Env) {
       return new Response(JSON.stringify({ error: "Invalid app" }), { status: 400 });
     }
 
-    // Covenant and Alignment require Pro subscription
+    // Covenant and Alignment translation requires Pro subscription
     if (app !== "defrag") {
-      const { requireActiveSubscription } = await import("./billing.js");
-      const subGate = await requireActiveSubscription(user, req);
-      if (subGate) return subGate;
+      const { resolveEntitlements, requireEntitlement } = await import("./entitlements.js");
+      const entitlements = resolveEntitlements(user);
+      const feature = app === "covenant" ? "canUseCovenant" as const : "canUseAlignment" as const;
+      const gate = requireEntitlement(entitlements, feature);
+      if (gate) return gate;
     }
 
     const translation = await buildHumanBehaviorTranslation(
@@ -308,20 +310,4 @@ export function registerBaselineRoutes(router: any, getEnv: () => Env) {
     });
   });
 
-  // GET /api/baseline/status — poll compilation status
-  router.get("/api/baseline/status", async (req: Request) => {
-    const env = getEnv();
-    const user = await getAuthUser(req, env.DB);
-    if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
-    const sid = await getSessionId(req);
-    const dataset = await getBaselineDataset(env, sid, user.id);
-    if (!dataset) return Response.json({ status: "none" });
-    return Response.json({
-      status: dataset.status,
-      computedAt: dataset.computedAt,
-      hasAstronomy: Boolean(dataset.astronomy),
-      hasFrameworks: Boolean(dataset.frameworks),
-      hasAiDataset: Boolean(dataset.aiDataset),
-    });
-  });
 }
