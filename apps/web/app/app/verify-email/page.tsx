@@ -1,5 +1,12 @@
 "use client"
 
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Verify Email — Sovereign.os",
+  description: "Verify your email address to activate your Sovereign.os space.",
+}
+
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
@@ -69,6 +76,17 @@ export default function VerifyEmailPage() {
 
   return (
     <div className="relative flex min-h-[100dvh] w-full items-center justify-center bg-[#08070a] px-6 py-12">
+      {/* Ambient light */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(224,116,58,0.06) 0%, transparent 65%)" }}
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: "radial-gradient(ellipse 40% 30% at 50% 100%, rgba(200,194,188,0.03) 0%, transparent 70%)" }}
+        aria-hidden
+      />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

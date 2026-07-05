@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
 import Link from "next/link"
+import { PricingUpgradeButton } from "@/components/marketing/PricingUpgradeButton"
 import { AnimatedHeading, TextReveal } from "@/components/marketing/animated-elements"
 
 export const metadata: Metadata = {
@@ -123,9 +124,7 @@ export default function PricingPage() {
                 ))}
               </div>
 
-              <Link href={APP_URL} className="btn-primary w-full text-center relative">
-                Upgrade to Pro
-              </Link>
+              <PricingUpgradeButton />
             </div>
 
           </div>
@@ -140,10 +139,47 @@ export default function PricingPage() {
             What each plan includes.
           </AnimatedHeading>
 
-          <div className="flex flex-col gap-0">
-            {[...FREE_FEATURES, ...PRO_FEATURES.filter(f => f !== "Everything in Free")].map((feature, i) => (
-              <div key={`${feature}-${i}`} className="flex items-center justify-between py-4 border-b border-white/[0.05] last:border-0">
-                <span className="text-sm text-[#a8a29a]">{feature}</span>
+          {/* Column headers */}
+          <div className="grid grid-cols-3 gap-0 mb-2">
+            <div className="col-span-1" />
+            <div className="text-center">
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b]">Free</span>
+            </div>
+            <div className="text-center">
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70">Pro</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-0 border border-white/[0.05] overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}>
+            {[
+              { label: "Baseline Design", free: true, pro: true },
+              { label: "Defrag space — full access", free: true, pro: true },
+              { label: "5 sessions per day", free: true, pro: false },
+              { label: "Pattern recognition output", free: true, pro: true },
+              { label: "Best Next Response", free: true, pro: true },
+              { label: "Unlimited sessions", free: false, pro: true },
+              { label: "Covenant space", free: false, pro: true },
+              { label: "Alignment space", free: false, pro: true },
+              { label: "Save results to Library", free: false, pro: true },
+              { label: "Return to your Library", free: false, pro: true },
+              { label: "Audio Overview", free: false, pro: true },
+              { label: "Invite Privately", free: false, pro: true },
+              { label: "Full Library depth", free: false, pro: true },
+            ].map((row, i) => (
+              <div key={row.label} className="grid grid-cols-3 gap-0 py-3.5 px-5 border-b border-white/[0.04] last:border-0 bg-[#0c0a0d] hover:bg-white/[0.01] transition-colors">
+                <span className="text-[13px] text-[#a8a29a] col-span-1">{row.label}</span>
+                <div className="flex items-center justify-center">
+                  {row.free
+                    ? <span className="text-[#76716b] text-sm">✓</span>
+                    : <span className="text-[#2a2828] text-sm">—</span>
+                  }
+                </div>
+                <div className="flex items-center justify-center">
+                  {row.pro
+                    ? <span className="text-[#e0743a]/70 text-sm">✓</span>
+                    : <span className="text-[#2a2828] text-sm">—</span>
+                  }
+                </div>
               </div>
             ))}
           </div>

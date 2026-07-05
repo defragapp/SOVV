@@ -188,18 +188,38 @@ function EmailVerificationStatus() {
     }
   }
 
-  if (status === "loading") return <span className="font-mono text-[10px] text-[#4f4b47]">Checking…</span>
-  if (status === "verified") return <span className="font-mono text-[10px] text-[#76716b]">Email verified ✓</span>
+  if (status === "loading") return (
+    <span className="font-mono text-[10px] text-[#4f4b47] animate-pulse">Checking…</span>
+  )
+  if (status === "verified") return (
+    <div className="flex items-center gap-2">
+      <span className="w-1.5 h-1.5 rounded-sm bg-[#e0743a]/60" />
+      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#76716b]">Email verified</span>
+    </div>
+  )
   if (status === "unverified") return (
-    <div className="flex items-center gap-4">
-      <span className="font-mono text-[10px] text-[#4f4b47]">Email not verified</span>
+    <div className="flex flex-col gap-3 p-4 border border-[#e0743a]/20 bg-[#e0743a]/[0.03]" style={{ borderRadius: "var(--radius-input)" }}>
+      <div className="flex items-center gap-2">
+        <span className="w-1.5 h-1.5 rounded-sm bg-[#4f4b47]" />
+        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#4f4b47]">Email not verified</span>
+      </div>
+      <p className="text-[12px] text-[#76716b] leading-relaxed">
+        Verify your email to ensure you can recover your account and receive important notifications.
+      </p>
       {!sent ? (
-        <button onClick={sendVerification} disabled={sending}
-          className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] hover:text-[#f4efe9] transition-colors disabled:opacity-30">
-          {sending ? "Sending…" : "Send verification"}
+        <button
+          onClick={sendVerification}
+          disabled={sending}
+          className="self-start font-mono text-[10px] uppercase tracking-[0.15em] text-[#f4efe9] border border-white/[0.12] px-4 py-2 hover:bg-white/[0.04] transition-colors disabled:opacity-30"
+          style={{ borderRadius: "var(--radius-button)" }}
+        >
+          {sending ? "Sending…" : "Send verification email"}
         </button>
       ) : (
-        <span className="font-mono text-[10px] text-[#76716b]">Check your email</span>
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-sm bg-[#e0743a]/60" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#76716b]">Check your inbox</span>
+        </div>
       )}
     </div>
   )

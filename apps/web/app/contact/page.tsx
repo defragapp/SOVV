@@ -54,6 +54,9 @@ export default function ContactPage() {
               <p className="text-[#a8a29a] text-sm leading-relaxed max-w-xl">
                 For product questions, support, account help, privacy requests, and general inquiries.
               </p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#4f4b47]">
+                Response within 1–2 business days
+              </p>
             </div>
 
             <div className="p-8 md:p-12 space-y-6 border-b border-white/[0.06] bg-[#08070a]">

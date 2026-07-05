@@ -1,13 +1,15 @@
-# Tasks - Sovereign.os Production Hardening
-- [ ] T1-A: Server-authoritative entitlements module
-- [ ] T1-B: Stripe webhook hardening
-- [ ] T1-C: Session cookie cross-subdomain auth
-- [ ] T1-D: Email verification gate
-- [ ] T2-A: KMS encryption for Baseline Design data
-- [ ] T2-B: CI pipeline for API worker deploy
-- [ ] T2-C: Rate limiter hardening
-- [ ] T2-D: Free tier daily limit UI
-- [ ] T3-A: Library persistence and pattern memory
-- [ ] T3-B: Invite system completion
-- [ ] T3-C: Alignment and Covenant space polish
-- [ ] T3-D: API worker smoke tests in CI
+# Tasks - Platform Visual & Completeness Audit
+- [ ] V1: Fix metadata titles - About and Use Cases missing brand suffix
+- [ ] V2: Add metadata to principles, forgot-password, reset-password, verify-email pages
+- [ ] V3: Pricing page - wire Upgrade to Pro CTA to checkout not login
+- [ ] V4: Pricing comparison table - add Free vs Pro column checkmarks
+- [ ] V5: Footer - add Use Cases and Principles to Company column
+- [ ] V6: Auth pages - add ambient light beam to forgot/reset/verify pages
+- [ ] V7: Privacy and Terms - upgrade to structured premium layout
+- [ ] V8: Contact page - add structured contact options
+- [ ] V9: 404 page - polish not-found.tsx
+- [ ] V10: OG metadata - verify all key pages have og:image
+- [ ] V11: Settings page - add email verification status and resend button
+- [ ] V12: Space sidebar - polish free-tier upgrade banner
+- [ ] V13: Defrag workspace - show remaining session count in UI
+- [ ] V14: Nav - add active state indicator for current page

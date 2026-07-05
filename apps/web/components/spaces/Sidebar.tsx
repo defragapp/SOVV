@@ -89,12 +89,24 @@ function SessionCounter() {
               <span className="font-mono text-[8px] text-[#4f4b47]">
                 {usage.used} / {usage.limit} used
               </span>
-              {low ? (
-                <span className="font-mono text-[8px] text-[#4f4b47]">Resets midnight UTC</span>
-              ) : warn ? (
+              {usage.remaining === 0 ? (
+                <Link
+                  href="/pricing"
+                  className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#e0743a]/80 hover:text-[#e0743a] transition-colors"
+                >
+                  Upgrade →
+                </Link>
+              ) : low ? (
                 <Link
                   href="/pricing"
                   className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#e0743a]/60 hover:text-[#e0743a] transition-colors"
+                >
+                  Upgrade →
+                </Link>
+              ) : warn ? (
+                <Link
+                  href="/pricing"
+                  className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
                 >
                   Upgrade →
                 </Link>
