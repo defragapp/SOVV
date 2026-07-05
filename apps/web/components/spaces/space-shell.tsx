@@ -46,12 +46,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
             </Link>
             <span className="text-[#4f4b47] text-xs">/</span>
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#f4efe9]">{spaceName}</span>
-            {typeof window !== "undefined" && window.location.pathname.includes("/workspace") && (
-              <>
-                <span className="text-[#4f4b47] text-xs">/</span>
-                <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#4f4b47]">Workspace</span>
-              </>
-            )}
+
           </div>
 
           {/* Space switcher */}
