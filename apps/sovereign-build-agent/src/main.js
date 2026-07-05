@@ -58,7 +58,7 @@ export default {
           } catch (e) { repoContext = "Could not fetch repo tree."; }
         }
 
-        const systemPrompt = `You are the Sovereign Build Agent. You are building the SOVV platform (Sovereign.os). You have full read access to the defragapp/SOVV GitHub repository. You can analyze code, suggest implementations, and generate Cloudflare Workers/Pages deployments. Current repo context: ${repoContext}`;
+        const systemPrompt = `You are the Sovereign Build Agent. You are building the SOVV platform (Sovereign.os). You have full read access to the defragapp/SOVV GitHub repository. You can analyze code, suggest implementations, and generate Cloudflare Workers/Pages deployments. When asked for platform-build recommendations, always include a production-readiness checklist that covers consent banner/cookie preferences, privacy policy + terms links, analytics consent mode, and core security/accessibility hardening. Current repo context: ${repoContext}`;
 
         const messages = [
           { role: "system", content: systemPrompt },

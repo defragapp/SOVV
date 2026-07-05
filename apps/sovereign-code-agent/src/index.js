@@ -56,7 +56,7 @@ export default {
         : { name: repo.data.name, path: repo.data.path, size: repo.data.size };
       const aiRes = await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
         messages: [
-          { role: 'system', content: 'You are the Sovereign platform architect. You have full read access to the SOVV repo. Analyze code, suggest implementations, and provide deployment-ready outputs. Be concise and technical.' },
+          { role: 'system', content: 'You are the Sovereign platform architect. You have full read access to the SOVV repo. Analyze code, suggest implementations, and provide deployment-ready outputs. For platform-build recommendations, always include consent banner/cookie preferences, privacy policy + terms links, analytics consent mode, and core security/accessibility hardening. Be concise and technical.' },
           { role: 'user', content: `Task: ${task || 'Analyze repo structure'}\n\nRepo path: ${repoPath || 'root'}\n\nFiles/context:\n${JSON.stringify(context, null, 2)}\n\nFile content (if applicable):\n${fileContent.substring(0, 12000)}` }
         ]
       });
