@@ -2,7 +2,10 @@
   "name": "sovv-web",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-06-04",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
   "account_id": "8b1954d216d65077c6480d62583fe2c2",
   "workers_dev": false,
   "assets": {
@@ -16,10 +19,22 @@
     }
   ],
   "routes": [
-    { "pattern": "defrag.app", "custom_domain": true },
-    { "pattern": "www.defrag.app", "custom_domain": true },
-    { "pattern": "app.defrag.app", "custom_domain": true },
-    { "pattern": "sovereign.defrag.app", "custom_domain": true }
+    {
+      "pattern": "defrag.app",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.defrag.app",
+      "custom_domain": true
+    },
+    {
+      "pattern": "app.defrag.app",
+      "custom_domain": true
+    },
+    {
+      "pattern": "sovereign.defrag.app",
+      "custom_domain": true
+    }
   ],
   "vars": {
     "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADhGIF8-iOLIg8MU",
