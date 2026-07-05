@@ -127,6 +127,11 @@ export default function CovenantWorkspacePage() {
           workspace_source: "COVENANT",
         }),
       })
+      if (res.status === 403) {
+        // Pro required for library saves
+        setSaveSuccess(false)
+        return
+      }
       if (!res.ok) throw new Error()
       setSaveSuccess(true)
     } catch { /* silent */ } finally {

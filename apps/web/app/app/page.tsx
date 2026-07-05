@@ -37,6 +37,23 @@ export default function LibraryPage() {
   const [recurringPattern, setRecurringPattern] = React.useState<string | null>(null)
   const [sessionCount, setSessionCount] = React.useState(0)
   const [proGated, setProGated] = React.useState(false)
+  const [checkoutResult, setCheckoutResult] = React.useState<"upgraded" | "canceled" | null>(null)
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get("upgraded") === "1") {
+        setCheckoutResult("upgraded")
+        // Clean URL
+        window.history.replaceState({}, "", "/app")
+        // Reload tier data
+        setTimeout(() => window.location.reload(), 2000)
+      } else if (params.get("canceled") === "1") {
+        setCheckoutResult("canceled")
+        window.history.replaceState({}, "", "/app")
+      }
+    }
+  }, [])
 
   React.useEffect(() => {
     fetch("/api/memory", { credentials: "include" })

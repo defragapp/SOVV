@@ -53,7 +53,11 @@ export default function DefragItemPage() {
 
   React.useEffect(() => {
     fetch(`/api/library/${id}`, { credentials: "include" })
-      .then(r => { if (!r.ok) throw new Error("Not found"); return r.json() })
+      .then(r => {
+        if (r.status === 403) throw new Error("Pro subscription required to access Library.")
+        if (!r.ok) throw new Error("Not found")
+        return r.json()
+      })
       .then(d => {
         if (d.payload) {
           const parsed = typeof d.payload === "string" ? JSON.parse(d.payload) : d.payload
