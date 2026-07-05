@@ -425,7 +425,20 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ authenticated: false })
-    return jsonResponse({ authenticated: true, user })
+    // Include entitlement-resolved tier so AuthGuard doesn't need a separate /api/auth/tier call
+    const { resolveEntitlements } = await import("./entitlements.js")
+    const entitlements = resolveEntitlements(user)
+    return jsonResponse({
+      authenticated: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        tier: entitlements.effectiveTier,
+        subscription_status: user.subscription_status,
+        email_verified: user.email_verified === 1,
+        is_in_grace_period: entitlements.isInGracePeriod,
+      }
+    })
   })
 
   // GET /api/auth/tier
@@ -807,21 +820,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     }
   })
 
-  // GET /api/user/me — current user profile
-  router.get("/api/user/me", async (request: Request) => {
-    const env = getEnv()
-    const user = await getAuthUser(request, env.DB)
-    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
-    const row = await env.DB.prepare("SELECT email_verified FROM users WHERE id = ?").bind(user.id).first() as any
-    return jsonResponse({
-      id: user.id,
-      email: user.email,
-      tier: user.tier || "free",
-      role: user.role || "user",
-      subscription_status: user.subscription_status || "free",
-      email_verified: row?.email_verified === 1,
-    })
-  })
+  // /api/user/me is registered in index.ts (primary registration)
 
   // GET /api/user/usage — session quota for current user
   router.get("/api/user/usage", async (request: Request) => {

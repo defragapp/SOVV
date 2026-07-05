@@ -44,20 +44,16 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
           return
         }
 
-        const session = await res.json() as { user?: { id: string; email: string } }
+        const session = await res.json() as { user?: { id: string; email: string; tier?: string } }
 
         if (!session.user) {
           setAuth({ loading: false, authenticated: false, user: null, tier: "free", hasBaseline: false, subscriptionChecked: false })
           return
         }
 
-        // Fetch tier + baseline in parallel
-        const [tierRes, baselineRes] = await Promise.all([
-          fetch("/api/auth/tier", { method: "GET", credentials: "include" }),
-          fetch("/api/baseline", { method: "GET", credentials: "include" }),
-        ])
-
-        const tierData = tierRes.ok ? await tierRes.json() as { tier: Tier } : { tier: "free" as Tier }
+        // Use tier from session (entitlement-resolved) + fetch baseline in parallel
+        const tierFromSession = (session.user.tier as Tier) || "free"
+        const baselineRes = await fetch("/api/baseline", { method: "GET", credentials: "include" })
 
         let hasBaseline = false
         if (baselineRes.ok) {
@@ -69,7 +65,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
           loading: false,
           authenticated: true,
           user: session.user,
-          tier: tierData.tier,
+          tier: tierFromSession,
           hasBaseline,
           subscriptionChecked: true,
         })

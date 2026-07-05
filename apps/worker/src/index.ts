@@ -273,14 +273,17 @@ router.get("/api/user/usage", async (request: Request) => {
     status: 401, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) }
   });
 
+  const { resolveEntitlements } = await import("./entitlements.js");
+  const entitlements = resolveEntitlements(user);
+  const isPro = entitlements.effectiveTier === "pro";
   const FREE_LIMIT = parseInt(env.FREE_DAILY_LIMIT || "15", 10);
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
   const usageKey = `usage:${user.id}:${today}`;
   const usedStr = await env.KV.get(usageKey);
   const used = usedStr ? parseInt(usedStr, 10) : 0;
-  const isPro = user.tier === "pro" || user.subscription_status === "active";
 
   return new Response(JSON.stringify({
+    tier: entitlements.effectiveTier,
     used,
     limit: isPro ? null : FREE_LIMIT,
     remaining: isPro ? null : Math.max(0, FREE_LIMIT - used),
