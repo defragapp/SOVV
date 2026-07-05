@@ -23,7 +23,7 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
 const FREE_FEATURES = [
   "Baseline Design",
   "Defrag space — full access",
-  "15 sessions per day",
+  "5 sessions per day",
   "Pattern recognition output",
   "Best Next Response",
 ]
@@ -100,7 +100,10 @@ export default function PricingPage() {
               <div className="relative mb-8">
                 <div className="flex items-center justify-between mb-3">
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b]">Pro</p>
-                  <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#e0743a]/80 border border-[#e0743a]/30 px-2 py-0.5" style={{ borderRadius: 4 }}>
+                  <span
+                    className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#e0743a]/80 border border-[#e0743a]/30 px-2 py-0.5"
+                    style={{ borderRadius: "var(--radius-minimal)" }}
+                  >
                     Recommended
                   </span>
                 </div>
@@ -138,70 +141,14 @@ export default function PricingPage() {
           </AnimatedHeading>
 
           <div className="flex flex-col gap-0">
-            {/* Header */}
-            <div className="grid grid-cols-3 pb-4 border-b border-white/[0.08]">
-              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Feature</span>
-              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] text-center">Free</span>
-              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] text-center">Pro</span>
-            </div>
-            {[
-              { feature: "Baseline Design", free: true, pro: true },
-              { feature: "Defrag space", free: true, pro: true },
-              { feature: "Covenant space", free: false, pro: true },
-              { feature: "Alignment space", free: false, pro: true },
-              { feature: "Sessions per day", free: "5", pro: "Unlimited" },
-              { feature: "Save to Library", free: false, pro: true },
-              { feature: "Library history", free: false, pro: true },
-              { feature: "Audio Overview", free: false, pro: true },
-              { feature: "Invite Privately", free: false, pro: true },
-            ].map((row, i) => (
-              <div key={i} className="grid grid-cols-3 py-4 border-b border-white/[0.06] last:border-0 items-center">
-                <span className="text-sm text-[#a8a29a]">{row.feature}</span>
-                <span className="text-center">
-                  {typeof row.free === "boolean"
-                    ? row.free
-                      ? <span className="text-[#e0743a]/60 text-sm">✓</span>
-                      : <span className="text-[#4f4b47] text-sm">—</span>
-                    : <span className="text-sm text-[#a8a29a]">{row.free}</span>
-                  }
-                </span>
-                <span className="text-center">
-                  {typeof row.pro === "boolean"
-                    ? row.pro
-                      ? <span className="text-[#e0743a]/60 text-sm">✓</span>
-                      : <span className="text-[#4f4b47] text-sm">—</span>
-                    : <span className="text-sm text-[#a8a29a]">{row.pro}</span>
-                  }
-                </span>
+            {[...FREE_FEATURES, ...PRO_FEATURES.filter(f => f !== "Everything in Free")].map((feature, i) => (
+              <div key={`${feature}-${i}`} className="flex items-center justify-between py-4 border-b border-white/[0.05] last:border-0">
+                <span className="text-sm text-[#a8a29a]">{feature}</span>
               </div>
             ))}
           </div>
         </Container>
       </section>
-
-      {/* ── FAQ ── */}
-      <section className="w-full py-16 md:py-20 bg-[#08070a] border-t border-white/5">
-        <Container className="max-w-2xl">
-          <MetaLabel>Questions</MetaLabel>
-          <div className="flex flex-col">
-            {[
-              { q: "Can I cancel anytime?", a: "Yes. Cancel from your account settings at any time. Your Pro access continues until the end of the billing period." },
-              { q: "What happens to my Library if I downgrade?", a: "Your saved results are preserved. You won't be able to add new ones on the free plan, but everything you saved stays in your account." },
-              { q: "Is there a free trial for Pro?", a: "Defrag is free with no time limit. If you want to try Covenant or Alignment, upgrade to Pro — you can cancel anytime." },
-              { q: "Do you offer promo codes?", a: "Yes. Enter a promo code at checkout. If you have one, it will be applied before your first charge." },
-            ].map((item, i) => (
-              <details key={i} className="group border-b border-white/[0.08] py-6 cursor-pointer">
-                <summary className="flex items-center justify-between gap-4 text-[#f4efe9] text-base font-normal list-none">
-                  {item.q}
-                  <span className="flex-none text-xl text-[#e0743a] transition-transform duration-300 group-open:rotate-45">+</span>
-                </summary>
-                <p className="mt-3 text-sm text-[#a8a29a] leading-relaxed">{item.a}</p>
-              </details>
-            ))}
-          </div>
-        </Container>
-      </section>
-
     </SiteShell>
   )
 }
