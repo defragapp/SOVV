@@ -393,7 +393,7 @@ export default function AlignmentWorkspacePage() {
               )}
               <Section label="What is actually happening"              value={result.whatIsTrue} />
               <Section label="What is yours to carry"    value={result.whatIsYours} />
-              <Section label="What is not yours to carry"          value={result.whatIsNotYours} />
+              <Section label="What to release"                     value={result.whatIsNotYours} />
               <Section label="The shift"                 value={result.theShift} />
               <Section label="One next step"             value={result.nextStep} />
               <Section label="What to avoid"             value={result.avoid} />

@@ -737,6 +737,11 @@ export default function DefragWorkspacePage() {
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
             <div className="flex items-center gap-3">
             <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">↵ Run · Shift+Enter for new line</span>
+            {input.length > 1500 && (
+              <span className={`font-mono text-[8px] tracking-[0.1em] ${input.length > 1900 ? "text-red-400/70" : "text-[#4f4b47]"}`}>
+                {input.length} / 2000
+              </span>
+            )}
             {limitRemaining !== null && limitRemaining <= 3 && !limitReached && (
               <span className={`font-mono text-[8px] uppercase tracking-[0.1em] ${limitRemaining <= 1 ? "text-[#e0743a]/70" : "text-[#4f4b47]"}`}>
                 {limitRemaining} session{limitRemaining !== 1 ? "s" : ""} left today

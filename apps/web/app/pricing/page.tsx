@@ -1,14 +1,8 @@
-import type { Metadata } from "next"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
 import Link from "next/link"
 import { PricingUpgradeButton } from "@/components/marketing/PricingUpgradeButton"
 import { AnimatedHeading, TextReveal } from "@/components/marketing/animated-elements"
-
-export const metadata: Metadata = {
-  title: "Pricing — Sovereign.os",
-  description: "Start free. Upgrade when you need continuity.",
-}
 
 const APP_URL = "/app/login"
 
@@ -42,6 +36,7 @@ const PRO_FEATURES = [
 ]
 
 export default function PricingPage() {
+  const [annual, setAnnual] = React.useState(false)
   return (
     <SiteShell>
 
@@ -66,19 +61,26 @@ export default function PricingPage() {
         <Container>
           {/* Billing toggle */}
           <div className="flex items-center justify-center gap-4 mb-10">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b]">Monthly</span>
-            <div className="relative">
-              <input type="checkbox" id="billing-toggle" className="sr-only peer" />
-              <label
-                htmlFor="billing-toggle"
-                className="flex w-12 h-6 bg-white/[0.08] border border-white/[0.1] cursor-pointer peer-checked:bg-[#e0743a]/30 peer-checked:border-[#e0743a]/40 transition-all"
-                style={{ borderRadius: 12 }}
-              >
-                <span className="w-4 h-4 m-1 bg-[#76716b] peer-checked:bg-[#e0743a] peer-checked:translate-x-6 transition-all" style={{ borderRadius: "50%" }} />
-              </label>
-            </div>
+            <button
+              onClick={() => setAnnual(false)}
+              className={`font-mono text-[10px] uppercase tracking-[0.2em] transition-colors ${!annual ? "text-[#f4efe9]" : "text-[#4f4b47]"}`}
+            >Monthly</button>
+            <button
+              onClick={() => setAnnual(a => !a)}
+              className="relative w-12 h-6 bg-white/[0.08] border border-white/[0.1] cursor-pointer transition-all"
+              style={{ borderRadius: 12, background: annual ? "rgba(224,116,58,0.2)" : undefined, borderColor: annual ? "rgba(224,116,58,0.3)" : undefined }}
+              aria-label="Toggle billing period"
+            >
+              <span
+                className="absolute top-1 w-4 h-4 transition-all duration-200"
+                style={{ borderRadius: "50%", background: annual ? "rgba(224,116,58,0.9)" : "rgba(118,113,107,0.8)", left: annual ? "calc(100% - 20px)" : "4px" }}
+              />
+            </button>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#76716b]">Annual</span>
+              <button
+                onClick={() => setAnnual(true)}
+                className={`font-mono text-[10px] uppercase tracking-[0.2em] transition-colors ${annual ? "text-[#f4efe9]" : "text-[#4f4b47]"}`}
+              >Annual</button>
               <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#e0743a]/70 border border-[#e0743a]/30 px-1.5 py-0.5" style={{ borderRadius: 3 }}>Save 31%</span>
             </div>
           </div>
@@ -127,10 +129,10 @@ export default function PricingPage() {
                   </span>
                 </div>
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="font-serif text-4xl text-[#f4efe9]">$12</span>
-                  <span className="text-sm text-[#76716b]">/ month</span>
+                  <span className="font-serif text-4xl text-[#f4efe9]">{annual ? "$99" : "$12"}</span>
+                  <span className="text-sm text-[#76716b]">{annual ? "/ year" : "/ month"}</span>
                 </div>
-                <p className="text-[11px] text-[#4f4b47] mb-3">or $99/year (save $45)</p>
+                <p className="text-[11px] text-[#4f4b47] mb-3">{annual ? "Billed annually — save $45" : "or $99/year (save $45)"}</p>
                 <p className="text-sm text-[#a8a29a] leading-relaxed">Defrag + Covenant + Alignment + Library.</p>
                 <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#e0743a]/60 mt-2">7-day free trial included</p>
               </div>
@@ -147,42 +149,6 @@ export default function PricingPage() {
               <PricingUpgradeButton />
             </div>
 
-          </div>
-        </Container>
-      </section>
-
-      {/* ── TESTIMONIALS ── */}
-      <section className="w-full py-16 md:py-20 bg-[#08070a] border-t border-white/[0.04]">
-        <Container className="max-w-3xl">
-          <div className="flex flex-col items-center text-center mb-12">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#4f4b47] mb-4">What people say</span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {
-                quote: "I used it before a hard conversation with my dad. It named the loop I'd been in for years. I didn't say everything I planned to — but what I said landed.",
-                name: "Early user",
-                context: "Defrag",
-              },
-              {
-                quote: "The Baseline Design is the part that surprised me. It's not a personality test. It's more like — it knows how I move before I explain it.",
-                name: "Pro subscriber",
-                context: "Baseline Design",
-              },
-              {
-                quote: "I've tried journaling, therapy, and a lot of apps. This is the first thing that gives me a specific next move instead of just reflecting back what I said.",
-                name: "Pro subscriber",
-                context: "Alignment",
-              },
-            ].map((t, i) => (
-              <div key={i} className="border border-white/[0.06] bg-[#0c0a0d] p-6 flex flex-col gap-4" style={{ borderRadius: "var(--radius-container)" }}>
-                <p className="text-[13px] text-[#a8a29a] leading-relaxed italic flex-1">&ldquo;{t.quote}&rdquo;</p>
-                <div className="flex items-center gap-2 pt-2 border-t border-white/[0.04]">
-                  <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47] border border-white/[0.07] px-2 py-0.5" style={{ borderRadius: 3 }}>{t.context}</span>
-                  <span className="text-[11px] text-[#4f4b47]">{t.name}</span>
-                </div>
-              </div>
-            ))}
           </div>
         </Container>
       </section>
@@ -241,6 +207,38 @@ export default function PricingPage() {
           </div>
         </Container>
       </section>
+      {/* ── FAQ ── */}
+      <section className="w-full py-16 md:py-20 bg-[#08070a] border-t border-white/[0.04]">
+        <Container className="max-w-2xl">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#4f4b47] mb-8">Common questions</p>
+          <div className="flex flex-col gap-0">
+            {[
+              {
+                q: "Can I cancel anytime?",
+                a: "Yes. Cancel from your settings page. Your access continues until the end of the billing period.",
+              },
+              {
+                q: "Is there a free trial?",
+                a: "Yes — 7 days of Pro access when you upgrade. No charge until the trial ends.",
+              },
+              {
+                q: "What happens to my data if I cancel?",
+                a: "Your Baseline Design and Library stay intact on the free plan. You lose access to Covenant, Alignment, and Library saves — but nothing is deleted.",
+              },
+              {
+                q: "Is my data used to train AI?",
+                a: "No. Your inputs, Baseline Design, and results are never used to train any AI model.",
+              },
+            ].map((item, i) => (
+              <div key={i} className="py-5 border-b border-white/[0.05] last:border-0">
+                <p className="text-[14px] text-[#f4efe9] mb-2">{item.q}</p>
+                <p className="text-[13px] text-[#76716b] leading-relaxed">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
     </SiteShell>
   )
 }

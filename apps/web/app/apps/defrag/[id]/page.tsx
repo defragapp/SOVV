@@ -319,7 +319,21 @@ export default function DefragItemPage() {
               onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleUpdate() } }}
             />
             <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
-              <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">Continue the thread</span>
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">Continue the thread</span>
+                {result && !saveUpdateSuccess && (
+                  <button
+                    onClick={handleSaveUpdate}
+                    disabled={isSavingUpdate}
+                    className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] hover:text-[#76716b] transition-colors disabled:opacity-30"
+                  >
+                    {isSavingUpdate ? "Saving…" : "Save to Library"}
+                  </button>
+                )}
+                {saveUpdateSuccess && (
+                  <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#76716b]">Saved ✓</span>
+                )}
+              </div>
               <button
                 onClick={handleUpdate}
                 disabled={!input.trim() || isLoading}

@@ -164,6 +164,13 @@ export default function Sidebar({
     }
   }
 
+  const handleDeletePerson = async (id: string) => {
+    try {
+      await fetch(`/api/people/${id}`, { method: "DELETE", credentials: "include" })
+      setPeople(prev => prev.filter(p => p.id !== id))
+    } catch { /* silent */ }
+  }
+
   const selfList = people.filter((p) => p.relation === "self")
   const peopleList = people.filter((p) => p.relation !== "self")
 
@@ -260,6 +267,7 @@ export default function Sidebar({
                   person={person}
                   isSelected={selectedPerson.id === person.id}
                   onSelect={onSelectPerson}
+                  onDelete={handleDeletePerson}
                 />
               ))}
               {peopleList.map((person) => (
@@ -268,6 +276,7 @@ export default function Sidebar({
                   person={person}
                   isSelected={selectedPerson.id === person.id}
                   onSelect={onSelectPerson}
+                  onDelete={handleDeletePerson}
                 />
               ))}
             </div>
@@ -288,25 +297,38 @@ function PersonRow({
   person,
   isSelected,
   onSelect,
+  onDelete,
 }: {
   person: Person
   isSelected: boolean
   onSelect: (person: Person) => void
+  onDelete?: (id: string) => void
 }) {
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(person)}
-      className={`flex w-full items-center gap-3 px-6 py-2.5 text-left border-l-2 transition-colors duration-150 ${
-        isSelected
-          ? "border-[#f4efe9] text-[#f4efe9] bg-white/[0.04]"
-          : "border-transparent text-[#76716b] hover:text-[#c8c2bc] hover:bg-white/[0.02]"
-      }`}
-    >
-      <span className="truncate font-medium">{person.name}</span>
-      <span className="ml-auto font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">
-        {RELATION_LABELS[person.relation]}
-      </span>
-    </button>
+    <div className="group flex items-center">
+      <button
+        type="button"
+        onClick={() => onSelect(person)}
+        className={`flex flex-1 items-center gap-3 px-6 py-2.5 text-left border-l-2 transition-colors duration-150 ${
+          isSelected
+            ? "border-[#f4efe9] text-[#f4efe9] bg-white/[0.04]"
+            : "border-transparent text-[#76716b] hover:text-[#c8c2bc] hover:bg-white/[0.02]"
+        }`}
+      >
+        <span className="truncate font-medium">{person.name}</span>
+        <span className="ml-auto font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">
+          {RELATION_LABELS[person.relation]}
+        </span>
+      </button>
+      {onDelete && (
+        <button
+          onClick={() => onDelete(person.id)}
+          className="opacity-0 group-hover:opacity-100 px-3 py-2.5 text-[#4f4b47] hover:text-red-400/60 transition-all text-[10px]"
+          title="Remove"
+        >
+          ✕
+        </button>
+      )}
+    </div>
   )
 }
