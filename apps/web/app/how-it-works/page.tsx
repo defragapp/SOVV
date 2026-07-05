@@ -91,7 +91,7 @@ export default function HowItWorksPage() {
                   <div className="flex flex-col items-center shrink-0">
                     <div
                       className="w-10 h-10 flex items-center justify-center border border-white/[0.08] bg-[#0c0a0d]"
-                      style={{ borderRadius: 8 }}
+                      style={{ borderRadius: "var(--radius-button)" }}
                     >
                       <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.2em]">{step.num}</span>
                     </div>
@@ -127,7 +127,6 @@ export default function HowItWorksPage() {
           </Link>
         </Container>
       </section>
-
     </SiteShell>
   )
 }
