@@ -1,27 +1,27 @@
 # Tasks - Full Platform Completion
-- [ ] P1: KMS_SECRET - deploy to live worker
-- [ ] P2: /api/user/me - add email_verified field
-- [ ] P3: patterns.ts - migrate to entitlements system
-- [ ] P4: D1 migration CI step - apply pending migrations
-- [ ] P5: ADMIN_SEED_SECRET - set worker secret
-- [ ] P6: Audio route - verify CF Workers AI TTS binding
-- [ ] P7: Invite result gate - entitlement check on result generation
-- [ ] P8: COOKIE_DOMAIN - verify correct value
-- [ ] P9: Promo code - wire Stripe discount to checkout
-- [ ] P10: Baseline compile - verify end-to-end pipeline
-- [ ] P11: Auth redirect - preserve return URL after login
-- [ ] P12: Library Pro gate UI - clear upgrade prompt
-- [ ] P13: Alignment prefill - verify ?prompt= flow
-- [ ] P14: Covenant scripture chips - null safety
-- [ ] P15: Mobile scroll position preservation in SpaceShell
-- [ ] P16: App shell 404 page
-- [ ] P17: Account deletion - cancel Stripe subscription
-- [ ] P18: Sitemap - add all marketing routes
-- [ ] P19: Welcome email on free registration
-- [ ] P20: ENABLE_MEMORY flag - enable in production
-- [ ] P21: ENABLE_FLOW_SUGGESTION flag - enable in production
-- [ ] P22: Admin panel - verify promo code generation
-- [ ] P23: Hub page - upgrade to premium design
-- [ ] P24: Robots.txt - verify indexing rules
-- [ ] P25: Error boundaries - verify recovery paths
-- [ ] P26: Rate limit headers in API responses
+- [x] P1: KMS_SECRET - deploy to live worker
+- [x] P2: /api/user/me - add email_verified field
+- [x] P3: patterns.ts - migrate to entitlements system
+- [x] P4: D1 migration CI step - apply pending migrations
+- [x] P5: ADMIN_SEED_SECRET - set worker secret
+- [x] P6: Audio route - verify CF Workers AI TTS binding
+- [x] P7: Invite result gate - entitlement check on result generation
+- [x] P8: COOKIE_DOMAIN - verify correct value
+- [x] P9: Promo code - wire Stripe discount to checkout
+- [x] P10: Baseline compile - verify end-to-end pipeline + encrypt dataset
+- [x] P11: Auth redirect - preserve return URL after login
+- [x] P12: Library Pro gate UI - clear upgrade prompt
+- [x] P13: Alignment prefill - verify ?prompt= flow + autorun
+- [x] P14: Covenant scripture chips - null safety
+- [x] P15: Mobile scroll position preservation in SpaceShell
+- [x] P16: App shell 404 page
+- [x] P17: Account deletion - cancel Stripe subscription
+- [x] P18: Sitemap - add all marketing routes
+- [x] P19: Welcome email on free registration
+- [x] P20: ENABLE_MEMORY flag - enable in production
+- [x] P21: ENABLE_FLOW_SUGGESTION flag - enable in production
+- [x] P22: Admin panel - verify promo code generation
+- [x] P23: Hub page - upgrade to premium design
+- [x] P24: Robots.txt - verify indexing rules
+- [x] P25: Error boundaries - verify recovery paths
+- [x] P26: Rate limit headers in API responses

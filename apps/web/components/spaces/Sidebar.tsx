@@ -131,7 +131,7 @@ export default function Sidebar({
   const pathname = usePathname()
 
   useEffect(() => {
-    fetch("/api/auth/people", { credentials: "include" })
+    fetch("/api/people", { credentials: "include" })
       .then((res) => (res.ok ? res.json() : { people: [] }))
       .then((data) => {
         if (data.people?.length) setPeople(data.people)

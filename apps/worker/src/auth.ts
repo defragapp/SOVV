@@ -433,7 +433,16 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ tier: "free", subscription_status: "free" })
-    return jsonResponse({ tier: user.tier, subscription_status: user.subscription_status })
+    // Use entitlements for accurate tier resolution (handles trialing, grace period, manual grants)
+    const { resolveEntitlements } = await import("./entitlements.js")
+    const entitlements = resolveEntitlements(user)
+    return jsonResponse({
+      tier: entitlements.effectiveTier,
+      subscription_status: user.subscription_status,
+      is_active_pro: entitlements.isActivePro,
+      is_in_grace_period: entitlements.isInGracePeriod,
+      is_manual_pro: entitlements.isManualPro,
+    })
   })
 
   // GET /api/auth/subscription — detailed subscription status for payment gating
@@ -441,10 +450,14 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    const { resolveEntitlements } = await import("./entitlements.js")
+    const entitlements = resolveEntitlements(user)
     return jsonResponse({
-      tier: user.tier,
+      tier: entitlements.effectiveTier,
       subscription_status: user.subscription_status,
-      has_active_subscription: user.subscription_status === "active" || user.tier === "pro",
+      has_active_subscription: entitlements.effectiveTier === "pro",
+      is_in_grace_period: entitlements.isInGracePeriod,
+      deny_reason: entitlements.denyReason,
     })
   })
 
