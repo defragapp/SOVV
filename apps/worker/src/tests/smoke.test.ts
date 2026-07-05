@@ -141,6 +141,35 @@ async function runTests() {
     assert(src.includes("resolveEntitlements"), "resolveEntitlements not used in explain");
   });
 
+
+  await test("analytics.ts exports emitMetric and trackAiCall", async () => {
+    const src = readFileSync("src/analytics.ts", "utf8");
+    assert(src.includes("export function emitMetric"), "emitMetric not exported");
+    assert(src.includes("export async function trackAiCall"), "trackAiCall not exported");
+    assert(src.includes("ANALYTICS"), "ANALYTICS binding not used");
+  });
+
+  await test("active-signals.ts traitLines declared before compound signals", async () => {
+    const src = readFileSync("src/active-signals.ts", "utf8");
+    const traitPos = src.indexOf("const traitLines: string[] = []");
+    const compoundPos = src.indexOf("// HD type + Moon sign compound");
+    assert(traitPos > 0, "traitLines declaration not found");
+    assert(compoundPos > 0, "compound signals block not found");
+    assert(traitPos < compoundPos, "traitLines must be declared before compound signals block");
+  });
+
+  await test("safety.ts exports SimpleSafetyEvent interface", async () => {
+    const src = readFileSync("src/safety.ts", "utf8");
+    assert(src.includes("export interface SimpleSafetyEvent"), "SimpleSafetyEvent not exported");
+    assert(src.includes("level:"), "level field missing from SimpleSafetyEvent");
+  });
+
+  await test("auth.ts has stricter KV-based rate limiting for login/register", async () => {
+    const src = readFileSync("src/auth.ts", "utf8");
+    assert(src.includes("checkAuthRateLimit"), "checkAuthRateLimit not defined");
+    assert(src.includes("15 minutes"), "15-minute window not configured");
+  });
+
   console.log("\n✅ All regression tests passed\n");
 }
 

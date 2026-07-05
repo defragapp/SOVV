@@ -7,6 +7,7 @@ import { suggestNextSpace, formatFlowSuggestion } from "./flow.js";
 import { getAuthUser, jsonResponse } from "./auth.js";
 import { checkAiRateLimit } from "./middleware/ai-rate-limit.js";
 import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
+import { emitMetric } from "./analytics.js";
 import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
 import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getCurrentSkySnapshot } from "./baseline-compiler.js";
@@ -387,6 +388,14 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       }).catch(() => {});
     }
   }
+
+  // Emit analytics metric
+  emitMetric(env, "ai_request", {
+    space: "defrag",
+    userId: user.id,
+    success: true,
+    tier: entitlements.effectiveTier,
+  });
 
   return jsonResponse(result, 200, {
     ...getCorsHeaders(req),

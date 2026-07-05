@@ -80,4 +80,8 @@ export interface Env {
   // Set via: wrangler secret put KMS_SECRET
   // Generate with: openssl rand -base64 32
   KMS_SECRET?: string
+
+  // Analytics Engine for custom metrics
+  // Dataset: sovereign-metrics
+  ANALYTICS?: AnalyticsEngineDataset
 }

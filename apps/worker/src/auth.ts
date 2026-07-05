@@ -124,6 +124,7 @@ import type { D1Database } from "@cloudflare/workers-types";
 import { getCorsHeaders } from "./cors.js";
 import { getSessionId } from "./plan.js";
 import { logSafetyEvent } from "./safety.js";
+import { emitMetric } from "./analytics.js";
 
 export function jsonResponse(data: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(data), {
@@ -367,10 +368,12 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         .bind(token, user.id, now + SESSION_TTL * 1000, now + SESSION_TTL * 1000, now)
         .run()
 
+      emitMetric(env, "auth_login", { success: true })
       return jsonResponse({ success: true, token }, 200, {
         "Set-Cookie": sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN),
       })
     } catch (e: any) {
+      emitMetric(env, "auth_failed", { space: "auth" })
       logSafetyEvent({ level: "error", event: "auth_login_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Login failed" }, 500)
     }

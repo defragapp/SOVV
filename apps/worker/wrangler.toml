@@ -61,3 +61,9 @@ destination_address = "info@defrag.app"
 
 [observability]
 enabled = true
+
+# Analytics Engine for custom metrics (AI latency, error rates, entitlement checks)
+# Dataset: sovereign-metrics
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "sovereign-metrics"
