@@ -24,15 +24,16 @@ async function proxyAuth(req: Request, pathParts: string[] = []) {
     body,
   });
 
-  const data = await r.text();
-  const response = new NextResponse(data, {
-    status: r.status,
-    headers: { "content-type": "application/json" },
-  });
-
+  const data = await r.arrayBuffer();
+  const responseHeaders: Record<string, string> = {
+    "content-type": r.headers.get("content-type") || "application/json",
+  };
   const setCookie = r.headers.get("set-cookie");
-  if (setCookie) response.headers.set("set-cookie", setCookie);
-  return response;
+  if (setCookie) responseHeaders["set-cookie"] = setCookie;
+  const contentDisposition = r.headers.get("content-disposition");
+  if (contentDisposition) responseHeaders["content-disposition"] = contentDisposition;
+
+  return new NextResponse(data, { status: r.status, headers: responseHeaders });
 }
 
 export async function GET(req: Request, props: { params: Promise<{ path: string[] }> }) {
