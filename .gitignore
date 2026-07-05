@@ -5,6 +5,8 @@ dist
 tmp
 out-tsc
 *.tsbuildinfo
+.open-next
+apps/web/.open-next
 .expo
 .expo-shared
 
