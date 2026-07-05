@@ -111,7 +111,8 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
 
       const aiResponse = await env.AI.run(
         (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
-        { messages, temperature: 0.3, max_tokens: 900 }
+        { messages, temperature: 0.3, max_tokens: 900 },
+        { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } }
       );
 
       let rawText = (aiResponse as any).response ?? String(aiResponse);
