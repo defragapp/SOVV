@@ -17,6 +17,12 @@
       "service": "sovv-web-production"
     }
   ],
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "web-opennext-cache"
+    }
+  ],
   "routes": [
     {
       "pattern": "defrag.app",
