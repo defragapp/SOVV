@@ -341,7 +341,20 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     return jsonResponse({ id: user.id, email: user.email, tier: user.tier, role: user.role })
   })
 
-    // POST /api/ambassador/promo-codes
+    // POST /api/admin/promo — alias for /api/ambassador/promo-codes (used by admin panel)
+  // POST /api/ambassador/promo-codes
+  router.post("/api/admin/promo", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    if (user.role !== "owner" && user.role !== "admin" && user.role !== "ambassador") {
+      return jsonResponse({ error: "Forbidden" }, 403)
+    }
+    // Delegate to ambassador/promo-codes handler
+    const newReq = new Request(request.url.replace("/api/admin/promo", "/api/ambassador/promo-codes"), request)
+    return router.fetch(newReq, env)
+  })
+
   router.post("/api/ambassador/promo-codes", async (request: Request) => {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
