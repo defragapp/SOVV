@@ -36,6 +36,7 @@ export default function LibraryPage() {
   const [isLoading, setIsLoading] = React.useState(true)
   const [recurringPattern, setRecurringPattern] = React.useState<string | null>(null)
   const [sessionCount, setSessionCount] = React.useState(0)
+  const [proGated, setProGated] = React.useState(false)
 
   React.useEffect(() => {
     fetch("/api/memory", { credentials: "include" })
@@ -49,8 +50,11 @@ export default function LibraryPage() {
 
   React.useEffect(() => {
     fetch("/api/library", { credentials: "include" })
-      .then(r => r.json())
-      .then(d => setItems(d.items || []))
+      .then(r => {
+        if (r.status === 403) { setProGated(true); return { items: [] } }
+        return r.json()
+      })
+      .then(d => setItems((d as any).items || []))
       .catch(() => {})
       .finally(() => setIsLoading(false))
   }, [])
@@ -121,6 +125,17 @@ export default function LibraryPage() {
       {isLoading ? (
         <div className="flex items-center justify-center py-20">
           <span className="w-4 h-4 border border-white/[0.15] border-t-white/40 rounded-full animate-spin" />
+        </div>
+      ) : proGated ? (
+        <div className="border border-[#e0743a]/20 bg-[#e0743a]/[0.03] flex flex-col items-center justify-center py-16 text-center px-8" style={{ borderRadius: "var(--radius-container)" }}>
+          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-4">Pro required</span>
+          <p className="text-[14px] text-[#f4efe9] mb-3">Library requires Pro.</p>
+          <p className="text-[12px] text-[#76716b] leading-relaxed max-w-xs mb-6">
+            Save and return to results from Defrag, Alignment, and Covenant. Upgrade to Pro to unlock your Library.
+          </p>
+          <a href="/pricing" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#f4efe9] bg-[#e0743a]/20 hover:bg-[#e0743a]/30 transition-colors border border-[#e0743a]/30 px-5 py-2.5" style={{ borderRadius: "var(--radius-button)" }}>
+            Upgrade to Pro →
+          </a>
         </div>
       ) : items.length === 0 ? (
         <div className="border border-white/[0.06] bg-white/[0.02] flex flex-col items-center justify-center py-16 text-center px-8" style={{ borderRadius: "var(--radius-container)" }}>

@@ -306,6 +306,10 @@ export default function DefragWorkspacePage() {
           ].filter(Boolean).join(". "),
         }),
       })
+      if (res.status === 403) {
+        const d = await res.json().catch(() => ({})) as any
+        throw new Error(d.error === "subscription_required" ? "Audio Overview requires Pro." : "Access denied.")
+      }
       if (!res.ok) { const d = (await res.json().catch(() => ({}))) as any; throw new Error(d.error || "Failed") }
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)

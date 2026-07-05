@@ -69,7 +69,10 @@ export default function CovenantPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.message || data.error || "Something went wrong.")
+        setError(
+          data.error === "subscription_required" ? "subscription_required" :
+          data.message || data.error || "Something went wrong."
+        )
         return
       }
       setResult(data)
@@ -224,7 +227,18 @@ export default function CovenantPage() {
         )}
 
         {error && (
-          <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">{error}</p>
+          <div className="flex flex-col items-center gap-4 py-8">
+            <p className="text-[13px] text-[#a8a29a] text-center max-w-sm mx-auto leading-relaxed">
+              {error === "subscription_required"
+                ? "Covenant requires a Pro subscription."
+                : error}
+            </p>
+            {error === "subscription_required" && (
+              <a href="/pricing" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#e0743a]/70 hover:text-[#e0743a] transition-colors border border-[#e0743a]/20 px-4 py-2" style={{ borderRadius: "var(--radius-button)" }}>
+                Upgrade to Pro →
+              </a>
+            )}
+          </div>
         )}
 
         <AnimatePresence>

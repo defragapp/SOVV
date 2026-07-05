@@ -161,7 +161,8 @@ export default function Sidebar({
           {navLinks.map((link) => {
             const active =
               pathname === link.href ||
-              (link.href === "/apps/defrag" && pathname === "/app")
+              pathname.startsWith(link.href + "/") ||
+              (link.href === "/apps/defrag" && (pathname === "/app" || pathname?.startsWith("/apps/defrag/")))
             return (
               <Link
                 key={link.href}
