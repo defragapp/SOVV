@@ -136,12 +136,12 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
         try {
           audioResponse = await env.AI.run("@cf/myshell-ai/melotts" as any, {
             text: text,
-          });
+          }, { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } });
         } catch {
           // Final fallback
           audioResponse = await env.AI.run("@cf/deepgram/aura-1" as any, {
             text: text,
-          });
+          }, { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } });
         }
       }
 
