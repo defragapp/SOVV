@@ -87,6 +87,20 @@ export const alignmentEntries = pgTable("alignment_entries", {
 });
 
 // ── Inferred types ────────────────────────────────────────────────────────────
+
+// --- Spaces (Workspaces for collaborative/private data) -------------------
+export const spaces = pgTable("spaces", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  tier: text("tier").notNull().default("defrag"), // 'defrag' | 'pro'
+  entitlements: jsonb("entitlements").notNull().default({}),
+  kmsKeyId: text("kms_key_id"), // KMS-backed encryption key identifier
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export type Space = typeof spaces.$inferSelect;
+export type InsertSpace = typeof spaces.$inferInsert;
 export type User            = typeof users.$inferSelect;
 export type Session         = typeof sessions.$inferSelect;
 export type Baseline        = typeof baselines.$inferSelect;
