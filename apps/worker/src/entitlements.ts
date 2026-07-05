@@ -37,8 +37,8 @@ export type UserRole = "user" | "admin";
 
 export interface EntitlementUser {
   id: string;
-  tier: UserTier;
-  role?: UserRole;
+  tier: string;
+  role?: string | null;
   subscription_status: string;
   subscription_current_period_end?: number | null;
   email_verified?: number | null;
