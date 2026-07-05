@@ -273,7 +273,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         const appUrl = env.APP_URL || "https://app.defrag.app"
         void fetch(`${appUrl}/api/auth/send-verification`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "Cookie": `session=${token}` },
+          headers: { "Content-Type": "application/json", "Cookie": `__sov_session=${token}` },
           body: JSON.stringify({ email }),
         }).catch((error) => {
           logSafetyEvent({
@@ -766,7 +766,15 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   // POST /api/auth/logout
   router.post("/api/auth/logout", async (request: Request) => {
     const env = getEnv()
-    const cookieDomain = env.COOKIE_DOMAIN || undefined
+    // Delete the current session token
+    const token = getSessionToken(request)
+    if (token) {
+      try {
+        await env.DB.prepare("DELETE FROM sessions WHERE token = ?").bind(token).run()
+      } catch (error) {
+        logSafetyEvent({ level: "warn", event: "auth_logout_session_delete_failed", request, error_type: "auth", error })
+      }
+    }
     // Clean up expired sessions opportunistically on logout
     try {
       await env.DB.prepare("DELETE FROM sessions WHERE expires_at < ?")
