@@ -281,7 +281,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     temperature: 0.35,
     max_tokens: 900,
   }, {
-    gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" }
+    gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" }
   });
 
   let rawText = asText((ai as any).response ?? ai);
@@ -302,7 +302,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       messages: retryMessages,
       temperature: 0.2,
       max_tokens: 900,
-    }, { gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" } })
+    }, { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } })
     rawText = asText((retryAi as any).response ?? retryAi)
     validation = validateAndScore(rawText, "defrag")
   }

@@ -232,31 +232,22 @@ export function registerPatternsRoutes(router: any, getEnv: () => Env) {
   router.get("/api/patterns", async (request: Request) => {
     const env = getEnv();
     
-    // Check session via cookies first
+    // Auth via __sov_session cookie
     const user = await getAuthUser(request, env.DB);
+    if (!user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
 
     // Subscription gate for workspace route
     const entitlements = resolveEntitlements(user);
     const subGate = requireEntitlement(entitlements, "canUseLibrary");
     if (subGate) return subGate;
 
-    const cookie = request.headers.get("Cookie") || "";
-    let sessionId = "";
-    const match = cookie.match(/sid=([a-zA-Z0-9_-]+)/);
-    if (match) sessionId = match[1] ?? "";
-
-    if (!sessionId) {
-      const { getAuthUser } = await import("./auth.js");
-      const user = await getAuthUser(request, env.DB);
-      if (user) sessionId = user.id;
-    }
-
-    if (!sessionId) {
-      return new Response(JSON.stringify({ error: "Missing identity scope" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" }
-      });
-    }
+    // Use user.id as the session scope for pattern lookup
+    const sessionId = user.id;
 
     try {
       const activeTracks = await getPatterns(env.DB, sessionId);

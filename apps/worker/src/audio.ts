@@ -130,7 +130,7 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
       try {
         audioResponse = await env.AI.run("@cf/deepgram/aura-2-en" as any, {
           text: text,
-        });
+        }, { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } });
       } catch {
         // Fallback to melotts if aura-2-en is unavailable
         try {
