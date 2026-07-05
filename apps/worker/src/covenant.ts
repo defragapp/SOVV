@@ -1,6 +1,6 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
-import { requireActiveSubscription } from "./billing.js";
+import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { checkProLimit } from "./plan.js";
 import { SYSTEM_COVENANT } from "./prompts.js";
@@ -44,7 +44,8 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
     }
 
-    const subGate = await requireActiveSubscription(user, request);
+    const entitlements = resolveEntitlements(user);
+    const subGate = requireEntitlement(entitlements, "canUseCovenant");
     if (subGate) return subGate;
 
     // Per-user Pro daily soft cap (200/day)

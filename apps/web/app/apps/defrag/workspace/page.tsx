@@ -77,6 +77,8 @@ export default function DefragWorkspacePage() {
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
   const [inviteOpen, setInviteOpen] = React.useState(false)
+  const [limitRemaining, setLimitRemaining] = React.useState<number | null>(null)
+  const [limitReached, setLimitReached] = React.useState(false)
 
   const [baseline, setBaseline] = React.useState<Baseline | null>(null)
   const [baselineLoading, setBaselineLoading] = React.useState(true)
@@ -591,24 +593,39 @@ export default function DefragWorkspacePage() {
 
         {/* Error */}
         {error && error !== "needs_baseline" && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
-            <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">
-              {error === "daily_limit_reached" || error.includes("daily limit")
-                ? "You've reached your daily limit. Upgrade to Pro for unlimited sessions."
-                : error.includes("connect") || error.includes("Connection")
-                ? "Connection issue. Check your network and try again."
-                : error.includes("couldn't read") || error.includes("couldn't")
-                ? "The system couldn't read this moment clearly. Try describing it with more specific detail."
-                : error || "Something went wrong. Try again."}
-            </p>
-            {error.includes("daily limit") && (
-              <a
-                href="/pricing"
-                className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]"
-                style={{ borderRadius: "var(--radius-button)" }}
-              >
-                See Pro plans →
-              </a>
+          <div className="flex flex-col items-center justify-center text-center h-full gap-5 px-6">
+            {(error === "daily_limit_reached" || limitReached) ? (
+              <>
+                <div className="flex flex-col items-center gap-3">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60">Daily limit reached</span>
+                  <p className="text-[14px] text-[#f4efe9] leading-relaxed max-w-xs">
+                    You&rsquo;ve used your free sessions for today.
+                  </p>
+                  <p className="text-[12px] text-[#76716b] leading-relaxed max-w-xs">
+                    Free access resets at midnight UTC. Upgrade to Pro for unlimited sessions, Covenant, Alignment, and your Library.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 items-center">
+                  <a
+                    href="/pricing"
+                    className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#f4efe9] bg-[#e0743a]/20 hover:bg-[#e0743a]/30 transition-colors border border-[#e0743a]/30 px-5 py-2.5"
+                    style={{ borderRadius: "var(--radius-button)" }}
+                  >
+                    Upgrade to Pro →
+                  </a>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#4f4b47]">
+                    Resets at midnight UTC
+                  </span>
+                </div>
+              </>
+            ) : (
+              <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">
+                {error.includes("connect") || error.includes("Connection")
+                  ? "Connection issue. Check your network and try again."
+                  : error.includes("couldn't read") || error.includes("couldn't")
+                  ? "The system couldn't read this moment clearly. Try describing it with more specific detail."
+                  : error || "Something went wrong. Try again."}
+              </p>
             )}
           </div>
         )}

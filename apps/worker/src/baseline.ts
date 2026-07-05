@@ -5,6 +5,7 @@ import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import { compileBaselineDataset, formatDatasetForAI, formatDatasetForApp, type BaselineDesignDataset } from "./baseline-compiler.js";
 import { buildHumanBehaviorTranslation } from "./human-translation.js";
 import { logSafetyEvent, protectionActive } from "./safety.js";
+import { kmsEncryptJson, kmsDecryptJson } from "./kms.js";
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const DATASET_KEY  = (sid: string) => `baseline-dataset:${sid}`;
@@ -36,7 +37,8 @@ async function requireSessionAuth(req: Request, env: Env): Promise<Response | nu
 }
 
 export async function getBaseline(env: Env, sid: string): Promise<Baseline | null> {
-  const raw = await env.KV.get(BASELINE_KEY(sid));
+  const rawEnc = await env.KV.get(BASELINE_KEY(sid));
+  const raw = rawEnc ? await kmsDecryptJson(env.KMS_SECRET, rawEnc).then(d => JSON.stringify(d)).catch(() => rawEnc) : null;
   if (!raw) return null;
   return safeJsonParse<Baseline>(raw);
 }
@@ -44,7 +46,8 @@ export async function getBaseline(env: Env, sid: string): Promise<Baseline | nul
 export async function getBaselineDataset(env: Env, sid: string, userId?: string): Promise<BaselineDesignDataset | null> {
   // Try user-ID-based key first (persists across sessions)
   if (userId) {
-    const userRaw = await env.KV.get(USER_DATASET_KEY(userId));
+    const userRawEnc = await env.KV.get(USER_DATASET_KEY(userId));
+    const userRaw = userRawEnc ? await kmsDecryptJson(env.KMS_SECRET, userRawEnc).then(d => JSON.stringify(d)).catch(() => userRawEnc) : null;
     if (userRaw) {
       try { return JSON.parse(userRaw) as BaselineDesignDataset; } catch { /* fall through */ }
     }
@@ -86,7 +89,8 @@ export async function saveBaseline(env: Env, sid: string, baseline: BaselineRequ
     updatedAt: now,
   };
 
-  await env.KV.put(BASELINE_KEY(sid), JSON.stringify(record));
+  const encryptedBaseline = await kmsEncryptJson(env.KMS_SECRET, record);
+  await env.KV.put(BASELINE_KEY(sid), encryptedBaseline);
   await env.KV.put(
     USER_KEY(sid),
     JSON.stringify({ sid, createdAt: record.createdAt, updatedAt: record.updatedAt, baselineAt: record.updatedAt })

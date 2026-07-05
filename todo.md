@@ -1,0 +1,13 @@
+# Tasks - Sovereign.os Production Hardening
+- [ ] T1-A: Server-authoritative entitlements module
+- [ ] T1-B: Stripe webhook hardening
+- [ ] T1-C: Session cookie cross-subdomain auth
+- [ ] T1-D: Email verification gate
+- [ ] T2-A: KMS encryption for Baseline Design data
+- [ ] T2-B: CI pipeline for API worker deploy
+- [ ] T2-C: Rate limiter hardening
+- [ ] T2-D: Free tier daily limit UI
+- [ ] T3-A: Library persistence and pattern memory
+- [ ] T3-B: Invite system completion
+- [ ] T3-C: Alignment and Covenant space polish
+- [ ] T3-D: API worker smoke tests in CI

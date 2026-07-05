@@ -8,6 +8,8 @@ import {
   sendPaymentSucceededEmail,
   sendPaymentFailedEmail,
   sendCancellationEmail,
+  sendTrialEndingEmail,
+  sendPaymentOverdueEmail,
 } from "./email.js";
 import { fetchWithTimeout, withLimitedRetry } from "./runtime-resilience.js";
 
@@ -42,6 +44,13 @@ const InvoiceObjectSchema = z.object({
   billing_reason: z.string().optional(),
   period_end: z.number().int().optional(),
 });
+const SubscriptionTrialSchema = z.object({
+  id: z.string().min(1),
+  customer: z.string().min(1),
+  trial_end: z.number().int().optional(),
+  status: z.string().min(1),
+});
+
 
 function parseStripeSignatureHeader(sigHeader: string): { timestamp: number; v1: string } | null {
   const rawParts = sigHeader.split(",").reduce<Record<string, string>>((acc, part) => {
@@ -571,7 +580,73 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
         }
         break;
       }
-      default:
+      case "customer.subscription.trial_will_end": {
+        // Trial ending in ~3 days — send reminder email
+        const parsed = SubscriptionTrialSchema.safeParse(event.data.object);
+        if (!parsed.success) break;
+        const sub = parsed.data;
+        customerId = sub.customer;
+        billingTransition = "trial_will_end";
+        if (emailOpts.emailBinding || emailOpts.resendApiKey) {
+          const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
+            .bind(sub.customer).first<{ email?: string }>();
+          if (user?.email) {
+            const trialEndDate = sub.trial_end
+              ? new Date(sub.trial_end * 1000).toLocaleDateString("en-US", { month: "long", day: "numeric" })
+              : "soon";
+            await sendTrialEndingEmail(user.email, { ...emailOpts, trialEndDate });
+          }
+        }
+        break;
+      }
+      case "invoice.payment_action_required":
+      case "invoice.upcoming": {
+        // Upcoming invoice or action required — no DB change needed, just log
+        billingTransition = `invoice_event:${event.type}`;
+        break;
+      }
+      case "customer.subscription.paused": {
+        // Subscription paused — treat as past_due for entitlement purposes
+        const parsed = SubscriptionObjectSchema.safeParse(event.data.object);
+        if (!parsed.success) break;
+        customerId = parsed.data.customer;
+        billingTransition = "subscription_status:paused";
+        await env.DB.prepare(
+          "UPDATE users SET subscription_status = 'past_due', subscription_updated_at = ? WHERE stripe_customer_id = ?"
+        ).bind(Date.now(), parsed.data.customer).run();
+        break;
+      }
+      case "customer.subscription.resumed": {
+        // Subscription resumed — restore active
+        const parsed = SubscriptionObjectSchema.safeParse(event.data.object);
+        if (!parsed.success) break;
+        customerId = parsed.data.customer;
+        billingTransition = "subscription_status:active";
+        await env.DB.prepare(
+          "UPDATE users SET subscription_status = 'active', tier = 'pro', subscription_updated_at = ? WHERE stripe_customer_id = ?"
+        ).bind(Date.now(), parsed.data.customer).run();
+        break;
+      }
+      case "payment_intent.payment_failed": {
+        // Payment intent failed — mark past_due and notify
+        const piSchema = z.object({ customer: z.string().min(1).optional() });
+        const parsed = piSchema.safeParse(event.data.object);
+        if (!parsed.success || !parsed.data.customer) break;
+        customerId = parsed.data.customer;
+        billingTransition = "payment_intent_failed";
+        await env.DB.prepare(
+          "UPDATE users SET subscription_status = 'past_due', subscription_updated_at = ? WHERE stripe_customer_id = ?"
+        ).bind(Date.now(), parsed.data.customer).run();
+        if (emailOpts.emailBinding || emailOpts.resendApiKey) {
+          const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
+            .bind(parsed.data.customer).first<{ email?: string }>();
+          if (user?.email) {
+            await sendPaymentOverdueEmail(user.email, emailOpts);
+          }
+        }
+        break;
+      }
+            default:
         break;
     }
 

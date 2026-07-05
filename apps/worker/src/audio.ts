@@ -1,6 +1,6 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
-import { requireActiveSubscription } from "./billing.js";
+import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
 import { validateRequest } from "./middleware/validate-request.js";
 import { RateLimiter, extractRateLimitKey, RATE_LIMIT_PRESETS } from "./middleware/rate-limiter.js";
 import { KVSafetyLogger, createSafetyEvent } from "./middleware/safety-logger.js";
@@ -29,7 +29,8 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
       }
 
       // Subscription gate: Audio Overview requires active Pro subscription
-      const subGate = await requireActiveSubscription(user, request);
+      const entitlements = resolveEntitlements(user);
+      const subGate = requireEntitlement(entitlements, "canUseAudio");
       if (subGate) return subGate;
 
       // ════════════════════════════════════════════════════════════════════════

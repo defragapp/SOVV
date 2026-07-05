@@ -4,8 +4,8 @@ import { getSessionId, cookieHeader } from "./plan";
 import type { Interaction } from "@sovereign/core";
 import { getAuthUser, verifyAccessJWT } from "./auth";
 import { mapInteraction, type InteractionRow } from "./db";
-import { requireActiveSubscription } from "./billing";
 import { logSafetyEvent } from "./safety.js";
+import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
 
 async function requireSessionAuth(req: Request, env: Env): Promise<Response | null> {
   const user = await getAuthUser(req, env.DB);
@@ -15,20 +15,14 @@ async function requireSessionAuth(req: Request, env: Env): Promise<Response | nu
 
 export async function handleHistory(req: Request, env: Env) {
   const authResponse = await requireSessionAuth(req, env);
-  if (authResponse) {
-    return authResponse;
-  }
+  if (authResponse) return authResponse;
 
   const user = await getAuthUser(req, env.DB);
+  if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
 
-  // Subscription gate for space route
-  const subGate = await requireActiveSubscription(user, req);
-  if (subGate) return subGate;
-
+  // History is available to all authenticated users (free + pro)
   const sid = await getSessionId(req);
-  if (!sid) {
-    return Response.json({ interactions: [] });
-  }
+  if (!sid) return Response.json({ interactions: [] });
 
   const url = new URL(req.url);
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "20", 10), 50);
@@ -42,54 +36,36 @@ export async function handleHistory(req: Request, env: Env) {
     .all<InteractionRow>();
 
     const interactions = (results ?? []).map(mapInteraction);
-
-    return Response.json({ interactions }, {
-      headers: { "set-cookie": cookieHeader(sid) }
-    });
+    return Response.json({ interactions }, { headers: { "set-cookie": cookieHeader(sid) } });
   } catch (e) {
-    logSafetyEvent({
-      level: "error",
-      event: "history_fetch_failed",
-      request: req,
-      error_type: "system",
-      error: e,
-    });
+    logSafetyEvent({ level: "error", event: "history_fetch_failed", request: req, error_type: "system", error: e });
     return Response.json({ interactions: [] });
   }
 }
 
 export async function handleSaveToLibrary(req: Request, env: Env) {
   const user = await getAuthUser(req, env.DB);
-  if (!user) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  if (!user) return new Response("Unauthorized", { status: 401 });
+
+  const entitlements = resolveEntitlements(user);
 
   try {
     const body = await req.json().catch((error) => {
-      logSafetyEvent({
-        level: "warn",
-        event: "library_save_invalid_json",
-        request: req,
-        error_type: "validation",
-        error,
-      });
+      logSafetyEvent({ level: "warn", event: "library_save_invalid_json", request: req, error_type: "validation", error });
       return {};
     }) as any;
     const { title, content, payload, workspace_source } = body;
 
     if (typeof title !== "string" || typeof workspace_source !== "string") {
-       return new Response("Invalid or missing required fields", { status: 400 });
+      return new Response("Invalid or missing required fields", { status: 400 });
     }
     if (!["DEFRAG", "COVENANT", "ALIGNMENT"].includes(workspace_source)) {
-       return new Response("Invalid workspace source", { status: 400 });
+      return new Response("Invalid workspace source", { status: 400 });
     }
 
-    // Covenant and Alignment saves require Pro subscription
-    // Defrag saves are available on free tier
-    if (workspace_source !== "DEFRAG") {
-      const subGate = await requireActiveSubscription(user, req);
-      if (subGate) return subGate;
-    }
+    // Library saves require Pro entitlement
+    const gate = requireEntitlement(entitlements, "canUseLibrary");
+    if (gate) return gate;
 
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
@@ -102,23 +78,18 @@ export async function handleSaveToLibrary(req: Request, env: Env) {
 
     return Response.json({ success: true, id });
   } catch (e) {
-    logSafetyEvent({
-      level: "error",
-      event: "library_save_failed",
-      request: req,
-      error_type: "system",
-      error: e,
-    });
+    logSafetyEvent({ level: "error", event: "library_save_failed", request: req, error_type: "system", error: e });
     return new Response("Internal Server Error", { status: 500 });
   }
 }
 
-
 export async function handleGetLibrary(req: Request, env: Env) {
   const user = await getAuthUser(req, env.DB);
-  if (!user) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  if (!user) return new Response("Unauthorized", { status: 401 });
+
+  const entitlements = resolveEntitlements(user);
+  const gate = requireEntitlement(entitlements, "canUseLibrary");
+  if (gate) return gate;
 
   const url = new URL(req.url);
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "20", 10), 50);
@@ -132,110 +103,70 @@ export async function handleGetLibrary(req: Request, env: Env) {
 
     if (workspaceSource && ["DEFRAG", "COVENANT", "ALIGNMENT"].includes(workspaceSource)) {
       if (searchQuery) {
-        // Filter by space + search title
         query = "SELECT * FROM library WHERE user_id = ? AND workspace_source = ? AND title LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
-        bindings = [user.id, workspaceSource, `%${searchQuery ?? ""}%`, limit, offset];
+        bindings = [user.id, workspaceSource, `%${searchQuery}%`, limit, offset];
       } else {
-        // Filter by space only — uses idx_library_user_id_source index
         query = "SELECT * FROM library WHERE user_id = ? AND workspace_source = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
         bindings = [user.id, workspaceSource, limit, offset];
       }
     } else if (searchQuery) {
-      // Search all spaces
       query = "SELECT * FROM library WHERE user_id = ? AND title LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
-      bindings = [user.id, `%${searchQuery ?? ""}%`, limit, offset];
+      bindings = [user.id, `%${searchQuery}%`, limit, offset];
     } else {
       query = "SELECT * FROM library WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
       bindings = [user.id, limit, offset];
     }
 
     const { results } = await env.DB.prepare(query).bind(...(bindings as any[])).all();
-
     return Response.json({ items: results || [] });
   } catch (e) {
-    logSafetyEvent({
-      level: "error",
-      event: "library_fetch_failed",
-      request: req,
-      error_type: "system",
-      error: e,
-    });
+    logSafetyEvent({ level: "error", event: "library_fetch_failed", request: req, error_type: "system", error: e });
     return Response.json({ items: [] });
   }
 }
 
-
 export async function handleGetLibraryItem(req: Request, env: Env) {
   const user = await getAuthUser(req, env.DB);
-  if (!user) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  if (!user) return new Response("Unauthorized", { status: 401 });
+
+  const entitlements = resolveEntitlements(user);
+  const gate = requireEntitlement(entitlements, "canUseLibrary");
+  if (gate) return gate;
 
   const url = new URL(req.url);
-  const segments = url.pathname.split('/');
-  const id = segments[segments.length - 1]; // /api/library/:id
-
-  if (!id) {
-    return new Response("Missing ID", { status: 400 });
-  }
+  const segments = url.pathname.split("/");
+  const id = segments[segments.length - 1];
+  if (!id) return new Response("Missing ID", { status: 400 });
 
   try {
-    const item = await env.DB.prepare(
-      "SELECT * FROM library WHERE id = ? AND user_id = ?"
-    )
-    .bind(id, user.id)
-    .first();
-
-    if (!item) {
-      return new Response("Not found", { status: 404 });
-    }
-
+    const item = await env.DB.prepare("SELECT * FROM library WHERE id = ? AND user_id = ?").bind(id, user.id).first();
+    if (!item) return new Response("Not found", { status: 404 });
     return Response.json(item);
   } catch (e) {
-    logSafetyEvent({
-      level: "error",
-      event: "library_item_fetch_failed",
-      request: req,
-      error_type: "system",
-      error: e,
-    });
+    logSafetyEvent({ level: "error", event: "library_item_fetch_failed", request: req, error_type: "system", error: e });
     return new Response("Internal error", { status: 500 });
   }
 }
 
 export async function handleDeleteLibraryItem(req: Request, env: Env) {
   const user = await getAuthUser(req, env.DB);
-  if (!user) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  if (!user) return new Response("Unauthorized", { status: 401 });
+
+  const entitlements = resolveEntitlements(user);
+  const gate = requireEntitlement(entitlements, "canUseLibrary");
+  if (gate) return gate;
 
   const url = new URL(req.url);
-  const segments = url.pathname.split('/');
+  const segments = url.pathname.split("/");
   const id = segments[segments.length - 1];
-
-  if (!id) {
-    return new Response("Missing ID", { status: 400 });
-  }
+  if (!id) return new Response("Missing ID", { status: 400 });
 
   try {
-    // Only delete if the item belongs to this user
-    const result = await env.DB.prepare(
-      "DELETE FROM library WHERE id = ? AND user_id = ?"
-    ).bind(id, user.id).run();
-
-    if (result.meta?.changes === 0) {
-      return new Response("Not found", { status: 404 });
-    }
-
+    const result = await env.DB.prepare("DELETE FROM library WHERE id = ? AND user_id = ?").bind(id, user.id).run();
+    if (result.meta?.changes === 0) return new Response("Not found", { status: 404 });
     return Response.json({ success: true });
   } catch (e) {
-    logSafetyEvent({
-      level: "error",
-      event: "library_item_delete_failed",
-      request: req,
-      error_type: "system",
-      error: e,
-    });
+    logSafetyEvent({ level: "error", event: "library_item_delete_failed", request: req, error_type: "system", error: e });
     return new Response("Internal Server Error", { status: 500 });
   }
 }
@@ -254,7 +185,6 @@ export async function handleGetLibraryStats(req: Request, env: Env) {
       stats[row.workspace_source] = row.count;
       stats.total += row.count;
     }
-
     return Response.json({ stats }, { headers: getCorsHeaders(req) });
   } catch (e) {
     return Response.json({ stats: { DEFRAG: 0, COVENANT: 0, ALIGNMENT: 0, total: 0 } }, { headers: getCorsHeaders(req) });
@@ -262,33 +192,10 @@ export async function handleGetLibraryStats(req: Request, env: Env) {
 }
 
 export function registerHistoryRoute(router: any, getEnv: () => Env) {
-  router.get("/api/history", async (req: Request) => {
-    const env = getEnv();
-    return handleHistory(req, env);
-  });
-
-  router.get("/api/library", async (req: Request) => {
-    const env = getEnv();
-    return handleGetLibrary(req, env);
-  });
-
-  router.get("/api/library/:id", async (req: Request) => {
-    const env = getEnv();
-    return handleGetLibraryItem(req, env);
-  });
-
-  router.delete("/api/library/:id", async (req: Request) => {
-    const env = getEnv();
-    return handleDeleteLibraryItem(req, env);
-  });
-
-  router.get("/api/library/stats", async (req: Request) => {
-    const env = getEnv();
-    return handleGetLibraryStats(req, env);
-  });
-
-  router.post("/api/history", async (req: Request) => {
-    const env = getEnv();
-    return handleSaveToLibrary(req, env);
-  });
+  router.get("/api/history", async (req: Request) => handleHistory(req, getEnv()));
+  router.get("/api/library", async (req: Request) => handleGetLibrary(req, getEnv()));
+  router.get("/api/library/:id", async (req: Request) => handleGetLibraryItem(req, getEnv()));
+  router.delete("/api/library/:id", async (req: Request) => handleDeleteLibraryItem(req, getEnv()));
+  router.get("/api/library/stats", async (req: Request) => handleGetLibraryStats(req, getEnv()));
+  router.post("/api/history", async (req: Request) => handleSaveToLibrary(req, getEnv()));
 }

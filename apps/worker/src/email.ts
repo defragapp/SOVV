@@ -270,3 +270,34 @@ export async function sendCancellationEmailLegacy(
 ): Promise<void> {
   await sendCancellationEmail(to, { resendApiKey: apiKey });
 }
+
+export async function sendTrialEndingEmail(
+  to: string,
+  opts: { emailBinding?: any; resendApiKey?: string; trialEndDate?: string }
+): Promise<void> {
+  const dateStr = opts.trialEndDate ?? "soon";
+  const html = `<div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;padding:48px 32px;background:#08070a;color:#f4efe9;"><p style="font-family:monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(244,239,233,0.3);margin-bottom:32px;">Sovereign.os</p><h1 style="font-size:24px;font-weight:300;margin-bottom:16px;">Your trial ends ${dateStr}.</h1><p style="color:rgba(244,239,233,0.6);font-size:14px;line-height:1.7;margin-bottom:24px;">Your Sovereign.os Pro trial is ending. To keep access to Covenant, Alignment, your Library, and all Pro features, your subscription will continue automatically.</p><p style="color:rgba(244,239,233,0.6);font-size:14px;line-height:1.7;margin-bottom:24px;">If you need to update your billing details, visit your account settings.</p><a href="https://app.defrag.app/hub/billing" style="display:inline-block;border:1px solid rgba(244,239,233,0.2);padding:12px 24px;font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#f4efe9;text-decoration:none;margin-bottom:24px;">Manage Billing</a><p style="color:rgba(244,239,233,0.3);font-size:12px;">Questions? Reply to this email.</p></div>`;
+
+  if (opts.resendApiKey) {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${opts.resendApiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: "Sovereign.os <info@defrag.app>", reply_to: "info@defrag.app", to: [to], subject: `Your Sovereign.os trial ends ${dateStr}`, html }),
+    }).catch(() => {});
+  }
+}
+
+export async function sendPaymentOverdueEmail(
+  to: string,
+  opts: { emailBinding?: any; resendApiKey?: string }
+): Promise<void> {
+  const html = `<div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;padding:48px 32px;background:#08070a;color:#f4efe9;"><p style="font-family:monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(244,239,233,0.3);margin-bottom:32px;">Sovereign.os</p><h1 style="font-size:24px;font-weight:300;margin-bottom:16px;">Payment overdue.</h1><p style="color:rgba(244,239,233,0.6);font-size:14px;line-height:1.7;margin-bottom:24px;">Your Sovereign.os subscription payment is overdue. Your Pro access will be suspended if payment is not received. Please update your billing details to continue.</p><a href="https://app.defrag.app/hub/billing" style="display:inline-block;border:1px solid rgba(244,239,233,0.2);padding:12px 24px;font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#f4efe9;text-decoration:none;margin-bottom:24px;">Update Billing</a></div>`;
+
+  if (opts.resendApiKey) {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${opts.resendApiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: "Sovereign.os <info@defrag.app>", reply_to: "info@defrag.app", to: [to], subject: "Action required: Sovereign.os payment overdue", html }),
+    }).catch(() => {});
+  }
+}

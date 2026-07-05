@@ -96,7 +96,10 @@ export default function CovenantWorkspacePage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.message || data.error || "Something went wrong.")
+        setError(
+          data.error === "subscription_required" ? "subscription_required" :
+          data.message || data.error || "Something went wrong."
+        )
         return
       }
       setResult(data)
@@ -314,6 +317,15 @@ export default function CovenantWorkspacePage() {
                 : error.includes("connect")
                 ? "Connection issue. Check your network and try again."
                 : error || "Something went wrong. Try describing the moment differently."}
+            {error === "subscription_required" && (
+              <a
+                href="/pricing"
+                className="mt-3 inline-block font-mono text-[9px] uppercase tracking-[0.14em] text-[#f4efe9] bg-[#e0743a]/20 hover:bg-[#e0743a]/30 transition-colors border border-[#e0743a]/30 px-5 py-2.5"
+                style={{ borderRadius: "var(--radius-button)" }}
+              >
+                Upgrade to Pro →
+              </a>
+            )}
             </p>
         )}
 

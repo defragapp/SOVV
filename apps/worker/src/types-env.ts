@@ -76,4 +76,8 @@ export interface Env {
   ENABLE_FLOW_SUGGESTION?: string
   CF_VERSION_METADATA?: string
   ELEVENLABS_API_KEY?: string
+  // KMS secret for AES-256-GCM encryption of Baseline Design data at rest.
+  // Set via: wrangler secret put KMS_SECRET
+  // Generate with: openssl rand -base64 32
+  KMS_SECRET?: string
 }

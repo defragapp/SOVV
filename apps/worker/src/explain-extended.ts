@@ -5,6 +5,8 @@ import { validateAndScore, buildRetryPrompt, parseAIOutput, checkGuardrails } fr
 import { loadMemoryContext, formatMemoryForPrompt } from "./memory.js"
 import { suggestNextSpace, formatFlowSuggestion } from "./flow.js";
 import { getAuthUser, jsonResponse } from "./auth.js";
+import { checkAiRateLimit } from "./middleware/ai-rate-limit.js";
+import { resolveEntitlements } from "./entitlements.js";
 import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
 import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getCurrentSkySnapshot } from "./baseline-compiler.js";
@@ -151,9 +153,16 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   }
 
   const sid = await getSessionId(req);
+  const entitlements = resolveEntitlements(user);
+  const isPro = entitlements.effectiveTier === "pro";
+
+  // Per-user AI rate limit (per-minute + burst protection)
+  if (env.KV) {
+    const rateLimitResponse = await checkAiRateLimit({ kv: env.KV, request: req, userId: user.id, isPro });
+    if (rateLimitResponse) return rateLimitResponse;
+  }
 
   // Free tier daily usage limit check
-  const isPro = user.subscription_status === "active" || user.tier === "pro";
   if (!isPro) {
     const limit = await checkFreeLimit(env, sid);
     if (!limit.allowed) {

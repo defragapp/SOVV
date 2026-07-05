@@ -77,6 +77,70 @@ async function runTests() {
       "prompt.ts (deprecated) is imported in index.ts");
   });
 
+
+  await test("entitlements.ts exports resolveEntitlements and requireEntitlement", async () => {
+    const src = readFileSync("src/entitlements.ts", "utf8");
+    assert(src.includes("export function resolveEntitlements"), "resolveEntitlements not exported");
+    assert(src.includes("export function requireEntitlement"), "requireEntitlement not exported");
+    assert(src.includes('"trialing"'), "trialing status not handled");
+    assert(src.includes('"past_due"'), "past_due status not handled");
+    assert(src.includes("GRACE_PERIOD_SECONDS"), "grace period not defined");
+    assert(src.includes("email_verified"), "email_verified gate missing");
+  });
+
+  await test("kms.ts exports kmsEncrypt and kmsDecrypt", async () => {
+    const src = readFileSync("src/kms.ts", "utf8");
+    assert(src.includes("export async function kmsEncrypt"), "kmsEncrypt not exported");
+    assert(src.includes("export async function kmsDecrypt"), "kmsDecrypt not exported");
+    assert(src.includes("AES-GCM"), "AES-GCM cipher not used");
+    assert(src.includes("enc:v1:"), "encryption prefix not defined");
+  });
+
+  await test("baseline.ts uses KMS encryption", async () => {
+    const src = readFileSync("src/baseline.ts", "utf8");
+    assert(src.includes("kmsEncryptJson"), "kmsEncryptJson not used in baseline");
+    assert(src.includes("kmsDecryptJson"), "kmsDecryptJson not used in baseline");
+  });
+
+  await test("covenant.ts uses entitlements not requireActiveSubscription", async () => {
+    const src = readFileSync("src/covenant.ts", "utf8");
+    assert(src.includes("resolveEntitlements"), "resolveEntitlements not used in covenant");
+    assert(src.includes("requireEntitlement"), "requireEntitlement not used in covenant");
+    assert(!src.includes("requireActiveSubscription"), "old requireActiveSubscription still in covenant");
+  });
+
+  await test("alignment.ts uses entitlements not requireActiveSubscription", async () => {
+    const src = readFileSync("src/alignment.ts", "utf8");
+    assert(src.includes("resolveEntitlements"), "resolveEntitlements not used in alignment");
+    assert(!src.includes("requireActiveSubscription"), "old requireActiveSubscription still in alignment");
+  });
+
+  await test("billing.ts handles trial_will_end and payment_intent.payment_failed", async () => {
+    const src = readFileSync("src/billing.ts", "utf8");
+    assert(src.includes("customer.subscription.trial_will_end"), "trial_will_end not handled");
+    assert(src.includes("payment_intent.payment_failed"), "payment_intent.payment_failed not handled");
+    assert(src.includes("sendTrialEndingEmail"), "sendTrialEndingEmail not called");
+  });
+
+  await test("auth.ts sessionCookie uses dynamic domain from env", async () => {
+    const src = readFileSync("src/auth.ts", "utf8");
+    assert(src.includes("domainPart"), "dynamic domain not used in sessionCookie");
+    assert(src.includes("email_verified"), "email_verified not in AuthUser type");
+    assert(src.includes("subscription_current_period_end"), "subscription_current_period_end not in getAuthUser");
+  });
+
+  await test("middleware/ai-rate-limit.ts exports checkAiRateLimit", async () => {
+    const src = readFileSync("src/middleware/ai-rate-limit.ts", "utf8");
+    assert(src.includes("export async function checkAiRateLimit"), "checkAiRateLimit not exported");
+    assert(src.includes("burst"), "burst protection not implemented");
+  });
+
+  await test("explain-extended.ts uses per-user AI rate limiting", async () => {
+    const src = readFileSync("src/explain-extended.ts", "utf8");
+    assert(src.includes("checkAiRateLimit"), "checkAiRateLimit not called in explain");
+    assert(src.includes("resolveEntitlements"), "resolveEntitlements not used in explain");
+  });
+
   console.log("\n✅ All regression tests passed\n");
 }
 

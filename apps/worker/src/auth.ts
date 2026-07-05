@@ -91,20 +91,25 @@ export function sessionCookie(
   maxAge = 7 * 24 * 60 * 60,
   cookieDomainValue?: string,
 ): string {
-  const domain = cookieDomain(cookieDomainValue)
+  // Use env COOKIE_DOMAIN (e.g. "defrag.app") for cross-subdomain auth.
+  // The leading dot makes the cookie valid on all subdomains.
+  const domain = cookieDomain(cookieDomainValue) ?? "defrag.app"
+  const domainPart = domain.startsWith(".") ? domain : `.${domain}`
   return [
     `__sov_session=${token}`,
     `Max-Age=${maxAge}`,
     "Path=/",
-"Domain=.defrag.app",
+    `Domain=${domainPart}`,
     "HttpOnly",
     "Secure",
     "SameSite=Lax",
   ].join("; ")
 }
 
-export function clearCookie(): string {
-  return "__sov_session=; Max-Age=0; Path=/; Domain=.defrag.app; HttpOnly; Secure; SameSite=Lax"
+export function clearCookie(cookieDomainValue?: string): string {
+  const domain = cookieDomain(cookieDomainValue) ?? "defrag.app"
+  const domainPart = domain.startsWith(".") ? domain : `.${domain}`
+  return `__sov_session=; Max-Age=0; Path=/; Domain=${domainPart}; HttpOnly; Secure; SameSite=Lax`
 }
 
 
@@ -137,6 +142,8 @@ export type AuthUser = {
   role: string
   stripe_customer_id: string | null | undefined
   subscription_status: string
+  subscription_current_period_end?: number | null
+  email_verified: number
 }
 
 export function generatePromoCode(length = 10): string {
@@ -150,7 +157,7 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
   if (!token) return null
 
   const session = await DB.prepare(
-    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
+    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status, COALESCE(u.subscription_current_period_end, 0) as subscription_current_period_end, COALESCE(u.email_verified, 0) as email_verified FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
   )
     .bind(token, Date.now())
     .first<{
@@ -160,6 +167,8 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
       role: string | null
       stripe_customer_id: string | null
       subscription_status: string | null
+      subscription_current_period_end: number | null
+      email_verified: number
     }>()
 
   if (!session) return null
@@ -182,7 +191,9 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
     tier: session.tier,
     role: session.role || "user",
     stripe_customer_id: session.stripe_customer_id,
-    subscription_status: session.subscription_status || "free",
+    subscription_status: session.subscription_status || "free",,
+    subscription_current_period_end: session.subscription_current_period_end ?? null,
+    email_verified: session.email_verified ?? 0,
   }
 }
 
@@ -556,7 +567,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          "Set-Cookie": clearCookie(),
+          "Set-Cookie": clearCookie(env.COOKIE_DOMAIN),
           ...getCorsHeaders(request),
         },
       })
@@ -683,7 +694,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Set-Cookie": clearCookie(),
+        "Set-Cookie": clearCookie(env.COOKIE_DOMAIN),
         ...getCorsHeaders(request),
       },
     })

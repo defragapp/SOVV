@@ -1,6 +1,6 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
-import { requireActiveSubscription } from "./billing.js";
+import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import { SYSTEM_ALIGNMENT, SECURITY_PREFIX } from "./prompts.js";
@@ -228,7 +228,8 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       });
     }
 
-    const subGate = await requireActiveSubscription(user, request);
+    const entitlements = resolveEntitlements(user);
+    const subGate = requireEntitlement(entitlements, "canUseAlignment");
     if (subGate) return subGate;
 
     // Per-user Pro daily soft cap (200/day)
