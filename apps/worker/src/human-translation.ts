@@ -646,7 +646,7 @@ export async function buildHumanBehaviorTranslation(
       aiSucceeded = true
     }
   } catch (err) {
-    console.error("[human-translation] AI error:", err)
+    logSafetyEvent({ level: "error", event: "human_translation_ai_error", error_type: "system", error: err })
   }
 
   // Fallback if AI failed

@@ -44,10 +44,12 @@ export function emitMetric(
     tier?: "free" | "pro"
   } = {}
 ): void {
-  if (!env.ANALYTICS) return
+  // ANALYTICS binding is optional - only active when dataset is created in CF dashboard
+  const analytics = (env as any).ANALYTICS
+  if (!analytics) return
 
   try {
-    env.ANALYTICS.writeDataPoint({
+    analytics.writeDataPoint({
       blobs: [
         event,
         options.space ?? "unknown",

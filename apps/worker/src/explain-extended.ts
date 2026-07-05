@@ -8,6 +8,7 @@ import { getAuthUser, jsonResponse } from "./auth.js";
 import { checkAiRateLimit } from "./middleware/ai-rate-limit.js";
 import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
 import { emitMetric } from "./analytics.js";
+import { logSafetyEvent } from "./safety.js";
 import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
 import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getCurrentSkySnapshot } from "./baseline-compiler.js";
@@ -307,7 +308,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   // Retry once if output is completely empty (no JSON parsed at all)
   if (validation.shouldRetry) {
-    console.warn("[Retry] Defrag output empty — retrying with correction prompt")
+    logSafetyEvent({ level: "warn", event: "defrag_retry", error_type: "system" })
     const retryMessages = [
       { role: "system", content: relational ? SYSTEM_DEFRAG_RELATIONAL : SYSTEM_DEFRAG },
       { role: "user", content: userPrompt },
@@ -327,7 +328,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   // Log guardrail violations
   if (!validation.guardrails.passed) {
-    console.warn("[Guardrail] Defrag violations:", validation.guardrails.violations)
+    logSafetyEvent({ level: "warn", event: "defrag_guardrail_violation", details: { violations: validation.guardrails.violations } })
   }
 
   // Extract confidence score for client
@@ -398,7 +399,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     await env.QUEUE.send({ sessionId: sid, interactionId: interactionId });
   } else {
     // Fallback for local dev or if queue is not configured.
-    console.warn("QUEUE binding not found. Running pattern extraction in a non-blocking way, but this may be unreliable.");
+    logSafetyEvent({ level: "warn", event: "queue_binding_missing", error_type: "system" });
     void extractPatterns(env, sid, interactionId);
 
     // Save pattern to memory for future sessions (non-blocking)

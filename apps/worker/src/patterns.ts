@@ -39,7 +39,7 @@ const PATTERN_SYSTEM_PROMPT = `You are a pattern recognition engine. Analyze the
 }`;
 
 export async function extractPatterns(env: Env, sessionId: string, newInteractionId: string): Promise<void> {
-  console.log(`[Queue] Starting pattern extraction for session: ${sessionId}`);
+  logSafetyEvent({ level: "info", event: "queue_pattern_extraction_start", details: { sessionId } });
   const requestId = newInteractionId;
   const endpoint = "/queue/pattern-extraction";
   const coldStart = getColdStartMarker();
@@ -52,7 +52,7 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
   // 1. Get recent contextual data
   const interactions = await getRecentInteractions(env.DB, sessionId, 15);
   if (interactions.length < 2) {
-    console.log("[Queue] Insufficient interactions to calculate recursive behavior.");
+    logSafetyEvent({ level: "info", event: "queue_pattern_insufficient_data" });
     await recordServiceOutcome(env, { endpoint, requestId, sessionId }, {
       aiExecuted: false,
       responsePath: "fallback",
@@ -87,7 +87,7 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
     : "No persistent behavioral structures logged yet.";
 
   if (!env.AI) {
-    console.error("[Queue] Cloudflare AI binding unavailable.");
+    logSafetyEvent({ level: "error", event: "queue_ai_binding_unavailable", error_type: "system" });
     await recordServiceOutcome(env, { endpoint, requestId, sessionId }, {
       aiExecuted: false,
       responsePath: "fallback",
@@ -182,7 +182,7 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
         coldStart,
       },
     });
-    console.log(`[Queue] Successfully stored ${patterns.length} isolated tracks.`);
+    logSafetyEvent({ level: "info", event: "queue_patterns_stored", details: { count: patterns.length } });
   } catch (err) {
     console.error("[Queue] Inference pipeline execution failure:", err);
     await recordServiceOutcome(env, { endpoint, requestId, sessionId }, {
