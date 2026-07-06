@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { UTMCapture } from "@/components/marketing/UTMCapture";
@@ -52,6 +53,7 @@ const FOOTER_COLS = [
 
 export function SiteShell({ children }: SiteShellProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -99,7 +101,11 @@ export function SiteShell({ children }: SiteShellProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[13px] text-[#76716b] hover:text-[#f4efe9] transition-colors duration-200 tracking-[-0.01em]"
+                className={`text-[13px] transition-colors duration-200 tracking-[-0.01em] ${
+                  pathname === link.href || (link.href !== "/" && pathname?.startsWith(link.href))
+                    ? "text-[#f4efe9]"
+                    : "text-[#76716b] hover:text-[#f4efe9]"
+                }`}
               >
                 {link.label}
               </Link>
@@ -206,31 +212,40 @@ export function SiteShell({ children }: SiteShellProps) {
       </div>
 
       {/* ── Footer ─────────────────────────────────────────────── */}
-      <footer role="contentinfo" className="border-t border-white/[0.05] py-16 relative z-10 bg-[#08070a]">
-        <div className="mx-auto max-w-[1280px] px-6 md:px-8">
-          <div className="flex flex-col md:flex-row items-start justify-between gap-10">
+      <footer role="contentinfo" className="relative z-10 bg-[#08070a]">
+        {/* Top divider with gradient fade */}
+        <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.06) 80%, transparent 100%)" }} />
+
+        <div className="mx-auto max-w-[1280px] px-6 md:px-8 py-16 md:py-20">
+          <div className="flex flex-col md:flex-row items-start justify-between gap-12 md:gap-16">
 
             {/* Brand */}
-            <div className="flex flex-col gap-3">
-              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#f4efe9]/50">Sovereign.os</span>
-              <p className="text-[13px] text-[#4f4b47] leading-relaxed max-w-[220px]">
-                Pattern-aware AI for the moments that matter.
+            <div className="flex flex-col gap-4 max-w-[240px]">
+              <Link href="/" className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#f4efe9]/50 hover:text-[#f4efe9]/80 transition-colors duration-300">
+                Sovereign.os
+              </Link>
+              <p className="text-[13px] text-[#4f4b47] leading-relaxed">
+                Pattern-aware AI for the moments that are hard to read while you're inside them.
               </p>
-              <p className="text-[11px] text-[#4f4b47]/60 leading-relaxed max-w-[220px] mt-1">
-                Not a replacement for therapy or professional support.
-              </p>
+              <Link
+                href="/app/login"
+                className="inline-flex items-center gap-2 text-[11px] text-[#e0743a]/50 hover:text-[#e0743a]/80 transition-colors duration-200 mt-1"
+              >
+                <span className="font-mono uppercase tracking-[0.15em]">Enter</span>
+                <svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5h8M5.5 1l3 2.5-3 2.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </Link>
             </div>
 
             {/* Nav columns */}
-            <div className="flex flex-wrap gap-x-16 gap-y-8">
+            <div className="flex flex-wrap gap-x-12 md:gap-x-16 gap-y-8">
               {FOOTER_COLS.map((col) => (
-                <div key={col.label} className="flex flex-col gap-3">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">{col.label}</p>
+                <div key={col.label} className="flex flex-col gap-2.5">
+                  <p className="font-mono text-[8px] uppercase tracking-[0.22em] text-[#4f4b47]/60 mb-1">{col.label}</p>
                   {col.links.map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
-                      className="text-[13px] text-[#4f4b47] hover:text-[#a8a29a] transition-colors duration-200"
+                      className="text-[13px] text-[#4f4b47] hover:text-[#76716b] transition-colors duration-200"
                     >
                       {link.label}
                     </Link>
@@ -240,11 +255,13 @@ export function SiteShell({ children }: SiteShellProps) {
             </div>
           </div>
 
-          <div className="mt-12 pt-6 border-t border-white/[0.04] flex items-center justify-between">
-            <p className="text-[12px] text-[#4f4b47]">© {new Date().getFullYear()} Sovereign.os</p>
-            <Link href="/app/login" className="text-[12px] text-[#4f4b47] hover:text-[#a8a29a] transition-colors duration-200">
-              Enter →
-            </Link>
+          {/* Bottom bar */}
+          <div className="mt-14 pt-6 border-t border-white/[0.04] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <p className="text-[11px] text-[#4f4b47]/60">© {new Date().getFullYear()} Sovereign.os · Not a replacement for therapy or professional support.</p>
+            <div className="flex items-center gap-4">
+              <Link href="/privacy" className="text-[11px] text-[#4f4b47]/60 hover:text-[#4f4b47] transition-colors">Privacy</Link>
+              <Link href="/terms" className="text-[11px] text-[#4f4b47]/60 hover:text-[#4f4b47] transition-colors">Terms</Link>
+            </div>
           </div>
         </div>
       </footer>

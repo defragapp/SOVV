@@ -735,6 +735,230 @@
 .btn-rect:disabled { opacity: 0.3; cursor: not-allowed; }
 
 
+
+/* ── Premium motion system ──────────────────────────────────────────────── */
+
+/* Breathing pulse — for ambient elements that feel alive */
+@keyframes breathe {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%       { opacity: 0.7; transform: scale(1.015); }
+}
+.breathe {
+  animation: breathe 6s ease-in-out infinite;
+}
+
+/* Slow float — for decorative orbs and glows */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%       { transform: translateY(-12px) rotate(0.5deg); }
+  66%       { transform: translateY(6px) rotate(-0.3deg); }
+}
+.float {
+  animation: float 20s ease-in-out infinite;
+}
+.float-slow {
+  animation: float 28s ease-in-out infinite reverse;
+}
+
+/* Shimmer — for loading states and premium surfaces */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.04) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Fade in from below — staggered content reveal */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up {
+  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+.fade-in-up-1 { animation-delay: 0ms; }
+.fade-in-up-2 { animation-delay: 100ms; }
+.fade-in-up-3 { animation-delay: 200ms; }
+.fade-in-up-4 { animation-delay: 300ms; }
+.fade-in-up-5 { animation-delay: 400ms; }
+.fade-in-up-6 { animation-delay: 500ms; }
+
+/* Horizontal line draw — for decorative separators */
+@keyframes drawLine {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.draw-line {
+  transform-origin: left;
+  animation: drawLine 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Glow pulse — for accent elements */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(224,116,58,0.15); }
+  50%       { box-shadow: 0 0 40px rgba(224,116,58,0.30), 0 0 80px rgba(224,116,58,0.10); }
+}
+.glow-pulse {
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+/* Orbit — for decorative ring elements */
+@keyframes orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.orbit-slow {
+  animation: orbit 60s linear infinite;
+}
+.orbit-reverse {
+  animation: orbit 80s linear infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .breathe, .float, .float-slow, .shimmer, .fade-in-up,
+  .draw-line, .glow-pulse, .orbit-slow, .orbit-reverse {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Spatial depth system ────────────────────────────────────────────────── */
+
+/* Deep space background — layered radial gradients for depth */
+.space-bg {
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(224,116,58,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 80% 80%, rgba(200,194,188,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 20% 60%, rgba(224,116,58,0.02) 0%, transparent 50%),
+    #08070a;
+}
+
+/* Elevated surface with depth shadow */
+.surface-elevated {
+  background: rgba(19, 16, 21, 0.9);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.04) inset,
+    0 -1px 0 rgba(0,0,0,0.3) inset,
+    0 24px 48px -12px rgba(0,0,0,0.5),
+    0 4px 16px -4px rgba(0,0,0,0.3);
+}
+
+/* Inset surface — recessed feel */
+.surface-inset {
+  background: rgba(4, 3, 6, 0.6);
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4) inset;
+}
+
+/* Warm accent border — subtle orange glow on border */
+.border-warm {
+  border-color: rgba(224,116,58,0.2);
+  box-shadow: 0 0 0 1px rgba(224,116,58,0.08);
+}
+
+/* ── Open space section dividers ─────────────────────────────────────────── */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.06) 20%,
+    rgba(255,255,255,0.06) 80%,
+    transparent 100%
+  );
+}
+
+/* ── Premium card hover system ───────────────────────────────────────────── */
+.card-hover {
+  transition:
+    transform 400ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 300ms ease,
+    box-shadow 400ms ease,
+    background 300ms ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255,255,255,0.10);
+  box-shadow:
+    0 0 0 1px rgba(224,116,58,0.06),
+    0 20px 60px -20px rgba(0,0,0,0.6),
+    0 4px 16px -4px rgba(0,0,0,0.3);
+}
+
+/* ── Noise texture overlay ───────────────────────────────────────────────── */
+.noise-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+}
+
+/* ── Typography refinements ──────────────────────────────────────────────── */
+.text-display {
+  font-family: var(--font-fraunces), "Times New Roman", serif;
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--text-primary);
+}
+
+.text-display-md {
+  font-family: var(--font-fraunces), "Times New Roman", serif;
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-weight: 300;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--text-primary);
+}
+
+/* Optical balance for large serif text */
+.text-balance-optical {
+  text-wrap: balance;
+  hanging-punctuation: first;
+}
+
+/* ── Skip to main content ────────────────────────────────────────────────── */
+.skip-to-main {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: #f4efe9;
+  color: #08070a;
+  font-size: 0.875rem;
+  border-radius: 0 0 8px 8px;
+  transition: top 200ms ease;
+}
+.skip-to-main:focus {
+  top: 0;
+}
+
+/* ── Glow card hover ─────────────────────────────────────────────────────── */
+.glow-card-hover {
+  transition: background 300ms ease, border-color 300ms ease;
+}
+.glow-card-hover:hover {
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.08);
+}
+
 /* ── iOS Overrides ───────────────────────────────────────────────────────── */
 * {
   -webkit-tap-highlight-color: transparent;
