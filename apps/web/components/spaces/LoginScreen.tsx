@@ -22,6 +22,21 @@ export default function LoginScreen() {
   const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+
+  // Password strength for registration
+  const passwordStrength = React.useMemo(() => {
+    if (!password || mode !== "register") return null
+    let score = 0
+    if (password.length >= 8) score++
+    if (password.length >= 12) score++
+    if (/[A-Z]/.test(password)) score++
+    if (/[0-9]/.test(password)) score++
+    if (/[^A-Za-z0-9]/.test(password)) score++
+    if (score <= 1) return { label: "Weak", color: "#ef4444", width: "20%" }
+    if (score <= 2) return { label: "Fair", color: "#f59e0b", width: "40%" }
+    if (score <= 3) return { label: "Good", color: "#84cc16", width: "65%" }
+    return { label: "Strong", color: "#22c55e", width: "100%" }
+  }, [password, mode])
   const [turnstileToken, setTurnstileToken] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -238,6 +253,21 @@ export default function LoginScreen() {
                   style={{ borderRadius: "var(--radius-input)", fontSize: "16px" }}
                 />
               </div>
+
+              {/* Password strength — only on register */}
+              {mode === "register" && passwordStrength && (
+                <div className="mt-1.5">
+                  <div className="h-0.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-300"
+                      style={{ width: passwordStrength.width, backgroundColor: passwordStrength.color }}
+                    />
+                  </div>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.15em] mt-1" style={{ color: passwordStrength.color }}>
+                    {passwordStrength.label}
+                  </p>
+                </div>
+              )}
 
               {/* Turnstile — only on register */}
               {mode === "register" && (

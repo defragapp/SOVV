@@ -1,6 +1,5 @@
 "use client"
 
-import type { Metadata } from "next"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
 import Link from "next/link"
