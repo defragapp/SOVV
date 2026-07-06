@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   // ── session checking ──
   const sessionId = request.cookies.get('__sov_session')?.value || request.cookies.get('sid')?.value;
   
-  const isAppShell = host === 'app.defrag.app';
+  const isAppShell = host === 'app.defrag.app' || host === 'sovereign.defrag.app';
   const isDefragRoot = host === 'defrag.app' || host === 'www.defrag.app';
   
   const isPublicPath =
@@ -58,7 +58,7 @@ export function middleware(request: NextRequest) {
   res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   res.headers.set('X-Content-Type-Options', 'nosniff');
-  res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.headers.set('Permissions-Policy', 'camera=(), microphone=(self), geolocation=()');
   res.headers.set('Content-Security-Policy',
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; " +
@@ -70,7 +70,7 @@ export function middleware(request: NextRequest) {
     "object-src 'none'; " +
     "base-uri 'self';"
   );
-  res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.headers.set('Permissions-Policy', 'camera=(), microphone=(self), geolocation=()');
   return res;
 }
 
