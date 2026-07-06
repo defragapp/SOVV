@@ -240,6 +240,7 @@ export function selectActiveSignals(
   // Compound signals from multiple frameworks produce stronger behavioral insights
   const gk = dataset.frameworks?.geneKeys
 
+  const traitLines: string[] = []
   // HD type + Moon sign compound
   if (hd?.type && ast?.placements) {
     const moon = ast.placements.find(p => p.body === "Moon")
@@ -278,7 +279,6 @@ export function selectActiveSignals(
   }
 
   // ── Trait lines: human-readable for AI context ────────────────────────────
-  const traitLines: string[] = []
   if (aiData?.derivedTraits?.length) {
     // Select top 3 most relevant traits based on context
     const relevantTraits = aiData.derivedTraits

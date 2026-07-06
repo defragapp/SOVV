@@ -125,6 +125,7 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
   if (authErr) return authErr;
 
   const sid = await getSessionId(req);
+  const user = await getAuthUser(req, env.DB).catch(() => null);
   const body = (await req.json().catch((error) => {
     logSafetyEvent({
       level: "warn",

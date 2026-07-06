@@ -1,4 +1,5 @@
 import type { Env } from "./types-env.js";
+import { protectionActive, logSafetyEvent } from "./safety.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
 import { validateRequest } from "./middleware/validate-request.js";

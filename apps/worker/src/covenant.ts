@@ -2,6 +2,7 @@ import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
+import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import { checkProLimit } from "./plan.js";
 import { SYSTEM_COVENANT } from "./prompts.js";
 import { checkGuardrails } from "./output-validator.js";

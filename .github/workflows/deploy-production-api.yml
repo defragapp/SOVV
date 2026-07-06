@@ -62,7 +62,7 @@ jobs:
 
       - name: Run worker smoke tests
         working-directory: apps/worker
-        run: node --experimental-vm-modules src/tests/smoke.test.ts
+        run: npx tsx src/tests/smoke.test.ts
 
   deploy:
     name: Deploy sovereign-os-api worker

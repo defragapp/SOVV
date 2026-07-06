@@ -43,12 +43,13 @@ export type SafetyEventType =
   | "request_lifecycle";
 
 export type SafetyEvent = {
-  type: SafetyEventType;
-  requestId: string;
-  metadata: Record<string, unknown>;
+  type?: SafetyEventType;
+  requestId?: string;
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown;
 };
 
-export async function logSafetyEvent(envOrEvent: Env | SafetyEvent, event?: SafetyEvent): Promise<void> {
+export async function logSafetyEvent(envOrEvent: Env | SafetyEvent | Record<string, unknown>, event?: SafetyEvent | Record<string, unknown>): Promise<void> {
   // Accept both (env, event) and (event) call signatures
   const env = event ? envOrEvent as Env : null
   const safetyEvent = event ?? envOrEvent as SafetyEvent
@@ -63,48 +64,49 @@ export async function logSafetyEvent(envOrEvent: Env | SafetyEvent, event?: Safe
 
   if (!env.KV) return;
 
-  const key = `safety:audit:${Date.now()}:${event.requestId}:${crypto.randomUUID()}`;
+  const key = `safety:audit:${Date.now()}:${(event as SafetyEvent).requestId ?? "unknown"}:${crypto.randomUUID()}`;
   await env.KV.put(key, JSON.stringify(payload), { expirationTtl: 60 * 60 * 24 * 30 });
 
-  const endpoint = typeof event.metadata.endpoint === "string" ? event.metadata.endpoint : "unknown";
+  const metadata = (event as SafetyEvent).metadata ?? {};
+  const endpoint = typeof metadata.endpoint === "string" ? metadata.endpoint : "unknown";
   const metricKeys: string[] = [];
 
-  if (event.type === "request_lifecycle" && event.metadata.stage === "end") {
+  if ((event as SafetyEvent).type === "request_lifecycle" && metadata.stage === "end") {
     metricKeys.push(`ops:metrics:${endpoint}:requests_processed`);
-    if (event.metadata.aiExecuted === true) {
+    if (metadata.aiExecuted === true) {
       metricKeys.push(`ops:metrics:${endpoint}:ai_calls`);
-      if (typeof event.metadata.aiCalls === "number") {
+      if (typeof metadata.aiCalls === "number") {
         metricKeys.push(`ops:metrics:${endpoint}:downstream_ai_calls`);
       }
     }
-    if (event.metadata.responsePath === "fallback") {
+    if (metadata.responsePath === "fallback") {
       metricKeys.push(`ops:metrics:${endpoint}:fallback_responses`);
     }
-    if (event.metadata.responsePath === "support-response") {
+    if (metadata.responsePath === "support-response") {
       metricKeys.push(`ops:metrics:${endpoint}:support_responses`);
     }
-    if (event.metadata.degradationState === "DEGRADED") {
+    if (metadata.degradationState === "DEGRADED") {
       metricKeys.push(`ops:metrics:${endpoint}:degraded_responses`);
     }
-    if (event.metadata.degradationState === "PROTECTED") {
+    if (metadata.degradationState === "PROTECTED") {
       metricKeys.push(`ops:metrics:${endpoint}:protected_responses`);
     }
-    if (event.metadata.slowRequest === true) {
+    if (metadata.slowRequest === true) {
       metricKeys.push(`ops:metrics:${endpoint}:slow_requests`);
     }
   }
-  if (event.type === "rate_limit_exceeded") {
+  if ((event as SafetyEvent).type === "rate_limit_exceeded") {
     metricKeys.push(`ops:metrics:${endpoint}:rate_limits_triggered`);
   }
-  if (event.type === "validation_error") {
+  if ((event as SafetyEvent).type === "validation_error") {
     metricKeys.push(`ops:metrics:${endpoint}:validation_failures`);
-    if (event.metadata.reason === "drift_detected") {
+    if (metadata.reason === "drift_detected") {
       metricKeys.push(`ops:metrics:${endpoint}:drift_detections`);
     }
   }
-  if (event.type === "system_error") {
+  if ((event as SafetyEvent).type === "system_error") {
     metricKeys.push(`ops:metrics:${endpoint}:system_errors`);
-    if (event.metadata.reason === "drift_detected") {
+    if (metadata.reason === "drift_detected") {
       metricKeys.push(`ops:metrics:${endpoint}:drift_detections`);
     }
   }
