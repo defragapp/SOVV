@@ -49,3 +49,8 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Agent internal files
+.agents/
+artifacts/
+todo.md
