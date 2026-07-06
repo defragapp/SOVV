@@ -799,10 +799,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const limit = baseLimit + bonusSessions
     return jsonResponse({ tier: "free", used, limit, remaining: Math.max(0, limit - used), bonus: bonusSessions })
   })
-}
 
-// POST /api/auth/admin-seed — standalone route registration
-// Called separately from registerAuthRoutes to avoid placement issues
   // ── Email notification preferences ──────────────────────────────────────
   router.post("/api/auth/notifications", async (request: Request) => {
     const env = getEnv();
@@ -840,6 +837,10 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     }
   });
 
+}
+
+// POST /api/auth/admin-seed — standalone route registration
+// Called separately from registerAuthRoutes to avoid placement issues
 
 export function registerAdminSeedRoute(router: any, getEnv: () => any) {
   router.post("/api/auth/admin-seed", async (request: Request) => {
