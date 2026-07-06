@@ -5,6 +5,7 @@ import type { Person, Relation } from "./types"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
+import { StreakBadge } from "@/components/spaces/StreakBadge"
 
 const RELATION_LABELS: Record<Relation, string> = {
   self: "Self",
@@ -196,10 +197,7 @@ export default function Sidebar({
         )}
       </div>
 
-      {/* Session counter — bottom of sidebar */}
-      <div className="shrink-0 border-t border-white/[0.05] pt-4">
-        <SessionCounter />
-      </div>
+      
 
     </div>
   )

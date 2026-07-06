@@ -1,6 +1,7 @@
 "use client"
 import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
+import { SessionOfWeek } from "@/components/spaces/SessionOfWeek"
 import Link from "next/link"
 
 interface LibraryItem {
@@ -96,16 +97,7 @@ export default function LibraryPage() {
 
   const main = (
     <div className="flex flex-col h-full max-w-3xl mx-auto w-full">
-      {/* Header */}
-      <div className="mb-8">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Library</p>
-        <h1 className="font-serif text-[28px] text-[#f4efe9] leading-tight tracking-[-0.02em]">
-          What you've saved.
-        </h1>
-        <p className="text-[13px] text-[#76716b] leading-relaxed mt-2">
-          Results from Defrag, Alignment, and Covenant. Return before the pattern takes over again.
-        </p>
-        {recurringPattern && sessionCount >= 3 && (
+      
           <div className="mt-5 px-4 py-3 border border-white/[0.06] bg-white/[0.02]" style={{ borderRadius: "var(--radius-container)" }}>
             <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">
               Most common pattern · {sessionCount} sessions
