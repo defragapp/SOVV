@@ -11,6 +11,7 @@ import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } fro
 import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
+import { recordActivity } from "./streak.js";
 import { requireActiveSubscription } from "./billing.js";
 import {
   selectActiveSignals,
@@ -375,9 +376,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   } else {
     // Fallback for local dev or if queue is not configured.
     console.warn("QUEUE binding not found. Running pattern extraction in a non-blocking way, but this may be unreliable.");
-    void extractPatterns(env, sid, interactionId);
-
-    // Save pattern to memory for future sessions (non-blocking)
+    
     if (parsed.activePattern) {
       import("./memory.js").then(({ savePatternMemory }) => {
         savePatternMemory(env, user.id, parsed as Record<string, unknown>, "DEFRAG").catch(() => {});
