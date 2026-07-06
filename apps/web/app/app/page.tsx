@@ -1,7 +1,7 @@
 "use client"
 import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
-import { SessionOfWeek } from "@/components/spaces/SessionOfWeek"
+
 import Link from "next/link"
 
 interface LibraryItem {

@@ -5,7 +5,6 @@ import type { Person, Relation } from "./types"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { StreakBadge } from "@/components/spaces/StreakBadge"
 
 const RELATION_LABELS: Record<Relation, string> = {
   self: "Self",

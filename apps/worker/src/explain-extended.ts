@@ -11,7 +11,7 @@ import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } fro
 import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
-import { recordActivity } from "./streak.js";
+
 import { requireActiveSubscription } from "./billing.js";
 import {
   selectActiveSignals,

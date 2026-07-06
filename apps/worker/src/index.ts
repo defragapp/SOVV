@@ -18,7 +18,6 @@ import { registerAuthExtendedRoutes } from "./routes/auth-extended.js";
 import { registerInviteSystemRoutes } from "./routes/invite.js";
 import { sendDay3NurtureEmail, sendDay7NurtureEmail } from "./email.js";
 // ── New feature routes ────────────────────────────────────────────────────────
-import { registerStreakRoute, recordActivity } from "./streak.js";
 import { registerReferralRoutes } from "./referral.js";
 import { registerDefragMessageRoute } from "./defrag-message.js";
 import { registerDefragMultiRoute } from "./defrag-multi.js";
@@ -28,7 +27,7 @@ import { registerCovenantSearchRoute } from "./covenant-search.js";
 import { registerAffiliateRoutes } from "./affiliate.js";
 import { registerAdminCohortsRoute } from "./admin-cohorts.js";
 import { registerAdminRevenueRoute } from "./admin-revenue.js";
-import { registerNotificationRoutes } from "./notifications.js";
+
 
 const router = Router();
 let currentEnv: Env;
@@ -150,7 +149,6 @@ registerAudioRoute(router, getEnv);
 registerDeriveProfileRoutes(router, getEnv);
 registerInviteRoutes(router, getEnv);
 // ── New feature routes ────────────────────────────────────────────────────────
-registerStreakRoute(router, getEnv);
 registerReferralRoutes(router, getEnv);
 registerDefragMessageRoute(router, getEnv);
 registerDefragMultiRoute(router, getEnv);
@@ -160,7 +158,7 @@ registerCovenantSearchRoute(router, getEnv);
 registerAffiliateRoutes(router, getEnv);
 registerAdminCohortsRoute(router, getEnv);
 registerAdminRevenueRoute(router, getEnv);
-registerNotificationRoutes(router, getEnv);
+
 
 // Memory context endpoint — pattern history for UI
 router.get("/api/memory", async (request: Request) => {

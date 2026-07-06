@@ -68,12 +68,6 @@ const CHANGELOG: ChangeEntry[] = [
   },
   {
     date: "2026-07-06",
-    title: "Streak tracking",
-    body: "Consecutive-day usage streaks are now tracked and displayed in the app. Streaks reset at midnight UTC if no session is recorded.",
-    type: "new",
-  },
-  {
-    date: "2026-07-06",
     title: "UTM parameter tracking",
     body: "UTM parameters (source, medium, campaign, term, content) are now captured at signup and stored for attribution analysis.",
     type: "infra",
