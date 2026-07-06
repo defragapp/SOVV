@@ -720,7 +720,7 @@ export async function handlePortal(req: Request, env: Env): Promise<Response> {
           headers: {
             "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
             "Content-Type": "application/x-www-form-urlencoded",
-            "Idempotency-Key": `checkout:${userId}:${planParam}:${withTrial ? "trial" : "notrial"}`,
+            "Idempotency-Key": `portal:${user.id}:${Date.now().toString().slice(0,-3)}`,
           },
           body: params.toString(),
         },

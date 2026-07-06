@@ -882,39 +882,6 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 // POST /api/auth/admin-seed — standalone route registration
 // Called separately from registerAuthRoutes to avoid placement issues
 
-  // GET /api/admin/audit-log — view recent audit events (admin only)
-  router.get("/api/admin/audit-log", async (request: Request) => {
-    const env = getEnv();
-    const user = await getAuthUser(request, env.DB);
-    if (!user || user.role !== "admin") return jsonResponse({ error: "Forbidden" }, 403);
-    const url = new URL(request.url);
-    const limit = Math.min(parseInt(url.searchParams.get("limit") || "50", 10), 200);
-    const rows = await env.DB.prepare(
-      "SELECT * FROM admin_audit_log ORDER BY created_at DESC LIMIT ?"
-    ).bind(limit).all();
-    return jsonResponse({ logs: rows.results ?? [] });
-  });
-
-  // GET /api/admin/stats — platform stats (admin only)
-  router.get("/api/admin/stats", async (request: Request) => {
-    const env = getEnv();
-    const user = await getAuthUser(request, env.DB);
-    if (!user || user.role !== "admin") return jsonResponse({ error: "Forbidden" }, 403);
-    const [users, proUsers, sessions, interactions] = await Promise.all([
-      env.DB.prepare("SELECT COUNT(*) as count FROM users").first<{ count: number }>(),
-      env.DB.prepare("SELECT COUNT(*) as count FROM users WHERE tier = 'pro'").first<{ count: number }>(),
-      env.DB.prepare("SELECT COUNT(*) as count FROM sessions WHERE expires_at > ?").bind(Date.now()).first<{ count: number }>(),
-      env.DB.prepare("SELECT COUNT(*) as count FROM interactions WHERE created_at > ?").bind(Date.now() - 86400000).first<{ count: number }>(),
-    ]);
-    return jsonResponse({
-      total_users: users?.count ?? 0,
-      pro_users: proUsers?.count ?? 0,
-      active_sessions: sessions?.count ?? 0,
-      interactions_24h: interactions?.count ?? 0,
-    });
-  });
-
-
 export function registerAdminSeedRoute(router: any, getEnv: () => any) {
   router.post("/api/auth/admin-seed", async (request: Request) => {
     const env = getEnv()

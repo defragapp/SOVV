@@ -378,7 +378,6 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
     'X-Frame-Options': 'DENY',
     'X-Content-Type-Options': 'nosniff',
-    'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   };
