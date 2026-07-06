@@ -521,5 +521,30 @@ export default {
     } catch (err) {
       console.error("[cron] Session cleanup failed:", err);
     }
+
+    // D1 backup — export user count snapshot to R2 (lightweight daily audit)
+    try {
+      if (env.TEMPLATES) {
+        const now = new Date().toISOString().slice(0, 10);
+        const [userSnap, sessionSnap, interactionSnap] = await Promise.all([
+          env.DB.prepare("SELECT COUNT(*) as count, SUM(CASE WHEN tier='pro' THEN 1 ELSE 0 END) as pro FROM users").first(),
+          env.DB.prepare("SELECT COUNT(*) as count FROM sessions WHERE expires_at > ?").bind(Date.now()).first(),
+          env.DB.prepare("SELECT COUNT(*) as count FROM interactions WHERE created_at > ?").bind(Date.now() - 86400000).first(),
+        ]);
+        const snapshot = JSON.stringify({
+          date: now,
+          timestamp: new Date().toISOString(),
+          users: userSnap,
+          active_sessions: sessionSnap,
+          interactions_24h: interactionSnap,
+        });
+        await env.TEMPLATES.put(`backups/daily/${now}.json`, snapshot, {
+          httpMetadata: { contentType: "application/json" },
+        });
+        console.log(`[cron] Daily snapshot saved: backups/daily/${now}.json`);
+      }
+    } catch (err) {
+      console.error("[cron] D1 backup failed:", err);
+    }
   },
 } satisfies ExportedHandler<Env>;

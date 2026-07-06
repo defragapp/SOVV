@@ -26,8 +26,21 @@ async function getAdminUser() {
   return res.json()
 }
 
+async function getAdminStats() {
+  try {
+    const cookieStore = await cookies()
+    const cookieHeader = cookieStore.toString()
+    const headers = new Headers()
+    if (cookieHeader) headers.set("cookie", cookieHeader)
+    const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || ""
+    const res = await fetch(`${base}/api/admin/stats`, { headers, cache: "no-store" })
+    if (!res.ok) return null
+    return res.json() as Promise<{ total_users: number; pro_users: number; active_sessions: number; interactions_24h: number }>
+  } catch { return null }
+}
+
 export default async function AdminPage() {
-  const admin = await getAdminUser()
+  const [admin, stats] = await Promise.all([getAdminUser(), getAdminStats()])
 
   if (!admin) {
     return (
@@ -47,6 +60,21 @@ export default async function AdminPage() {
       <div className="mx-auto max-w-3xl px-6 py-24 space-y-10">
         <div className="space-y-4">
           <h1 className="font-serif text-[32px] tracking-[-0.02em]">Admin</h1>
+          {stats && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+              {[
+                { label: "Total users", value: stats.total_users },
+                { label: "Pro users", value: stats.pro_users },
+                { label: "Active sessions", value: stats.active_sessions },
+                { label: "Sessions (24h)", value: stats.interactions_24h },
+              ].map(({ label, value }) => (
+                <div key={label} className="border border-white/[0.08] bg-white/[0.02] p-4 rounded-[var(--radius-container)]">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] mb-1">{label}</p>
+                  <p className="text-2xl text-[#f4efe9] font-light">{value}</p>
+                </div>
+              ))}
+            </div>
+          )}
           <p className="text-sm text-[#a8a29a]">
             Signed in as <span className="text-[#f4efe9]">{admin.email}</span> — role <span className="text-[#f4efe9]">{admin.role}</span>.
           </p>
