@@ -98,16 +98,15 @@ export default function LibraryPage() {
   const main = (
     <div className="flex flex-col h-full max-w-3xl mx-auto w-full">
       {recurringPattern && sessionCount >= 3 && (
-          <div className="mt-5 px-4 py-3 border border-white/[0.06] bg-white/[0.02]" style={{ borderRadius: "var(--radius-container)" }}>
-            <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">
-              Most common pattern · {sessionCount} sessions
-            </p>
-            <p className="text-[12px] text-[#a8a29a] leading-relaxed italic">
-              &ldquo;{recurringPattern.length > 100 ? recurringPattern.slice(0, 100) + "…" : recurringPattern}&rdquo;
-            </p>
-          </div>
-        )}
-      </div>
+        <div className="mt-5 px-4 py-3 border border-white/[0.06] bg-white/[0.02]" style={{ borderRadius: "var(--radius-container)" }}>
+          <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">
+            Most common pattern · {sessionCount} sessions
+          </p>
+          <p className="text-[12px] text-[#a8a29a] leading-relaxed italic">
+            &ldquo;{recurringPattern.length > 100 ? recurringPattern.slice(0, 100) + "…" : recurringPattern}&rdquo;
+          </p>
+        </div>
+      )}
 
       {/* Items */}
       {isLoading ? (
