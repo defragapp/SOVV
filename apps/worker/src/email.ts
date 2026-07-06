@@ -242,6 +242,95 @@ export async function sendCancellationEmail(
   );
 }
 
+
+export async function sendAbandonedCheckoutEmail(
+  to: string,
+  opts: { emailBinding?: SendEmail; resendApiKey?: string },
+): Promise<void> {
+  const html = baseTemplate(`
+    <p class="label">Still thinking?</p>
+    <p style="color:#F6F5F3;font-size:18px;font-weight:300;margin-bottom:24px;">
+      Your Pro access is one step away.
+    </p>
+    <p>You started upgrading to Pro but didn't complete checkout. Covenant, Alignment, your Library, and Audio Overview are waiting.</p>
+    <p style="color:rgba(246,245,243,0.4);">
+      Your Baseline Design is already set. Pro unlocks the full depth of what it can do.
+    </p>
+    <a href="${APP_URL}/pricing" class="cta">Complete Upgrade</a>
+    <p style="margin-top:24px;color:rgba(246,245,243,0.3);font-size:12px;">If you have questions, reach us at <a href="mailto:${SUPPORT}" style="color:rgba(246,245,243,0.4);">${SUPPORT}</a>.</p>
+  `);
+
+  await sendEmail(
+    { to, subject: "Your Pro upgrade is waiting — Sovereign.os", html },
+    opts,
+  );
+}
+
+export async function sendDay3NurtureEmail(
+  to: string,
+  opts: { emailBinding?: SendEmail; resendApiKey?: string },
+): Promise<void> {
+  const html = baseTemplate(`
+    <p class="label">Day 3</p>
+    <p style="color:#F6F5F3;font-size:18px;font-weight:300;margin-bottom:24px;">
+      What patterns are you noticing?
+    </p>
+    <p>Three days in. The Defrag space works best when you bring it the moments that feel stuck — the conversation that didn't land, the decision you keep circling, the dynamic that keeps repeating.</p>
+    <p style="color:rgba(246,245,243,0.4);">
+      Pro unlocks Covenant (values-based clarity), Alignment (timing and readiness), and your full Library of saved sessions.
+    </p>
+    <a href="${APP_URL}" class="cta">Return to your space</a>
+  `);
+
+  await sendEmail(
+    { to, subject: "What are you noticing? — Sovereign.os", html },
+    opts,
+  );
+}
+
+export async function sendDay7NurtureEmail(
+  to: string,
+  opts: { emailBinding?: SendEmail; resendApiKey?: string },
+): Promise<void> {
+  const html = baseTemplate(`
+    <p class="label">Day 7</p>
+    <p style="color:#F6F5F3;font-size:18px;font-weight:300;margin-bottom:24px;">
+      A week of pattern awareness.
+    </p>
+    <p>You've been using Sovereign.os for a week. The patterns you've surfaced in Defrag are the beginning — not the whole picture.</p>
+    <p>Pro gives you Covenant for values-based decisions, Alignment for timing, and a Library that holds your history across sessions.</p>
+    <p style="color:rgba(246,245,243,0.4);">
+      Most people who upgrade do it after a session that hit something real. If that's happened, this is the moment.
+    </p>
+    <a href="${APP_URL}/pricing" class="cta">Upgrade to Pro</a>
+  `);
+
+  await sendEmail(
+    { to, subject: "One week in — Sovereign.os", html },
+    opts,
+  );
+}
+
+export async function sendInviteAcceptedEmail(
+  to: string,
+  inviteeName: string,
+  opts: { emailBinding?: SendEmail; resendApiKey?: string },
+): Promise<void> {
+  const html = baseTemplate(`
+    <p class="label">Invite accepted</p>
+    <p style="color:#F6F5F3;font-size:18px;font-weight:300;margin-bottom:24px;">
+      ${inviteeName} accepted your invite.
+    </p>
+    <p>You've been credited 3 bonus sessions as a thank you for bringing someone into the space.</p>
+    <a href="${APP_URL}" class="cta">Return to your space</a>
+  `);
+
+  await sendEmail(
+    { to, subject: "Your invite was accepted — Sovereign.os", html },
+    opts,
+  );
+}
+
 /**
  * Legacy compatibility shims — these maintain the old (apiKey: string, to: string) signature
  * used by billing.ts callers. Update callers to use the new opts pattern when convenient.

@@ -46,6 +46,10 @@ type = "ratelimit"
 namespace_id = "100"
 simple = { limit = 15, period = 60 }
 
+
+[triggers]
+crons = ["0 10 * * *"]  # Daily at 10am UTC — nurture emails + session cleanup
+
 [vars]
 FREE_DAILY_LIMIT = "15"
 AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"

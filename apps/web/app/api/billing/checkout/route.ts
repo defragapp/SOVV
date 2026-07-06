@@ -1,22 +1,20 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server"
 
-export async function POST(req: Request) {
-  const apiBase = process.env.API_BASE || "https://api.defrag.app";
-  const headers = new Headers();
-  const cookie = req.headers.get("cookie");
-  if (cookie) headers.set("cookie", cookie);
+const API = process.env.NEXT_PUBLIC_API_URL ?? "https://api.defrag.app"
 
-  const r = await fetch(`${apiBase}/api/billing/checkout`, {
+export async function POST(req: NextRequest) {
+  const body = await req.text()
+  const res = await fetch(`${API}/api/billing/checkout`, {
     method: "POST",
-    headers,
-  });
-  const data = await r.text();
-  const response = new NextResponse(data, {
-    status: r.status,
-    headers: { "content-type": "application/json" },
-  });
-
-  const setCookie = r.headers.get("set-cookie");
-  if (setCookie) response.headers.set("set-cookie", setCookie);
-  return response;
+    headers: {
+      "content-type": "application/json",
+      cookie: req.headers.get("cookie") ?? "",
+    },
+    body,
+  })
+  const data = await res.text()
+  return new NextResponse(data, {
+    status: res.status,
+    headers: { "content-type": res.headers.get("content-type") ?? "application/json" },
+  })
 }

@@ -758,7 +758,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
-    const row = await env.DB.prepare("SELECT email_verified FROM users WHERE id = ?").bind(user.id).first() as any
+    const row = await env.DB.prepare("SELECT email_verified, email_notifications FROM users WHERE id = ?").bind(user.id).first() as any
     return jsonResponse({
       id: user.id,
       email: user.email,
@@ -766,6 +766,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       role: user.role || "user",
       subscription_status: user.subscription_status || "free",
       email_verified: row?.email_verified === 1,
+      email_notifications: row?.email_notifications !== 0,
     })
   })
 
@@ -791,13 +792,55 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const key = `usage:${sid}:${today}`
     const raw = await env.KV.get(key)
     const used = raw ? parseInt(raw, 10) : 0
-    const limit = parseInt(env.FREE_DAILY_LIMIT || "5", 10)
-    return jsonResponse({ tier: "free", used, limit, remaining: Math.max(0, limit - used) })
+    const baseLimit = parseInt(env.FREE_DAILY_LIMIT || "5", 10)
+    // Add bonus sessions from referral incentive
+    const bonusRaw = await env.KV.get(`bonus_sessions:${user.id}`)
+    const bonusSessions = bonusRaw ? parseInt(bonusRaw, 10) : 0
+    const limit = baseLimit + bonusSessions
+    return jsonResponse({ tier: "free", used, limit, remaining: Math.max(0, limit - used), bonus: bonusSessions })
   })
 }
 
 // POST /api/auth/admin-seed — standalone route registration
 // Called separately from registerAuthRoutes to avoid placement issues
+  // ── Email notification preferences ──────────────────────────────────────
+  router.post("/api/auth/notifications", async (request: Request) => {
+    const env = getEnv();
+    const user = await getAuthUser(request, env.DB);
+    if (!user) return jsonResponse({ error: "unauthorized" }, 401);
+    const body = await request.json().catch(() => ({})) as Record<string, unknown>;
+    const enabled = body.enabled !== false ? 1 : 0;
+    await env.DB.prepare("UPDATE users SET email_notifications = ? WHERE id = ?")
+      .bind(enabled, user.id).run();
+    return jsonResponse({ ok: true, email_notifications: enabled === 1 });
+  });
+
+  // ── One-click unsubscribe (GET link from email footer) ───────────────────
+  router.get("/api/auth/unsubscribe", async (request: Request) => {
+    const env = getEnv();
+    const url = new URL(request.url);
+    const token = url.searchParams.get("token");
+    if (!token) return new Response("Invalid link", { status: 400 });
+    try {
+      const decoded = atob(token);
+      const [, userId] = decoded.split(":");
+      if (!userId) return new Response("Invalid link", { status: 400 });
+      await env.DB.prepare("UPDATE users SET email_notifications = 0 WHERE id = ?")
+        .bind(userId).run();
+      return new Response(
+        `<!DOCTYPE html><html><body style="font-family:sans-serif;text-align:center;padding:60px;background:#08070a;color:#f4efe9;">
+          <h2>Unsubscribed</h2>
+          <p style="color:#a8a29a;">You've been removed from marketing emails. Transactional emails (password reset, billing) will still be sent.</p>
+          <a href="https://app.defrag.app/settings" style="color:#e0743a;">Manage preferences</a>
+        </body></html>`,
+        { headers: { "content-type": "text/html" } }
+      );
+    } catch {
+      return new Response("Invalid link", { status: 400 });
+    }
+  });
+
+
 export function registerAdminSeedRoute(router: any, getEnv: () => any) {
   router.post("/api/auth/admin-seed", async (request: Request) => {
     const env = getEnv()

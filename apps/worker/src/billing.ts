@@ -8,7 +8,7 @@ import {
   sendPaymentSucceededEmail,
   sendPaymentFailedEmail,
   sendCancellationEmail,
-} from "./email.js";
+, sendAbandonedCheckoutEmail} from "./email.js";
 import { fetchWithTimeout, withLimitedRetry } from "./runtime-resilience.js";
 
 const WEBHOOK_TOLERANCE_SECONDS = 300;
@@ -187,14 +187,28 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
       });
       return errorJson(400, "billing_not_configured", "Checkout is not configured in this environment (STRIPE_SECRET_KEY, STRIPE_PRICE_ID, or APP_URL missing)");
     }
+
+  // Support plan=annual|monthly and trial=1
+  const body = await req.json().catch(() => ({})) as Record<string, unknown>;
+  const planParam = typeof body.plan === "string" ? body.plan : "monthly";
+  const withTrial = body.trial === true;
+  const priceId = planParam === "annual" && env.STRIPE_ANNUAL_PRICE_ID
+    ? env.STRIPE_ANNUAL_PRICE_ID
+    : env.STRIPE_PRICE_ID;
+
   const params = new URLSearchParams();
   params.set("mode", "subscription");
-  params.set("line_items[0][price]", env.STRIPE_PRICE_ID);
+  params.set("line_items[0][price]", priceId);
   params.set("line_items[0][quantity]", "1");
-  params.set("success_url", `${env.APP_URL}/app?upgraded=1`);
+  params.set("success_url", `${env.APP_URL}/app?upgraded=1${withTrial ? "&trial=1" : ""}`);
   params.set("cancel_url", `${env.APP_URL}/app?canceled=1`);
   params.set("client_reference_id", userId);
   params.set("subscription_data[metadata][userId]", userId);
+  params.set("subscription_data[metadata][plan]", planParam);
+  if (withTrial) {
+    params.set("subscription_data[trial_period_days]", "7");
+  }
+  params.set("allow_promotion_codes", "true");
   // Pre-fill email so Stripe checkout doesn't ask for it again
   if (user?.email) {
     params.set("customer_email", user.email);
@@ -569,6 +583,24 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
             }
           }
         }
+        break;
+      }
+      case "checkout.session.expired": {
+        // Abandoned checkout — send recovery email
+        const session = event.data.object as Record<string, unknown>;
+        const customerEmail = typeof session.customer_email === "string" ? session.customer_email : null;
+        const clientRef = typeof session.client_reference_id === "string" ? session.client_reference_id : null;
+        if (customerEmail && emailOpts.resendApiKey) {
+          await sendAbandonedCheckoutEmail(customerEmail, emailOpts).catch(() => {});
+        } else if (clientRef) {
+          const user = await env.DB.prepare("SELECT email FROM users WHERE id = ?")
+            .bind(clientRef)
+            .first<{ email?: string }>();
+          if (user?.email && (emailOpts.emailBinding || emailOpts.resendApiKey)) {
+            await sendAbandonedCheckoutEmail(user.email, emailOpts).catch(() => {});
+          }
+        }
+        billingTransition = "checkout_abandoned";
         break;
       }
       default:

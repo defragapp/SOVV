@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -18,6 +19,7 @@ type LoginMode = "login" | "register"
 
 export default function LoginScreen() {
   const [mode, setMode] = useState<LoginMode>("login")
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [turnstileToken, setTurnstileToken] = useState("")
@@ -106,10 +108,33 @@ export default function LoginScreen() {
         return
       }
       // Check if user has baseline, redirect to settings if not
+      const checkoutParam = searchParams?.get("checkout")
+      const planParam = searchParams?.get("plan") || "monthly"
+      const trialParam = searchParams?.get("trial")
+      const returnParam = searchParams?.get("return")
+
       fetch("/api/baseline", { credentials: "include" })
         .then(r => r.ok ? r.json() : { baseline: null })
-        .then((d: any) => {
-          if (d.baseline?.dob) {
+        .then(async (d: any) => {
+          // If checkout=1, trigger checkout after login
+          if (checkoutParam === "1") {
+            try {
+              const checkoutRes = await fetch("/api/billing/checkout", {
+                method: "POST",
+                credentials: "include",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ plan: planParam, trial: trialParam === "1" }),
+              })
+              const checkoutData = await checkoutRes.json() as { url?: string }
+              if (checkoutData.url) {
+                window.location.href = checkoutData.url
+                return
+              }
+            } catch {}
+          }
+          if (returnParam) {
+            window.location.href = returnParam
+          } else if (d.baseline?.dob) {
             window.location.href = "/apps/defrag"
           } else {
             // New user — go to settings to set up Baseline Design

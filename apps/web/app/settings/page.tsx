@@ -43,6 +43,66 @@ const inputBase =
 
 
 
+
+function NotificationPreferences() {
+  const [enabled, setEnabled] = useState<boolean | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    fetch("/api/user/me", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then((d: any) => {
+        if (d?.email_notifications !== undefined) {
+          setEnabled(d.email_notifications !== 0)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  async function toggle() {
+    if (enabled === null) return
+    const next = !enabled
+    setSaving(true)
+    try {
+      await fetch("/api/auth/notifications", {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ enabled: next }),
+      })
+      setEnabled(next)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch {}
+    setSaving(false)
+  }
+
+  if (enabled === null) return null
+
+  return (
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm text-[#a8a29a]">Marketing emails</p>
+        <p className="text-xs text-[#76716b] mt-0.5">Day 3 and Day 7 follow-up emails for free users</p>
+      </div>
+      <div className="flex items-center gap-3">
+        {saved && <span className="text-xs text-[#e0743a]/70">Saved</span>}
+        <button
+          onClick={toggle}
+          disabled={saving}
+          className="relative w-10 h-5 rounded-full border border-white/10 bg-[#131015] flex items-center px-0.5 transition-colors"
+          aria-label={enabled ? "Disable marketing emails" : "Enable marketing emails"}
+        >
+          <span
+            className={`w-4 h-4 rounded-full transition-transform duration-200 ${enabled ? "translate-x-5 bg-[#e0743a]" : "translate-x-0 bg-[#4f4b47]"}`}
+          />
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function DeleteAccountSection() {
   const [confirming, setConfirming] = React.useState(false)
   const [confirmText, setConfirmText] = React.useState("")
@@ -584,6 +644,12 @@ export default function SettingsPage() {
         <div className="mt-8 pt-6 border-t border-white/[0.06]">
           <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] mb-3">Email</p>
           <EmailVerificationStatus />
+        </div>
+
+        {/* Notification preferences */}
+        <div className="mt-6 pt-6 border-t border-white/[0.06]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] mb-3">Notifications</p>
+          <NotificationPreferences />
         </div>
 
         {/* Active sessions */}

@@ -1,3 +1,4 @@
+import { sendInviteAcceptedEmail } from "./email.js";
 /**
  * invite.ts — Invite Privately loop
  *
@@ -264,6 +265,25 @@ async function handleAcceptInvite(token: string, req: Request, env: Env): Promis
   await env.DB.prepare(
     "UPDATE invites_v2 SET invitee_id = ?, status = 'accepted' WHERE token = ?"
   ).bind(user.id, token).run();
+
+  // Grant inviter 3 bonus sessions (stored in KV, expires in 30 days)
+  const bonusKey = `bonus_sessions:${invite.owner_id}`;
+  const existing = await env.KV.get(bonusKey);
+  const currentBonus = existing ? parseInt(existing, 10) : 0;
+  await env.KV.put(bonusKey, String(currentBonus + 3), { expirationTtl: 60 * 60 * 24 * 30 });
+
+  // Notify inviter by email (non-blocking)
+  const emailOpts = {
+    emailBinding: (env as any).EMAIL as any,
+    resendApiKey: env.RESEND_API_KEY,
+  };
+  if (emailOpts.emailBinding || emailOpts.resendApiKey) {
+    const owner = await env.DB.prepare("SELECT email FROM users WHERE id = ?")
+      .bind(invite.owner_id).first<{ email: string }>();
+    if (owner?.email) {
+      sendInviteAcceptedEmail(owner.email, user.email, emailOpts).catch(() => {});
+    }
+  }
 
   return jsonResponse({ accepted: true, ready_for_result: true, token }, 200);
 }

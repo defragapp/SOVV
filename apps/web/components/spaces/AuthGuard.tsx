@@ -6,6 +6,7 @@ import type { Tier } from "./types"
 import LoginScreen from "./LoginScreen"
 import BaselineEntry from "./BaselineEntry"
 import UpgradeBanner from "./UpgradeBanner"
+import OnboardingModal from "./OnboardingModal"
 
 interface AuthState {
   loading: boolean
@@ -30,6 +31,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     subscriptionChecked: false,
   })
   const [justSetBaseline, setJustSetBaseline] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
   useEffect(() => {
     // Refresh session token on mount (extends session by 7 days)
@@ -73,6 +75,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
           hasBaseline,
           subscriptionChecked: true,
         })
+        if (hasBaseline) setShowOnboarding(true)
       } catch {
         setAuth({ loading: false, authenticated: false, user: null, tier: "free", hasBaseline: false, subscriptionChecked: false })
       }
@@ -114,6 +117,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}
+      <OnboardingModal hasBaseline={auth.hasBaseline} onDismiss={() => setShowOnboarding(false)} />
       {/* First-session hint — shown briefly after Baseline Design is set */}
       {justSetBaseline && (
         <div

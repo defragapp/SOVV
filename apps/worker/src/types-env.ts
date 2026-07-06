@@ -49,6 +49,7 @@ export interface Env {
   STRIPE_PUBLISHABLE_KEY?: string
   STRIPE_WEBHOOK_SECRET?: string
   STRIPE_PRICE_ID?: string
+  STRIPE_ANNUAL_PRICE_ID?: string
   STRIPE_ACCOUNT_ID?: string
   STRIPE_SUPPORT_LINK_URL?: string
 

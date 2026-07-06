@@ -412,4 +412,46 @@ export default {
       }
     }
   },
+
+  async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
+    // Daily nurture email cron — runs at 10am UTC
+    const emailOpts = {
+      emailBinding: (env as any).EMAIL as SendEmail | undefined,
+      resendApiKey: env.RESEND_API_KEY,
+    };
+
+    if (!emailOpts.emailBinding && !emailOpts.resendApiKey) return;
+
+    const now = Date.now();
+    const DAY = 86_400_000;
+
+    // Find free users who registered 3 days ago (±12h window)
+    const day3Min = now - 3 * DAY - 12 * 3_600_000;
+    const day3Max = now - 3 * DAY + 12 * 3_600_000;
+    const day3Users = await env.DB.prepare(
+      "SELECT id, email FROM users WHERE tier = 'free' AND created_at >= ? AND created_at <= ?"
+    ).bind(new Date(day3Min).toISOString(), new Date(day3Max).toISOString()).all<{ id: string; email: string }>();
+
+    for (const user of (day3Users.results ?? [])) {
+      // Check not already sent
+      const sent = await env.KV.get(`nurture:day3:${user.id}`);
+      if (sent) continue;
+      await sendDay3NurtureEmail(user.email, emailOpts).catch(() => {});
+      await env.KV.put(`nurture:day3:${user.id}`, "1", { expirationTtl: 60 * 60 * 24 * 30 });
+    }
+
+    // Find free users who registered 7 days ago (±12h window)
+    const day7Min = now - 7 * DAY - 12 * 3_600_000;
+    const day7Max = now - 7 * DAY + 12 * 3_600_000;
+    const day7Users = await env.DB.prepare(
+      "SELECT id, email FROM users WHERE tier = 'free' AND created_at >= ? AND created_at <= ?"
+    ).bind(new Date(day7Min).toISOString(), new Date(day7Max).toISOString()).all<{ id: string; email: string }>();
+
+    for (const user of (day7Users.results ?? [])) {
+      const sent = await env.KV.get(`nurture:day7:${user.id}`);
+      if (sent) continue;
+      await sendDay7NurtureEmail(user.email, emailOpts).catch(() => {});
+      await env.KV.put(`nurture:day7:${user.id}`, "1", { expirationTtl: 60 * 60 * 24 * 30 });
+    }
+  },
 } satisfies ExportedHandler<Env>;
