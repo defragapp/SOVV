@@ -116,9 +116,6 @@ export default function LaunchPage() {
                     src={s.file}
                     alt={s.label}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none"
-                    }}
                   />
                 </div>
                 <div className="p-4">
