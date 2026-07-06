@@ -210,6 +210,7 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
     params.set("subscription_data[trial_period_days]", "7");
   }
   params.set("allow_promotion_codes", "true");
+  params.set("automatic_tax[enabled]", "true");
   // Pre-fill email so Stripe checkout doesn't ask for it again
   if (user?.email) {
     params.set("customer_email", user.email);

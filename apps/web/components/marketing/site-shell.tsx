@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: "/product", label: "Product" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/pricing", label: "Pricing" },
+  { href: "/blog", label: "Blog" },
   { href: "/about", label: "About" },
 ];
 
@@ -21,6 +22,7 @@ const FOOTER_COLS = [
       { href: "/product", label: "Product" },
       { href: "/how-it-works", label: "How it works" },
       { href: "/pricing", label: "Pricing" },
+      { href: "/blog", label: "Blog" },
       { href: "/about", label: "About" },
       { href: "/faq", label: "FAQ" },
     ],

@@ -1,0 +1,39 @@
+name: Uptime check
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Every 15 minutes
+  workflow_dispatch:
+
+jobs:
+  health:
+    name: Health check
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check API health
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api.defrag.app/health)
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ API health check failed: HTTP $STATUS"
+            exit 1
+          fi
+          echo "✅ API healthy: HTTP $STATUS"
+
+      - name: Check web health
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://defrag.app)
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ Web health check failed: HTTP $STATUS"
+            exit 1
+          fi
+          echo "✅ Web healthy: HTTP $STATUS"
+
+      - name: Check app health
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://app.defrag.app/app/login)
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ App health check failed: HTTP $STATUS"
+            exit 1
+          fi
+          echo "✅ App healthy: HTTP $STATUS"

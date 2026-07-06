@@ -4,6 +4,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://defrag.app"
   const now = new Date()
 
+  const blogPosts = [
+    "what-is-pattern-awareness",
+    "baseline-design-explained",
+    "defrag-vs-journaling",
+  ]
+
   return [
     { url: base, lastModified: now, changeFrequency: "weekly", priority: 1.0 },
     { url: `${base}/campaign/sovereign-os`, lastModified: now, changeFrequency: "weekly", priority: 0.95 },

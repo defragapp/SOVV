@@ -223,6 +223,53 @@ router.get('/health', () => {
   }), { headers: { 'Content-Type': 'application/json' } });
 });
 
+// Detailed health check — checks all subsystems
+router.get('/health/detailed', async (req: Request) => {
+  const env = getEnv();
+  const checks: Record<string, boolean | string> = {};
+  const start = Date.now();
+
+  // D1 database
+  try {
+    await env.DB.prepare('SELECT 1').first();
+    checks.db = true;
+  } catch (e) {
+    checks.db = String(e);
+  }
+
+  // KV store
+  try {
+    await env.KV.put('health:ping', '1', { expirationTtl: 60 });
+    const val = await env.KV.get('health:ping');
+    checks.kv = val === '1';
+  } catch (e) {
+    checks.kv = String(e);
+  }
+
+  // AI binding
+  checks.ai = Boolean((env as any).AI);
+
+  // Stripe config
+  checks.stripe = Boolean(env.STRIPE_SECRET_KEY && env.STRIPE_PRICE_ID);
+
+  // Email config
+  checks.email = Boolean(env.RESEND_API_KEY || (env as any).EMAIL);
+
+  const allOk = Object.values(checks).every(v => v === true);
+  const latency = Date.now() - start;
+
+  return new Response(JSON.stringify({
+    ok: allOk,
+    service: 'sovereign-os-api',
+    timestamp: new Date().toISOString(),
+    latency_ms: latency,
+    checks,
+  }), {
+    status: allOk ? 200 : 503,
+    headers: { 'Content-Type': 'application/json' }
+  });
+});
+
 async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: string; subject: string } ): Promise<void> {
   if (!env.EMAIL) {
     return;

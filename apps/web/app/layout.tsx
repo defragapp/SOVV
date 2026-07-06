@@ -52,6 +52,9 @@ export const metadata: Metadata = {
   authors: [{ name: "Sovereign.os", url: "https://defrag.app" }],
   creator: "Sovereign.os",
   publisher: "Sovereign.os",
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "",
+  },
   robots: {
     index: true,
     follow: true,
@@ -116,6 +119,48 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`antialiased ${jetBrainsMono.variable} ${GeistSans.variable} ${fraunces.variable}`}
     >
       <head>
+        {/* JSON-LD structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": "Sovereign.os",
+              "applicationCategory": "LifestyleApplication",
+              "operatingSystem": "Web",
+              "url": "https://defrag.app",
+              "description": "Pattern-aware AI for the moments that are hard to read while you're inside them.",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Free",
+                  "price": "0",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Pro Monthly",
+                  "price": "20",
+                  "priceCurrency": "USD",
+                  "billingIncrement": "P1M"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Pro Annual",
+                  "price": "99",
+                  "priceCurrency": "USD",
+                  "billingIncrement": "P1Y"
+                }
+              ],
+              "publisher": {
+                "@type": "Organization",
+                "name": "Sovereign.os",
+                "url": "https://defrag.app"
+              }
+            })
+          }}
+        />
         {/* DNS prefetch for external resources */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
