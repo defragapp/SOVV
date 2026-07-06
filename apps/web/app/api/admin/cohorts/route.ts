@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
 
-export const runtime = "edge"
-
 /**
  * GET /api/admin/cohorts
  * Segment users by signup date, tier, and usage. Admin only (enforced at worker).

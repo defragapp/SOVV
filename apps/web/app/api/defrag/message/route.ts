@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
 
-export const runtime = "edge"
-
 /**
  * POST /api/defrag/message
  * Defrag a text message — paste any message, get a pattern read.

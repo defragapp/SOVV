@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
 
-export const runtime = "edge"
-
 /**
  * GET /api/admin/revenue
  * Stripe revenue metrics: MRR, ARR, active subs, trials, churn. Admin only.

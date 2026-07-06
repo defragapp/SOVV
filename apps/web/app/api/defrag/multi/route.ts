@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
 
-export const runtime = "edge"
-
 /**
  * POST /api/defrag/multi
  * Multi-person Defrag — compare patterns across 3+ people simultaneously.

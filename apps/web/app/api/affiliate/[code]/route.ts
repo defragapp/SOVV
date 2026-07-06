@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
 
-export const runtime = "edge"
-
 /**
  * GET /api/affiliate/[code] — validate an affiliate code
  */

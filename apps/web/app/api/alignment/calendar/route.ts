@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
 
-export const runtime = "edge"
-
 /**
  * GET /api/alignment/calendar
  * Fetch upcoming calendar events to suggest Alignment timing.

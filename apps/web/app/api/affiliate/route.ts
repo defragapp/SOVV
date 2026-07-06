@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
 
-export const runtime = "edge"
-
 /**
  * GET  /api/affiliate  — get current user's affiliate info
  * POST /api/affiliate  — register as affiliate partner

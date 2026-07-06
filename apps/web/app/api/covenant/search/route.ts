@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
 
-export const runtime = "edge"
-
 /**
  * GET /api/covenant/search
  * Search scripture by theme (e.g. "forgiveness", "boundaries", "grief").

@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
 
-export const runtime = "edge"
-
 /**
  * POST /api/baseline/update
  * Re-run Baseline Design after major life changes. Preserves history snapshot.
