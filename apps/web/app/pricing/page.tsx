@@ -59,7 +59,7 @@ function CheckIcon({ active }: { active: boolean }) {
 export default function PricingPage() {
   const [annual, setAnnual] = useState(false)
 
-  const monthlyPrice = 12
+  const monthlyPrice = 20
   const annualPrice = 99
   const annualMonthly = Math.round(annualPrice / 12)
   const savings = Math.round(100 - (annualPrice / (monthlyPrice * 12)) * 100)
