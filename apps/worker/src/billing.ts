@@ -8,7 +8,8 @@ import {
   sendPaymentSucceededEmail,
   sendPaymentFailedEmail,
   sendCancellationEmail,
-, sendAbandonedCheckoutEmail} from "./email.js";
+  sendAbandonedCheckoutEmail,
+} from "./email.js";
 import { fetchWithTimeout, withLimitedRetry } from "./runtime-resilience.js";
 
 const WEBHOOK_TOLERANCE_SECONDS = 300;

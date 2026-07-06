@@ -16,6 +16,7 @@ import { registerDeriveProfileRoutes } from "./derive-profile.js";
 import { registerInviteRoutes } from "./invite.js";
 import { registerAuthExtendedRoutes } from "./routes/auth-extended.js";
 import { registerInviteSystemRoutes } from "./routes/invite.js";
+import { sendDay3NurtureEmail, sendDay7NurtureEmail } from "./email.js";
 
 const router = Router();
 let currentEnv: Env;
@@ -416,7 +417,7 @@ export default {
   async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
     // Daily nurture email cron — runs at 10am UTC
     const emailOpts = {
-      emailBinding: (env as any).EMAIL as SendEmail | undefined,
+      emailBinding: (env as any).EMAIL as any,
       resendApiKey: env.RESEND_API_KEY,
     };
 
