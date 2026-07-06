@@ -206,10 +206,10 @@ async function handleAcceptInvite(token: string, req: Request, env: Env): Promis
   const user = await getAuthUser(req, env.DB);
   if (!user) return jsonResponse({ error: "Unauthorized" }, 401);
 
-  let invite: { token: string; owner_id: string; status: string; invitee_id: string | null } | null = null;
+  let invite: { token: string; owner_id: string; status: string; invitee_id: string | null; expires_at?: string | null } | null = null;
   try {
     invite = await env.DB.prepare(
-      "SELECT token, owner_id, status, invitee_id FROM invites_v2 WHERE token = ?"
+      "SELECT token, owner_id, status, invitee_id, expires_at FROM invites_v2 WHERE token = ?"
     ).bind(token).first<{ token: string; owner_id: string; status: string; invitee_id: string | null }>();
   } catch (error) {
     logSafetyEvent({
@@ -240,6 +240,14 @@ async function handleAcceptInvite(token: string, req: Request, env: Env): Promis
   if (!invite) return jsonResponse({ error: "Invite not found" }, 404);
   if (invite.owner_id === user.id) return jsonResponse({ error: "Cannot accept your own invite" }, 400);
   if (invite.status === "completed") return jsonResponse({ error: "Invite already completed" }, 400);
+
+  // Check invite expiry
+  if (invite.expires_at) {
+    const expiresAt = new Date(invite.expires_at).getTime();
+    if (Date.now() > expiresAt) {
+      return jsonResponse({ error: "This invite has expired." }, 410);
+    }
+  }
 
   // Check consent in request body
   const body = await req.json().catch((error) => {
