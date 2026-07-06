@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
-import { useEffect, useRef, useState } from "react"
+import { type FormEvent, useEffect, useMemo, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 declare global {
@@ -24,7 +24,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("")
 
   // Password strength for registration
-  const passwordStrength = React.useMemo(() => {
+  const passwordStrength = useMemo(() => {
     if (!password || mode !== "register") return null
     let score = 0
     if (password.length >= 8) score++
@@ -87,7 +87,7 @@ export default function LoginScreen() {
     }
   }, [mode, turnstileSiteKey])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError("")
     setLoading(true)
