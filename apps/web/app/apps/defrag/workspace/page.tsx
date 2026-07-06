@@ -89,6 +89,8 @@ export default function DefragWorkspacePage() {
   // Compare With Someone — Pro only
   const [compareMode, setCompareMode] = React.useState(false)
   const [compareName, setCompareName] = React.useState("")
+  // Read a message — paste a text message, get a pattern read
+  const [messageMode, setMessageMode] = React.useState(false)
 
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
@@ -185,6 +187,39 @@ export default function DefragWorkspacePage() {
     setAudioError("")
     setResult(null)
     setStreamingText("")  // clear previous stream
+
+    // Message mode — paste a text message, get a pattern read via /api/defrag/message
+    if (messageMode) {
+      try {
+        const res = await fetch("/api/defrag/message", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ message: input }),
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          setError(data.error || "Something went wrong.")
+          return
+        }
+        // Map message result to DefragResult shape for ResultCard
+        setResult({
+          activePattern: data.whatMightBeActive,
+          theRepeat: data.whatTheyMightMean,
+          alignment: data.yourPattern,
+          bestNextResponse: data.bestNextResponse,
+          summary: data.tone,
+          sourcesUsed: { baseline: true, history: false, invitedUsers: false },
+        } as any)
+        setThread(prev => [...prev.slice(-2), { input, result: { activePattern: data.whatMightBeActive } as any }])
+      } catch {
+        setError("Unable to connect. Check your connection and try again.")
+      } finally {
+        setIsLoading(false)
+      }
+      return
+    }
+
     try {
       // Start streaming for progressive display
       const streamController = new AbortController()
@@ -688,7 +723,13 @@ export default function DefragWorkspacePage() {
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder={compareMode ? "Describe the dynamic between you — what keeps happening." : "Describe what's happening — a message, a conversation, a pattern, a moment."}
+            placeholder={
+              messageMode
+                ? "Paste the message — exactly as it was sent."
+                : compareMode
+                  ? "Describe the dynamic between you — what keeps happening."
+                  : "Describe what's happening — a message, a conversation, a pattern, a moment."
+            }
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             maxLength={2000}
@@ -701,12 +742,19 @@ export default function DefragWorkspacePage() {
             {result?.sourcesUsed?.invitedUsers === false && (
               <button
                 type="button"
-                onClick={() => setCompareMode(m => !m)}
+                onClick={() => { setCompareMode(m => !m); if (!compareMode) setMessageMode(false) }}
                 className={`font-mono text-[8px] uppercase tracking-[0.1em] transition-colors ${compareMode ? "text-[#e0743a]/70" : "text-[#4f4b47] hover:text-[#76716b]"}`}
               >
                 {compareMode ? "Solo mode" : "+ Compare"}
               </button>
             )}
+            <button
+              type="button"
+              onClick={() => { setMessageMode(m => !m); setCompareMode(false) }}
+              className={`font-mono text-[8px] uppercase tracking-[0.1em] transition-colors ${messageMode ? "text-[#e0743a]/70" : "text-[#4f4b47] hover:text-[#76716b]"}`}
+            >
+              {messageMode ? "Clear" : "Read a message"}
+            </button>
             </div>
             <button
               onClick={handleSubmit}
