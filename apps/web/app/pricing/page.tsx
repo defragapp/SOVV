@@ -263,7 +263,7 @@ export default function PricingPage() {
         </Container>
       </section>
 
-      
+      <section className="w-full py-20 bg-[#08070a] border-t border-white/5">
         <Container className="flex flex-col items-center text-center max-w-xl">
           <MetaLabel>Get started</MetaLabel>
           <h2 className="text-3xl md:text-4xl font-serif tracking-[-0.02em] text-[#f4efe9] mb-4">

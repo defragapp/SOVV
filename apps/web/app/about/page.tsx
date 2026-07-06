@@ -88,7 +88,7 @@ export default function AboutPage() {
         </Container>
       </section>
 
-      
+      <section className="relative w-full py-20 bg-[#08070a] border-t border-white/[0.04] overflow-hidden text-center">
         <div className="light-beam opacity-40" aria-hidden />
         <Container className="relative z-10 text-center max-w-2xl mx-auto">
           <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight mb-8 text-balance">
