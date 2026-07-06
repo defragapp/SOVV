@@ -103,7 +103,7 @@ export default function LibraryPage() {
               Most common pattern · {sessionCount} sessions
             </p>
             <p className="text-[12px] text-[#a8a29a] leading-relaxed italic">
-              "{recurringPattern.length > 100 ? recurringPattern.slice(0, 100) + "…" : recurringPattern}"
+              &ldquo;{recurringPattern.length > 100 ? recurringPattern.slice(0, 100) + "…" : recurringPattern}&rdquo;
             </p>
           </div>
         )}

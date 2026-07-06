@@ -695,7 +695,19 @@ export default function DefragWorkspacePage() {
             style={{ fontSize: "16px" }}
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
           />
-          
+          <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
+            <div className="flex items-center gap-3">
+            <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">↵ Run · Shift+Enter for new line</span>
+            {result?.sourcesUsed?.invitedUsers === false && (
+              <button
+                type="button"
+                onClick={() => setCompareMode(m => !m)}
+                className={`font-mono text-[8px] uppercase tracking-[0.1em] transition-colors ${compareMode ? "text-[#e0743a]/70" : "text-[#4f4b47] hover:text-[#76716b]"}`}
+              >
+                {compareMode ? "Solo mode" : "+ Compare"}
+              </button>
+            )}
+            </div>
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
