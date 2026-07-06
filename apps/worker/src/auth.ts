@@ -198,7 +198,10 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       if (env.RATE_LIMITER) {
         const ip = request.headers.get("CF-Connecting-IP") || "unknown"
         const { success } = await env.RATE_LIMITER.limit({ key: `register:${ip}` })
-        if (!success) return jsonResponse({ error: "Too many registration attempts. Please wait before trying again." }, 429)
+        if (!success) return new Response(
+          JSON.stringify({ error: "Too many registration attempts. Please wait before trying again." }),
+          { status: 429, headers: { "Content-Type": "application/json", "Retry-After": "60" } }
+        )
       }
       const { email: rawRegEmail, password, turnstileToken } = await request.json() as any
       const email = typeof rawRegEmail === "string" ? rawRegEmail.toLowerCase().trim() : ""
@@ -281,7 +284,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         "Set-Cookie": sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN),
       })
     } catch (e: any) {
-      if (e?.message?.includes("UNIQUE")) return jsonResponse({ error: "Email exists" }, 400)
+      if (e?.message?.includes("UNIQUE")) return jsonResponse({ error: "An account with this email already exists." }, 400)
       logSafetyEvent({ level: "error", event: "auth_registration_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Registration failed" }, 500)
     }
@@ -295,7 +298,10 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       if (env.RATE_LIMITER) {
         const ip = request.headers.get("CF-Connecting-IP") || "unknown"
         const { success } = await env.RATE_LIMITER.limit({ key: `login:${ip}` })
-        if (!success) return jsonResponse({ error: "Too many login attempts. Please wait before trying again." }, 429)
+        if (!success) return new Response(
+          JSON.stringify({ error: "Too many login attempts. Please wait before trying again." }),
+          { status: 429, headers: { "Content-Type": "application/json", "Retry-After": "60" } }
+        )
       }
       const { email: rawEmail, password } = await request.json() as any
       const email = typeof rawEmail === "string" ? rawEmail.toLowerCase().trim() : ""
