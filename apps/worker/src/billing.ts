@@ -1,3 +1,4 @@
+import { writeAuditLog } from "./utils/audit.js";
 import type { Env } from "./types-env.js";
 import { getSessionId, cookieHeader } from "./plan.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
@@ -459,13 +460,19 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
           .bind(session.customer, Date.now(), session.client_reference_id)
           .run();
 
-        if (emailOpts.emailBinding || emailOpts.resendApiKey) {
-          const user = await env.DB.prepare("SELECT email FROM users WHERE id = ?")
-            .bind(session.client_reference_id)
-            .first<{ email?: string }>();
-          if (user?.email) {
-            await sendWelcomeEmail(user.email, emailOpts);
+        const activatedUser = await env.DB.prepare("SELECT email FROM users WHERE id = ?")
+          .bind(session.client_reference_id)
+          .first<{ email?: string }>();
+        if (activatedUser?.email) {
+          if (emailOpts.emailBinding || emailOpts.resendApiKey) {
+            await sendWelcomeEmail(activatedUser.email, emailOpts);
           }
+          await writeAuditLog(env.DB, {
+            actorId: session.client_reference_id,
+            actorEmail: activatedUser.email,
+            action: "subscription_activated",
+            metadata: { customer: session.customer, plan: "pro" },
+          });
         }
         break;
       }
