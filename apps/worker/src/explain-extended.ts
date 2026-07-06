@@ -5,15 +5,12 @@ import { validateAndScore, buildRetryPrompt, parseAIOutput, checkGuardrails } fr
 import { loadMemoryContext, formatMemoryForPrompt } from "./memory.js"
 import { suggestNextSpace, formatFlowSuggestion } from "./flow.js";
 import { getAuthUser, jsonResponse } from "./auth.js";
-import { checkAiRateLimit } from "./middleware/ai-rate-limit.js";
-import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
-import { emitMetric } from "./analytics.js";
-import { logSafetyEvent } from "./safety.js";
 import { getSessionId, cookieHeader, checkFreeLimit } from "./plan.js";
 import { getBaseline, formatBaseline, getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js";
 import { extractPatterns } from "./patterns.js";
+import { requireActiveSubscription } from "./billing.js";
 import {
   selectActiveSignals,
   buildBaselineSignature,
@@ -154,16 +151,9 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   }
 
   const sid = await getSessionId(req);
-  const entitlements = resolveEntitlements(user);
-  const isPro = entitlements.effectiveTier === "pro";
-
-  // Per-user AI rate limit (per-minute + burst protection)
-  if (env.KV) {
-    const rateLimitResponse = await checkAiRateLimit({ kv: env.KV, request: req, userId: user.id, isPro });
-    if (rateLimitResponse) return rateLimitResponse;
-  }
 
   // Free tier daily usage limit check
+  const isPro = user.subscription_status === "active" || user.tier === "pro";
   if (!isPro) {
     const limit = await checkFreeLimit(env, sid);
     if (!limit.allowed) {
@@ -182,40 +172,24 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   };
 
   const message = String(body.message ?? body.question ?? body.text ?? "").trim();
-  
-  // Minimum input quality gate: require at least 10 words for meaningful pattern analysis
-  const wordCount = message.split(/\s+/).filter(Boolean).length;
   if (!message) {
     return jsonResponse({ error: "message_required" }, 400, {
       ...getCorsHeaders(req),
       "set-cookie": cookieHeader(sid),
     });
   }
-  
-  // Short input guard: very short inputs produce low-quality pattern analysis
-  if (wordCount < 5) {
-    return jsonResponse(
-      { 
-        error: "input_too_short",
-        message: "Please describe the situation in a bit more detail — at least a sentence or two gives the system enough to work with.",
-        type: "input_too_short"
-      },
-      400,
-      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
-    );
-  }
 
   const target = body.target;
   const relational = Boolean(target);
   const mode = (body.mode ?? (relational ? "pair" : "self")) as string;
 
-  // Relational mode requires Pro subscription (uses entitlements)
+  // Relational mode requires Pro subscription
   if (relational) {
-    const relGate = requireEntitlement(entitlements, "canInvite");
-    if (relGate) return relGate;
+    const subGate = await requireActiveSubscription(user, req);
+    if (subGate) return subGate;
   }
 
-  if (relational && entitlements.effectiveTier === "free") {
+  if (relational && user.tier === "free") {
     return jsonResponse(
       { error: "Relational analysis requires Pro" },
       403,
@@ -298,7 +272,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     temperature: 0.35,
     max_tokens: 900,
   }, {
-    gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" }
+    gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" }
   });
 
   let rawText = asText((ai as any).response ?? ai);
@@ -308,7 +282,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   // Retry once if output is completely empty (no JSON parsed at all)
   if (validation.shouldRetry) {
-    logSafetyEvent({ level: "warn", event: "defrag_retry", error_type: "system" })
+    console.warn("[Retry] Defrag output empty — retrying with correction prompt")
     const retryMessages = [
       { role: "system", content: relational ? SYSTEM_DEFRAG_RELATIONAL : SYSTEM_DEFRAG },
       { role: "user", content: userPrompt },
@@ -319,7 +293,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
       messages: retryMessages,
       temperature: 0.2,
       max_tokens: 900,
-    }, { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } })
+    }, { gateway: { id: env.GATEWAY_ID || "sovereign-code-agent" } })
     rawText = asText((retryAi as any).response ?? retryAi)
     validation = validateAndScore(rawText, "defrag")
   }
@@ -328,7 +302,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
 
   // Log guardrail violations
   if (!validation.guardrails.passed) {
-    logSafetyEvent({ level: "warn", event: "defrag_guardrail_violation", details: { violations: validation.guardrails.violations } })
+    console.warn("[Guardrail] Defrag violations:", validation.guardrails.violations)
   }
 
   // Extract confidence score for client
@@ -345,11 +319,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   }
 
   // Flow suggestion — Defrag → Alignment chain
-  // Use AI's nextSpace field if provided, fall back to keyword matching
-  const aiNextSpace = (parsed as any).nextSpace as "ALIGNMENT" | "COVENANT" | null | undefined
-  const flowSuggestion = aiNextSpace !== undefined
-    ? (aiNextSpace ? { nextSpace: aiNextSpace, reason: "ai_suggested", prefillContext: (parsed as any).alignment || "", urgency: "medium" as const } : null)
-    : suggestNextSpace(parsed)
+  const flowSuggestion = suggestNextSpace(parsed)
 
   const result = {
     id: crypto.randomUUID(),
@@ -366,7 +336,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     giftUnderStrain: parsed.giftUnderStrain || undefined,
     alignment: parsed.alignment || undefined,
     bestNextResponse: parsed.bestNextResponse || undefined,
-    conversationalSteering: ((parsed.conversationalSteering as any)?.do?.length || (parsed.conversationalSteering as any)?.avoid?.length)
+    conversationalSteering: (parsed.conversationalSteering?.do?.length || parsed.conversationalSteering?.avoid?.length)
       ? parsed.conversationalSteering
       : undefined,
     sourcesUsed: {
@@ -399,24 +369,17 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     await env.QUEUE.send({ sessionId: sid, interactionId: interactionId });
   } else {
     // Fallback for local dev or if queue is not configured.
-    logSafetyEvent({ level: "warn", event: "queue_binding_missing", error_type: "system" });
+    console.warn("QUEUE binding not found. Running pattern extraction in a non-blocking way, but this may be unreliable.");
     void extractPatterns(env, sid, interactionId);
 
     // Save pattern to memory for future sessions (non-blocking)
     if (parsed.activePattern) {
-      import("./memory.js").then(({ savePatternMemory }) => {
-        savePatternMemory(env, user.id, parsed as Record<string, unknown>, "DEFRAG").catch(() => {});
+      import("./memory.js").then(({ savePatternMemory, extractPatternSignature }) => {
+        const sig = extractPatternSignature(parsed, "DEFRAG");
+        if (sig) savePatternMemory(env, user.id, sig).catch(() => {});
       }).catch(() => {});
     }
   }
-
-  // Emit analytics metric
-  emitMetric(env, "ai_request", {
-    space: "defrag",
-    userId: user.id,
-    success: true,
-    tier: entitlements.effectiveTier,
-  });
 
   return jsonResponse(result, 200, {
     ...getCorsHeaders(req),

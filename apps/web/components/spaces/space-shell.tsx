@@ -46,7 +46,6 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
             </Link>
             <span className="text-[#4f4b47] text-xs">/</span>
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#f4efe9]">{spaceName}</span>
-
           </div>
 
           {/* Space switcher */}
@@ -60,8 +59,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
                 key={s.href}
                 href={s.href}
                 aria-current={spaceName === s.label ? "page" : undefined}
-                tabIndex={0}
-                className={`px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] uppercase transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[#e0743a]/50 ${
+                className={`px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] uppercase transition-colors ${
                   spaceName === s.label
                     ? "bg-white/[0.08] text-[#f4efe9]"
                     : "text-[#76716b] hover:text-[#a8a29a] hover:bg-white/[0.04]"
@@ -188,16 +186,7 @@ export function SpaceShell({ sidebar, main, contextPanel, mobileTabs, spaceName 
                   }
                 })
               }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault()
-                  setActiveTab(tab.id)
-                }
-              }}
-              tabIndex={0}
-              role="tab"
-              aria-selected={activeTab === tab.id}
-              className={`px-4 py-2.5 border-b-2 font-mono text-[10px] tracking-[0.2em] uppercase whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[#e0743a]/50 ${
+              className={`px-4 py-2.5 border-b-2 font-mono text-[10px] tracking-[0.2em] uppercase whitespace-nowrap transition-colors ${
                 activeTab === tab.id
                   ? "border-[#e0743a] text-[#f4efe9]"
                   : "border-transparent text-[#76716b] hover:text-[#a8a29a]"

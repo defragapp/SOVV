@@ -28,20 +28,13 @@ function Section({ label, value }: { label: string; value?: string }) {
 }
 
 function ScriptureChip({ text }: { text: string }) {
-  if (!text) return null
-  // Build a Bible Gateway search URL for the scripture reference
-  const bibleUrl = `https://www.biblegateway.com/passage/?search=${encodeURIComponent(text)}&version=NIV`
   return (
-    <a
-      href={bibleUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-block font-mono text-[8px] uppercase tracking-[0.12em] text-[#76716b] border border-white/[0.08] px-2 py-1 hover:text-[#a8a29a] hover:border-white/[0.16] transition-colors"
+    <span
+      className="inline-block font-mono text-[8px] uppercase tracking-[0.12em] text-[#76716b] border border-white/[0.08] px-2 py-1"
       style={{ borderRadius: 4 }}
-      title={`Read ${text} on Bible Gateway`}
     >
-      {text} ↗
-    </a>
+      {text}
+    </span>
   )
 }
 
@@ -103,10 +96,7 @@ export default function CovenantWorkspacePage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(
-          data.error === "subscription_required" ? "subscription_required" :
-          data.message || data.error || "Something went wrong."
-        )
+        setError(data.message || data.error || "Something went wrong.")
         return
       }
       setResult(data)
@@ -133,11 +123,6 @@ export default function CovenantWorkspacePage() {
           workspace_source: "COVENANT",
         }),
       })
-      if (res.status === 403) {
-        // Pro required for library saves
-        setSaveSuccess(false)
-        return
-      }
       if (!res.ok) throw new Error()
       setSaveSuccess(true)
     } catch { /* silent */ } finally {
@@ -329,15 +314,6 @@ export default function CovenantWorkspacePage() {
                 : error.includes("connect")
                 ? "Connection issue. Check your network and try again."
                 : error || "Something went wrong. Try describing the moment differently."}
-            {error === "subscription_required" && (
-              <a
-                href="/pricing"
-                className="mt-3 inline-block font-mono text-[9px] uppercase tracking-[0.14em] text-[#f4efe9] bg-[#e0743a]/20 hover:bg-[#e0743a]/30 transition-colors border border-[#e0743a]/30 px-5 py-2.5"
-                style={{ borderRadius: "var(--radius-button)" }}
-              >
-                Upgrade to Pro →
-              </a>
-            )}
             </p>
         )}
 
@@ -376,7 +352,7 @@ export default function CovenantWorkspacePage() {
                   <div className="mt-6 pt-6 border-t border-white/[0.05]">
                     <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#3a3733] mb-3">Scripture to explore</p>
                     <div className="flex flex-wrap gap-2">
-                      {result.scriptures.filter((s: string) => s && typeof s === "string" && s.trim()).map((s: string, i: number) => <ScriptureChip key={i} text={s.trim()} />)}
+                      {result.scriptures.map((s: string, i: number) => <ScriptureChip key={i} text={s} />)}
                     </div>
                   </div>
                 )}

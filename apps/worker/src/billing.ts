@@ -8,8 +8,6 @@ import {
   sendPaymentSucceededEmail,
   sendPaymentFailedEmail,
   sendCancellationEmail,
-  sendTrialEndingEmail,
-  sendPaymentOverdueEmail,
 } from "./email.js";
 import { fetchWithTimeout, withLimitedRetry } from "./runtime-resilience.js";
 
@@ -44,13 +42,6 @@ const InvoiceObjectSchema = z.object({
   billing_reason: z.string().optional(),
   period_end: z.number().int().optional(),
 });
-const SubscriptionTrialSchema = z.object({
-  id: z.string().min(1),
-  customer: z.string().min(1),
-  trial_end: z.number().int().optional(),
-  status: z.string().min(1),
-});
-
 
 function parseStripeSignatureHeader(sigHeader: string): { timestamp: number; v1: string } | null {
   const rawParts = sigHeader.split(",").reduce<Record<string, string>>((acc, part) => {
@@ -196,36 +187,14 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
       });
       return errorJson(400, "billing_not_configured", "Checkout is not configured in this environment (STRIPE_SECRET_KEY, STRIPE_PRICE_ID, or APP_URL missing)");
     }
-  // Parse optional promo/coupon from request body
-  let couponId: string | undefined;
-  try {
-    const body = await req.clone().json() as { couponId?: string; promo_code?: string };
-    couponId = body.couponId || body.promo_code;
-  } catch { /* no body */ }
-
   const params = new URLSearchParams();
   params.set("mode", "subscription");
   params.set("line_items[0][price]", env.STRIPE_PRICE_ID);
   params.set("line_items[0][quantity]", "1");
   params.set("success_url", `${env.APP_URL}/app?upgraded=1`);
   params.set("cancel_url", `${env.APP_URL}/app?canceled=1`);
-  // Track checkout start for abandoned checkout recovery
-  if (env.KV && userId !== "unknown") {
-    const checkoutKey = `checkout:started:${userId}`;
-    await env.KV.put(checkoutKey, JSON.stringify({ email: user?.email, startedAt: Date.now() }), {
-      expirationTtl: 48 * 60 * 60, // 48 hours
-    }).catch(() => {});
-  }
   params.set("client_reference_id", userId);
   params.set("subscription_data[metadata][userId]", userId);
-  // Trial period: configure in Stripe dashboard when ready
-  // Apply Stripe coupon/discount if provided
-  if (couponId) {
-    params.set("discounts[0][coupon]", couponId);
-  } else {
-    // Allow Stripe promotion codes (user-entered codes at checkout)
-    params.set("allow_promotion_codes", "true");
-  }
   // Pre-fill email so Stripe checkout doesn't ask for it again
   if (user?.email) {
     params.set("customer_email", user.email);
@@ -602,73 +571,7 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
         }
         break;
       }
-      case "customer.subscription.trial_will_end": {
-        // Trial ending in ~3 days — send reminder email
-        const parsed = SubscriptionTrialSchema.safeParse(event.data.object);
-        if (!parsed.success) break;
-        const sub = parsed.data;
-        customerId = sub.customer;
-        billingTransition = "trial_will_end";
-        if (emailOpts.emailBinding || emailOpts.resendApiKey) {
-          const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
-            .bind(sub.customer).first<{ email?: string }>();
-          if (user?.email) {
-            const trialEndDate = sub.trial_end
-              ? new Date(sub.trial_end * 1000).toLocaleDateString("en-US", { month: "long", day: "numeric" })
-              : "soon";
-            await sendTrialEndingEmail(user.email, { ...emailOpts, trialEndDate });
-          }
-        }
-        break;
-      }
-      case "invoice.payment_action_required":
-      case "invoice.upcoming": {
-        // Upcoming invoice or action required — no DB change needed, just log
-        billingTransition = `invoice_event:${event.type}`;
-        break;
-      }
-      case "customer.subscription.paused": {
-        // Subscription paused — treat as past_due for entitlement purposes
-        const parsed = SubscriptionObjectSchema.safeParse(event.data.object);
-        if (!parsed.success) break;
-        customerId = parsed.data.customer;
-        billingTransition = "subscription_status:paused";
-        await env.DB.prepare(
-          "UPDATE users SET subscription_status = 'past_due', subscription_updated_at = ? WHERE stripe_customer_id = ?"
-        ).bind(Date.now(), parsed.data.customer).run();
-        break;
-      }
-      case "customer.subscription.resumed": {
-        // Subscription resumed — restore active
-        const parsed = SubscriptionObjectSchema.safeParse(event.data.object);
-        if (!parsed.success) break;
-        customerId = parsed.data.customer;
-        billingTransition = "subscription_status:active";
-        await env.DB.prepare(
-          "UPDATE users SET subscription_status = 'active', tier = 'pro', subscription_updated_at = ? WHERE stripe_customer_id = ?"
-        ).bind(Date.now(), parsed.data.customer).run();
-        break;
-      }
-      case "payment_intent.payment_failed": {
-        // Payment intent failed — mark past_due and notify
-        const piSchema = z.object({ customer: z.string().min(1).optional() });
-        const parsed = piSchema.safeParse(event.data.object);
-        if (!parsed.success || !parsed.data.customer) break;
-        customerId = parsed.data.customer;
-        billingTransition = "payment_intent_failed";
-        await env.DB.prepare(
-          "UPDATE users SET subscription_status = 'past_due', subscription_updated_at = ? WHERE stripe_customer_id = ?"
-        ).bind(Date.now(), parsed.data.customer).run();
-        if (emailOpts.emailBinding || emailOpts.resendApiKey) {
-          const user = await env.DB.prepare("SELECT email FROM users WHERE stripe_customer_id = ?")
-            .bind(parsed.data.customer).first<{ email?: string }>();
-          if (user?.email) {
-            await sendPaymentOverdueEmail(user.email, emailOpts);
-          }
-        }
-        break;
-      }
-            default:
+      default:
         break;
     }
 

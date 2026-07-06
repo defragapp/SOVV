@@ -42,7 +42,6 @@ export default function AlignmentWorkspacePage() {
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
   const [patterns, setPatterns] = React.useState<Array<{ key: string; value: string }>>([])
-  const [skyContext, setSkyContext] = React.useState<string | null>(null)
   // Audio Overview
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
@@ -56,22 +55,12 @@ export default function AlignmentWorkspacePage() {
 
 
   // Prefill composer from ?prompt= query param
-  // If ?autorun=1 is also present, auto-submit after prefill
   React.useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search)
       const prompt = params.get("prompt")
-      const autorun = params.get("autorun") === "1"
       if (prompt) {
-        const decoded = decodeURIComponent(prompt)
-        setInput((prev) => prev || decoded)
-        // Auto-submit after a short delay to allow state to settle
-        if (autorun && decoded) {
-          setTimeout(() => {
-            const submitBtn = document.querySelector<HTMLButtonElement>('[data-submit="alignment"]')
-            if (submitBtn && !submitBtn.disabled) submitBtn.click()
-          }, 300)
-        }
+        setInput((prev) => prev || decodeURIComponent(prompt))
       }
     }
   }, [])
@@ -99,7 +88,7 @@ export default function AlignmentWorkspacePage() {
     try {
       const pResult = await processInput({ space: "alignment", message: input })
       if (!pResult.ok) {
-        setError(pResult.error === "subscription_required" ? "subscription_required" : pResult.error)
+        setError(pResult.error)
         return
       }
       setResult(pResult.output.meta as any)
@@ -127,11 +116,6 @@ export default function AlignmentWorkspacePage() {
           workspace_source: "ALIGNMENT",
         }),
       })
-      if (res.status === 403) {
-        // Pro required for library saves
-        setSaveSuccess(false)
-        return
-      }
       if (!res.ok) throw new Error()
       setSaveSuccess(true)
     } catch { /* silent */ } finally {
@@ -184,12 +168,6 @@ export default function AlignmentWorkspacePage() {
         <p className="text-[12px] text-[#76716b] leading-relaxed mb-5">
           Your Baseline Design is your fixed center — how you naturally operate. The live sky is the emotional weather you're moving through right now. Alignment uses both to show you the path back to yourself.
         </p>
-        {result?.skyContext && (
-          <div className="border border-white/[0.06] bg-white/[0.02] p-3 mb-4" style={{ borderRadius: "var(--radius-container)" }}>
-            <p className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#4f4b47] mb-1.5">Live sky · right now</p>
-            <p className="text-[11px] text-[#76716b] leading-relaxed">{result.skyContext}</p>
-          </div>
-        )}
         <div className="space-y-3">
           {[
             "What is actually true in this situation",
@@ -359,15 +337,6 @@ export default function AlignmentWorkspacePage() {
                 : error.includes("connect")
                 ? "Connection issue. Check your network and try again."
                 : error || "Something went wrong. Try describing the moment differently."}
-            {error === "subscription_required" && (
-              <a
-                href="/pricing"
-                className="mt-3 inline-block font-mono text-[9px] uppercase tracking-[0.14em] text-[#f4efe9] bg-[#e0743a]/20 hover:bg-[#e0743a]/30 transition-colors border border-[#e0743a]/30 px-5 py-2.5"
-                style={{ borderRadius: "var(--radius-button)" }}
-              >
-                Upgrade to Pro →
-              </a>
-            )}
             </p>
         )}
 
@@ -393,7 +362,7 @@ export default function AlignmentWorkspacePage() {
               )}
               <Section label="What is actually happening"              value={result.whatIsTrue} />
               <Section label="What is yours to carry"    value={result.whatIsYours} />
-              <Section label="What to release"                     value={result.whatIsNotYours} />
+              <Section label="What is not yours to carry"          value={result.whatIsNotYours} />
               <Section label="The shift"                 value={result.theShift} />
               <Section label="One next step"             value={result.nextStep} />
               <Section label="What to avoid"             value={result.avoid} />
@@ -421,7 +390,6 @@ export default function AlignmentWorkspacePage() {
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || isLoading}
-              data-submit="alignment"
               className="h-8 px-5 border border-[#c8c2bc]/40 text-[#c8c2bc] text-[11px] font-medium tracking-wide hover:bg-[#c8c2bc]/10 hover:border-[#c8c2bc]/60 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               style={{ borderRadius: 2 }}
             >

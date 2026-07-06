@@ -138,15 +138,9 @@ export function InviteModal({ open, onClose, workspaceSource, libraryId }: Invit
                     <p className="text-[13px] text-[#76716b] leading-relaxed mb-3">
                       They'll add their Baseline Design. You'll both see how your patterns interact — not who is right.
                     </p>
-                    <p className="text-[11px] text-[#4f4b47] leading-relaxed mb-4">
+                    <p className="text-[11px] text-[#4f4b47] leading-relaxed mb-6">
                       Your raw Baseline Design stays private. The result only generates after they accept.
                     </p>
-                    <div className="flex items-center gap-2 mb-6 px-3 py-2 border border-[#e0743a]/20 bg-[#e0743a]/[0.03]" style={{ borderRadius: "var(--radius-minimal)" }}>
-                      <span className="w-1 h-1 rounded-sm bg-[#e0743a]/50 shrink-0" />
-                      <p className="text-[10px] text-[#76716b] leading-relaxed">
-                        Pro feature — share your pattern map with someone who matters.
-                      </p>
-                    </div>
                     <button
                       onClick={createInvite}
                       className="w-full h-11 bg-[#f4efe9] text-[#08070a] text-[13px] font-medium hover:opacity-90 transition-opacity"

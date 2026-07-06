@@ -72,32 +72,20 @@ export default function PrivacyPage() {
 
       {/* Content */}
       <Section className="w-full py-24 md:py-32 bg-[#0c0a0d]">
-        <Container className="max-w-2xl">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#4f4b47] mb-12">
-            Last updated: July 2026
-          </p>
-          <div className="flex flex-col gap-12">
+        <Container className="max-w-3xl">
+          <div className="flex flex-col gap-0 rounded-[14px] border border-white/[0.06] overflow-hidden">
             {SECTIONS.map((section, i) => (
-              <div key={i} className="flex gap-8 md:gap-12">
-                <div className="shrink-0 pt-1">
-                  <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.1em]">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-3 pb-12 border-b border-white/[0.04] last:border-0 last:pb-0 flex-1">
-                  <h3 className="text-[#f4efe9] text-[17px] font-medium tracking-[-0.01em]">{section.title}</h3>
-                  <p className="text-[#76716b] text-[14px] leading-[1.8]">{section.body}</p>
-                </div>
+              <div
+                key={i}
+                className={[
+                  "p-8 md:p-12 space-y-3 bg-[#08070a]",
+                  i < SECTIONS.length - 1 ? "border-b border-white/[0.06]" : "",
+                ].join(" ")}
+              >
+                <h3 className="text-[#f4efe9] text-lg font-medium tracking-tight">{section.title}</h3>
+                <p className="text-[#a8a29a] text-sm leading-relaxed max-w-2xl">{section.body}</p>
               </div>
             ))}
-          </div>
-          <div className="mt-16 pt-8 border-t border-white/[0.04]">
-            <p className="text-[13px] text-[#4f4b47] leading-relaxed">
-              Questions? Contact us at{" "}
-              <a href="mailto:info@defrag.app" className="text-[#76716b] hover:text-[#a8a29a] transition-colors">
-                info@defrag.app
-              </a>
-            </p>
           </div>
         </Container>
       </Section>

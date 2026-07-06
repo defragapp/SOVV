@@ -1,7 +1,6 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
-import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
-import { logSafetyEvent, protectionActive } from "./safety.js";
+import { requireActiveSubscription } from "./billing.js";
 import { validateRequest } from "./middleware/validate-request.js";
 import { RateLimiter, extractRateLimitKey, RATE_LIMIT_PRESETS } from "./middleware/rate-limiter.js";
 import { KVSafetyLogger, createSafetyEvent } from "./middleware/safety-logger.js";
@@ -30,8 +29,7 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
       }
 
       // Subscription gate: Audio Overview requires active Pro subscription
-      const entitlements = resolveEntitlements(user);
-      const subGate = requireEntitlement(entitlements, "canUseAudio");
+      const subGate = await requireActiveSubscription(user, request);
       if (subGate) return subGate;
 
       // ════════════════════════════════════════════════════════════════════════
@@ -124,32 +122,15 @@ export function registerAudioRoute(router: any, getEnv: () => Env) {
         return new Response(JSON.stringify({ error: "Cloudflare AI binding is not configured." }), { status: 503 });
       }
 
-      // Use Cloudflare Workers AI TTS - try available models in order of preference
-      // @cf/deepgram/aura-2-en is the highest quality English TTS available
-      let audioResponse: any;
-      let contentType = "audio/mpeg";
-      try {
-        audioResponse = await env.AI.run("@cf/deepgram/aura-2-en" as any, {
-          text: text,
-        }, { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } });
-      } catch {
-        // Fallback to melotts if aura-2-en is unavailable
-        try {
-          audioResponse = await env.AI.run("@cf/myshell-ai/melotts" as any, {
-            text: text,
-          }, { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } });
-        } catch {
-          // Final fallback
-          audioResponse = await env.AI.run("@cf/deepgram/aura-1" as any, {
-            text: text,
-          }, { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } });
-        }
-      }
+      // We use @cf/elevenlabs/tts, which Cloudflare provides natively without needing your own API key
+      const response = await env.AI.run("@cf/elevenlabs/tts", {
+        text: text,
+      });
 
-      return new Response(audioResponse as any, {
+      // It returns a Uint8Array containing the audio data.
+      return new Response(response as any, {
         headers: {
-          "Content-Type": contentType,
-          "Cache-Control": "no-store",
+          "Content-Type": "audio/mpeg",
         },
       });
 

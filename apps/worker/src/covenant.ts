@@ -1,12 +1,10 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
-import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
+import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { checkProLimit } from "./plan.js";
 import { SYSTEM_COVENANT } from "./prompts.js";
 import { checkGuardrails } from "./output-validator.js";
-import { logSafetyEvent } from "./safety.js";
-import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import {
   selectActiveSignals,
   buildTimingSignals,
@@ -46,8 +44,7 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
     }
 
-    const entitlements = resolveEntitlements(user);
-    const subGate = requireEntitlement(entitlements, "canUseCovenant");
+    const subGate = await requireActiveSubscription(user, request);
     if (subGate) return subGate;
 
     // Per-user Pro daily soft cap (200/day)
@@ -113,8 +110,7 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
 
       const aiResponse = await env.AI.run(
         (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
-        { messages, temperature: 0.3, max_tokens: 900 },
-        { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } }
+        { messages, temperature: 0.3, max_tokens: 900 }
       );
 
       let rawText = (aiResponse as any).response ?? String(aiResponse);
@@ -124,7 +120,7 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
       let validation = validate(rawText, "covenant")
 
       if (validation.shouldRetry) {
-        logSafetyEvent({ level: "warn", event: "covenant_retry", error_type: "system" })
+        console.warn("[Retry] Covenant output empty — retrying")
         const retryAi = await env.AI.run(
           (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
           { messages: [
@@ -133,8 +129,7 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
               { role: "assistant", content: rawText },
               { role: "user", content: retryPrompt("covenant", validation.missing) },
             ], temperature: 0.2, max_tokens: 800 }
-        ,
-          { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } })
+        )
         rawText = (retryAi as any).response ?? String(retryAi)
         validation = validate(rawText, "covenant")
       }
@@ -143,7 +138,7 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
 
       // Log guardrail violations
       if (!validation.guardrails.passed) {
-        logSafetyEvent({ level: "warn", event: "covenant_guardrail_violation", error_type: "system" })
+        console.warn("[Guardrail] Covenant violations:", validation.guardrails.violations)
       }
 
       // Empty result guard

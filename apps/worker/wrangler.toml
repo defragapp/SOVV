@@ -61,12 +61,3 @@ destination_address = "info@defrag.app"
 
 [observability]
 enabled = true
-
-# Cron triggers for maintenance tasks
-[triggers]
-crons = ["0 3 * * *"]  # Daily at 3am UTC — session cleanup
-
-# Analytics Engine: add when dataset is created in Cloudflare dashboard
-# [[analytics_engine_datasets]]
-# binding = "ANALYTICS"
-# dataset = "sovereign-metrics"

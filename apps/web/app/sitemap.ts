@@ -6,6 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: base, lastModified: now, changeFrequency: "weekly", priority: 1.0 },
+    { url: `${base}/campaign/sovereign-os`, lastModified: now, changeFrequency: "weekly", priority: 0.95 },
     { url: `${base}/product`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/product/defrag`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/product/covenant`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
@@ -19,6 +20,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
     { url: `${base}/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
     { url: `${base}/contact`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
-    { url: `${base}/covenant`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
   ]
 }

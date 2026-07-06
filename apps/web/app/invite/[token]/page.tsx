@@ -53,11 +53,6 @@ export default function InvitePage() {
         headers: { "Content-Type": "application/json" },
       })
       const data = await res.json() as any
-      if (res.status === 401) {
-        // Not logged in - redirect to login with return URL
-        window.location.href = `/app/login?return=/invite/${token}`
-        return
-      }
       if (data.needs_baseline) { setStep("needs_baseline"); return }
       if (data.accepted) { setStep("accepted"); generateResult() }
       else { setError(data.error || "Failed to accept invite"); setStep("error") }

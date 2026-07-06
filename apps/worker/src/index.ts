@@ -1,4 +1,3 @@
-import { logSafetyEvent } from "./safety.js";
 import { Router } from "itty-router";
 import type { Env } from "./types-env.js";
 import { registerAuthRoutes, getAuthUser, registerAdminSeedRoute } from "./auth.js";
@@ -198,7 +197,7 @@ router.get("/api/stripe/prices", async (request: Request) => {
       headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
     });
   } catch (error) {
-    logSafetyEvent({ level: "error", event: "stripe_prices_fetch_failed", error_type: "system", error });
+    console.error("[STRIPE_PRICES]", error);
     return new Response(JSON.stringify([]), {
       status: 200,
       headers: { "Content-Type": "application/json", ...getCorsHeaders(request) },
@@ -243,9 +242,9 @@ async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: stri
       text,
       html,
     });
-    logSafetyEvent({ level: "info", event: "email_auto_reply_sent", details: { recipient: ticket.sender } });
+    console.log(`[EMAIL] Auto-reply sent to ${ticket.sender}`);
   } catch (replyErr) {
-    logSafetyEvent({ level: "warn", event: "email_auto_reply_failed", error_type: "system", error: replyErr });
+    console.error("[EMAIL] Auto-reply failed:", replyErr);
   }
 }
 
@@ -261,8 +260,6 @@ router.get("/api/user/me", async (request: Request) => {
     email: user.email,
     tier: user.tier || "free",
     subscription_status: user.subscription_status || "free",
-    email_verified: user.email_verified === 1,
-    subscription_current_period_end: user.subscription_current_period_end ?? null,
   }), { status: 200, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
 });
 
@@ -274,17 +271,14 @@ router.get("/api/user/usage", async (request: Request) => {
     status: 401, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) }
   });
 
-  const { resolveEntitlements } = await import("./entitlements.js");
-  const entitlements = resolveEntitlements(user);
-  const isPro = entitlements.effectiveTier === "pro";
   const FREE_LIMIT = parseInt(env.FREE_DAILY_LIMIT || "15", 10);
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
   const usageKey = `usage:${user.id}:${today}`;
   const usedStr = await env.KV.get(usageKey);
   const used = usedStr ? parseInt(usedStr, 10) : 0;
+  const isPro = user.tier === "pro" || user.subscription_status === "active";
 
   return new Response(JSON.stringify({
-    tier: entitlements.effectiveTier,
     used,
     limit: isPro ? null : FREE_LIMIT,
     remaining: isPro ? null : Math.max(0, FREE_LIMIT - used),
@@ -330,18 +324,6 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
     'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-    // CSP: restrict script/style sources, allow Cloudflare Turnstile and Stripe
-    'Content-Security-Policy': [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://js.stripe.com",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https:",
-      "connect-src 'self' https://api.defrag.app https://api.stripe.com",
-      "frame-src https://challenges.cloudflare.com https://js.stripe.com",
-      "font-src 'self' data:",
-      "object-src 'none'",
-      "base-uri 'self'",
-    ].join('; '),
   };
   Object.entries(securityHeaders).forEach(([key, value]) => {
     corsResponse.headers.set(key, value);
@@ -351,41 +333,12 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
 }
 
 export default {
-  // Scheduled cron handler — runs daily at 3am UTC
-  async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
-    currentEnv = env;
-    try {
-      // Clean up expired sessions
-      const result = await env.DB.prepare(
-        "DELETE FROM sessions WHERE expires_at < ?"
-      ).bind(Date.now()).run();
-      logSafetyEvent({ level: "info", event: "cron_session_cleanup", details: { deleted: result.meta?.changes ?? 0 } });
-
-      // Clean up old safety audit logs (older than 30 days)
-      const cutoff = Date.now() - (30 * 24 * 60 * 60 * 1000);
-      const keys = await env.KV.list({ prefix: "safety:audit:" });
-      let kvDeleted = 0;
-      for (const key of keys.keys) {
-        const ts = parseInt(key.name.split(":")[2] ?? "0", 10);
-        if (ts < cutoff) {
-          await env.KV.delete(key.name).catch(() => {});
-          kvDeleted++;
-        }
-      }
-      if (kvDeleted > 0) {
-        logSafetyEvent({ level: "info", event: "cron_kv_cleanup", details: { deleted: kvDeleted } });
-      }
-    } catch (err) {
-      logSafetyEvent({ level: "error", event: "cron_cleanup_failed", error_type: "system", error: err });
-    }
-  },
-
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     currentEnv = env;
     try {
       return await handleWithCors(request, env, ctx);
     } catch (error) {
-      logSafetyEvent({ level: "error", event: "internal_error", error_type: "system", error });
+      console.error("[INTERNAL]", error);
       return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: { "Content-Type": "application/json" } });
     }
   },
@@ -396,7 +349,7 @@ export default {
       const sessionId = body?.sessionId;
       const interactionId = body?.interactionId;
       if (!sessionId || !interactionId) {
-        logSafetyEvent({ level: "warn", event: "queue_invalid_message_body", error_type: "validation" });
+        console.error("Queue: invalid message body");
         message.ack();
         return;
       }
@@ -404,7 +357,7 @@ export default {
         await extractPatterns(env, sessionId, interactionId);
         message.ack();
       } catch (err) {
-        logSafetyEvent({ level: "error", event: "queue_pattern_extraction_failed", error_type: "system", error: err, details: { interactionId } });
+        console.error("Queue: pattern extraction failed for", interactionId, err);
         message.retry();
       }
     }));
@@ -420,7 +373,7 @@ export default {
                           message.headers.get("X-Auto-Response-Suppress")?.toLowerCase() === "all" || 
                           message.headers.get("Precedence")?.toLowerCase() === "bulk";
       if (isAutomated) {
-        logSafetyEvent({ level: "info", event: "email_automated_skipped", details: { sender } });
+        console.log(`[EMAIL] Skipping automated message from ${sender}`);
         return;
       }
       let bodyPreview = "";
@@ -438,23 +391,23 @@ export default {
         subject,
         body_preview: bodyPreview,
       });
-      logSafetyEvent({ level: "info", event: "email_ticket_created", details: { ticketId, sender } });
+      console.log(`[EMAIL] Ticket created: ${ticketId} from ${sender}`);
       if (!isAutomated) {
         await sendSupportAutoReply(env, { id: ticketId, sender, subject });
       }
       if (env.EMAIL_FORWARD_ADDRESS) {
         await message.forward(env.EMAIL_FORWARD_ADDRESS);
-        logSafetyEvent({ level: "info", event: "email_forwarded" });
+        console.log(`[EMAIL] Forwarded to configured address.`);
       } else {
-        logSafetyEvent({ level: "warn", event: "email_forward_address_missing", error_type: "system" });
+        console.warn("[EMAIL] EMAIL_FORWARD_ADDRESS secret not set. Cannot forward email.");
       }
     } catch (err) {
-      logSafetyEvent({ level: "error", event: "email_handler_failed", error_type: "system", error: err });
+      console.error("[EMAIL] Handler failed:", err);
       if (env.EMAIL_FORWARD_ADDRESS) {
         try {
           await message.forward(env.EMAIL_FORWARD_ADDRESS);
         } catch (forwardErr) {
-          logSafetyEvent({ level: "error", event: "email_forward_failed", error_type: "system", error: forwardErr });
+          console.error("[EMAIL] Forward failed:", forwardErr);
         }
       }
     }

@@ -45,10 +45,12 @@ const inputBase =
 
 function DeleteAccountSection() {
   const [confirming, setConfirming] = React.useState(false)
+  const [confirmText, setConfirmText] = React.useState("")
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState("")
 
   const handleDelete = async () => {
+    if (confirmText !== "DELETE") return
     setLoading(true)
     setError("")
     try {
@@ -82,23 +84,33 @@ function DeleteAccountSection() {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3 p-4 border border-red-400/20 bg-red-400/[0.03]" style={{ borderRadius: "var(--radius-container)" }}>
       <p className="text-[13px] text-[#a8a29a] leading-relaxed">
         This will permanently delete your account, all saved results, and your Baseline Design. This cannot be undone.
       </p>
+      <p className="text-[12px] text-[#76716b]">Type <strong className="text-[#f4efe9]">DELETE</strong> to confirm.</p>
+      <input
+        type="text"
+        value={confirmText}
+        onChange={e => setConfirmText(e.target.value)}
+        placeholder="DELETE"
+        className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-2.5 text-[13px] text-[#f4efe9] placeholder:text-[#4f4b47] outline-none focus:border-red-400/30"
+        style={{ borderRadius: "var(--radius-input)" }}
+        autoFocus
+      />
       {error && <p className="text-[12px] text-red-400/70">{error}</p>}
       <div className="flex gap-3">
         <button
           type="button"
           onClick={handleDelete}
-          disabled={loading}
+          disabled={loading || confirmText !== "DELETE"}
           className="font-mono text-[10px] uppercase tracking-[0.15em] text-red-400/60 hover:text-red-400 transition-colors disabled:opacity-30"
         >
-          {loading ? "Deleting…" : "Yes, delete my account"}
+          {loading ? "Deleting…" : "Confirm delete"}
         </button>
         <button
           type="button"
-          onClick={() => setConfirming(false)}
+          onClick={() => { setConfirming(false); setConfirmText("") }}
           className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
         >
           Cancel
@@ -188,38 +200,18 @@ function EmailVerificationStatus() {
     }
   }
 
-  if (status === "loading") return (
-    <span className="font-mono text-[10px] text-[#4f4b47] animate-pulse">Checking…</span>
-  )
-  if (status === "verified") return (
-    <div className="flex items-center gap-2">
-      <span className="w-1.5 h-1.5 rounded-sm bg-[#e0743a]/60" />
-      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#76716b]">Email verified</span>
-    </div>
-  )
+  if (status === "loading") return <span className="font-mono text-[10px] text-[#4f4b47]">Checking…</span>
+  if (status === "verified") return <span className="font-mono text-[10px] text-[#76716b]">Email verified ✓</span>
   if (status === "unverified") return (
-    <div className="flex flex-col gap-3 p-4 border border-[#e0743a]/20 bg-[#e0743a]/[0.03]" style={{ borderRadius: "var(--radius-input)" }}>
-      <div className="flex items-center gap-2">
-        <span className="w-1.5 h-1.5 rounded-sm bg-[#4f4b47]" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#4f4b47]">Email not verified</span>
-      </div>
-      <p className="text-[12px] text-[#76716b] leading-relaxed">
-        Verify your email to ensure you can recover your account and receive important notifications.
-      </p>
+    <div className="flex items-center gap-4">
+      <span className="font-mono text-[10px] text-[#4f4b47]">Email not verified</span>
       {!sent ? (
-        <button
-          onClick={sendVerification}
-          disabled={sending}
-          className="self-start font-mono text-[10px] uppercase tracking-[0.15em] text-[#f4efe9] border border-white/[0.12] px-4 py-2 hover:bg-white/[0.04] transition-colors disabled:opacity-30"
-          style={{ borderRadius: "var(--radius-button)" }}
-        >
-          {sending ? "Sending…" : "Send verification email"}
+        <button onClick={sendVerification} disabled={sending}
+          className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] hover:text-[#f4efe9] transition-colors disabled:opacity-30">
+          {sending ? "Sending…" : "Send verification"}
         </button>
       ) : (
-        <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-sm bg-[#e0743a]/60" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#76716b]">Check your inbox</span>
-        </div>
+        <span className="font-mono text-[10px] text-[#76716b]">Check your email</span>
       )}
     </div>
   )
@@ -325,7 +317,6 @@ function ChangePasswordForm() {
 
 export default function SettingsPage() {
   const isOnboarding = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("onboard") === "1"
-  const [onboardingComplete, setOnboardingComplete] = React.useState(false)
   const [baseline, setBaseline] = useState<BaselineRequest>(initialState);
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -361,7 +352,7 @@ export default function SettingsPage() {
             if (d.status === "ready") {
               setMessage({ text: "Baseline Design compiled. Your pattern map is active.", ok: true });
             } else if (d.status === "failed") {
-              setMessage({ text: "Compilation failed. Your birth data was saved — click 'Save Baseline Design' to retry.", ok: false });
+              setMessage({ text: "Compilation failed. Try saving again.", ok: false });
             } else if (d.status === "pending") {
               setTimeout(pollStatus, 5000);
             }
@@ -401,20 +392,6 @@ export default function SettingsPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-6 py-16 md:py-24">
-
-        {/* Onboarding completion */}
-        {isOnboarding && onboardingComplete && (
-          <div className="mb-8 px-6 py-5 border border-[#e0743a]/30 bg-[#e0743a]/[0.04]" style={{ borderRadius: "var(--radius-container)" }}>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70 mb-2">Baseline Design active</p>
-            <p className="text-[15px] text-[#f4efe9] leading-snug mb-3">Your space is ready.</p>
-            <p className="text-[13px] text-[#76716b] leading-relaxed mb-4">
-              Describe what is happening — Defrag will show you what is active beneath it.
-            </p>
-            <a href="/apps/defrag" className="btn-primary inline-flex">
-              Open Defrag →
-            </a>
-          </div>
-        )}
 
         {/* Title */}
         <div className="mb-14">
@@ -613,33 +590,6 @@ export default function SettingsPage() {
         <div className="mt-6 pt-6 border-t border-white/[0.06]">
           <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#4f4b47] mb-3">Active Sessions</p>
           <ActiveSessionsList />
-        </div>
-
-        {/* Notification preferences */}
-        <div className="bg-white/[0.02] border border-white/[0.08] rounded-[14px] p-8 md:p-10 mt-14">
-          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-6">
-            Notifications
-          </p>
-          <div className="flex flex-col gap-4">
-            {[
-              { label: "Billing reminders", desc: "Payment due, subscription changes", defaultOn: true },
-              { label: "Product updates", desc: "New spaces, features, and improvements", defaultOn: false },
-              { label: "Pattern insights", desc: "Weekly summary of your recurring patterns", defaultOn: false },
-            ].map((pref) => (
-              <div key={pref.label} className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-[13px] text-[#f4efe9]">{pref.label}</p>
-                  <p className="text-[11px] text-[#4f4b47] mt-0.5">{pref.desc}</p>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="font-mono text-[9px] text-[#4f4b47]">
-                    {pref.defaultOn ? "On" : "Off"}
-                  </span>
-                  <p className="font-mono text-[9px] text-[#4f4b47]/50">· email info@defrag.app to update</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Subscription */}

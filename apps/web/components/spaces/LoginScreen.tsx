@@ -93,28 +93,30 @@ export default function LoginScreen() {
 
       if (!res.ok) {
         const data = await res.json() as { error?: string }
-        setError(data.error ?? "Authentication failed")
+        const errMsg = data.error ?? "Authentication failed"
+        if (errMsg === "Bot verification failed") {
+          setError("Verification failed. Please complete the check above and try again.")
+        } else if (errMsg === "Email exists") {
+          setError("An account with this email already exists. Sign in instead.")
+        } else if (errMsg === "Invalid credentials") {
+          setError("Incorrect email or password.")
+        } else {
+          setError(errMsg)
+        }
         return
       }
       // Check if user has baseline, redirect to settings if not
-      // Preserve return URL from ?return= or ?next= query param
-      const urlParams = new URLSearchParams(window.location.search)
-      const returnUrl = urlParams.get("return") || urlParams.get("next") || ""
-      const safeReturn = returnUrl.startsWith("/") ? returnUrl : ""
-
       fetch("/api/baseline", { credentials: "include" })
         .then(r => r.ok ? r.json() : { baseline: null })
         .then((d: any) => {
-          if (safeReturn) {
-            window.location.href = safeReturn
-          } else if (d.baseline?.dob) {
+          if (d.baseline?.dob) {
             window.location.href = "/apps/defrag"
           } else {
             // New user — go to settings to set up Baseline Design
             window.location.href = "/settings?onboard=1"
           }
         })
-        .catch(() => { window.location.href = safeReturn || "/apps/defrag" })
+        .catch(() => { window.location.href = "/apps/defrag" })
     } catch {
       setError("Connection failed. Please try again.")
     } finally {
@@ -217,10 +219,18 @@ export default function LoginScreen() {
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Verification</label>
                   {turnstileSiteKey ? (
-                    <div ref={turnstileRef} className="min-h-[65px]" />
+                    <div>
+                      <div ref={turnstileRef} className="min-h-[65px]" />
+                      {!turnstileToken && (
+                        <p className="mt-2 text-[11px] text-[#4f4b47] leading-relaxed">
+                          Complete the check above to continue.
+                          {" "}If it doesn&rsquo;t appear, try disabling your ad blocker or refreshing.
+                        </p>
+                      )}
+                    </div>
                   ) : (
                     <p className="text-sm text-[#4f4b47] leading-relaxed">
-                      Bot verification not configured.
+                      Verification not configured.
                     </p>
                   )}
                 </div>

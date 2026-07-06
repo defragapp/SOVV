@@ -5,7 +5,6 @@ import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import { compileBaselineDataset, formatDatasetForAI, formatDatasetForApp, type BaselineDesignDataset } from "./baseline-compiler.js";
 import { buildHumanBehaviorTranslation } from "./human-translation.js";
 import { logSafetyEvent, protectionActive } from "./safety.js";
-import { kmsEncryptJson, kmsDecryptJson } from "./kms.js";
 
 const BASELINE_KEY = (sid: string) => `baseline:${sid}`;
 const DATASET_KEY  = (sid: string) => `baseline-dataset:${sid}`;
@@ -37,8 +36,7 @@ async function requireSessionAuth(req: Request, env: Env): Promise<Response | nu
 }
 
 export async function getBaseline(env: Env, sid: string): Promise<Baseline | null> {
-  const rawEnc = await env.KV.get(BASELINE_KEY(sid));
-  const raw = rawEnc ? await kmsDecryptJson(env.KMS_SECRET, rawEnc).then(d => JSON.stringify(d)).catch(() => rawEnc) : null;
+  const raw = await env.KV.get(BASELINE_KEY(sid));
   if (!raw) return null;
   return safeJsonParse<Baseline>(raw);
 }
@@ -46,14 +44,12 @@ export async function getBaseline(env: Env, sid: string): Promise<Baseline | nul
 export async function getBaselineDataset(env: Env, sid: string, userId?: string): Promise<BaselineDesignDataset | null> {
   // Try user-ID-based key first (persists across sessions)
   if (userId) {
-    const userRawEnc = await env.KV.get(USER_DATASET_KEY(userId));
-    const userRaw = userRawEnc ? await kmsDecryptJson(env.KMS_SECRET, userRawEnc).then(d => JSON.stringify(d)).catch(() => userRawEnc) : null;
+    const userRaw = await env.KV.get(USER_DATASET_KEY(userId));
     if (userRaw) {
       try { return JSON.parse(userRaw) as BaselineDesignDataset; } catch { /* fall through */ }
     }
   }
-  const rawDatasetEnc = await env.KV.get(DATASET_KEY(sid));
-  const raw = rawDatasetEnc ? await kmsDecryptJson(env.KMS_SECRET, rawDatasetEnc).then(d => JSON.stringify(d)).catch(() => rawDatasetEnc) : null;
+  const raw = await env.KV.get(DATASET_KEY(sid));
   if (!raw) return null;
   return safeJsonParse<BaselineDesignDataset>(raw);
 }
@@ -90,8 +86,7 @@ export async function saveBaseline(env: Env, sid: string, baseline: BaselineRequ
     updatedAt: now,
   };
 
-  const encryptedBaseline = await kmsEncryptJson(env.KMS_SECRET, record);
-  await env.KV.put(BASELINE_KEY(sid), encryptedBaseline);
+  await env.KV.put(BASELINE_KEY(sid), JSON.stringify(record));
   await env.KV.put(
     USER_KEY(sid),
     JSON.stringify({ sid, createdAt: record.createdAt, updatedAt: record.updatedAt, baselineAt: record.updatedAt })
@@ -169,9 +164,6 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
   await env.KV.put(DATASET_KEY(sid), JSON.stringify(pendingDataset));
 
   // Compile in background using waitUntil if available, otherwise fire-and-forget
-  // Get user for cross-session persistence
-  const user = await getAuthUser(req, env.DB).catch(() => null);
-
   const compileAndStore = async () => {
     try {
       const dataset = await compileBaselineDataset(
@@ -179,12 +171,10 @@ export async function handleSaveBaseline(req: Request, env: Env): Promise<Respon
         (env as any).AI,
         aiModel
       );
-      const encDataset = await kmsEncryptJson(env.KMS_SECRET, dataset);
-      await env.KV.put(DATASET_KEY(sid), encDataset);
+      await env.KV.put(DATASET_KEY(sid), JSON.stringify(dataset));
       // Also save by user ID for persistence across sessions
       if (user?.id) {
-        const encUserDataset = await kmsEncryptJson(env.KMS_SECRET, dataset);
-        await env.KV.put(USER_DATASET_KEY(user.id), encUserDataset);
+        await env.KV.put(USER_DATASET_KEY(user.id), JSON.stringify(dataset));
       }
     } catch (err) {
       logSafetyEvent({
@@ -270,13 +260,11 @@ export function registerBaselineRoutes(router: any, getEnv: () => Env) {
       return new Response(JSON.stringify({ error: "Invalid app" }), { status: 400 });
     }
 
-    // Covenant and Alignment translation requires Pro subscription
+    // Covenant and Alignment require Pro subscription
     if (app !== "defrag") {
-      const { resolveEntitlements, requireEntitlement } = await import("./entitlements.js");
-      const entitlements = resolveEntitlements(user);
-      const feature = app === "covenant" ? "canUseCovenant" as const : "canUseAlignment" as const;
-      const gate = requireEntitlement(entitlements, feature);
-      if (gate) return gate;
+      const { requireActiveSubscription } = await import("./billing.js");
+      const subGate = await requireActiveSubscription(user, req);
+      if (subGate) return subGate;
     }
 
     const translation = await buildHumanBehaviorTranslation(
@@ -313,4 +301,20 @@ export function registerBaselineRoutes(router: any, getEnv: () => Env) {
     });
   });
 
+  // GET /api/baseline/status — poll compilation status
+  router.get("/api/baseline/status", async (req: Request) => {
+    const env = getEnv();
+    const user = await getAuthUser(req, env.DB);
+    if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+    const sid = await getSessionId(req);
+    const dataset = await getBaselineDataset(env, sid, user.id);
+    if (!dataset) return Response.json({ status: "none" });
+    return Response.json({
+      status: dataset.status,
+      computedAt: dataset.computedAt,
+      hasAstronomy: Boolean(dataset.astronomy),
+      hasFrameworks: Boolean(dataset.frameworks),
+      hasAiDataset: Boolean(dataset.aiDataset),
+    });
+  });
 }

@@ -76,10 +76,7 @@ export default function DefragWorkspacePage() {
   const [error, setError] = React.useState("")
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
-  const [saveError, setSaveError] = React.useState<"pro_required" | "error" | null>(null)
   const [inviteOpen, setInviteOpen] = React.useState(false)
-  const [limitRemaining, setLimitRemaining] = React.useState<number | null>(null)
-  const [limitReached, setLimitReached] = React.useState(false)
 
   const [baseline, setBaseline] = React.useState<Baseline | null>(null)
   const [baselineLoading, setBaselineLoading] = React.useState(true)
@@ -91,17 +88,6 @@ export default function DefragWorkspacePage() {
   // Compare With Someone — Pro only
   const [compareMode, setCompareMode] = React.useState(false)
   const [compareName, setCompareName] = React.useState("")
-  const [people, setPeople] = React.useState<Array<{ id: string; name: string; relation: string }>>([])
-
-  // Load people list for compare mode
-  React.useEffect(() => {
-    if (compareMode && people.length === 0) {
-      fetch("/api/people", { credentials: "include" })
-        .then(r => r.ok ? r.json() : { people: [] })
-        .then((d: any) => { if (d.people?.length) setPeople(d.people) })
-        .catch(() => {})
-    }
-  }, [compareMode])
 
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
@@ -282,17 +268,9 @@ export default function DefragWorkspacePage() {
           workspace_source: "DEFRAG",
         }),
       })
-      if (res.status === 403) {
-        setSaveError("pro_required")
-        return
-      }
-      if (!res.ok) {
-        setSaveError("error")
-        return
-      }
+      if (!res.ok) throw new Error()
       setSaveSuccess(true)
-      setSaveError(null)
-    } catch { setSaveError("error") } finally {
+    } catch { /* silent */ } finally {
       setIsSaving(false)
     }
   }
@@ -307,24 +285,16 @@ export default function DefragWorkspacePage() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          text: (() => {
-            const parts: string[] = []
-            if (result.activePattern) parts.push(`Here is what is active right now. ${result.activePattern}.`)
-            if (result.theRepeat) parts.push(`What keeps happening: ${result.theRepeat}.`)
-            if (result.oldRole) parts.push(`The role being pulled into: ${result.oldRole}.`)
-            if (result.strainPattern) parts.push(`Under pressure: ${result.strainPattern}.`)
-            if (result.alignment) parts.push(`What gives this moment a better chance: ${result.alignment}.`)
-            const bnr = result.bestNextResponse
-            const bnrText = typeof bnr === "object" ? bnr?.summary : bnr
-            if (bnrText) parts.push(`The next move: ${bnrText}.`)
-            return parts.join(" ")
-          })(),
+          text: [
+            result.activePattern,
+            result.theRepeat ? `What keeps happening: ${result.theRepeat}` : null,
+            result.alignment ? `What gives this moment a better chance: ${result.alignment}` : null,
+            result.bestNextResponse
+              ? `Next move: ${typeof result.bestNextResponse === "object" ? result.bestNextResponse?.summary : result.bestNextResponse}`
+              : null,
+          ].filter(Boolean).join(". "),
         }),
       })
-      if (res.status === 403) {
-        const d = await res.json().catch(() => ({})) as any
-        throw new Error(d.error === "subscription_required" ? "Audio Overview requires Pro." : "Access denied.")
-      }
       if (!res.ok) { const d = (await res.json().catch(() => ({}))) as any; throw new Error(d.error || "Failed") }
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
@@ -446,14 +416,9 @@ export default function DefragWorkspacePage() {
               Past patterns were used in this result.
             </p>
           ) : (
-            <div className="flex flex-col gap-2">
-              <p className="text-[11px] text-[#4f4b47] leading-relaxed">
-                Your first pattern will appear here after your first session.
-              </p>
-              <p className="text-[10px] text-[#4f4b47]/60 leading-relaxed">
-                Each result you run builds a pattern map that makes future results more grounded.
-              </p>
-            </div>
+            <p className="text-[11px] text-[#4f4b47] leading-relaxed">
+              Patterns from past sessions will inform future results.
+            </p>
           )}
         </div>
       )}
@@ -626,39 +591,24 @@ export default function DefragWorkspacePage() {
 
         {/* Error */}
         {error && error !== "needs_baseline" && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-5 px-6">
-            {(error === "daily_limit_reached" || limitReached) ? (
-              <>
-                <div className="flex flex-col items-center gap-3">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60">Daily limit reached</span>
-                  <p className="text-[14px] text-[#f4efe9] leading-relaxed max-w-xs">
-                    You&rsquo;ve used your free sessions for today.
-                  </p>
-                  <p className="text-[12px] text-[#76716b] leading-relaxed max-w-xs">
-                    Free access resets at midnight UTC. Upgrade to Pro for unlimited sessions, Covenant, Alignment, and your Library.
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-3 items-center">
-                  <a
-                    href="/pricing"
-                    className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#f4efe9] bg-[#e0743a]/20 hover:bg-[#e0743a]/30 transition-colors border border-[#e0743a]/30 px-5 py-2.5"
-                    style={{ borderRadius: "var(--radius-button)" }}
-                  >
-                    Upgrade to Pro →
-                  </a>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#4f4b47]">
-                    Resets at midnight UTC
-                  </span>
-                </div>
-              </>
-            ) : (
-              <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">
-                {error.includes("connect") || error.includes("Connection")
-                  ? "Connection issue. Check your network and try again."
-                  : error.includes("couldn't read") || error.includes("couldn't")
-                  ? "The system couldn't read this moment clearly. Try describing it with more specific detail."
-                  : error || "Something went wrong. Try again."}
-              </p>
+          <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
+            <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">
+              {error === "daily_limit_reached" || error.includes("daily limit")
+                ? "You've reached your daily limit. Upgrade to Pro for unlimited sessions."
+                : error.includes("connect") || error.includes("Connection")
+                ? "Connection issue. Check your network and try again."
+                : error.includes("couldn't read") || error.includes("couldn't")
+                ? "The system couldn't read this moment clearly. Try describing it with more specific detail."
+                : error || "Something went wrong. Try again."}
+            </p>
+            {error.includes("daily limit") && (
+              <a
+                href="/pricing"
+                className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]"
+                style={{ borderRadius: "var(--radius-button)" }}
+              >
+                See Pro plans →
+              </a>
             )}
           </div>
         )}
@@ -673,7 +623,6 @@ export default function DefragWorkspacePage() {
               onSave={handleSave}
               isSaving={isSaving}
               saveSuccess={saveSuccess}
-              saveError={saveError}
               onInvite={() => setInviteOpen(true)}
             />
 
@@ -685,7 +634,7 @@ export default function DefragWorkspacePage() {
                   Take this to Alignment — separate what&rsquo;s yours to carry from what isn&rsquo;t.
                 </p>
                 <a
-                  href={`/apps/alignment/workspace?prompt=${encodeURIComponent(result.alignment || "")}&autorun=1`}
+                  href={`/apps/alignment/workspace?prompt=${encodeURIComponent(result.alignment || "")}`}
                   className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors whitespace-nowrap shrink-0"
                 >
                   Alignment →
@@ -730,24 +679,9 @@ export default function DefragWorkspacePage() {
                 value={compareName}
                 onChange={e => setCompareName(e.target.value)}
                 placeholder="Who are you comparing with? (name or relation)"
-                className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] outline-none text-[13px] pb-2"
+                className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] outline-none text-[13px] pb-3"
                 style={{ fontSize: "16px" }}
               />
-              {people.length > 0 && !compareName && (
-                <div className="flex gap-1.5 flex-wrap pb-3">
-                  {people.slice(0, 5).map(p => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => setCompareName(p.name)}
-                      className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] border border-white/[0.07] px-2 py-1 hover:text-[#76716b] hover:border-white/[0.12] transition-colors"
-                      style={{ borderRadius: 3 }}
-                    >
-                      {p.name}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
           )}
           <textarea
@@ -763,16 +697,6 @@ export default function DefragWorkspacePage() {
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
             <div className="flex items-center gap-3">
             <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">↵ Run · Shift+Enter for new line</span>
-            {input.length > 1500 && (
-              <span className={`font-mono text-[8px] tracking-[0.1em] ${input.length > 1900 ? "text-red-400/70" : "text-[#4f4b47]"}`}>
-                {input.length} / 2000
-              </span>
-            )}
-            {limitRemaining !== null && limitRemaining <= 3 && !limitReached && (
-              <span className={`font-mono text-[8px] uppercase tracking-[0.1em] ${limitRemaining <= 1 ? "text-[#e0743a]/70" : "text-[#4f4b47]"}`}>
-                {limitRemaining} session{limitRemaining !== 1 ? "s" : ""} left today
-              </span>
-            )}
             {result?.sourcesUsed?.invitedUsers === false && (
               <button
                 type="button"

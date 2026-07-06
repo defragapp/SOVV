@@ -36,10 +36,7 @@ export interface EmailJob {
     | "payment_success"
     | "payment_failed"
     | "canceled"
-    | "inbound_email"
-    | "nurture_day3"
-    | "nurture_day7"
-    | "abandoned_checkout";
+    | "inbound_email";
   to?: string;
   from?: string;
   size?: number;
@@ -128,7 +125,6 @@ const opts = {
       // Internal notification only — no outbound send.
       // Log for operator awareness. Future: create support ticket in D1.
       logSafetyEvent({
-        level: "info",
         event: "email_consumer_inbound_notification",
         endpoint: "queue:email",
         requestId: job.from ?? "unknown",

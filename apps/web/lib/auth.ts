@@ -1,8 +1,7 @@
-// Use relative URLs so requests go through the Next.js proxy
-// (avoids direct cross-origin calls to api.defrag.app)
+const API_BASE = 'https://api.defrag.app'
 
 export async function getSession() {
-  const res = await fetch('/api/auth/session', {
+  const res = await fetch(`${API_BASE}/api/auth/session`, {
     credentials: 'include',
   })
   if (!res.ok) return null
@@ -10,7 +9,7 @@ export async function getSession() {
 }
 
 export async function logout() {
-  await fetch('/api/auth/logout', {
+  await fetch(`${API_BASE}/api/auth/logout`, {
     method: 'POST',
     credentials: 'include',
   })

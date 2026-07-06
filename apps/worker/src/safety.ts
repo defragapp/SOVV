@@ -48,47 +48,8 @@ export type SafetyEvent = {
   metadata: Record<string, unknown>;
 };
 
-// Simplified event format used by auth.ts and other modules
-export interface SimpleSafetyEvent {
-  level: "info" | "warn" | "error" | "debug";
-  event: string;
-  request?: Request;
-  error_type?: string;
-  error?: unknown;
-  details?: Record<string, unknown>;
-  // Additional fields used by various modules
-  endpoint?: string;
-  reason?: string;
-  requestId?: string;
-  userId?: string;
-  [key: string]: unknown;
-}
-
-// Overloaded logSafetyEvent: accepts both the full (env, event) form
-// and the simplified { level, event, ... } form
-export async function logSafetyEvent(
-  envOrEvent: Env | SafetyEvent | SimpleSafetyEvent,
-  event?: SafetyEvent
-): Promise<void> {
-  // Handle simplified form: { level, event, ... }
-  if (envOrEvent && typeof envOrEvent === "object" && "level" in envOrEvent) {
-    const simple = envOrEvent as SimpleSafetyEvent;
-    // Log to console in structured format
-    const payload = {
-      channel: "safety",
-      timestamp: new Date().toISOString(),
-      level: simple.level,
-      event: simple.event,
-      error_type: simple.error_type,
-      error: simple.error instanceof Error ? simple.error.message : String(simple.error ?? ""),
-      details: simple.details,
-    };
-    if (simple.level === "error") console.error(JSON.stringify(payload));
-    else if (simple.level === "warn") console.warn(JSON.stringify(payload));
-    else console.log(JSON.stringify(payload));
-    return;
-  }
-  // Accept both (env, event) and (event) call signatures (original form)
+export async function logSafetyEvent(envOrEvent: Env | SafetyEvent, event?: SafetyEvent): Promise<void> {
+  // Accept both (env, event) and (event) call signatures
   const env = event ? envOrEvent as Env : null
   const safetyEvent = event ?? envOrEvent as SafetyEvent
   if (!env) { console.warn("[safety] logSafetyEvent called without env", safetyEvent?.type); return }

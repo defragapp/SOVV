@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 interface SiteShellProps {
   children: React.ReactNode;
@@ -20,11 +19,9 @@ const FOOTER_COLS = [
     label: "Platform",
     links: [
       { href: "/product", label: "Product" },
-      { href: "/product/defrag", label: "Defrag" },
-      { href: "/product/covenant", label: "Covenant" },
-      { href: "/product/alignment", label: "Alignment" },
       { href: "/how-it-works", label: "How it works" },
       { href: "/pricing", label: "Pricing" },
+      { href: "/about", label: "About" },
       { href: "/faq", label: "FAQ" },
     ],
   },
@@ -33,7 +30,6 @@ const FOOTER_COLS = [
     links: [
       { href: "/principles", label: "Principles" },
       { href: "/use-cases", label: "Use cases" },
-      { href: "/about", label: "About" },
       { href: "/contact", label: "Contact" },
     ],
   },
@@ -49,7 +45,6 @@ const FOOTER_COLS = [
 export function SiteShell({ children }: SiteShellProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -139,21 +134,16 @@ export function SiteShell({ children }: SiteShellProps) {
             style={{ background: "rgba(8,7,10,0.96)", backdropFilter: "blur(20px)" }}
           >
             <nav aria-label="Mobile navigation" className="flex flex-col">
-              {NAV_LINKS.map((link) => {
-                const isActive = pathname === link.href || pathname.startsWith(link.href + "/");
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`text-[15px] transition-colors py-3.5 border-b border-white/[0.04] tracking-[-0.01em] ${
-                      isActive ? "text-[#f4efe9]" : "text-[#76716b] hover:text-[#f4efe9]"
-                    }`}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-[15px] text-[#76716b] hover:text-[#f4efe9] transition-colors py-3.5 border-b border-white/[0.04] tracking-[-0.01em]"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
               <Link
                 href="/app/login"
                 className="mt-5 inline-flex items-center justify-center h-11 px-6 text-[13px] bg-[#f4efe9] text-[#08070a] tracking-[-0.01em]"

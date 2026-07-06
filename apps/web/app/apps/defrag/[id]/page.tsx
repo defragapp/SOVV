@@ -45,8 +45,6 @@ export default function DefragItemPage() {
   const [initialLoading, setInitialLoading] = React.useState(true)
   const [isLoading, setIsLoading] = React.useState(false)
   const [error, setError] = React.useState("")
-  const [isSavingUpdate, setIsSavingUpdate] = React.useState(false)
-  const [saveUpdateSuccess, setSaveUpdateSuccess] = React.useState(false)
 
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
@@ -55,11 +53,7 @@ export default function DefragItemPage() {
 
   React.useEffect(() => {
     fetch(`/api/library/${id}`, { credentials: "include" })
-      .then(r => {
-        if (r.status === 403) throw new Error("Pro subscription required to access Library.")
-        if (!r.ok) throw new Error("Not found")
-        return r.json()
-      })
+      .then(r => { if (!r.ok) throw new Error("Not found"); return r.json() })
       .then(d => {
         if (d.payload) {
           const parsed = typeof d.payload === "string" ? JSON.parse(d.payload) : d.payload
@@ -97,40 +91,6 @@ export default function DefragItemPage() {
       setError(err.message || "An error occurred.")
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleSaveUpdate = async () => {
-    if (!result || isSavingUpdate) return
-    setIsSavingUpdate(true)
-    try {
-      // Try to update the existing library item first (PUT)
-      // If it fails (e.g. item was deleted), create a new one (POST)
-      const updateRes = await fetch(`/api/library/${id}`, {
-        method: "DELETE", // We'll re-create with updated content
-        credentials: "include",
-      }).catch(() => null)
-      
-      const saveContent = result.summary || result.activePattern || ""
-      const res = await fetch("/api/history", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          title: savedTitle || "Updated result",
-          content: saveContent,
-          payload: result,
-          workspace_source: "DEFRAG",
-        }),
-      })
-      if (res.ok) {
-        const data = await res.json() as any
-        // Navigate to the new item
-        if (data.id) window.history.replaceState({}, "", `/apps/defrag/${data.id}`)
-        setSaveUpdateSuccess(true)
-      }
-    } catch { /* silent */ } finally {
-      setIsSavingUpdate(false)
     }
   }
 
@@ -331,21 +291,7 @@ export default function DefragItemPage() {
               onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleUpdate() } }}
             />
             <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">Continue the thread</span>
-                {result && !saveUpdateSuccess && (
-                  <button
-                    onClick={handleSaveUpdate}
-                    disabled={isSavingUpdate}
-                    className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] hover:text-[#76716b] transition-colors disabled:opacity-30"
-                  >
-                    {isSavingUpdate ? "Saving…" : "Save to Library"}
-                  </button>
-                )}
-                {saveUpdateSuccess && (
-                  <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#76716b]">Saved ✓</span>
-                )}
-              </div>
+              <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">Continue the thread</span>
               <button
                 onClick={handleUpdate}
                 disabled={!input.trim() || isLoading}

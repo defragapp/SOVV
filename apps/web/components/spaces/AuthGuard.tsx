@@ -32,6 +32,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [justSetBaseline, setJustSetBaseline] = useState(false)
 
   useEffect(() => {
+    // Refresh session token on mount (extends session by 7 days)
+    fetch("/api/auth/refresh", { method: "POST", credentials: "include" }).catch(() => {})
+
     async function checkSession() {
       try {
         const res = await fetch("/api/auth/session", {
@@ -51,7 +54,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
           return
         }
 
-        // Use tier from session (entitlement-resolved) + fetch baseline in parallel
+        // Use tier from session (entitlement-resolved) + fetch baseline
+        // This eliminates a separate /api/auth/tier call on every page load
         const tierFromSession = (session.user.tier as Tier) || "free"
         const baselineRes = await fetch("/api/baseline", { method: "GET", credentials: "include" })
 

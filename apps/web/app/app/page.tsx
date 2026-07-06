@@ -36,47 +36,6 @@ export default function LibraryPage() {
   const [isLoading, setIsLoading] = React.useState(true)
   const [recurringPattern, setRecurringPattern] = React.useState<string | null>(null)
   const [sessionCount, setSessionCount] = React.useState(0)
-  const [proGated, setProGated] = React.useState(false)
-  const [checkoutResult, setCheckoutResult] = React.useState<"upgraded" | "canceled" | null>(null)
-  const [filterSpace, setFilterSpace] = React.useState<"ALL" | "DEFRAG" | "COVENANT" | "ALIGNMENT">("ALL")
-  const [searchQuery, setSearchQuery] = React.useState("")
-  const [debouncedSearch, setDebouncedSearch] = React.useState("")
-
-  // Debounce search query by 400ms
-  React.useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 400)
-    return () => clearTimeout(timer)
-  }, [searchQuery])
-  const [deletingId, setDeletingId] = React.useState<string | null>(null)
-
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (!confirm("Delete this saved result?")) return
-    setDeletingId(id)
-    try {
-      await fetch(`/api/library/${id}`, { method: "DELETE", credentials: "include" })
-      setItems(prev => prev.filter(item => item.id !== id))
-    } catch { /* silent */ } finally {
-      setDeletingId(null)
-    }
-  }
-
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search)
-      if (params.get("upgraded") === "1") {
-        setCheckoutResult("upgraded")
-        // Clean URL
-        window.history.replaceState({}, "", "/app")
-        // Reload tier data
-        setTimeout(() => window.location.reload(), 2000)
-      } else if (params.get("canceled") === "1") {
-        setCheckoutResult("canceled")
-        window.history.replaceState({}, "", "/app")
-      }
-    }
-  }, [])
 
   React.useEffect(() => {
     fetch("/api/memory", { credentials: "include" })
@@ -89,19 +48,12 @@ export default function LibraryPage() {
   }, [])
 
   React.useEffect(() => {
-    const params = new URLSearchParams()
-    if (filterSpace !== "ALL") params.set("workspace_source", filterSpace)
-    if (debouncedSearch.trim()) params.set("q", debouncedSearch.trim())
-    const url = `/api/library${params.toString() ? "?" + params.toString() : ""}`
-    fetch(url, { credentials: "include" })
-      .then(r => {
-        if (r.status === 403) { setProGated(true); return { items: [] } }
-        return r.json()
-      })
-      .then(d => setItems((d as any).items || []))
+    fetch("/api/library", { credentials: "include" })
+      .then(r => r.json())
+      .then(d => setItems(d.items || []))
       .catch(() => {})
       .finally(() => setIsLoading(false))
-  }, [filterSpace, debouncedSearch])
+  }, [])
 
   const sidebar = (
     <div className="flex flex-col h-full">
@@ -146,43 +98,13 @@ export default function LibraryPage() {
     <div className="flex flex-col h-full max-w-3xl mx-auto w-full">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-3">
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Library</p>
-          <div className="flex items-center gap-1">
-            {(["ALL", "DEFRAG", "COVENANT", "ALIGNMENT"] as const).map(space => (
-              <button
-                key={space}
-                onClick={() => setFilterSpace(space)}
-                className={`font-mono text-[8px] uppercase tracking-[0.1em] px-2 py-1 transition-colors ${
-                  filterSpace === space
-                    ? "text-[#f4efe9] border border-white/[0.12] bg-white/[0.04]"
-                    : "text-[#4f4b47] hover:text-[#76716b]"
-                }`}
-                style={{ borderRadius: 3 }}
-              >
-                {space === "ALL" ? "All" : space.charAt(0) + space.slice(1).toLowerCase()}
-              </button>
-            ))}
-          </div>
-        </div>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Library</p>
         <h1 className="font-serif text-[28px] text-[#f4efe9] leading-tight tracking-[-0.02em]">
           What you've saved.
         </h1>
         <p className="text-[13px] text-[#76716b] leading-relaxed mt-2">
           Results from Defrag, Alignment, and Covenant. Return before the pattern takes over again.
         </p>
-        {checkoutResult === "upgraded" && (
-          <div className="mt-4 px-4 py-3 border border-[#e0743a]/30 bg-[#e0743a]/[0.05] flex items-center gap-3" style={{ borderRadius: "var(--radius-container)" }}>
-            <span className="w-1.5 h-1.5 rounded-sm bg-[#e0743a]/60 shrink-0" />
-            <p className="text-[13px] text-[#f4efe9]">Welcome to Pro. Your Library, Covenant, and Alignment spaces are now active.</p>
-          </div>
-        )}
-        {checkoutResult === "canceled" && (
-          <div className="mt-4 px-4 py-3 border border-white/[0.06] bg-white/[0.02] flex items-center gap-3" style={{ borderRadius: "var(--radius-container)" }}>
-            <span className="w-1.5 h-1.5 rounded-sm bg-[#4f4b47] shrink-0" />
-            <p className="text-[13px] text-[#76716b]">Checkout canceled. You're still on the free plan.</p>
-          </div>
-        )}
         {recurringPattern && sessionCount >= 3 && (
           <div className="mt-5 px-4 py-3 border border-white/[0.06] bg-white/[0.02]" style={{ borderRadius: "var(--radius-container)" }}>
             <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">
@@ -199,17 +121,6 @@ export default function LibraryPage() {
       {isLoading ? (
         <div className="flex items-center justify-center py-20">
           <span className="w-4 h-4 border border-white/[0.15] border-t-white/40 rounded-full animate-spin" />
-        </div>
-      ) : proGated ? (
-        <div className="border border-[#e0743a]/20 bg-[#e0743a]/[0.03] flex flex-col items-center justify-center py-16 text-center px-8" style={{ borderRadius: "var(--radius-container)" }}>
-          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-4">Pro required</span>
-          <p className="text-[14px] text-[#f4efe9] mb-3">Library requires Pro.</p>
-          <p className="text-[12px] text-[#76716b] leading-relaxed max-w-xs mb-6">
-            Save and return to results from Defrag, Alignment, and Covenant. Upgrade to Pro to unlock your Library.
-          </p>
-          <a href="/pricing" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#f4efe9] bg-[#e0743a]/20 hover:bg-[#e0743a]/30 transition-colors border border-[#e0743a]/30 px-5 py-2.5" style={{ borderRadius: "var(--radius-button)" }}>
-            Upgrade to Pro →
-          </a>
         </div>
       ) : items.length === 0 ? (
         <div className="border border-white/[0.06] bg-white/[0.02] flex flex-col items-center justify-center py-16 text-center px-8" style={{ borderRadius: "var(--radius-container)" }}>
@@ -247,7 +158,7 @@ export default function LibraryPage() {
               <Link
                 key={item.id}
                 href={`/apps/defrag/${item.id}`}
-                className="block px-6 py-5 border-b border-white/[0.05] last:border-0 glow-card-hover group relative"
+                className="block px-6 py-5 border-b border-white/[0.05] last:border-0 glow-card-hover group"
               >
                 <div className="flex items-start justify-between gap-4 mb-2">
                   <div className="flex items-center gap-2">
@@ -258,17 +169,7 @@ export default function LibraryPage() {
                       {spaceLabel(item.workspace_source)}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono text-[9px] text-[#4f4b47] shrink-0">{formatDate(item.created_at)}</span>
-                    <button
-                      onClick={(e) => handleDelete(item.id, e)}
-                      disabled={deletingId === item.id}
-                      className="opacity-0 group-hover:opacity-100 font-mono text-[8px] text-[#4f4b47] hover:text-red-400/60 transition-all disabled:opacity-30"
-                      title="Delete"
-                    >
-                      {deletingId === item.id ? "…" : "✕"}
-                    </button>
-                  </div>
+                  <span className="font-mono text-[9px] text-[#4f4b47] shrink-0">{formatDate(item.created_at)}</span>
                 </div>
                 <p className="text-[14px] text-[#c8c2bc] group-hover:text-[#f4efe9] transition-colors leading-snug mb-1">
                   {item.title || "Untitled"}

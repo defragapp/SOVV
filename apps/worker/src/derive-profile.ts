@@ -19,7 +19,7 @@
 
 import type { IRequest } from "itty-router"
 import { getAuthUser, jsonResponse } from "./auth.js"
-import { logSafetyEvent, protectionActive } from "./safety.js"
+import { logSafetyEvent } from "./safety.js"
 import {
   evaluateInputClassification,
   getColdStartMarker,
@@ -69,7 +69,7 @@ export async function handleDeriveProfile(
   const coldStart = getColdStartMarker()
 
   // 1. Auth — session required
-  const authUser = await getAuthUser(request, env.DB)
+  const authUser = await getAuthUser(httpRequest, env.DB)
   if (!authUser) {
     return jsonResponse({ error: "Unauthorized" }, 401)
   }
@@ -94,7 +94,7 @@ export async function handleDeriveProfile(
     logSafetyEvent({
       level: "error",
       event: "derive_profile_invalid_baseline",
-      request: request,
+      request: httpRequest,
       reason: "unknown_failure",
       error_type: "system",
       error,
@@ -156,11 +156,11 @@ export async function handleDeriveProfile(
     return temporaryUnavailableResponse(requestId)
   }
 
-  if (protectionActive(request, 2)) {
+  if (protectionActive(httpRequest, 2)) {
     logSafetyEvent({
       level: "warn",
       event: "derive_profile_protective_fallback",
-      request: request,
+      request: httpRequest,
       reason: "protection_escalation",
       error_type: "system",
       protection_level: 2,
@@ -186,7 +186,7 @@ export async function handleDeriveProfile(
       ],
       temperature: 0.3,
       max_tokens: tuneTokenBudget(800, serviceState.state, pressure.throttleLevel),
-    }, { gateway: { id: (env as any).GATEWAY_ID || "sovereign-ai-gateway" } })
+    })
 
     // CF Workers AI returns { response: string } for chat models
     aiText = typeof aiResponse === "object" && "response" in aiResponse

@@ -15,7 +15,6 @@ export default function UpgradeBanner() {
     setError("")
 
     try {
-      let stripePromoCodeId: string | undefined
       if (promoCode.trim()) {
         const promoRes = await fetch("/api/promo/redeem", {
           method: "POST",
@@ -23,19 +22,16 @@ export default function UpgradeBanner() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code: promoCode.trim().toUpperCase() }),
         })
-        const promoData = await promoRes.json() as { discount_percent?: number; stripe_promotion_code_id?: string; error?: string }
+        const promoData = await promoRes.json() as { discount_percent?: number; error?: string }
         if (!promoRes.ok && promoData.error !== "Invalid or inactive promo code") {
           setError(promoData.error || "Invalid promo code")
           return
         }
-        stripePromoCodeId = promoData.stripe_promotion_code_id
       }
 
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(stripePromoCodeId ? { couponId: stripePromoCodeId } : {}),
       })
 
       const data = await res.json() as { url?: string; error?: string }

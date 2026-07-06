@@ -51,13 +51,10 @@ export async function processInput(options: ProcessInputOptions): Promise<Proces
     }
 
     if (!res.ok) {
-      const code = raw.error as string | undefined
-      const msg = code === "daily_limit_reached"
+      const msg = raw.error === "daily_limit_reached"
         ? "You've reached your daily limit. Upgrade to continue."
-        : code === "subscription_required" || code === "rate_limit_exceeded"
-        ? (raw.message as string) || code
-        : (raw.message as string) || code || "Something went wrong."
-      return { ok: false, error: msg, code }
+        : (raw.message as string) || (raw.error as string) || "Something went wrong."
+      return { ok: false, error: msg, code: raw.error as string | undefined }
     }
 
     let output: SystemOutput

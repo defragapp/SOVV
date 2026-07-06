@@ -219,8 +219,7 @@ const DEFRAG_OUTPUT_CONTRACT = `OUTPUT FORMAT — JSON only, no markdown, no cod
   "conversationalSteering": {
     "do": ["what to do — specific. OMIT entire object if redundant with bestNextResponse."],
     "avoid": ["what not to do — specific"]
-  },
-  "nextSpace": "ALIGNMENT" | "COVENANT" | null
+  }
 }
 
 FIELD RULES:
@@ -237,7 +236,6 @@ FIELD RULES:
 - Use short declarative lines
 - Prefer ordinary words used precisely
 - If the input is brief or unclear, return only: activePattern + alignment + bestNextResponse
-- "nextSpace": suggest "ALIGNMENT" if the user needs to separate what is theirs to carry, "COVENANT" if faith/meaning/repair is present, null otherwise. OMIT if unclear.
 `
 
 

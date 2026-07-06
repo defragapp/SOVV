@@ -91,25 +91,20 @@ export function sessionCookie(
   maxAge = 7 * 24 * 60 * 60,
   cookieDomainValue?: string,
 ): string {
-  // Use env COOKIE_DOMAIN (e.g. "defrag.app") for cross-subdomain auth.
-  // The leading dot makes the cookie valid on all subdomains.
-  const domain = cookieDomain(cookieDomainValue) ?? "defrag.app"
-  const domainPart = domain.startsWith(".") ? domain : `.${domain}`
+  const domain = cookieDomain(cookieDomainValue)
   return [
     `__sov_session=${token}`,
     `Max-Age=${maxAge}`,
     "Path=/",
-    `Domain=${domainPart}`,
+"Domain=.defrag.app",
     "HttpOnly",
     "Secure",
     "SameSite=Lax",
   ].join("; ")
 }
 
-export function clearCookie(cookieDomainValue?: string): string {
-  const domain = cookieDomain(cookieDomainValue) ?? "defrag.app"
-  const domainPart = domain.startsWith(".") ? domain : `.${domain}`
-  return `__sov_session=; Max-Age=0; Path=/; Domain=${domainPart}; HttpOnly; Secure; SameSite=Lax`
+export function clearCookie(): string {
+  return "__sov_session=; Max-Age=0; Path=/; Domain=.defrag.app; HttpOnly; Secure; SameSite=Lax"
 }
 
 
@@ -124,7 +119,6 @@ import type { D1Database } from "@cloudflare/workers-types";
 import { getCorsHeaders } from "./cors.js";
 import { getSessionId } from "./plan.js";
 import { logSafetyEvent } from "./safety.js";
-import { emitMetric } from "./analytics.js";
 
 export function jsonResponse(data: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(data), {
@@ -143,8 +137,6 @@ export type AuthUser = {
   role: string
   stripe_customer_id: string | null | undefined
   subscription_status: string
-  subscription_current_period_end?: number | null
-  email_verified: number
 }
 
 export function generatePromoCode(length = 10): string {
@@ -158,7 +150,7 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
   if (!token) return null
 
   const session = await DB.prepare(
-    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status, COALESCE(u.subscription_current_period_end, 0) as subscription_current_period_end, COALESCE(u.email_verified, 0) as email_verified FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
+    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
   )
     .bind(token, Date.now())
     .first<{
@@ -168,8 +160,6 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
       role: string | null
       stripe_customer_id: string | null
       subscription_status: string | null
-      subscription_current_period_end: number | null
-      email_verified: number
     }>()
 
   if (!session) return null
@@ -193,38 +183,10 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
     role: session.role || "user",
     stripe_customer_id: session.stripe_customer_id,
     subscription_status: session.subscription_status || "free",
-    subscription_current_period_end: session.subscription_current_period_end ?? null,
-    email_verified: session.email_verified ?? 0,
   }
 }
 
 const SESSION_TTL = 7 * 24 * 60 * 60
-
-/**
- * Strict per-IP rate limiter for auth routes.
- * 5 attempts per 15 minutes — prevents credential stuffing.
- * Uses KV for persistence across requests.
- */
-async function checkAuthRateLimit(
-  kv: KVNamespace,
-  ip: string,
-  action: "login" | "register" | "forgot_password"
-): Promise<{ allowed: boolean; retryAfter: number }> {
-  const window = 15 * 60 // 15 minutes
-  const maxAttempts = action === "register" ? 3 : 5
-  const key = `auth-rate:${action}:${ip}:${new Date().toISOString().slice(0, 13)}` // hourly bucket
-
-  const raw = await kv.get(key).catch(() => null)
-  const count = raw ? parseInt(raw, 10) : 0
-
-  if (count >= maxAttempts) {
-    return { allowed: false, retryAfter: window }
-  }
-
-  await kv.put(key, String(count + 1), { expirationTtl: window }).catch(() => {})
-  return { allowed: true, retryAfter: 0 }
-}
-
 
 export async function registerAuthRoutes(router: any, getEnv: () => any) {
   // POST /api/auth/register
@@ -236,16 +198,6 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         const ip = request.headers.get("CF-Connecting-IP") || "unknown"
         const { success } = await env.RATE_LIMITER.limit({ key: `register:${ip}` })
         if (!success) return jsonResponse({ error: "Too many registration attempts. Please wait before trying again." }, 429)
-      }
-      // Stricter KV-based rate limit: 3 registrations per 15 minutes per IP
-      if (env.KV) {
-        const ip = request.headers.get("CF-Connecting-IP") || "unknown"
-        const { allowed, retryAfter } = await checkAuthRateLimit(env.KV, ip, "register")
-        if (!allowed) {
-          return jsonResponse({ error: "Too many registration attempts. Please wait 15 minutes before trying again." }, 429, {
-            "Retry-After": String(retryAfter),
-          })
-        }
       }
       const { email: rawRegEmail, password, turnstileToken } = await request.json() as any
       const email = typeof rawRegEmail === "string" ? rawRegEmail.toLowerCase().trim() : ""
@@ -290,10 +242,6 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
             details: { recipient: email },
           })
         )
-        // Schedule nurture emails (Day 3 and Day 7)
-        // These are sent via the queue with a delay — the consumer handles timing
-        void env.QUEUE.send({ type: "nurture_day3", to: email }).catch(() => {})
-        void env.QUEUE.send({ type: "nurture_day7", to: email }).catch(() => {})
       } else if (env.RESEND_API_KEY) {
         // Fallback: send directly if no queue
         const { sendWelcomeEmail } = await import("./email.js")
@@ -314,7 +262,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         const appUrl = env.APP_URL || "https://app.defrag.app"
         void fetch(`${appUrl}/api/auth/send-verification`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "Cookie": `__sov_session=${token}` },
+          headers: { "Content-Type": "application/json", "Cookie": `session=${token}` },
           body: JSON.stringify({ email }),
         }).catch((error) => {
           logSafetyEvent({
@@ -348,16 +296,6 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         const { success } = await env.RATE_LIMITER.limit({ key: `login:${ip}` })
         if (!success) return jsonResponse({ error: "Too many login attempts. Please wait before trying again." }, 429)
       }
-      // Stricter KV-based rate limit: 5 attempts per 15 minutes
-      if (env.KV) {
-        const ip = request.headers.get("CF-Connecting-IP") || "unknown"
-        const { allowed, retryAfter } = await checkAuthRateLimit(env.KV, ip, "login")
-        if (!allowed) {
-          return jsonResponse({ error: "Too many login attempts. Please wait 15 minutes before trying again." }, 429, {
-            "Retry-After": String(retryAfter),
-          })
-        }
-      }
       const { email: rawEmail, password } = await request.json() as any
       const email = typeof rawEmail === "string" ? rawEmail.toLowerCase().trim() : ""
       const user = await env.DB.prepare("SELECT id, email, password_hash, tier, role FROM users WHERE email = ?").bind(email).first() as any
@@ -372,12 +310,10 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         .bind(token, user.id, now + SESSION_TTL * 1000, now + SESSION_TTL * 1000, now)
         .run()
 
-      emitMetric(env, "auth_login", { success: true })
       return jsonResponse({ success: true, token }, 200, {
         "Set-Cookie": sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN),
       })
     } catch (e: any) {
-      emitMetric(env, "auth_failed", { space: "auth" })
       logSafetyEvent({ level: "error", event: "auth_login_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Login failed" }, 500)
     }
@@ -394,20 +330,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     return jsonResponse({ id: user.id, email: user.email, tier: user.tier, role: user.role })
   })
 
-    // POST /api/admin/promo — alias for /api/ambassador/promo-codes (used by admin panel)
-  // POST /api/ambassador/promo-codes
-  router.post("/api/admin/promo", async (request: Request) => {
-    const env = getEnv()
-    const user = await getAuthUser(request, env.DB)
-    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
-    if (user.role !== "owner" && user.role !== "admin" && user.role !== "ambassador") {
-      return jsonResponse({ error: "Forbidden" }, 403)
-    }
-    // Delegate to ambassador/promo-codes handler
-    const newReq = new Request(request.url.replace("/api/admin/promo", "/api/ambassador/promo-codes"), request)
-    return router.fetch(newReq, env)
-  })
-
+    // POST /api/ambassador/promo-codes
   router.post("/api/ambassador/promo-codes", async (request: Request) => {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
@@ -482,9 +405,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       success: true, 
       code: promo.code,
       discount_percent: promo.discount_percent,
-      applicable_tiers: promo.applicable_tiers ? JSON.parse(promo.applicable_tiers) : null,
-      stripe_coupon_id: promo.stripe_coupon_id || null,
-      stripe_promotion_code_id: promo.stripe_promotion_code_id || null,
+      applicable_tiers: promo.applicable_tiers ? JSON.parse(promo.applicable_tiers) : null
     })
   })
 
@@ -493,20 +414,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ authenticated: false })
-    // Include entitlement-resolved tier so AuthGuard doesn't need a separate /api/auth/tier call
-    const { resolveEntitlements } = await import("./entitlements.js")
-    const entitlements = resolveEntitlements(user)
-    return jsonResponse({
-      authenticated: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        tier: entitlements.effectiveTier,
-        subscription_status: user.subscription_status,
-        email_verified: user.email_verified === 1,
-        is_in_grace_period: entitlements.isInGracePeriod,
-      }
-    })
+    return jsonResponse({ authenticated: true, user })
   })
 
   // GET /api/auth/tier
@@ -514,16 +422,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ tier: "free", subscription_status: "free" })
-    // Use entitlements for accurate tier resolution (handles trialing, grace period, manual grants)
-    const { resolveEntitlements } = await import("./entitlements.js")
-    const entitlements = resolveEntitlements(user)
-    return jsonResponse({
-      tier: entitlements.effectiveTier,
-      subscription_status: user.subscription_status,
-      is_active_pro: entitlements.isActivePro,
-      is_in_grace_period: entitlements.isInGracePeriod,
-      is_manual_pro: entitlements.isManualPro,
-    })
+    return jsonResponse({ tier: user.tier, subscription_status: user.subscription_status })
   })
 
   // GET /api/auth/subscription — detailed subscription status for payment gating
@@ -531,14 +430,10 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
-    const { resolveEntitlements } = await import("./entitlements.js")
-    const entitlements = resolveEntitlements(user)
     return jsonResponse({
-      tier: entitlements.effectiveTier,
+      tier: user.tier,
       subscription_status: user.subscription_status,
-      has_active_subscription: entitlements.effectiveTier === "pro",
-      is_in_grace_period: entitlements.isInGracePeriod,
-      deny_reason: entitlements.denyReason,
+      has_active_subscription: user.subscription_status === "active" || user.tier === "pro",
     })
   })
 
@@ -568,10 +463,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       // Invalidate all other sessions for security
       await env.DB.prepare("DELETE FROM sessions WHERE user_id = ? AND token != ?")
-        .bind(user.id, 
-          request.headers.get("cookie")?.match(/__sov_session=([^;]+)/)?.[1] ||
-          request.headers.get("cookie")?.match(/session=([^;]+)/)?.[1] || ""
-        ).run()
+        .bind(user.id, request.headers.get("cookie")?.match(/session=([^;]+)/)?.[1] || "").run()
 
       return jsonResponse({ success: true })
     } catch (e) {
@@ -598,24 +490,13 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         env.KV.get(`natal:${user.id}`),
       ])
 
-      // Decrypt baseline data if KMS-encrypted
-      let baselineDesign = null
-      if (natal) {
-        try {
-          const { kmsDecryptJson } = await import("./kms.js")
-          baselineDesign = await kmsDecryptJson(env.KMS_SECRET, natal)
-        } catch {
-          try { baselineDesign = JSON.parse(natal) } catch { /* skip */ }
-        }
-      }
-
       const exportData = {
         exportedAt: new Date().toISOString(),
         account: { id: user.id, email: user.email, tier: user.tier, createdAt: (user as any).created_at },
         library: library.results || [],
         interactions: interactions.results || [],
         people: people.results || [],
-        baselineDesign,
+        baselineDesign: natal ? JSON.parse(natal) : null,
       }
 
       return new Response(JSON.stringify(exportData, null, 2), {
@@ -638,36 +519,6 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
 
     try {
-      // Cancel Stripe subscription before deleting account
-      if (user.stripe_customer_id && env.STRIPE_SECRET_KEY) {
-        try {
-          // Get active subscriptions for this customer
-          const subsRes = await fetch(
-            `https://api.stripe.com/v1/subscriptions?customer=${user.stripe_customer_id}&status=active&limit=5`,
-            { headers: { "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}` } }
-          )
-          if (subsRes.ok) {
-            const subsData = await subsRes.json() as { data?: Array<{ id: string }> }
-            for (const sub of subsData.data ?? []) {
-              await fetch(`https://api.stripe.com/v1/subscriptions/${sub.id}`, {
-                method: "DELETE",
-                headers: { "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}` },
-              }).catch(() => {})
-            }
-          }
-        } catch {
-          // Non-fatal: log but continue with account deletion
-          logSafetyEvent({
-            level: "warn",
-            event: "auth_delete_account_stripe_cancel_failed",
-            request,
-            error_type: "system",
-            error: "stripe_cancel_failed",
-            details: { userId: user.id },
-          })
-        }
-      }
-
       // Delete all user data in order (FK constraints)
       await env.DB.batch([
         env.DB.prepare("DELETE FROM sessions WHERE user_id = ?").bind(user.id),
@@ -705,7 +556,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          "Set-Cookie": clearCookie(env.COOKIE_DOMAIN),
+          "Set-Cookie": clearCookie(),
           ...getCorsHeaders(request),
         },
       })
@@ -791,10 +642,9 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       const SESSION_TTL = 7 * 24 * 60 * 60 // 7 days in seconds
       const cookieDomain = env.COOKIE_DOMAIN || undefined
 
-      // Get old token from cookie (__sov_session is the primary cookie name)
+      // Get old token from cookie
       const cookieHeader_val = request.headers.get("cookie") || ""
-      const oldToken = cookieHeader_val.match(/__sov_session=([^;]+)/)?.[1]
-        || cookieHeader_val.match(/session=([^;]+)/)?.[1]
+      const oldToken = cookieHeader_val.match(/session=([^;]+)/)?.[1]
 
       // Insert new session
       await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, expires, created_at) VALUES (?, ?, ?, ?, ?)")
@@ -821,15 +671,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   // POST /api/auth/logout
   router.post("/api/auth/logout", async (request: Request) => {
     const env = getEnv()
-    // Delete the current session token
-    const token = getSessionToken(request)
-    if (token) {
-      try {
-        await env.DB.prepare("DELETE FROM sessions WHERE token = ?").bind(token).run()
-      } catch (error) {
-        logSafetyEvent({ level: "warn", event: "auth_logout_session_delete_failed", request, error_type: "auth", error })
-      }
-    }
+    const cookieDomain = env.COOKIE_DOMAIN || undefined
     // Clean up expired sessions opportunistically on logout
     try {
       await env.DB.prepare("DELETE FROM sessions WHERE expires_at < ?")
@@ -841,7 +683,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Set-Cookie": clearCookie(env.COOKIE_DOMAIN),
+        "Set-Cookie": clearCookie(),
         ...getCorsHeaders(request),
       },
     })
@@ -911,7 +753,21 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     }
   })
 
-  // /api/user/me is registered in index.ts (primary registration)
+  // GET /api/user/me — current user profile
+  router.get("/api/user/me", async (request: Request) => {
+    const env = getEnv()
+    const user = await getAuthUser(request, env.DB)
+    if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    const row = await env.DB.prepare("SELECT email_verified FROM users WHERE id = ?").bind(user.id).first() as any
+    return jsonResponse({
+      id: user.id,
+      email: user.email,
+      tier: user.tier || "free",
+      role: user.role || "user",
+      subscription_status: user.subscription_status || "free",
+      email_verified: row?.email_verified === 1,
+    })
+  })
 
   // GET /api/user/usage — session quota for current user
   router.get("/api/user/usage", async (request: Request) => {
@@ -955,7 +811,7 @@ export function registerAdminSeedRoute(router: any, getEnv: () => any) {
       const password_hash = await hashPassword(password)
       const now = Date.now()
       const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?")
-        .bind(normalizedEmail).first() as { id: string } | null
+        .bind(normalizedEmail).first<{ id: string }>()
       if (existing) {
         await env.DB.prepare("UPDATE users SET password_hash = ?, role = 'owner' WHERE id = ?")
           .bind(password_hash, existing.id).run()

@@ -5,7 +5,7 @@ import type { Env } from "./types-env.js";
 import { getRecentInteractions, upsertPatterns, getPatterns } from "./db.js";
 import { getAuthUser, verifyAccessJWT } from "./auth.js";
 import { getSessionId, cookieHeader } from "./plan.js";
-import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
+import { requireActiveSubscription } from "./billing.js";
 import { logSafetyEvent } from "./safety.js";
 import {
   evaluateInputClassification,
@@ -39,7 +39,7 @@ const PATTERN_SYSTEM_PROMPT = `You are a pattern recognition engine. Analyze the
 }`;
 
 export async function extractPatterns(env: Env, sessionId: string, newInteractionId: string): Promise<void> {
-  logSafetyEvent({ level: "info", event: "queue_pattern_extraction_start", details: { sessionId } });
+  console.log(`[Queue] Starting pattern extraction for session: ${sessionId}`);
   const requestId = newInteractionId;
   const endpoint = "/queue/pattern-extraction";
   const coldStart = getColdStartMarker();
@@ -52,7 +52,7 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
   // 1. Get recent contextual data
   const interactions = await getRecentInteractions(env.DB, sessionId, 15);
   if (interactions.length < 2) {
-    logSafetyEvent({ level: "info", event: "queue_pattern_insufficient_data" });
+    console.log("[Queue] Insufficient interactions to calculate recursive behavior.");
     await recordServiceOutcome(env, { endpoint, requestId, sessionId }, {
       aiExecuted: false,
       responsePath: "fallback",
@@ -87,7 +87,7 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
     : "No persistent behavioral structures logged yet.";
 
   if (!env.AI) {
-    logSafetyEvent({ level: "error", event: "queue_ai_binding_unavailable", error_type: "system" });
+    console.error("[Queue] Cloudflare AI binding unavailable.");
     await recordServiceOutcome(env, { endpoint, requestId, sessionId }, {
       aiExecuted: false,
       responsePath: "fallback",
@@ -182,7 +182,7 @@ export async function extractPatterns(env: Env, sessionId: string, newInteractio
         coldStart,
       },
     });
-    logSafetyEvent({ level: "info", event: "queue_patterns_stored", details: { count: patterns.length } });
+    console.log(`[Queue] Successfully stored ${patterns.length} isolated tracks.`);
   } catch (err) {
     console.error("[Queue] Inference pipeline execution failure:", err);
     await recordServiceOutcome(env, { endpoint, requestId, sessionId }, {
@@ -232,22 +232,30 @@ export function registerPatternsRoutes(router: any, getEnv: () => Env) {
   router.get("/api/patterns", async (request: Request) => {
     const env = getEnv();
     
-    // Auth via __sov_session cookie
+    // Check session via cookies first
     const user = await getAuthUser(request, env.DB);
-    if (!user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+
+    // Subscription gate for workspace route
+    const subGate = await requireActiveSubscription(user, request);
+    if (subGate) return subGate;
+
+    const cookie = request.headers.get("Cookie") || "";
+    let sessionId = "";
+    const match = cookie.match(/sid=([a-zA-Z0-9_-]+)/);
+    if (match) sessionId = match[1] ?? "";
+
+    if (!sessionId) {
+      const { getAuthUser } = await import("./auth.js");
+      const user = await getAuthUser(request, env.DB);
+      if (user) sessionId = user.id;
+    }
+
+    if (!sessionId) {
+      return new Response(JSON.stringify({ error: "Missing identity scope" }), {
         status: 401,
         headers: { "Content-Type": "application/json" }
       });
     }
-
-    // Subscription gate for workspace route
-    const entitlements = resolveEntitlements(user);
-    const subGate = requireEntitlement(entitlements, "canUseLibrary");
-    if (subGate) return subGate;
-
-    // Use user.id as the session scope for pattern lookup
-    const sessionId = user.id;
 
     try {
       const activeTracks = await getPatterns(env.DB, sessionId);

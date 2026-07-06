@@ -634,17 +634,17 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-6 bg-[#e0743a]/60" />
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">
-                See how it works
+                The clarity console
               </span>
             </div>
             <h2
               className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight text-balance max-w-lg"
               style={{ fontSize: "clamp(1.9rem, 4vw, 3.2rem)" }}
             >
-              <span className="text-glow">This is what it looks like</span> inside.
+              <span className="text-glow">A private notebook</span> that turns reflection into direction.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-sm">
-              Describe the moment. Your Baseline Design is already active. The system shows what&rsquo;s running beneath the surface — and one clear next move.
+              The Clarity Console reads the situation through your Baseline Design — showing what&rsquo;s active, what&rsquo;s repeating, and what next move gives the moment a better chance.
             </p>
           </div>
           <SpacePreview />
@@ -671,7 +671,7 @@ export default function Home() {
               <span className="text-glow">The moment</span> is rarely the whole pattern.
             </h2>
             <p className="mt-5 text-[15px] text-[#76716b] leading-relaxed max-w-lg">
-              The argument, the silence, the message — it feels bigger than it is because it&rsquo;s touching something already in motion. This separates the two.
+              A text, tone, silence, or conflict can feel bigger than the facts because it is touching a pattern already in motion. Sovereign.os helps you separate the moment from the pattern — before pressure chooses for you.
             </p>
           </div>
 
@@ -679,7 +679,7 @@ export default function Home() {
             {[
               {
                 label: "The Moment",
-                desc: "The text. The silence. The conversation. What happened on the surface.",
+                desc: "What happened on the surface. The text. The conversation. The request. The decision.",
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <circle cx="10" cy="10" r="3" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5"/>
@@ -690,7 +690,7 @@ export default function Home() {
               },
               {
                 label: "The Pattern",
-                desc: "What keeps happening beneath it. The loop, the role, the pressure that makes this moment feel heavier than it is.",
+                desc: "What may be repeating underneath. The role, pressure, loop, or meaning that makes the moment feel heavier.",
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M3 10 Q7 4 10 10 Q13 16 17 10" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
@@ -701,7 +701,7 @@ export default function Home() {
               },
               {
                 label: "The Next Move",
-                desc: "One specific move. Not a list. Not advice. The response that gives this moment a better chance.",
+                desc: "The response, pause, boundary, or repair that gives the situation a better chance.",
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M4 10h12M12 6l4 4-4 4" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -916,7 +916,9 @@ export default function Home() {
                   </p>
                 </div>
 
-                <div className="flex-1" />
+                <div className="flex flex-col gap-2 flex-1">
+                  <p className="text-[13px] text-[#a8a29a] leading-relaxed">{space.what}</p>
+                </div>
 
                 <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.05]">
                   {space.tags.map((tag) => (

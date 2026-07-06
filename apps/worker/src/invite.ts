@@ -16,7 +16,6 @@
 
 import type { Env } from "./types-env.js";
 import { getAuthUser, jsonResponse } from "./auth.js";
-import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
 import { getBaseline, getBaselineForAI } from "./baseline.js";
 import { logSafetyEvent } from "./safety.js";
 import {
@@ -53,11 +52,6 @@ function expiresAt(): string {
 async function handleCreateInvite(req: Request, env: Env): Promise<Response> {
   const user = await getAuthUser(req, env.DB);
   if (!user) return jsonResponse({ error: "Unauthorized" }, 401);
-
-  // Invite Privately is a Pro feature
-  const entitlements = resolveEntitlements(user);
-  const inviteGate = requireEntitlement(entitlements, "canInvite");
-  if (inviteGate) return inviteGate;
 
   // Per-user invite creation rate limit (10/day)
   if (env.KV) {
@@ -283,12 +277,6 @@ async function handleInviteResult(token: string, req: Request, env: Env): Promis
   const coldStart = getColdStartMarker()
   const user = await getAuthUser(req, env.DB);
   if (!user) return jsonResponse({ error: "Unauthorized" }, 401);
-
-  // Invite result generation requires Pro (canInvite entitlement)
-  const { resolveEntitlements, requireEntitlement } = await import("./entitlements.js");
-  const entitlements = resolveEntitlements(user);
-  const inviteGate = requireEntitlement(entitlements, "canInvite");
-  if (inviteGate) return inviteGate;
 
   await logSafetyEvent(env, {
     type: "request_lifecycle",

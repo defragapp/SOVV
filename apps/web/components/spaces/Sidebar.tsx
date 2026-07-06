@@ -89,24 +89,12 @@ function SessionCounter() {
               <span className="font-mono text-[8px] text-[#4f4b47]">
                 {usage.used} / {usage.limit} used
               </span>
-              {usage.remaining === 0 ? (
-                <Link
-                  href="/pricing"
-                  className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#e0743a]/80 hover:text-[#e0743a] transition-colors"
-                >
-                  Upgrade →
-                </Link>
-              ) : low ? (
-                <Link
-                  href="/pricing"
-                  className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#e0743a]/60 hover:text-[#e0743a] transition-colors"
-                >
-                  Upgrade →
-                </Link>
+              {low ? (
+                <span className="font-mono text-[8px] text-[#4f4b47]">Resets midnight UTC</span>
               ) : warn ? (
                 <Link
                   href="/pricing"
-                  className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
+                  className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#e0743a]/60 hover:text-[#e0743a] transition-colors"
                 >
                   Upgrade →
                 </Link>
@@ -128,48 +116,16 @@ export default function Sidebar({
   onSelectPerson?: (person: Person) => void
 }) {
   const [people, setPeople] = useState<Person[]>([])
-  const [addingPerson, setAddingPerson] = useState(false)
-  const [newPersonName, setNewPersonName] = useState("")
-  const [newPersonRelation, setNewPersonRelation] = useState<Relation>("friend")
-  const [addingLoading, setAddingLoading] = useState(false)
   const pathname = usePathname()
 
   useEffect(() => {
-    fetch("/api/people", { credentials: "include" })
+    fetch("/api/auth/people", { credentials: "include" })
       .then((res) => (res.ok ? res.json() : { people: [] }))
       .then((data) => {
         if (data.people?.length) setPeople(data.people)
       })
       .catch(() => {})
   }, [])
-
-  const handleAddPerson = async () => {
-    if (!newPersonName.trim() || addingLoading) return
-    setAddingLoading(true)
-    try {
-      const res = await fetch("/api/people", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newPersonName.trim(), relation: newPersonRelation }),
-      })
-      if (res.ok) {
-        const data = await res.json() as any
-        setPeople(prev => [...prev, { id: data.id, name: newPersonName.trim(), relation: newPersonRelation }])
-        setNewPersonName("")
-        setAddingPerson(false)
-      }
-    } catch { /* silent */ } finally {
-      setAddingLoading(false)
-    }
-  }
-
-  const handleDeletePerson = async (id: string) => {
-    try {
-      await fetch(`/api/people/${id}`, { method: "DELETE", credentials: "include" })
-      setPeople(prev => prev.filter(p => p.id !== id))
-    } catch { /* silent */ }
-  }
 
   const selfList = people.filter((p) => p.relation === "self")
   const peopleList = people.filter((p) => p.relation !== "self")
@@ -193,8 +149,7 @@ export default function Sidebar({
           {navLinks.map((link) => {
             const active =
               pathname === link.href ||
-              pathname.startsWith(link.href + "/") ||
-              (link.href === "/apps/defrag" && (pathname === "/app" || pathname?.startsWith("/apps/defrag/")))
+              (link.href === "/apps/defrag" && pathname === "/app")
             return (
               <Link
                 key={link.href}
@@ -216,50 +171,9 @@ export default function Sidebar({
       <div className="flex-1 overflow-y-auto py-4">
         {onSelectPerson && selectedPerson && (
           <>
-            <div className="flex items-center justify-between px-6 mb-2">
-              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">
-                Relational Matrix
-              </span>
-              <button
-                onClick={() => setAddingPerson(p => !p)}
-                className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
-              >
-                {addingPerson ? "Cancel" : "+ Add"}
-              </button>
-            </div>
-
-            {addingPerson && (
-              <div className="mx-4 mb-3 p-3 border border-white/[0.08] bg-white/[0.02]" style={{ borderRadius: "var(--radius-container)" }}>
-                <input
-                  type="text"
-                  value={newPersonName}
-                  onChange={e => setNewPersonName(e.target.value)}
-                  placeholder="Name"
-                  className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] outline-none text-[12px] mb-2 border-b border-white/[0.06] pb-2"
-                  onKeyDown={e => e.key === "Enter" && handleAddPerson()}
-                  autoFocus
-                />
-                <select
-                  value={newPersonRelation}
-                  onChange={e => setNewPersonRelation(e.target.value as Relation)}
-                  className="w-full bg-[#0c0a0d] text-[#76716b] text-[11px] outline-none mb-2 border border-white/[0.06] px-2 py-1"
-                  style={{ borderRadius: 4 }}
-                >
-                  {(Object.entries(RELATION_LABELS) as [Relation, string][]).map(([val, label]) => (
-                    <option key={val} value={val}>{label}</option>
-                  ))}
-                </select>
-                <button
-                  onClick={handleAddPerson}
-                  disabled={!newPersonName.trim() || addingLoading}
-                  className="w-full h-7 bg-[#f4efe9] text-[#08070a] text-[11px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30"
-                  style={{ borderRadius: 4 }}
-                >
-                  {addingLoading ? "Adding…" : "Add person"}
-                </button>
-              </div>
-            )}
-
+            <span className="block px-6 mb-2 font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">
+              Relational Matrix
+            </span>
             <div className="flex flex-col">
               {selfList.map((person) => (
                 <PersonRow
@@ -267,7 +181,6 @@ export default function Sidebar({
                   person={person}
                   isSelected={selectedPerson.id === person.id}
                   onSelect={onSelectPerson}
-                  onDelete={handleDeletePerson}
                 />
               ))}
               {peopleList.map((person) => (
@@ -276,7 +189,6 @@ export default function Sidebar({
                   person={person}
                   isSelected={selectedPerson.id === person.id}
                   onSelect={onSelectPerson}
-                  onDelete={handleDeletePerson}
                 />
               ))}
             </div>
@@ -297,38 +209,25 @@ function PersonRow({
   person,
   isSelected,
   onSelect,
-  onDelete,
 }: {
   person: Person
   isSelected: boolean
   onSelect: (person: Person) => void
-  onDelete?: (id: string) => void
 }) {
   return (
-    <div className="group flex items-center">
-      <button
-        type="button"
-        onClick={() => onSelect(person)}
-        className={`flex flex-1 items-center gap-3 px-6 py-2.5 text-left border-l-2 transition-colors duration-150 ${
-          isSelected
-            ? "border-[#f4efe9] text-[#f4efe9] bg-white/[0.04]"
-            : "border-transparent text-[#76716b] hover:text-[#c8c2bc] hover:bg-white/[0.02]"
-        }`}
-      >
-        <span className="truncate font-medium">{person.name}</span>
-        <span className="ml-auto font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">
-          {RELATION_LABELS[person.relation]}
-        </span>
-      </button>
-      {onDelete && (
-        <button
-          onClick={() => onDelete(person.id)}
-          className="opacity-0 group-hover:opacity-100 px-3 py-2.5 text-[#4f4b47] hover:text-red-400/60 transition-all text-[10px]"
-          title="Remove"
-        >
-          ✕
-        </button>
-      )}
-    </div>
+    <button
+      type="button"
+      onClick={() => onSelect(person)}
+      className={`flex w-full items-center gap-3 px-6 py-2.5 text-left border-l-2 transition-colors duration-150 ${
+        isSelected
+          ? "border-[#f4efe9] text-[#f4efe9] bg-white/[0.04]"
+          : "border-transparent text-[#76716b] hover:text-[#c8c2bc] hover:bg-white/[0.02]"
+      }`}
+    >
+      <span className="truncate font-medium">{person.name}</span>
+      <span className="ml-auto font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">
+        {RELATION_LABELS[person.relation]}
+      </span>
+    </button>
   )
 }

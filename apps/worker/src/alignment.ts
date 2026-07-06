@@ -1,7 +1,6 @@
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
-import { resolveEntitlements, requireEntitlement } from "./entitlements.js";
-import { logSafetyEvent, protectionActive } from "./safety.js";
+import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
 import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import { SYSTEM_ALIGNMENT, SECURITY_PREFIX } from "./prompts.js";
@@ -229,8 +228,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       });
     }
 
-    const entitlements = resolveEntitlements(user);
-    const subGate = requireEntitlement(entitlements, "canUseAlignment");
+    const subGate = await requireActiveSubscription(user, request);
     if (subGate) return subGate;
 
     // Per-user Pro daily soft cap (200/day)
@@ -279,8 +277,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
         const aiResponse = await env.AI.run(
           (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
-          { messages, temperature: 0.3, max_tokens: 900 },
-          { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } }
+          { messages, temperature: 0.3, max_tokens: 900 }
         );
 
         const rawText = (aiResponse as any).response ?? String(aiResponse);
@@ -357,8 +354,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       const aiResponse = await env.AI.run(
         (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
         { messages, temperature: 0.3, max_tokens: 700 }
-      ,
-          { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } });
+      );
 
       let rawText = (aiResponse as any).response ?? String(aiResponse);
 
@@ -367,7 +363,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       let validation = validate(rawText, "alignment")
 
       if (validation.shouldRetry) {
-        logSafetyEvent({ level: "warn", event: "alignment_retry", error_type: "system" })
+        console.warn("[Retry] Alignment output empty — retrying")
         const retryAi = await env.AI.run(
           (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
           { messages: [
@@ -376,8 +372,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
               { role: "assistant", content: rawText },
               { role: "user", content: retryPrompt("alignment", validation.missing) },
             ], temperature: 0.2, max_tokens: 800 }
-        ,
-          { gateway: { id: env.GATEWAY_ID || "sovereign-ai-gateway" } })
+        )
         rawText = (retryAi as any).response ?? String(retryAi)
         validation = validate(rawText, "alignment")
       }
@@ -386,7 +381,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
 
       // Log guardrail violations
       if (!validation.guardrails.passed) {
-        logSafetyEvent({ level: "warn", event: "alignment_guardrail_violation", details: { violations: validation.guardrails.violations } })
+        console.warn("[Guardrail] Alignment violations:", validation.guardrails.violations)
       }
 
       // Empty result guard
@@ -412,7 +407,7 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       });
 
     } catch (e: any) {
-      logSafetyEvent({ level: "error", event: "alignment_route_error", error_type: "system", error: e });
+      console.error("Alignment route error:", e);
       return new Response(JSON.stringify({ error: "Failed to process" }), {
         status: 500, headers: { "Content-Type": "application/json" }
       });

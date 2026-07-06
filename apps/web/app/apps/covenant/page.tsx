@@ -26,18 +26,13 @@ function Section({ label, value }: { label: string; value?: string }) {
 }
 
 function ScriptureChip({ text }: { text: string }) {
-  if (!text) return null
-  const bibleUrl = `https://www.biblegateway.com/passage/?search=${encodeURIComponent(text)}&version=NIV`
   return (
-    <a
-      href={bibleUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-block font-mono text-[8px] uppercase tracking-[0.12em] text-[#76716b] border border-white/[0.08] px-2 py-1 hover:text-[#a8a29a] hover:border-white/[0.16] transition-colors"
+    <span
+      className="inline-block font-mono text-[8px] uppercase tracking-[0.12em] text-[#76716b] border border-white/[0.08] px-2 py-1"
       style={{ borderRadius: 4 }}
     >
-      {text} ↗
-    </a>
+      {text}
+    </span>
   )
 }
 
@@ -74,10 +69,7 @@ export default function CovenantPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(
-          data.error === "subscription_required" ? "subscription_required" :
-          data.message || data.error || "Something went wrong."
-        )
+        setError(data.message || data.error || "Something went wrong.")
         return
       }
       setResult(data)
@@ -232,18 +224,7 @@ export default function CovenantPage() {
         )}
 
         {error && (
-          <div className="flex flex-col items-center gap-4 py-8">
-            <p className="text-[13px] text-[#a8a29a] text-center max-w-sm mx-auto leading-relaxed">
-              {error === "subscription_required"
-                ? "Covenant requires a Pro subscription."
-                : error}
-            </p>
-            {error === "subscription_required" && (
-              <a href="/pricing" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#e0743a]/70 hover:text-[#e0743a] transition-colors border border-[#e0743a]/20 px-4 py-2" style={{ borderRadius: "var(--radius-button)" }}>
-                Upgrade to Pro →
-              </a>
-            )}
-          </div>
+          <p className="text-[13px] text-[#a8a29a] text-center py-8 max-w-sm mx-auto leading-relaxed">{error}</p>
         )}
 
         <AnimatePresence>
