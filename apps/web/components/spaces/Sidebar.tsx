@@ -135,6 +135,7 @@ export default function Sidebar({
     { href: "/apps/alignment", label: "Alignment" },
     { href: "/apps/covenant", label: "Covenant" },
     { href: "/app", label: "Library" },
+    { href: "/pattern-library", label: "Patterns" },
   ]
 
   return (

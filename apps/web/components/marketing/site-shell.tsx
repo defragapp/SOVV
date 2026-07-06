@@ -29,6 +29,7 @@ const FOOTER_COLS = [
       { href: "/about", label: "About" },
       { href: "/faq", label: "FAQ" },
       { href: "/changelog", label: "Changelog" },
+      { href: "/pattern-library", label: "Pattern library" },
     ],
   },
   {
@@ -37,6 +38,7 @@ const FOOTER_COLS = [
       { href: "/principles", label: "Principles" },
       { href: "/use-cases", label: "Use cases" },
       { href: "/contact", label: "Contact" },
+      { href: "/launch", label: "Launch" },
     ],
   },
   {

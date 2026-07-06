@@ -29,6 +29,13 @@ bucket_name = "vibesdk-templates"
 binding = "QUEUE"
 queue = "pattern-extraction-tasks"
 
+[[queues.consumers]]
+queue = "pattern-extraction-tasks"
+max_batch_size = 10
+max_batch_timeout = 30
+max_retries = 3
+dead_letter_queue = "pattern-extraction-dlq"
+
 [ai]
 binding = "AI"
 

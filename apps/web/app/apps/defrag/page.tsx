@@ -473,6 +473,7 @@ export default function DefragEntryPage() {
                 { label: "I am making this heavier", href: "/apps/alignment/workspace?prompt=I%20am%20making%20this%20heavier", desc: "See what you may be adding." },
                 { label: "I am pulling back", href: "/apps/defrag/workspace?prompt=I%20am%20pulling%20back", desc: "Understand what silence is protecting." },
                 { label: "This feels bigger than this", href: "/apps/covenant/workspace?prompt=This%20feels%20bigger%20than%20this", desc: "Hold what matters without forcing an answer." },
+                { label: "This involves more than two people", href: "/apps/defrag/multi", desc: "Read the group dynamic — three or more people." },
               ].map(item => (
                 <Link key={item.label} href={item.href}
                   className="flex items-start justify-between gap-4 py-3 border-b border-white/[0.04] last:border-0 group hover:bg-white/[0.02] transition-colors -mx-2 px-2"

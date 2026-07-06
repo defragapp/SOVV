@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import ManageSubscription from "@/components/spaces/ManageSubscription"
+import { ReferralDashboard } from "@/components/spaces/ReferralDashboard"
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -661,13 +662,7 @@ export default function SettingsPage() {
 
         
 
-        {/* Change Password */}
-        <div className="bg-white/[0.02] border border-white/[0.08] rounded-[14px] p-8 md:p-10 mt-14">
-          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#76716b] mb-6">
-            Change Password
-          </p>
-          <ChangePasswordForm />
-        </div>
+        
 
         {/* Danger zone */}
         <div className="mt-14 pt-8 border-t border-white/[0.06]">

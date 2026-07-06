@@ -2,6 +2,7 @@
 import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
+import { CovenantScriptureSearch } from "@/components/spaces/CovenantScriptureSearch"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 
@@ -193,14 +194,7 @@ export default function CovenantWorkspacePage() {
             </div>
           ))}
         </div>
-        <div className="mt-6 pt-5 border-t border-white/[0.04]">
-          <Link href="/apps/covenant" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733] hover:text-[#76716b] transition-colors">
-            ← Covenant overview
-          </Link>
-        </div>
-      </div>
-    </div>
-  )
+        
 
   // ─── RIGHT PANEL ───────────────────────────────────────────────────────────
   const contextPanel = (
