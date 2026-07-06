@@ -59,7 +59,7 @@ export function CovenantScriptureSearch() {
     search(query);
   };
 
-  const useTheme = (theme: string) => {
+  const applyTheme = (theme: string) => {
     setQuery(theme);
     search(theme);
   };
@@ -102,7 +102,7 @@ export function CovenantScriptureSearch() {
         {SUGGESTED_THEMES.map((theme) => (
           <button
             key={theme}
-            onClick={() => useTheme(theme)}
+            onClick={() => setQuery(theme)}
             className="font-mono text-[8px] uppercase tracking-[0.16em] px-2.5 py-1.5 border border-white/[0.06] text-[#4f4b47] hover:text-[#76716b] hover:border-white/[0.10] transition-colors"
             style={{ borderRadius: 5 }}
           >

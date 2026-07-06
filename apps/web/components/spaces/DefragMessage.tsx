@@ -51,7 +51,7 @@ export function DefragMessage() {
     }
   };
 
-  const useExample = (ex: string) => {
+  const applyExample = (ex: string) => {
     setMessage(ex);
     setResult(null);
     setError(null);
@@ -74,7 +74,7 @@ export function DefragMessage() {
         {EXAMPLE_MESSAGES.map((ex) => (
           <button
             key={ex}
-            onClick={() => useExample(ex)}
+            onClick={() => setMessage(ex)}
             className="font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 border border-white/[0.06] text-[#4f4b47] hover:text-[#76716b] hover:border-white/[0.10] transition-colors"
             style={{ borderRadius: 5 }}
           >
