@@ -41,6 +41,7 @@ export function getCorsHeaders(request: Request): Record<string, string> {
 
   if (ALLOWED_ORIGINS.includes(origin)) {
     headers['Access-Control-Allow-Origin'] = origin;
+    headers['Access-Control-Allow-Credentials'] = 'true';
   }
 
   return headers;
@@ -365,10 +366,18 @@ async function handleWithCors(request: Request, env: Env, ctx: ExecutionContext)
   Object.entries(cors).forEach(([key, value]) => {
     corsResponse.headers.set(key, value);
   });
+
+  // Auth routes must never be cached
+  const url = new URL(request.url);
+  if (url.pathname.startsWith('/api/auth') || url.pathname.startsWith('/api/user') || url.pathname.startsWith('/api/billing')) {
+    corsResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    corsResponse.headers.set('Pragma', 'no-cache');
+  }
   
   const securityHeaders = {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
     'X-Frame-Options': 'DENY',
+    'X-Content-Type-Options': 'nosniff',
     'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
@@ -500,6 +509,18 @@ export default {
       if (sent) continue;
       await sendDay7NurtureEmail(user.email, emailOpts).catch(() => {});
       await env.KV.put(`nurture:day7:${user.id}`, "1", { expirationTtl: 60 * 60 * 24 * 30 });
+    }
+
+    // Session cleanup — delete expired sessions from D1
+    try {
+      const result = await env.DB.prepare(
+        "DELETE FROM sessions WHERE expires_at < ?"
+      ).bind(Date.now()).run();
+      if (result.meta?.changes && result.meta.changes > 0) {
+        console.log(`[cron] Cleaned up ${result.meta.changes} expired sessions`);
+      }
+    } catch (err) {
+      console.error("[cron] Session cleanup failed:", err);
     }
   },
 } satisfies ExportedHandler<Env>;

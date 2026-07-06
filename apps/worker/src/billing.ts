@@ -178,6 +178,15 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
   const user = await getAuthUser(req, env.DB);
   const userId = user?.id ?? "unknown";
 
+  // Require email verification before checkout
+  if (user) {
+    const emailRow = await env.DB.prepare("SELECT email_verified FROM users WHERE id = ?")
+      .bind(user.id).first<{ email_verified: number }>();
+    if (emailRow && emailRow.email_verified === 0) {
+      return errorJson(403, "email_not_verified", "Please verify your email address before upgrading.");
+    }
+  }
+
   const sid = await getSessionId(req);
 
   if (!env.STRIPE_SECRET_KEY || !env.STRIPE_PRICE_ID || !env.APP_URL) {
@@ -226,6 +235,7 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
           headers: {
             "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
             "Content-Type": "application/x-www-form-urlencoded",
+            "Idempotency-Key": `checkout:${userId}:${planParam}:${withTrial ? "trial" : "notrial"}`,
           },
           body: params.toString(),
         },
@@ -703,6 +713,7 @@ export async function handlePortal(req: Request, env: Env): Promise<Response> {
           headers: {
             "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
             "Content-Type": "application/x-www-form-urlencoded",
+            "Idempotency-Key": `checkout:${userId}:${planParam}:${withTrial ? "trial" : "notrial"}`,
           },
           body: params.toString(),
         },

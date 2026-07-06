@@ -1,3 +1,4 @@
+import { sanitizeInput, detectPromptInjection } from "./utils/sanitize.js";
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
@@ -300,7 +301,10 @@ export function registerAlignmentRoute(router: any, getEnv: () => Env) {
       }
 
       // ── WORKSPACE MODE (preserved exactly) ─────────────────────────────
-      const message = body.message;
+      const message = sanitizeInput(body.message);
+      if (detectPromptInjection(message)) {
+        return new Response(JSON.stringify({ error: "validation_error" }), { status: 400 });
+      }
       if (!message) {
         return new Response(JSON.stringify({ error: "Message is required" }), {
           status: 400, headers: { "Content-Type": "application/json" }

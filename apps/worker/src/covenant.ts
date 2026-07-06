@@ -1,3 +1,4 @@
+import { sanitizeInput, detectPromptInjection } from "./utils/sanitize.js";
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { requireActiveSubscription } from "./billing.js";
@@ -64,7 +65,10 @@ export function registerCovenantRoute(router: any, getEnv: () => Env) {
     try {
       const body = await request.json().catch(() => ({})) as any;
       // Accept both "message" and "moment" for compatibility
-      const message = body.message || body.moment;
+      const message = sanitizeInput(body.message || body.moment);
+      if (detectPromptInjection(message)) {
+        return new Response(JSON.stringify({ error: "validation_error" }), { status: 400 });
+      }
 
       if (!message) {
         return new Response(JSON.stringify({ error: "Message is required" }), { status: 400, headers: { "Content-Type": "application/json" } });

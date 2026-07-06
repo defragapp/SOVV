@@ -1,3 +1,4 @@
+import { sanitizeInput, detectPromptInjection } from "./utils/sanitize.js";
 import type { Env } from "./types-env.js"
 import { SYSTEM_DEFRAG, SYSTEM_DEFRAG_RELATIONAL } from "./prompts.js"
 import { getFeatureFlags } from "./featureFlags.js"
@@ -171,7 +172,11 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     people?: Array<{ id: string; relation?: string; name?: string }>;
   };
 
-  const message = String(body.message ?? body.question ?? body.text ?? "").trim();
+  const rawMessage = String(body.message ?? body.question ?? body.text ?? "").trim();
+  const message = sanitizeInput(rawMessage);
+  if (detectPromptInjection(message)) {
+    return jsonResponse({ error: "validation_error", message: "Input contains unsupported patterns." }, 400, getCorsHeaders(req));
+  }
   if (!message) {
     return jsonResponse({ error: "message_required" }, 400, {
       ...getCorsHeaders(req),
