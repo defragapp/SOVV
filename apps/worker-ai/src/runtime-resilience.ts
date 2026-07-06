@@ -84,16 +84,30 @@ async function runWithTimeout<T>(operation: Promise<T>, timeoutMs: number): Prom
   }
 }
 
-export async function runAiWithResilience(
-  env: { AI: { run: (model: string, input: { messages: Array<{ role: "system" | "user" | "assistant"; content: string }> }) => Promise<{ response?: string }> } },
-  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
-  model = "@cf/meta/llama-3.1-8b-instruct-fast"
-): Promise<string> {
-  if (isCircuitOpen()) {
-    logSystemError("circuit_open", { model });
-    throw new ServiceUnavailableError("service_unavailable");
-  }
+// ── Model fallback chain ──────────────────────────────────────────────────────
+// Ordered by preference: fastest/cheapest first, most capable last.
+// Each model is tried in sequence on failure.
+const MODEL_FALLBACK_CHAIN = [
+  "@cf/meta/llama-3.1-8b-instruct-fast",   // primary — fast, low latency
+  "@cf/meta/llama-3.1-8b-instruct",         // fallback 1 — standard
+  "@cf/meta/llama-3.2-11b-vision-instruct", // fallback 2 — larger
+  "@cf/mistral/mistral-7b-instruct-v0.1",   // fallback 3 — different architecture
+] as const;
 
+type AIEnv = {
+  AI: {
+    run: (
+      model: string,
+      input: { messages: Array<{ role: "system" | "user" | "assistant"; content: string }> }
+    ) => Promise<{ response?: string }>
+  }
+}
+
+async function runSingleModel(
+  env: AIEnv,
+  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
+  model: string
+): Promise<string> {
   await acquireSlot();
   let aiPromise: Promise<{ response?: string }>;
   try {
@@ -103,26 +117,70 @@ export async function runAiWithResilience(
     throw error;
   }
 
-  void aiPromise.finally(() => {
-    releaseSlot();
-  });
+  void aiPromise.finally(() => releaseSlot());
 
-  try {
-    const aiResponse = await runWithTimeout(
-      aiPromise,
-      AI_TIMEOUT_MS
-    );
-    markSuccess();
-    return boundedAiText(aiResponse.response ?? "");
-  } catch (error) {
-    const reason = error instanceof Error && error.message === "timeout" ? "timeout" : "ai_failure";
-    logSystemError(reason, {
-      model,
-      error: error instanceof Error ? error.message : String(error),
-    });
-    markFailure();
-    throw error;
+  const aiResponse = await runWithTimeout(aiPromise, AI_TIMEOUT_MS);
+  return boundedAiText(aiResponse.response ?? "");
+}
+
+export async function runAiWithResilience(
+  env: AIEnv,
+  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
+  model = MODEL_FALLBACK_CHAIN[0]
+): Promise<string> {
+  if (isCircuitOpen()) {
+    logSystemError("circuit_open", { model });
+    throw new ServiceUnavailableError("service_unavailable");
   }
+
+  // Build the chain: requested model first, then remaining fallbacks
+  const chain = [
+    model,
+    ...MODEL_FALLBACK_CHAIN.filter((m) => m !== model),
+  ];
+
+  let lastError: unknown = null;
+
+  for (let i = 0; i < chain.length; i++) {
+    const currentModel = chain[i];
+    const isFallback = i > 0;
+
+    if (isFallback) {
+      logSystemError("model_fallback", {
+        failedModel: chain[i - 1],
+        tryingModel: currentModel,
+        attempt: i + 1,
+        error: lastError instanceof Error ? lastError.message : String(lastError),
+      });
+    }
+
+    try {
+      const result = await runSingleModel(env, messages, currentModel);
+      if (isFallback) {
+        logSystemError("fallback_success", { model: currentModel, attempt: i + 1 });
+      }
+      markSuccess();
+      return result;
+    } catch (error) {
+      lastError = error;
+      const reason =
+        error instanceof Error && error.message === "timeout" ? "timeout" : "ai_failure";
+      logSystemError(reason, {
+        model: currentModel,
+        attempt: i + 1,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      markFailure();
+
+      // If circuit just opened, stop trying
+      if (isCircuitOpen()) {
+        logSystemError("circuit_open_abort_chain", { stoppedAt: currentModel });
+        break;
+      }
+    }
+  }
+
+  throw new ServiceUnavailableError("all_models_failed");
 }
 
 export function boundedAiText(text: string): string {

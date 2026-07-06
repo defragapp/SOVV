@@ -5,6 +5,42 @@ import { Container } from "@/components/ui/layout-primitives"
 import Link from "next/link"
 import { useState } from "react"
 import { AnimatedHeading, TextReveal } from "@/components/marketing/animated-elements"
+import { FaqAccordion } from "@/components/marketing/faq-accordion"
+
+const PRICING_FAQ = [
+  {
+    q: "Is Defrag really free forever?",
+    a: "Yes. Defrag — the core pattern recognition space — is free with no time limit. You get 5 sessions per day, full Baseline Design integration, and Best Next Response. No credit card required.",
+  },
+  {
+    q: "What happens after the 7-day free trial?",
+    a: "If you don't cancel before the trial ends, you'll be charged for your chosen plan (monthly or annual). You can cancel anytime from your account settings — no hoops, no retention flows.",
+  },
+  {
+    q: "Can I switch between monthly and annual?",
+    a: "Yes. You can switch plans at any time from your billing settings. If you switch to annual mid-cycle, we'll prorate the difference.",
+  },
+  {
+    q: "What is Baseline Design and why does it matter?",
+    a: "Baseline Design is your private pattern map — built from your birth data (date, time, place) and a short calibration conversation. It stays active beneath every session, so Sovereign.os reads your moment through your actual patterns, not a generic lens.",
+  },
+  {
+    q: "Is my data private?",
+    a: "Yes. Your Baseline Design, sessions, and Library are private to you. We do not sell data, train on your inputs, or expose your content to other users. Sessions are encrypted in transit and at rest.",
+  },
+  {
+    q: "What's the difference between Defrag, Covenant, and Alignment?",
+    a: "Defrag separates the moment from the pattern — for arguments, messages, family roles, grief, and boundaries. Covenant connects reflection to faith and values — for users who want that layer. Alignment turns recognition into practice — the space between insight and next move. Covenant and Alignment require Pro.",
+  },
+  {
+    q: "Is this a replacement for therapy?",
+    a: "No. Sovereign.os is the space between sessions — not a replacement for professional support. If you're in crisis or need clinical care, please reach out to a licensed therapist or crisis line.",
+  },
+  {
+    q: "Can I cancel anytime?",
+    a: "Yes. Cancel from your account settings at any time. You'll retain Pro access until the end of your current billing period.",
+  },
+]
 
 const APP_URL = "/app/login"
 
@@ -227,8 +263,7 @@ export default function PricingPage() {
         </Container>
       </section>
 
-      {/* ── TRIAL CTA ── */}
-      <section className="w-full py-20 bg-[#08070a] border-t border-white/5">
+      
         <Container className="flex flex-col items-center text-center max-w-xl">
           <MetaLabel>Get started</MetaLabel>
           <h2 className="text-3xl md:text-4xl font-serif tracking-[-0.02em] text-[#f4efe9] mb-4">

@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { UTMCapture } from "@/components/marketing/UTMCapture";
 
 interface SiteShellProps {
   children: React.ReactNode;
@@ -13,6 +15,7 @@ const NAV_LINKS = [
   { href: "/pricing", label: "Pricing" },
   { href: "/blog", label: "Blog" },
   { href: "/about", label: "About" },
+  { href: "/changelog", label: "Changelog" },
 ];
 
 const FOOTER_COLS = [
@@ -25,6 +28,7 @@ const FOOTER_COLS = [
       { href: "/blog", label: "Blog" },
       { href: "/about", label: "About" },
       { href: "/faq", label: "FAQ" },
+      { href: "/changelog", label: "Changelog" },
     ],
   },
   {
@@ -63,6 +67,9 @@ export function SiteShell({ children }: SiteShellProps) {
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-[#08070a] text-[#f4efe9]">
+      <Suspense fallback={null}>
+        <UTMCapture />
+      </Suspense>
 
       {/* ── Header ─────────────────────────────────────────────── */}
       <header
@@ -117,46 +124,78 @@ export function SiteShell({ children }: SiteShellProps) {
           {/* Mobile toggle */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden flex flex-col gap-[5px] p-2 -mr-2 group"
+            className="md:hidden flex flex-col justify-center gap-[5px] p-2 -mr-2 w-9 h-9"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
           >
-            <span className={`block h-px w-5 bg-[#76716b] group-hover:bg-[#f4efe9] transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
-            <span className={`block h-px w-5 bg-[#76716b] group-hover:bg-[#f4efe9] transition-all duration-300 ${menuOpen ? "opacity-0" : ""}`} />
-            <span className={`block h-px w-5 bg-[#76716b] group-hover:bg-[#f4efe9] transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
+            <motion.span
+              animate={menuOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="block h-px w-5 bg-[#76716b] origin-center"
+            />
+            <motion.span
+              animate={menuOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
+              transition={{ duration: 0.2 }}
+              className="block h-px w-5 bg-[#76716b] origin-center"
+            />
+            <motion.span
+              animate={menuOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="block h-px w-5 bg-[#76716b] origin-center"
+            />
           </button>
         </div>
 
         {/* Mobile menu */}
-        {menuOpen && (
-          <div
-            id="mobile-menu"
-            className="md:hidden border-t border-white/[0.05] px-6 py-6"
-            style={{ background: "rgba(8,7,10,0.96)", backdropFilter: "blur(20px)" }}
-          >
-            <nav aria-label="Mobile navigation" className="flex flex-col">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-[15px] text-[#76716b] hover:text-[#f4efe9] transition-colors py-3.5 border-b border-white/[0.04] tracking-[-0.01em]"
-                  onClick={() => setMenuOpen(false)}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              id="mobile-menu"
+              key="mobile-menu"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="md:hidden border-t border-white/[0.05] overflow-hidden"
+              style={{ background: "rgba(8,7,10,0.97)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)" }}
+            >
+              <nav aria-label="Mobile navigation" className="flex flex-col px-6 py-4">
+                {NAV_LINKS.map((link, i) => (
+                  <motion.div
+                    key={link.href}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04, duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <Link
+                      href={link.href}
+                      className="block text-[15px] text-[#76716b] hover:text-[#f4efe9] transition-colors py-3.5 border-b border-white/[0.04] tracking-[-0.01em]"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                ))}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: NAV_LINKS.length * 0.04 + 0.05, duration: 0.3 }}
+                  className="mt-5"
                 >
-                  {link.label}
-                </Link>
-              ))}
-              <Link
-                href="/app/login"
-                className="mt-5 inline-flex items-center justify-center h-11 px-6 text-[13px] bg-[#f4efe9] text-[#08070a] tracking-[-0.01em]"
-                style={{ borderRadius: 8 }}
-                onClick={() => setMenuOpen(false)}
-              >
-                Get started
-              </Link>
-            </nav>
-          </div>
-        )}
+                  <Link
+                    href="/app/login"
+                    className="inline-flex items-center justify-center w-full h-11 px-6 text-[13px] bg-[#f4efe9] text-[#08070a] tracking-[-0.01em] hover:bg-white transition-colors duration-200"
+                    style={{ borderRadius: 8 }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Get started
+                  </Link>
+                </motion.div>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Content — no pt-16 spacer; hero pages use -mt-[68px] */}

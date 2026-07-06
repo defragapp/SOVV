@@ -1,4 +1,6 @@
 import { NoiseLayer } from "@/components/ui/noise-layer"
+import { CookieConsent } from "@/components/marketing/cookie-consent"
+import { PWAInstallPrompt } from "@/components/spaces/PWAInstallPrompt"
 import type { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
 import { GeistSans } from "geist/font/sans"
@@ -213,6 +215,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to main content
         </a>
         <NoiseLayer />
+        <CookieConsent />
+        <PWAInstallPrompt />
         <main id="main-content">
           {children}
         </main>
