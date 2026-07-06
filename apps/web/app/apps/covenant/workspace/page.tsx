@@ -194,7 +194,14 @@ export default function CovenantWorkspacePage() {
             </div>
           ))}
         </div>
-        
+        <div className="mt-6 pt-5 border-t border-white/[0.04]">
+          <a href="/apps/covenant" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#3a3733] hover:text-[#76716b] transition-colors">
+            ← Covenant overview
+          </a>
+        </div>
+      </div>
+    </div>
+  )
 
   // ─── RIGHT PANEL ───────────────────────────────────────────────────────────
   const contextPanel = (
