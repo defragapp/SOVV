@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import ManageSubscription from "@/components/spaces/ManageSubscription"
-import { ReferralDashboard } from "@/components/spaces/ReferralDashboard"
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";

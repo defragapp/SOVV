@@ -104,12 +104,12 @@ export function PWAInstallPrompt() {
               </div>
               <div className="flex-1">
                 <p className="text-[14px] text-[#f4efe9] font-medium leading-snug mb-0.5">
-                  Add to Home Screen
+                  Sovereign.os
                 </p>
                 <p className="text-[12px] text-[#76716b] leading-relaxed">
                   {isIOS
-                    ? "Install Sovereign.os for a native app experience."
-                    : "Install Sovereign.os — works offline, opens instantly."}
+                    ? "Save to your home screen for direct access."
+                    : "Save to your home screen."}
                 </p>
               </div>
               <button
