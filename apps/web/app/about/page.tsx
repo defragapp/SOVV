@@ -5,29 +5,48 @@ import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "About — Sovereign.os",
-  description: "Sovereign.os is pattern-aware AI for the moments that are hard to read while you're inside them.",
+  description: "Sovereign.os is personal AI with your full context — Baseline Design, live timing, relationship dynamics, and saved history working together.",
 }
 
 const PRINCIPLES = [
   {
     num: "01",
-    title: "Pattern over advice.",
-    body: "Advice is generic. Pattern recognition is specific. We surface what's driving the moment — not what you should do about it.",
+    title: "Context over advice.",
+    body: "Generic advice is easy to give and hard to use. Sovereign works from your Baseline Design, live timing, and relationship context — so the guidance fits the actual moment, not a version of it.",
   },
   {
     num: "02",
     title: "Private by design.",
-    body: "Your Baseline Design is never exposed in outputs. Your sessions are yours. We don't train on your data.",
+    body: "Your Baseline Design is never exposed in outputs. Your sessions are yours. We do not sell data, train on your inputs, or expose your content to other users. Sessions are encrypted in transit and at rest.",
   },
   {
     num: "03",
-    title: "Honest, not therapeutic.",
-    body: "We're not a therapy replacement. We're a clarity tool. The distinction matters — and we hold it.",
+    title: "Useful, not therapeutic.",
+    body: "Sovereign.os is the space between sessions — not a replacement for professional support. We are a clarity tool. That distinction matters and we hold it.",
   },
   {
     num: "04",
-    title: "Useful in the moment.",
-    body: "The moments that matter most are the ones you're inside. We're built for those — not for reflection after the fact.",
+    title: "No homework required.",
+    body: "You do not need to understand astrology, Human Design, Gene Keys, or numerology. Sovereign translates the symbolic complexity into plain language you can use. The system works for you — not the other way around.",
+  },
+]
+
+const PLATFORM = [
+  {
+    label: "Baseline Design",
+    body: "Your personal context layer — built from birth data and a short calibration. Maps how you tend to process, respond, connect, protect, and return to center. Active beneath every session.",
+  },
+  {
+    label: "Live Timing",
+    body: "Current planetary positions read against your Baseline. Surfaces what may be more active, louder, softer, easier, or harder right now — without requiring you to interpret a chart.",
+  },
+  {
+    label: "Relational Overlay",
+    body: "The same situation can mean completely different things to different people. Sovereign accounts for both sides — helping explain how the moment may have landed for each person involved.",
+  },
+  {
+    label: "Saved Context",
+    body: "Your Library holds what helped — saved Defrags, relationship dynamics, decisions, reflections, and recurring patterns. The next hard moment benefits from what you already worked through.",
   },
 ]
 
@@ -39,53 +58,53 @@ export default function AboutPage() {
       <section className="relative w-full pt-36 pb-24 md:pt-48 md:pb-32 bg-[#08070a] overflow-hidden">
         <div
           className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(ellipse 80% 50% at 30% 0%, rgba(224,116,58,0.07) 0%, transparent 60%)" }}
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(ellipse 60% 40% at 80% 100%, rgba(200,194,188,0.03) 0%, transparent 60%)" }}
+          style={{ background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(224,116,58,0.07) 0%, transparent 65%)" }}
           aria-hidden
         />
 
         <Container className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-3 mb-8 fade-in-up fade-in-up-1">
+          <div className="inline-flex items-center gap-3 mb-8">
             <span className="h-px w-8 bg-[#e0743a]/50" />
             <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b]">About</span>
           </div>
 
-          <h1 className="font-serif text-[clamp(2.8rem,7vw,5.5rem)] text-[#f4efe9] leading-[0.97] tracking-[-0.03em] text-balance mb-10 fade-in-up fade-in-up-2">
-            Built for the moments<br />
-            <span className="text-[#a8a29a]">that are hard to read.</span>
+          <h1 className="font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.0] tracking-[-0.03em] text-balance mb-8">
+            Personal AI<br />
+            <span className="text-[#a8a29a]">with your full context.</span>
           </h1>
 
-          <p className="text-[#a8a29a] text-lg max-w-xl leading-relaxed fade-in-up fade-in-up-3">
-            Most of us can describe what happened. Fewer of us can see what keeps happening. Sovereign.os is built for that gap.
+          <p className="text-[#a8a29a] text-lg max-w-xl leading-relaxed">
+            Sovereign.os combines your Baseline Design, live timing, relationship dynamics, and saved context to help you understand yourself, the people around you, and the next move that actually fits.
           </p>
         </Container>
       </section>
 
-      {/* ── MISSION ── */}
+      {/* ── WHAT MAKES IT DIFFERENT ── */}
       <section className="w-full py-24 md:py-32 bg-[#0c0a0d] border-t border-white/[0.04]">
         <Container className="max-w-3xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
-            <div>
-              <div className="inline-flex items-center gap-3 mb-8">
-                <span className="h-px w-8 bg-[#e0743a]/50" />
-                <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b]">Mission</span>
+          <div className="inline-flex items-center gap-3 mb-10">
+            <span className="h-px w-8 bg-[#e0743a]/50" />
+            <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b]">The platform</span>
+          </div>
+
+          <h2 className="font-serif text-[clamp(1.8rem,4vw,3rem)] text-[#f4efe9] tracking-[-0.02em] leading-tight mb-4 text-balance">
+            Most AI only knows what you type.
+          </h2>
+          <p className="text-[#76716b] text-base leading-relaxed mb-14 max-w-xl">
+            Sovereign works from a deeper foundation. Four layers of context — active together, translated into plain language, so you can ask real human questions and get guidance that actually fits.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {PLATFORM.map((item) => (
+              <div
+                key={item.label}
+                className="border border-white/[0.07] bg-[#08070a] p-7 flex flex-col gap-3"
+                style={{ borderRadius: "var(--radius-container)" }}
+              >
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60">{item.label}</p>
+                <p className="text-[14px] text-[#a8a29a] leading-relaxed">{item.body}</p>
               </div>
-              <h2 className="font-serif text-[clamp(1.8rem,4vw,2.8rem)] text-[#f4efe9] tracking-[-0.02em] leading-tight text-balance">
-                Pattern awareness as a daily practice.
-              </h2>
-            </div>
-            <div className="flex flex-col gap-6 pt-2 md:pt-16">
-              <p className="text-[#a8a29a] text-base leading-relaxed">
-                The moments that shape relationships, decisions, and grief are the ones hardest to see clearly while you're inside them. Pressure narrows perception. Old patterns activate. The response that made sense once keeps happening — even when it no longer serves.
-              </p>
-              <p className="text-[#76716b] text-base leading-relaxed">
-                Sovereign.os is built to interrupt that. Not with advice. With pattern recognition — specific to you, grounded in your Baseline Design, available in the moment it matters.
-              </p>
-            </div>
+            ))}
           </div>
         </Container>
       </section>
@@ -93,76 +112,71 @@ export default function AboutPage() {
       {/* ── PRINCIPLES ── */}
       <section className="w-full py-24 md:py-32 bg-[#08070a] border-t border-white/[0.04]">
         <Container className="max-w-3xl">
-          <div className="inline-flex items-center gap-3 mb-12">
+          <div className="inline-flex items-center gap-3 mb-10">
             <span className="h-px w-8 bg-[#e0743a]/50" />
-            <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b]">How we build</span>
+            <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b]">What we believe</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-px border border-white/[0.06] overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}>
+          <h2 className="font-serif text-[clamp(1.8rem,4vw,3rem)] text-[#f4efe9] tracking-[-0.02em] leading-tight mb-14 text-balance">
+            How we build.
+          </h2>
+
+          <div className="flex flex-col gap-0 border border-white/[0.06] overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}>
             {PRINCIPLES.map((p, i) => (
               <div
                 key={p.num}
-                className={`p-8 bg-[#08070a] card-hover ${
-                  i % 2 === 0 ? "border-r border-white/[0.04]" : ""
-                } ${i < 2 ? "border-b border-white/[0.04]" : ""}`}
+                className={`flex gap-8 p-8 bg-[#0c0a0d] ${i < PRINCIPLES.length - 1 ? "border-b border-white/[0.04]" : ""}`}
               >
-                <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.2em] block mb-4">{p.num}</span>
-                <h3 className="font-serif text-[1.1rem] text-[#f4efe9] leading-snug mb-3">{p.title}</h3>
-                <p className="text-sm text-[#76716b] leading-relaxed">{p.body}</p>
+                <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.2em] shrink-0 pt-1">{p.num}</span>
+                <div>
+                  <h3 className="font-serif text-[1.1rem] text-[#f4efe9] mb-2">{p.title}</h3>
+                  <p className="text-sm text-[#76716b] leading-relaxed">{p.body}</p>
+                </div>
               </div>
             ))}
           </div>
         </Container>
       </section>
 
-      {/* ── FOUNDER NOTE ── */}
+      {/* ── WHAT IT IS NOT ── */}
       <section className="w-full py-24 md:py-32 bg-[#0c0a0d] border-t border-white/[0.04]">
-        <Container className="max-w-2xl">
+        <Container className="max-w-3xl">
           <div className="inline-flex items-center gap-3 mb-10">
             <span className="h-px w-8 bg-[#e0743a]/50" />
-            <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b]">Origin</span>
+            <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-[#76716b]">Clarity on scope</span>
           </div>
 
-          <blockquote className="border-l border-[#e0743a]/20 pl-8">
-            <p className="font-serif text-[1.3rem] md:text-[1.5rem] text-[#f4efe9] leading-relaxed tracking-[-0.01em] mb-6 text-balance">
-              "I kept watching people — including myself — make the same moves under pressure. Not because they didn't know better. Because they couldn't see the pattern while they were inside it."
-            </p>
-            <p className="text-[#a8a29a] text-base leading-relaxed mb-6">
-              Sovereign.os started as a personal tool. A way to bring structure to the moments that felt too close to read clearly. The Baseline Design came first — a map of how I tend to operate. Then the pattern recognition. Then the spaces.
-            </p>
-            <p className="text-[#76716b] text-base leading-relaxed">
-              The goal was never to replace reflection or therapy or conversation. It was to make the moment legible — before the old response takes over.
-            </p>
-          </blockquote>
+          <h2 className="font-serif text-[clamp(1.8rem,4vw,3rem)] text-[#f4efe9] tracking-[-0.02em] leading-tight mb-6 text-balance">
+            Not generic advice.<br />
+            <span className="text-[#a8a29a]">Not a personality quiz.<br />Not a prediction engine.</span>
+          </h2>
+
+          <p className="text-[#76716b] text-base leading-relaxed max-w-xl mb-8">
+            Sovereign.os is not a replacement for therapy, clinical care, or professional support. If you are in crisis or need clinical help, please reach out to a licensed therapist or crisis line.
+          </p>
+          <p className="text-[#76716b] text-base leading-relaxed max-w-xl">
+            What Sovereign is: a clarity tool for the space between sessions. For the moments that are hard to read while you&rsquo;re inside them. For the next move that keeps you clear.
+          </p>
         </Container>
       </section>
 
       {/* ── CTA ── */}
       <section className="relative w-full py-32 md:py-40 bg-[#08070a] border-t border-white/[0.04] text-center overflow-hidden">
-        <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" aria-hidden>
-          {[300, 500, 700].map((size) => (
-            <div
-              key={size}
-              className="alignment-ring absolute"
-              style={{ width: size, height: size, left: -size / 2, top: -size / 2, opacity: 0.05 }}
-            />
-          ))}
-        </div>
         <div
           className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(ellipse 50% 50% at 50% 50%, rgba(224,116,58,0.04) 0%, transparent 70%)" }}
+          style={{ background: "radial-gradient(ellipse 50% 50% at 50% 50%, rgba(224,116,58,0.05) 0%, transparent 70%)" }}
           aria-hidden
         />
-
         <Container className="relative z-10 max-w-xl">
-          <h2 className="font-serif text-[clamp(2rem,5vw,3.5rem)] text-[#f4efe9] tracking-[-0.025em] leading-tight mb-6 text-balance">
-            The way through is already here.
+          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#76716b] mb-6">Start here</p>
+          <h2 className="font-serif text-[clamp(2rem,5vw,3.8rem)] text-[#f4efe9] tracking-[-0.025em] leading-tight mb-6 text-balance">
+            Your Baseline is the starting point.
           </h2>
           <p className="text-[#76716b] text-base leading-relaxed mb-10">
-            Free to start. No credit card required.
+            Free to start. Private by design. No credit card required.
           </p>
           <Link href="/app/login" className="btn-primary">
-            Enter Sovereign.os
+            Build Your Baseline
           </Link>
         </Container>
       </section>

@@ -137,10 +137,10 @@ export default function DefragProductPage() {
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Defrag · Free</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
-            Separate the moment from the pattern.
+            Understand relationship tension before it becomes damage.
           </h1>
           <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed animate-fade-up delay-100">
-            Something happened. You don't know if you overreacted, if they crossed a line, or if this is the same thing that always happens. Defrag shows you what is actually active — and gives you the clearest next response.
+            The same situation can mean completely different things to different people. Defrag uses your Baseline Design, live timing, and relational context to show you what is actually active — from more than one side — and gives you the clearest next move.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
             <Link href={APP_URL} className="btn-primary">Open Defrag — Free</Link>
@@ -183,10 +183,10 @@ export default function DefragProductPage() {
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">See it work</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
-              Real inputs. Real results.
+              Real moments. Context-aware results.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-md">
-              This is what Defrag actually returns — four structured outputs that show you what's active and what to do next.
+              This is what Defrag actually returns — structured outputs that show what&rsquo;s active, what may be repeating, and the next move that gives the situation a better chance.
             </p>
           </div>
           <DefragDemo />
@@ -205,7 +205,7 @@ export default function DefragProductPage() {
               className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl"
               style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)" }}
             >
-              Three steps. One clear result.
+              Bring the moment. Sovereign reads the context.
             </h2>
           </div>
 
@@ -214,17 +214,17 @@ export default function DefragProductPage() {
               {
                 n: "01",
                 title: "Describe the moment",
-                body: "Type what happened — the argument, the silence, the message you can't stop thinking about. Say it how it actually felt.",
+                body: "Type what happened — the argument, the silence, the message you can't stop thinking about. Say it how it actually felt. No framework required.",
               },
               {
                 n: "02",
-                title: "Defrag reads the pattern",
-                body: "Your Baseline Design is already active. Defrag uses it to separate what's yours from what's the situation, and names the loop running beneath the surface.",
+                title: "Sovereign reads both sides",
+                body: "Your Baseline Design, live timing, and relational overlay are already active. Defrag surfaces what's driving the moment — and how it may have landed differently for each person involved.",
               },
               {
                 n: "03",
-                title: "Get your Best Next Response",
-                body: "One specific, proportionate next step — grounded in how you actually move through pressure, not a generic response.",
+                title: "Choose your next move",
+                body: "What's active, what may be repeating, and your Best Next Response — specific to you, specific to this moment. Not generic advice.",
               },
             ].map((step) => (
               <div key={step.n} className="bg-[#0c0a0d] p-8 md:p-10 glow-card-hover cursor-default">
@@ -249,7 +249,7 @@ export default function DefragProductPage() {
               className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl"
               style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)" }}
             >
-              Any moment that keeps repeating.
+              The fight is rarely about the first thing said.
             </h2>
           </div>
 
@@ -327,10 +327,11 @@ export default function DefragProductPage() {
         <div className="light-beam" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <h2 className="font-serif text-4xl md:text-6xl text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
-            See what is actually active.
+            Same situation.<br />
+            <span style={{ color: "rgba(244,239,233,0.5)" }}>Different meanings.</span>
           </h2>
           <p className="mt-6 max-w-md text-base text-[#a8a29a] leading-relaxed">
-            Defrag is free. Open it and describe the moment. Your Baseline Design is already waiting.
+            Defrag is free. Describe the moment — the argument, the silence, the message — and see what&rsquo;s actually active beneath it. Your Baseline Design is already waiting.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3">
             <Link href={APP_URL} className="btn-primary">Open Defrag — Free</Link>

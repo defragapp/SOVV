@@ -583,7 +583,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
             className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#f4efe9]/30 mb-5 px-8"
           >
-            Sovereign.os · Pattern-aware AI
+            Sovereign.os · Personal AI with your full context
           </motion.p>
 
           <motion.h1
@@ -593,10 +593,10 @@ export default function Home() {
             className="font-serif text-[#f4efe9] text-balance leading-[1.06] tracking-[-0.02em] px-8"
             style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", maxWidth: "22ch" }}
           >
-            <span className="text-glow">Healing isn&apos;t optional.</span>
+            <span className="text-glow">Personal AI</span>
             <br />
             <span style={{ color: "rgba(244,239,233,0.48)" }}>
-              Holding the pain is.
+              with your full context.
             </span>
           </motion.h1>
 
@@ -607,7 +607,7 @@ export default function Home() {
             className="mt-5 max-w-xs text-[#a8a29a] leading-relaxed px-8"
             style={{ fontSize: "clamp(0.8rem, 1.6vw, 0.9rem)" }}
           >
-            Pattern-aware AI for the moments that are hard to read while you&rsquo;re inside them.
+            Sovereign.os combines your Baseline Design, live timing, and relationship context to help you understand the moment — and the next move that actually fits.
           </motion.p>
 
           <motion.div
@@ -617,10 +617,10 @@ export default function Home() {
             className="mt-8 flex flex-col sm:flex-row gap-3 items-center px-8"
           >
             <Link href={APP_URL} className="btn-primary">
-              Enter Sovereign.os
+              Build Your Baseline
             </Link>
             <Link href="/how-it-works" className="btn-secondary" style={{ opacity: 0.70 }}>
-              See how it works
+              Explore Sovereign
             </Link>
           </motion.div>
         </div>
@@ -641,10 +641,10 @@ export default function Home() {
               className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight text-balance max-w-lg"
               style={{ fontSize: "clamp(1.9rem, 4vw, 3.2rem)" }}
             >
-              <span className="text-glow">A private notebook</span> that turns reflection into direction.
+              <span className="text-glow">Better answers</span> need better context.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-sm">
-              The Clarity Console reads the situation through your Baseline Design — showing what&rsquo;s active, what&rsquo;s repeating, and what next move gives the moment a better chance.
+              Most AI only knows what you type. Sovereign works from a deeper foundation — your Baseline Design, live timing, and relationship context — so you can ask real human questions and get guidance that actually fits.
             </p>
           </div>
           <SpacePreview />
@@ -668,10 +668,10 @@ export default function Home() {
               className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] text-balance"
               style={{ fontSize: "clamp(2rem, 4.5vw, 3.8rem)" }}
             >
-              <span className="text-glow">The moment</span> is rarely the whole pattern.
+              <span className="text-glow">Some moments</span> are too layered for generic advice.
             </h2>
             <p className="mt-5 text-[15px] text-[#76716b] leading-relaxed max-w-lg">
-              A text, tone, silence, or conflict can feel bigger than the facts because it is touching a pattern already in motion. Sovereign.os helps you separate the moment from the pattern — before pressure chooses for you.
+              When people, timing, history, and emotion are all involved, context changes the answer. Sovereign.os separates the moment from the pattern — before pressure decides for you.
             </p>
           </div>
 
@@ -679,7 +679,7 @@ export default function Home() {
             {[
               {
                 label: "The Moment",
-                desc: "What happened on the surface. The text. The conversation. The request. The decision.",
+                desc: "What happened on the surface — the message, the silence, the conversation, the decision.",
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <circle cx="10" cy="10" r="3" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5"/>
@@ -690,7 +690,7 @@ export default function Home() {
               },
               {
                 label: "The Pattern",
-                desc: "What may be repeating underneath. The role, pressure, loop, or meaning that makes the moment feel heavier.",
+                desc: "What may be repeating underneath — the role, the loop, the pressure that makes the moment feel heavier than the facts.",
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M3 10 Q7 4 10 10 Q13 16 17 10" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
@@ -701,7 +701,7 @@ export default function Home() {
               },
               {
                 label: "The Next Move",
-                desc: "The response, pause, boundary, or repair that gives the situation a better chance.",
+                desc: "The response, pause, boundary, or repair that resolves the moment without pulling you out of yourself.",
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M4 10h12M12 6l4 4-4 4" stroke="rgba(224,116,58,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -736,7 +736,7 @@ export default function Home() {
               className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] text-balance max-w-xl"
               style={{ fontSize: "clamp(1.9rem, 4vw, 3.2rem)" }}
             >
-              From reaction to recognition.
+              Ask human questions. Get context-aware guidance.
             </h2>
           </div>
 
@@ -744,18 +744,18 @@ export default function Home() {
             {[
               {
                 num: "01",
-                title: "Enter the moment",
-                body: "Start with the situation as it happened — a message, conflict, boundary, grief point, or decision.",
+                title: "Bring the moment",
+                body: "Describe what's happening — a message, conflict, boundary, grief point, or decision. No framework required.",
               },
               {
                 num: "02",
-                title: "See the pattern",
-                body: "Your Baseline Design is already active. It shows what's running beneath the surface — the loop, the role, the pressure.",
+                title: "Sovereign reads the context",
+                body: "Your Baseline Design, live timing, and relationship dynamics are already active. The AI translates the complexity into plain language.",
               },
               {
                 num: "03",
-                title: "Return with clarity",
-                body: "Get a Best Next Response you can use, edit, or Save to Sovereign — before pressure chooses for you.",
+                title: "Choose your next move",
+                body: "Get a clear, context-aware response — what's active, what may be repeating, and the next move that gives the situation a better chance.",
               },
             ].map((step, i) => (
               <div key={step.num} className={`bg-[#0c0a0d] p-8 md:p-10 flex flex-col gap-6 reveal-up reveal-up-${i + 2}`}>
@@ -792,12 +792,12 @@ export default function Home() {
             className="font-serif text-[#f4efe9] leading-[1.15] tracking-[-0.02em] text-balance"
             style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.5rem)" }}
           >
-            <span className="text-glow">Clarity is not control.</span>
+            <span className="text-glow">You do not need to decode the system.</span>
             <br />
-            <span style={{ color: "rgba(244,239,233,0.45)" }}>It is return.</span>
+            <span style={{ color: "rgba(244,239,233,0.45)" }}>Sovereign translates it for you.</span>
           </blockquote>
           <p className="mt-8 text-[15px] text-[#76716b] leading-relaxed max-w-md mx-auto">
-            Sovereign.os does not tell you who to be. It gives you enough structure to return to yourself before the pattern runs the room.
+            Astrology, Human Design, Gene Keys, numerology, live timing — Sovereign.os brings it all together into one personal context layer. No homework. No decoding. Just clearer guidance.
           </p>
         </Container>
       </section>
@@ -820,7 +820,7 @@ export default function Home() {
                 name: "Defrag",
                 tier: "Free",
                 href: "/product/defrag",
-                hook: "Separate the moment from the pattern.",
+                hook: "Understand relationship tension before it becomes damage.",
                 what: "For the argument, the silence, the message, the grief — and the pattern beneath all of them.",
                 cta: "What's active, what may be repeating, and your Best Next Response.",
                 tags: ["Arguments", "Messages", "Family roles", "Boundaries", "Grief"],
@@ -840,10 +840,10 @@ export default function Home() {
                 name: "Covenant",
                 tier: "Pro",
                 href: "/product/covenant",
-                hook: "Reflect through faith without performance.",
-                what: "For users who want faith connected to the work — not as certainty, but as honest next step.",
-                cta: "One honest next step — grounded in faith, not reaction.",
-                tags: ["Faith", "Values", "Commitments", "Repair"],
+                hook: "For the questions that need meaning, not more noise.",
+                what: "Values, responsibility, faith-context reflection, family patterns, grief, and decisions that feel bigger than simple problem-solving.",
+                cta: "One honest next step — grounded in what matters, not reaction.",
+                tags: ["Faith", "Values", "Grief", "Discernment", "Family patterns"],
                 icon: (
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     {/* Covenant: connected arc, story bridge */}
@@ -861,9 +861,9 @@ export default function Home() {
                 name: "Alignment",
                 tier: "Pro",
                 href: "/product/alignment",
-                hook: "Turn recognition into practice.",
-                what: "After the insight. Before the next move. See what is yours to carry and what isn't.",
-                cta: "After Defrag. Before the next move. Return to yourself.",
+                hook: "Choose the move that keeps you clear.",
+                what: "After the insight. Before the next move. Speak, wait, repair, clarify, hold the boundary — with less reactivity.",
+                cta: "The right move should resolve the moment without pulling you out of yourself.",
                 tags: ["After Defrag", "Before a hard conversation", "After a conflict"],
                 icon: (
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -950,14 +950,16 @@ export default function Home() {
             className="font-serif text-[#f4efe9] tracking-[-0.025em] leading-[1.05] max-w-2xl text-balance"
             style={{ fontSize: "clamp(2.2rem, 5.5vw, 4.5rem)" }}
           >
-            <span className="text-glow">Return before</span> the pattern runs the room.
+            <span className="text-glow">Less guessing.</span>
+            <br />
+            <span style={{ color: "rgba(244,239,233,0.55)" }}>More context.</span>
           </h2>
           <p className="mt-6 max-w-md text-[15px] text-[#76716b] leading-relaxed">
-            Defrag is free. Describe the moment — the argument, the silence, the message — and see what&rsquo;s actually active beneath it.
+            Defrag is free. Build your Baseline Design and bring the moment — the argument, the silence, the message — and see what&rsquo;s actually active beneath it.
           </p>
           <div className="mt-9">
             <Link href={APP_URL} className="btn-primary">
-              Enter Sovereign.os
+              Build Your Baseline
             </Link>
             <p className="mt-5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
               Private by design · Free to start

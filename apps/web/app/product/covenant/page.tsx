@@ -176,10 +176,10 @@ export default function CovenantProductPage() {
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Covenant · Pro</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
-            <span className="text-glow">Reflect through faith</span> without performance.
+            <span className="text-glow">For the questions</span> that need meaning, not more noise.
           </h1>
           <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed animate-fade-up delay-100">
-            Covenant connects what you're going through to the real human stories in Scripture — not as metaphor, but as lived experience. It finds the biblical figure who walked something like what you're facing, shows you what they learned, and gives you one honest next step.
+            Covenant helps with values, responsibility, faith-context reflection, family patterns, grief, discernment, and decisions that feel bigger than simple problem-solving. It connects your moment to the real human stories in Scripture — not as metaphor, but as lived experience — and gives you one honest next step.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
             <Link href={APP_URL} className="btn-primary">Open Covenant</Link>
@@ -214,10 +214,10 @@ export default function CovenantProductPage() {
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">See it work</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
-              Pick a situation. See the story.
+              Not every hard moment needs a faster answer.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-md">
-              This is how Covenant responds — matching your moment to Scripture, then showing you what it means for you today.
+              Some need a truer one. This is how Covenant responds — matching your moment to Scripture, then showing you what it means for you today.
             </p>
           </div>
           <CovenantDemo />
@@ -236,7 +236,7 @@ export default function CovenantProductPage() {
               className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl"
               style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)" }}
             >
-              Faith connected to the moment.
+              Before you decide what to do, understand what you are protecting.
             </h2>
           </div>
 
@@ -274,10 +274,10 @@ export default function CovenantProductPage() {
         <div className="light-beam" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <h2 className="font-serif text-4xl md:text-6xl text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
-            You're not the first person to walk this path.
+            <span className="text-glow">Urgency is not</span> always truth.
           </h2>
           <p className="mt-6 max-w-md text-base text-[#a8a29a] leading-relaxed">
-            Open Covenant and describe what you're walking through. Scripture has been here before.
+            Open Covenant and describe what you&rsquo;re walking through. Some choices are not just decisions — they shape who you become.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3">
             <Link href={APP_URL} className="btn-primary">Open Covenant</Link>

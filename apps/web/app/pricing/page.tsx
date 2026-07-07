@@ -22,7 +22,7 @@ const PRICING_FAQ = [
   },
   {
     q: "What is Baseline Design and why does it matter?",
-    a: "Baseline Design is your private pattern map — built from your birth data (date, time, place) and a short calibration conversation. It stays active beneath every session, so Sovereign.os reads your moment through your actual patterns, not a generic lens.",
+    a: "Baseline Design is your personal context layer — built from your birth data (date, time, place). It maps how you tend to process, respond, connect, protect, and return to center. It stays active beneath every session so Sovereign.os reads your moment through your actual patterns, not a generic lens. You don't need to understand astrology or Human Design — Sovereign translates it into plain language.",
   },
   {
     q: "Is my data private?",
@@ -30,7 +30,11 @@ const PRICING_FAQ = [
   },
   {
     q: "What's the difference between Defrag, Covenant, and Alignment?",
-    a: "Defrag separates the moment from the pattern — for arguments, messages, family roles, grief, and boundaries. Covenant connects reflection to faith and values — for users who want that layer. Alignment turns recognition into practice — the space between insight and next move. Covenant and Alignment require Pro.",
+    a: "Defrag helps you understand relationship tension before it becomes damage — for arguments, messages, family roles, grief, and boundaries. Covenant is for the questions that need meaning, not more noise — values, faith-context reflection, grief, and decisions that feel bigger than simple problem-solving. Alignment helps you choose the move that keeps you clear — after the insight, before the next move. Covenant and Alignment require Pro.",
+  },
+  {
+    q: "Do I need to understand astrology or Human Design?",
+    a: "No. You do not need to calculate, decode, or do any homework. Sovereign.os translates the symbolic complexity of astrology, Human Design, Gene Keys, and numerology into plain language you can use. The system works for you — not the other way around.",
   },
   {
     q: "Is this a replacement for therapy?",
@@ -108,11 +112,11 @@ export default function PricingPage() {
         <Container className="relative z-10 flex flex-col items-center text-center">
           <MetaLabel>Pricing</MetaLabel>
           <AnimatedHeading className="text-4xl md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
-            Start free. Upgrade when you need continuity.
+            Start free. Upgrade when you need the full context.
           </AnimatedHeading>
           <TextReveal delay={200}>
             <p className="mt-5 max-w-md text-base text-[#a8a29a] leading-relaxed">
-              Defrag is free. Covenant, Alignment, and your Library require Pro.
+              Defrag is free — no time limit, no credit card. Covenant, Alignment, and your Library require Pro.
             </p>
           </TextReveal>
 
@@ -267,10 +271,10 @@ export default function PricingPage() {
         <Container className="flex flex-col items-center text-center max-w-xl">
           <MetaLabel>Get started</MetaLabel>
           <h2 className="text-3xl md:text-4xl font-serif tracking-[-0.02em] text-[#f4efe9] mb-4">
-            Try Pro free for 7 days.
+            Less guessing. More context.
           </h2>
           <p className="text-[#a8a29a] text-base leading-relaxed mb-8">
-            No commitment. Cancel before the trial ends and you won't be charged.
+            Try Pro free for 7 days. Cancel before the trial ends and you won&rsquo;t be charged.
           </p>
           <Link
             href={`/app/login?checkout=1&plan=${annual ? "annual" : "monthly"}&trial=1`}

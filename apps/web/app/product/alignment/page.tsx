@@ -184,10 +184,10 @@ export default function AlignmentProductPage() {
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Alignment · Pro</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
-            <span className="text-glow">Turn recognition</span> into practice.
+            <span className="text-glow">Choose the move</span> that keeps you clear.
           </h1>
           <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed animate-fade-up delay-100">
-            Life pulls you off course. A conversation, a conflict, a decision — and suddenly you're reacting from somewhere that isn't you. Alignment uses two things to show you the path back: your Baseline Design, and the live sky above you right now.
+            Alignment helps you decide what to do next when emotion, timing, relationship stakes, and uncertainty are all active. Speak. Wait. Repair. Clarify. Hold the boundary. Alignment uses your Baseline Design and live timing to help you choose with less reactivity.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
             <Link href={APP_URL} className="btn-primary">Open Alignment</Link>
@@ -230,10 +230,10 @@ export default function AlignmentProductPage() {
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Your two inputs</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
-              <span className="text-glow">Your fixed center.</span> The moving sky.
+              <span className="text-glow">Your Baseline.</span> The live sky.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-lg">
-              Your Baseline Design is who you are when you're most yourself. The live sky is the weather you're moving through right now. Alignment holds both — and shows you the path that stays true to you.
+              Your Baseline Design is your fixed center — how you tend to process, respond, and return to yourself under pressure. The live sky is the current timing you&rsquo;re moving through. Alignment reads both together and surfaces what&rsquo;s active right now.
             </p>
           </div>
           <BaselineAndSky />
@@ -249,10 +249,10 @@ export default function AlignmentProductPage() {
               <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">See it work</span>
             </div>
             <h2 className="font-serif text-3xl md:text-5xl text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl text-balance">
-              <span className="text-glow">What Alignment</span> actually returns.
+              <span className="text-glow">Not every reaction</span> deserves your obedience.
             </h2>
             <p className="mt-4 text-base text-[#a8a29a] leading-relaxed max-w-md">
-              Five outputs — grounded in your Baseline Design and the live sky. What is true, what is yours, what is theirs, one next step, and what to avoid.
+              Alignment returns what&rsquo;s true, what&rsquo;s yours to carry, what belongs to the other side, one clear next step, and what to avoid — grounded in your Baseline Design and live timing.
             </p>
           </div>
           <AlignmentDemo />
@@ -272,10 +272,10 @@ export default function AlignmentProductPage() {
               className="font-serif text-[#f4efe9] tracking-[-0.02em] leading-tight max-w-xl"
               style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)" }}
             >
-              After the insight. Before the next move.
+              The best move is not always the fastest one.
             </h2>
             <p className="mt-4 text-[15px] text-[#76716b] leading-relaxed max-w-lg">
-              Use Alignment when you understand what happened but need to know how to respond — what's yours to carry, what isn't, and what a clean next step looks like.
+              Use Alignment when you understand what happened but need to know how to respond — what&rsquo;s yours to carry, what isn&rsquo;t, and what a clear next step looks like without pulling you out of yourself.
             </p>
           </div>
 
@@ -301,10 +301,12 @@ export default function AlignmentProductPage() {
         <div className="light-beam" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <h2 className="font-serif text-4xl md:text-6xl text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
-            <span className="text-glow">Back into</span> your own lane.
+            <span className="text-glow">Choose what helps.</span>
+            <br />
+            <span style={{ color: "rgba(244,239,233,0.5)" }}>Not what only releases the feeling.</span>
           </h2>
           <p className="mt-6 max-w-md text-base text-[#a8a29a] leading-relaxed">
-            Open Alignment and describe what you're trying to move through. Your Baseline Design and the live sky are already waiting.
+            Open Alignment and describe what you&rsquo;re trying to move through. Your Baseline Design and live timing are already active.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3">
             <Link href={APP_URL} className="btn-primary">Open Alignment</Link>
