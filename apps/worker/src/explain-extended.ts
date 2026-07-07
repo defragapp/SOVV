@@ -1,3 +1,4 @@
+import { runPresenceEngine, MODE_OVERLAYS, STEP_DEEPER_LABELS } from "./presence-engine.js";
 import { sanitizeInput, detectPromptInjection } from "./utils/sanitize.js";
 import type { Env } from "./types-env.js"
 import { SYSTEM_DEFRAG, SYSTEM_DEFRAG_RELATIONAL } from "./prompts.js"
@@ -260,11 +261,27 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     signatureLine = signature.line;
   }
 
+  // ── Presence Engine ─────────────────────────────────────────────────────────
+  // Runs before space execution to determine the right response mode and depth.
+  const userRequestedDepth = (body as any).depth as "simple" | "deep" | null ?? null;
+  const presenceProfile = runPresenceEngine({
+    input: message,
+    hasBaseline: Boolean(dataset?.status === "ready"),
+    hasMemory: Boolean(memoryText),
+    currentSpace: "defrag",
+    userRequestedDepth,
+  });
+
+  // Build mode-aware system prompt
+  const modeOverlay = MODE_OVERLAYS[presenceProfile.mode];
+  const baseSystemPrompt = relational ? SYSTEM_DEFRAG_RELATIONAL : SYSTEM_DEFRAG;
+  const systemPromptWithMode = baseSystemPrompt + "\n\n" + modeOverlay;
+
   const userPrompt = buildUserPrompt({
     message,
-    baselineText,
-    patternText: [patternText, memoryText].filter(Boolean).join("\n\n"),
-    activeSignalsText: activeSignalsText || undefined,
+    baselineText: presenceProfile.useBaseline ? baselineText : "",
+    patternText: presenceProfile.useMemory ? [patternText, memoryText].filter(Boolean).join("\n\n") : patternText,
+    activeSignalsText: presenceProfile.useBaseline ? (activeSignalsText || undefined) : undefined,
     targetName: target ? target.relation : undefined,
     targetBaseline,
   });
@@ -272,7 +289,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const modelId = env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
   const ai = await env.AI.run(modelId, {
     messages: [
-      { role: "system", content: relational ? SYSTEM_DEFRAG_RELATIONAL : SYSTEM_DEFRAG },
+      { role: "system", content: systemPromptWithMode },
       { role: "user", content: userPrompt },
     ],
     temperature: 0.35,
@@ -353,6 +370,15 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
     media: {
       audioOverviewAvailable: isPro,
       watchPreviewAvailable: false,
+    },
+    // Presence Engine output — drives UI chips and depth choices
+    presence: {
+      mode: presenceProfile.mode,
+      overlay: presenceProfile.overlay,
+      emotionalCharge: presenceProfile.emotionalCharge,
+      visibleStructure: presenceProfile.visibleStructure,
+      stepDeeperChoices: presenceProfile.stepDeeperChoices,
+      useBaseline: presenceProfile.useBaseline,
     },
   };
 

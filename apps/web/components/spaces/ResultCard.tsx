@@ -6,6 +6,34 @@ interface RailBaseline { pace?: string; stabilizes?: string; responds?: string }
 interface RailSky { urgency?: string; tolerance?: string; state?: string }
 interface RailPattern { loop?: string }
 
+type StepDeeperChoice =
+  | "keep_simple"
+  | "show_pattern"
+  | "map_baseline"
+  | "turn_into_action"
+  | "save_pattern"
+  | "go_deeper"
+  | "steady_first"
+
+const STEP_DEEPER_LABELS: Record<StepDeeperChoice, string> = {
+  keep_simple: "Keep it simple",
+  show_pattern: "Show the deeper pattern",
+  map_baseline: "Map with Baseline Design",
+  turn_into_action: "Turn this into action",
+  save_pattern: "Save this pattern",
+  go_deeper: "Go deeper",
+  steady_first: "Steady first",
+}
+
+interface PresenceData {
+  mode?: string
+  overlay?: string
+  emotionalCharge?: "low" | "medium" | "high"
+  visibleStructure?: string
+  stepDeeperChoices?: StepDeeperChoice[]
+  useBaseline?: boolean
+}
+
 interface ResultCardProps {
   result: {
     activePattern?: string
@@ -28,6 +56,8 @@ interface ResultCardProps {
       sky?: RailSky
       pattern?: RailPattern
     }
+    /** Presence Engine output */
+    presence?: PresenceData
   }
   input: string
   spaceName?: string
@@ -35,6 +65,7 @@ interface ResultCardProps {
   isSaving?: boolean
   saveSuccess?: boolean
   onInvite?: () => void
+  onStepDeeper?: (choice: StepDeeperChoice) => void
 }
 
 export function ResultCard({
@@ -45,6 +76,7 @@ export function ResultCard({
   isSaving,
   saveSuccess,
   onInvite,
+  onStepDeeper,
 }: ResultCardProps) {
   const [copied, setCopied] = React.useState(false)
 
@@ -328,6 +360,22 @@ export function ResultCard({
             View Library →
           </a>
         </motion.div>
+      )}
+
+      {/* Step-deeper choice chips */}
+      {result.presence?.stepDeeperChoices && result.presence.stepDeeperChoices.length > 0 && onStepDeeper && (
+        <div className="px-6 py-4 border-t border-white/[0.04] flex flex-wrap gap-2">
+          {result.presence.stepDeeperChoices.map((choice) => (
+            <button
+              key={choice}
+              onClick={() => onStepDeeper(choice)}
+              className="font-mono text-[8px] uppercase tracking-[0.14em] px-3 py-1.5 border border-white/[0.06] text-[#76716b] hover:text-[#f4efe9] hover:border-white/[0.12] transition-all duration-200"
+              style={{ borderRadius: "var(--radius-minimal)" }}
+            >
+              {STEP_DEEPER_LABELS[choice]}
+            </button>
+          ))}
+        </div>
       )}
 
       {/* Footer actions */}

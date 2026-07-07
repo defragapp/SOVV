@@ -286,6 +286,44 @@ export default function DefragWorkspacePage() {
     }
   }
 
+  const handleStepDeeper = async (choice: string) => {
+    if (!result) return
+    if (choice === "keep_simple") {
+      // Re-submit with depth=simple
+      await handleSubmitWithDepth("simple")
+    } else if (choice === "go_deeper" || choice === "map_baseline") {
+      await handleSubmitWithDepth("deep")
+    } else if (choice === "turn_into_action") {
+      // Navigate to Alignment with current result
+      const prompt = (result as any).alignment || input
+      window.location.href = `/apps/alignment/workspace?prompt=${encodeURIComponent(prompt)}`
+    } else if (choice === "save_pattern") {
+      handleSave()
+    } else if (choice === "show_pattern") {
+      await handleSubmitWithDepth("deep")
+    } else if (choice === "steady_first") {
+      await handleSubmitWithDepth("simple")
+    }
+  }
+
+  const handleSubmitWithDepth = async (depth: "simple" | "deep") => {
+    if (!input.trim() || isLoading) return
+    setIsLoading(true)
+    setResult(null)
+    try {
+      const res = await fetch("/api/explain", {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message: input, depth }),
+      })
+      if (!res.ok) return
+      const data = await res.json() as any
+      setResult(data)
+    } catch {}
+    finally { setIsLoading(false) }
+  }
+
   const handleSave = async () => {
     if (!result) return
     setIsSaving(true)
@@ -660,6 +698,7 @@ export default function DefragWorkspacePage() {
               isSaving={isSaving}
               saveSuccess={saveSuccess}
               onInvite={() => setInviteOpen(true)}
+              onStepDeeper={handleStepDeeper}
             />
 
             {/* Flow suggestion — contextual next space recommendation */}
