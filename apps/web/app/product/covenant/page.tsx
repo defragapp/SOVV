@@ -176,10 +176,10 @@ export default function CovenantProductPage() {
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Covenant · Pro</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
-            <span className="text-glow">For the questions</span> that need meaning, not more noise.
+            <span className="text-glow">Not every hard moment</span> needs a faster answer.
           </h1>
           <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed animate-fade-up delay-100">
-            Covenant helps with values, responsibility, faith-context reflection, family patterns, grief, discernment, and decisions that feel bigger than simple problem-solving. It connects your moment to the real human stories in Scripture — not as metaphor, but as lived experience — and gives you one honest next step.
+            Some need a truer one. Covenant helps with values, faith-context reflection, grief, family patterns, and decisions that feel bigger than simple problem-solving — connecting your moment to the real human stories in Scripture and giving you one honest next step.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
             <Link href={APP_URL} className="btn-primary">Open Covenant</Link>

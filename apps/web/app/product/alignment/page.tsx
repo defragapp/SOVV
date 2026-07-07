@@ -184,10 +184,10 @@ export default function AlignmentProductPage() {
             <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">Alignment · Pro</span>
           </div>
           <h1 className="font-serif text-[#f4efe9] text-4xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.05] max-w-3xl animate-fade-up">
-            <span className="text-glow">Choose the move</span> that keeps you clear.
+            <span className="text-glow">The right response</span> should not cost you yourself.
           </h1>
           <p className="mt-7 max-w-xl text-base md:text-lg text-[#c8c2ba] leading-relaxed animate-fade-up delay-100">
-            Alignment helps you decide what to do next when emotion, timing, relationship stakes, and uncertainty are all active. Speak. Wait. Repair. Clarify. Hold the boundary. Alignment uses your Baseline Design and live timing to help you choose with less reactivity.
+            Alignment helps you choose the Best Next Response when emotion, timing, pressure, and relationship stakes are all active. Speak. Wait. Repair. Clarify. Hold the boundary. Say less. Alignment uses your Baseline Design and live timing to help you choose with less reactivity.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3 animate-fade-up delay-200">
             <Link href={APP_URL} className="btn-primary">Open Alignment</Link>
@@ -301,9 +301,9 @@ export default function AlignmentProductPage() {
         <div className="light-beam" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <h2 className="font-serif text-4xl md:text-6xl text-[#f4efe9] tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
-            <span className="text-glow">Choose what helps.</span>
+            <span className="text-glow">Not every reaction</span>
             <br />
-            <span style={{ color: "rgba(244,239,233,0.5)" }}>Not what only releases the feeling.</span>
+            <span style={{ color: "rgba(244,239,233,0.5)" }}>deserves your obedience.</span>
           </h2>
           <p className="mt-6 max-w-md text-base text-[#a8a29a] leading-relaxed">
             Open Alignment and describe what you&rsquo;re trying to move through. Your Baseline Design and live timing are already active.

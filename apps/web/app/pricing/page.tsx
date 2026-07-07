@@ -112,11 +112,11 @@ export default function PricingPage() {
         <Container className="relative z-10 flex flex-col items-center text-center">
           <MetaLabel>Pricing</MetaLabel>
           <AnimatedHeading className="text-4xl md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
-            Start free. Upgrade when you need the full context.
+            No decoding. No homework. Start free.
           </AnimatedHeading>
           <TextReveal delay={200}>
             <p className="mt-5 max-w-md text-base text-[#a8a29a] leading-relaxed">
-              Defrag is free — no time limit, no credit card. Covenant, Alignment, and your Library require Pro.
+              Defrag is free — no time limit, no credit card. Upgrade to Pro for Covenant, Alignment, your Library, and unlimited sessions.
             </p>
           </TextReveal>
 
@@ -271,7 +271,8 @@ export default function PricingPage() {
         <Container className="flex flex-col items-center text-center max-w-xl">
           <MetaLabel>Get started</MetaLabel>
           <h2 className="text-3xl md:text-4xl font-serif tracking-[-0.02em] text-[#f4efe9] mb-4">
-            Less guessing. More context.
+            Most AI answers the question.<br />
+            <span style={{ color: "rgba(244,239,233,0.55)" }}>Sovereign understands the context around it.</span>
           </h2>
           <p className="text-[#a8a29a] text-base leading-relaxed mb-8">
             Try Pro free for 7 days. Cancel before the trial ends and you won&rsquo;t be charged.

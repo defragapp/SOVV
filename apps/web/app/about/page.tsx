@@ -26,7 +26,7 @@ const PRINCIPLES = [
   },
   {
     num: "04",
-    title: "No homework required.",
+    title: "No decoding. No homework.",
     body: "You do not need to understand astrology, Human Design, Gene Keys, or numerology. Sovereign translates the symbolic complexity into plain language you can use. The system works for you — not the other way around.",
   },
 ]
@@ -69,12 +69,12 @@ export default function AboutPage() {
           </div>
 
           <h1 className="font-serif text-[clamp(2.8rem,6vw,5rem)] text-[#f4efe9] leading-[1.0] tracking-[-0.03em] text-balance mb-8">
-            Personal AI<br />
-            <span className="text-[#a8a29a]">with your full context.</span>
+            The AI that understands<br />
+            <span className="text-[#a8a29a]">why this feels different for you.</span>
           </h1>
 
           <p className="text-[#a8a29a] text-lg max-w-xl leading-relaxed">
-            Sovereign.os combines your Baseline Design, live timing, relationship dynamics, and saved context to help you understand yourself, the people around you, and the next move that actually fits.
+            Most AI only sees the question. Sovereign sees the person, the timing, the relationship, and the pattern underneath it — and translates all of it into plain language you can use.
           </p>
         </Container>
       </section>
@@ -88,10 +88,11 @@ export default function AboutPage() {
           </div>
 
           <h2 className="font-serif text-[clamp(1.8rem,4vw,3rem)] text-[#f4efe9] tracking-[-0.02em] leading-tight mb-4 text-balance">
-            Most AI only knows what you type.
+            Your chart is not the product.<br />
+            <span className="text-[#a8a29a]">What the AI can do with it is.</span>
           </h2>
           <p className="text-[#76716b] text-base leading-relaxed mb-14 max-w-xl">
-            Sovereign works from a deeper foundation. Four layers of context — active together, translated into plain language, so you can ask real human questions and get guidance that actually fits.
+            Baseline Design turns astrology, Human Design, Gene Keys, numerology, and live timing into a personal context layer Sovereign can use across every answer. Four layers active together — translated into plain language, no decoding required.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -170,10 +171,11 @@ export default function AboutPage() {
         <Container className="relative z-10 max-w-xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#76716b] mb-6">Start here</p>
           <h2 className="font-serif text-[clamp(2rem,5vw,3.8rem)] text-[#f4efe9] tracking-[-0.025em] leading-tight mb-6 text-balance">
-            Your Baseline is the starting point.
+            Ask human questions.<br />
+            <span className="text-[#a8a29a]">Get guidance built from your full context.</span>
           </h2>
           <p className="text-[#76716b] text-base leading-relaxed mb-10">
-            Free to start. Private by design. No credit card required.
+            Free to start. No decoding. No homework. No credit card required.
           </p>
           <Link href="/app/login" className="btn-primary">
             Build Your Baseline

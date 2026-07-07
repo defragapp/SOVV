@@ -13,8 +13,8 @@ const STEPS = [
     num: "01",
     label: "Foundation",
     title: "Build your Baseline Design.",
-    body: "Your date, time, and place of birth. Sovereign uses this to map how you tend to process, respond, connect, protect, communicate, and return to center. It stays active beneath every session — private, never exposed in outputs. You do not have to explain who you are every time a moment happens.",
-    aside: "The AI translates the symbolic complexity into plain language. No homework. No decoding.",
+    body: "Your date, time, and place of birth. Sovereign uses this to map how you tend to process, respond, connect, protect, communicate, and return to center. It stays active beneath every session — private, never exposed in outputs.",
+    aside: "No decoding. No homework. No guessing what it means. The AI translates the symbolic complexity into plain language you can use.",
     accent: "rgba(224,116,58,0.12)",
   },
   {
@@ -29,23 +29,23 @@ const STEPS = [
     num: "03",
     label: "Context",
     title: "Sovereign reads the full picture.",
-    body: "Your Baseline Design, live timing, and relationship dynamics are all active. The AI surfaces what's driving the moment — the loop, the role, the pressure — and how it may be landing differently for each person involved.",
+    body: "Your Baseline Design, live timing, and relationship dynamics are all active. The AI surfaces the Active pattern — the loop, the role, the pressure — and how it may be landing differently for each person involved.",
     aside: null,
     accent: "rgba(224,116,58,0.08)",
   },
   {
     num: "04",
     label: "Guidance",
-    title: "Receive clear, context-aware guidance.",
-    body: "What's active, what may be repeating, and your Best Next Response — grounded in your Baseline Design, not a generic read. Specific to you. Specific to this moment.",
+    title: "Get your Best Next Response.",
+    body: "What's active, what may be repeating, and the response that gives the situation a better chance — grounded in your Baseline Design, not a generic read. Specific to you. Specific to this moment.",
     aside: null,
     accent: "rgba(200,194,188,0.04)",
   },
   {
     num: "05",
-    label: "Memory",
+    label: "Library",
     title: "Keep what life already taught you.",
-    body: "Save the result before the moment disappears. Your Library holds what helped — searchable, returnable, yours. When the same dynamic comes back, you return with context instead of starting over.",
+    body: "Save the result before the moment disappears. Your Library holds what helped — Defrags, Best Next Responses, relationship dynamics, recurring patterns. When the same moment comes back, you return with context instead of starting over.",
     aside: "The same lesson should not have to arrive as a crisis twice.",
     accent: "rgba(224,116,58,0.10)",
   },
@@ -80,12 +80,12 @@ export default function HowItWorksPage() {
           </div>
 
           <h1 className="font-serif text-[clamp(3rem,7vw,5.5rem)] text-[#f4efe9] leading-[0.97] tracking-[-0.03em] text-balance mb-8 fade-in-up fade-in-up-2">
-            Better answers<br />
-            <span className="text-[#a8a29a]">need better context.</span>
+            Your chart is not the product.<br />
+            <span className="text-[#a8a29a]">What the AI can do with it is.</span>
           </h1>
 
           <p className="text-[#a8a29a] text-lg max-w-lg leading-relaxed fade-in-up fade-in-up-3">
-            Most AI only knows what you type. Sovereign works from a deeper foundation — your Baseline Design, live timing, and relationship context — so the guidance actually fits the moment you&rsquo;re in.
+            Baseline Design turns astrology, Human Design, Gene Keys, numerology, and live timing into a personal context layer Sovereign can use across every answer. No decoding. No homework. No guessing what it means.
           </p>
         </Container>
       </section>
@@ -157,7 +157,7 @@ export default function HowItWorksPage() {
             Three spaces. One platform.
           </h2>
           <p className="text-[#76716b] text-base leading-relaxed mb-14 max-w-xl">
-            Each space is designed for a different kind of moment. Your Baseline Design is active in all of them.
+            Each space is designed for a different kind of moment. Your Baseline Design is active in all of them. No decoding required in any of them.
           </p>
 
           <div className="flex flex-col gap-px border border-white/[0.06] overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}>
@@ -231,11 +231,11 @@ export default function HowItWorksPage() {
         <Container className="relative z-10 max-w-xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#76716b] mb-6">Start here</p>
           <h2 className="font-serif text-[clamp(2.2rem,5vw,4rem)] text-[#f4efe9] tracking-[-0.025em] leading-tight mb-6 text-balance">
-            Build your Baseline.<br />
-            <span className="text-[#a8a29a]">Bring the moment.</span>
+            No decoding.<br />
+            <span className="text-[#a8a29a]">No homework. No starting from zero.</span>
           </h2>
           <p className="text-[#76716b] text-base leading-relaxed mb-10">
-            Defrag is free. No credit card required. Your Baseline Design stays private — never exposed in outputs.
+            Defrag is free. Build your Baseline Design and bring the moment. Sovereign translates the rest into plain language you can use.
           </p>
           <Link href="/app/login" className="btn-primary">
             Build Your Baseline
