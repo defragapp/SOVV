@@ -15,6 +15,11 @@ export interface Env {
   // Binding name in wrangler.toml: TEMPLATES
   TEMPLATES?: R2Bucket
 
+  // R2 — error monitoring logs (bucket: sovereign-logs)
+  // Logpush job id=1768279 writes workers_trace_events here
+  // Binding name in wrangler.toml: LOGS
+  LOGS?: R2Bucket
+
   // ── AI ───────────────────────────────────────────────────────────────────
   AI: Ai
   AI_SERVICE: Fetcher
