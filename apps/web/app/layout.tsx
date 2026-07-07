@@ -114,6 +114,57 @@ export const viewport: Viewport = {
   themeColor: "#08070a",
 }
 
+// Single canonical JSON-LD block — no duplicates
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Sovereign.os",
+  "applicationCategory": "LifestyleApplication",
+  "operatingSystem": "Web",
+  "url": "https://defrag.app",
+  "description":
+    "Pattern-aware AI for the moments that are hard to read while you're inside them.",
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Free",
+      "price": "0",
+      "priceCurrency": "USD",
+      "description": "Defrag space with Baseline Design — free forever",
+    },
+    {
+      "@type": "Offer",
+      "name": "Pro Monthly",
+      "price": "20",
+      "priceCurrency": "USD",
+      "billingIncrement": "P1M",
+      "description": "Unlimited sessions, Covenant, Alignment, Library, Audio Overview",
+    },
+    {
+      "@type": "Offer",
+      "name": "Pro Annual",
+      "price": "99",
+      "priceCurrency": "USD",
+      "billingIncrement": "P1Y",
+      "description": "Best value — save 59% vs monthly",
+    },
+  ],
+  "featureList": [
+    "Baseline Design — personal pattern map",
+    "Defrag — pattern recognition space",
+    "Covenant — faith-context reflection",
+    "Alignment — response integration",
+    "Sovereign.os Library — private saved results",
+    "Audio Overview",
+    "Invite Privately",
+  ],
+  "publisher": {
+    "@type": "Organization",
+    "name": "Sovereign.os",
+    "url": "https://defrag.app",
+  },
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -121,93 +172,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`antialiased ${jetBrainsMono.variable} ${GeistSans.variable} ${fraunces.variable}`}
     >
       <head>
-        {/* JSON-LD structured data */}
+        {/* Canonical JSON-LD structured data — single block, correct prices */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              "name": "Sovereign.os",
-              "applicationCategory": "LifestyleApplication",
-              "operatingSystem": "Web",
-              "url": "https://defrag.app",
-              "description": "Pattern-aware AI for the moments that are hard to read while you're inside them.",
-              "offers": [
-                {
-                  "@type": "Offer",
-                  "name": "Free",
-                  "price": "0",
-                  "priceCurrency": "USD"
-                },
-                {
-                  "@type": "Offer",
-                  "name": "Pro Monthly",
-                  "price": "20",
-                  "priceCurrency": "USD",
-                  "billingIncrement": "P1M"
-                },
-                {
-                  "@type": "Offer",
-                  "name": "Pro Annual",
-                  "price": "99",
-                  "priceCurrency": "USD",
-                  "billingIncrement": "P1Y"
-                }
-              ],
-              "publisher": {
-                "@type": "Organization",
-                "name": "Sovereign.os",
-                "url": "https://defrag.app"
-              }
-            })
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {/* DNS prefetch for external resources */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-
-        {/* Structured data — SoftwareApplication */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              "name": "Sovereign.os",
-              "applicationCategory": "LifestyleApplication",
-              "operatingSystem": "Web",
-              "url": "https://defrag.app",
-              "description": "Pattern-aware AI for the moments that are hard to read while you're inside them.",
-              "offers": [
-                {
-                  "@type": "Offer",
-                  "price": "0",
-                  "priceCurrency": "USD",
-                  "name": "Free",
-                  "description": "Defrag space with Baseline Design — free forever"
-                },
-                {
-                  "@type": "Offer",
-                  "price": "12",
-                  "priceCurrency": "USD",
-                  "billingIncrement": "P1M",
-                  "name": "Pro",
-                  "description": "Unlimited sessions, Covenant, Alignment, Library, Audio Overview"
-                }
-              ],
-              "featureList": [
-                "Baseline Design — personal pattern map",
-                "Defrag — pattern recognition space",
-                "Covenant — faith-context reflection",
-                "Alignment — response integration",
-                "Sovereign.os Library — private saved results",
-                "Audio Overview",
-                "Invite Privately"
-              ]
-            })
-          }}
-        />
+        <link rel="dns-prefetch" href="//challenges.cloudflare.com" />
       </head>
       <body className="min-h-screen overflow-x-hidden bg-[#08070a] text-[#f4efe9] overscroll-none selection:bg-white/20 selection:text-white">
         {/* Skip to main content — keyboard accessibility */}

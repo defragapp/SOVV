@@ -1,5 +1,22 @@
 {
   "version": 1,
   "include": ["/*"],
-  "exclude": ["/_next/static/*", "/_next/image/*", "/assets/*", "/*.css", "/*.js", "/favicon.ico", "/brand-mark.svg", "/social-card.svg"]
+  "exclude": [
+    "/_next/static/*",
+    "/_next/image/*",
+    "/assets/*",
+    "/fonts/*",
+    "/*.css",
+    "/*.js",
+    "/favicon.ico",
+    "/favicon.png",
+    "/brand-mark.svg",
+    "/social-card.svg",
+    "/social-card.png",
+    "/apple-touch-icon.png",
+    "/hero-hand.webp",
+    "/hero-hand-1x.webp",
+    "/hero-light.png",
+    "/manifest.json"
+  ]
 }

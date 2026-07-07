@@ -1,26 +1,50 @@
 {
   "name": "Sovereign.os",
   "short_name": "Sovereign.os",
-  "description": "Understand what is shaping your relationships, family dynamics, grief, boundaries, and decisions.",
-  "start_url": "/",
+  "description": "Pattern-aware AI for the moments that are hard to read while you're inside them.",
+  "start_url": "/app/login",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#020202",
-  "theme_color": "#020202",
+  "orientation": "portrait-primary",
+  "background_color": "#08070a",
+  "theme_color": "#08070a",
+  "lang": "en",
+  "categories": ["productivity", "lifestyle"],
   "icons": [
     {
       "src": "/favicon.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/apple-touch-icon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/brand-mark.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Open Defrag",
+      "short_name": "Defrag",
+      "description": "Open the Defrag pattern recognition space",
+      "url": "/apps/defrag",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
 }

@@ -5,16 +5,41 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
 
-  // Set the proper domain configurations for session cookies
-  const response = NextResponse.next();
-  const originUrl = new URL(request.url);
-
-  // ── session checking ──
-  const sessionId = request.cookies.get('__sov_session')?.value || request.cookies.get('sid')?.value;
-  
   const isAppShell = host === 'app.defrag.app' || host === 'sovereign.defrag.app';
   const isDefragRoot = host === 'defrag.app' || host === 'www.defrag.app';
-  
+
+  // ── Security headers applied to every response ──────────────────────────
+  const securityHeaders: Record<string, string> = {
+    'X-Frame-Options': 'DENY',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+    // microphone=(self) required for VoiceInput component
+    'Permissions-Policy': 'camera=(), microphone=(self), geolocation=()',
+    'Content-Security-Policy':
+      "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; " +
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+      "font-src 'self' https://fonts.gstatic.com; " +
+      "img-src 'self' data: https:; " +
+      "connect-src 'self' https://api.defrag.app https://challenges.cloudflare.com; " +
+      "frame-src https://challenges.cloudflare.com; " +
+      "object-src 'none'; " +
+      "base-uri 'self';",
+  };
+
+  function applySecurityHeaders(res: NextResponse): NextResponse {
+    for (const [key, value] of Object.entries(securityHeaders)) {
+      res.headers.set(key, value);
+    }
+    return res;
+  }
+
+  // ── Session check ────────────────────────────────────────────────────────
+  const sessionId =
+    request.cookies.get('__sov_session')?.value ||
+    request.cookies.get('sid')?.value;
+
   const isPublicPath =
     pathname.startsWith('/app/login') ||
     pathname.startsWith('/api/') ||
@@ -22,58 +47,44 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/assets/') ||
     pathname.startsWith('/favicon') ||
     pathname.startsWith('/brand-mark') ||
-    pathname.startsWith('/social-card');
+    pathname.startsWith('/social-card') ||
+    pathname.startsWith('/manifest') ||
+    pathname.startsWith('/apple-touch-icon');
 
-  // If no session and route is not public, immediately redirect to login to intercept
-  // before client-side rendering or AuthGuard
+  // ── App shell: redirect unauthenticated users to login ───────────────────
   if (isAppShell && !sessionId && !isPublicPath) {
-    // Redirect to login, preserving the original path as return URL
     const loginUrl = new URL('/app/login', request.url);
     if (pathname !== '/' && pathname !== '/app/login') {
       loginUrl.searchParams.set('return', pathname + (url.search || ''));
     }
     const redirectRes = NextResponse.redirect(loginUrl);
     redirectRes.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
-    return redirectRes;
+    return applySecurityHeaders(redirectRes);
   }
 
-  if (isAppShell) {
-    if (pathname === '/') {
-      url.pathname = '/apps/defrag';
-      const rewriteRes = NextResponse.rewrite(url);
-      rewriteRes.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
-      return rewriteRes;
-    }
+  // ── App shell root → rewrite to /apps/defrag ────────────────────────────
+  if (isAppShell && pathname === '/') {
+    url.pathname = '/apps/defrag';
+    const rewriteRes = NextResponse.rewrite(url);
+    rewriteRes.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+    return applySecurityHeaders(rewriteRes);
   }
 
+  // ── Marketing root: redirect logged-in users to app ─────────────────────
   if (isDefragRoot && sessionId && pathname === '/') {
-    const redirectRes = NextResponse.redirect(new URL('https://app.defrag.app/apps/defrag'));
+    const redirectRes = NextResponse.redirect(
+      new URL('https://app.defrag.app/apps/defrag')
+    );
     redirectRes.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
-    return redirectRes;
+    return applySecurityHeaders(redirectRes);
   }
 
-  // Add security headers to all responses
-  const res = NextResponse.next();
-  res.headers.set('X-Frame-Options', 'DENY');
-  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-  res.headers.set('X-Content-Type-Options', 'nosniff');
-  res.headers.set('Permissions-Policy', 'camera=(), microphone=(self), geolocation=()');
-  res.headers.set('Content-Security-Policy',
-    "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; " +
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-    "font-src 'self' https://fonts.gstatic.com; " +
-    "img-src 'self' data: https:; " +
-    "connect-src 'self' https://api.defrag.app https://challenges.cloudflare.com; " +
-    "frame-src https://challenges.cloudflare.com; " +
-    "object-src 'none'; " +
-    "base-uri 'self';"
-  );
-  res.headers.set('Permissions-Policy', 'camera=(), microphone=(self), geolocation=()');
-  return res;
+  // ── Default: pass through with security headers ──────────────────────────
+  return applySecurityHeaders(NextResponse.next());
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|assets|favicon.ico|sitemap.xml|robots.txt|brand-mark.svg|social-card.svg).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|assets|favicon.ico|sitemap.xml|robots.txt|brand-mark.svg|social-card.svg).*)',
+  ],
 };

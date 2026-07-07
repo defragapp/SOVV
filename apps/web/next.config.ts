@@ -15,6 +15,29 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Static assets — long-lived immutable cache
+        source: "/_next/static/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        // Public assets (fonts, images, icons)
+        source: "/fonts/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        // All routes — base security headers
+        // Note: middleware applies the full security header set per-request.
+        // These headers serve as a fallback for routes not matched by middleware.
         source: "/(.*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
@@ -22,7 +45,8 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
+            // microphone=(self) required for VoiceInput component
+            value: "camera=(), microphone=(self), geolocation=()",
           },
         ],
       },
