@@ -3,10 +3,7 @@ import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
 import { ResultCard } from "@/components/spaces/ResultCard"
-import { VoiceInput } from "@/components/spaces/VoiceInput"
 import Link from "next/link"
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Baseline {
   dob: string
@@ -33,6 +30,8 @@ interface DefragResult {
   sourcesUsed?: { baseline?: boolean; history?: boolean; invitedUsers?: boolean }
   media?: { audioOverviewAvailable?: boolean; watchPreviewAvailable?: boolean }
   signature?: string
+  confidence?: { score: number; strength: "low" | "medium" | "high" }
+  presence?: { stepDeeperChoices?: Array<"keep_simple" | "show_pattern" | "map_baseline" | "turn_into_action" | "save_pattern" | "go_deeper" | "steady_first"> }
   rail?: {
     baseline?: { pace?: string; stabilizes?: string; responds?: string }
     sky?: { urgency?: string; tolerance?: string; state?: string }
@@ -47,14 +46,11 @@ interface LibraryItem {
   created_at: string
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function formatBirthSummary(b: Baseline): string {
   const city = b.pob.split(",")[0].trim()
   return `${b.dob} · ${b.tob.value} · ${city}`
 }
 
-// Evidence chip — Baseline Design data point
 function EvidenceChip({ label }: { label: string }) {
   return (
     <span
@@ -66,14 +62,12 @@ function EvidenceChip({ label }: { label: string }) {
   )
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default function DefragWorkspacePage() {
   const [input, setInput] = React.useState("")
   const [result, setResult] = React.useState<DefragResult | null>(null)
-  const [thread, setThread] = React.useState<Array<{input: string; result: DefragResult}>>([])  // conversation history
+  const [thread, setThread] = React.useState<Array<{input: string; result: DefragResult}>>([])
   const [isLoading, setIsLoading] = React.useState(false)
-  const [streamingText, setStreamingText] = React.useState("")  // progressive AI output
+  const [streamingText, setStreamingText] = React.useState("")
   const [error, setError] = React.useState("")
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
@@ -86,10 +80,8 @@ export default function DefragWorkspacePage() {
   const [datasetStatus, setDatasetStatus] = React.useState<"none" | "pending" | "ready" | "failed" | null>(null)
   const [recurringPattern, setRecurringPattern] = React.useState<string | null>(null)
   const [sessionCount, setSessionCount] = React.useState(0)
-  // Compare With Someone — Pro only
   const [compareMode, setCompareMode] = React.useState(false)
   const [compareName, setCompareName] = React.useState("")
-  // Read a message — paste a text message, get a pattern read
   const [messageMode, setMessageMode] = React.useState(false)
 
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
@@ -100,7 +92,6 @@ export default function DefragWorkspacePage() {
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
 
-  // Prefill from ?prompt= query param
   React.useEffect(() => {
     if (typeof window !== "undefined") {
       const p = new URLSearchParams(window.location.search).get("prompt")
@@ -108,24 +99,22 @@ export default function DefragWorkspacePage() {
     }
   }, [])
 
-  // Load baseline
   React.useEffect(() => {
     fetch("/api/baseline", { credentials: "include" })
       .then(r => r.ok ? r.json() : { baseline: null })
-      .then((d: any) => setBaseline(d.baseline ?? null))
+      .then((d: { baseline?: Baseline | null }) => setBaseline(d.baseline ?? null))
       .catch(() => {})
       .finally(() => setBaselineLoading(false))
   }, [])
 
-  // Poll baseline compilation status
   React.useEffect(() => {
     if (!baseline) return
     let active = true
     const poll = async () => {
       try {
         const r = await fetch("/api/baseline/status", { credentials: "include" })
-        if (!r.ok || !active) return
-        const d = await r.json() as any
+        if (!r.ok || !active) return null
+        const d = await r.json() as { status?: "none" | "pending" | "ready" | "failed" }
         setDatasetStatus(d.status ?? "none")
         return d.status
       } catch { return null }
@@ -142,13 +131,12 @@ export default function DefragWorkspacePage() {
     return () => { active = false }
   }, [baseline])
 
-  // Load derived profile statements
   React.useEffect(() => {
     if (!baseline) return
     setStatementsLoading(true)
     fetch("/api/derive-profile", { credentials: "include" })
       .then(r => r.ok ? r.json() : { statements: [] })
-      .then((d: any) => { if (Array.isArray(d.statements) && d.statements.length > 0) setBaselineStatements(d.statements) })
+      .then((d: { statements?: BaselineStatement[] }) => { if (Array.isArray(d.statements) && d.statements.length > 0) setBaselineStatements(d.statements) })
       .catch(() => {})
       .finally(() => setStatementsLoading(false))
   }, [baseline])
@@ -157,23 +145,21 @@ export default function DefragWorkspacePage() {
     return () => { if (audioUrl) URL.revokeObjectURL(audioUrl) }
   }, [audioUrl])
 
-  // Load pattern memory
   React.useEffect(() => {
     fetch("/api/memory", { credentials: "include" })
       .then(r => r.ok ? r.json() : null)
-      .then((d: any) => {
+      .then((d: { recurringPattern?: string; sessionCount?: number } | null) => {
         if (d?.recurringPattern) setRecurringPattern(d.recurringPattern)
         if (d?.sessionCount) setSessionCount(d.sessionCount)
       })
       .catch(() => {})
   }, [])
 
-  // Load library
   React.useEffect(() => {
     setLibraryLoading(true)
     fetch("/api/library?workspace_source=DEFRAG", { credentials: "include" })
       .then(r => r.ok ? r.json() : { items: [] })
-      .then((d: any) => setLibrary(d.items || []))
+      .then((d: { items?: LibraryItem[] }) => setLibrary(d.items || []))
       .catch(() => {})
       .finally(() => setLibraryLoading(false))
   }, [saveSuccess])
@@ -186,9 +172,8 @@ export default function DefragWorkspacePage() {
     setAudioUrl(null)
     setAudioError("")
     setResult(null)
-    setStreamingText("")  // clear previous stream
+    setStreamingText("")
 
-    // Message mode — paste a text message, get a pattern read via /api/defrag/message
     if (messageMode) {
       try {
         const res = await fetch("/api/defrag/message", {
@@ -197,21 +182,28 @@ export default function DefragWorkspacePage() {
           credentials: "include",
           body: JSON.stringify({ message: input }),
         })
-        const data = await res.json()
+        const data = await res.json() as {
+          error?: string
+          whatMightBeActive?: string
+          whatTheyMightMean?: string
+          yourPattern?: string
+          bestNextResponse?: string
+          tone?: string
+        }
         if (!res.ok) {
           setError(data.error || "Something went wrong.")
           return
         }
-        // Map message result to DefragResult shape for ResultCard
-        setResult({
+        const messageResult: DefragResult = {
           activePattern: data.whatMightBeActive,
           theRepeat: data.whatTheyMightMean,
           alignment: data.yourPattern,
           bestNextResponse: data.bestNextResponse,
           summary: data.tone,
           sourcesUsed: { baseline: true, history: false, invitedUsers: false },
-        } as any)
-        setThread(prev => [...prev.slice(-2), { input, result: { activePattern: data.whatMightBeActive } as any }])
+        }
+        setResult(messageResult)
+        setThread(prev => [...prev.slice(-2), { input, result: messageResult }])
       } catch {
         setError("Unable to connect. Check your connection and try again.")
       } finally {
@@ -221,7 +213,6 @@ export default function DefragWorkspacePage() {
     }
 
     try {
-      // Start streaming for progressive display
       const streamController = new AbortController()
       fetch("/api/explain/stream", {
         method: "POST",
@@ -243,7 +234,7 @@ export default function DefragWorkspacePage() {
           for (const line of evtLines) {
             if (!line.startsWith("data: ")) continue
             try {
-              const d = JSON.parse(line.slice(6))
+              const d = JSON.parse(line.slice(6)) as { token?: string; done?: boolean; error?: string }
               if (d.token) setStreamingText(prev => prev + d.token)
               if (d.done || d.error) break
             } catch { /* ignore */ }
@@ -257,18 +248,16 @@ export default function DefragWorkspacePage() {
         credentials: "include",
         body: JSON.stringify({
           message: input,
-          // Compare With Someone — passes target name for relational overlay
           ...(compareMode && compareName.trim() ? {
             target: { id: "compare", relation: "partner" },
             targetName: compareName.trim(),
           } : {}),
-          // Pass recent patterns for conversational continuity
           ...(thread.length > 0 ? {
-            priorPatterns: thread.slice(-2).map(t => t.result?.activePattern).filter(Boolean),
+            priorPatterns: thread.slice(-2).map(t => t.result.activePattern).filter(Boolean),
           } : {}),
         }),
       })
-      const data = await res.json()
+      const data = await res.json() as DefragResult & { type?: string; error?: string; message?: string }
       if (data.type === "needs_baseline") { setError("needs_baseline"); return }
       if (!res.ok) {
         setError(data.error === "daily_limit_reached"
@@ -276,7 +265,7 @@ export default function DefragWorkspacePage() {
           : data.message || data.error || "Something went wrong.")
         return
       }
-      setStreamingText("")  // clear stream, show structured result
+      setStreamingText("")
       setResult(data)
       setThread(prev => [...prev.slice(-2), { input, result: data }])
     } catch {
@@ -286,23 +275,17 @@ export default function DefragWorkspacePage() {
     }
   }
 
-  const handleStepDeeper = async (choice: string) => {
+  const handleStepDeeper = async (choice: "keep_simple" | "show_pattern" | "map_baseline" | "turn_into_action" | "save_pattern" | "go_deeper" | "steady_first") => {
     if (!result) return
-    if (choice === "keep_simple") {
-      // Re-submit with depth=simple
+    if (choice === "keep_simple" || choice === "steady_first") {
       await handleSubmitWithDepth("simple")
-    } else if (choice === "go_deeper" || choice === "map_baseline") {
+    } else if (choice === "go_deeper" || choice === "map_baseline" || choice === "show_pattern") {
       await handleSubmitWithDepth("deep")
     } else if (choice === "turn_into_action") {
-      // Navigate to Alignment with current result
-      const prompt = (result as any).alignment || input
+      const prompt = result.alignment || input
       window.location.href = `/apps/alignment/workspace?prompt=${encodeURIComponent(prompt)}`
     } else if (choice === "save_pattern") {
       handleSave()
-    } else if (choice === "show_pattern") {
-      await handleSubmitWithDepth("deep")
-    } else if (choice === "steady_first") {
-      await handleSubmitWithDepth("simple")
     }
   }
 
@@ -318,7 +301,7 @@ export default function DefragWorkspacePage() {
         body: JSON.stringify({ message: input, depth }),
       })
       if (!res.ok) return
-      const data = await res.json() as any
+      const data = await res.json() as DefragResult
       setResult(data)
     } catch {}
     finally { setIsLoading(false) }
@@ -369,31 +352,24 @@ export default function DefragWorkspacePage() {
           ].filter(Boolean).join(". "),
         }),
       })
-      if (!res.ok) { const d = (await res.json().catch(() => ({}))) as any; throw new Error(d.error || "Failed") }
+      if (!res.ok) { const d = (await res.json().catch(() => ({}))) as { error?: string }; throw new Error(d.error || "Failed") }
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
       setAudioUrl(url)
       requestAnimationFrame(() => { audioRef.current?.play().catch(() => {}) })
-    } catch (err: any) {
-      setAudioError(err.message || "Failed to generate audio")
+    } catch (err) {
+      setAudioError(err instanceof Error ? err.message : "Failed to generate audio")
     } finally {
       setIsGeneratingAudio(false)
     }
   }
 
-  // ─── LEFT PANEL — Baseline Design ─────────────────────────────────────────
-
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-
-      {/* Panel header */}
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Baseline Design</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Baseline</p>
       </div>
-
-      {/* Baseline Design — the private inference layer */}
       <div className="px-5 pt-5 pb-5 border-b border-white/[0.05]">
-
         {baselineLoading ? (
           <div className="flex flex-col gap-2.5 py-1">
             <div className="skeleton skeleton-text w-full" />
@@ -402,131 +378,77 @@ export default function DefragWorkspacePage() {
           </div>
         ) : baseline ? (
           <>
-            {/* Birth summary — compact, low priority */}
-            <p className="font-mono text-[9px] text-[#4f4b47] mb-4 tracking-[0.1em]">
-              {formatBirthSummary(baseline)}
-            </p>
-
-            {/* Derived behavioral statements with evidence chips */}
+            <p className="font-mono text-[9px] text-[#4f4b47] mb-4 tracking-[0.1em]">{formatBirthSummary(baseline)}</p>
             {statementsLoading ? (
               <div className="flex flex-col gap-2.5 py-1">
-            <div className="skeleton skeleton-text w-full" />
-            <div className="skeleton skeleton-text w-4/5" />
-            <div className="skeleton skeleton-text w-3/5" />
-          </div>
+                <div className="skeleton skeleton-text w-full" />
+                <div className="skeleton skeleton-text w-4/5" />
+                <div className="skeleton skeleton-text w-3/5" />
+              </div>
             ) : baselineStatements.length > 0 ? (
               <div className="flex flex-col gap-0">
                 {baselineStatements.map(({ statement, chips }, i) => (
                   <div key={i} className="py-3 border-b border-white/[0.04] last:border-0">
                     <p className="text-[12px] text-[#c8c2bc] leading-[1.6] mb-2">{statement}</p>
-                    {chips.length > 0 && (
-                      <div className="flex gap-1 flex-wrap">
-                        {chips.map(chip => <EvidenceChip key={chip} label={chip} />)}
-                      </div>
-                    )}
+                    {chips.length > 0 && <div className="flex gap-1 flex-wrap">{chips.map(chip => <EvidenceChip key={chip} label={chip} />)}</div>}
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-[12px] text-[#76716b] leading-relaxed">
-                Your Baseline Design is active. Behavioral profile is being derived.
-              </p>
+              <p className="text-[12px] text-[#76716b] leading-relaxed">Your Baseline is active. Behavioral profile is being derived.</p>
             )}
-
-            {/* Footer */}
             <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/[0.04]">
               <div className="flex items-center gap-1.5">
                 {datasetStatus === "ready" && <span className="w-1.5 h-1.5 rounded-full bg-[#e0743a]/50" />}
                 {datasetStatus === "pending" && <span className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />}
-                <p className="text-[10px] text-[#4f4b47]">
-                  {datasetStatus === "ready" ? "Pattern map active." :
-                   datasetStatus === "pending" ? "Compiling…" :
-                   "Active in every result."}
-                </p>
+                <p className="text-[10px] text-[#4f4b47]">{datasetStatus === "ready" ? "Understanding model active." : datasetStatus === "pending" ? "Compiling…" : "Active in every result."}</p>
               </div>
-              <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.1em] text-[#76716b] hover:text-[#a8a29a] transition-colors">
-                Edit
-              </a>
+              <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.1em] text-[#76716b] hover:text-[#a8a29a] transition-colors">Edit</a>
             </div>
           </>
         ) : (
-          /* No baseline — prompt to add */
           <div className="border border-white/[0.08] bg-white/[0.02] p-4" style={{ borderRadius: "var(--radius-container)" }}>
-            <p className="text-[12px] text-[#a8a29a] mb-1">Baseline Design required</p>
-            <p className="text-[12px] text-[#76716b] leading-relaxed mb-3">
-              Add your date, time, and place of birth to begin. This is the private layer that grounds every result.
-            </p>
-            <a
-              href="/settings"
-              className="inline-flex h-8 px-4 bg-[#f4efe9] text-[#08070a] text-[11px] font-medium items-center hover:opacity-90 transition-opacity"
-              style={{ borderRadius: "var(--radius-button)" }}
-            >
-              Add birth data →
-            </a>
+            <p className="text-[12px] text-[#a8a29a] mb-1">Baseline required</p>
+            <p className="text-[12px] text-[#76716b] leading-relaxed mb-3">Add your date, time, and place of birth to begin. This private layer grounds every result.</p>
+            <a href="/settings" className="inline-flex h-8 px-4 bg-[#f4efe9] text-[#08070a] text-[11px] font-medium items-center hover:opacity-90 transition-opacity" style={{ borderRadius: "var(--radius-button)" }}>Add birth data →</a>
           </div>
         )}
       </div>
-
-      {/* Pattern history — what's been brought before */}
       {baseline && (
         <div className="px-5 pt-4 pb-4 border-b border-white/[0.05]">
           <div className="flex items-center justify-between mb-2">
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Pattern history</p>
-            {sessionCount > 0 && (
-              <span className="font-mono text-[8px] text-[#4f4b47]">{sessionCount} session{sessionCount !== 1 ? "s" : ""}</span>
-            )}
+            {sessionCount > 0 && <span className="font-mono text-[8px] text-[#4f4b47]">{sessionCount} session{sessionCount !== 1 ? "s" : ""}</span>}
           </div>
           {recurringPattern ? (
             <div>
-              <p className="text-[11px] text-[#76716b] leading-relaxed mb-1">
-                This pattern keeps appearing:
-              </p>
-              <p className="text-[11px] text-[#c8c2bc] leading-relaxed italic">
-                "{recurringPattern.length > 80 ? recurringPattern.slice(0, 80) + "…" : recurringPattern}"
-              </p>
+              <p className="text-[11px] text-[#76716b] leading-relaxed mb-1">This pattern keeps appearing:</p>
+              <p className="text-[11px] text-[#c8c2bc] leading-relaxed italic">"{recurringPattern.length > 80 ? recurringPattern.slice(0, 80) + "…" : recurringPattern}"</p>
             </div>
           ) : result?.sourcesUsed?.history ? (
-            <p className="text-[11px] text-[#76716b] leading-relaxed">
-              Past patterns were used in this result.
-            </p>
+            <p className="text-[11px] text-[#76716b] leading-relaxed">Past patterns were used in this result.</p>
           ) : (
-            <p className="text-[11px] text-[#4f4b47] leading-relaxed">
-              Patterns from past sessions will inform future results.
-            </p>
+            <p className="text-[11px] text-[#4f4b47] leading-relaxed">Patterns from past sessions will inform future results.</p>
           )}
         </div>
       )}
-
-      {/* Navigation */}
       <div className="px-5 pt-4">
-        <Link href="/apps/defrag" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors">
-          ← Back to Defrag
-        </Link>
+        <Link href="/apps/defrag" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors">← Back to Defrag</Link>
       </div>
     </div>
   )
 
-  // ─── RIGHT PANEL — Library ─────────────────────────────────────────────────
-
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-
-      {/* Panel header */}
       <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Saved results</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Saved understanding</p>
       </div>
-
-      {/* Audio — only when result has audio available */}
       {result?.media?.audioOverviewAvailable && (
         <div className="px-5 pt-4 pb-4 border-b border-white/[0.05]">
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Audio overview</p>
           <div className="border border-white/[0.07] bg-white/[0.02] overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}>
             {!audioUrl ? (
-              <button
-                onClick={handleGenerateAudio}
-                disabled={isGeneratingAudio}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/[0.03] transition-colors disabled:opacity-40"
-              >
+              <button onClick={handleGenerateAudio} disabled={isGeneratingAudio} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/[0.03] transition-colors disabled:opacity-40">
                 <div className="w-5 h-5 border border-white/[0.12] flex items-center justify-center shrink-0 text-[#a8a29a] text-[9px]" style={{ borderRadius: "50%" }}>▶</div>
                 <span className="text-[12px] text-[#a8a29a]">{isGeneratingAudio ? "Generating…" : "Generate audio overview"}</span>
               </button>
@@ -537,38 +459,22 @@ export default function DefragWorkspacePage() {
           </div>
         </div>
       )}
-
-      {/* Library list */}
       <div className="flex-1">
         {libraryLoading ? (
-          <div className="flex justify-center py-10">
-            <span className="w-4 h-4 border border-white/[0.15] border-t-white/30 rounded-full animate-spin" />
-          </div>
+          <div className="flex justify-center py-10"><span className="w-4 h-4 border border-white/[0.15] border-t-white/30 rounded-full animate-spin" /></div>
         ) : library.length === 0 ? (
           <div className="px-5 py-8 text-center">
-            <p className="text-[12px] text-[#4f4b47] leading-relaxed">
-              Saved results appear here.
-            </p>
-            <p className="text-[11px] text-[#4f4b47] mt-1 opacity-60">
-              Save to Library after each session.
-            </p>
+            <p className="text-[12px] text-[#4f4b47] leading-relaxed">Saved understanding appears here.</p>
+            <p className="text-[11px] text-[#4f4b47] mt-1 opacity-60">Save the patterns worth remembering.</p>
           </div>
         ) : (
           library.map(item => (
-            <a
-              key={item.id}
-              href={`/apps/defrag/${item.id}`}
-              className="block px-5 py-4 border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors group"
-            >
+            <a key={item.id} href={`/apps/defrag/${item.id}`} className="block px-5 py-4 border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors group">
               <div className="flex items-center justify-between mb-1">
                 <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f4b47]">Defrag</span>
-                <span className="text-[10px] text-[#4f4b47]">
-                  {new Date(item.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-                </span>
+                <span className="text-[10px] text-[#4f4b47]">{new Date(item.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
               </div>
-              <p className="text-[13px] text-[#76716b] group-hover:text-[#c8c2bc] transition-colors leading-snug line-clamp-2">
-                {item.title}
-              </p>
+              <p className="text-[13px] text-[#76716b] group-hover:text-[#c8c2bc] transition-colors leading-snug line-clamp-2">{item.title}</p>
             </a>
           ))
         )}
@@ -576,199 +482,86 @@ export default function DefragWorkspacePage() {
     </div>
   )
 
-  // ─── CENTER PANEL — Thread ─────────────────────────────────────────────────
-
   const main = (
     <div className="flex flex-col h-full">
-
-      {/* Thread header — shows active data sources */}
       <div className="h-11 px-6 flex items-center justify-between border-b border-white/[0.06] shrink-0">
         <div className="flex items-center gap-3">
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Defrag</span>
           <span className="text-[#4f4b47] text-[10px]">·</span>
-          <span className="text-[11px] text-[#4f4b47]">What's active. What keeps happening. One next move.</span>
+          <span className="text-[11px] text-[#4f4b47]">Experience → Understanding → Clean move</span>
         </div>
         {result?.sourcesUsed && (
           <div className="flex items-center gap-1.5">
-            {result.sourcesUsed.baseline && (
-              <span
-                className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#e0743a]/60 border border-[#e0743a]/20 px-2 py-0.5"
-                style={{ borderRadius: "var(--radius-minimal)" }}
-              >
-                Baseline Design active
-              </span>
-            )}
-            {result.sourcesUsed.history && (
-              <span
-                className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] border border-white/[0.08] px-2 py-0.5"
-                style={{ borderRadius: "var(--radius-minimal)" }}
-              >
-                Pattern history
-              </span>
-            )}
+            {result.sourcesUsed.baseline && <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#e0743a]/60 border border-[#e0743a]/20 px-2 py-0.5" style={{ borderRadius: "var(--radius-minimal)" }}>Baseline active</span>}
+            {result.sourcesUsed.history && <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] border border-white/[0.08] px-2 py-0.5" style={{ borderRadius: "var(--radius-minimal)" }}>Pattern history</span>}
           </div>
         )}
       </div>
 
-      {/* Result / empty state */}
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
-
-        {/* No baseline */}
         {!baselineLoading && !baseline && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
-            <p className="text-[15px] text-[#f4efe9] leading-snug">Set your Baseline Design first.</p>
-            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">
-              Your Baseline Design is the private map that grounds every result. It takes 30 seconds to set — date, time, and place of birth.
-            </p>
-            <a
-              href="/settings"
-              className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]"
-              style={{ borderRadius: "var(--radius-button)" }}
-            >
-              Set Baseline Design →
-            </a>
+            <p className="text-[15px] text-[#f4efe9] leading-snug">Set your Baseline first.</p>
+            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">Your Baseline is the private model that gives every result context.</p>
+            <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>Set Baseline →</a>
           </div>
         )}
-
-        {/* Ready — no result yet */}
         {baseline && !result && !isLoading && !error && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-2">
-            <p className="text-[15px] text-[#f4efe9] leading-snug">What's happening right now?</p>
-            <p className="text-[13px] text-[#4f4b47] leading-relaxed max-w-xs">
-              Describe the moment. The message. The conversation. The pattern you keep returning to.
-            </p>
+          <div className="flex flex-col items-center justify-center text-center h-full gap-3">
+            <p className="font-serif text-[clamp(1.9rem,4vw,3.1rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.025em] max-w-lg">Tell me what happened.</p>
+            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-sm">No categories. No diagnosis. Bring the message, the silence, the argument, the pressure, or the loop you keep returning to.</p>
           </div>
         )}
-
-        {/* Loading */}
         {isLoading && (
           streamingText ? (
             <div className="px-6 pt-6 pb-4">
               <div className="border border-white/[0.06] bg-white/[0.01] p-6 scan-lines" style={{ borderRadius: "var(--radius-container)" }}>
                 <div className="flex items-center gap-2 mb-4">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#e0743a]/50 animate-pulse" />
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Reading the pattern</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Building understanding</p>
                 </div>
-                <p className="text-[14px] text-[#f4efe9]/70 leading-[1.7] whitespace-pre-wrap">
-                  {streamingText}
-                  <span className="inline-block w-0.5 h-4 bg-[#e0743a]/40 ml-0.5 animate-pulse align-middle" />
-                </p>
+                <p className="text-[14px] text-[#f4efe9]/70 leading-[1.7] whitespace-pre-wrap">{streamingText}<span className="inline-block w-0.5 h-4 bg-[#e0743a]/40 ml-0.5 animate-pulse align-middle" /></p>
               </div>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/40 rounded-full animate-spin" />
-              <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Reading the pattern…</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Separating the moment from the pattern…</p>
             </div>
           )
         )}
-
-        {/* Error */}
         {error && error !== "needs_baseline" && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
             <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">
-              {error === "daily_limit_reached" || error.includes("daily limit")
-                ? "You've reached your daily limit. Upgrade to Pro for unlimited sessions."
-                : error.includes("connect") || error.includes("Connection")
-                ? "Connection issue. Check your network and try again."
-                : error.includes("couldn't read") || error.includes("couldn't")
-                ? "The system couldn't read this moment clearly. Try describing it with more specific detail."
-                : error || "Something went wrong. Try again."}
+              {error.includes("daily limit") ? "You've reached your daily limit. Upgrade to Pro for unlimited sessions." : error.includes("connect") ? "Connection issue. Check your network and try again." : error || "Something went wrong. Try again."}
             </p>
-            {error.includes("daily limit") && (
-              <a
-                href="/pricing"
-                className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]"
-                style={{ borderRadius: "var(--radius-button)" }}
-              >
-                See Pro plans →
-              </a>
-            )}
+            {error.includes("daily limit") && <a href="/pricing" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>See Pro plans →</a>}
           </div>
         )}
-
-        {/* Result */}
         {result && (
           <>
-            <ResultCard
-              result={result}
-              input={input}
-              spaceName="Defrag"
-              onSave={handleSave}
-              isSaving={isSaving}
-              saveSuccess={saveSuccess}
-              onInvite={() => setInviteOpen(true)}
-              onStepDeeper={handleStepDeeper}
-            />
-
-            {/* Flow suggestion — contextual next space recommendation */}
-            {/* Show Alignment CTA when result has a clear next move */}
-            {result && !((result as any).flow?.nextSpace) && result.alignment && (
+            <ResultCard result={result} input={input} spaceName="Defrag" onSave={handleSave} isSaving={isSaving} saveSuccess={saveSuccess} onInvite={() => setInviteOpen(true)} onStepDeeper={handleStepDeeper} />
+            {result && !((result as { flow?: { nextSpace?: string } }).flow?.nextSpace) && result.alignment && (
               <div className="mt-4 border border-white/[0.05] bg-white/[0.01] px-5 py-3 flex items-center justify-between gap-4" style={{ borderRadius: "var(--radius-container)" }}>
-                <p className="text-[12px] text-[#4f4b47] leading-snug">
-                  Take this to Alignment — separate what&rsquo;s yours to carry from what isn&rsquo;t.
-                </p>
-                <a
-                  href={`/apps/alignment/workspace?prompt=${encodeURIComponent(result.alignment || "")}`}
-                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors whitespace-nowrap shrink-0"
-                >
-                  Alignment →
-                </a>
-              </div>
-            )}
-            {(result as any).flow?.nextSpace && (
-              <div className="mt-4 border border-white/[0.06] bg-white/[0.02] px-5 py-4 flex items-center justify-between gap-4" style={{ borderRadius: "var(--radius-container)" }}>
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1">
-                    {(result as any).flow.urgency === "high" ? "Next" : "When you’re ready"}
-                  </p>
-                  <p className="text-[13px] text-[#a8a29a] leading-snug">
-                    {(result as any).flow.nextSpace === "ALIGNMENT"
-                      ? "Alignment separates what is yours to carry from what isn't — and shows you the clearest response."
-                      : "Covenant finds the biblical story that fits this moment — and what it means for you."}
-                  </p>
-                </div>
-                <a
-                  href={`/apps/${(result as any).flow.nextSpace?.toLowerCase()}/workspace`}
-                  className="shrink-0 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-3 py-2 hover:border-white/[0.16]"
-                  style={{ borderRadius: "var(--radius-button)" }}
-                >
-                  {(result as any).flow.nextSpace === "ALIGNMENT" ? "Open Alignment" : "Open Covenant"} →
-                </a>
+                <p className="text-[12px] text-[#4f4b47] leading-snug">Take this to Alignment — understand what happens between you.</p>
+                <a href={`/apps/alignment/workspace?prompt=${encodeURIComponent(result.alignment || "")}`} className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors whitespace-nowrap shrink-0">Alignment →</a>
               </div>
             )}
           </>
         )}
       </div>
 
-      {/* Input composer */}
       <div className={`flex-none px-6 pb-6 ${!baseline ? "opacity-40 pointer-events-none" : ""}`}>
-        <div
-          className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors"
-          style={{ borderRadius: "var(--radius-container)" }}
-        >
+        <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: "var(--radius-container)" }}>
           {compareMode && (
             <div className="px-5 pt-4 pb-0 border-b border-white/[0.05]">
-              <input
-                type="text"
-                value={compareName}
-                onChange={e => setCompareName(e.target.value)}
-                placeholder="Who are you comparing with? (name or relation)"
-                className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] outline-none text-[13px] pb-3"
-                style={{ fontSize: "16px" }}
-              />
+              <input type="text" value={compareName} onChange={e => setCompareName(e.target.value)} placeholder="Who is involved? Name or relation." className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] outline-none text-[13px] pb-3" style={{ fontSize: "16px" }} />
             </div>
           )}
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder={
-              messageMode
-                ? "Paste the message — exactly as it was sent."
-                : compareMode
-                  ? "Describe the dynamic between you — what keeps happening."
-                  : "Describe what's happening — a message, a conversation, a pattern, a moment."
-            }
+            placeholder={messageMode ? "Paste the message exactly as it was sent." : compareMode ? "Tell me what keeps happening between you." : "Tell me what happened."}
             rows={3}
             className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
             maxLength={2000}
@@ -777,32 +570,13 @@ export default function DefragWorkspacePage() {
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
             <div className="flex items-center gap-3">
-            <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">↵ Run · Shift+Enter for new line</span>
-            {result?.sourcesUsed?.invitedUsers === false && (
-              <button
-                type="button"
-                onClick={() => { setCompareMode(m => !m); if (!compareMode) setMessageMode(false) }}
-                className={`font-mono text-[8px] uppercase tracking-[0.1em] transition-colors ${compareMode ? "text-[#e0743a]/70" : "text-[#4f4b47] hover:text-[#76716b]"}`}
-              >
-                {compareMode ? "Solo mode" : "+ Compare"}
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => { setMessageMode(m => !m); setCompareMode(false) }}
-              className={`font-mono text-[8px] uppercase tracking-[0.1em] transition-colors ${messageMode ? "text-[#e0743a]/70" : "text-[#4f4b47] hover:text-[#76716b]"}`}
-            >
-              {messageMode ? "Clear" : "Read a message"}
-            </button>
+              <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">Enter to run · Shift+Enter for new line</span>
+              {result?.sourcesUsed?.invitedUsers === false && (
+                <button type="button" onClick={() => { setCompareMode(m => !m); if (!compareMode) setMessageMode(false) }} className={`font-mono text-[8px] uppercase tracking-[0.1em] transition-colors ${compareMode ? "text-[#e0743a]/70" : "text-[#4f4b47] hover:text-[#76716b]"}`}>{compareMode ? "Solo mode" : "+ Relationship"}</button>
+              )}
+              <button type="button" onClick={() => { setMessageMode(m => !m); setCompareMode(false) }} className={`font-mono text-[8px] uppercase tracking-[0.1em] transition-colors ${messageMode ? "text-[#e0743a]/70" : "text-[#4f4b47] hover:text-[#76716b]"}`}>{messageMode ? "Clear" : "Read a message"}</button>
             </div>
-            <button
-              onClick={handleSubmit}
-              disabled={!input.trim() || isLoading}
-              className="h-8 px-5 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
-              style={{ borderRadius: "var(--radius-button)" }}
-            >
-              {isLoading ? "…" : "Show me what's active"}
-            </button>
+            <button onClick={handleSubmit} disabled={!input.trim() || isLoading} className="h-8 px-5 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed" style={{ borderRadius: "var(--radius-button)" }}>{isLoading ? "…" : "Understand"}</button>
           </div>
         </div>
       </div>
@@ -811,11 +585,7 @@ export default function DefragWorkspacePage() {
 
   return (
     <>
-      <InviteModal
-        open={inviteOpen}
-        onClose={() => setInviteOpen(false)}
-        workspaceSource="DEFRAG"
-      />
+      <InviteModal open={inviteOpen} onClose={() => setInviteOpen(false)} workspaceSource="DEFRAG" />
       <SpaceShell
         spaceName="Defrag"
         sidebar={sidebar}
