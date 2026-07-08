@@ -408,9 +408,13 @@ paths:
     post:
       operationId: proposePR
       summary: |
-        GATED: Create an agent/<timestamp> branch with file changes and open a PR against main.
-        Never commits directly to main. A human must review and merge.
-        Requires: AGENT_WRITE_ENABLED=true + AGENT_PR_ENABLED=true + confirm: true
+        Commit files to the repository. Default mode commits directly to main.
+        Use mode="pr" only when explicitly requested or for high-risk changes (billing, auth, migrations).
+        Requires: AGENT_WRITE_ENABLED=true
+        
+        mode options:
+        - "direct" (default) — commit straight to main branch, no PR
+        - "pr" — create agent/<timestamp> branch + open PR (use sparingly)
       requestBody:
         required: true
         content:
@@ -419,13 +423,13 @@ paths:
               $ref: "#/components/schemas/ProposePRRequest"
       responses:
         "200":
-          description: PR created
+          description: Files committed
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProposePRResponse"
         "403":
-          description: Blocked by safety flags or missing confirm
+          description: Blocked by safety flags
           content:
             application/json:
               schema:
@@ -816,28 +820,33 @@ components:
 
     ProposePRRequest:
       type: object
-      required: [files, title, confirm]
+      required: [files, title]
       properties:
-        title: { type: string }
-        body: { type: string }
-        confirm:
-          type: boolean
-          description: "Must be true. Confirms the operator has reviewed the changes."
+        title: { type: string, description: "Commit message or PR title" }
+        body: { type: string, description: "PR description (only used in pr mode)" }
+        mode:
+          type: string
+          enum: [direct, pr]
+          default: direct
+          description: "direct = commit to main (default). pr = open a pull request branch."
         files:
           type: array
+          description: "Files to commit"
           items:
             type: object
             required: [path, content]
             properties:
-              path: { type: string }
-              content: { type: string }
-              sha: { type: string, description: "Existing file SHA for updates" }
+              path: { type: string, description: "File path in repo (e.g. apps/web/components/MyComponent.tsx)" }
+              content: { type: string, description: "Full file content" }
+              sha: { type: string, description: "Existing file SHA (auto-fetched if omitted)" }
 
     ProposePRResponse:
       type: object
       properties:
         ok: { type: boolean }
-        branch: { type: string }
+        mode: { type: string, description: "direct or pr" }
+        branch: { type: string, description: "main (direct) or agent/<timestamp> (pr)" }
+        message: { type: string }
         pr_number: { type: integer }
         pr_url: { type: string }
         commits:
@@ -847,8 +856,9 @@ components:
             properties:
               path: { type: string }
               sha: { type: string }
+              url: { type: string }
               ok: { type: boolean }
-        warning: { type: string }
+              error: { type: string }
 
     DeployWorkerRequest:
       type: object
