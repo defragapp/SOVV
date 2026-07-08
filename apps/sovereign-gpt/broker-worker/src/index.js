@@ -561,22 +561,39 @@ async function handleRevenue(url, env) {
 }
 
 // ── Build scope (read-only AI analysis) ──────────────────────────────────────
+
+
+  
+
 async function handleBuildScope(env) {
-  const treeRes = await ghFetch("/git/trees/main?recursive=1", env);
-  const treeData = await treeRes.json();
-  const files = (treeData.tree || [])
-    .filter(t => t.type === "blob")
-    .filter(f => !f.path.startsWith(".migration-backup") && !isPathBlocked(f.path))
-    .map(t => t.path);
+  // Lightweight directory listing to avoid CPU timeout from full recursive tree fetch
+  let fileSummary = "File tree unavailable";
+  try {
+    const treeRes = await ghFetch("/contents/apps", env);
+    if (treeRes.ok) {
+      const dirs = await treeRes.json();
+      if (Array.isArray(dirs)) {
+        fileSummary = `Apps: ${dirs.map(d => d.name).join(", ")}`;
+      }
+    }
+  } catch (_) {}
 
-  const scopePrompt = `Analyze the SOVV / defrag.app platform codebase.
+  const prompt = `Analyze the SOVV / Sovereign.os / defrag.app platform.
 
-File tree (${files.length} files):
-${files.join("\n")}
+Known structure:
+- ${fileSummary}
+- apps/web: Next.js 15 web app (landing, Defrag, Alignment, Covenant spaces, settings, pricing, auth)
+- apps/worker: Cloudflare Worker API (auth, billing, baseline, defrag, alignment, covenant, patterns, library, invites, referrals, affiliates)
+- apps/worker-ai: CF AI inference worker
+- apps/worker-session: Durable Objects for real-time sessions
+- apps/sovereign-broker: GPT API broker
+- lib/api-spec: OpenAPI spec, packages/prompts: AI prompts, packages/core: shared components
 
-Known deployed workers: chatthread, developer, sovereign-broker, sovereign-build-agent, sovereign-build-broker, sovereign-code-agent, sovereign-control, sovereign-control-ui, sovereign-os-api, sovv-web, worker-ai, worker-session
+Deployed workers: sovereign-os-api, worker-ai, worker-session, sovereign-broker, sovereign-build-agent, sovereign-code-agent, sovereign-control, sovereign-control-ui, sovereign-build-broker, sovv-web, developer, chatthread
 
-Stack: Next.js 15, Cloudflare Workers, D1, KV, R2, CF AI, Stripe, TypeScript, Tailwind, itty-router
+Stack: Next.js 15, React 19, TypeScript, Tailwind v4, Framer Motion, Cloudflare Workers/D1/KV/R2/AI/Queues, Stripe, itty-router, pnpm monorepo
+
+Product: Defrag (free, pattern analysis), Alignment (pro, vectors), Covenant (pro, boundaries), Baseline Design (personal context layer). Pre-revenue stage.
 
 Return JSON with exactly these fields:
 {
@@ -589,23 +606,37 @@ Return JSON with exactly these fields:
   ]
 }
 
-Return only valid JSON.`;
+Return only valid JSON. No markdown. No code fences.`;
 
   try {
     const result = await env.AI.run(
-      MODEL_MAP.code,
+      MODEL_MAP.chat,
       {
         messages: [
-          { role: "system", content: "You are a senior platform architect. Return only valid JSON." },
-          { role: "user", content: scopePrompt },
+          { role: "system", content: "You are a senior platform architect. Return only valid JSON with no markdown or code fences." },
+          { role: "user", content: prompt },
         ],
-        max_tokens: 2048,
+        max_tokens: 1200,
+        temperature: 0.3,
       },
       { gateway: { id: GATEWAY_ID } }
     );
+
+    let parsed;
     const raw = result.response || result;
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : { summary: raw };
+    if (typeof raw === "object" && raw !== null && !Array.isArray(raw)) {
+      parsed = raw;
+    } else if (typeof raw === "string") {
+      const cleaned = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      try {
+        parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : { summary: cleaned };
+      } catch (_) {
+        parsed = { summary: cleaned };
+      }
+    } else {
+      parsed = { summary: String(raw) };
+    }
     return json({ ok: true, ...parsed });
   } catch (e) {
     return err(`Scope analysis error: ${e.message}`, 500);
