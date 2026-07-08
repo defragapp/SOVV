@@ -15,6 +15,7 @@ binding = "AI"
 binding = "TEMPLATES"
 bucket_name = "vibesdk-templates"
 
+# Persist broker mutation audit events to R2.
 [[r2_buckets]]
 binding = "LOGS"
 bucket_name = "sovereign-logs"
