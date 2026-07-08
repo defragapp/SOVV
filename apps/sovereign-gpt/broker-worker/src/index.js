@@ -190,7 +190,7 @@ async function handleHealth(env) {
 
   return json({
     ok: true,
-    broker: "sovereign-broker v2.1 (production-safe)",
+    broker: "sovereign-dev v2.1",
     github: ghOk ? "connected" : "error",
     cloudflare: cfOk ? "connected" : "error",
     stripe: stripeOk ? "connected" : "error",
