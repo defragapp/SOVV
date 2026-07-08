@@ -1,335 +1,263 @@
-# Sovereign Build Agent — Operator Runbook
-*Knowledge file for Sovereign Build Agent GPT. Reference this for operational tasks, debugging, and build workflows.*
+# Sovereign Build Operator — Runbook
+*Runtime-verified capabilities and operational reference. Treat this as live documentation — inspect the runtime first, use this as context.*
 
 ---
 
-## Safety Flags Quick Reference
+## Verified Runtime Capabilities (as of 2026-07-08)
+
+These were verified against the live broker at `sovereign-broker.defrag.app`:
+
+| Capability | Status | How |
+|------------|--------|-----|
+| Direct commit to main | ✅ Confirmed | `proposePR` with `mode: "direct"` |
+| PR branch creation | ✅ Confirmed | `proposePR` with `mode: "pr"` |
+| Worker deploy | ✅ Enabled | `deployWorker` — `AGENT_DEPLOY_ENABLED=true` |
+| KV write | ✅ Enabled | `kvSet` — `AGENT_DESTRUCTIVE_ACTIONS_ENABLED=true` |
+| Stripe write | ✅ Enabled | `createPrice` — `AGENT_STRIPE_WRITE_ENABLED=true` |
+| D1 query | ✅ Read-only | `d1Query` — SELECT only, writes blocked at broker |
+| Repo read | ✅ Confirmed | `getRepoFile`, `getRepoTree` — secrets denylist active |
+
+**Always verify runtime state with `healthCheck` before reporting system status.**
+
+---
+
+## Broker API — Live Endpoints
+
+Base URL: `https://sovereign-broker.defrag.app`
+
+### Read endpoints (always available)
+```
+GET  /health                          — broker + service status + flag state
+GET  /repo/tree                       — full file tree (secrets-filtered)
+GET  /repo/file?path=<path>           — read a file (blocked for secrets)
+GET  /repo/commits?limit=<n>          — recent commits on main
+GET  /repo/prs?state=open|closed|all  — pull requests
+GET  /cf/workers                      — list all deployed workers
+GET  /cf/worker/logs?worker=<name>    — worker logs
+GET  /cf/kv/get?key=<key>             — read KV value
+GET  /cf/r2/list?bucket=<name>        — list R2 objects
+GET  /cf/pages/deployments            — Pages deployment status
+GET  /stripe/overview                 — MRR, subscribers, charges
+GET  /stripe/subscriptions            — subscription list
+GET  /stripe/revenue?days=<n>         — revenue metrics
+GET  /build/scope                     — AI project scope analysis
+
+POST /ai/chat                         — AI inference (model switching)
+POST /ai/generate-image               — image generation (Flux/SDXL)
+POST /ai/analyze-image                — vision analysis
+POST /cf/d1/query                     — SELECT queries on vibesdk-db
+POST /build/generate-component        — generate React/TS component (no commit)
+POST /build/generate-worker           — generate CF Worker (no deploy)
+```
+
+### Write endpoints (all flags enabled)
+```
+POST /build/propose-pr                — commit files (mode: direct|pr)
+POST /cf/worker/deploy                — deploy a Cloudflare Worker
+POST /cf/kv/set                       — write a KV value
+POST /stripe/create-price             — create Stripe product + price
+```
+
+### `proposePR` — the commit tool
+```json
+{
+  "title": "feat: description [sovereign-gpt]",
+  "mode": "direct",
+  "files": [
+    { "path": "apps/web/app/page.tsx", "content": "..." }
+  ]
+}
+```
+- `mode: "direct"` → commits straight to main (default for all standard work)
+- `mode: "pr"` → creates `agent/<timestamp>` branch + opens PR
+- SHA is auto-fetched for existing files — omit it
+- Returns: `{ ok, mode, branch, commits: [{ path, sha, url, ok }], message }`
+
+---
+
+## AI Models — Live on CF AI Gateway
+
+Gateway ID: `sovereign-ai-gateway`
+
+### Text models (via `/ai/chat`)
+| Alias | CF Model ID | Use for |
+|-------|-------------|---------|
+| `chat` | `@cf/meta/llama-3.3-70b-instruct-fp8-fast` | Planning, analysis, conversation |
+| `code` | `@cf/openai/gpt-oss-120b` | Complex code, architecture, full components |
+| `vision` | `@cf/meta/llama-3.2-11b-vision-instruct` | Screenshot analysis, image understanding |
+| `fast` | `@cf/meta/llama-3.2-3b-instruct` | Quick lookups, simple answers |
+
+### Image models (via `/ai/generate-image`)
+| Alias | CF Model ID | Use for |
+|-------|-------------|---------|
+| `flux-schnell` | `@cf/black-forest-labs/flux-1-schnell` | Fast UI mockups |
+| `flux-dev` | `@cf/black-forest-labs/flux-2-dev` | High-quality visuals, hero images |
+| `sdxl` | `@cf/stabilityai/stable-diffusion-xl-base-1.0` | Detailed/photorealistic |
+| `sdxl-lightning` | `@cf/bytedance/stable-diffusion-xl-lightning` | Fast + detailed |
+
+---
+
+## Stripe — Live Data
+
+**Always call `stripeOverview` for current numbers — don't rely on static values.**
+
+Known reference IDs (verify against live data):
+- Active product: `prod_UdHEFXmi3YN78U` (DEFRAG Pro)
+- Monthly price: `price_1Te0g9Bk78yJ8Hww8fFZCqhm` ($20.00/month)
+- Annual price: `price_1Tq6nPBk78yJ8Hwwm0pxg4hH` ($99.00/year)
+- All legacy products archived as of 2026-07-07
+
+---
+
+## D1 Database — vibesdk-db
+
+**Always use the uploaded D1 schema file as the authoritative table reference.**
+
+Connection: SELECT only via `/cf/d1/query`. Writes require direct operator access.
+
+Quick reference — key tables:
+```
+users              id, email, tier, role, email_verified, stripe_customer_id
+sessions           user_id, token, expires_at, last_active
+design_inputs      user_id, birth_date, birth_time, birth_location, status, compiled_at
+design_facts       user_id, category, key, value, source
+library            user_id, space, title, content
+defrag_sessions    user_id, created_at
+defrag_messages    session_id, role, content
+subscriptions      user_id, stripe_subscription_id, status, tier, current_period_end
+stripe_events      id (Stripe event ID), type, processed_at
+invites            inviter_id, invitee_email, token, accepted_at, space, role
+people             user_id, name, relation, birth_date
+referral_codes     user_id, code
+referral_conversions  referrer_id, referred_user_id
+affiliates         user_id, code, commission_rate
+admin_audit_log    admin_id, action, target_id, details
+email_notifications  user_id, type, sent_at
+password_reset_tokens  user_id, token, expires_at
+```
+
+---
+
+## Deployed Workers (13 total)
+
+**Always call `listWorkers` for current state — this list may be stale.**
+
+| Worker | Domain | Purpose |
+|--------|--------|---------|
+| `sovereign-os-api` | api.defrag.app | Main API |
+| `worker-ai` | ai.defrag.app | CF AI inference |
+| `worker-session` | — | Durable Objects |
+| `sovereign-broker` | sovereign-broker.defrag.app | GPT API surface |
+| `sovereign-build-agent` | — | Build agent |
+| `sovereign-code-agent` | — | Code generation |
+| `sovereign-control` | — | Control plane |
+| `sovereign-control-ui` | — | Control plane UI |
+| `sovereign-build-broker` | — | Build orchestration |
+| `sovv-web` | — | Web (OpenNext) |
+| `developer` | — | Developer tools |
+| `chatthread` | — | Chat threads |
+
+---
+
+## Safety Flags
 
 Set in **Cloudflare Dashboard → Workers → sovereign-broker → Settings → Variables**
 
-| Flag | Default | Enable to allow... |
-|------|---------|-------------------|
-| `AGENT_ENABLED` | `true` | Master switch — set `false` to kill ALL mutations |
-| `AGENT_WRITE_ENABLED` | `false` | Repo writes (branch + PR only, never direct main) |
-| `AGENT_PR_ENABLED` | `false` | PR creation on GitHub |
-| `AGENT_DEPLOY_ENABLED` | `false` | Cloudflare Worker deploys |
-| `AGENT_STRIPE_WRITE_ENABLED` | `false` | Stripe billing mutations |
-| `AGENT_DESTRUCTIVE_ACTIONS_ENABLED` | `false` | KV/R2 writes |
+| Flag | Current | Effect |
+|------|---------|--------|
+| `AGENT_ENABLED` | `true` | Master kill switch — set `false` to block ALL mutations |
+| `AGENT_WRITE_ENABLED` | `true` | Repo writes |
+| `AGENT_PR_ENABLED` | `true` | PR creation |
+| `AGENT_DEPLOY_ENABLED` | `true` | Worker deploys |
+| `AGENT_STRIPE_WRITE_ENABLED` | `true` | Billing mutations |
+| `AGENT_DESTRUCTIVE_ACTIONS_ENABLED` | `true` | KV/R2 writes |
 
 **Kill switch:** Set `AGENT_ENABLED=false` → all mutations blocked instantly, reads still work.
 
 ---
 
-## Common Operational Tasks
+## Common Operational Queries
 
-### Check platform health
+### Platform health
 ```
-Ask: "Run a health check across all services"
-→ calls healthCheck (broker), stripeOverview, listWorkers, getPagesDeployments
-```
-
-### Check recent activity
-```
-Ask: "What changed in the last 10 commits?"
-→ calls getRecentCommits with limit=10
+healthCheck → broker status + all flag states
+listWorkers → deployed worker list
+getPagesDeployments → web deployment status
+getWorkerLogs?worker=sovereign-os-api → API errors
 ```
 
-### Check open PRs (agent branches)
+### Revenue
 ```
-Ask: "Are there any open agent PRs?"
-→ calls listPRs with state=open
-→ look for branches named agent/<timestamp>
-```
-
-### Check worker errors
-```
-Ask: "Check logs for sovereign-os-api"
-→ calls getWorkerLogs with worker=sovereign-os-api
+stripeOverview → MRR, active subscribers, recent charges
+getRevenue?days=30 → 30-day revenue breakdown
+listSubscriptions?status=active → active subscriber list
 ```
 
-### Check revenue
-```
-Ask: "What's our MRR and how many active subscribers?"
-→ calls stripeOverview
-→ calls getRevenue with days=30
-```
-
-### Query the database
-```
-Ask: "How many users signed up this week?"
-→ calls d1Query with:
-   sql: "SELECT COUNT(*) as count FROM users WHERE created_at >= datetime('now', '-7 days')"
-```
-
-### Get project scope
-```
-Ask: "What should we build next?"
-→ calls getBuildScope (AI analysis of full file tree)
-→ calls getRecentCommits
-→ calls stripeOverview
-```
-
----
-
-## Build Workflows
-
-### Build a new React component
-1. Agent reads existing similar components (`getRepoFile`)
-2. Agent calls `generateComponent` with description + `generate_mockup: true`
-3. Agent shows you the code + mockup image
-4. You review → say "open a PR for this"
-5. Enable `AGENT_WRITE_ENABLED=true` + `AGENT_PR_ENABLED=true` in CF dashboard
-6. Agent calls `proposePR` with `confirm: true`
-7. PR opens on `agent/<timestamp>` branch
-8. You review on GitHub → merge
-9. CI/CD deploys automatically
-
-### Build a new API endpoint
-1. Agent reads `apps/worker/src/index.ts` + relevant route files
-2. Agent generates the handler code via `aiChat` with `model: "code"`
-3. Agent shows you the new file + the index.ts change needed
-4. You review → say "open a PR"
-5. Agent calls `proposePR` with both files + `confirm: true`
-6. PR opens → you merge → `deploy-production-api.yml` runs
-
-### Build a new Cloudflare Worker
-1. Agent calls `generateWorker` with name + description
-2. Agent shows code + wrangler.toml
-3. You review → say "deploy this"
-4. Enable `AGENT_DEPLOY_ENABLED=true` in CF dashboard
-5. Agent calls `deployWorker` with `confirm: true`
-6. Worker is live immediately
-
-### Generate a UI mockup
-```
-Ask: "Show me what a new onboarding flow could look like"
-→ calls generateImage with flux-dev model
-→ returns image URL from R2
-→ no code changes, purely visual
-```
-
-### Analyze a screenshot
-```
-Paste an image URL and ask: "What's wrong with this layout?"
-→ calls analyzeImage with the URL + question
-→ uses Llama Vision 11B
-→ returns detailed visual analysis
-```
-
----
-
-## Debugging Workflows
-
-### Worker returning 500s
-```
-1. getWorkerLogs for the affected worker
-2. getRepoFile for the relevant source file
-3. aiChat with model=code: "Here's the error and the source — what's wrong?"
-4. generateComponent or aiChat to generate the fix
-5. proposePR with the fix
-```
-
-### Billing not working
-```
-1. stripeOverview — check if Stripe is connected
-2. d1Query: "SELECT * FROM stripe_events ORDER BY processed_at DESC LIMIT 10"
-3. d1Query: "SELECT * FROM subscriptions WHERE status != 'active' LIMIT 20"
-4. getRepoFile: apps/worker/src/billing.ts
-5. aiChat: "Here's the billing code and the DB state — what's broken?"
-```
-
-### Auth issues
-```
-1. d1Query: "SELECT id, email, email_verified, tier FROM users ORDER BY created_at DESC LIMIT 10"
-2. d1Query: "SELECT COUNT(*) FROM sessions WHERE expires_at < unixepoch()"
-3. getRepoFile: apps/worker/src/auth.ts
-4. getRepoFile: apps/web/middleware.ts
-```
-
-### Baseline not compiling
-```
-1. d1Query: "SELECT user_id, status, compiled_at FROM design_inputs WHERE status != 'compiled' LIMIT 20"
-2. getRepoFile: apps/worker/src/baseline-compiler.ts
-3. getRepoFile: apps/worker/src/baseline.ts
-```
-
----
-
-## Model Selection Guide
-
-| Task | Use model | Why |
-|------|-----------|-----|
-| "Explain this code" | `chat` | Fast, good reasoning |
-| "What's wrong with X?" | `chat` | Good at analysis |
-| "Write a complete component" | `code` | GPT-OSS 120B — best code quality |
-| "Write a Cloudflare Worker" | `code` | Complex, needs high capability |
-| "Write a DB migration" | `code` | Precise SQL needed |
-| "What does this screenshot show?" | `vision` | Llama Vision 11B |
-| "Is this UI accessible?" | `vision` | Visual analysis |
-| "What's the MRR?" | `fast` | Simple lookup, no reasoning needed |
-| "List the files in /components" | `fast` | Simple retrieval |
-| "Design a mockup for X" | `generateImage` | Flux Schnell (fast) or Dev (quality) |
-
----
-
-## File Path Reference
-
-### Most-edited files
-```
-apps/worker/src/index.ts          — add new routes here
-apps/worker/src/billing.ts        — Stripe integration
-apps/worker/src/auth.ts           — auth logic
-apps/worker/src/entitlements.ts   — tier/feature access
-apps/worker/src/prompts.ts        — AI prompt architecture
-apps/web/app/pricing/page.tsx     — pricing page
-apps/web/components/spaces/Sidebar.tsx  — main nav
-apps/web/middleware.ts            — auth middleware
-apps/web/lib/api.ts               — API client
-```
-
-### Adding a new API route (checklist)
-```
-1. Create: apps/worker/src/<feature>.ts
-2. Edit:   apps/worker/src/index.ts  (import + register)
-3. Edit:   lib/api-spec/openapi.yaml (add endpoint spec)
-4. Run:    pnpm run typecheck (in apps/worker/)
-```
-
-### Adding a new page (checklist)
-```
-1. Create: apps/web/app/<route>/page.tsx
-2. Create: apps/web/app/<route>/layout.tsx (if needed)
-3. Edit:   apps/web/components/spaces/Sidebar.tsx (add nav link)
-4. Create: apps/web/app/api/<route>/route.ts (if needs API)
-```
-
----
-
-## Stripe Operations
-
-### Check current revenue
+### Database inspection
 ```sql
--- Via d1Query (local data)
-SELECT s.status, COUNT(*) as count, s.tier
-FROM subscriptions s
-GROUP BY s.status, s.tier;
+-- Recent signups
+SELECT id, email, tier, email_verified, created_at
+FROM users ORDER BY created_at DESC LIMIT 20;
+
+-- Active pro users
+SELECT u.email, s.status, s.current_period_end
+FROM users u JOIN subscriptions s ON s.user_id = u.id
+WHERE s.status = 'active';
+
+-- Baseline compilation status
+SELECT status, COUNT(*) as count FROM design_inputs GROUP BY status;
+
+-- Invite funnel
+SELECT COUNT(*) total, COUNT(accepted_at) accepted FROM invites;
 ```
 
-### Create a new price (requires AGENT_STRIPE_WRITE_ENABLED=true)
+### Codebase state
 ```
-Ask: "Create a new monthly price called 'DEFRAG Teams' at $49/month"
-→ agent calls createPrice with confirm: true
-→ returns price_id to use in checkout flow
-```
-
-### Active price IDs
-- Monthly Pro: `price_1Te0g9Bk78yJ8Hww8fFZCqhm` ($20/mo)
-- Annual Pro: `price_1Tq6nPBk78yJ8Hwwm0pxg4hH` ($99/yr)
-
----
-
-## KV Operations
-
-### Read a cached value
-```
-Ask: "Read the KV key baseline:<user_id>"
-→ calls kvGet with key=baseline:<user_id>
-```
-
-### Write a KV value (requires AGENT_DESTRUCTIVE_ACTIONS_ENABLED=true)
-```
-Ask: "Set the feature flag feature:new_onboarding:<user_id> to true"
-→ agent calls kvSet with confirm: true
-```
-
-### Common KV key patterns
-```
-session:<token>              — session data
-baseline:<user_id>           — compiled baseline cache
-usage:<user_id>:<YYYY-MM-DD> — daily usage counter
-natal:<user_id>              — natal data cache
-feature:<flag>:<user_id>     — per-user feature flag
+getBuildScope → AI analysis of full file tree
+getRecentCommits?limit=15 → recent activity
+listPRs?state=open → open branches
 ```
 
 ---
 
-## Deployment Reference
+## Build Workflow Reference
 
-### Web deploy (CI/CD)
+### Standard component build
 ```
-Trigger: push to main → deploy-production-web.yml runs automatically
-Manual:  gh workflow run deploy-production-web.yml --ref main
-URL:     https://app.defrag.app
-```
-
-### API worker deploy
-```
-Trigger: push to main → deploy-production-api.yml runs automatically
-Manual:  cd apps/worker && npx wrangler deploy
-URL:     https://api.defrag.app
+1. getRepoFile → read existing similar component
+2. aiChat (code model) → generate complete TypeScript component
+3. Show operator the code + optional generateImage mockup
+4. On "yes/build it/go" → proposePR mode:direct → commit to main
+5. Report: file path, commit sha, what changed, next recommendation
 ```
 
-### Worker deploy via GPT (requires AGENT_DEPLOY_ENABLED=true)
+### New API route
 ```
-Ask: "Deploy the updated sovereign-broker worker"
-→ agent generates/reads code → shows it → asks confirm → calls deployWorker
+1. getRepoFile → apps/worker/src/index.ts
+2. getRepoFile → most similar existing route handler
+3. aiChat (code model) → generate handler + index.ts update
+4. proposePR mode:direct → commit both files
+5. Note: worker redeploy needed for changes to take effect
 ```
 
----
+### New Cloudflare Worker
+```
+1. aiChat (code model) → generate worker code + wrangler.toml
+2. Show operator
+3. On authorization → deployWorker → report actual deploy status
+4. Never claim deployed unless tool confirms success
+```
 
-## Rotating the Broker Token
+### Emergency — kill agent mutations
+```
+Cloudflare Dashboard → Workers → sovereign-broker → Settings → Variables
+Set AGENT_ENABLED = false
+Takes effect immediately, no redeploy needed
+```
 
+### Rotate broker token
 ```bash
-# 1. Generate new token
 NEW=$(openssl rand -hex 32)
-
-# 2. Update worker secret
 echo "$NEW" | npx wrangler secret put BROKER_TOKEN --name sovereign-broker
-
-# 3. Update GPT action auth
-# Go to: chatgpt.com/gpts/editor → your GPT → Actions → Edit → Auth → update API key
-```
-
----
-
-## PR Review Checklist (for agent-opened PRs)
-
-When the agent opens a PR on `agent/<timestamp>`:
-
-- [ ] Check the branch name — should be `agent/<unix-timestamp>`
-- [ ] Review every file changed — no secrets, no .env, no credentials
-- [ ] Check the commit message — should end with `[sovereign-gpt]`
-- [ ] Verify the change matches what you asked for
-- [ ] Run CI checks (auto-triggered on PR open)
-- [ ] Merge only after CI passes
-- [ ] Delete the branch after merge
-
----
-
-## Emergency Procedures
-
-### Kill all agent mutations immediately
-```
-Cloudflare Dashboard → Workers → sovereign-broker → Settings → Variables
-Set: AGENT_ENABLED = false
-Takes effect on next request (no redeploy needed)
-```
-
-### Revoke GPT access entirely
-```
-Cloudflare Dashboard → Workers → sovereign-broker → Settings → Variables
-Delete: BROKER_TOKEN
-(or rotate it and don't update the GPT)
-```
-
-### Roll back a bad worker deploy
-```
-Cloudflare Dashboard → Workers → <worker-name> → Deployments
-Click the previous version → "Rollback to this version"
-```
-
-### Roll back a bad web deploy
-```
-Cloudflare Dashboard → Pages → sovv-web → Deployments
-Click the previous deployment → "Rollback"
+# Then update API key in GPT action settings
 ```
