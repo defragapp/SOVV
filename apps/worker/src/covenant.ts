@@ -1,28 +1,27 @@
-import { sanitizeInput, detectPromptInjection } from "./utils/sanitize.js";
 import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
+import { safetyMode, supportResponse, RISK_WORDS } from "./safety.js";
+import { getCorsHeaders } from "./cors.js";
 import { requireActiveSubscription } from "./billing.js";
 import { getBaselineForAI, getBaselineDataset } from "./baseline.js";
-import { getCurrentSkySnapshot } from "./baseline-compiler.js";
 import { checkProLimit } from "./plan.js";
 import { SYSTEM_COVENANT } from "./prompts.js";
-import { checkGuardrails } from "./output-validator.js";
 import {
   selectActiveSignals,
   buildTimingSignals,
   formatActiveSignalsForPrompt,
 } from "./active-signals.js";
+import { validateRequest } from "./middleware/validate-request.js";
+import { RateLimiter, extractRateLimitKey, RATE_LIMIT_PRESETS } from "./middleware/rate-limiter.js";
+import { KVSafetyLogger, createSafetyEvent } from "./middleware/safety-logger.js";
+import { generateRequestId } from "./utils/request-id.js";
+import { z } from "zod";
 
 /**
  * CRITICAL SYSTEM RULE
  *
  * Full baseline compute is never used directly in prompts or UI.
  * All reasoning must pass through the active signal selection layer.
- *
- * If this rule breaks, the system will drift back into:
- * - framework dumping
- * - prompt hallucination
- * - inconsistent outputs
  */
 
 /**
@@ -33,144 +32,221 @@ import {
  *
  * Covenant consumes: activeSignals + timingSignals
  * Covenant must NOT: re-derive structural pattern from scratch
- *
- * If this breaks, Covenant becomes a second Defrag
- * and the system loses clarity.
  */
+
+function jsonResponse(data: unknown, status = 200, headers: Record<string, string> = {}) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      ...headers,
+    },
+  });
+}
+
+function extractJsonObject(rawText: string): Record<string, any> | null {
+  try {
+    const match = rawText.trim().match(/\{[\s\S]*\}/);
+    return match ? JSON.parse(match[0]) : null;
+  } catch {
+    return null;
+  }
+}
+
+function buildCovenantFallback(message: string): Record<string, any> {
+  return {
+    figure: "the present moment",
+    reference: "Covenant reflection",
+    pattern: "A place in you is asking to be met with steadiness instead of pressure.",
+    story: "This moment may be less about solving everything at once and more about returning to what is true, humble, and yours to carry.",
+    whatBroke: "The old reflex was to carry the whole weight alone.",
+    howGodMet: "God meets you by narrowing the next step and reminding you that burden is not the same as obedience.",
+    whatTheyLearned: "Return to the faithful next thing rather than trying to control the whole outcome.",
+    forYou: `Bring this before God plainly: ${message}`,
+    nextStep: "Name one faithful action you can take today, then release what is not yours to force.",
+    scriptures: [],
+    reflectionPrompts: [
+      "What part of this am I trying to carry without grace?",
+      "What is the next faithful step, not the entire solution?",
+    ],
+  };
+}
+
+async function buildReducedSignalContext(env: Env, userId: string, message: string): Promise<string> {
+  try {
+    const dataset = await getBaselineDataset(env, userId);
+    if (dataset?.status === "ready") {
+      const activeSignals = selectActiveSignals(dataset, {
+        message,
+        relational: false,
+        mode: "self",
+      });
+      const timingSignals = buildTimingSignals(dataset);
+      return formatActiveSignalsForPrompt(activeSignals, timingSignals);
+    }
+  } catch {}
+
+  try {
+    return await getBaselineForAI(env, userId, "covenant");
+  } catch {
+    return "";
+  }
+}
+
 export function registerCovenantRoute(router: any, getEnv: () => Env) {
   router.post("/api/covenant", async (request: Request) => {
     const env = getEnv();
-    const user = await getAuthUser(request, env.DB);
-
-    if (!user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
-    }
-
-    const subGate = await requireActiveSubscription(user, request);
-    if (subGate) return subGate;
-
-    // Per-user Pro daily soft cap (200/day)
-    if (env.KV) {
-      const limitCheck = await checkProLimit(env.KV, user.id);
-      if (!limitCheck.allowed) {
-        return new Response(JSON.stringify({
-          error: "daily_limit_reached",
-          message: "You've reached your daily Covenant limit. It resets at midnight UTC.",
-          remaining: 0,
-          limit: limitCheck.limit,
-        }), { status: 429, headers: { "Content-Type": "application/json" } });
-      }
-    }
+    const requestId = generateRequestId();
+    let safetyLogger: KVSafetyLogger | null = null;
+    let rateLimiter: RateLimiter | null = null;
+    let user: any = null;
 
     try {
-      const body = await request.json().catch(() => ({})) as any;
-      // Accept both "message" and "moment" for compatibility
-      const message = sanitizeInput(body.message || body.moment);
-      if (detectPromptInjection(message)) {
-        return new Response(JSON.stringify({ error: "validation_error" }), { status: 400 });
+      if (env.KV) {
+        safetyLogger = new KVSafetyLogger(env.KV);
+        rateLimiter = new RateLimiter(env.KV, RATE_LIMIT_PRESETS.normal);
       }
+
+      user = await getAuthUser(request, env.DB);
+      if (!user) {
+        return jsonResponse({ error: "Unauthorized", requestId }, 401);
+      }
+
+      const subGate = await requireActiveSubscription(user, request);
+      if (subGate) return subGate;
+
+      const validationSchema = z.object({
+        message: z.string().optional(),
+        moment: z.string().optional(),
+      });
+
+      const validationResult = await validateRequest(request, validationSchema, {
+        validateContentType: true,
+        maxBodySize: 50 * 1024,
+      });
+
+      if (!validationResult.valid) {
+        const errorResult = validationResult as { valid: false; error: any };
+        if (safetyLogger && user) {
+          await safetyLogger.log(
+            createSafetyEvent(user.id, "validation_error", "low", {
+              validation_field: errorResult.error.field,
+              endpoint: "/api/covenant",
+            }, { requestId })
+          );
+        }
+        return jsonResponse({
+          error: errorResult.error.field,
+          message: errorResult.error.error,
+          requestId,
+        }, errorResult.error.status);
+      }
+
+      if (rateLimiter) {
+        const rateLimitKey = extractRateLimitKey(request, user.id);
+        const limitResult = await rateLimiter.checkLimit(rateLimitKey);
+
+        if (!limitResult.allowed) {
+          if (safetyLogger) {
+            await safetyLogger.log(
+              createSafetyEvent(user.id, "rate_limit_exceeded", "low", {
+                endpoint: "/api/covenant",
+              }, { requestId })
+            );
+          }
+          return jsonResponse({
+            error: "rate_limit_exceeded",
+            message: "Too many requests",
+            retryAfter: limitResult.retryAfter,
+            requestId,
+          }, 429, { "Retry-After": String(limitResult.retryAfter) });
+        }
+      }
+
+      if (env.KV) {
+        const limitCheck = await checkProLimit(env.KV, user.id);
+        if (!limitCheck.allowed) {
+          return jsonResponse({
+            error: "daily_limit_reached",
+            message: "You've reached your daily Covenant limit. It resets at midnight UTC.",
+            remaining: 0,
+            limit: limitCheck.limit,
+            requestId,
+          }, 429);
+        }
+      }
+
+      const body = validationResult.data as any;
+      const message = typeof body.message === "string" && body.message.trim()
+        ? body.message.trim()
+        : typeof body.moment === "string" && body.moment.trim()
+          ? body.moment.trim()
+          : "";
 
       if (!message) {
-        return new Response(JSON.stringify({ error: "Message is required" }), { status: 400, headers: { "Content-Type": "application/json" } });
-      }
-      // Input length validation — prevent abuse
-      if (typeof message === "string" && message.length > 3000) {
-        return new Response(JSON.stringify({ error: "Message too long. Please keep it under 3000 characters." }), { status: 400, headers: { "Content-Type": "application/json" } });
+        return jsonResponse({ error: "Message is required", requestId }, 400);
       }
 
-      // Build baseline context and active signals
-      let activeSignalsText = "";
-      let baselineContext = "";
-      try {
-        const dataset = await getBaselineDataset(env, user.id);
-        if (dataset?.status === "ready") {
-          const activeSignals = selectActiveSignals(dataset, {
-            message: typeof message === "string" ? message : "",
-            relational: false,
-            mode: "self",
-          });
-          // Fetch live sky for current timing context
-          const userLat = dataset.input.latitude ?? 0;
-          const userLng = dataset.input.longitude ?? 0;
-          const liveSky = (userLat !== 0 || userLng !== 0)
-            ? await getCurrentSkySnapshot(env, userLat, userLng).catch(() => null)
-            : null;
-          const timingSignals = buildTimingSignals(dataset, liveSky);
-          activeSignalsText = formatActiveSignalsForPrompt(activeSignals, timingSignals);
-        } else {
-          // Fallback to raw baseline text
-          baselineContext = await getBaselineForAI(env, user.id, "covenant").catch(() => "");
+      if (message.length > 3000) {
+        return jsonResponse({ error: "Message too long. Please keep it under 3000 characters.", requestId }, 400);
+      }
+
+      if (safetyMode(message) === "support") {
+        if (safetyLogger) {
+          const detectedWord = RISK_WORDS.find((w) => message.toLowerCase().includes(w));
+          await safetyLogger.log(
+            createSafetyEvent(user.id, "risk_word_detected", "high", {
+              riskWord: detectedWord,
+              endpoint: "/api/covenant",
+            }, { requestId })
+          );
         }
-      } catch { /* non-blocking */ }
+        return Response.json(supportResponse(), { status: 200, headers: getCorsHeaders(request) });
+      }
 
-      const userContent = [
-        activeSignalsText || (baselineContext ? `User Baseline Design:\n${baselineContext}` : ""),
-        `What they are navigating:\n${message}`
-      ].filter(Boolean).join("\n\n");
+      const signalContext = await buildReducedSignalContext(env, user.id, message);
+      const dateStr = new Date().toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
 
       const messages = [
-        { role: "system" as const, content: SYSTEM_COVENANT },
-        { role: "user" as const, content: userContent },
+        { role: "system", content: SYSTEM_COVENANT },
+        {
+          role: "user",
+          content: [
+            signalContext ? `Reduced baseline signals:\n${signalContext}` : "No reduced baseline signals available.",
+            `Current date: ${dateStr}`,
+            `Moment to reframe:\n${message}`,
+          ].join("\n\n"),
+        },
       ];
 
       const aiResponse = await env.AI.run(
-        (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
-        { messages, temperature: 0.3, max_tokens: 900 }
+        (env.AI_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast") as any,
+        { messages, temperature: 0.3, max_tokens: 800 }
       );
 
-      let rawText = (aiResponse as any).response ?? String(aiResponse);
+      const rawText = (aiResponse as any).response ?? String(aiResponse);
+      const parsed = extractJsonObject(rawText) ?? buildCovenantFallback(message);
 
-      // Validate, score, and retry if needed
-      const { validateAndScore: validate, buildRetryPrompt: retryPrompt } = await import("./output-validator.js")
-      let validation = validate(rawText, "covenant")
-
-      if (validation.shouldRetry) {
-        console.warn("[Retry] Covenant output empty — retrying")
-        const retryAi = await env.AI.run(
-          (env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") as any,
-          { messages: [
-              { role: "system", content: SYSTEM_COVENANT },
-              { role: "user", content: [activeSignalsText || (baselineContext ? `User Baseline Design:\n${baselineContext}` : ""), `What they are navigating:\n${message}`].filter(Boolean).join("\n\n") },
-              { role: "assistant", content: rawText },
-              { role: "user", content: retryPrompt("covenant", validation.missing) },
-            ], temperature: 0.2, max_tokens: 800 }
-        )
-        rawText = (retryAi as any).response ?? String(retryAi)
-        validation = validate(rawText, "covenant")
-      }
-
-      let parsed: Record<string, any> = validation.output;
-
-      // Log guardrail violations
-      if (!validation.guardrails.passed) {
-        console.warn("[Guardrail] Covenant violations:", validation.guardrails.violations)
-      }
-
-      // Empty result guard
-      if (!parsed.forYou && !parsed.whatIsTrue && !parsed.figure && !parsed.pattern) {
-        return new Response(JSON.stringify({
-          error: "incomplete_output",
-          message: "The system couldn't read this moment clearly. Try describing it with more specific detail."
-        }), { status: 200, headers: { "Content-Type": "application/json" } })
-      }
-
-      // Add media capabilities and confidence scoring
-      const covenantConfidence = validation.scoring as any
-      const responseWithMedia = {
+      return jsonResponse({
         ...parsed,
         media: { audioOverviewAvailable: true },
-        confidence: {
-          score: covenantConfidence?.confidence ?? 0.5,
-          strength: covenantConfidence?.certainty === "stable" ? "high" : covenantConfidence?.certainty === "emerging" ? "medium" : "low",
-        },
-      };
-      return new Response(JSON.stringify(responseWithMedia), {
-        status: 200,
-        headers: { "Content-Type": "application/json" }
+        requestId,
       });
     } catch (error: any) {
       console.error("Covenant route error:", error);
-      return new Response(JSON.stringify({ error: "Failed to process" }), { status: 500, headers: { "Content-Type": "application/json" } });
+      if (user && safetyLogger) {
+        await safetyLogger.log(
+          createSafetyEvent(user.id, "system_error", "medium", {
+            error: error?.message || "Unknown error",
+            endpoint: "/api/covenant",
+          }, { requestId })
+        ).catch((err) => console.error("Failed to log safety event:", err));
+      }
+      return jsonResponse({ error: "Failed to process", requestId }, 500);
     }
   });
 }
