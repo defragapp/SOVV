@@ -1,0 +1,31 @@
+name = "sovereign-broker"
+main = "./src/index.js"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+
+[[routes]]
+pattern = "sovereign-broker.defrag.app"
+custom_domain = true
+
+[ai]
+binding = "AI"
+
+[[r2_buckets]]
+binding = "TEMPLATES"
+bucket_name = "vibesdk-templates"
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
+# Secrets (set via: wrangler secret put <NAME>)
+# BROKER_TOKEN       — random hex secret shared with ChatGPT GPT action auth
+# GITHUB_TOKEN       — GitHub PAT with repo read/write access
+# CF_API_TOKEN       — Cloudflare API token with Workers + D1 + KV + R2 access
+# STRIPE_SECRET_KEY  — Stripe live secret key
