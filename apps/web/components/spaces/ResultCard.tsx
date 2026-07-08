@@ -1,6 +1,7 @@
 "use client"
 import * as React from "react"
 import { motion } from "framer-motion"
+import { ResponseStructure, type StructuredResponseSection } from "@/components/understanding/ResponseStructure"
 
 interface RailBaseline { pace?: string; stabilizes?: string; responds?: string }
 interface RailSky { urgency?: string; tolerance?: string; state?: string }
@@ -68,6 +69,11 @@ interface ResultCardProps {
   onStepDeeper?: (choice: StepDeeperChoice) => void
 }
 
+function getResponseSummary(response: ResultCardProps["result"]["bestNextResponse"]): string | undefined {
+  if (!response) return undefined
+  return typeof response === "string" ? response : response.summary
+}
+
 export function ResultCard({
   result,
   input,
@@ -80,19 +86,24 @@ export function ResultCard({
 }: ResultCardProps) {
   const [copied, setCopied] = React.useState(false)
 
-  
-
   const response = result.bestNextResponse
+  const responseSummary = getResponseSummary(response)
   const steering = result.conversationalSteering
 
+  const structuredSections: StructuredResponseSection[] = [
+    { label: "Diagnosis", value: result.activePattern || result.summary },
+    { label: "Explanation", value: result.whatYouLearnedToCarry || result.strainPattern || result.theRepeat },
+    { label: "Pattern connection", value: result.theRepeat || result.oldRole || result.giftUnderStrain },
+    { label: "Clean move", value: responseSummary || result.alignment, emphasis: true },
+    { label: "Reflection", value: result.alignment || result.giftUnderStrain || result.signature },
+  ]
+
   const sections = [
-    { label: "What's active",          value: result.activePattern },
-    { label: "The pattern",            value: result.theRepeat },
-    { label: "The role",               value: result.oldRole },
-    { label: "What shaped this",       value: result.whatYouLearnedToCarry },
-    { label: "Under pressure",         value: result.strainPattern },
-    { label: "What's working",         value: result.giftUnderStrain },
-    { label: "What changes this",      value: result.alignment },
+    { label: "Diagnosis", value: result.activePattern || result.summary },
+    { label: "Explanation", value: result.whatYouLearnedToCarry || result.strainPattern || result.theRepeat },
+    { label: "Pattern connection", value: result.theRepeat || result.oldRole || result.giftUnderStrain },
+    { label: "Clean move", value: responseSummary || result.alignment },
+    { label: "Reflection", value: result.alignment || result.giftUnderStrain || result.signature },
   ].filter(s => s.value)
 
   const handleCopyAll = async () => {
@@ -109,12 +120,9 @@ export function ResultCard({
       lines.push(s.value!)
       lines.push("")
     })
-    if (response) {
-      lines.push("NEXT MOVE")
-      lines.push(typeof response === "string" ? response : (response.summary || ""))
-      if (typeof response === "object" && response.phrasing?.length) {
-        response.phrasing.forEach(p => lines.push(`  -> ${p}`))
-      }
+    if (response && typeof response === "object" && response.phrasing?.length) {
+      lines.push("WORDS YOU CAN USE")
+      response.phrasing.forEach(p => lines.push(`  -> ${p}`))
       lines.push("")
     }
     if (steering) {
@@ -151,11 +159,6 @@ export function ResultCard({
       lines.push(s.value!)
       lines.push("")
     })
-    if (response) {
-      lines.push("NEXT MOVE")
-      lines.push(typeof response === "string" ? response : (response.summary || ""))
-      lines.push("")
-    }
     lines.push("—")
     lines.push("Sovereign.os · defrag.app")
     const blob = new Blob([lines.join(NL)], { type: "text/plain" })
@@ -175,7 +178,6 @@ export function ResultCard({
       className="border border-white/[0.08] bg-white/[0.02] overflow-hidden"
       style={{ borderRadius: "var(--radius-container)" }}
     >
-      {/* Card header */}
       <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between bg-[#08070a]/60">
         <div className="flex items-center gap-3">
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Sovereign.os</span>
@@ -197,100 +199,70 @@ export function ResultCard({
         </div>
       </div>
 
-      {/* Input echo */}
       <div className="px-6 py-4 border-b border-white/[0.04] bg-white/[0.01]">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">You described</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">Experience</p>
         <p className="text-[13px] text-[#76716b] leading-relaxed italic">"{input.slice(0, 120)}{input.length > 120 ? "…" : ""}"</p>
       </div>
 
-      {/* Sections — 6 rows + Next move */}
-      <div className="px-6 py-6">
-        {sections.map((s, i) => (
-          <motion.div
-            key={s.label}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="border-b border-white/[0.05] pb-5 mb-5 last:border-0 last:pb-0 last:mb-0"
-          >
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-2">{s.label}</p>
-            <p className="text-[14px] text-[#f4efe9] leading-[1.7]">{s.value}</p>
-          </motion.div>
-        ))}
+      <ResponseStructure sections={structuredSections} />
 
-        {/* Next move — rendered with slight emphasis */}
-        {response && (
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: sections.length * 0.06, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="border-t border-white/[0.06] pt-5 mt-5"
-          >
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/60 mb-3">Next move</p>
-            <p className="text-[14px] text-[#f4efe9] leading-[1.7] mb-4">
-              {typeof response === "string" ? response : response.summary}
-            </p>
-            {typeof response === "object" && response.phrasing && response.phrasing.length > 0 && (
-              <div className="border border-white/[0.06] bg-white/[0.02] p-4" style={{ borderRadius: 10 }}>
-                {response.phrasing.map((phrase, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-3 text-[13px] text-[#a8a29a] leading-relaxed py-2.5 border-b border-white/[0.04] last:border-0 last:pb-0 cursor-pointer hover:text-[#f4efe9] transition-colors group"
-                    onClick={() => navigator.clipboard.writeText(phrase)}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <span className="text-[#4f4b47] shrink-0 mt-0.5 select-none">↳</span>
-                    <span className="flex-1">{phrase}</span>
-                    <span className="text-[9px] text-[#4f4b47] opacity-0 group-hover:opacity-100 transition-opacity shrink-0 self-center font-mono uppercase tracking-[0.1em]">Copy</span>
-                  </div>
+      {response && typeof response === "object" && response.phrasing && response.phrasing.length > 0 && (
+        <div className="px-6 pb-6">
+          <div className="border border-white/[0.06] bg-white/[0.02] p-4" style={{ borderRadius: 10 }}>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-2">Words you can use</p>
+            {response.phrasing.map((phrase, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-3 text-[13px] text-[#a8a29a] leading-relaxed py-2.5 border-b border-white/[0.04] last:border-0 last:pb-0 cursor-pointer hover:text-[#f4efe9] transition-colors group"
+                onClick={() => navigator.clipboard.writeText(phrase)}
+                role="button"
+                tabIndex={0}
+              >
+                <span className="text-[#4f4b47] shrink-0 mt-0.5 select-none">↳</span>
+                <span className="flex-1">{phrase}</span>
+                <span className="text-[9px] text-[#4f4b47] opacity-0 group-hover:opacity-100 transition-opacity shrink-0 self-center font-mono uppercase tracking-[0.1em]">Copy</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {steering && (steering.do?.length || steering.avoid?.length) && (
+        <motion.div
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.36, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="px-6 pb-6 grid grid-cols-2 gap-6"
+        >
+          {steering.do?.length ? (
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">In the next conversation</p>
+              <ul className="space-y-2">
+                {steering.do.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-[12px] text-[#a8a29a] leading-relaxed">
+                    <span className="text-[#76716b] shrink-0 select-none">+</span>
+                    <span>{item}</span>
+                  </li>
                 ))}
-              </div>
-            )}
-          </motion.div>
-        )}
+              </ul>
+            </div>
+          ) : null}
+          {steering.avoid?.length ? (
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Avoid</p>
+              <ul className="space-y-2">
+                {steering.avoid.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-[12px] text-[#a8a29a] leading-relaxed">
+                    <span className="text-[#76716b] shrink-0 select-none">−</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </motion.div>
+      )}
 
-        {/* Conversational steering */}
-        {steering && (steering.do?.length || steering.avoid?.length) && (
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: (sections.length + 1) * 0.06, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="border-t border-white/[0.06] pt-5 mt-5 grid grid-cols-2 gap-6"
-          >
-            {steering.do?.length ? (
-              <div>
-                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">In the next conversation</p>
-                <ul className="space-y-2">
-                  {steering.do.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-[12px] text-[#a8a29a] leading-relaxed">
-                      <span className="text-[#76716b] shrink-0 select-none">+</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-            {steering.avoid?.length ? (
-              <div>
-                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Avoid</p>
-                <ul className="space-y-2">
-                  {steering.avoid.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-[12px] text-[#a8a29a] leading-relaxed">
-                      <span className="text-[#76716b] shrink-0 select-none">−</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </motion.div>
-        )}
-      </div>
-
-      {/* Rail — reduced signal instrumentation, quiet and compressed.
-           Default: baseline (pace/stabilizes/responds) + sky (urgency/tolerance) + pattern.
-           state: reactive intentionally omitted from default — expanded rail only. */}
       {result.rail ? (
         <div className="px-6 py-4 border-t border-white/[0.04] bg-[#08070a]/30">
           <div className="flex flex-wrap gap-x-8 gap-y-3">
@@ -298,28 +270,18 @@ export function ResultCard({
               <div>
                 <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1.5">Baseline</p>
                 <div className="flex flex-col gap-0.5">
-                  {result.rail.baseline.pace && (
-                    <p className="font-mono text-[9px] text-[#4f4b47]">pace: {result.rail.baseline.pace}</p>
-                  )}
-                  {result.rail.baseline.stabilizes && (
-                    <p className="font-mono text-[9px] text-[#4f4b47]">stabilizes: {result.rail.baseline.stabilizes}</p>
-                  )}
-                  {result.rail.baseline.responds && (
-                    <p className="font-mono text-[9px] text-[#4f4b47]">responds: {result.rail.baseline.responds}</p>
-                  )}
+                  {result.rail.baseline.pace && <p className="font-mono text-[9px] text-[#4f4b47]">pace: {result.rail.baseline.pace}</p>}
+                  {result.rail.baseline.stabilizes && <p className="font-mono text-[9px] text-[#4f4b47]">stabilizes: {result.rail.baseline.stabilizes}</p>}
+                  {result.rail.baseline.responds && <p className="font-mono text-[9px] text-[#4f4b47]">responds: {result.rail.baseline.responds}</p>}
                 </div>
               </div>
             )}
             {result.rail.sky && (result.rail.sky.urgency || result.rail.sky.tolerance) && (
               <div>
-                <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1.5">Sky</p>
+                <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#4f4b47] mb-1.5">Timing</p>
                 <div className="flex flex-col gap-0.5">
-                  {result.rail.sky.urgency && (
-                    <p className="font-mono text-[9px] text-[#4f4b47]">urgency: {result.rail.sky.urgency}</p>
-                  )}
-                  {result.rail.sky.tolerance && (
-                    <p className="font-mono text-[9px] text-[#4f4b47]">tolerance: {result.rail.sky.tolerance}</p>
-                  )}
+                  {result.rail.sky.urgency && <p className="font-mono text-[9px] text-[#4f4b47]">urgency: {result.rail.sky.urgency}</p>}
+                  {result.rail.sky.tolerance && <p className="font-mono text-[9px] text-[#4f4b47]">tolerance: {result.rail.sky.tolerance}</p>}
                 </div>
               </div>
             )}
@@ -333,15 +295,12 @@ export function ResultCard({
         </div>
       ) : null}
 
-      {/* Signature line — once only, bottom only, very low contrast.
-           Encoded identity, not explained. Never shown in body. */}
       {result.signature ? (
         <div className="px-6 py-3 border-t border-white/[0.03]">
           <p className="font-mono text-[8px] text-[#4f4b47] tracking-[0.12em]">{result.signature}</p>
         </div>
       ) : null}
 
-      {/* Save confirmation — brief, auto-dismiss */}
       {saveSuccess && (
         <motion.div
           initial={{ opacity: 0, y: -4 }}
@@ -350,19 +309,11 @@ export function ResultCard({
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="px-6 py-3 border-t border-[#e0743a]/10 bg-[#e0743a]/[0.04] flex items-center justify-between"
         >
-          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70">
-            Saved to your Library
-          </span>
-          <a
-            href="/app"
-            className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
-          >
-            View Library →
-          </a>
+          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70">Saved to your Library</span>
+          <a href="/app" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors">View Library →</a>
         </motion.div>
       )}
 
-      {/* Step-deeper choice chips */}
       {result.presence?.stepDeeperChoices && result.presence.stepDeeperChoices.length > 0 && onStepDeeper && (
         <div className="px-6 py-4 border-t border-white/[0.04] flex flex-wrap gap-2">
           {result.presence.stepDeeperChoices.map((choice) => (
@@ -378,37 +329,17 @@ export function ResultCard({
         </div>
       )}
 
-      {/* Footer actions */}
       <div className="px-6 py-4 border-t border-white/[0.06] bg-[#08070a]/40 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <button
-            onClick={handleCopyAll}
-            className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1"/>
-              <path d="M1 8V1h7" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-            </svg>
+          <button onClick={handleCopyAll} className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors">
             {copied ? "Copied" : "Copy"}
           </button>
-          <button
-            onClick={handleDownload}
-            className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+          <button onClick={handleDownload} className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors">
             Export
           </button>
         </div>
         {onInvite && (
-          <button
-            onClick={onInvite}
-            className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors"
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M8 1H11V4M11 1L6.5 5.5M5 2H2C1.45 2 1 2.45 1 3V10C1 10.55 1.45 11 2 11H9C9.55 11 10 10.55 10 10V7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+          <button onClick={onInvite} className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors">
             Invite Privately
           </button>
         )}
