@@ -8,10 +8,8 @@
   "scripts": {
     "dev": "wrangler dev --port 8787",
     "deploy": "wrangler deploy",
-    "build": "echo \"Skipping strict tsc for worker-ai\""
-  },
-  "dependencies": {
-    "@sovereign/prompts": "file:../../packages/prompts"
+    "build": "pnpm run typecheck",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@sovereign/prompts": "file:../../packages/prompts"
