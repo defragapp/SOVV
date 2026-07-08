@@ -19,9 +19,9 @@ interface LibraryViewProps {
 }
 
 function spaceLabel(source: string): string {
-  if (source === "DEFRAG") return "Defrag"
-  if (source === "COVENANT") return "Covenant"
-  if (source === "ALIGNMENT") return "Alignment"
+  if (source === "DEFRAG") return "Experience"
+  if (source === "COVENANT") return "Agreement"
+  if (source === "ALIGNMENT") return "Relationship"
   return source
 }
 
@@ -30,7 +30,7 @@ function formatDate(dateStr: string): string {
 }
 
 /**
- * LibraryView — renders the user's saved Library items.
+ * LibraryView — renders the user's saved understanding.
  *
  * Fetches from GET /api/library (optionally filtered by workspace_source).
  * Designed to be embedded in workspace right-panels or standalone pages.
@@ -61,11 +61,16 @@ export function LibraryView({ workspaceSource, onSelect, refreshKey = 0 }: Libra
 
   if (items.length === 0) {
     return (
-      <p className="text-[12px] text-[#4f4b47] leading-relaxed px-5 py-8 text-center">
-        {workspaceSource
-          ? `No saved ${spaceLabel(workspaceSource)} results yet.`
-          : "Nothing saved yet. Results you save will appear here."}
-      </p>
+      <div className="px-5 py-8 text-center">
+        <p className="text-[12px] text-[#76716b] leading-relaxed">
+          {workspaceSource
+            ? `No saved ${spaceLabel(workspaceSource).toLowerCase()} nodes yet.`
+            : "Nothing saved yet."}
+        </p>
+        <p className="text-[11px] text-[#4f4b47] mt-1 leading-relaxed">
+          Save the experiences, patterns, repairs, and agreements worth remembering.
+        </p>
+      </div>
     )
   }
 
