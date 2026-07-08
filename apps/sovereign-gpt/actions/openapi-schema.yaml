@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: SOVV Sovereign Build Agent API
+  title: Sovereign Dev API
   description: |
     Production-safe build agent for the SOVV / Sovereign.os / defrag.app platform.
     
