@@ -1,0 +1,6 @@
+direct_commit_to_main: true
+pr_mode: true
+deploy_workers: true
+kv_write: true
+stripe_write: true
+verified: 2026-07-08
