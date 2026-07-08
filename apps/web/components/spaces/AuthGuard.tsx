@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import type { Tier } from "./types"
 import LoginScreen from "./LoginScreen"
 import BaselineEntry from "./BaselineEntry"
@@ -17,11 +17,12 @@ interface AuthState {
   subscriptionChecked: boolean
 }
 
-// Routes that require Pro subscription
 const PRO_ROUTES = ["/apps/covenant", "/apps/alignment"]
+const FIRST_DEFRAG_PATH = "/apps/defrag"
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [auth, setAuth] = useState<AuthState>({
     loading: true,
     authenticated: false,
@@ -34,7 +35,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [showOnboarding, setShowOnboarding] = useState(false)
 
   useEffect(() => {
-    // Refresh session token on mount (extends session by 7 days)
     fetch("/api/auth/refresh", { method: "POST", credentials: "include" }).catch(() => {})
 
     async function checkSession() {
@@ -56,8 +56,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
           return
         }
 
-        // Use tier from session (entitlement-resolved) + fetch baseline
-        // This eliminates a separate /api/auth/tier call on every page load
         const tierFromSession = (session.user.tier as Tier) || "free"
         const baselineRes = await fetch("/api/baseline", { method: "GET", credentials: "include" })
 
@@ -84,7 +82,23 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     checkSession()
   }, [])
 
-  // Loading
+  useEffect(() => {
+    if (!justSetBaseline) return
+
+    const timer = window.setTimeout(() => setJustSetBaseline(false), 4200)
+    return () => window.clearTimeout(timer)
+  }, [justSetBaseline])
+
+  function completeBaselineEntry() {
+    setAuth((prev) => ({ ...prev, hasBaseline: true }))
+    setJustSetBaseline(true)
+    setShowOnboarding(true)
+
+    if (!pathname?.startsWith(FIRST_DEFRAG_PATH)) {
+      router.replace(`${FIRST_DEFRAG_PATH}?onboarding=baseline-complete`)
+    }
+  }
+
   if (auth.loading) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-[#08070a]">
@@ -93,45 +107,41 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     )
   }
 
-  // Not authenticated → login
   if (!auth.authenticated) {
     return <LoginScreen />
   }
 
-  // No Baseline Design → collect it first (all users)
   if (!auth.hasBaseline) {
-    return (
-      <BaselineEntry
-        onComplete={() => setAuth((prev) => ({ ...prev, hasBaseline: true }))}
-      />
-    )
+    return <BaselineEntry onComplete={completeBaselineEntry} />
   }
 
-  // Pro-only routes → show upgrade if free
   const requiresPro = PRO_ROUTES.some(route => pathname?.startsWith(route))
   if (requiresPro && auth.tier !== "pro" && auth.subscriptionChecked) {
     return <UpgradeBanner />
   }
 
-  // Authenticated + Baseline Design set → enter workspace
   return (
     <>
       {children}
-      <OnboardingModal hasBaseline={auth.hasBaseline} onDismiss={() => setShowOnboarding(false)} />
-      {/* First-session hint — shown briefly after Baseline Design is set */}
+      {showOnboarding && (
+        <OnboardingModal
+          hasBaseline={auth.hasBaseline}
+          onDismiss={() => setShowOnboarding(false)}
+        />
+      )}
       {justSetBaseline && (
         <div
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 border border-white/[0.10] bg-[#0c0a0d]/95 backdrop-blur-md shadow-2xl"
+          className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 border border-white/[0.10] bg-[#0c0a0d]/95 px-5 py-3 shadow-2xl backdrop-blur-md"
           style={{ borderRadius: "var(--radius-container)", maxWidth: 360 }}
         >
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70 mb-1">
+          <p className="mb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-[#e0743a]/70">
             Baseline Design active
           </p>
-          <p className="text-[13px] text-[#f4efe9] leading-snug mb-1">
-            Your space is ready.
+          <p className="mb-1 text-[13px] leading-snug text-[#f4efe9]">
+            Your first Defrag is ready.
           </p>
-          <p className="text-[11px] text-[#76716b] leading-relaxed">
-            Describe what is happening — Defrag will show you what is active beneath it.
+          <p className="text-[11px] leading-relaxed text-[#76716b]">
+            Describe what is happening. Defrag will show you what is active beneath it.
           </p>
         </div>
       )}
