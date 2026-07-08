@@ -32,6 +32,11 @@ interface WizardStep {
 const STORAGE_KEY = "sovv_baseline_draft_v1"
 const ease = [0.16, 1, 0.3, 1] as const
 
+const TIME_MODES: TimeMode[] = ["exact", "approximate", "window", "unknown"]
+const DAY_WINDOWS: DayWindow[] = ["early_morning", "morning", "noon", "afternoon", "evening", "night"]
+const APPROX_RANGES: ApproxRange[] = ["15", "30", "60", "unsure"]
+const STEP_IDS: StepId[] = ["welcome", "birthDate", "birthTime", "birthPlace", "review"]
+
 const WINDOW_TIMES: Record<DayWindow, { time: string; uncertaintyMinutes: number }> = {
   early_morning: { time: "05:00", uncertaintyMinutes: 120 },
   morning: { time: "09:00", uncertaintyMinutes: 180 },
@@ -100,28 +105,51 @@ const LOADING_MESSAGES = [
   "Preparing your first Defrag workspace",
 ]
 
+function isStepId(value: unknown): value is StepId {
+  return typeof value === "string" && STEP_IDS.includes(value as StepId)
+}
+
+function isTimeMode(value: unknown): value is TimeMode {
+  return typeof value === "string" && TIME_MODES.includes(value as TimeMode)
+}
+
+function isDayWindow(value: unknown): value is DayWindow {
+  return typeof value === "string" && DAY_WINDOWS.includes(value as DayWindow)
+}
+
+function isApproxRange(value: unknown): value is ApproxRange {
+  return typeof value === "string" && APPROX_RANGES.includes(value as ApproxRange)
+}
+
+function getString(value: unknown) {
+  return typeof value === "string" ? value : ""
+}
+
 function getStoredDraft(): BaselineDraft | null {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY)
     if (!stored) return null
-    const parsed = JSON.parse(stored) as Partial<BaselineDraft>
+    const parsed = JSON.parse(stored) as Record<string, unknown>
 
     return {
-      ...DEFAULT_DRAFT,
-      ...parsed,
-      approxRange: parsed.approxRange ?? DEFAULT_DRAFT.approxRange,
-      dayWindow: parsed.dayWindow ?? DEFAULT_DRAFT.dayWindow,
-      timeMode: parsed.timeMode ?? DEFAULT_DRAFT.timeMode,
-      step: parsed.step ?? DEFAULT_DRAFT.step,
+      dob: getString(parsed.dob),
+      tob: getString(parsed.tob),
+      tobApprox: getString(parsed.tobApprox),
+      approxRange: isApproxRange(parsed.approxRange) ? parsed.approxRange : DEFAULT_DRAFT.approxRange,
+      dayWindow: isDayWindow(parsed.dayWindow) ? parsed.dayWindow : DEFAULT_DRAFT.dayWindow,
+      timeMode: isTimeMode(parsed.timeMode) ? parsed.timeMode : DEFAULT_DRAFT.timeMode,
+      pob: getString(parsed.pob),
+      step: isStepId(parsed.step) ? parsed.step : DEFAULT_DRAFT.step,
     }
   } catch {
+    window.localStorage.removeItem(STORAGE_KEY)
     return null
   }
 }
 
 function getTimeSummary(draft: BaselineDraft) {
   if (draft.timeMode === "exact" && draft.tob) return `Exact time: ${draft.tob}`
-  if (draft.timeMode === "approximate" && draft.tobApprox) return `Approximate time: ${draft.tobApprox}`
+  if (draft.timeMode === "approximate" && draft.tobApprox) return `Approximate time: ${draft.tobApprox} (${draft.approxRange === "unsure" ? "uncertain" : `within ${draft.approxRange} minutes`})`
   if (draft.timeMode === "window") return `Part of day: ${WINDOW_LABELS[draft.dayWindow]}`
   if (draft.timeMode === "unknown") return "Unknown birth time"
   return "Not set"
@@ -135,7 +163,7 @@ function ProgressRail({ currentIndex }: { currentIndex: number }) {
           Step {currentIndex + 1} of {STEPS.length}
         </p>
         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
-          Autosaved
+          Autosaved locally
         </p>
       </div>
       <div className="grid grid-cols-5 gap-2" aria-hidden>
@@ -621,7 +649,7 @@ export default function BaselineEntry({ onComplete }: { onComplete: () => void }
                   </div>
 
                   <p className="mt-6 text-center text-xs text-[#4f4b47]">
-                    Private by design · Birth details are never shared or exposed in outputs.
+                    Private by design - birth details are never shared or exposed in outputs.
                   </p>
                 </motion.div>
               )}
