@@ -1,6 +1,8 @@
 "use client"
+
 import * as React from "react"
 import Link from "next/link"
+import { PremiumErrorState } from "@/components/spaces/WorkspaceStates"
 
 export default function SpaceError({
   error,
@@ -10,33 +12,33 @@ export default function SpaceError({
   reset: () => void
 }) {
   React.useEffect(() => {
-    console.error("[Space error]", error)
+    console.error("[Alignment error]", error)
   }, [error])
 
   return (
     <div className="flex h-[100dvh] w-screen items-center justify-center bg-[#08070a] text-[#f4efe9]">
-      <div className="text-center px-6 max-w-sm">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-6">
-          Something went wrong
-        </p>
-        <p className="text-[14px] text-[#76716b] leading-relaxed mb-8">
-          The Space encountered an error. Your session is intact.
-        </p>
-        <div className="flex flex-col gap-3 items-center">
-          <button
-            onClick={reset}
-            className="btn-primary w-full"
-          >
-            Try again
-          </button>
-          <Link
-            href="/apps/defrag"
-            className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] hover:text-[#76716b] transition-colors"
-          >
-            Return to Defrag
-          </Link>
-        </div>
-      </div>
+      <PremiumErrorState
+        label="Alignment interrupted"
+        title="The workspace hit a recoverable error."
+        body="Your session is still intact. Try reopening the workspace, or return to the Alignment entry surface."
+        action={(
+          <>
+            <button
+              onClick={reset}
+              className="inline-flex h-10 w-full items-center justify-center bg-[#f4efe9] px-5 text-sm font-medium text-[#08070a] transition-opacity hover:opacity-90"
+              style={{ borderRadius: "var(--radius-button)" }}
+            >
+              Try again
+            </button>
+            <Link
+              href="/apps/alignment"
+              className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] transition-colors hover:text-[#76716b]"
+            >
+              Return to Alignment
+            </Link>
+          </>
+        )}
+      />
     </div>
   )
 }
