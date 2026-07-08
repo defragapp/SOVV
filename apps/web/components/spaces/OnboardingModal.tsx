@@ -20,6 +20,8 @@ interface OnboardingStep {
 
 const STORAGE_KEY = "sovv_onboarding_completed_v1"
 const LEGACY_STORAGE_KEY = "sovv_onboarding_dismissed"
+const FIRST_DEFRAG_PROMPT = "Tell me about something I am carrying right now."
+const FIRST_DEFRAG_HREF = `/apps/defrag/workspace?prompt=${encodeURIComponent(FIRST_DEFRAG_PROMPT)}`
 const ease = [0.16, 1, 0.3, 1] as const
 
 const STEPS: OnboardingStep[] = [
@@ -137,7 +139,7 @@ export default function OnboardingModal({ onDismiss, hasBaseline }: OnboardingMo
                 <div className="mb-7 flex items-center justify-between gap-4">
                   <div>
                     <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#e0743a]/70">
-                      First run · {current.label}
+                      First run - {current.label}
                     </p>
                     <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">
                       Step {current.step} of {STEPS.length}
@@ -229,12 +231,12 @@ export default function OnboardingModal({ onDismiss, hasBaseline }: OnboardingMo
 
                   {isFinalStep ? (
                     <Link
-                      href="/apps/defrag"
+                      href={FIRST_DEFRAG_HREF}
                       onClick={complete}
                       className="inline-flex h-10 items-center justify-center bg-[#f4efe9] px-5 text-sm font-medium text-[#08070a] transition-opacity hover:opacity-90"
                       style={{ borderRadius: "var(--radius-button)" }}
                     >
-                      Start Defrag
+                      Start first Defrag
                     </Link>
                   ) : (
                     <button
