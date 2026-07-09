@@ -4,6 +4,8 @@ import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
 import { ResultCard } from "@/components/spaces/ResultCard"
 import { PanelHeader, EvidenceChip, PremiumEmptyState, PremiumLoadingState, PremiumErrorState } from "@/components/spaces/WorkspaceStates"
+import { BaselineSidebar } from "@/components/spaces/BaselineSidebar"
+import { DefragComposer } from "@/components/spaces/DefragComposer"
 import Link from "next/link"
 
 interface Baseline {
@@ -357,78 +359,20 @@ export default function DefragWorkspacePage() {
   }
 
   const sidebar = (
-    <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-      <PanelHeader label="Baseline" />
-      <div className="px-5 pt-5 pb-5 border-b border-white/[0.05]">
-        {baselineLoading ? (
-          <div className="flex flex-col gap-2.5 py-1">
-            <div className="skeleton skeleton-text w-full" />
-            <div className="skeleton skeleton-text w-4/5" />
-            <div className="skeleton skeleton-text w-3/5" />
-          </div>
-        ) : baseline ? (
-          <>
-            <p className="font-mono text-[9px] text-[#4f4b47] mb-4 tracking-[0.1em]">{formatBirthSummary(baseline)}</p>
-            {statementsLoading ? (
-              <div className="flex flex-col gap-2.5 py-1">
-                <div className="skeleton skeleton-text w-full" />
-                <div className="skeleton skeleton-text w-4/5" />
-                <div className="skeleton skeleton-text w-3/5" />
-              </div>
-            ) : baselineStatements.length > 0 ? (
-              <div className="flex flex-col gap-0">
-                {baselineStatements.map(({ statement, chips }, i) => (
-                  <div key={i} className="py-3 border-b border-white/[0.04] last:border-0">
-                    <p className="text-[12px] text-[#c8c2bc] leading-[1.6] mb-2">{statement}</p>
-                    {chips.length > 0 && <div className="flex gap-1 flex-wrap">{chips.map(chip => <EvidenceChip key={chip} label={chip} />)}</div>}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[12px] text-[#76716b] leading-relaxed">Your Baseline is active. Behavioral profile is being derived.</p>
-            )}
-            <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/[0.04]">
-              <div className="flex items-center gap-1.5">
-                {datasetStatus === "ready" && <span className="w-1.5 h-1.5 rounded-full bg-[#e0743a]/50" />}
-                {datasetStatus === "pending" && <span className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />}
-                <p className="text-[10px] text-[#4f4b47]">{datasetStatus === "ready" ? "Understanding model active." : datasetStatus === "pending" ? "Compilingâ¦" : "Active in every result."}</p>
-              </div>
-              <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.1em] text-[#76716b] hover:text-[#a8a29a] transition-colors">Edit</a>
-            </div>
-          </>
-        ) : (
-          <div className="border border-white/[0.08] bg-white/[0.02] p-4" style={{ borderRadius: "var(--radius-container)" }}>
-            <p className="text-[12px] text-[#a8a29a] mb-1">Baseline required</p>
-            <p className="text-[12px] text-[#76716b] leading-relaxed mb-3">Add your date, time, and place of birth to begin. This private layer grounds every result.</p>
-            <a href="/settings" className="inline-flex h-8 px-4 bg-[#f4efe9] text-[#08070a] text-[11px] font-medium items-center hover:opacity-90 transition-opacity" style={{ borderRadius: "var(--radius-button)" }}>Add birth data â</a>
-          </div>
-        )}
-      </div>
-      {baseline && (
-        <div className="px-5 pt-4 pb-4 border-b border-white/[0.05]">
-          <div className="flex items-center justify-between mb-2">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Pattern history</p>
-            {sessionCount > 0 && <span className="font-mono text-[8px] text-[#4f4b47]">{sessionCount} session{sessionCount !== 1 ? "s" : ""}</span>}
-          </div>
-          {recurringPattern ? (
-            <div>
-              <p className="text-[11px] text-[#76716b] leading-relaxed mb-1">This pattern keeps appearing:</p>
-              <p className="text-[11px] text-[#c8c2bc] leading-relaxed italic">"{recurringPattern.length > 80 ? recurringPattern.slice(0, 80) + "â¦" : recurringPattern}"</p>
-            </div>
-          ) : result?.sourcesUsed?.history ? (
-            <p className="text-[11px] text-[#76716b] leading-relaxed">Past patterns were used in this result.</p>
-          ) : (
-            <p className="text-[11px] text-[#4f4b47] leading-relaxed">Patterns from past sessions will inform future results.</p>
-          )}
-        </div>
-      )}
-      <div className="px-5 pt-4">
-        <Link href="/apps/defrag" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors">â Back to Defrag</Link>
-      </div>
-    </div>
+    <BaselineSidebar
+      baseline={baseline}
+      baselineLoading={baselineLoading}
+      baselineStatements={baselineStatements}
+      statementsLoading={statementsLoading}
+      datasetStatus={datasetStatus}
+      recurringPattern={recurringPattern}
+      sessionCount={sessionCount}
+      hasResult={!!result}
+      historyUsed={result?.sourcesUsed?.history ?? false}
+    />
   )
 
-  const contextPanel = (
+    const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <PanelHeader label="Saved understanding" />
       {result?.media?.audioOverviewAvailable && (
@@ -537,35 +481,20 @@ export default function DefragWorkspacePage() {
         )}
       </div>
 
-      <div className={`flex-none px-6 pb-6 ${!baseline ? "opacity-40 pointer-events-none" : ""}`}>
-        <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: "var(--radius-container)" }}>
-          {compareMode && (
-            <div className="px-5 pt-4 pb-0 border-b border-white/[0.05]">
-              <input type="text" value={compareName} onChange={e => setCompareName(e.target.value)} placeholder="Who is involved? Name or relation." className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] outline-none text-[13px] pb-3" style={{ fontSize: "16px" }} />
-            </div>
-          )}
-          <textarea
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            placeholder={messageMode ? "Paste the message exactly as it was sent." : compareMode ? "Tell me what keeps happening between you." : "Tell me what happened."}
-            rows={3}
-            className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
-            maxLength={2000}
-            style={{ fontSize: "16px" }}
-            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
-          />
-          <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">Enter to run Â· Shift+Enter for new line</span>
-              {result?.sourcesUsed?.invitedUsers === false && (
-                <button type="button" onClick={() => { setCompareMode(m => !m); if (!compareMode) setMessageMode(false) }} className={`font-mono text-[8px] uppercase tracking-[0.1em] transition-colors ${compareMode ? "text-[#e0743a]/70" : "text-[#4f4b47] hover:text-[#76716b]"}`}>{compareMode ? "Solo mode" : "+ Relationship"}</button>
-              )}
-              <button type="button" onClick={() => { setMessageMode(m => !m); setCompareMode(false) }} className={`font-mono text-[8px] uppercase tracking-[0.1em] transition-colors ${messageMode ? "text-[#e0743a]/70" : "text-[#4f4b47] hover:text-[#76716b]"}`}>{messageMode ? "Clear" : "Read a message"}</button>
-            </div>
-            <button onClick={handleSubmit} disabled={!input.trim() || isLoading} className="h-8 px-5 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed" style={{ borderRadius: "var(--radius-button)" }}>{isLoading ? "â¦" : "Understand"}</button>
-          </div>
-        </div>
-      </div>
+      <DefragComposer
+        input={input}
+        onInputChange={setInput}
+        onSubmit={handleSubmit}
+        isLoading={isLoading}
+        baseline={!!baseline}
+        compareMode={compareMode}
+        compareName={compareName}
+        onCompareModeToggle={() => { setCompareMode(m => !m); if (!compareMode) setMessageMode(false) }}
+        onCompareNameChange={setCompareName}
+        messageMode={messageMode}
+        onMessageModeToggle={() => { setMessageMode(m => !m); setCompareMode(false) }}
+        showRelationshipToggle={result?.sourcesUsed?.invitedUsers === false}
+      />
     </div>
   )
 
