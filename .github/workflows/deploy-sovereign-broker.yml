@@ -25,7 +25,7 @@ jobs:
     name: Deploy sovereign-broker Worker
     if: ${{ github.event_name == 'push' || inputs.confirm == 'DEPLOY' }}
     runs-on: ubuntu-latest
-    environment: production
+    environment: Production
     timeout-minutes: 10
     env:
       CI: true
