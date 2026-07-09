@@ -358,9 +358,7 @@ export default function DefragWorkspacePage() {
 
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-      <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Baseline</p>
-      </div>
+      <PanelHeader label="Baseline" />
       <div className="px-5 pt-5 pb-5 border-b border-white/[0.05]">
         {baselineLoading ? (
           <div className="flex flex-col gap-2.5 py-1">
@@ -432,9 +430,7 @@ export default function DefragWorkspacePage() {
 
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-      <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47]">Saved understanding</p>
-      </div>
+      <PanelHeader label="Saved understanding" />
       {result?.media?.audioOverviewAvailable && (
         <div className="px-5 pt-4 pb-4 border-b border-white/[0.05]">
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f4b47] mb-3">Audio overview</p>
@@ -476,27 +472,25 @@ export default function DefragWorkspacePage() {
 
   const main = (
     <div className="flex flex-col h-full">
-      <div className="h-11 px-6 flex items-center justify-between border-b border-white/[0.06] shrink-0">
-        <div className="flex items-center gap-3">
-          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Defrag</span>
-          <span className="text-[#4f4b47] text-[10px]">Â·</span>
-          <span className="text-[11px] text-[#4f4b47]">Experience â Understanding â Clean move</span>
-        </div>
-        {result?.sourcesUsed && (
+      <PanelHeader
+        label="Defrag"
+        detail="Experience → Understanding → Clean move"
+        right={result?.sourcesUsed ? (
           <div className="flex items-center gap-1.5">
-            {result.sourcesUsed.baseline && <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#e0743a]/60 border border-[#e0743a]/20 px-2 py-0.5" style={{ borderRadius: "var(--radius-minimal)" }}>Baseline active</span>}
-            {result.sourcesUsed.history && <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-[#4f4b47] border border-white/[0.08] px-2 py-0.5" style={{ borderRadius: "var(--radius-minimal)" }}>Pattern history</span>}
+            {result.sourcesUsed.baseline && <EvidenceChip label="Baseline active" tone="accent" />}
+            {result.sourcesUsed.history && <EvidenceChip label="Pattern history" tone="neutral" />}
           </div>
-        )}
-      </div>
+        ) : undefined}
+      />
 
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
         {!baselineLoading && !baseline && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
-            <p className="text-[15px] text-[#f4efe9] leading-snug">Set your Baseline first.</p>
-            <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">Your Baseline is the private model that gives every result context.</p>
-            <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>Set Baseline â</a>
-          </div>
+          <PremiumEmptyState
+            label="Baseline required"
+            title="Set your Baseline first."
+            body="Your Baseline is the private model that gives every result context."
+            action={<a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>Set Baseline →</a>}
+          />
         )}
         {baseline && !result && !isLoading && !error && (
           <div className="flex flex-col items-center justify-center text-center h-full gap-3">
@@ -516,19 +510,19 @@ export default function DefragWorkspacePage() {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full gap-4">
-              <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/40 rounded-full animate-spin" />
-              <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Separating the moment from the patternâ¦</p>
-            </div>
+            <PremiumLoadingState
+              label="Reading the signal"
+              body="Separating the moment from the pattern."
+            />
           )
         )}
         {error && error !== "needs_baseline" && (
-          <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
-            <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">
-              {error.includes("daily limit") ? "You've reached your daily limit. Upgrade to Pro for unlimited sessions." : error.includes("connect") ? "Connection issue. Check your network and try again." : error || "Something went wrong. Try again."}
-            </p>
-            {error.includes("daily limit") && <a href="/pricing" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>See Pro plans â</a>}
-          </div>
+          <PremiumErrorState
+            label="Something went wrong"
+            title={error.includes("daily limit") ? "Daily limit reached" : error.includes("connect") ? "Connection issue" : "Something went wrong"}
+            body={error.includes("daily limit") ? "You've reached your free daily limit. Upgrade to continue." : error.includes("connect") ? "Check your network and try again." : error || "Try again."}
+            action={error.includes("daily limit") ? <a href="/pricing" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>See Pro plans →</a> : undefined}
+          />
         )}
         {result && (
           <>
