@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Sovereign Dev API
   description: Production-safe build agent for SOVV / Sovereign.os / defrag.app.
-  version: 2.8.0
+  version: 2.9.0
 servers:
   - url: https://sovereign-broker.defrag.app
 paths:
@@ -228,6 +228,12 @@ paths:
       summary: Build scope analysis
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /capabilities:
+    get:
+      operationId: getCapabilities
+      summary: Self-describing capability registry — lists all broker capabilities and current safety flag states
+      responses:
+        "200": { description: Capability map, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /build/generate-component:
     post:
       operationId: generateComponent
