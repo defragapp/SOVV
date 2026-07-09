@@ -1,0 +1,171 @@
+openapi: 3.1.0
+info:
+  title: Sovereign Jobs API Overlay
+  version: 0.1.0
+servers:
+  - url: https://sovereign-broker.defrag.app
+paths:
+  /jobs:
+    post:
+      operationId: jobsCreate
+      summary: Create a durable broker orchestration job
+      description: V1 supports only deploying sovereign-broker from main.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobCreateRequest'
+      responses:
+        '201':
+          description: Job created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        '200':
+          description: Existing idempotent job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+  /jobs/{id}:
+    get:
+      operationId: jobsGet
+      summary: Get job status
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+  /jobs/{id}/events:
+    get:
+      operationId: jobsGetEvents
+      summary: Get structured job events
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JobEvent'
+  /jobs/{id}/cancel:
+    post:
+      operationId: jobsCancel
+      summary: Cancel a queued, running, or waiting job
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job canceled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    JobCreateRequest:
+      type: object
+      required: [type, target, input]
+      properties:
+        type:
+          type: string
+          enum: [deploy]
+        intent:
+          type: string
+        target:
+          type: object
+          required: [surface, name, ref]
+          properties:
+            surface:
+              type: string
+              enum: [broker]
+            name:
+              type: string
+              enum: [sovereign-broker]
+            ref:
+              type: string
+              enum: [main]
+        input:
+          type: object
+          required: [workflow, confirm]
+          properties:
+            workflow:
+              type: string
+              enum: [deploy-sovereign-broker.yml]
+            confirm:
+              type: string
+              enum: [DEPLOY]
+        idempotency_key:
+          type: string
+    Job:
+      type: object
+      additionalProperties: true
+      required: [id, type, status, target, input, idempotency_key]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+          enum: [queued, running, waiting, succeeded, failed, canceled]
+        target:
+          type: object
+          additionalProperties: true
+        input:
+          type: object
+          additionalProperties: true
+        idempotency_key:
+          type: string
+    JobEvent:
+      type: object
+      additionalProperties: true
+      required: [id, job_id, ts, level, phase, message]
+      properties:
+        id:
+          type: string
+        job_id:
+          type: string
+        ts:
+          type: string
+        level:
+          type: string
+          enum: [info, warn, error, debug]
+        phase:
+          type: string
+          enum: [queued, planning, dispatching, polling, verifying, completed]
+        message:
+          type: string
