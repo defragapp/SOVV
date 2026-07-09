@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Sovereign Dev API
   description: Production-safe build agent for SOVV / Sovereign.os / defrag.app.
-  version: 2.5.0
+  version: 2.7.0
 servers:
   - url: https://sovereign-broker.defrag.app
 paths:
@@ -85,6 +85,32 @@ paths:
         - { name: state, in: query, required: false, schema: { type: string, enum: [open, closed, all], default: open } }
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /repo/edit:
+    post:
+      operationId: repoEdit
+      summary: Safe anchor-based file edit with dry-run and diff preview
+      description: >
+        Applies one or more anchor-based operations (insert_after, insert_before, replace_exact)
+        to a repository file. Supports dry_run mode. Requires confirm: true for committed writes.
+        Fails if any anchor is missing or appears more than once. Blocked paths are rejected.
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/RepoEditRequest" } } } }
+      responses:
+        "200": { description: Edit result with diff, content: { application/json: { schema: { $ref: "#/components/schemas/RepoEditResponse" } } } }
+        "400": { description: Anchor not found or duplicate, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+        "403": { description: Blocked path or safety flag, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /build:
+    post:
+      operationId: build
+      summary: Intent-driven build and deploy runtime
+      description: >
+        Accepts a high-level goal and orchestrates the full build/deploy pipeline.
+        Currently supports goal "deploy broker" which dispatches the sovereign-broker
+        GitHub workflow, persists a durable job, and returns a structured build report.
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/BuildRequest" } } } }
+      responses:
+        "200": { description: Build report with job, stages, and verification, content: { application/json: { schema: { $ref: "#/components/schemas/BuildResponse" } } } }
+        "400": { description: Unsupported goal, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+        "403": { description: Safety flag not enabled, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /ai/chat:
     post:
       operationId: aiChat
@@ -223,6 +249,39 @@ paths:
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ProposePRRequest" } } } }
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /jobs:
+    post:
+      operationId: jobsCreate
+      summary: Create a durable deploy job
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/JobCreateRequest" } } } }
+      responses:
+        "200": { description: Job created, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /jobs/{id}:
+    get:
+      operationId: jobsGet
+      summary: Get job status
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Job, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+        "404": { description: Not found }
+  /jobs/{id}/events:
+    get:
+      operationId: jobsGetEvents
+      summary: Get job events
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Events, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /jobs/{id}/cancel:
+    post:
+      operationId: jobsCancel
+      summary: Cancel a job
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody: { required: false, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200": { description: Cancelled, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
 components:
   securitySchemes:
     BearerAuth: { type: http, scheme: bearer }
@@ -271,6 +330,94 @@ components:
         path: { type: string }
         github: {}
         rate_limit: { type: object, additionalProperties: true }
+    RepoEditOperation:
+      type: object
+      required: [type, anchor, content]
+      properties:
+        type:
+          type: string
+          enum: [insert_after, insert_before, replace_exact]
+          description: Operation type
+        anchor:
+          type: string
+          description: Unique string in the file to anchor the operation. Must appear exactly once.
+        content:
+          type: string
+          description: Content to insert or replacement text
+    RepoEditRequest:
+      type: object
+      required: [path, operations]
+      properties:
+        path: { type: string, description: Repository file path to edit }
+        dry_run: { type: boolean, default: true, description: If true, returns diff without committing }
+        confirm: { type: boolean, description: Required (true) for committed writes }
+        message: { type: string, description: Optional commit message }
+        operations:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/RepoEditOperation" }
+    RepoEditResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        dry_run: { type: boolean }
+        path: { type: string }
+        diff_id: { type: string }
+        diff: { type: string }
+        operations_applied: { type: integer }
+        committed: { type: boolean }
+        commit_sha: { type: string }
+        url: { type: string }
+    BuildRequest:
+      type: object
+      required: [goal]
+      properties:
+        goal:
+          type: string
+          description: High-level build intent. Currently supported: "deploy broker"
+          example: deploy broker
+    BuildResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        build_id: { type: string }
+        job_id: { type: string }
+        goal: { type: string }
+        status: { type: string }
+        state: { type: string }
+        stages:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              status: { type: string, enum: [pending, running, completed, failed, not_applicable] }
+        job: { type: object, additionalProperties: true }
+        events: { type: array, items: { type: object } }
+        verification:
+          type: object
+          properties:
+            ok: { type: boolean }
+            status: { type: integer }
+            broker: { type: string }
+            timestamp: { type: string }
+    JobCreateRequest:
+      type: object
+      required: [type, target, input]
+      properties:
+        type: { type: string, enum: [deploy] }
+        target:
+          type: object
+          properties:
+            surface: { type: string, enum: [broker] }
+            name: { type: string }
+            ref: { type: string }
+        input:
+          type: object
+          properties:
+            workflow: { type: string }
+            confirm: { type: string }
+        idempotency_key: { type: string }
     ChatRequest:
       type: object
       required: [message]
