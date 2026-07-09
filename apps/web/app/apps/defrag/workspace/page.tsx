@@ -3,6 +3,7 @@ import * as React from "react"
 import { SpaceShell } from "@/components/spaces/space-shell"
 import { InviteModal } from "@/components/spaces/InviteModal"
 import { ResultCard } from "@/components/spaces/ResultCard"
+import { PanelHeader, EvidenceChip, PremiumEmptyState, PremiumLoadingState, PremiumErrorState } from "@/components/spaces/WorkspaceStates"
 import Link from "next/link"
 
 interface Baseline {
@@ -48,19 +49,10 @@ interface LibraryItem {
 
 function formatBirthSummary(b: Baseline): string {
   const city = b.pob.split(",")[0].trim()
-  return `${b.dob} · ${b.tob.value} · ${city}`
+  return `${b.dob} Â· ${b.tob.value} Â· ${city}`
 }
 
-function EvidenceChip({ label }: { label: string }) {
-  return (
-    <span
-      className="font-mono text-[8px] tracking-[0.1em] px-2 py-0.5 border border-[#e0743a]/20 text-[#e0743a]/60 bg-[#e0743a]/[0.04]"
-      style={{ borderRadius: "var(--radius-minimal)" }}
-    >
-      {label}
-    </span>
-  )
-}
+// EvidenceChip is now imported from WorkspaceStates
 
 export default function DefragWorkspacePage() {
   const [input, setInput] = React.useState("")
@@ -319,7 +311,7 @@ export default function DefragWorkspacePage() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          title: input.slice(0, 60) + (input.length > 60 ? "…" : ""),
+          title: input.slice(0, 60) + (input.length > 60 ? "â¦" : ""),
           content,
           payload: result,
           workspace_source: "DEFRAG",
@@ -401,7 +393,7 @@ export default function DefragWorkspacePage() {
               <div className="flex items-center gap-1.5">
                 {datasetStatus === "ready" && <span className="w-1.5 h-1.5 rounded-full bg-[#e0743a]/50" />}
                 {datasetStatus === "pending" && <span className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />}
-                <p className="text-[10px] text-[#4f4b47]">{datasetStatus === "ready" ? "Understanding model active." : datasetStatus === "pending" ? "Compiling…" : "Active in every result."}</p>
+                <p className="text-[10px] text-[#4f4b47]">{datasetStatus === "ready" ? "Understanding model active." : datasetStatus === "pending" ? "Compilingâ¦" : "Active in every result."}</p>
               </div>
               <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.1em] text-[#76716b] hover:text-[#a8a29a] transition-colors">Edit</a>
             </div>
@@ -410,7 +402,7 @@ export default function DefragWorkspacePage() {
           <div className="border border-white/[0.08] bg-white/[0.02] p-4" style={{ borderRadius: "var(--radius-container)" }}>
             <p className="text-[12px] text-[#a8a29a] mb-1">Baseline required</p>
             <p className="text-[12px] text-[#76716b] leading-relaxed mb-3">Add your date, time, and place of birth to begin. This private layer grounds every result.</p>
-            <a href="/settings" className="inline-flex h-8 px-4 bg-[#f4efe9] text-[#08070a] text-[11px] font-medium items-center hover:opacity-90 transition-opacity" style={{ borderRadius: "var(--radius-button)" }}>Add birth data →</a>
+            <a href="/settings" className="inline-flex h-8 px-4 bg-[#f4efe9] text-[#08070a] text-[11px] font-medium items-center hover:opacity-90 transition-opacity" style={{ borderRadius: "var(--radius-button)" }}>Add birth data â</a>
           </div>
         )}
       </div>
@@ -423,7 +415,7 @@ export default function DefragWorkspacePage() {
           {recurringPattern ? (
             <div>
               <p className="text-[11px] text-[#76716b] leading-relaxed mb-1">This pattern keeps appearing:</p>
-              <p className="text-[11px] text-[#c8c2bc] leading-relaxed italic">"{recurringPattern.length > 80 ? recurringPattern.slice(0, 80) + "…" : recurringPattern}"</p>
+              <p className="text-[11px] text-[#c8c2bc] leading-relaxed italic">"{recurringPattern.length > 80 ? recurringPattern.slice(0, 80) + "â¦" : recurringPattern}"</p>
             </div>
           ) : result?.sourcesUsed?.history ? (
             <p className="text-[11px] text-[#76716b] leading-relaxed">Past patterns were used in this result.</p>
@@ -433,7 +425,7 @@ export default function DefragWorkspacePage() {
         </div>
       )}
       <div className="px-5 pt-4">
-        <Link href="/apps/defrag" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors">← Back to Defrag</Link>
+        <Link href="/apps/defrag" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47] hover:text-[#76716b] transition-colors">â Back to Defrag</Link>
       </div>
     </div>
   )
@@ -449,8 +441,8 @@ export default function DefragWorkspacePage() {
           <div className="border border-white/[0.07] bg-white/[0.02] overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}>
             {!audioUrl ? (
               <button onClick={handleGenerateAudio} disabled={isGeneratingAudio} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/[0.03] transition-colors disabled:opacity-40">
-                <div className="w-5 h-5 border border-white/[0.12] flex items-center justify-center shrink-0 text-[#a8a29a] text-[9px]" style={{ borderRadius: "50%" }}>▶</div>
-                <span className="text-[12px] text-[#a8a29a]">{isGeneratingAudio ? "Generating…" : "Generate audio overview"}</span>
+                <div className="w-5 h-5 border border-white/[0.12] flex items-center justify-center shrink-0 text-[#a8a29a] text-[9px]" style={{ borderRadius: "50%" }}>â¶</div>
+                <span className="text-[12px] text-[#a8a29a]">{isGeneratingAudio ? "Generatingâ¦" : "Generate audio overview"}</span>
               </button>
             ) : (
               <audio ref={audioRef} src={audioUrl} controls preload="auto" className="w-full h-9 outline-none block" style={{ opacity: 0.75 }} />
@@ -487,8 +479,8 @@ export default function DefragWorkspacePage() {
       <div className="h-11 px-6 flex items-center justify-between border-b border-white/[0.06] shrink-0">
         <div className="flex items-center gap-3">
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#f4efe9]">Defrag</span>
-          <span className="text-[#4f4b47] text-[10px]">·</span>
-          <span className="text-[11px] text-[#4f4b47]">Experience → Understanding → Clean move</span>
+          <span className="text-[#4f4b47] text-[10px]">Â·</span>
+          <span className="text-[11px] text-[#4f4b47]">Experience â Understanding â Clean move</span>
         </div>
         {result?.sourcesUsed && (
           <div className="flex items-center gap-1.5">
@@ -503,7 +495,7 @@ export default function DefragWorkspacePage() {
           <div className="flex flex-col items-center justify-center text-center h-full gap-4 px-6">
             <p className="text-[15px] text-[#f4efe9] leading-snug">Set your Baseline first.</p>
             <p className="text-[13px] text-[#76716b] leading-relaxed max-w-xs">Your Baseline is the private model that gives every result context.</p>
-            <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>Set Baseline →</a>
+            <a href="/settings" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>Set Baseline â</a>
           </div>
         )}
         {baseline && !result && !isLoading && !error && (
@@ -526,7 +518,7 @@ export default function DefragWorkspacePage() {
           ) : (
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <span className="w-5 h-5 border border-white/[0.15] border-t-[#e0743a]/40 rounded-full animate-spin" />
-              <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Separating the moment from the pattern…</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#4f4b47]">Separating the moment from the patternâ¦</p>
             </div>
           )
         )}
@@ -535,7 +527,7 @@ export default function DefragWorkspacePage() {
             <p className="text-[13px] text-[#a8a29a] leading-relaxed max-w-sm">
               {error.includes("daily limit") ? "You've reached your daily limit. Upgrade to Pro for unlimited sessions." : error.includes("connect") ? "Connection issue. Check your network and try again." : error || "Something went wrong. Try again."}
             </p>
-            {error.includes("daily limit") && <a href="/pricing" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>See Pro plans →</a>}
+            {error.includes("daily limit") && <a href="/pricing" className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors border border-white/[0.08] px-4 py-2 hover:border-white/[0.16]" style={{ borderRadius: "var(--radius-button)" }}>See Pro plans â</a>}
           </div>
         )}
         {result && (
@@ -543,8 +535,8 @@ export default function DefragWorkspacePage() {
             <ResultCard result={result} input={input} spaceName="Defrag" onSave={handleSave} isSaving={isSaving} saveSuccess={saveSuccess} onInvite={() => setInviteOpen(true)} onStepDeeper={handleStepDeeper} />
             {result && !((result as { flow?: { nextSpace?: string } }).flow?.nextSpace) && result.alignment && (
               <div className="mt-4 border border-white/[0.05] bg-white/[0.01] px-5 py-3 flex items-center justify-between gap-4" style={{ borderRadius: "var(--radius-container)" }}>
-                <p className="text-[12px] text-[#4f4b47] leading-snug">Take this to Alignment — understand what happens between you.</p>
-                <a href={`/apps/alignment/workspace?prompt=${encodeURIComponent(result.alignment || "")}`} className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors whitespace-nowrap shrink-0">Alignment →</a>
+                <p className="text-[12px] text-[#4f4b47] leading-snug">Take this to Alignment â understand what happens between you.</p>
+                <a href={`/apps/alignment/workspace?prompt=${encodeURIComponent(result.alignment || "")}`} className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors whitespace-nowrap shrink-0">Alignment â</a>
               </div>
             )}
           </>
@@ -570,13 +562,13 @@ export default function DefragWorkspacePage() {
           />
           <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
             <div className="flex items-center gap-3">
-              <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">Enter to run · Shift+Enter for new line</span>
+              <span className="font-mono text-[9px] text-[#4f4b47] tracking-[0.1em] uppercase">Enter to run Â· Shift+Enter for new line</span>
               {result?.sourcesUsed?.invitedUsers === false && (
                 <button type="button" onClick={() => { setCompareMode(m => !m); if (!compareMode) setMessageMode(false) }} className={`font-mono text-[8px] uppercase tracking-[0.1em] transition-colors ${compareMode ? "text-[#e0743a]/70" : "text-[#4f4b47] hover:text-[#76716b]"}`}>{compareMode ? "Solo mode" : "+ Relationship"}</button>
               )}
               <button type="button" onClick={() => { setMessageMode(m => !m); setCompareMode(false) }} className={`font-mono text-[8px] uppercase tracking-[0.1em] transition-colors ${messageMode ? "text-[#e0743a]/70" : "text-[#4f4b47] hover:text-[#76716b]"}`}>{messageMode ? "Clear" : "Read a message"}</button>
             </div>
-            <button onClick={handleSubmit} disabled={!input.trim() || isLoading} className="h-8 px-5 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed" style={{ borderRadius: "var(--radius-button)" }}>{isLoading ? "…" : "Understand"}</button>
+            <button onClick={handleSubmit} disabled={!input.trim() || isLoading} className="h-8 px-5 bg-[#f4efe9] text-[#08070a] text-[12px] font-medium hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed" style={{ borderRadius: "var(--radius-button)" }}>{isLoading ? "â¦" : "Understand"}</button>
           </div>
         </div>
       </div>
