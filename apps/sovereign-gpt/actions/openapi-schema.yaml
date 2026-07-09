@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Sovereign Dev API
   description: Production-safe build agent for SOVV / Sovereign.os / defrag.app.
-  version: 2.7.0
+  version: 2.8.0
 servers:
   - url: https://sovereign-broker.defrag.app
 paths:
@@ -493,6 +493,10 @@ components:
     ProposePRRequest:
       type: object
       required: [files, title]
+      description: >
+        Commit or PR file changes. For EXISTING files, provide operations[] (anchor-based patch via /repo/edit).
+        Raw content is only accepted for NEW files that do not yet exist in the repo.
+        Attempting to supply content for an existing file returns HTTP 409 with a redirect hint.
       properties:
         title: { type: string }
         body: { type: string }
@@ -501,10 +505,20 @@ components:
           type: array
           items:
             type: object
-            required: [path, content]
+            required: [path]
             properties:
-              path: { type: string }
-              content: { type: string }
-              sha: { type: string }
+              path: { type: string, description: Repository file path }
+              content:
+                type: string
+                description: >
+                  Raw file content. Only accepted for NEW files (path does not exist on main).
+                  For existing files, use operations[] instead.
+              operations:
+                type: array
+                description: >
+                  Anchor-based edit operations for EXISTING files. Routed through /repo/edit internally.
+                  Use this instead of content for any file that already exists in the repo.
+                items: { $ref: "#/components/schemas/RepoEditOperation" }
+              sha: { type: string, description: Optional SHA hint for conflict detection }
 security:
   - BearerAuth: []
