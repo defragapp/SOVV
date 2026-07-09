@@ -1,882 +1,258 @@
 openapi: 3.1.0
 info:
   title: Sovereign Dev API
-  description: |
-    Production-safe build agent for the SOVV / Sovereign.os / defrag.app platform.
-    
-    SAFETY MODEL:
-    - GET endpoints and AI inference are always read-only.
-    - Write/deploy/billing endpoints require `confirm: true` AND operator feature flags
-      enabled in the Cloudflare dashboard (AGENT_WRITE_ENABLED, AGENT_DEPLOY_ENABLED, etc.)
-    - Direct commits to main are permanently blocked. All writes go to agent/<timestamp> branch + PR.
-    - Secrets/credential files are hard-blocked by path denylist regardless of flags.
-  version: 2.1.0
+  description: Production-safe build agent for SOVV / Sovereign.os / defrag.app.
+  version: 2.2.0
 servers:
   - url: https://sovereign-broker.defrag.app
-    description: Sovereign GPT Broker (Cloudflare Worker)
-
 paths:
-
-  # ── Health ──────────────────────────────────────────────────────────────────
   /health:
     get:
       operationId: healthCheck
-      summary: Check broker health and current safety flag status
+      summary: Broker health and safety flags
       responses:
-        "200":
-          description: Service status + safety flags
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HealthResponse"
-
-  # ── Repo (read-only) ─────────────────────────────────────────────────────────
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /github/request:
+    post:
+      operationId: githubRequest
+      summary: Execute a repo-scoped GitHub API request through the broker and return the GitHub response
+      description: Uses the broker's stored GitHub token. Paths are scoped to defragapp/SOVV. Mutating methods require confirm=true and write flags.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GithubRequest"
+      responses:
+        "200": { description: GitHub response, content: { application/json: { schema: { $ref: "#/components/schemas/GithubResponse" } } } }
+        "403": { description: Blocked, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /repo/tree:
     get:
       operationId: getRepoTree
-      summary: Get the full file tree of defragapp/SOVV (secrets-filtered)
+      summary: Full repo tree, secrets filtered
       parameters:
-        - name: recursive
-          in: query
-          required: false
-          schema:
-            type: boolean
-            default: true
+        - { name: recursive, in: query, required: false, schema: { type: boolean, default: true } }
       responses:
-        "200":
-          description: File tree
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RepoTreeResponse"
-
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /repo/file:
     get:
       operationId: getRepoFile
-      summary: Read a specific file from the SOVV repo (blocked for secrets/credentials)
+      summary: Read repo file, secrets blocked
       parameters:
-        - name: path
-          in: query
-          required: true
-          schema:
-            type: string
-          description: File path relative to repo root (e.g. apps/worker/src/index.ts)
+        - { name: path, in: query, required: true, schema: { type: string } }
       responses:
-        "200":
-          description: File content
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RepoFileResponse"
-        "403":
-          description: Path blocked by secrets denylist
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BlockedResponse"
-
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /repo/commits:
     get:
       operationId: getRecentCommits
-      summary: Get recent commits on main branch
+      summary: Recent commits on main
       parameters:
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 10
+        - { name: limit, in: query, required: false, schema: { type: integer, default: 10 } }
       responses:
-        "200":
-          description: Recent commits
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CommitsResponse"
-
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /repo/prs:
     get:
       operationId: listPRs
-      summary: List pull requests (open agent branches, merged PRs)
+      summary: List pull requests
       parameters:
-        - name: state
-          in: query
-          required: false
-          schema:
-            type: string
-            enum: [open, closed, all]
-            default: open
+        - { name: state, in: query, required: false, schema: { type: string, enum: [open, closed, all], default: open } }
       responses:
-        "200":
-          description: Pull requests
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PRsResponse"
-
-  # ── AI (read-only inference) ─────────────────────────────────────────────────
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /ai/chat:
     post:
       operationId: aiChat
-      summary: |
-        Chat with the Sovereign Build Agent using Cloudflare AI.
-        Model selection:
-        - "chat"   → @cf/meta/llama-3.3-70b-instruct-fp8-fast (default)
-        - "code"   → @cf/openai/gpt-oss-120b (complex code generation)
-        - "vision" → @cf/meta/llama-3.2-11b-vision-instruct
-        - "fast"   → @cf/meta/llama-3.2-3b-instruct
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ChatRequest"
+      summary: Chat with build agent
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ChatRequest" } } } }
       responses:
-        "200":
-          description: AI response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ChatResponse"
-
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /ai/generate-image:
     post:
       operationId: generateImage
-      summary: Generate a UI mockup or visual asset using Cloudflare AI image models
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ImageGenRequest"
+      summary: Generate image
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ImageGenRequest" } } } }
       responses:
-        "200":
-          description: Generated image URL or base64
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ImageGenResponse"
-
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /ai/analyze-image:
     post:
       operationId: analyzeImage
-      summary: Analyze a screenshot or image using Llama 3.2 Vision
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ImageAnalyzeRequest"
+      summary: Analyze image
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ImageAnalyzeRequest" } } } }
       responses:
-        "200":
-          description: Vision analysis
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ChatResponse"
-
-  # ── Cloudflare (reads) ───────────────────────────────────────────────────────
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /cf/workers:
     get:
       operationId: listWorkers
-      summary: List all deployed Cloudflare Workers
+      summary: List Cloudflare Workers
       responses:
-        "200":
-          description: Worker list
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WorkersListResponse"
-
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /cf/worker/logs:
     get:
       operationId: getWorkerLogs
-      summary: Get recent logs for a specific worker
+      summary: Worker logs
       parameters:
-        - name: worker
-          in: query
-          required: true
-          schema:
-            type: string
+        - { name: worker, in: query, required: true, schema: { type: string } }
       responses:
-        "200":
-          description: Worker logs
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WorkerLogsResponse"
-
-  /cf/kv/get:
-    get:
-      operationId: kvGet
-      summary: Read a value from Cloudflare KV
-      parameters:
-        - name: key
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: KV value
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/KVResponse"
-
-  /cf/d1/query:
-    post:
-      operationId: d1Query
-      summary: Run a read-only SELECT query against the D1 database (SELECT only — writes blocked)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/D1QueryRequest"
-      responses:
-        "200":
-          description: Query results
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/D1QueryResponse"
-        "403":
-          description: Non-SELECT query blocked
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BlockedResponse"
-
-  /cf/r2/list:
-    get:
-      operationId: r2List
-      summary: List objects in an R2 bucket
-      parameters:
-        - name: bucket
-          in: query
-          required: false
-          schema:
-            type: string
-            enum: [vibesdk-templates, sovereign-logs]
-            default: vibesdk-templates
-        - name: prefix
-          in: query
-          required: false
-          schema:
-            type: string
-      responses:
-        "200":
-          description: R2 object list
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/R2ListResponse"
-
-  /cf/pages/deployments:
-    get:
-      operationId: getPagesDeployments
-      summary: Get recent Cloudflare Pages deployments
-      parameters:
-        - name: project
-          in: query
-          required: false
-          schema:
-            type: string
-            default: sovv-web
-      responses:
-        "200":
-          description: Pages deployments
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PagesDeploymentsResponse"
-
-  # ── Stripe (reads) ───────────────────────────────────────────────────────────
-  /stripe/overview:
-    get:
-      operationId: stripeOverview
-      summary: Get Stripe account overview — MRR, active subscribers, recent charges
-      responses:
-        "200":
-          description: Stripe overview
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/StripeOverviewResponse"
-
-  /stripe/subscriptions:
-    get:
-      operationId: listSubscriptions
-      summary: List Stripe subscriptions
-      parameters:
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 20
-        - name: status
-          in: query
-          required: false
-          schema:
-            type: string
-            enum: [active, past_due, canceled, trialing, all]
-            default: active
-      responses:
-        "200":
-          description: Subscriptions
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SubscriptionsResponse"
-
-  /stripe/revenue:
-    get:
-      operationId: getRevenue
-      summary: Get revenue metrics for a time period
-      parameters:
-        - name: days
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 30
-      responses:
-        "200":
-          description: Revenue metrics
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RevenueResponse"
-
-  # ── Build intelligence (read-only) ───────────────────────────────────────────
-  /build/scope:
-    get:
-      operationId: getBuildScope
-      summary: AI-powered analysis of what's built, missing, broken, and what to build next
-      responses:
-        "200":
-          description: Build scope analysis
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BuildScopeResponse"
-
-  /build/generate-component:
-    post:
-      operationId: generateComponent
-      summary: |
-        Generate a complete React/TypeScript component. Returns code only — does NOT commit.
-        To commit, use /build/propose-pr with the generated code.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GenerateComponentRequest"
-      responses:
-        "200":
-          description: Generated component code + optional mockup image
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GenerateComponentResponse"
-
-  /build/generate-worker:
-    post:
-      operationId: generateWorker
-      summary: |
-        Generate a Cloudflare Worker. Returns code only — does NOT deploy.
-        To deploy, use /cf/worker/deploy with the generated code and confirm: true.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GenerateWorkerRequest"
-      responses:
-        "200":
-          description: Generated worker code + wrangler.toml
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GenerateWorkerResponse"
-
-  # ── Gated write operations ───────────────────────────────────────────────────
-  /build/propose-pr:
-    post:
-      operationId: proposePR
-      summary: |
-        Commit files to the repository. Default mode commits directly to main.
-        Use mode="pr" only when explicitly requested or for high-risk changes (billing, auth, migrations).
-        Requires: AGENT_WRITE_ENABLED=true
-        
-        mode options:
-        - "direct" (default) — commit straight to main branch, no PR
-        - "pr" — create agent/<timestamp> branch + open PR (use sparingly)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ProposePRRequest"
-      responses:
-        "200":
-          description: Files committed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProposePRResponse"
-        "403":
-          description: Blocked by safety flags
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BlockedResponse"
-
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /cf/worker/deploy:
     post:
       operationId: deployWorker
-      summary: |
-        GATED: Deploy a Cloudflare Worker script.
-        Requires: AGENT_DEPLOY_ENABLED=true + confirm: true
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DeployWorkerRequest"
+      summary: Deploy Cloudflare Worker script through broker
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/DeployWorkerRequest" } } } }
       responses:
-        "200":
-          description: Deploy result
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DeployWorkerResponse"
-        "403":
-          description: Blocked by safety flags or missing confirm
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BlockedResponse"
-
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /cf/kv/get:
+    get:
+      operationId: kvGet
+      summary: Read KV value
+      parameters:
+        - { name: key, in: query, required: true, schema: { type: string } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /cf/kv/set:
     post:
       operationId: kvSet
-      summary: |
-        GATED: Write a value to Cloudflare KV.
-        Requires: AGENT_DESTRUCTIVE_ACTIONS_ENABLED=true + confirm: true
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/KVSetRequest"
+      summary: Write KV value
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/KVSetRequest" } } } }
       responses:
-        "200":
-          description: Write result
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/OkResponse"
-        "403":
-          description: Blocked
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BlockedResponse"
-
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /cf/d1/query:
+    post:
+      operationId: d1Query
+      summary: Run SELECT query against D1
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/D1QueryRequest" } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /cf/r2/list:
+    get:
+      operationId: r2List
+      summary: List R2 objects
+      parameters:
+        - { name: bucket, in: query, required: false, schema: { type: string, enum: [vibesdk-templates, sovereign-logs], default: vibesdk-templates } }
+        - { name: prefix, in: query, required: false, schema: { type: string } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /cf/pages/deployments:
+    get:
+      operationId: getPagesDeployments
+      summary: Cloudflare Pages deployments
+      parameters:
+        - { name: project, in: query, required: false, schema: { type: string, default: sovv-web } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /stripe/overview:
+    get:
+      operationId: stripeOverview
+      summary: Stripe overview
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /stripe/subscriptions:
+    get:
+      operationId: listSubscriptions
+      summary: List subscriptions
+      parameters:
+        - { name: status, in: query, required: false, schema: { type: string, enum: [active, past_due, canceled, trialing, all], default: active } }
+        - { name: limit, in: query, required: false, schema: { type: integer, default: 20 } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /stripe/revenue:
+    get:
+      operationId: getRevenue
+      summary: Revenue metrics
+      parameters:
+        - { name: days, in: query, required: false, schema: { type: integer, default: 30 } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /stripe/create-price:
     post:
       operationId: createPrice
-      summary: |
-        GATED: Create a new Stripe product and price.
-        Requires: AGENT_STRIPE_WRITE_ENABLED=true + confirm: true
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreatePriceRequest"
+      summary: Create Stripe product and price
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreatePriceRequest" } } } }
       responses:
-        "200":
-          description: Created price
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CreatePriceResponse"
-        "403":
-          description: Blocked
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BlockedResponse"
-
-# ── Schemas ──────────────────────────────────────────────────────────────────
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /build/scope:
+    get:
+      operationId: getBuildScope
+      summary: Build scope analysis
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /build/generate-component:
+    post:
+      operationId: generateComponent
+      summary: Generate component code
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/GenerateComponentRequest" } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /build/generate-worker:
+    post:
+      operationId: generateWorker
+      summary: Generate worker code
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/GenerateWorkerRequest" } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /build/propose-pr:
+    post:
+      operationId: proposePR
+      summary: Commit files directly or open PR
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ProposePRRequest" } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
 components:
   securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-
+    BearerAuth: { type: http, scheme: bearer }
   schemas:
-    HealthResponse:
+    AnyResponse:
+      type: object
+      additionalProperties: true
+    GithubRequest:
+      type: object
+      required: [path]
+      properties:
+        method: { type: string, enum: [GET, HEAD, POST, PUT, PATCH, DELETE], default: GET }
+        path: { type: string, description: Repo-scoped GitHub API path, e.g. /contents/README.md or /pulls }
+        headers: { type: object, additionalProperties: { type: string } }
+        body: { description: JSON body to forward to GitHub }
+        confirm: { type: boolean, description: Required for POST/PUT/PATCH/DELETE GitHub requests }
+    GithubResponse:
       type: object
       properties:
         ok: { type: boolean }
-        broker: { type: string }
-        github: { type: string }
-        cloudflare: { type: string }
-        stripe: { type: string }
-        safety_mode:
-          type: object
-          properties:
-            agent_enabled: { type: boolean }
-            write_enabled: { type: boolean }
-            deploy_enabled: { type: boolean }
-            stripe_write: { type: boolean }
-            destructive_enabled: { type: boolean }
-            pr_enabled: { type: boolean }
-        timestamp: { type: string }
-
-    BlockedResponse:
-      type: object
-      properties:
-        ok: { type: boolean, example: false }
-        blocked: { type: boolean, example: true }
-        reason: { type: string }
-        hint: { type: string }
-
-    RepoTreeResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        files: { type: array, items: { type: string } }
-        total: { type: integer }
-
-    RepoFileResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
+        status: { type: integer }
+        status_text: { type: string }
+        method: { type: string }
         path: { type: string }
-        content: { type: string }
-        sha: { type: string }
-        url: { type: string }
-
-    CommitsResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        commits:
-          type: array
-          items:
-            type: object
-            properties:
-              sha: { type: string }
-              message: { type: string }
-              author: { type: string }
-              date: { type: string }
-              url: { type: string }
-
-    PRsResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        pull_requests:
-          type: array
-          items:
-            type: object
-            properties:
-              number: { type: integer }
-              title: { type: string }
-              state: { type: string }
-              branch: { type: string }
-              author: { type: string }
-              created_at: { type: string }
-              url: { type: string }
-
+        github: {}
+        rate_limit: { type: object, additionalProperties: true }
     ChatRequest:
       type: object
       required: [message]
       properties:
         message: { type: string }
-        model:
-          type: string
-          enum: [chat, code, vision, fast]
-          default: chat
+        model: { type: string, enum: [chat, code, vision, fast], default: chat }
         inject_repo_context: { type: boolean, default: true }
         system_override: { type: string }
-        history:
-          type: array
-          items:
-            type: object
-            properties:
-              role: { type: string, enum: [user, assistant] }
-              content: { type: string }
-
-    ChatResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        response: { type: string }
-        model_used: { type: string }
-
+        history: { type: array, items: { type: object, properties: { role: { type: string }, content: { type: string } } } }
     ImageGenRequest:
       type: object
       required: [prompt]
       properties:
         prompt: { type: string }
-        model:
-          type: string
-          enum: [flux-schnell, flux-dev, sdxl, sdxl-lightning]
-          default: flux-schnell
+        model: { type: string, enum: [flux-schnell, flux-dev, sdxl, sdxl-lightning], default: flux-schnell }
         width: { type: integer, default: 1024 }
         height: { type: integer, default: 1024 }
         upload_to_r2: { type: boolean, default: true }
         r2_key: { type: string }
-
-    ImageGenResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        image_url: { type: string }
-        base64: { type: string }
-        model_used: { type: string }
-        r2_key: { type: string }
-
     ImageAnalyzeRequest:
       type: object
       required: [image_url, question]
       properties:
         image_url: { type: string }
         question: { type: string }
-
-    WorkersListResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        workers:
-          type: array
-          items:
-            type: object
-            properties:
-              id: { type: string }
-              etag: { type: string }
-              modified_on: { type: string }
-
-    WorkerLogsResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        worker: { type: string }
-        logs: { type: array, items: { type: object } }
-
-    KVResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        key: { type: string }
-        value: { type: string }
-
     D1QueryRequest:
       type: object
       required: [sql]
       properties:
-        sql: { type: string, description: "SELECT query only" }
+        sql: { type: string }
         params: { type: array, items: {} }
-
-    D1QueryResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        results: { type: array, items: { type: object } }
-        meta: { type: object }
-
-    R2ListResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        bucket: { type: string }
-        objects:
-          type: array
-          items:
-            type: object
-            properties:
-              key: { type: string }
-              size: { type: integer }
-              uploaded: { type: string }
-
-    PagesDeploymentsResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        project: { type: string }
-        deployments:
-          type: array
-          items:
-            type: object
-            properties:
-              id: { type: string }
-              url: { type: string }
-              created_on: { type: string }
-              environment: { type: string }
-              latest_stage: { type: object }
-
-    StripeOverviewResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        active_product: { type: string }
-        active_subscriptions: { type: integer }
-        mrr_cents: { type: integer }
-        arr_cents: { type: integer }
-        recent_charges: { type: array, items: { type: object } }
-
-    SubscriptionsResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        subscriptions:
-          type: array
-          items:
-            type: object
-            properties:
-              id: { type: string }
-              status: { type: string }
-              customer: { type: string }
-              plan: { type: string }
-              amount: { type: integer }
-              created: { type: string }
-
-    RevenueResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        period_days: { type: integer }
-        total_revenue_cents: { type: integer }
-        mrr_cents: { type: integer }
-        arr_cents: { type: integer }
-        charge_count: { type: integer }
-        active_subs: { type: integer }
-
-    BuildScopeResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        summary: { type: string }
-        built: { type: array, items: { type: string } }
-        missing: { type: array, items: { type: string } }
-        broken: { type: array, items: { type: string } }
-        next_priorities:
-          type: array
-          items:
-            type: object
-            properties:
-              priority: { type: integer }
-              task: { type: string }
-              files: { type: array, items: { type: string } }
-              effort: { type: string }
-
-    GenerateComponentRequest:
-      type: object
-      required: [description]
-      properties:
-        description: { type: string }
-        component_name: { type: string }
-        target_path: { type: string, default: "apps/web/components/" }
-        style_context: { type: string }
-        generate_mockup: { type: boolean, default: false }
-
-    GenerateComponentResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        component_name: { type: string }
-        code: { type: string }
-        suggested_path: { type: string }
-        mockup_url: { type: string }
-        committed: { type: boolean, example: false }
-        next_step: { type: string }
-
-    GenerateWorkerRequest:
-      type: object
-      required: [name, description]
-      properties:
-        name: { type: string }
-        description: { type: string }
-        routes: { type: array, items: { type: string } }
-        bindings: { type: array, items: { type: object } }
-
-    GenerateWorkerResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        worker_name: { type: string }
-        code: { type: string }
-        wrangler_toml: { type: string }
-        deployed: { type: boolean, example: false }
-        next_step: { type: string }
-
-    ProposePRRequest:
-      type: object
-      required: [files, title]
-      properties:
-        title: { type: string, description: "Commit message or PR title" }
-        body: { type: string, description: "PR description (only used in pr mode)" }
-        mode:
-          type: string
-          enum: [direct, pr]
-          default: direct
-          description: "direct = commit to main (default). pr = open a pull request branch."
-        files:
-          type: array
-          description: "Files to commit"
-          items:
-            type: object
-            required: [path, content]
-            properties:
-              path: { type: string, description: "File path in repo (e.g. apps/web/components/MyComponent.tsx)" }
-              content: { type: string, description: "Full file content" }
-              sha: { type: string, description: "Existing file SHA (auto-fetched if omitted)" }
-
-    ProposePRResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        mode: { type: string, description: "direct or pr" }
-        branch: { type: string, description: "main (direct) or agent/<timestamp> (pr)" }
-        message: { type: string }
-        pr_number: { type: integer }
-        pr_url: { type: string }
-        commits:
-          type: array
-          items:
-            type: object
-            properties:
-              path: { type: string }
-              sha: { type: string }
-              url: { type: string }
-              ok: { type: boolean }
-              error: { type: string }
-
-    DeployWorkerRequest:
-      type: object
-      required: [name, code, confirm]
-      properties:
-        name: { type: string }
-        code: { type: string }
-        confirm:
-          type: boolean
-          description: "Must be true. Confirms the operator has reviewed the worker code."
-
-    DeployWorkerResponse:
-      type: object
-      properties:
-        ok: { type: boolean }
-        worker_name: { type: string }
-        deployed: { type: boolean }
-
     KVSetRequest:
       type: object
       required: [key, value, confirm]
@@ -884,10 +260,14 @@ components:
         key: { type: string }
         value: { type: string }
         ttl: { type: integer }
-        confirm:
-          type: boolean
-          description: "Must be true."
-
+        confirm: { type: boolean }
+    DeployWorkerRequest:
+      type: object
+      required: [name, code]
+      properties:
+        name: { type: string }
+        code: { type: string }
+        confirm: { type: boolean, description: Optional for this Action bridge; deploy flag still required }
     CreatePriceRequest:
       type: object
       required: [name, amount_cents, interval, confirm]
@@ -896,22 +276,39 @@ components:
         amount_cents: { type: integer }
         interval: { type: string, enum: [month, year, one_time] }
         currency: { type: string, default: usd }
-        confirm:
-          type: boolean
-          description: "Must be true."
-
-    CreatePriceResponse:
+        confirm: { type: boolean }
+    GenerateComponentRequest:
       type: object
+      required: [description]
       properties:
-        ok: { type: boolean }
-        price_id: { type: string }
-        product_id: { type: string }
-
-    OkResponse:
+        description: { type: string }
+        component_name: { type: string }
+        target_path: { type: string }
+        style_context: { type: string }
+        generate_mockup: { type: boolean }
+    GenerateWorkerRequest:
       type: object
+      required: [name, description]
       properties:
-        ok: { type: boolean }
-        message: { type: string }
-
+        name: { type: string }
+        description: { type: string }
+        routes: { type: array, items: { type: string } }
+        bindings: { type: array, items: { type: object } }
+    ProposePRRequest:
+      type: object
+      required: [files, title]
+      properties:
+        title: { type: string }
+        body: { type: string }
+        mode: { type: string, enum: [direct, pr], default: direct }
+        files:
+          type: array
+          items:
+            type: object
+            required: [path, content]
+            properties:
+              path: { type: string }
+              content: { type: string }
+              sha: { type: string }
 security:
   - BearerAuth: []
