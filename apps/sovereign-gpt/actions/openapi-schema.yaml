@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Sovereign Dev API
   description: Production-safe build agent for SOVV / Sovereign.os / defrag.app.
-  version: 2.2.0
+  version: 2.5.0
 servers:
   - url: https://sovereign-broker.defrag.app
 paths:
@@ -12,17 +12,44 @@ paths:
       summary: Broker health and safety flags
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /repo/read-file:
+    post:
+      operationId: repoReadFile
+      summary: Read a repo file by path using a stable broker Action endpoint
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/RepoReadFileRequest" } } } }
+      responses:
+        "200": { description: Repo file content, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /repo/list-files:
+    post:
+      operationId: repoListFiles
+      summary: List repository files using a stable broker Action endpoint
+      requestBody: { required: false, content: { application/json: { schema: { $ref: "#/components/schemas/RepoListFilesRequest" } } } }
+      responses:
+        "200": { description: File list, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /repo/list-commits:
+    post:
+      operationId: repoListCommits
+      summary: List recent repository commits using a stable broker Action endpoint
+      requestBody: { required: false, content: { application/json: { schema: { $ref: "#/components/schemas/RepoListCommitsRequest" } } } }
+      responses:
+        "200": { description: Commit list, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
+  /repo/list-pull-requests:
+    post:
+      operationId: repoListPullRequests
+      summary: List repository pull requests using a stable broker Action endpoint
+      requestBody: { required: false, content: { application/json: { schema: { $ref: "#/components/schemas/RepoListPullRequestsRequest" } } } }
+      responses:
+        "200": { description: Pull request list, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /github/request:
     post:
       operationId: githubRequest
       summary: Execute a repo-scoped GitHub API request through the broker and return the GitHub response
-      description: Uses the broker's stored GitHub token. Paths are scoped to defragapp/SOVV. Mutating methods require confirm=true and write flags.
+      description: Prefer the stable /repo/* endpoints. This raw GitHub passthrough is still available for allowlisted public reads and authenticated writes.
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: "#/components/schemas/GithubRequest"
+            schema: { $ref: "#/components/schemas/GithubRequest" }
       responses:
         "200": { description: GitHub response, content: { application/json: { schema: { $ref: "#/components/schemas/GithubResponse" } } } }
         "403": { description: Blocked, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
@@ -203,6 +230,28 @@ components:
     AnyResponse:
       type: object
       additionalProperties: true
+    RepoReadFileRequest:
+      type: object
+      required: [path]
+      properties:
+        path: { type: string, description: Repository file path, e.g. package.json }
+        ref: { type: string, description: Optional branch, tag, or SHA }
+    RepoListFilesRequest:
+      type: object
+      properties:
+        prefix: { type: string, description: Optional path prefix }
+        ref: { type: string, default: main }
+        recursive: { type: boolean, default: true }
+    RepoListCommitsRequest:
+      type: object
+      properties:
+        limit: { type: integer, default: 10, maximum: 100 }
+        sha: { type: string, default: main }
+    RepoListPullRequestsRequest:
+      type: object
+      properties:
+        state: { type: string, enum: [open, closed, all], default: open }
+        limit: { type: integer, default: 20, maximum: 100 }
     GithubRequest:
       type: object
       required: [path]
