@@ -1,0 +1,79 @@
+name: Sovereign allowlisted command runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: Allowlisted operation to execute
+        required: true
+        type: choice
+        options:
+          - deploy-sovereign-broker
+          - smoke-sovereign-broker
+          - verify-sovereign-broker-config
+      confirm:
+        description: Type RUN to execute the selected operation
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sovereign-command-${{ inputs.command }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    name: Run ${{ inputs.command }}
+    if: ${{ inputs.confirm == 'RUN' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CI: true
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        if: ${{ inputs.command == 'deploy-sovereign-broker' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify sovereign-broker config
+        if: ${{ inputs.command == 'verify-sovereign-broker-config' || inputs.command == 'deploy-sovereign-broker' }}
+        working-directory: apps/sovereign-gpt/broker-worker
+        run: |
+          set -euo pipefail
+          test -f wrangler.toml
+          grep -q 'name = "sovereign-broker"' wrangler.toml
+          grep -q 'binding = "LOGS"' wrangler.toml
+          grep -q 'bucket_name = "sovereign-logs"' wrangler.toml
+          echo "sovereign-broker config verified"
+
+      - name: Deploy sovereign-broker
+        if: ${{ inputs.command == 'deploy-sovereign-broker' }}
+        working-directory: apps/sovereign-gpt/broker-worker
+        run: npx wrangler@latest deploy
+
+      - name: Smoke check sovereign-broker
+        if: ${{ inputs.command == 'smoke-sovereign-broker' || inputs.command == 'deploy-sovereign-broker' }}
+        run: |
+          set -euo pipefail
+          sleep 5
+          STATUS=$(curl -s -o /tmp/broker-health.json -w "%{http_code}" --max-time 10 "https://sovereign-broker.defrag.app/health")
+          cat /tmp/broker-health.json
+          echo
+          echo "Broker health status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            exit 1
+          fi
+
+      - name: Summarize
+        run: |
+          echo "### Sovereign command complete" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Command: ${{ inputs.command }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Confirmed: ${{ inputs.confirm }}" >> "$GITHUB_STEP_SUMMARY"
