@@ -1,4 +1,5 @@
 import { writeAuditLog } from "./utils/audit.js";
+import { resolveEntitlements } from "./entitlements.js";
 // Password hashing - PBKDF2 with SHA-512 via Web Crypto API
 const PBKDF2_ITERATIONS = 100_000
 const SALT_LENGTH = 32
@@ -138,6 +139,8 @@ export type AuthUser = {
   role: string
   stripe_customer_id: string | null | undefined
   subscription_status: string
+  subscription_current_period_end: number | null
+  email_verified: number
 }
 
 export function generatePromoCode(length = 10): string {
@@ -151,7 +154,7 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
   if (!token) return null
 
   const session = await DB.prepare(
-    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
+    "SELECT u.id, u.email, u.tier, u.role, u.stripe_customer_id, COALESCE(u.subscription_status, 'free') as subscription_status, u.subscription_current_period_end, COALESCE(u.email_verified, 0) as email_verified FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > ?"
   )
     .bind(token, Date.now())
     .first<{
@@ -161,6 +164,8 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
       role: string | null
       stripe_customer_id: string | null
       subscription_status: string | null
+      subscription_current_period_end: number | null
+      email_verified: number | null
     }>()
 
   if (!session) return null
@@ -184,6 +189,8 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
     role: session.role || "user",
     stripe_customer_id: session.stripe_customer_id,
     subscription_status: session.subscription_status || "free",
+    subscription_current_period_end: session.subscription_current_period_end,
+    email_verified: session.email_verified ?? 0,
   }
 }
 
@@ -437,10 +444,13 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
+    const entitlements = resolveEntitlements(user)
     return jsonResponse({
       tier: user.tier,
       subscription_status: user.subscription_status,
-      has_active_subscription: user.subscription_status === "active" || user.tier === "pro",
+      has_active_subscription: entitlements.effectiveTier === "pro",
+      is_in_grace_period: entitlements.isInGracePeriod,
+      is_manual_pro: entitlements.isManualPro,
     })
   })
 
@@ -789,7 +799,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
 
-    const isPro = user.tier === "pro" || user.subscription_status === "active"
+    const isPro = resolveEntitlements(user).effectiveTier === "pro"
     if (isPro) {
       const today = new Date().toISOString().slice(0, 10)
       const key = `pro-usage:${user.id}:${today}`
@@ -805,7 +815,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const key = `usage:${sid}:${today}`
     const raw = await env.KV.get(key)
     const used = raw ? parseInt(raw, 10) : 0
-    const baseLimit = parseInt(env.FREE_DAILY_LIMIT || "5", 10)
+    const baseLimit = parseInt(env.FREE_DAILY_LIMIT || "15", 10)
     // Add bonus sessions from referral incentive
     const bonusRaw = await env.KV.get(`bonus_sessions:${user.id}`)
     const bonusSessions = bonusRaw ? parseInt(bonusRaw, 10) : 0
@@ -833,10 +843,10 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const user = await getAuthUser(request, env.DB);
     if (!user || user.role !== "admin") return jsonResponse({ error: "Forbidden" }, 403);
     const [userCount, proCount, sessionCount, libraryCount] = await Promise.all([
-      env.DB.prepare("SELECT COUNT(*) as n FROM users").first<{ n: number }>(),
-      env.DB.prepare("SELECT COUNT(*) as n FROM users WHERE tier = 'pro'").first<{ n: number }>(),
-      env.DB.prepare("SELECT COUNT(*) as n FROM sessions WHERE expires_at > ?").bind(Date.now()).first<{ n: number }>(),
-      env.DB.prepare("SELECT COUNT(*) as n FROM library").first<{ n: number }>().catch(() => ({ n: 0 })),
+      env.DB.prepare("SELECT COUNT(*) as n FROM users").first(),
+      env.DB.prepare("SELECT COUNT(*) as n FROM users WHERE tier = 'pro'").first(),
+      env.DB.prepare("SELECT COUNT(*) as n FROM sessions WHERE expires_at > ?").bind(Date.now()).first(),
+      env.DB.prepare("SELECT COUNT(*) as n FROM library").first().catch(() => ({ n: 0 })),
     ]);
     return jsonResponse({
       users: { total: userCount?.n ?? 0, pro: proCount?.n ?? 0 },
@@ -901,7 +911,7 @@ export function registerAdminSeedRoute(router: any, getEnv: () => any) {
       const password_hash = await hashPassword(password)
       const now = Date.now()
       const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?")
-        .bind(normalizedEmail).first<{ id: string }>()
+        .bind(normalizedEmail).first() as { id: string } | null
       if (existing) {
         await env.DB.prepare("UPDATE users SET password_hash = ?, role = 'owner' WHERE id = ?")
           .bind(password_hash, existing.id).run()
