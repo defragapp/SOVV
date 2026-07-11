@@ -14,6 +14,7 @@ import { getPatterns, formatPatternsForPrompt, insertInteraction } from "./db.js
 import { extractPatterns } from "./patterns.js";
 
 import { requireActiveSubscription } from "./billing.js";
+import { resolveEntitlements } from "./entitlements.js";
 import {
   selectActiveSignals,
   buildBaselineSignature,
@@ -156,7 +157,7 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   const sid = await getSessionId(req);
 
   // Free tier daily usage limit check
-  const isPro = user.subscription_status === "active" || user.tier === "pro";
+  const isPro = resolveEntitlements(user).effectiveTier === "pro";
   if (!isPro) {
     const limit = await checkFreeLimit(env, sid);
     if (!limit.allowed) {
@@ -194,14 +195,6 @@ export async function handleExplain(req: Request, env: Env): Promise<Response> {
   if (relational) {
     const subGate = await requireActiveSubscription(user, req);
     if (subGate) return subGate;
-  }
-
-  if (relational && user.tier === "free") {
-    return jsonResponse(
-      { error: "Relational analysis requires Pro" },
-      403,
-      { ...getCorsHeaders(req), "set-cookie": cookieHeader(sid) }
-    );
   }
 
   const baseline = await getBaseline(env, sid);
