@@ -21,7 +21,7 @@ const FAQS = [
   },
   {
     q: "What's included in the free plan?",
-    a: "The free plan includes full access to the Defrag space — 5 sessions per day, pattern recognition, Best Next Response, and your Baseline Design. Covenant, Alignment, your Library, Audio Overview, and Invite Privately require Pro.",
+    a: "The free plan includes full access to the Defrag space — 15 sessions per day, pattern recognition, Best Next Response, and your Baseline Design. Covenant, Alignment, your Library, Audio Overview, and Invite Privately require Pro.",
   },
   {
     q: "What does Pro include?",
