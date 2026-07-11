@@ -19,7 +19,7 @@
 
 import type { IRequest } from "itty-router"
 import { getAuthUser, jsonResponse } from "./auth.js"
-import { logSafetyEvent } from "./safety.js"
+import { logSafetyEvent, protectionActive } from "./safety.js"
 import {
   evaluateInputClassification,
   getColdStartMarker,
@@ -63,6 +63,7 @@ export async function handleDeriveProfile(
   request: IRequest,
   env: Env
 ): Promise<Response> {
+  const httpRequest = request as unknown as Request
   const requestId = crypto.randomUUID()
   const endpoint = "/api/derive-profile"
   const startedAt = Date.now()
