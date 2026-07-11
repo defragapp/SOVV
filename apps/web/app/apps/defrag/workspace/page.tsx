@@ -51,7 +51,7 @@ interface LibraryItem {
 
 function formatBirthSummary(b: Baseline): string {
   const city = b.pob.split(",")[0].trim()
-  return `${b.dob} Â· ${b.tob.value} Â· ${city}`
+  return `${b.dob} · ${b.tob.value} · ${city}`
 }
 
 // EvidenceChip is now imported from WorkspaceStates
@@ -313,7 +313,7 @@ export default function DefragWorkspacePage() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          title: input.slice(0, 60) + (input.length > 60 ? "â¦" : ""),
+          title: input.slice(0, 60) + (input.length > 60 ? "…" : ""),
           content,
           payload: result,
           workspace_source: "DEFRAG",
@@ -381,8 +381,8 @@ export default function DefragWorkspacePage() {
           <div className="border border-white/[0.07] bg-white/[0.02] overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}>
             {!audioUrl ? (
               <button onClick={handleGenerateAudio} disabled={isGeneratingAudio} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/[0.03] transition-colors disabled:opacity-40">
-                <div className="w-5 h-5 border border-white/[0.12] flex items-center justify-center shrink-0 text-[#a8a29a] text-[9px]" style={{ borderRadius: "50%" }}>â¶</div>
-                <span className="text-[12px] text-[#a8a29a]">{isGeneratingAudio ? "Generatingâ¦" : "Generate audio overview"}</span>
+                <div className="w-5 h-5 border border-white/[0.12] flex items-center justify-center shrink-0 text-[#a8a29a] text-[9px]" style={{ borderRadius: "50%" }}>▶</div>
+                <span className="text-[12px] text-[#a8a29a]">{isGeneratingAudio ? "Generating…" : "Generate audio overview"}</span>
               </button>
             ) : (
               <audio ref={audioRef} src={audioUrl} controls preload="auto" className="w-full h-9 outline-none block" style={{ opacity: 0.75 }} />
@@ -473,8 +473,8 @@ export default function DefragWorkspacePage() {
             <ResultCard result={result} input={input} spaceName="Defrag" onSave={handleSave} isSaving={isSaving} saveSuccess={saveSuccess} onInvite={() => setInviteOpen(true)} onStepDeeper={handleStepDeeper} />
             {result && !((result as { flow?: { nextSpace?: string } }).flow?.nextSpace) && result.alignment && (
               <div className="mt-4 border border-white/[0.05] bg-white/[0.01] px-5 py-3 flex items-center justify-between gap-4" style={{ borderRadius: "var(--radius-container)" }}>
-                <p className="text-[12px] text-[#4f4b47] leading-snug">Take this to Alignment â understand what happens between you.</p>
-                <a href={`/apps/alignment/workspace?prompt=${encodeURIComponent(result.alignment || "")}`} className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors whitespace-nowrap shrink-0">Alignment â</a>
+                <p className="text-[12px] text-[#4f4b47] leading-snug">Take this to Alignment — understand what happens between you.</p>
+                <a href={`/apps/alignment/workspace?prompt=${encodeURIComponent(result.alignment || "")}`} className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#76716b] hover:text-[#f4efe9] transition-colors whitespace-nowrap shrink-0">Alignment →</a>
               </div>
             )}
           </>
