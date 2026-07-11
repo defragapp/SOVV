@@ -316,7 +316,7 @@ export default function LoginScreen() {
 
             <p className="mt-6 text-center text-sm text-[#76716b] leading-relaxed">
               {mode === "register"
-                ? "Free tier · 5 sessions per day · Your Baseline Design stays private."
+                ? "Free tier · 15 sessions per day · Your Baseline Design stays private."
                 : "Your Baseline Design and Library are waiting."}
             </p>
 
