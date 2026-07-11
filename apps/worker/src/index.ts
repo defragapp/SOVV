@@ -17,7 +17,8 @@ import { registerInviteRoutes } from "./invite.js";
 import { registerAuthExtendedRoutes } from "./routes/auth-extended.js";
 import { registerInviteSystemRoutes } from "./routes/invite.js";
 import { sendDay3NurtureEmail, sendDay7NurtureEmail } from "./email.js";
-// ââ New feature routes ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+import { resolveEntitlements } from "./entitlements.js";
+// New feature routes
 import { registerReferralRoutes } from "./referral.js";
 import { registerDefragMessageRoute } from "./defrag-message.js";
 import { registerDefragMultiRoute } from "./defrag-multi.js";
@@ -159,7 +160,7 @@ registerAlignmentRoute(router, getEnv);
 registerAudioRoute(router, getEnv);
 registerDeriveProfileRoutes(router, getEnv);
 registerInviteRoutes(router, getEnv);
-// ââ New feature routes ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// New feature routes
 registerReferralRoutes(router, getEnv);
 registerDefragMessageRoute(router, getEnv);
 registerDefragMultiRoute(router, getEnv);
@@ -171,7 +172,7 @@ registerAdminCohortsRoute(router, getEnv);
 registerAdminRevenueRoute(router, getEnv);
 
 
-// Memory context endpoint â pattern history for UI
+// Memory context endpoint — pattern history for UI
 router.get("/api/memory", async (request: Request) => {
   const env = getEnv();
   const user = await getAuthUser(request, env.DB);
@@ -240,7 +241,7 @@ router.get("/api/stripe/prices", async (request: Request) => {
   }
 });
 
-// Root route â deployment validation
+// Root route — deployment validation
 router.get('/', () => {
   return new Response(JSON.stringify({
     service: 'sovereign-os-api',
@@ -257,7 +258,7 @@ router.get('/health', () => {
   }), { headers: { 'Content-Type': 'application/json' } });
 });
 
-// Detailed health check â checks all subsystems
+// Detailed health check — checks all subsystems
 router.get('/health/detailed', async (req: Request) => {
   const env = getEnv();
   const checks: Record<string, boolean | string> = {};
@@ -314,9 +315,9 @@ async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: stri
       <p>Thanks for reaching out. Your message has been logged as <strong>${ticket.id}</strong>.</p>
       <p>We'll get back to you as soon as possible.</p>
       <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0">
-      <p style="color:#9ca3af;font-size:13px">Sovereign â defrag.app</p>
+      <p style="color:#9ca3af;font-size:13px">Sovereign — defrag.app</p>
     </div>`;
-    const text = `Thanks for reaching out. Your message has been logged as ${ticket.id}. We'll get back to you as soon as possible.\n\nâ Sovereign (defrag.app)`;
+    const text = `Thanks for reaching out. Your message has been logged as ${ticket.id}. We'll get back to you as soon as possible.\n\n— Sovereign (defrag.app)`;
     await env.EMAIL.send({
       to: ticket.sender,
       from: { email: "noreply@defrag.app", name: "Sovereign" },
@@ -330,7 +331,7 @@ async function sendSupportAutoReply(env: Env, ticket: { id: string; sender: stri
   }
 }
 
-// GET /api/user/me â current authenticated user info
+// GET /api/user/me — current authenticated user info
 router.get("/api/user/me", async (request: Request) => {
   const env = getEnv();
   const user = await getAuthUser(request, env.DB);
@@ -345,7 +346,7 @@ router.get("/api/user/me", async (request: Request) => {
   }), { status: 200, headers: { "Content-Type": "application/json", ...getCorsHeaders(request) } });
 });
 
-// GET /api/user/usage â session usage for current user (free tier counter)
+// GET /api/user/usage — session usage for current user (free tier counter)
 router.get("/api/user/usage", async (request: Request) => {
   const env = getEnv();
   const user = await getAuthUser(request, env.DB);
@@ -358,7 +359,7 @@ router.get("/api/user/usage", async (request: Request) => {
   const usageKey = `usage:${user.id}:${today}`;
   const usedStr = await env.KV.get(usageKey);
   const used = usedStr ? parseInt(usedStr, 10) : 0;
-  const isPro = user.tier === "pro" || user.subscription_status === "active";
+  const isPro = resolveEntitlements(user).effectiveTier === "pro";
 
   return new Response(JSON.stringify({
     used,
@@ -503,7 +504,7 @@ export default {
   },
 
   async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
-    // Daily nurture email cron â runs at 10am UTC
+    // Daily nurture email cron — runs at 10am UTC
     const emailOpts = {
       emailBinding: (env as any).EMAIL as any,
       resendApiKey: env.RESEND_API_KEY,
@@ -514,7 +515,7 @@ export default {
     const now = Date.now();
     const DAY = 86_400_000;
 
-    // Find free users who registered 3 days ago (Â±12h window)
+    // Find free users who registered 3 days ago (±12h window)
     const day3Min = now - 3 * DAY - 12 * 3_600_000;
     const day3Max = now - 3 * DAY + 12 * 3_600_000;
     const day3Users = await env.DB.prepare(
@@ -529,7 +530,7 @@ export default {
       await env.KV.put(`nurture:day3:${user.id}`, "1", { expirationTtl: 60 * 60 * 24 * 30 });
     }
 
-    // Find free users who registered 7 days ago (Â±12h window)
+    // Find free users who registered 7 days ago (±12h window)
     const day7Min = now - 7 * DAY - 12 * 3_600_000;
     const day7Max = now - 7 * DAY + 12 * 3_600_000;
     const day7Users = await env.DB.prepare(
@@ -543,7 +544,7 @@ export default {
       await env.KV.put(`nurture:day7:${user.id}`, "1", { expirationTtl: 60 * 60 * 24 * 30 });
     }
 
-    // Session cleanup â delete expired sessions from D1
+    // Session cleanup — delete expired sessions from D1
     try {
       const result = await env.DB.prepare(
         "DELETE FROM sessions WHERE expires_at < ?"
@@ -555,7 +556,7 @@ export default {
       console.error("[cron] Session cleanup failed:", err);
     }
 
-    // D1 backup â export user count snapshot to R2 (lightweight daily audit)
+    // D1 backup — export user count snapshot to R2 (lightweight daily audit)
     try {
       if (env.TEMPLATES) {
         const now = new Date().toISOString().slice(0, 10);
