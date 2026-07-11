@@ -10,7 +10,7 @@ import { FaqAccordion } from "@/components/marketing/faq-accordion"
 const PRICING_FAQ = [
   {
     q: "Is Defrag really free forever?",
-    a: "Yes. Defrag — the core pattern recognition space — is free with no time limit. You get 5 sessions per day, full Baseline Design integration, and Best Next Response. No credit card required.",
+    a: "Yes. Defrag — the core pattern recognition space — is free with no time limit. You get 15 sessions per day, full Baseline Design integration, and Best Next Response. No credit card required.",
   },
   {
     q: "What happens after the 7-day free trial?",
@@ -60,7 +60,7 @@ function MetaLabel({ children }: { children: React.ReactNode }) {
 const FREE_FEATURES = [
   "Baseline Design",
   "Defrag space — full access",
-  "5 sessions per day",
+  "15 sessions per day",
   "Pattern recognition output",
   "Best Next Response",
 ]
@@ -81,7 +81,7 @@ const COMPARISON = [
   { feature: "Defrag space", free: true, pro: true },
   { feature: "Pattern recognition", free: true, pro: true },
   { feature: "Best Next Response", free: true, pro: true },
-  { feature: "5 sessions / day", free: true, pro: false },
+  { feature: "15 sessions / day", free: true, pro: false },
   { feature: "Unlimited sessions", free: false, pro: true },
   { feature: "Covenant space", free: false, pro: true },
   { feature: "Alignment space", free: false, pro: true },
