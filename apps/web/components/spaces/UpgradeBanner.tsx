@@ -93,7 +93,7 @@ export default function UpgradeBanner() {
           className="w-full h-11 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-opacity duration-200 hover:opacity-90 active:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed mb-4"
           style={{ borderRadius: "var(--radius-button)" }}
         >
-          {loading ? "···" : "Upgrade to Pro — $12/mo"}
+          {loading ? "···" : "Upgrade to Pro — $20/mo"}
         </button>
 
         {/* Promo code */}
