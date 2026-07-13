@@ -169,9 +169,7 @@ export default function CovenantWorkspacePage() {
   // ─── LEFT PANEL ────────────────────────────────────────────────────────────
   const sidebar = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-      <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Context</p>
-      </div>
+      <PanelHeader label="Context" />
       <div className="px-5 pt-6 pb-5">
         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/50 mb-3">How this works</p>
         <p className="text-[12px] text-[#4f4b47] leading-relaxed mb-5">
@@ -207,9 +205,7 @@ export default function CovenantWorkspacePage() {
   // ─── RIGHT PANEL ───────────────────────────────────────────────────────────
   const contextPanel = (
     <div className="flex flex-col h-full overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-      <div className="px-5 h-11 flex items-center border-b border-white/[0.06] shrink-0">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8a29a]">Library</p>
-      </div>
+      <PanelHeader label="Library" />
 
       {result && (
         <div className="px-5 pt-5 pb-5 border-b border-white/[0.06]">
@@ -277,9 +273,7 @@ export default function CovenantWorkspacePage() {
   // ─── CENTER PANEL ──────────────────────────────────────────────────────────
   const main = (
     <div className="flex flex-col h-full">
-      <div className="h-11 px-6 flex items-center border-b border-white/[0.06] shrink-0">
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#f4efe9]">Covenant</span>
-      </div>
+      <PanelHeader label="Covenant" />
 
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" style={{ scrollbarWidth: "none" }}>
 
