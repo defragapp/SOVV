@@ -3,7 +3,7 @@ set -euo pipefail
 
 echo "Executing strict OpenNext deployment for SOVV Web..."
 
-echo "Target Worker: sovv-web-production"
+echo "Target Worker: sovv-web"
 echo "Expected production domains: defrag.app, www.defrag.app, app.defrag.app, sovereign.defrag.app"
 echo "API domain must remain on the separate sovereign-os-api Worker: api.defrag.app"
 
