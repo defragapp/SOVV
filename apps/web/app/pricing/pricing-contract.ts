@@ -6,6 +6,8 @@ export const LAUNCH_PRICING = {
   annualPlan: "annual",
   monthlyStripePriceId: "price_1Te0g9Bk78yJ8Hww8fFZCqhm",
   annualStripePriceId: "price_1Tq6nPBk78yJ8Hwwm0pxg4hH",
+  stripeProductId: "prod_UdHEFXmi3YN78U",
+  trialDays: 0,
 } as const
 
 export const FREE_FEATURES = [
