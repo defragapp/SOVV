@@ -58,6 +58,9 @@ jobs:
         working-directory: apps/worker
         run: pnpm exec tsx src/tests/smoke.test.ts
 
+      - name: Validate Worker bundle
+        run: pnpm exec wrangler deploy --dry-run --config apps/worker/wrangler.toml
+
   deploy:
     name: Deploy sovereign-os-api worker
     needs: verify
@@ -93,23 +96,32 @@ jobs:
 
       - name: Deploy sovereign-os-api
         working-directory: apps/worker
-        run: pnpm exec wrangler deploy
+        run: pnpm run deploy
 
-      - name: Smoke check API health
+      - name: Verify API health
         run: |
-          sleep 5
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://api.defrag.app/health")
-          echo "API health status: $STATUS"
-          if [ "$STATUS" != "200" ]; then
-            echo "API health check failed with status $STATUS"
+          for attempt in 1 2 3 4 5 6; do
+            STATUS=$(curl -sS -o /tmp/api-health.json -w "%{http_code}" --max-time 15 "https://api.defrag.app/health" || true)
+            echo "API health attempt $attempt: $STATUS"
+            if [ "$STATUS" = "200" ] && grep -Eq '"(ok|status)"' /tmp/api-health.json; then
+              cat /tmp/api-health.json
+              break
+            fi
+            if [ "$attempt" = "6" ]; then
+              cat /tmp/api-health.json 2>/dev/null || true
+              exit 1
+            fi
+            sleep 5
+          done
+
+      - name: Verify anonymous auth session
+        run: |
+          STATUS=$(curl -sS -o /tmp/api-session.json -w "%{http_code}" --max-time 15 "https://api.defrag.app/api/auth/session" || true)
+          echo "Auth session status: $STATUS"
+          cat /tmp/api-session.json 2>/dev/null || true
+          if [ "$STATUS" != "200" ] && [ "$STATUS" != "401" ]; then
             exit 1
           fi
-
-      - name: Smoke check auth endpoint
-        run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://api.defrag.app/api/auth/session")
-          echo "Auth session status: $STATUS"
-          if [ "$STATUS" != "401" ] && [ "$STATUS" != "200" ]; then
-            echo "Auth endpoint returned unexpected status $STATUS"
+          if [ "$STATUS" = "200" ] && ! grep -Eq '"authenticated"[[:space:]]*:[[:space:]]*false' /tmp/api-session.json; then
             exit 1
           fi
