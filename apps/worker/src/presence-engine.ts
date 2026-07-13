@@ -68,7 +68,7 @@ export interface PresenceProfile {
 const EMOTIONAL_ACTIVATION_SIGNALS = [
   /i don'?t know what to do/i,
   /i can'?t (stop|think|breathe|sleep)/i,
-  /i'?m (so|really|completely|totally) (lost|overwhelmed|scared|broken|done|exhausted|stuck)/i,
+  /i'?m (so|really|completely|totally) (lost|overwhelmed|scared|broken|done|exhausted|tired|stuck)/i,
   /i feel like (everything|nothing|i'?m)/i,
   /why (does|do|is|am|can'?t)/i,
   /i keep (doing|saying|feeling|thinking|going back)/i,
@@ -118,8 +118,14 @@ const CLARIFICATION_NEEDED_SIGNALS = [
 
 function detectEmotionalCharge(input: string): "low" | "medium" | "high" {
   const highCount = EMOTIONAL_ACTIVATION_SIGNALS.filter(p => p.test(input)).length
+  const hasPattern = PATTERN_SIGNALS.some(p => p.test(input))
   if (highCount >= 2) return "high"
-  if (highCount === 1) return "medium"
+  if (highCount === 1) return hasPattern ? "high" : "medium"
+
+  // A clearly repeated loop carries meaningful charge even when the user
+  // describes it calmly. Route it to mapping instead of flattening it into
+  // a generic reflection.
+  if (hasPattern) return "medium"
 
   // Check for urgency markers
   const urgencyMarkers = /(!{2,}|\?{2,}|help|urgent|now|please|asap)/i
@@ -329,7 +335,7 @@ export function runPresenceEngine(opts: {
 
   if (sufficiency.needsClarification) {
     mode = "clarify"
-  } else if (intent.needsSteadying || emotionalCharge === "high") {
+  } else if (intent.needsSteadying) {
     mode = "steady"
   } else if (intent.isExecution) {
     mode = "execute"
@@ -343,6 +349,8 @@ export function runPresenceEngine(opts: {
     mode = "reflect"
   } else if (intent.isSpiritual) {
     mode = "integrate"
+  } else if (emotionalCharge === "high") {
+    mode = "steady"
   } else if (emotionalCharge === "medium") {
     mode = "reflect"
   } else {
