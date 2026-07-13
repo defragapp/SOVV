@@ -1,0 +1,115 @@
+openapi: 3.1.0
+info:
+  title: Sovereign Repository Patch API
+  version: 1.0.0
+  description: Safe multi-file unified patch preview, commit, and stored diff retrieval for the Sovereign broker.
+servers:
+  - url: https://sovereign-broker.defrag.app
+security:
+  - BearerAuth: []
+paths:
+  /repo/apply-patch:
+    post:
+      operationId: repoApplyPatch
+      summary: Preview or apply a unified repository patch
+      description: Parses a unified diff for existing repository files. Dry-run is the default. Committed writes require confirm true and enabled broker write flags.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RepoApplyPatchRequest"
+      responses:
+        "200":
+          description: Patch preview or committed result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RepoApplyPatchResponse"
+        "400":
+          description: Invalid patch or context mismatch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Missing or invalid broker token
+        "403":
+          description: Safety flag, confirmation, or path restriction blocked the operation
+  /repo/diff/{id}:
+    get:
+      operationId: repoGetDiff
+      summary: Retrieve a stored repository diff preview
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[A-Za-z0-9_-]+$"
+      responses:
+        "200":
+          description: Stored diff
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RepoDiffResponse"
+        "404":
+          description: Diff not found
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    RepoApplyPatchRequest:
+      type: object
+      required: [patch]
+      properties:
+        patch:
+          type: string
+          description: Unified diff targeting existing repository files.
+        dry_run:
+          type: boolean
+          default: true
+        confirm:
+          type: boolean
+          description: Must be true when dry_run is false.
+        message:
+          type: string
+          description: Commit message for confirmed writes.
+    RepoApplyPatchResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        dry_run: { type: boolean }
+        committed: { type: boolean }
+        diff_id: { type: string }
+        paths:
+          type: array
+          items: { type: string }
+        diff: { type: string }
+        commits:
+          type: array
+          items:
+            type: object
+            properties:
+              path: { type: string }
+              commit_sha: { type: string }
+              url: { type: string }
+    RepoDiffResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        id: { type: string }
+        created_at: { type: string }
+        paths:
+          type: array
+          items: { type: string }
+        diff: { type: string }
+    ErrorResponse:
+      type: object
+      additionalProperties: true
+      properties:
+        ok: { type: boolean }
+        error: { type: string }
