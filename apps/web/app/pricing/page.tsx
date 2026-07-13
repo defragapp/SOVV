@@ -1,292 +1,186 @@
 "use client"
 
-import { SiteShell } from "@/components/marketing/site-shell"
-import { Container } from "@/components/ui/layout-primitives"
 import Link from "next/link"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { SiteShell } from "@/components/marketing/site-shell"
 import { AnimatedHeading, TextReveal } from "@/components/marketing/animated-elements"
 import { FaqAccordion } from "@/components/marketing/faq-accordion"
+import { Container } from "@/components/ui/layout-primitives"
+import { FREE_FEATURES, LAUNCH_PRICING, PRO_FEATURES } from "./pricing-contract"
 
 const PRICING_FAQ = [
   {
     q: "Is Defrag really free forever?",
-    a: "Yes. Defrag — the core pattern recognition space — is free with no time limit. You get 15 sessions per day, full Baseline Design integration, and Best Next Response. No credit card required.",
+    a: `Yes. Defrag is free with no time limit. You get ${LAUNCH_PRICING.freeDailySessions} sessions per day, Baseline Design, pattern recognition, and Best Next Response. No credit card is required.`,
   },
   {
-    q: "What happens after the 7-day free trial?",
-    a: "If you don't cancel before the trial ends, you'll be charged for your chosen plan (monthly or annual). You can cancel anytime from your account settings — no hoops, no retention flows.",
+    q: "Why is there no free trial?",
+    a: "The free plan is the trial. You can use Defrag every day and upgrade only when you need Covenant, Alignment, unlimited sessions, saved Library depth, Audio Overview, or private invites.",
   },
   {
-    q: "Can I switch between monthly and annual?",
-    a: "Yes. You can switch plans at any time from your billing settings. If you switch to annual mid-cycle, we'll prorate the difference.",
-  },
-  {
-    q: "What is Baseline Design and why does it matter?",
-    a: "Baseline Design is your personal context layer — built from your birth data (date, time, place). It maps how you tend to process, respond, connect, protect, and return to center. It stays active beneath every session so Sovereign.os reads your moment through your actual patterns, not a generic lens. You don't need to understand astrology or Human Design — Sovereign translates it into plain language.",
-  },
-  {
-    q: "Is my data private?",
-    a: "Yes. Your Baseline Design, sessions, and Library are private to you. We do not sell data, train on your inputs, or expose your content to other users. Sessions are encrypted in transit and at rest.",
-  },
-  {
-    q: "What's the difference between Defrag, Covenant, and Alignment?",
-    a: "Defrag helps you understand relationship tension before it becomes damage — for arguments, messages, family roles, grief, and boundaries. Covenant is for the questions that need meaning, not more noise — values, faith-context reflection, grief, and decisions that feel bigger than simple problem-solving. Alignment helps you choose the move that keeps you clear — after the insight, before the next move. Covenant and Alignment require Pro.",
-  },
-  {
-    q: "Do I need to understand astrology or Human Design?",
-    a: "No. You do not need to calculate, decode, or do any homework. Sovereign.os translates the symbolic complexity of astrology, Human Design, Gene Keys, and numerology into plain language you can use. The system works for you — not the other way around.",
-  },
-  {
-    q: "Is this a replacement for therapy?",
-    a: "No. Sovereign.os is the space between sessions — not a replacement for professional support. If you're in crisis or need clinical care, please reach out to a licensed therapist or crisis line.",
+    q: "Can I switch between monthly and annual billing?",
+    a: "Yes. Manage your plan and payment method through billing settings. Stripe handles the subscription securely.",
   },
   {
     q: "Can I cancel anytime?",
-    a: "Yes. Cancel from your account settings at any time. You'll retain Pro access until the end of your current billing period.",
+    a: "Yes. Cancel from billing settings at any time. You keep Pro access through the end of the paid billing period.",
   },
-]
-
-const APP_URL = "/app/login"
-
-function MetaLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="inline-flex items-center gap-2 mb-6">
-      <span className="h-px w-6 bg-[#e0743a]/60" />
-      <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">{children}</span>
-    </div>
-  )
-}
-
-const FREE_FEATURES = [
-  "Baseline Design",
-  "Defrag space — full access",
-  "15 sessions per day",
-  "Pattern recognition output",
-  "Best Next Response",
-]
-
-const PRO_FEATURES = [
-  "Everything in Free",
-  "Unlimited sessions",
-  "Covenant space",
-  "Alignment space",
-  "Save results to your Library",
-  "Audio Overview",
-  "Invite Privately",
-  "Full Library depth",
+  {
+    q: "What is Baseline Design?",
+    a: "Baseline Design is the personal context layer beneath every session. It helps Sovereign.os interpret your patterns and translate complex symbolic inputs into direct, usable language.",
+  },
+  {
+    q: "What is the difference between Defrag, Covenant, and Alignment?",
+    a: "Defrag helps you understand tension and patterns. Covenant helps with meaning, values, faith-context reflection, grief, and larger decisions. Alignment helps turn insight into a clear next move. Covenant and Alignment are included in Pro.",
+  },
+  {
+    q: "Is this a replacement for therapy?",
+    a: "No. Sovereign.os is a reflective decision-support platform, not a replacement for licensed mental health care or emergency support.",
+  },
 ]
 
 const COMPARISON = [
   { feature: "Baseline Design", free: true, pro: true },
-  { feature: "Defrag space", free: true, pro: true },
-  { feature: "Pattern recognition", free: true, pro: true },
-  { feature: "Best Next Response", free: true, pro: true },
-  { feature: "15 sessions / day", free: true, pro: false },
+  { feature: "Defrag", free: true, pro: true },
+  { feature: `${LAUNCH_PRICING.freeDailySessions} sessions / day`, free: true, pro: false },
   { feature: "Unlimited sessions", free: false, pro: true },
-  { feature: "Covenant space", free: false, pro: true },
-  { feature: "Alignment space", free: false, pro: true },
-  { feature: "Library — save results", free: false, pro: true },
+  { feature: "Covenant", free: false, pro: true },
+  { feature: "Alignment", free: false, pro: true },
+  { feature: "Library", free: false, pro: true },
   { feature: "Audio Overview", free: false, pro: true },
-  { feature: "Invite Privately", free: false, pro: true },
-]
+  { feature: "Private invites", free: false, pro: true },
+] as const
 
-function CheckIcon({ active }: { active: boolean }) {
-  if (!active) return <span className="text-[#4f4b47] text-sm">—</span>
-  return <span className="text-[#e0743a]/70 text-sm">✓</span>
+function MetaLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-6 inline-flex items-center gap-2">
+      <span className="h-px w-6 bg-[#e0743a]/60" />
+      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#a8a29a]">{children}</span>
+    </div>
+  )
+}
+
+function Check({ active }: { active: boolean }) {
+  return <span className={active ? "text-[#e0743a]" : "text-[#4f4b47]"}>{active ? "✓" : "—"}</span>
 }
 
 export default function PricingPage() {
-  const [annual, setAnnual] = useState(false)
-
-  const monthlyPrice = 20
-  const annualPrice = 99
-  const annualMonthly = Math.round(annualPrice / 12)
-  const savings = Math.round(100 - (annualPrice / (monthlyPrice * 12)) * 100)
+  const [annual, setAnnual] = useState(true)
+  const annualMonthly = useMemo(() => Math.round(LAUNCH_PRICING.annualPriceUsd / 12), [])
+  const savings = useMemo(
+    () => Math.round(100 - (LAUNCH_PRICING.annualPriceUsd / (LAUNCH_PRICING.monthlyPriceUsd * 12)) * 100),
+    [],
+  )
+  const plan = annual ? LAUNCH_PRICING.annualPlan : LAUNCH_PRICING.monthlyPlan
 
   return (
     <SiteShell>
-
-      {/* ── HERO ── */}
-      <section className="relative w-full pt-32 pb-16 md:pt-40 md:pb-20 bg-[#08070a] overflow-hidden">
+      <section className="relative overflow-hidden bg-[#08070a] pb-16 pt-32 md:pb-20 md:pt-40">
         <div className="light-beam opacity-50" aria-hidden />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <MetaLabel>Pricing</MetaLabel>
-          <AnimatedHeading className="text-4xl md:text-6xl tracking-[-0.02em] leading-[1.05] max-w-2xl text-balance">
-            No decoding. No homework. Start free.
+          <AnimatedHeading className="max-w-3xl text-balance text-4xl leading-[1.05] tracking-[-0.03em] md:text-6xl">
+            Start free. Upgrade when you need continuity.
           </AnimatedHeading>
-          <TextReveal delay={200}>
-            <p className="mt-5 max-w-md text-base text-[#a8a29a] leading-relaxed">
-              Defrag is free — no time limit, no credit card. Upgrade to Pro for Covenant, Alignment, your Library, and unlimited sessions.
+          <TextReveal delay={180}>
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-[#a8a29a]">
+              Use Defrag every day for free. Pro adds unlimited sessions, Covenant, Alignment, Library, Audio Overview, and private invites.
             </p>
           </TextReveal>
 
-          {/* Billing toggle */}
-          <div className="mt-10 flex items-center gap-3">
+          <div className="mt-10 inline-flex items-center rounded-full border border-white/10 bg-[#0c0a0d] p-1">
             <button
+              type="button"
               onClick={() => setAnnual(false)}
-              className={`font-mono text-[11px] uppercase tracking-[0.15em] transition-colors ${!annual ? "text-[#f4efe9]" : "text-[#76716b]"}`}
+              className={`rounded-full px-4 py-2 font-mono text-[10px] uppercase tracking-[0.16em] transition ${!annual ? "bg-white/10 text-[#f4efe9]" : "text-[#76716b]"}`}
             >
               Monthly
             </button>
             <button
-              onClick={() => setAnnual(v => !v)}
-              className="relative w-10 h-5 rounded-full border border-white/10 bg-[#131015] flex items-center px-0.5 transition-colors"
-              aria-label="Toggle annual billing"
-            >
-              <span
-                className={`w-4 h-4 rounded-full bg-[#e0743a] transition-transform duration-200 ${annual ? "translate-x-5" : "translate-x-0"}`}
-              />
-            </button>
-            <button
+              type="button"
               onClick={() => setAnnual(true)}
-              className={`font-mono text-[11px] uppercase tracking-[0.15em] transition-colors ${annual ? "text-[#f4efe9]" : "text-[#76716b]"}`}
+              className={`rounded-full px-4 py-2 font-mono text-[10px] uppercase tracking-[0.16em] transition ${annual ? "bg-[#e0743a]/15 text-[#f4efe9]" : "text-[#76716b]"}`}
             >
-              Annual
+              Annual · Save {savings}%
             </button>
-            {annual && (
-              <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#e0743a]/80 border border-[#e0743a]/30 px-2 py-0.5" style={{ borderRadius: "var(--radius-minimal)" }}>
-                Save {savings}%
-              </span>
-            )}
           </div>
         </Container>
       </section>
 
-      {/* ── PLANS ── */}
-      <section className="w-full py-16 md:py-20 bg-[#08070a]">
+      <section className="bg-[#08070a] py-16 md:py-20">
         <Container>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-
-            {/* Free */}
-            <div className="border border-white/[0.08] bg-[#0c0a0d] p-8 flex flex-col" style={{ borderRadius: "var(--radius-container)" }}>
-              <div className="mb-8">
-                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b] mb-3">Free</p>
-                <div className="flex items-baseline gap-1 mb-3">
-                  <span className="font-serif text-4xl text-[#f4efe9]">$0</span>
-                  <span className="text-sm text-[#76716b]">forever</span>
-                </div>
-                <p className="text-sm text-[#a8a29a] leading-relaxed">Start with Defrag — free forever.</p>
+          <div className="mx-auto grid max-w-4xl grid-cols-1 gap-4 md:grid-cols-2">
+            <article className="flex flex-col rounded-3xl border border-white/[0.08] bg-[#0c0a0d] p-8">
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b]">Free</p>
+              <div className="mt-4 flex items-baseline gap-2">
+                <span className="font-serif text-5xl text-[#f4efe9]">$0</span>
+                <span className="text-sm text-[#76716b]">forever</span>
               </div>
-
-              <div className="flex flex-col gap-3 flex-1 mb-8">
-                {FREE_FEATURES.map(f => (
-                  <div key={f} className="flex items-start gap-3">
-                    <span className="text-[#e0743a]/60 text-sm shrink-0 mt-0.5">✓</span>
-                    <span className="text-sm text-[#a8a29a]">{f}</span>
+              <p className="mt-3 text-sm leading-relaxed text-[#a8a29a]">A real daily product, not a demo.</p>
+              <div className="my-8 flex flex-1 flex-col gap-3">
+                {FREE_FEATURES.map((feature) => (
+                  <div key={feature} className="flex gap-3 text-sm text-[#a8a29a]">
+                    <span className="text-[#e0743a]">✓</span>
+                    <span>{feature}</span>
                   </div>
                 ))}
               </div>
+              <Link href="/app/login" className="btn-secondary w-full text-center">Start Free</Link>
+            </article>
 
-              <Link href={APP_URL} className="btn-secondary w-full text-center">
-                Start Free
-              </Link>
-            </div>
-
-            {/* Pro */}
-            <div className="border border-[#e0743a]/30 bg-[#0c0a0d] p-8 flex flex-col relative overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}>
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{ background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(224,116,58,0.06) 0%, transparent 70%)" }}
-                aria-hidden
-              />
-              <div className="relative mb-8">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b]">Pro</p>
-                  <span
-                    className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#e0743a]/80 border border-[#e0743a]/30 px-2 py-0.5"
-                    style={{ borderRadius: "var(--radius-minimal)" }}
-                  >
-                    {annual ? `Save ${savings}%` : "Recommended"}
-                  </span>
-                </div>
-                <div className="flex items-baseline gap-1 mb-1">
-                  <span className="font-serif text-4xl text-[#f4efe9]">
-                    ${annual ? annualMonthly : monthlyPrice}
-                  </span>
-                  <span className="text-sm text-[#76716b]">/ month</span>
-                </div>
-                {annual && (
-                  <p className="text-xs text-[#76716b] mb-2">Billed ${annualPrice}/year</p>
-                )}
-                <p className="text-sm text-[#a8a29a] leading-relaxed">Defrag + Covenant + Alignment + Library.</p>
+            <article className="relative flex flex-col overflow-hidden rounded-3xl border border-[#e0743a]/35 bg-[#0c0a0d] p-8">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(224,116,58,0.08),transparent_70%)]" />
+              <div className="relative flex items-center justify-between">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#76716b]">Pro</p>
+                <span className="rounded-full border border-[#e0743a]/30 px-2.5 py-1 font-mono text-[8px] uppercase tracking-[0.14em] text-[#e0743a]">
+                  {annual ? `Save ${savings}%` : "Monthly"}
+                </span>
               </div>
-
-              <div className="relative flex flex-col gap-3 flex-1 mb-8">
-                {PRO_FEATURES.map(f => (
-                  <div key={f} className="flex items-start gap-3">
-                    <span className="text-[#e0743a]/60 text-sm shrink-0 mt-0.5">✓</span>
-                    <span className="text-sm text-[#a8a29a]">{f}</span>
+              <div className="relative mt-4 flex items-baseline gap-2">
+                <span className="font-serif text-5xl text-[#f4efe9]">${annual ? annualMonthly : LAUNCH_PRICING.monthlyPriceUsd}</span>
+                <span className="text-sm text-[#76716b]">/ month</span>
+              </div>
+              {annual && <p className="relative mt-1 text-xs text-[#76716b]">Billed ${LAUNCH_PRICING.annualPriceUsd} annually</p>}
+              <p className="relative mt-3 text-sm leading-relaxed text-[#a8a29a]">The complete Sovereign.os experience.</p>
+              <div className="relative my-8 flex flex-1 flex-col gap-3">
+                {PRO_FEATURES.map((feature) => (
+                  <div key={feature} className="flex gap-3 text-sm text-[#a8a29a]">
+                    <span className="text-[#e0743a]">✓</span>
+                    <span>{feature}</span>
                   </div>
                 ))}
               </div>
-
-              <div className="relative flex flex-col gap-3">
-                <Link
-                  href={`/app/login?checkout=1&plan=${annual ? "annual" : "monthly"}`}
-                  className="btn-primary w-full text-center"
-                >
-                  Upgrade to Pro
-                </Link>
-                <p className="text-center text-[11px] text-[#76716b]">
-                  7-day free trial · Cancel anytime
-                </p>
-              </div>
-            </div>
-
+              <Link href={`/app/login?checkout=1&plan=${plan}`} className="btn-primary relative w-full text-center">Upgrade to Pro</Link>
+              <p className="relative mt-3 text-center text-[11px] text-[#76716b]">Cancel anytime · Secure checkout by Stripe</p>
+            </article>
           </div>
         </Container>
       </section>
 
-      {/* ── COMPARISON TABLE ── */}
-      <section className="w-full py-16 md:py-20 bg-[#0c0a0d] border-t border-white/5">
-        <Container className="max-w-3xl">
-          <MetaLabel>What's included</MetaLabel>
-          <AnimatedHeading className="text-3xl md:text-4xl tracking-[-0.02em] leading-tight mb-12">
-            What each plan includes.
-          </AnimatedHeading>
-
-          {/* Header */}
-          <div className="grid grid-cols-3 gap-4 mb-4 px-4">
-            <span className="text-xs text-[#76716b] font-mono uppercase tracking-[0.15em]">Feature</span>
-            <span className="text-xs text-[#76716b] font-mono uppercase tracking-[0.15em] text-center">Free</span>
-            <span className="text-xs text-[#e0743a]/70 font-mono uppercase tracking-[0.15em] text-center">Pro</span>
-          </div>
-
-          <div className="flex flex-col gap-0 border border-white/[0.06] overflow-hidden" style={{ borderRadius: "var(--radius-container)" }}>
-            {COMPARISON.map((row, i) => (
-              <div
-                key={row.feature}
-                className={`grid grid-cols-3 gap-4 items-center px-4 py-3.5 ${i < COMPARISON.length - 1 ? "border-b border-white/[0.04]" : ""}`}
-              >
-                <span className="text-sm text-[#a8a29a]">{row.feature}</span>
-                <span className="text-center"><CheckIcon active={row.free} /></span>
-                <span className="text-center"><CheckIcon active={row.pro} /></span>
+      <section className="border-t border-white/5 bg-[#0c0a0d] py-16 md:py-20">
+        <Container className="max-w-4xl">
+          <MetaLabel>What’s included</MetaLabel>
+          <AnimatedHeading className="mb-10 text-3xl tracking-[-0.02em] md:text-4xl">One clear free plan. One complete Pro plan.</AnimatedHeading>
+          <div className="overflow-hidden rounded-2xl border border-white/[0.06]">
+            <div className="grid grid-cols-3 bg-white/[0.02] px-4 py-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#76716b]">
+              <span>Feature</span><span className="text-center">Free</span><span className="text-center text-[#e0743a]">Pro</span>
+            </div>
+            {COMPARISON.map((row) => (
+              <div key={row.feature} className="grid grid-cols-3 border-t border-white/[0.05] px-4 py-3.5 text-sm text-[#a8a29a]">
+                <span>{row.feature}</span><span className="text-center"><Check active={row.free} /></span><span className="text-center"><Check active={row.pro} /></span>
               </div>
             ))}
           </div>
         </Container>
       </section>
 
-      <section className="w-full py-20 bg-[#08070a] border-t border-white/5">
-        <Container className="flex flex-col items-center text-center max-w-xl">
-          <MetaLabel>Get started</MetaLabel>
-          <h2 className="text-3xl md:text-4xl font-serif tracking-[-0.02em] text-[#f4efe9] mb-4">
-            Most AI answers the question.<br />
-            <span style={{ color: "rgba(244,239,233,0.55)" }}>Sovereign understands the context around it.</span>
-          </h2>
-          <p className="text-[#a8a29a] text-base leading-relaxed mb-8">
-            Try Pro free for 7 days. Cancel before the trial ends and you won&rsquo;t be charged.
-          </p>
-          <Link
-            href={`/app/login?checkout=1&plan=${annual ? "annual" : "monthly"}&trial=1`}
-            className="btn-primary px-8"
-          >
-            Start Free Trial
-          </Link>
-          <p className="mt-4 text-xs text-[#76716b]">Card required to start trial. Cancel anytime.</p>
+      <section className="bg-[#08070a] py-16 md:py-20">
+        <Container className="max-w-3xl">
+          <MetaLabel>Questions</MetaLabel>
+          <AnimatedHeading className="mb-10 text-3xl tracking-[-0.02em] md:text-4xl">Everything before you upgrade.</AnimatedHeading>
+          <FaqAccordion items={PRICING_FAQ} />
         </Container>
       </section>
-
     </SiteShell>
   )
 }
