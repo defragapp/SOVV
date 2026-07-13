@@ -57,9 +57,9 @@ async function getUserHistoryStats(env: Env, userId: string): Promise<{
   const cutoff90 = new Date(now - 90 * 24 * 60 * 60 * 1000).toISOString();
 
   const [total, old30, old90] = await Promise.all([
-    env.DB.prepare("SELECT COUNT(*) as n FROM history WHERE user_id = ?").bind(userId).first<{ n: number }>(),
-    env.DB.prepare("SELECT COUNT(*) as n FROM history WHERE user_id = ? AND created_at < ?").bind(userId, cutoff30).first<{ n: number }>(),
-    env.DB.prepare("SELECT COUNT(*) as n FROM history WHERE user_id = ? AND created_at < ?").bind(userId, cutoff90).first<{ n: number }>(),
+    env.DB.prepare("SELECT COUNT(*) as n FROM history WHERE user_id = ?").bind(userId).first().then((row) => row as { n: number } | null),
+    env.DB.prepare("SELECT COUNT(*) as n FROM history WHERE user_id = ? AND created_at < ?").bind(userId, cutoff30).first().then((row) => row as { n: number } | null),
+    env.DB.prepare("SELECT COUNT(*) as n FROM history WHERE user_id = ? AND created_at < ?").bind(userId, cutoff90).first().then((row) => row as { n: number } | null),
   ]);
 
   return {
@@ -70,10 +70,9 @@ async function getUserHistoryStats(env: Env, userId: string): Promise<{
 }
 
 export function registerRetentionRoutes(router: any, getEnv: () => Env) {
-  const cors = getCorsHeaders();
-
   // GET /api/retention/status — return policy and record counts
   router.get("/api/retention/status", async (request: Request) => {
+    const cors = getCorsHeaders(request);
     const env = getEnv();
     const user = await getAuthUser(request, env.DB);
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401, cors);
@@ -94,6 +93,7 @@ export function registerRetentionRoutes(router: any, getEnv: () => Env) {
 
   // POST /api/retention/purge — purge expired records for authenticated user
   router.post("/api/retention/purge", async (request: Request) => {
+    const cors = getCorsHeaders(request);
     const env = getEnv();
     const user = await getAuthUser(request, env.DB);
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401, cors);
@@ -156,7 +156,7 @@ export async function scheduledRetentionPurge(env: Env): Promise<{ purged: numbe
        AND user_id IN (SELECT id FROM users WHERE tier = 'free' OR tier IS NULL)`
   )
     .bind(cutoffIso)
-    .first<{ n: number }>();
+    .first() as { n: number } | null;
 
   console.log(JSON.stringify({
     event: "scheduled_retention_purge",
