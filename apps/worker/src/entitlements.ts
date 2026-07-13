@@ -19,7 +19,7 @@
  *
  * Manual/promo access:
  *   tier = "pro" with subscription_status = "free" → manual grant (admin override)
- *   role = "admin" → full access to everything
+ *   role = "admin" or "owner" → full access to everything
  */
 
 export type SubscriptionStatus =
@@ -33,7 +33,7 @@ export type SubscriptionStatus =
   | "free";
 
 export type UserTier = "free" | "pro";
-export type UserRole = "user" | "admin";
+export type UserRole = "user" | "admin" | "owner";
 
 export interface EntitlementUser {
   id: string;
@@ -63,7 +63,7 @@ export interface Entitlements {
   isInGracePeriod: boolean;
   /** Is on manual/promo Pro grant */
   isManualPro: boolean;
-  /** Is admin role */
+  /** Is a privileged admin or owner role */
   isAdmin: boolean;
   /** Effective tier for display */
   effectiveTier: UserTier;
@@ -78,31 +78,29 @@ const GRACE_PERIOD_SECONDS = 72 * 60 * 60; // 72 hours
  * Call this once per request and pass the result to all gate checks.
  */
 export function resolveEntitlements(user: EntitlementUser): Entitlements {
-  const isAdmin = user.role === "admin";
+  const isPrivileged = user.role === "admin" || user.role === "owner";
   const status = (user.subscription_status ?? "free") as SubscriptionStatus;
   const now = Math.floor(Date.now() / 1000);
   const periodEnd = user.subscription_current_period_end ?? 0;
 
-  // Admin gets everything
-  if (isAdmin) {
-    return fullAccess(true, false, false, true);
+  // Owner and admin roles get everything independent of billing state.
+  if (isPrivileged) {
+    return fullAccess(false, false, true);
   }
 
-  // Unverified email: allow Defrag (free) but block Pro features
-  // This prevents unverified accounts from accessing paid features
-  // and ensures transactional emails (billing, password reset) are deliverable.
+  // Unverified email: allow Defrag (free) but block Pro features.
   const emailVerified = (user.email_verified ?? 0) === 1;
 
   // Active subscription
   if (status === "active") {
     if (!emailVerified) return freeOnly("not_subscribed");
-    return fullAccess(false, false, false, false);
+    return fullAccess(false, false, false);
   }
 
   // Trial — full Pro access
   if (status === "trialing") {
     if (!emailVerified) return freeOnly("not_subscribed");
-    return fullAccess(false, false, false, false);
+    return fullAccess(false, false, false);
   }
 
   // Past due or unpaid — check grace period
@@ -110,19 +108,17 @@ export function resolveEntitlements(user: EntitlementUser): Entitlements {
     if (!emailVerified) return freeOnly("not_subscribed");
     const inGrace = periodEnd > 0 && now < periodEnd + GRACE_PERIOD_SECONDS;
     if (inGrace) {
-      return fullAccess(false, true, false, false);
+      return fullAccess(true, false, false);
     }
-    // Grace expired
     return freeOnly("grace_expired");
   }
 
   // Manual Pro grant: tier=pro but status=free (admin override / promo)
   if (user.tier === "pro" && status === "free") {
     if (!emailVerified) return freeOnly("not_subscribed");
-    return fullAccess(false, false, true, false);
+    return fullAccess(false, true, false);
   }
 
-  // Canceled, incomplete, incomplete_expired, or free
   if (status === "canceled") {
     return freeOnly("subscription_canceled");
   }
@@ -131,15 +127,13 @@ export function resolveEntitlements(user: EntitlementUser): Entitlements {
     return freeOnly("not_subscribed");
   }
 
-  // Default: free
   return freeOnly("not_subscribed");
 }
 
 function fullAccess(
-  isAdmin: boolean,
   isInGracePeriod: boolean,
   isManualPro: boolean,
-  adminRole: boolean
+  isPrivileged: boolean,
 ): Entitlements {
   return {
     canUseDefrag: true,
@@ -151,7 +145,7 @@ function fullAccess(
     isActivePro: !isInGracePeriod && !isManualPro,
     isInGracePeriod,
     isManualPro,
-    isAdmin: adminRole,
+    isAdmin: isPrivileged,
     effectiveTier: "pro",
     denyReason: null,
   };
@@ -181,7 +175,7 @@ function freeOnly(reason: Entitlements["denyReason"]): Entitlements {
 export function requireEntitlement(
   entitlements: Entitlements,
   feature: keyof Pick<Entitlements, "canUseCovenant" | "canUseAlignment" | "canUseLibrary" | "canUseAudio" | "canInvite">,
-  requestId?: string
+  requestId?: string,
 ): Response | null {
   if (entitlements[feature]) return null;
 
@@ -207,6 +201,6 @@ export function requireEntitlement(
         "Content-Type": "application/json",
         ...(requestId ? { "x-request-id": requestId } : {}),
       },
-    }
+    },
   );
 }
