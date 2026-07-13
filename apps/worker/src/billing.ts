@@ -12,6 +12,7 @@ import {
   sendAbandonedCheckoutEmail,
 } from "./email.js";
 import { fetchWithTimeout, withLimitedRetry } from "./runtime-resilience.js";
+import { requireEntitlement, resolveEntitlements } from "./entitlements.js";
 
 const WEBHOOK_TOLERANCE_SECONDS = 300;
 const IDEMPOTENCY_TTL_SECONDS = 60 * 60 * 24 * 7;
@@ -114,8 +115,15 @@ async function requireSessionAuth(req: Request, env: Env): Promise<Response | nu
  * and the route is a workspace-protected route.
  */
 export async function requireActiveSubscription(
-  user: { subscription_status: string; tier: string } | null,
-  request: Request,
+  user: {
+    id: string;
+    subscription_status: string;
+    tier: string;
+    role?: string | null;
+    subscription_current_period_end?: number | null;
+    email_verified?: number | null;
+  } | null,
+  _request: Request,
   requestId?: string
 ): Promise<Response | null> {
   const reqMeta = requestId ? { requestId } : {};
@@ -126,29 +134,11 @@ export async function requireActiveSubscription(
     });
   }
 
-  const url = new URL(request.url);
-
-  // Pro-only routes — Covenant and Alignment require active subscription
-  const isProRoute = url.pathname.startsWith("/api/covenant") ||
-    url.pathname.startsWith("/api/alignment");
-
-  if (!isProRoute) {
-    return null; // Not a Pro-only route — let it through (free users can use Defrag)
-  }
-
-  const hasActive = user.subscription_status === "active" || user.tier === "pro";
-  if (!hasActive) {
-    return new Response(JSON.stringify({
-      error: "payment_required",
-      message: "The Covenant and Alignment spaces require a Pro subscription. Upgrade to access all spaces.",
-      ...reqMeta,
-    }), {
-      status: 402,
-      headers: { "Content-Type": "application/json", ...(requestId ? { "x-request-id": requestId } : {}) },
-    });
-  }
-
-  return null; // Subscription is active — proceed
+  // Legacy callers use this helper only at explicit Pro feature boundaries.
+  // Resolve through the single entitlement source so trials, grace periods,
+  // manual grants, admin access, and email verification behave consistently.
+  const entitlements = resolveEntitlements(user);
+  return requireEntitlement(entitlements, "canUseCovenant", requestId);
 }
 
 export async function handleCheckout(req: Request, env: Env): Promise<Response> {
