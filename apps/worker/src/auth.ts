@@ -108,6 +108,30 @@ export function clearCookie(): string {
   return "__sov_session=; Max-Age=0; Path=/; Domain=.defrag.app; HttpOnly; Secure; SameSite=Lax"
 }
 
+/** Non-HttpOnly cookie readable by Next.js middleware for entitlement checks. */
+export function tierCookie(tier: string, maxAge = 7 * 24 * 60 * 60): string {
+  return [
+    `__sov_tier=${encodeURIComponent(tier || "free")}`,
+    `Max-Age=${maxAge}`,
+    "Path=/",
+    "Domain=.defrag.app",
+    "Secure",
+    "SameSite=Lax",
+  ].join("; ")
+}
+
+/** Non-HttpOnly cookie readable by Next.js middleware for role checks. */
+export function roleCookie(role: string, maxAge = 7 * 24 * 60 * 60): string {
+  return [
+    `__sov_role=${encodeURIComponent(role || "user")}`,
+    `Max-Age=${maxAge}`,
+    "Path=/",
+    "Domain=.defrag.app",
+    "Secure",
+    "SameSite=Lax",
+  ].join("; ")
+}
+
 
 export function getSessionToken(request: Request): string | null {
   const cookie = request.headers.get("Cookie")
@@ -317,9 +341,12 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         .bind(token, user.id, now + SESSION_TTL * 1000, now + SESSION_TTL * 1000, now)
         .run()
 
-      return jsonResponse({ success: true, token }, 200, {
-        "Set-Cookie": sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN),
-      })
+      const loginHeaders = new Headers()
+      loginHeaders.append("Set-Cookie", sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN))
+      loginHeaders.append("Set-Cookie", tierCookie(user.tier || "free", 7 * 24 * 60 * 60))
+      loginHeaders.append("Set-Cookie", roleCookie(user.role || "user", 7 * 24 * 60 * 60))
+      loginHeaders.set("Content-Type", "application/json")
+      return new Response(JSON.stringify({ success: true, token }), { status: 200, headers: loginHeaders })
     } catch (e: any) {
       logSafetyEvent({ level: "error", event: "auth_login_failed", request, error_type: "auth", error: e })
       return jsonResponse({ error: "Login failed" }, 500)
