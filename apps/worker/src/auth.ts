@@ -97,15 +97,24 @@ export function sessionCookie(
     `__sov_session=${token}`,
     `Max-Age=${maxAge}`,
     "Path=/",
-"Domain=.defrag.app",
+    ...(domain ? [`Domain=${domain}`] : []),
     "HttpOnly",
     "Secure",
     "SameSite=Lax",
   ].join("; ")
 }
 
-export function clearCookie(): string {
-  return "__sov_session=; Max-Age=0; Path=/; Domain=.defrag.app; HttpOnly; Secure; SameSite=Lax"
+export function clearCookie(cookieDomainValue?: string): string {
+  const domain = cookieDomain(cookieDomainValue)
+  return [
+    "__sov_session=",
+    "Max-Age=0",
+    "Path=/",
+    ...(domain ? [`Domain=${domain}`] : []),
+    "HttpOnly",
+    "Secure",
+    "SameSite=Lax",
+  ].join("; ")
 }
 
 /** Non-HttpOnly cookie readable by Next.js middleware for entitlement checks. */
@@ -502,8 +511,9 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         action: "password_changed",
         ip: request.headers.get("CF-Connecting-IP") ?? undefined,
       });
+      const currentToken = getSessionToken(request) ?? ""
       await env.DB.prepare("DELETE FROM sessions WHERE user_id = ? AND token != ?")
-        .bind(user.id, request.headers.get("cookie")?.match(/session=([^;]+)/)?.[1] || "").run()
+        .bind(user.id, currentToken).run()
 
       return jsonResponse({ success: true })
     } catch (e) {
@@ -561,11 +571,11 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     try {
       // Delete all user data in order (FK constraints)
       await env.DB.batch([
-        env.DB.prepare("DELETE FROM sessions WHERE user_id = ?").bind(user.id),
-        env.DB.prepare("DELETE FROM library WHERE user_id = ?").bind(user.id),
         env.DB.prepare("DELETE FROM interactions WHERE session_id IN (SELECT token FROM sessions WHERE user_id = ?)").bind(user.id),
         env.DB.prepare("DELETE FROM patterns WHERE session_id IN (SELECT token FROM sessions WHERE user_id = ?)").bind(user.id),
+        env.DB.prepare("DELETE FROM library WHERE user_id = ?").bind(user.id),
         env.DB.prepare("DELETE FROM people WHERE user_id = ?").bind(user.id),
+        env.DB.prepare("DELETE FROM sessions WHERE user_id = ?").bind(user.id),
         env.DB.prepare("DELETE FROM users WHERE id = ?").bind(user.id),
       ])
 
@@ -596,7 +606,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          "Set-Cookie": clearCookie(),
+          "Set-Cookie": clearCookie(cookieDomain),
           ...getCorsHeaders(request),
         },
       })
@@ -683,8 +693,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       const cookieDomain = env.COOKIE_DOMAIN || undefined
 
       // Get old token from cookie
-      const cookieHeader_val = request.headers.get("cookie") || ""
-      const oldToken = cookieHeader_val.match(/session=([^;]+)/)?.[1]
+      const oldToken = getSessionToken(request)
 
       // Insert new session
       await env.DB.prepare("INSERT INTO sessions (token, user_id, expires_at, expires, created_at) VALUES (?, ?, ?, ?, ?)")
@@ -723,7 +732,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Set-Cookie": clearCookie(),
+        "Set-Cookie": clearCookie(cookieDomain),
         ...getCorsHeaders(request),
       },
     })
