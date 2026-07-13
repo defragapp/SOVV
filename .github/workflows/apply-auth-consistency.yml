@@ -1,22 +1,25 @@
 name: Apply auth consistency patch
 
 on:
-  push:
-    branches:
-      - automation/auth-consistency
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    branches: [main]
 
 permissions:
   contents: write
+  pull-requests: read
 
 jobs:
   patch:
-    if: ${{ !contains(github.event.head_commit.message, '[auth-consistency-bot]') }}
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'automation/auth-consistency'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: automation/auth-consistency
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -30,162 +33,18 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Apply exact auth replacements
-        run: |
-          python3 <<'PY'
-          from pathlib import Path
-
-          path = Path('apps/worker/src/auth.ts')
-          text = path.read_text()
-
-          def replace_once(old: str, new: str) -> None:
-              global text
-              count = text.count(old)
-              if count != 1:
-                  raise SystemExit(f'Expected one exact match, found {count}: {old[:100]!r}')
-              text = text.replace(old, new, 1)
-
-          replace_once(
-          '''export function tierCookie(tier: string, maxAge = 7 * 24 * 60 * 60): string {
-            return [
-              `__sov_tier=${encodeURIComponent(tier || "free")}`,
-              `Max-Age=${maxAge}`,
-              "Path=/",
-              "Domain=.defrag.app",
-              "Secure",
-              "SameSite=Lax",
-            ].join("; ")
-          }''',
-          '''export function tierCookie(
-            tier: string,
-            maxAge = 7 * 24 * 60 * 60,
-            cookieDomainValue?: string,
-          ): string {
-            const domain = cookieDomain(cookieDomainValue)
-            return [
-              `__sov_tier=${encodeURIComponent(tier || "free")}`,
-              `Max-Age=${maxAge}`,
-              "Path=/",
-              ...(domain ? [`Domain=${domain}`] : []),
-              "Secure",
-              "SameSite=Lax",
-            ].join("; ")
-          }''')
-
-          replace_once(
-          '''export function roleCookie(role: string, maxAge = 7 * 24 * 60 * 60): string {
-            return [
-              `__sov_role=${encodeURIComponent(role || "user")}`,
-              `Max-Age=${maxAge}`,
-              "Path=/",
-              "Domain=.defrag.app",
-              "Secure",
-              "SameSite=Lax",
-            ].join("; ")
-          }''',
-          '''export function roleCookie(
-            role: string,
-            maxAge = 7 * 24 * 60 * 60,
-            cookieDomainValue?: string,
-          ): string {
-            const domain = cookieDomain(cookieDomainValue)
-            return [
-              `__sov_role=${encodeURIComponent(role || "user")}`,
-              `Max-Age=${maxAge}`,
-              "Path=/",
-              ...(domain ? [`Domain=${domain}`] : []),
-              "Secure",
-              "SameSite=Lax",
-            ].join("; ")
-          }''')
-
-          replace_once(
-          'import { logSafetyEvent } from "./safety.js";',
-          'import { logSafetyEvent } from "./safety.js";\nimport { resolveEntitlements } from "./entitlements.js";')
-
-          replace_once(
-          'const SESSION_TTL = 7 * 24 * 60 * 60\n\nexport async function registerAuthRoutes',
-          'const SESSION_TTL = 7 * 24 * 60 * 60\n\nfunction isPrivilegedRole(role: string): boolean {\n  return role === "owner" || role === "admin"\n}\n\nexport async function registerAuthRoutes')
-
-          replace_once('"Cookie": `session=${token}`', '"Cookie": `__sov_session=${token}`')
-          replace_once('tierCookie(user.tier || "free", 7 * 24 * 60 * 60)', 'tierCookie(user.tier || "free", 7 * 24 * 60 * 60, env.COOKIE_DOMAIN)')
-          replace_once('roleCookie(user.role || "user", 7 * 24 * 60 * 60)', 'roleCookie(user.role || "user", 7 * 24 * 60 * 60, env.COOKIE_DOMAIN)')
-          replace_once('if (user.role !== "owner") return jsonResponse({ error: "Forbidden" }, 403)', 'if (!isPrivilegedRole(user.role)) return jsonResponse({ error: "Forbidden" }, 403)')
-          replace_once('if (!user || user.role !== "admin") return jsonResponse({ error: "Forbidden" }, 403);', 'if (!user || !isPrivilegedRole(user.role)) return jsonResponse({ error: "Forbidden" }, 403);')
-          replace_once('if (!user || user.role !== "admin") return jsonResponse({ error: "Forbidden" }, 403);', 'if (!user || !isPrivilegedRole(user.role)) return jsonResponse({ error: "Forbidden" }, 403);')
-
-          replace_once(
-          '''    return jsonResponse({
-              tier: user.tier,
-              subscription_status: user.subscription_status,
-              has_active_subscription: user.subscription_status === "active" || user.tier === "pro",
-            })''',
-          '''    const entitlements = resolveEntitlements({
-              id: user.id,
-              tier: user.tier,
-              role: user.role,
-              subscription_status: user.subscription_status,
-              subscription_current_period_end: null,
-              email_verified: 1,
-            })
-            return jsonResponse({
-              tier: entitlements.effectiveTier,
-              subscription_status: user.subscription_status,
-              has_active_subscription: entitlements.isActivePro,
-              is_in_grace_period: entitlements.isInGracePeriod,
-              deny_reason: entitlements.denyReason,
-            })''')
-
-          replace_once(
-          '    const isPro = user.tier === "pro" || user.subscription_status === "active"',
-          '''    const entitlements = resolveEntitlements({
-              id: user.id,
-              tier: user.tier,
-              role: user.role,
-              subscription_status: user.subscription_status,
-              subscription_current_period_end: null,
-              email_verified: 1,
-            })
-            const isPro = entitlements.isActivePro''')
-
-          path.write_text(text)
-
-          test_path = Path('apps/worker/tests/auth-cookies.test.ts')
-          tests = test_path.read_text()
-          old_import = 'import { clearCookie, getSessionToken, sessionCookie } from "../src/auth.js"'
-          new_import = 'import { clearCookie, getSessionToken, roleCookie, sessionCookie, tierCookie } from "../src/auth.js"'
-          if tests.count(old_import) != 1:
-              raise SystemExit('Unexpected auth cookie test import')
-          tests = tests.replace(old_import, new_import, 1)
-          marker = '\n})\n'
-          additions = '''
-
-            it("uses the configured domain for tier and role cookies", () => {
-              expect(tierCookie("pro", 3600, ".defrag.app")).toContain("Domain=.defrag.app")
-              expect(roleCookie("owner", 3600, ".defrag.app")).toContain("Domain=.defrag.app")
-            })
-
-            it("omits the domain for host-only tier and role cookies", () => {
-              expect(tierCookie("free")).not.toContain("Domain=")
-              expect(roleCookie("user")).not.toContain("Domain=")
-            })
-          '''
-          index = tests.rfind(marker)
-          if index == -1:
-              raise SystemExit('Could not find test suite closing marker')
-          tests = tests[:index] + additions + tests[index:]
-          test_path.write_text(tests)
-          PY
+        run: python3 .github/scripts/apply-auth-consistency.py
 
       - name: Validate worker
         run: |
           pnpm --filter ./apps/worker run typecheck
           pnpm --filter ./apps/worker run test
 
-      - name: Commit patched files and remove workflow
+      - name: Commit validated patch and remove one-shot automation
         run: |
           git config user.name "sovereign-auth-bot"
           git config user.email "actions@users.noreply.github.com"
-          git rm .github/workflows/apply-auth-consistency.yml
+          git rm .github/workflows/apply-auth-consistency.yml .github/scripts/apply-auth-consistency.py
           git add apps/worker/src/auth.ts apps/worker/tests/auth-cookies.test.ts
           git commit -m "Unify auth cookies roles and entitlements [auth-consistency-bot]"
           git push origin HEAD:automation/auth-consistency
