@@ -7,6 +7,7 @@ on:
     paths:
       - apps/worker/**
       - packages/core/**
+      - pnpm-lock.yaml
       - .github/workflows/deploy-production-api.yml
   workflow_dispatch:
     inputs:
@@ -22,51 +23,44 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  typecheck-and-test:
-    name: Typecheck and test API worker
+  verify:
+    name: Verify API worker
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
-      - name: Install worker dependencies
-        working-directory: apps/worker
-        run: npm install --legacy-peer-deps
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Install core package
-        working-directory: packages/core
-        run: npm install --legacy-peer-deps
+      - name: Scan for committed secrets
+        run: node scripts/secret-scan.js
 
       - name: Typecheck worker
-        working-directory: apps/worker
-        # Allow pre-existing TS errors in the codebase (auth.ts, active-signals.ts)
-        # Our new modules (entitlements, kms, ai-rate-limit) must be error-free
-        run: |
-          npx tsc --noEmit -p tsconfig.json 2>&1 | tee /tmp/tsc_output.txt || true
-          # Fail if our new modules have errors
-          if grep -E "src/(entitlements|kms|middleware/ai-rate-limit)\.ts" /tmp/tsc_output.txt; then
-            echo "TypeScript errors in new modules - failing"
-            exit 1
-          fi
-          echo "No errors in new modules"
+        run: pnpm --filter ./apps/worker run typecheck
 
       - name: Run worker unit tests
-        working-directory: apps/worker
-        run: npx vitest run --reporter=verbose
+        run: pnpm --filter ./apps/worker run test
 
       - name: Run worker smoke tests
         working-directory: apps/worker
-        run: npx tsx src/tests/smoke.test.ts
+        run: pnpm exec tsx src/tests/smoke.test.ts
 
   deploy:
     name: Deploy sovereign-os-api worker
-    needs: typecheck-and-test
+    needs: verify
     if: ${{ github.event_name == 'push' || inputs.confirm == 'DEPLOY' }}
     runs-on: ubuntu-latest
     environment: production
@@ -79,32 +73,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
-      - name: Install worker dependencies
-        working-directory: apps/worker
-        run: npm install --legacy-peer-deps
-
-      - name: Install core package
-        working-directory: packages/core
-        run: npm install --legacy-peer-deps
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Apply pending D1 migrations
         working-directory: apps/worker
-        run: |
-          echo "Applying pending D1 migrations to vibesdk-db..."
-          npx wrangler d1 migrations apply vibesdk-db --remote 2>&1 || echo "Migrations complete (some may already be applied)"
-          echo "Migration step done"
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm exec wrangler d1 migrations apply vibesdk-db --remote
 
       - name: Deploy sovereign-os-api
         working-directory: apps/worker
-        run: npx wrangler deploy
+        run: pnpm exec wrangler deploy
 
       - name: Smoke check API health
         run: |
@@ -115,7 +104,6 @@ jobs:
             echo "API health check failed with status $STATUS"
             exit 1
           fi
-          echo "API health check passed"
 
       - name: Smoke check auth endpoint
         run: |
@@ -125,4 +113,3 @@ jobs:
             echo "Auth endpoint returned unexpected status $STATUS"
             exit 1
           fi
-          echo "Auth endpoint smoke check passed"
