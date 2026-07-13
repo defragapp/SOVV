@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   const isAppShell = host === 'app.defrag.app' || host === 'sovereign.defrag.app';
   const isDefragRoot = host === 'defrag.app' || host === 'www.defrag.app';
 
-  // ── Security headers applied to every response ──────────────────────────
+  // ── Security headers applied to every response ──────────────────────────────
   const securityHeaders: Record<string, string> = {
     'X-Frame-Options': 'DENY',
     'X-Content-Type-Options': 'nosniff',
@@ -35,7 +35,7 @@ export function middleware(request: NextRequest) {
     return res;
   }
 
-  // ── Session check ────────────────────────────────────────────────────────
+  // ── Session check ────────────────────────────────────────────────────────────
   const sessionId =
     request.cookies.get('__sov_session')?.value ||
     request.cookies.get('sid')?.value;
@@ -51,7 +51,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/manifest') ||
     pathname.startsWith('/apple-touch-icon');
 
-  // ── App shell: redirect unauthenticated users to login ───────────────────
+  // ── App shell: redirect unauthenticated users to login ──────────────────────
   if (isAppShell && !sessionId && !isPublicPath) {
     const loginUrl = new URL('/app/login', request.url);
     if (pathname !== '/' && pathname !== '/app/login') {
@@ -62,7 +62,37 @@ export function middleware(request: NextRequest) {
     return applySecurityHeaders(redirectRes);
   }
 
-  // ── App shell root → rewrite to /apps/defrag ────────────────────────────
+  // ── Pro space entitlement check ──────────────────────────────────────────────
+  // Alignment and Covenant are pro-only spaces.
+  // The middleware reads the tier cookie set by the API worker on login/session.
+  // This is a fast, non-blocking check — the authoritative check is in the API worker.
+  // If the cookie is absent (e.g. old session), we allow through and let the API enforce.
+  const PRO_PATHS = [
+    '/apps/alignment',
+    '/apps/covenant',
+  ];
+
+  const isProPath = PRO_PATHS.some(p => pathname.startsWith(p));
+
+  if (isAppShell && sessionId && isProPath) {
+    const tier = request.cookies.get('__sov_tier')?.value || '';
+    const role = request.cookies.get('__sov_role')?.value || '';
+    const isAdmin = role === 'admin';
+    const isPro = tier === 'pro' || isAdmin;
+
+    // Only block if we have a definitive free-tier signal
+    // If cookie is absent, allow through (API will enforce)
+    if (tier && !isPro) {
+      const upgradeUrl = new URL('/pricing', 'https://defrag.app');
+      upgradeUrl.searchParams.set('reason', 'pro_required');
+      upgradeUrl.searchParams.set('space', pathname.split('/')[2] || 'pro');
+      const redirectRes = NextResponse.redirect(upgradeUrl);
+      redirectRes.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+      return applySecurityHeaders(redirectRes);
+    }
+  }
+
+  // ── App shell root → rewrite to /apps/defrag ────────────────────────────────
   if (isAppShell && pathname === '/') {
     url.pathname = '/apps/defrag';
     const rewriteRes = NextResponse.rewrite(url);
@@ -70,7 +100,7 @@ export function middleware(request: NextRequest) {
     return applySecurityHeaders(rewriteRes);
   }
 
-  // ── Marketing root: redirect logged-in users to app ─────────────────────
+  // ── Marketing root: redirect logged-in users to app ─────────────────────────
   if (isDefragRoot && sessionId && pathname === '/') {
     const redirectRes = NextResponse.redirect(
       new URL('https://app.defrag.app/apps/defrag')
@@ -79,7 +109,7 @@ export function middleware(request: NextRequest) {
     return applySecurityHeaders(redirectRes);
   }
 
-  // ── Default: pass through with security headers ──────────────────────────
+  // ── Default: pass through with security headers ──────────────────────────────
   return applySecurityHeaders(NextResponse.next());
 }
 
