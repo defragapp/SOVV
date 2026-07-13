@@ -7,15 +7,15 @@ export const PRICING_CONFIG = {
     features: [
       "Baseline Design",
       "Defrag space — full access",
-      "5 sessions per day",
+      "15 sessions per day",
       "Clear next responses"
     ],
     cta: "Start Free",
-    href: "/login"
+    href: "/app/login"
   },
   pro: {
     name: "Pro",
-    price: "$12",
+    price: "$20",
     period: "month",
     highlight: "Recommended",
     description: "For patterns that need continuity.",
@@ -29,8 +29,8 @@ export const PRICING_CONFIG = {
       "Full Library depth"
     ],
     cta: "Upgrade to Pro",
-    href: "/login",
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "price_default"
+    href: "/app/login",
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || ""
   }
 }
 
