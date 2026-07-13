@@ -6,11 +6,26 @@ import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
+  reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
   typescript: {
     ignoreBuildErrors: true,
+  },
+  async redirects() {
+    return [
+      {
+        source: "/hub/:path*",
+        destination: "/apps/defrag",
+        permanent: true,
+      },
+      {
+        source: "/tool/:path*",
+        destination: "/apps/defrag",
+        permanent: true,
+      },
+    ];
   },
   async headers() {
     return [
