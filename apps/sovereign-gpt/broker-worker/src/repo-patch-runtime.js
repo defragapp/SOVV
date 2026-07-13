@@ -6,7 +6,6 @@ const json = (data, status = 200) => new Response(JSON.stringify(data), {
   status,
   headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
 })
-
 const blocked = (reason) => json({ ok: false, blocked: true, reason }, 403)
 const isEnabled = (env, flag) => String(env[flag] || "false").toLowerCase() === "true"
 const encodePath = (path) => encodeURIComponent(path).replace(/%2F/g, "/")
@@ -36,28 +35,28 @@ export function parseUnifiedPatch(patch) {
   const files = []
   let current = null
   let hunk = null
+  let oldPath = null
 
   for (const line of lines) {
-    if (line.startsWith("--- ")) continue
+    if (line.startsWith("--- ")) {
+      oldPath = line.slice(4).trim()
+      if (oldPath === "/dev/null") throw new Error("Patch must target an existing repository file")
+      continue
+    }
     if (line.startsWith("+++ ")) {
       const path = line.slice(4).trim().replace(/^b\//, "")
-      if (!path || path === "/dev/null") throw new Error("Patch must target an existing repository file")
+      if (!oldPath || !path || path === "/dev/null") throw new Error("Patch must target an existing repository file")
       current = { path, hunks: [] }
       files.push(current)
       hunk = null
+      oldPath = null
       continue
     }
     if (line.startsWith("@@")) {
       if (!current) throw new Error("Patch hunk appears before a file header")
       const match = line.match(/^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/)
       if (!match) throw new Error(`Invalid hunk header: ${line}`)
-      hunk = {
-        oldStart: Number(match[1]),
-        oldCount: Number(match[2] || 1),
-        newStart: Number(match[3]),
-        newCount: Number(match[4] || 1),
-        lines: [],
-      }
+      hunk = { oldStart: Number(match[1]), oldCount: Number(match[2] || 1), newStart: Number(match[3]), newCount: Number(match[4] || 1), lines: [] }
       current.hunks.push(hunk)
       continue
     }
@@ -74,13 +73,11 @@ export function applyUnifiedHunks(original, filePatch) {
   const source = String(original).replace(/\r\n/g, "\n").split("\n")
   const output = []
   let sourceIndex = 0
-
   for (const hunk of filePatch.hunks) {
     const targetIndex = hunk.oldStart - 1
     if (targetIndex < sourceIndex) throw new Error(`Overlapping hunks for ${filePatch.path}`)
     output.push(...source.slice(sourceIndex, targetIndex))
     let cursor = targetIndex
-
     for (const line of hunk.lines) {
       const marker = line[0]
       const text = line.slice(1)
@@ -91,13 +88,10 @@ export function applyUnifiedHunks(original, filePatch) {
       } else if (marker === "-") {
         if (source[cursor] !== text) throw new Error(`Removal mismatch in ${filePatch.path} at line ${cursor + 1}`)
         cursor += 1
-      } else if (marker === "+") {
-        output.push(text)
-      }
+      } else if (marker === "+") output.push(text)
     }
     sourceIndex = cursor
   }
-
   output.push(...source.slice(sourceIndex))
   return output.join("\n")
 }
@@ -120,11 +114,7 @@ export async function handleRepoApplyPatch(request, env) {
   if (typeof body.patch !== "string" || !body.patch.trim()) return json({ ok: false, error: "Missing patch" }, 400)
 
   let parsed
-  try {
-    parsed = parseUnifiedPatch(body.patch)
-  } catch (error) {
-    return json({ ok: false, error: error.message }, 400)
-  }
+  try { parsed = parseUnifiedPatch(body.patch) } catch (error) { return json({ ok: false, error: error.message }, 400) }
 
   const updates = []
   for (const filePatch of parsed) {
@@ -136,11 +126,7 @@ export async function handleRepoApplyPatch(request, env) {
     }
     const original = atob(fileData.content.replace(/\n/g, ""))
     try {
-      updates.push({
-        path: filePatch.path,
-        sha: fileData.sha,
-        content: applyUnifiedHunks(original, filePatch),
-      })
+      updates.push({ path: filePatch.path, content: applyUnifiedHunks(original, filePatch) })
     } catch (error) {
       return json({ ok: false, error: error.message, path: filePatch.path }, 400)
     }
@@ -151,22 +137,52 @@ export async function handleRepoApplyPatch(request, env) {
   if (env.LOGS) await env.LOGS.put(`repo-diffs/${diffId}.json`, JSON.stringify(stored), { httpMetadata: { contentType: "application/json" } })
   if (dryRun) return json({ ok: true, dry_run: true, diff_id: diffId, paths: stored.paths, diff: body.patch })
 
-  const commits = []
+  const refResponse = await ghFetch("/git/ref/heads/main", env)
+  const refData = await parseResponse(refResponse)
+  if (!refResponse.ok || !refData?.object?.sha) return json({ ok: false, error: "Could not resolve main branch" }, 502)
+  const parentSha = refData.object.sha
+
+  const commitResponse = await ghFetch(`/git/commits/${parentSha}`, env)
+  const parentCommit = await parseResponse(commitResponse)
+  if (!commitResponse.ok || !parentCommit?.tree?.sha) return json({ ok: false, error: "Could not resolve main tree" }, 502)
+
+  const treeEntries = []
   for (const update of updates) {
-    const response = await ghFetch(`/contents/${encodePath(update.path)}`, env, {
-      method: "PUT",
+    const blobResponse = await ghFetch("/git/blobs", env, {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: `${body.message || "Apply repository patch"} [sovereign-broker]`,
-        content: btoa(unescape(encodeURIComponent(update.content))),
-        sha: update.sha,
-        branch: "main",
-      }),
+      body: JSON.stringify({ content: update.content, encoding: "utf-8" }),
     })
-    const data = await parseResponse(response)
-    if (!response.ok) return json({ ok: false, committed: false, error: `Commit failed for ${update.path}`, github: data, commits }, response.status)
-    commits.push({ path: update.path, commit_sha: data.commit?.sha, url: data.commit?.html_url })
+    const blob = await parseResponse(blobResponse)
+    if (!blobResponse.ok || !blob?.sha) return json({ ok: false, error: `Could not create blob for ${update.path}`, github: blob }, blobResponse.status)
+    treeEntries.push({ path: update.path, mode: "100644", type: "blob", sha: blob.sha })
   }
 
-  return json({ ok: true, dry_run: false, committed: true, diff_id: diffId, paths: stored.paths, commits })
+  const treeResponse = await ghFetch("/git/trees", env, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ base_tree: parentCommit.tree.sha, tree: treeEntries }),
+  })
+  const tree = await parseResponse(treeResponse)
+  if (!treeResponse.ok || !tree?.sha) return json({ ok: false, error: "Could not create patch tree", github: tree }, treeResponse.status)
+
+  const newCommitResponse = await ghFetch("/git/commits", env, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: `${body.message || "Apply repository patch"} [sovereign-broker]`, tree: tree.sha, parents: [parentSha] }),
+  })
+  const newCommit = await parseResponse(newCommitResponse)
+  if (!newCommitResponse.ok || !newCommit?.sha) return json({ ok: false, error: "Could not create patch commit", github: newCommit }, newCommitResponse.status)
+
+  const updateRefResponse = await ghFetch("/git/refs/heads/main", env, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sha: newCommit.sha, force: false }),
+  })
+  const updateRef = await parseResponse(updateRefResponse)
+  if (!updateRefResponse.ok) return json({ ok: false, error: "Could not advance main branch", github: updateRef }, updateRefResponse.status)
+
+  if (env.LOGS) await env.LOGS.put(`audit/repo-patch/${Date.now()}.json`, JSON.stringify({ event: "repo_apply_patch", diff_id: diffId, paths: stored.paths, commit_sha: newCommit.sha, timestamp: new Date().toISOString() }), { httpMetadata: { contentType: "application/json" } })
+
+  return json({ ok: true, dry_run: false, committed: true, diff_id: diffId, paths: stored.paths, commit_sha: newCommit.sha, url: `https://github.com/${REPO_OWNER}/${REPO_NAME}/commit/${newCommit.sha}` })
 }
