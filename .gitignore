@@ -7,6 +7,7 @@ out-tsc
 *.tsbuildinfo
 .open-next
 apps/web/.open-next
+.wrangler/
 .expo
 .expo-shared
 
