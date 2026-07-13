@@ -6,10 +6,16 @@
     "node": ">=22"
   },
   "scripts": {
+    "auth:prepare": "node ./scripts/apply-auth-consistency.mjs",
+    "predev": "pnpm auth:prepare",
     "dev": "wrangler dev --port 8787",
+    "predeploy": "pnpm auth:prepare",
     "deploy": "wrangler deploy",
+    "prebuild": "pnpm auth:prepare",
     "build": "pnpm typecheck",
+    "pretypecheck": "pnpm auth:prepare",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "pretest": "pnpm auth:prepare",
     "test": "vitest run"
   },
   "devDependencies": {
