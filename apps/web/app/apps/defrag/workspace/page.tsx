@@ -8,25 +8,9 @@ import { BaselineSidebar } from "@/components/spaces/BaselineSidebar"
 import { DefragComposer } from "@/components/spaces/DefragComposer"
 import { useDefragRun } from "@/lib/hooks/useDefragRun"
 import type { DefragResult } from "@/lib/hooks/useDefragRun"
+import { useBaselineContext, useLibraryContext } from "@/lib/hooks/useBaselineContext"
+import type { Baseline, BaselineStatement, LibraryItem } from "@/lib/hooks/useBaselineContext"
 import Link from "next/link"
-
-interface Baseline {
-  dob: string
-  tob: { type: "exact" | "approx"; value: string }
-  pob: string
-}
-
-interface BaselineStatement {
-  statement: string
-  chips: string[]
-}
-
-interface LibraryItem {
-  id: string
-  title: string
-  workspace_source: string
-  created_at: string
-}
 
 function formatBirthSummary(b: Baseline): string {
   const city = b.pob.split(",")[0].trim()
@@ -41,14 +25,6 @@ export default function DefragWorkspacePage() {
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
   const [inviteOpen, setInviteOpen] = React.useState(false)
-
-  const [baseline, setBaseline] = React.useState<Baseline | null>(null)
-  const [baselineLoading, setBaselineLoading] = React.useState(true)
-  const [baselineStatements, setBaselineStatements] = React.useState<BaselineStatement[]>([])
-  const [statementsLoading, setStatementsLoading] = React.useState(false)
-  const [datasetStatus, setDatasetStatus] = React.useState<"none" | "pending" | "ready" | "failed" | null>(null)
-  const [recurringPattern, setRecurringPattern] = React.useState<string | null>(null)
-  const [sessionCount, setSessionCount] = React.useState(0)
   const [compareMode, setCompareMode] = React.useState(false)
   const [compareName, setCompareName] = React.useState("")
   const [messageMode, setMessageMode] = React.useState(false)
@@ -58,8 +34,9 @@ export default function DefragWorkspacePage() {
   const [isGeneratingAudio, setIsGeneratingAudio] = React.useState(false)
   const [audioError, setAudioError] = React.useState("")
 
-  const [library, setLibrary] = React.useState<LibraryItem[]>([])
-  const [libraryLoading, setLibraryLoading] = React.useState(true)
+  const { baseline, baselineLoading, baselineStatements, statementsLoading, datasetStatus, recurringPattern, sessionCount } = useBaselineContext()
+  const { library, libraryLoading } = useLibraryContext("DEFRAG", saveSuccess)
+
 
   const { result, streamingText, isLoading, error, run: runDefrag, runWithDepth, reset: resetRun } = useDefragRun({
     input,
