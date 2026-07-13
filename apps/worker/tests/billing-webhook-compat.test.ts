@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest"
-import { isSubscriptionInvoiceEvent, needsCreatedTimestampNormalization } from "../src/billing-webhook-compat.js"
+import {
+  isSubscriptionInvoiceEvent,
+  needsCreatedTimestampNormalization,
+  validateKnownLifecycleEvent,
+} from "../src/billing-webhook-compat.js"
 
 describe("billing webhook compatibility", () => {
   it("accepts subscription invoice events", () => {
@@ -29,5 +33,32 @@ describe("billing webhook compatibility", () => {
 
   it("preserves a recent event creation timestamp", () => {
     expect(needsCreatedTimestampNormalization({ created: 1_000 }, 1_300)).toBe(false)
+  })
+
+  it("accepts a complete subscription lifecycle event", () => {
+    expect(validateKnownLifecycleEvent({
+      id: "evt_1",
+      type: "customer.subscription.updated",
+      created: 1_000,
+      data: { object: { id: "sub_1", customer: "cus_1", status: "active" } },
+    })).toEqual({ valid: true })
+  })
+
+  it("rejects malformed subscription events before idempotency storage", () => {
+    expect(validateKnownLifecycleEvent({
+      id: "evt_1",
+      type: "customer.subscription.updated",
+      created: 1_000,
+      data: { object: { customer: "cus_1" } },
+    })).toEqual({ valid: false, reason: "invalid_subscription" })
+  })
+
+  it("rejects malformed checkout completion events", () => {
+    expect(validateKnownLifecycleEvent({
+      id: "evt_2",
+      type: "checkout.session.completed",
+      created: 1_000,
+      data: { object: { customer: "cus_1" } },
+    })).toEqual({ valid: false, reason: "invalid_checkout_session" })
   })
 })
