@@ -5,6 +5,7 @@ import { InviteModal } from "@/components/spaces/InviteModal"
 import { CovenantScriptureSearch } from "@/components/spaces/CovenantScriptureSearch"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
+import { SpaceComposer } from "@/components/spaces/SpaceComposer"
 import { PanelHeader, PremiumEmptyState, PremiumLoadingState, PremiumErrorState } from "@/components/spaces/WorkspaceStates"
 
 interface LibraryItem {
@@ -370,29 +371,14 @@ export default function CovenantWorkspacePage() {
       </div>
 
       {/* Composer */}
-      <div className="flex-none px-6 pb-6">
-        <div className="border border-white/[0.08] bg-white/[0.02] overflow-hidden focus-within:border-white/[0.14] transition-colors" style={{ borderRadius: 16 }}>
-          <textarea
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            placeholder="What does this moment mean in the larger story?"
-            rows={3}
-            className="w-full bg-transparent text-[#f4efe9] placeholder:text-[#4f4b47] resize-none outline-none text-[14px] p-5 leading-[1.75] block"
-            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit() } }}
-          />
-          <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05]">
-            <span className="font-mono text-[10px] text-[#4f4b47] tracking-[0.08em]">↵ Run</span>
-            <button
-              onClick={handleSubmit}
-              disabled={!input.trim() || isLoading}
-              className="h-8 px-5 border border-[#c8c2bc]/40 text-[#c8c2bc] text-[11px] font-medium tracking-wide hover:bg-[#c8c2bc]/10 hover:border-[#c8c2bc]/60 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-              style={{ borderRadius: 2 }}
-            >
-              {isLoading ? "…" : "Find the story"}
-            </button>
-          </div>
-        </div>
-      </div>
+      <SpaceComposer
+        input={input}
+        onInputChange={setInput}
+        onSubmit={handleSubmit}
+        isLoading={isLoading}
+        placeholder="What does this moment mean in the larger story?"
+        submitLabel="Reflect"
+      />
     </div>
   )
 
