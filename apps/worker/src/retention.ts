@@ -133,7 +133,20 @@ export function registerRetentionRoutes(router: any, getEnv: () => Env) {
 export async function scheduledRetentionPurge(env: Env): Promise<{ purged: number; users: number }> {
   const cutoffIso = new Date(Date.now() - FREE_RETENTION_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
-  // Delete old history for free-tier users only
+  // Count affected users before deleting their eligible history records.
+  const usersResult = await env.DB.prepare(
+    `SELECT COUNT(DISTINCT user_id) as n FROM history
+     WHERE created_at < ?
+       AND user_id IN (
+         SELECT id FROM users
+         WHERE (tier = 'free' OR tier IS NULL)
+           AND (subscription_status = 'free' OR subscription_status IS NULL OR subscription_status = 'canceled')
+       )`
+  )
+    .bind(cutoffIso)
+    .first() as { n: number } | null;
+
+  // Delete old history for free-tier users only.
   const result = await env.DB.prepare(
     `DELETE FROM history
      WHERE created_at < ?
@@ -148,15 +161,6 @@ export async function scheduledRetentionPurge(env: Env): Promise<{ purged: numbe
     .all();
 
   const purged = result.results?.length ?? 0;
-
-  // Count affected users (approximate)
-  const usersResult = await env.DB.prepare(
-    `SELECT COUNT(DISTINCT user_id) as n FROM history
-     WHERE created_at < ?
-       AND user_id IN (SELECT id FROM users WHERE tier = 'free' OR tier IS NULL)`
-  )
-    .bind(cutoffIso)
-    .first() as { n: number } | null;
 
   console.log(JSON.stringify({
     event: "scheduled_retention_purge",
