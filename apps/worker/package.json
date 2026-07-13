@@ -6,7 +6,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "auth:prepare": "node ./scripts/apply-auth-consistency.mjs",
+    "auth:prepare": "node ./scripts/apply-auth-consistency-v2.mjs",
     "predev": "pnpm auth:prepare",
     "dev": "wrangler dev --port 8787",
     "predeploy": "pnpm auth:prepare",
