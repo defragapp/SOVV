@@ -6,6 +6,8 @@ import { ResultCard } from "@/components/spaces/ResultCard"
 import { PanelHeader, EvidenceChip, PremiumEmptyState, PremiumLoadingState, PremiumErrorState } from "@/components/spaces/WorkspaceStates"
 import { BaselineSidebar } from "@/components/spaces/BaselineSidebar"
 import { DefragComposer } from "@/components/spaces/DefragComposer"
+import { useDefragRun } from "@/lib/hooks/useDefragRun"
+import type { DefragResult } from "@/lib/hooks/useDefragRun"
 import Link from "next/link"
 
 interface Baseline {
@@ -17,29 +19,6 @@ interface Baseline {
 interface BaselineStatement {
   statement: string
   chips: string[]
-}
-
-interface DefragResult {
-  activePattern?: string
-  theRepeat?: string
-  oldRole?: string
-  whatYouLearnedToCarry?: string
-  strainPattern?: string
-  giftUnderStrain?: string
-  alignment?: string
-  bestNextResponse?: { summary?: string; phrasing?: string[] } | string
-  conversationalSteering?: { do?: string[]; avoid?: string[] }
-  summary?: string
-  sourcesUsed?: { baseline?: boolean; history?: boolean; invitedUsers?: boolean }
-  media?: { audioOverviewAvailable?: boolean; watchPreviewAvailable?: boolean }
-  signature?: string
-  confidence?: { score: number; strength: "low" | "medium" | "high" }
-  presence?: { stepDeeperChoices?: Array<"keep_simple" | "show_pattern" | "map_baseline" | "turn_into_action" | "save_pattern" | "go_deeper" | "steady_first"> }
-  rail?: {
-    baseline?: { pace?: string; stabilizes?: string; responds?: string }
-    sky?: { urgency?: string; tolerance?: string; state?: string }
-    pattern?: { loop?: string }
-  }
 }
 
 interface LibraryItem {
@@ -58,11 +37,7 @@ function formatBirthSummary(b: Baseline): string {
 
 export default function DefragWorkspacePage() {
   const [input, setInput] = React.useState("")
-  const [result, setResult] = React.useState<DefragResult | null>(null)
   const [thread, setThread] = React.useState<Array<{input: string; result: DefragResult}>>([])
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [streamingText, setStreamingText] = React.useState("")
-  const [error, setError] = React.useState("")
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveSuccess, setSaveSuccess] = React.useState(false)
   const [inviteOpen, setInviteOpen] = React.useState(false)
@@ -86,277 +61,25 @@ export default function DefragWorkspacePage() {
   const [library, setLibrary] = React.useState<LibraryItem[]>([])
   const [libraryLoading, setLibraryLoading] = React.useState(true)
 
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      const p = new URLSearchParams(window.location.search).get("prompt")
-      if (p) setInput(prev => prev || decodeURIComponent(p))
-    }
-  }, [])
+  const { result, streamingText, isLoading, error, run: runDefrag, runWithDepth, reset: resetRun } = useDefragRun({
+    input,
+    compareMode,
+    compareName,
+    messageMode,
+    thread,
+  })
 
+  // Sync thread when result changes
   React.useEffect(() => {
-    fetch("/api/baseline", { credentials: "include" })
-      .then(r => r.ok ? r.json() : { baseline: null })
-      .then((d: { baseline?: Baseline | null }) => setBaseline(d.baseline ?? null))
-      .catch(() => {})
-      .finally(() => setBaselineLoading(false))
-  }, [])
+    if (result) setThread(prev => [...prev.slice(-2), { input, result }])
+  }, [result]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  React.useEffect(() => {
-    if (!baseline) return
-    let active = true
-    const poll = async () => {
-      try {
-        const r = await fetch("/api/baseline/status", { credentials: "include" })
-        if (!r.ok || !active) return null
-        const d = await r.json() as { status?: "none" | "pending" | "ready" | "failed" }
-        setDatasetStatus(d.status ?? "none")
-        return d.status
-      } catch { return null }
-    }
-    poll().then(status => {
-      if (status === "pending") {
-        const interval = setInterval(async () => {
-          const s = await poll()
-          if (s === "ready" || s === "failed" || !active) clearInterval(interval)
-        }, 5000)
-        return () => { active = false; clearInterval(interval) }
-      }
-    })
-    return () => { active = false }
-  }, [baseline])
-
-  React.useEffect(() => {
-    if (!baseline) return
-    setStatementsLoading(true)
-    fetch("/api/derive-profile", { credentials: "include" })
-      .then(r => r.ok ? r.json() : { statements: [] })
-      .then((d: { statements?: BaselineStatement[] }) => { if (Array.isArray(d.statements) && d.statements.length > 0) setBaselineStatements(d.statements) })
-      .catch(() => {})
-      .finally(() => setStatementsLoading(false))
-  }, [baseline])
-
-  React.useEffect(() => {
-    return () => { if (audioUrl) URL.revokeObjectURL(audioUrl) }
-  }, [audioUrl])
-
-  React.useEffect(() => {
-    fetch("/api/memory", { credentials: "include" })
-      .then(r => r.ok ? r.json() : null)
-      .then((d: { recurringPattern?: string; sessionCount?: number } | null) => {
-        if (d?.recurringPattern) setRecurringPattern(d.recurringPattern)
-        if (d?.sessionCount) setSessionCount(d.sessionCount)
-      })
-      .catch(() => {})
-  }, [])
-
-  React.useEffect(() => {
-    setLibraryLoading(true)
-    fetch("/api/library?workspace_source=DEFRAG", { credentials: "include" })
-      .then(r => r.ok ? r.json() : { items: [] })
-      .then((d: { items?: LibraryItem[] }) => setLibrary(d.items || []))
-      .catch(() => {})
-      .finally(() => setLibraryLoading(false))
-  }, [saveSuccess])
-
-  const handleSubmit = async () => {
-    if (!input.trim() || isLoading) return
-    setIsLoading(true)
-    setError("")
+  const handleSubmit = React.useCallback(async () => {
     setSaveSuccess(false)
     setAudioUrl(null)
     setAudioError("")
-    setResult(null)
-    setStreamingText("")
-
-    if (messageMode) {
-      try {
-        const res = await fetch("/api/defrag/message", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ message: input }),
-        })
-        const data = await res.json() as {
-          error?: string
-          whatMightBeActive?: string
-          whatTheyMightMean?: string
-          yourPattern?: string
-          bestNextResponse?: string
-          tone?: string
-        }
-        if (!res.ok) {
-          setError(data.error || "Something went wrong.")
-          return
-        }
-        const messageResult: DefragResult = {
-          activePattern: data.whatMightBeActive,
-          theRepeat: data.whatTheyMightMean,
-          alignment: data.yourPattern,
-          bestNextResponse: data.bestNextResponse,
-          summary: data.tone,
-          sourcesUsed: { baseline: true, history: false, invitedUsers: false },
-        }
-        setResult(messageResult)
-        setThread(prev => [...prev.slice(-2), { input, result: messageResult }])
-      } catch {
-        setError("Unable to connect. Check your connection and try again.")
-      } finally {
-        setIsLoading(false)
-      }
-      return
-    }
-
-    try {
-      const streamController = new AbortController()
-      fetch("/api/explain/stream", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        signal: streamController.signal,
-        body: JSON.stringify({ message: input }),
-      }).then(async (streamRes) => {
-        if (!streamRes.ok || !streamRes.body) return
-        const reader = streamRes.body.getReader()
-        const decoder = new TextDecoder()
-        let buffer = ""
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-          buffer += decoder.decode(value, { stream: true })
-          const evtLines = buffer.split("\n\n")
-          buffer = evtLines.pop() ?? ""
-          for (const line of evtLines) {
-            if (!line.startsWith("data: ")) continue
-            try {
-              const d = JSON.parse(line.slice(6)) as { token?: string; done?: boolean; error?: string }
-              if (d.token) setStreamingText(prev => prev + d.token)
-              if (d.done || d.error) break
-            } catch { /* ignore */ }
-          }
-        }
-      }).catch(() => { /* stream failed, main fetch will handle */ })
-
-      const res = await fetch("/api/explain", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          message: input,
-          ...(compareMode && compareName.trim() ? {
-            target: { id: "compare", relation: "partner" },
-            targetName: compareName.trim(),
-          } : {}),
-          ...(thread.length > 0 ? {
-            priorPatterns: thread.slice(-2).map(t => t.result.activePattern).filter(Boolean),
-          } : {}),
-        }),
-      })
-      const data = await res.json() as DefragResult & { type?: string; error?: string; message?: string }
-      if (data.type === "needs_baseline") { setError("needs_baseline"); return }
-      if (!res.ok) {
-        setError(data.error === "daily_limit_reached"
-          ? "You've reached your free daily limit. Upgrade to continue."
-          : data.message || data.error || "Something went wrong.")
-        return
-      }
-      setStreamingText("")
-      setResult(data)
-      setThread(prev => [...prev.slice(-2), { input, result: data }])
-    } catch {
-      setError("Unable to connect. Check your connection and try again.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleStepDeeper = async (choice: "keep_simple" | "show_pattern" | "map_baseline" | "turn_into_action" | "save_pattern" | "go_deeper" | "steady_first") => {
-    if (!result) return
-    if (choice === "keep_simple" || choice === "steady_first") {
-      await handleSubmitWithDepth("simple")
-    } else if (choice === "go_deeper" || choice === "map_baseline" || choice === "show_pattern") {
-      await handleSubmitWithDepth("deep")
-    } else if (choice === "turn_into_action") {
-      const prompt = result.alignment || input
-      window.location.href = `/apps/alignment/workspace?prompt=${encodeURIComponent(prompt)}`
-    } else if (choice === "save_pattern") {
-      handleSave()
-    }
-  }
-
-  const handleSubmitWithDepth = async (depth: "simple" | "deep") => {
-    if (!input.trim() || isLoading) return
-    setIsLoading(true)
-    setResult(null)
-    try {
-      const res = await fetch("/api/explain", {
-        method: "POST",
-        credentials: "include",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ message: input, depth }),
-      })
-      if (!res.ok) return
-      const data = await res.json() as DefragResult
-      setResult(data)
-    } catch {}
-    finally { setIsLoading(false) }
-  }
-
-  const handleSave = async () => {
-    if (!result) return
-    setIsSaving(true)
-    try {
-      const content = result.summary || result.activePattern ||
-        (typeof result.bestNextResponse === "string" ? result.bestNextResponse : result.bestNextResponse?.summary) ||
-        input.slice(0, 300)
-      const res = await fetch("/api/history", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          title: input.slice(0, 60) + (input.length > 60 ? "â¦" : ""),
-          content,
-          payload: result,
-          workspace_source: "DEFRAG",
-        }),
-      })
-      if (!res.ok) throw new Error()
-      setSaveSuccess(true)
-    } catch { /* silent */ } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleGenerateAudio = async () => {
-    if (!result || isGeneratingAudio) return
-    setIsGeneratingAudio(true)
-    setAudioError("")
-    try {
-      const res = await fetch("/api/audio", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          text: [
-            result.activePattern,
-            result.theRepeat ? `What keeps happening: ${result.theRepeat}` : null,
-            result.alignment ? `What gives this moment a better chance: ${result.alignment}` : null,
-            result.bestNextResponse
-              ? `Next move: ${typeof result.bestNextResponse === "object" ? result.bestNextResponse?.summary : result.bestNextResponse}`
-              : null,
-          ].filter(Boolean).join(". "),
-        }),
-      })
-      if (!res.ok) { const d = (await res.json().catch(() => ({}))) as { error?: string }; throw new Error(d.error || "Failed") }
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      setAudioUrl(url)
-      requestAnimationFrame(() => { audioRef.current?.play().catch(() => {}) })
-    } catch (err) {
-      setAudioError(err instanceof Error ? err.message : "Failed to generate audio")
-    } finally {
-      setIsGeneratingAudio(false)
-    }
-  }
+    await runDefrag()
+  }, [runDefrag])
 
   const sidebar = (
     <BaselineSidebar
