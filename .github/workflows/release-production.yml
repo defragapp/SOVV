@@ -1,0 +1,143 @@
+name: Release production
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Production surface to release
+        required: true
+        type: choice
+        options:
+          - web
+          - api
+          - broker
+      confirm:
+        description: Type DEPLOY to confirm production release
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-${{ inputs.target }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate release request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require explicit production confirmation
+        run: |
+          if [ "${{ inputs.confirm }}" != "DEPLOY" ]; then
+            echo "Production release not confirmed."
+            exit 1
+          fi
+
+  web:
+    name: Release web
+    if: ${{ inputs.target == 'web' }}
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 30
+    env:
+      CI: true
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+      PRODUCTION_WEB_URLS: https://defrag.app/,https://www.defrag.app/
+      CLOUDFLARE_PURGE_HOSTS: defrag.app,www.defrag.app,app.defrag.app,sovereign.defrag.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/secret-scan.js
+      - name: Verify launch pricing contract
+        run: |
+          grep -q 'freeDailySessions: 15' apps/web/app/pricing/pricing-contract.ts
+          grep -q 'monthlyPriceUsd: 20' apps/web/app/pricing/pricing-contract.ts
+          grep -q 'annualPriceUsd: 99' apps/web/app/pricing/pricing-contract.ts
+          grep -q 'trialDays: 0' apps/web/app/pricing/pricing-contract.ts
+      - name: Build and deploy web
+        working-directory: apps/web
+        run: pnpm run deploy
+      - name: Purge production cache
+        run: pnpm --filter @workspace/scripts run purge:production-web-cache
+      - name: Verify production web
+        run: pnpm verify:production-web
+
+  api:
+    name: Release API
+    if: ${{ inputs.target == 'api' }}
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    env:
+      CI: true
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/secret-scan.js
+      - run: pnpm --filter ./apps/worker run typecheck
+      - run: pnpm --filter ./apps/worker run test
+      - name: Apply D1 migrations
+        working-directory: apps/worker
+        run: pnpm exec wrangler d1 migrations apply vibesdk-db --remote
+      - name: Deploy API
+        working-directory: apps/worker
+        run: pnpm run deploy
+      - name: Verify API health
+        run: |
+          curl --fail --silent --show-error --max-time 20 https://api.defrag.app/health
+
+  broker:
+    name: Release broker
+    if: ${{ inputs.target == 'broker' }}
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    env:
+      CI: true
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/secret-scan.js
+      - run: node --check apps/sovereign-gpt/broker-worker/src/index-v4.js
+      - run: node --check apps/sovereign-gpt/broker-worker/src/repo-patch-runtime.js
+      - run: pnpm exec vitest run apps/sovereign-gpt/broker-worker/src/repo-patch-runtime.test.js
+      - name: Deploy broker
+        run: pnpm exec wrangler deploy --config apps/sovereign-gpt/broker-worker/wrangler.toml
+      - name: Verify broker edge response
+        run: |
+          STATUS=$(curl -sS -o /tmp/broker-health.json -w "%{http_code}" --max-time 20 https://sovereign-broker.defrag.app/health || true)
+          echo "Broker health status: $STATUS"
+          cat /tmp/broker-health.json 2>/dev/null || true
+          if [ "$STATUS" != "200" ]; then exit 1; fi
