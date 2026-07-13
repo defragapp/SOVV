@@ -13,10 +13,11 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "@cloudflare/workers-types": "^4.20260515.0",
-    "@vitest/ui": "^4.1.8",
+    "@vitest/ui": "4.1.8",
     "typescript": "^5.5.4",
-    "vitest": "^4.1.8",
+    "vitest": "4.1.8",
     "wrangler": "^4.105.0"
   },
   "dependencies": {
