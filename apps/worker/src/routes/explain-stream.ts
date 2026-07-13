@@ -26,6 +26,7 @@ import {
 } from "../active-signals.js";
 import { getCurrentSkySnapshot } from "../baseline-compiler.js";
 import { formatBaseline } from "../baseline.js";
+import { resolveEntitlements } from "../entitlements.js";
 
 export function registerExplainStreamRoute(router: any, getEnv: () => Env) {
   router.post("/api/explain/stream", async (request: Request) => {
@@ -44,7 +45,7 @@ export function registerExplainStreamRoute(router: any, getEnv: () => Env) {
     }
 
     const sid = await getSessionId(request);
-    const isPro = user.subscription_status === "active" || user.tier === "pro";
+    const isPro = resolveEntitlements(user).effectiveTier === "pro";
     if (!isPro) {
       const limit = await checkFreeLimit(env, sid);
       if (!limit.allowed) {
