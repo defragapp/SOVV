@@ -1,5 +1,5 @@
 name = "sovereign-os-api"
-main = "./src/index.ts"
+main = "./src/index-v2.ts"
 compatibility_date = "2026-06-01"
 compatibility_flags = ["nodejs_compat"]
 # account_id removed — set CLOUDFLARE_ACCOUNT_ID in CI secrets
@@ -58,30 +58,29 @@ service = "worker-session"
 name = "RATE_LIMITER"
 type = "ratelimit"
 namespace_id = "100"
-simple = { limit = 15, period = 60 }
-
+simple = { limit = 200, period = 60 }
 
 [triggers]
-crons = ["0 10 * * *"]  # Daily at 10am UTC — nurture emails + session cleanup
-
-[vars]
-FREE_DAILY_LIMIT = "15"
-AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
-APP_URL = "https://app.defrag.app"
-GATEWAY_ID = "sovereign-ai-gateway"
-
-# ── Stripe price IDs (set as Worker secrets — listed here for reference only) ──
-# STRIPE_PRICE_ID    = price_1Te0g9Bk78yJ8Hww8fFZCqhm  ($20.00/month — DEFRAG Pro)
-# STRIPE_ANNUAL_PRICE_ID = price_1Tq6nPBk78yJ8Hwwm0pxg4hH ($99.00/year  — DEFRAG Pro Annual)
-# Product: DEFRAG Pro (prod_UdHEFXmi3YN78U) — only active product as of 2026-07-07
-# All legacy products (Pro Plan $9, Scale Plan $49) archived 2026-07-07
-
-# send_email binding — Cloudflare Email Routing (verified destination: info@defrag.app)
-# Email Routing is active on defrag.app. Destination address verified.
-# Sender must be from defrag.app domain.
-[[email]]
-name = "EMAIL"
-destination_address = "info@defrag.app"
+crons = ["0 10 * * *"]
 
 [observability]
 enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
+[vars]
+APP_URL = "https://defrag.app"
+AI_MODEL = "openai/gpt-oss-120b"
+GATEWAY_ID = "sovereign-os-gateway"
+ENABLE_NEW_FLOW = "true"
+ENABLE_MEMORY = "true"
+FREE_DAILY_LIMIT = "15"
+ENABLE_FLOW_SUGGESTION = "true"
+COOKIE_DOMAIN = ".defrag.app"
+STRIPE_PRICE_ID = "price_1Te0g9Bk78yJ8Hww8fFZCqhm"
+STRIPE_ANNUAL_PRICE_ID = "price_1Tq6nPBk78yJ8Hwwm0pxg4hH"
+STRIPE_SUPPORT_LINK_URL = "https://support.stripe.com/contact"
