@@ -28,6 +28,7 @@ import { registerCovenantSearchRoute } from "./covenant-search.js";
 import { registerAffiliateRoutes } from "./affiliate.js";
 import { registerAdminCohortsRoute } from "./admin-cohorts.js";
 import { registerAdminRevenueRoute } from "./admin-revenue.js";
+import { registerRetentionRoutes, scheduledRetentionPurge } from "./retention.js";
 
 
 const router = Router();
@@ -170,6 +171,7 @@ registerCovenantSearchRoute(router, getEnv);
 registerAffiliateRoutes(router, getEnv);
 registerAdminCohortsRoute(router, getEnv);
 registerAdminRevenueRoute(router, getEnv);
+  registerRetentionRoutes(router, getEnv);
 
 
 // Memory context endpoint — pattern history for UI
@@ -504,6 +506,14 @@ export default {
   },
 
   async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
+    // Daily retention purge — 30-day free tier cleanup
+    try {
+      const retentionResult = await scheduledRetentionPurge(env);
+      console.log(JSON.stringify({ event: "cron_retention_purge", ...retentionResult }));
+    } catch (e: any) {
+      console.error("Retention purge failed:", e?.message);
+    }
+
     // Daily nurture email cron — runs at 10am UTC
     const emailOpts = {
       emailBinding: (env as any).EMAIL as any,
