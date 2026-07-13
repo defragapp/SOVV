@@ -125,3 +125,26 @@ jobs:
           if [ "$STATUS" = "200" ] && ! grep -Eq '"authenticated"[[:space:]]*:[[:space:]]*false' /tmp/api-session.json; then
             exit 1
           fi
+
+      - name: Verify Stripe webhook rejects unsigned requests
+        run: |
+          STATUS=$(curl -sS -o /tmp/api-webhook.json -w "%{http_code}" --max-time 15 \
+            -X POST "https://api.defrag.app/api/billing/webhook" \
+            -H "content-type: application/json" \
+            --data '{"id":"evt_unsigned","type":"customer.subscription.updated","created":0,"data":{"object":{}}}' || true)
+          echo "Unsigned webhook status: $STATUS"
+          cat /tmp/api-webhook.json 2>/dev/null || true
+          if [ "$STATUS" != "400" ]; then
+            exit 1
+          fi
+
+      - name: Verify configured Stripe prices are exposed
+        run: |
+          STATUS=$(curl -sS -o /tmp/api-prices.json -w "%{http_code}" --max-time 15 "https://api.defrag.app/api/stripe/prices" || true)
+          echo "Stripe prices status: $STATUS"
+          cat /tmp/api-prices.json 2>/dev/null || true
+          if [ "$STATUS" != "200" ]; then
+            exit 1
+          fi
+          grep -q 'price_1Te0g9Bk78yJ8Hww8fFZCqhm' /tmp/api-prices.json
+          grep -q 'price_1Tq6nPBk78yJ8Hwwm0pxg4hH' /tmp/api-prices.json
