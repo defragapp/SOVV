@@ -118,24 +118,34 @@ export function clearCookie(cookieDomainValue?: string): string {
 }
 
 /** Non-HttpOnly cookie readable by Next.js middleware for entitlement checks. */
-export function tierCookie(tier: string, maxAge = 7 * 24 * 60 * 60): string {
+export function tierCookie(
+  tier: string,
+  maxAge = 7 * 24 * 60 * 60,
+  cookieDomainValue?: string,
+): string {
+  const domain = cookieDomain(cookieDomainValue)
   return [
     `__sov_tier=${encodeURIComponent(tier || "free")}`,
     `Max-Age=${maxAge}`,
     "Path=/",
-    "Domain=.defrag.app",
+    ...(domain ? [`Domain=${domain}`] : []),
     "Secure",
     "SameSite=Lax",
   ].join("; ")
 }
 
 /** Non-HttpOnly cookie readable by Next.js middleware for role checks. */
-export function roleCookie(role: string, maxAge = 7 * 24 * 60 * 60): string {
+export function roleCookie(
+  role: string,
+  maxAge = 7 * 24 * 60 * 60,
+  cookieDomainValue?: string,
+): string {
+  const domain = cookieDomain(cookieDomainValue)
   return [
     `__sov_role=${encodeURIComponent(role || "user")}`,
     `Max-Age=${maxAge}`,
     "Path=/",
-    "Domain=.defrag.app",
+    ...(domain ? [`Domain=${domain}`] : []),
     "Secure",
     "SameSite=Lax",
   ].join("; ")
@@ -153,6 +163,7 @@ import type { D1Database } from "@cloudflare/workers-types";
 import { getCorsHeaders } from "./cors.js";
 import { getSessionId } from "./plan.js";
 import { logSafetyEvent } from "./safety.js";
+import { resolveEntitlements } from "./entitlements.js";
 
 export function jsonResponse(data: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(data), {
@@ -221,6 +232,10 @@ export async function getAuthUser(request: Request, DB: D1Database): Promise<Aut
 }
 
 const SESSION_TTL = 7 * 24 * 60 * 60
+
+function isPrivilegedRole(role: string): boolean {
+  return role === "owner" || role === "admin"
+}
 
 export async function registerAuthRoutes(router: any, getEnv: () => any) {
   // POST /api/auth/register
@@ -299,7 +314,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
         const appUrl = env.APP_URL || "https://app.defrag.app"
         void fetch(`${appUrl}/api/auth/send-verification`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "Cookie": `session=${token}` },
+          headers: { "Content-Type": "application/json", "Cookie": `__sov_session=${token}` },
           body: JSON.stringify({ email }),
         }).catch((error) => {
           logSafetyEvent({
@@ -352,8 +367,8 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
 
       const loginHeaders = new Headers()
       loginHeaders.append("Set-Cookie", sessionCookie(token, 7 * 24 * 60 * 60, env.COOKIE_DOMAIN))
-      loginHeaders.append("Set-Cookie", tierCookie(user.tier || "free", 7 * 24 * 60 * 60))
-      loginHeaders.append("Set-Cookie", roleCookie(user.role || "user", 7 * 24 * 60 * 60))
+      loginHeaders.append("Set-Cookie", tierCookie(user.tier || "free", 7 * 24 * 60 * 60, env.COOKIE_DOMAIN))
+      loginHeaders.append("Set-Cookie", roleCookie(user.role || "user", 7 * 24 * 60 * 60, env.COOKIE_DOMAIN))
       loginHeaders.set("Content-Type", "application/json")
       return new Response(JSON.stringify({ success: true, token }), { status: 200, headers: loginHeaders })
     } catch (e: any) {
@@ -369,7 +384,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
-    if (user.role !== "owner") return jsonResponse({ error: "Forbidden" }, 403)
+    if (!isPrivilegedRole(user.role)) return jsonResponse({ error: "Forbidden" }, 403)
     return jsonResponse({ id: user.id, email: user.email, tier: user.tier, role: user.role })
   })
 
@@ -473,10 +488,20 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const env = getEnv()
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
-    return jsonResponse({
+    const entitlements = resolveEntitlements({
+      id: user.id,
       tier: user.tier,
+      role: user.role,
       subscription_status: user.subscription_status,
-      has_active_subscription: user.subscription_status === "active" || user.tier === "pro",
+      subscription_current_period_end: null,
+      email_verified: 1,
+    })
+    return jsonResponse({
+      tier: entitlements.effectiveTier,
+      subscription_status: user.subscription_status,
+      has_active_subscription: entitlements.isActivePro,
+      is_in_grace_period: entitlements.isInGracePeriod,
+      deny_reason: entitlements.denyReason,
     })
   })
 
@@ -825,7 +850,15 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const user = await getAuthUser(request, env.DB)
     if (!user) return jsonResponse({ error: "Unauthorized" }, 401)
 
-    const isPro = user.tier === "pro" || user.subscription_status === "active"
+    const entitlements = resolveEntitlements({
+      id: user.id,
+      tier: user.tier,
+      role: user.role,
+      subscription_status: user.subscription_status,
+      subscription_current_period_end: null,
+      email_verified: 1,
+    })
+    const isPro = entitlements.isActivePro
     if (isPro) {
       const today = new Date().toISOString().slice(0, 10)
       const key = `pro-usage:${user.id}:${today}`
@@ -853,7 +886,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   router.get("/api/admin/audit-log", async (request: Request) => {
     const env = getEnv();
     const user = await getAuthUser(request, env.DB);
-    if (!user || user.role !== "admin") return jsonResponse({ error: "Forbidden" }, 403);
+    if (!user || !isPrivilegedRole(user.role)) return jsonResponse({ error: "Forbidden" }, 403);
     const url = new URL(request.url);
     const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 200);
     const offset = parseInt(url.searchParams.get("offset") || "0");
@@ -867,7 +900,7 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
   router.get("/api/admin/stats", async (request: Request) => {
     const env = getEnv();
     const user = await getAuthUser(request, env.DB);
-    if (!user || user.role !== "admin") return jsonResponse({ error: "Forbidden" }, 403);
+    if (!user || !isPrivilegedRole(user.role)) return jsonResponse({ error: "Forbidden" }, 403);
     const [userCount, proCount, sessionCount, libraryCount] = await Promise.all([
       env.DB.prepare("SELECT COUNT(*) as n FROM users").first().then((row) => row as { n: number } | null),
       env.DB.prepare("SELECT COUNT(*) as n FROM users WHERE tier = 'pro'").first().then((row) => row as { n: number } | null),
