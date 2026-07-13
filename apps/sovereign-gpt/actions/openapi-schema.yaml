@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Sovereign Dev API
   description: Production-safe build agent for SOVV / Sovereign.os / defrag.app.
-  version: 2.9.0
+  version: 3.0.0
 servers:
   - url: https://sovereign-broker.defrag.app
 paths:
@@ -390,6 +390,7 @@ components:
           type: string
           description: High-level build intent. Currently supported: "deploy broker"
           example: deploy broker
+          enum: ["deploy broker", "verify broker", "rollback broker"]
     BuildResponse:
       type: object
       properties:
@@ -408,6 +409,9 @@ components:
               status: { type: string, enum: [pending, running, completed, failed, not_applicable] }
         job: { type: object, additionalProperties: true }
         events: { type: array, items: { type: object } }
+        poll_url:
+          type: string
+          description: URL to poll for job completion status
         verification:
           type: object
           properties:
