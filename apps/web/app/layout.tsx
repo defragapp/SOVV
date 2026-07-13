@@ -6,6 +6,7 @@ import localFont from "next/font/local"
 import { GeistSans } from "geist/font/sans"
 import { Fraunces } from "next/font/google"
 import "./globals.css"
+import "./theme-normalization.css"
 
 const jetBrainsMono = localFont({
   src: "../public/fonts/JetBrainsMono-VariableFont.woff2",
