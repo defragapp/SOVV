@@ -2,10 +2,22 @@ import { describe, expect, it } from "vitest"
 import {
   isSubscriptionInvoiceEvent,
   needsCreatedTimestampNormalization,
+  parseStripeSignatures,
   validateKnownLifecycleEvent,
 } from "../src/billing-webhook-compat.js"
 
 describe("billing webhook compatibility", () => {
+  it("parses all Stripe v1 signatures during secret rotation", () => {
+    expect(parseStripeSignatures("t=1700000000,v1=aaaa,v1=bbbb,v0=cccc")).toEqual({
+      timestamp: 1_700_000_000,
+      signatures: ["aaaa", "bbbb"],
+    })
+  })
+
+  it("rejects an incomplete Stripe signature header", () => {
+    expect(parseStripeSignatures("t=1700000000,v0=aaaa")).toBeNull()
+  })
+
   it("accepts subscription invoice events", () => {
     expect(isSubscriptionInvoiceEvent({
       type: "invoice.payment_succeeded",
