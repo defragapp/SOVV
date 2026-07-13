@@ -10,6 +10,8 @@ type StripeEnvelope = {
   data?: { object?: Record<string, unknown> }
 }
 
+type ValidationResult = { valid: true } | { valid: false; reason: string }
+
 function parseSignature(header: string): { timestamp: number; signature: string } | null {
   const values = Object.fromEntries(
     header.split(",").map((part) => {
@@ -44,13 +46,52 @@ async function signatureIsValid(rawBody: string, timestamp: number, received: st
   return difference === 0
 }
 
+function hasString(value: unknown): value is string {
+  return typeof value === "string" && value.length > 0
+}
+
+export function validateKnownLifecycleEvent(event: StripeEnvelope): ValidationResult {
+  if (!hasString(event.id) || !hasString(event.type) || typeof event.created !== "number" || !event.data?.object) {
+    return { valid: false, reason: "invalid_envelope" }
+  }
+
+  const object = event.data.object
+  if (event.type === "checkout.session.completed") {
+    return hasString(object.customer) && hasString(object.client_reference_id)
+      ? { valid: true }
+      : { valid: false, reason: "invalid_checkout_session" }
+  }
+
+  if (
+    event.type === "customer.subscription.created" ||
+    event.type === "customer.subscription.updated" ||
+    event.type === "customer.subscription.deleted"
+  ) {
+    return hasString(object.id) && hasString(object.customer) && hasString(object.status)
+      ? { valid: true }
+      : { valid: false, reason: "invalid_subscription" }
+  }
+
+  if (event.type === "invoice.payment_succeeded" || event.type === "invoice.payment_failed") {
+    return hasString(object.customer)
+      ? { valid: true }
+      : { valid: false, reason: "invalid_invoice" }
+  }
+
+  return { valid: true }
+}
+
 export function isSubscriptionInvoiceEvent(event: StripeEnvelope): boolean {
   if (event.type !== "invoice.payment_succeeded" && event.type !== "invoice.payment_failed") return true
-  return typeof event.data?.object?.subscription === "string" && event.data.object.subscription.length > 0
+  return hasString(event.data?.object?.subscription)
 }
 
 export function needsCreatedTimestampNormalization(event: StripeEnvelope, signatureTimestamp: number): boolean {
   return typeof event.created === "number" && Math.abs(signatureTimestamp - event.created) > WEBHOOK_TOLERANCE_SECONDS
+}
+
+function recreateRequest(request: Request, body: string, headers = request.headers): Request {
+  return new Request(request.url, { method: request.method, headers, body })
 }
 
 export async function handleWebhookCompat(request: Request, env: Env): Promise<Response> {
@@ -59,21 +100,31 @@ export async function handleWebhookCompat(request: Request, env: Env): Promise<R
   const rawBody = await request.text()
   const signatureHeader = request.headers.get("stripe-signature") || ""
   const parsedSignature = parseSignature(signatureHeader)
-  if (!parsedSignature) return handleWebhook(new Request(request.url, { method: request.method, headers: request.headers, body: rawBody }), env)
+  if (!parsedSignature) return handleWebhook(recreateRequest(request, rawBody), env)
 
   const now = Math.floor(Date.now() / 1000)
   if (Math.abs(now - parsedSignature.timestamp) > WEBHOOK_TOLERANCE_SECONDS) {
-    return handleWebhook(new Request(request.url, { method: request.method, headers: request.headers, body: rawBody }), env)
+    return handleWebhook(recreateRequest(request, rawBody), env)
   }
 
-  const valid = await signatureIsValid(rawBody, parsedSignature.timestamp, parsedSignature.signature, env.STRIPE_WEBHOOK_SECRET)
-  if (!valid) return handleWebhook(new Request(request.url, { method: request.method, headers: request.headers, body: rawBody }), env)
+  const validSignature = await signatureIsValid(
+    rawBody,
+    parsedSignature.timestamp,
+    parsedSignature.signature,
+    env.STRIPE_WEBHOOK_SECRET,
+  )
+  if (!validSignature) return handleWebhook(recreateRequest(request, rawBody), env)
 
   let event: StripeEnvelope
   try {
     event = JSON.parse(rawBody) as StripeEnvelope
   } catch {
-    return handleWebhook(new Request(request.url, { method: request.method, headers: request.headers, body: rawBody }), env)
+    return handleWebhook(recreateRequest(request, rawBody), env)
+  }
+
+  const validation = validateKnownLifecycleEvent(event)
+  if (!validation.valid) {
+    return Response.json({ error: "payload_invalid", reason: validation.reason }, { status: 400 })
   }
 
   if (!isSubscriptionInvoiceEvent(event)) {
@@ -81,7 +132,7 @@ export async function handleWebhookCompat(request: Request, env: Env): Promise<R
   }
 
   if (!needsCreatedTimestampNormalization(event, parsedSignature.timestamp)) {
-    return handleWebhook(new Request(request.url, { method: request.method, headers: request.headers, body: rawBody }), env)
+    return handleWebhook(recreateRequest(request, rawBody), env)
   }
 
   const normalizedBody = JSON.stringify({ ...event, created: parsedSignature.timestamp })
@@ -89,5 +140,5 @@ export async function handleWebhookCompat(request: Request, env: Env): Promise<R
   const headers = new Headers(request.headers)
   headers.set("stripe-signature", `t=${parsedSignature.timestamp},v1=${normalizedSignature}`)
 
-  return handleWebhook(new Request(request.url, { method: request.method, headers, body: normalizedBody }), env)
+  return handleWebhook(recreateRequest(request, normalizedBody, headers), env)
 }
