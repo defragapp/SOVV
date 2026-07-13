@@ -3,6 +3,7 @@ import type { Env } from "./types-env.js";
 import { getAuthUser } from "./auth.js";
 import { getCorsHeaders } from "./cors.js";
 import { SECURITY_PREFIX } from "./prompts.js";
+import { requireEntitlement, resolveEntitlements } from "./entitlements.js";
 
 // ── Covenant scripture search by theme ────────────────────────────────────────
 // Search scripture by theme (e.g. "forgiveness", "boundaries", "grief").
@@ -68,13 +69,8 @@ export function registerCovenantSearchRoute(router: any, getEnv: () => Env) {
       });
     }
 
-    // Pro feature check — user must have active subscription
-    if (user.tier === "free" && user.subscription_status !== "active") {
-      return new Response(JSON.stringify({ error: "Pro subscription required for Covenant" }), {
-        status: 403,
-        headers: { "Content-Type": "application/json", ...cors },
-      });
-    }
+    const entitlementError = requireEntitlement(resolveEntitlements(user), "canUseCovenant");
+    if (entitlementError) return entitlementError;
 
     const url = new URL(request.url);
     const rawTheme = url.searchParams.get("theme") || "";
