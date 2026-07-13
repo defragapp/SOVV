@@ -18,7 +18,7 @@ const WEBHOOK_TOLERANCE_SECONDS = 300;
 
 const CheckoutRequestSchema = z.object({
   plan: z.enum(["monthly", "annual"]).default("monthly"),
-}).strict();
+});
 const IDEMPOTENCY_TTL_SECONDS = 60 * 60 * 24 * 7;
 
 const StripeWebhookEnvelopeSchema = z.object({
@@ -193,9 +193,20 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
       return errorJson(400, "billing_not_configured", "Checkout is not configured in this environment (STRIPE_SECRET_KEY, STRIPE_PRICE_ID, or APP_URL missing)");
     }
 
-  const checkoutInput = CheckoutRequestSchema.safeParse(
-    await req.json().catch(() => ({}))
-  );
+  let checkoutBody: unknown;
+  try {
+    const rawBody = await req.text();
+    checkoutBody = rawBody ? JSON.parse(rawBody) : {};
+  } catch {
+    await logSafetyEvent(env, {
+      type: "validation_error",
+      requestId,
+      metadata: { endpoint, reason: "checkout_json_invalid", userId },
+    });
+    return errorJson(400, "invalid_json", "Invalid JSON payload provided.");
+  }
+
+  const checkoutInput = CheckoutRequestSchema.safeParse(checkoutBody);
   if (!checkoutInput.success) {
     await logSafetyEvent(env, {
       type: "validation_error",
@@ -236,7 +247,6 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
   params.set("client_reference_id", userId);
   params.set("subscription_data[metadata][userId]", userId);
   params.set("subscription_data[metadata][plan]", planParam);
-  // trial logic removed
   params.set("allow_promotion_codes", "true");
   params.set("automatic_tax[enabled]", "true");
   // Pre-fill email so Stripe checkout doesn't ask for it again
