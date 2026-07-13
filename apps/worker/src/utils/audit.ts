@@ -13,6 +13,7 @@ export type AuditAction =
   | "promo_code_created"
   | "promo_code_redeemed"
   | "subscription_activated"
+  | "checkout_completed"
   | "subscription_canceled"
   | "email_verified"
   | "session_revoked_all";
