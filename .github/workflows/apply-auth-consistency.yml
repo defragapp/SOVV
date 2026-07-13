@@ -1,23 +1,21 @@
 name: Apply auth consistency patch
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
-    branches: [main]
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
-  pull-requests: read
+  issues: write
 
 jobs:
   patch:
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'automation/auth-consistency'
+    if: github.event.issue.title == '[operator] apply auth consistency patch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: automation/auth-consistency
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -44,7 +42,12 @@ jobs:
         run: |
           git config user.name "sovereign-auth-bot"
           git config user.email "actions@users.noreply.github.com"
-          git rm .github/workflows/apply-auth-consistency.yml .github/scripts/apply-auth-consistency.py
+          git rm .github/workflows/apply-auth-consistency.yml .github/scripts/apply-auth-consistency.py .github/auth-consistency-trigger
           git add apps/worker/src/auth.ts apps/worker/tests/auth-cookies.test.ts
           git commit -m "Unify auth cookies roles and entitlements [auth-consistency-bot]"
           git push origin HEAD:automation/auth-consistency
+
+      - name: Close trigger issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh issue close "${{ github.event.issue.number }}" --comment "Validated auth patch applied to automation/auth-consistency."
