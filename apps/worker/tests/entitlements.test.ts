@@ -8,6 +8,7 @@
 
 import { describe, it, expect } from "vitest"
 import { resolveEntitlements, requireEntitlement } from "../src/entitlements.js"
+import { requireActiveSubscription } from "../src/billing.js"
 import type { EntitlementUser } from "../src/entitlements.js"
 
 function makeUser(overrides: Partial<EntitlementUser> = {}): EntitlementUser {
@@ -183,5 +184,33 @@ describe("requireEntitlement", () => {
     const body = await response?.json() as any
     expect(body.denyReason).toBe("subscription_canceled")
     expect(body.error).toBe("subscription_required")
+  })
+})
+
+describe("requireActiveSubscription compatibility gate", () => {
+  const request = new Request("https://api.defrag.app/api/audio")
+
+  it("denies a free user at an explicit Pro boundary", async () => {
+    const response = await requireActiveSubscription(makeUser(), request)
+    expect(response?.status).toBe(403)
+  })
+
+  it("allows a verified trialing user", async () => {
+    const response = await requireActiveSubscription(
+      makeUser({ subscription_status: "trialing" }),
+      request,
+    )
+    expect(response).toBeNull()
+  })
+
+  it("allows an eligible user in the payment grace period", async () => {
+    const response = await requireActiveSubscription(
+      makeUser({
+        subscription_status: "past_due",
+        subscription_current_period_end: Math.floor(Date.now() / 1000) - 3600,
+      }),
+      request,
+    )
+    expect(response).toBeNull()
   })
 })
