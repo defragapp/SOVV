@@ -860,10 +860,10 @@ export async function registerAuthRoutes(router: any, getEnv: () => any) {
     const user = await getAuthUser(request, env.DB);
     if (!user || user.role !== "admin") return jsonResponse({ error: "Forbidden" }, 403);
     const [userCount, proCount, sessionCount, libraryCount] = await Promise.all([
-      env.DB.prepare("SELECT COUNT(*) as n FROM users").first<{ n: number }>(),
-      env.DB.prepare("SELECT COUNT(*) as n FROM users WHERE tier = 'pro'").first<{ n: number }>(),
-      env.DB.prepare("SELECT COUNT(*) as n FROM sessions WHERE expires_at > ?").bind(Date.now()).first<{ n: number }>(),
-      env.DB.prepare("SELECT COUNT(*) as n FROM library").first<{ n: number }>().catch(() => ({ n: 0 })),
+      env.DB.prepare("SELECT COUNT(*) as n FROM users").first().then((row) => row as { n: number } | null),
+      env.DB.prepare("SELECT COUNT(*) as n FROM users WHERE tier = 'pro'").first().then((row) => row as { n: number } | null),
+      env.DB.prepare("SELECT COUNT(*) as n FROM sessions WHERE expires_at > ?").bind(Date.now()).first().then((row) => row as { n: number } | null),
+      env.DB.prepare("SELECT COUNT(*) as n FROM library").first().then((row) => row as { n: number } | null).catch(() => ({ n: 0 })),
     ]);
     return jsonResponse({
       users: { total: userCount?.n ?? 0, pro: proCount?.n ?? 0 },
@@ -928,7 +928,8 @@ export function registerAdminSeedRoute(router: any, getEnv: () => any) {
       const password_hash = await hashPassword(password)
       const now = Date.now()
       const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?")
-        .bind(normalizedEmail).first<{ id: string }>()
+        .bind(normalizedEmail)
+        .first() as { id: string } | null
       if (existing) {
         await env.DB.prepare("UPDATE users SET password_hash = ?, role = 'owner' WHERE id = ?")
           .bind(password_hash, existing.id).run()

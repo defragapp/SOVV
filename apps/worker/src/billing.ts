@@ -15,6 +15,10 @@ import { fetchWithTimeout, withLimitedRetry } from "./runtime-resilience.js";
 import { requireEntitlement, resolveEntitlements } from "./entitlements.js";
 
 const WEBHOOK_TOLERANCE_SECONDS = 300;
+
+const CheckoutRequestSchema = z.object({
+  plan: z.enum(["monthly", "annual"]).default("monthly"),
+});
 const IDEMPOTENCY_TTL_SECONDS = 60 * 60 * 24 * 7;
 
 const StripeWebhookEnvelopeSchema = z.object({
@@ -189,26 +193,60 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
       return errorJson(400, "billing_not_configured", "Checkout is not configured in this environment (STRIPE_SECRET_KEY, STRIPE_PRICE_ID, or APP_URL missing)");
     }
 
-  // Support plan=annual|monthly and trial=1
-  const body = await req.json().catch(() => ({})) as Record<string, unknown>;
-  const planParam = typeof body.plan === "string" ? body.plan : "monthly";
-  const withTrial = body.trial === true;
-  const priceId = planParam === "annual" && env.STRIPE_ANNUAL_PRICE_ID
-    ? env.STRIPE_ANNUAL_PRICE_ID
+  let checkoutBody: unknown;
+  try {
+    const rawBody = await req.text();
+    checkoutBody = rawBody ? JSON.parse(rawBody) : {};
+  } catch {
+    await logSafetyEvent(env, {
+      type: "validation_error",
+      requestId,
+      metadata: { endpoint, reason: "checkout_json_invalid", userId },
+    });
+    return errorJson(400, "invalid_json", "Invalid JSON payload provided.");
+  }
+
+  const checkoutInput = CheckoutRequestSchema.safeParse(checkoutBody);
+  if (!checkoutInput.success) {
+    await logSafetyEvent(env, {
+      type: "validation_error",
+      requestId,
+      metadata: {
+        endpoint,
+        reason: "checkout_input_invalid",
+        userId,
+        issues: checkoutInput.error.issues.map((issue) => ({
+          path: issue.path.join("."),
+          code: issue.code,
+        })),
+      },
+    });
+    return errorJson(400, "invalid_checkout_request", "Choose either the monthly or annual plan.");
+  }
+
+  const { plan: planParam } = checkoutInput.data;
+  if (planParam === "annual" && !env.STRIPE_ANNUAL_PRICE_ID) {
+    await logSafetyEvent(env, {
+      type: "validation_error",
+      requestId,
+      metadata: { endpoint, reason: "annual_plan_not_configured", userId },
+    });
+    return errorJson(503, "annual_plan_not_configured", "Annual billing is not currently available.");
+  }
+
+  const priceId = planParam === "annual"
+    ? env.STRIPE_ANNUAL_PRICE_ID!
     : env.STRIPE_PRICE_ID;
 
   const params = new URLSearchParams();
   params.set("mode", "subscription");
   params.set("line_items[0][price]", priceId);
   params.set("line_items[0][quantity]", "1");
-  params.set("success_url", `${env.APP_URL}/app?upgraded=1${withTrial ? "&trial=1" : ""}`);
+  params.set("success_url", `${env.APP_URL}/app?upgraded=1`);
   params.set("cancel_url", `${env.APP_URL}/app?canceled=1`);
   params.set("client_reference_id", userId);
   params.set("subscription_data[metadata][userId]", userId);
   params.set("subscription_data[metadata][plan]", planParam);
-  if (withTrial) {
-    params.set("subscription_data[trial_period_days]", "7");
-  }
   params.set("allow_promotion_codes", "true");
   params.set("automatic_tax[enabled]", "true");
   // Pre-fill email so Stripe checkout doesn't ask for it again
@@ -226,7 +264,7 @@ export async function handleCheckout(req: Request, env: Env): Promise<Response> 
           headers: {
             "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
             "Content-Type": "application/x-www-form-urlencoded",
-            "Idempotency-Key": `checkout:${userId}:${planParam}:${withTrial ? "trial" : "notrial"}`,
+            "Idempotency-Key": `checkout:${userId}:${planParam}`,
           },
           body: params.toString(),
         },
@@ -442,10 +480,10 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
         const session = parsed.data;
         userId = session.client_reference_id;
         customerId = session.customer;
-        billingTransition = "subscription_status:active";
+        billingTransition = "stripe_customer_linked";
 
         await env.DB.prepare(
-          "UPDATE users SET tier = 'pro', subscription_status = 'active', stripe_customer_id = ?, subscription_updated_at = ? WHERE id = ?"
+          "UPDATE users SET stripe_customer_id = ?, subscription_updated_at = ? WHERE id = ?"
         )
           .bind(session.customer, Date.now(), session.client_reference_id)
           .run();
@@ -460,7 +498,7 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
           await writeAuditLog(env.DB, {
             actorId: session.client_reference_id,
             actorEmail: activatedUser.email,
-            action: "subscription_activated",
+            action: "checkout_completed",
             metadata: { customer: session.customer, plan: "pro" },
           });
         }
@@ -504,10 +542,13 @@ export async function handleWebhook(req: Request, env: Env): Promise<Response> {
             params.push(subscription.current_period_end);
           }
 
-          if (event.type === "customer.subscription.created" || status === "active") {
+          updates.push("stripe_subscription_id = ?");
+          params.push(subscription.id);
+
+          if (status === "active" || status === "trialing") {
             updates.push("tier = 'pro'");
-            updates.push("stripe_subscription_id = ?");
-            params.push(subscription.id);
+          } else if (status === "canceled" || status === "incomplete" || status === "incomplete_expired") {
+            updates.push("tier = 'free'");
           }
 
           params.push(subscription.customer);
