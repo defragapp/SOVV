@@ -46,6 +46,8 @@ jobs:
         run: |
           test -f wrangler.toml
           grep -q 'name = "sovereign-broker"' wrangler.toml
+          grep -q 'main = "./src/index-v4.js"' wrangler.toml
+          grep -q 'pattern = "sovereign-broker.defrag.app"' wrangler.toml
           grep -q 'binding = "LOGS"' wrangler.toml
           grep -q 'bucket_name = "sovereign-logs"' wrangler.toml
 
@@ -56,12 +58,38 @@ jobs:
       - name: Smoke check broker health
         run: |
           sleep 8
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "https://sovereign-broker.defrag.app/health")
-          echo "Broker health status: $STATUS"
+          curl --silent --show-error --max-time 15 \
+            --dump-header broker-health-headers.txt \
+            --output broker-health-body.txt \
+            "https://sovereign-broker.defrag.app/health" || true
+
+          echo "=== Broker health response headers ==="
+          cat broker-health-headers.txt || true
+          echo "=== Broker health response body ==="
+          head -c 4000 broker-health-body.txt || true
+          echo
+
+          STATUS=$(awk 'toupper($1) ~ /^HTTP\// { code=$2 } END { print code }' broker-health-headers.txt)
+          echo "Broker health status: ${STATUS:-missing}"
+
           if [ "$STATUS" != "200" ]; then
-            echo "Broker health check failed with status $STATUS"
+            echo "Broker health check failed with status ${STATUS:-missing}"
             exit 1
           fi
-          VERSION=$(curl -s --max-time 10 "https://sovereign-broker.defrag.app/health" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('broker','unknown'))")
+
+          grep -iq '^x-sovereign-broker: sovereign-dev-v3' broker-health-headers.txt
+          grep -iq '^x-sovereign-entrypoint: index-v4' broker-health-headers.txt
+
+          VERSION=$(python3 -c "import json; print(json.load(open('broker-health-body.txt')).get('broker','unknown'))")
           echo "Broker version: $VERSION"
-          echo "Broker health check passed"
+          echo "Broker health check passed through index-v4"
+
+      - name: Upload failed health diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sovereign-broker-health-diagnostics
+          path: |
+            broker-health-headers.txt
+            broker-health-body.txt
+          if-no-files-found: ignore
