@@ -3,6 +3,7 @@ import type { Env } from "./types-env.js"
 import { handleWebhookCompat } from "./billing-webhook-compat.js"
 import {
   handleBaselineGuideCheckout,
+  handleBaselineGuideDownload,
   handleBaselineGuideVerify,
   handleSupportRedirect,
 } from "./commerce.js"
@@ -23,6 +24,10 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/api/commerce/baseline-guide/verify") {
       return handleBaselineGuideVerify(request, env)
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/commerce/baseline-guide/download") {
+      return handleBaselineGuideDownload(request, env)
     }
 
     if (request.method === "GET" && url.pathname === "/api/commerce/support") {
