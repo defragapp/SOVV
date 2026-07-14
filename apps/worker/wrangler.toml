@@ -15,19 +15,14 @@ database_name = "vibesdk-db"
 database_id = "c8c2fd8d-5297-46fc-8594-7629c8bad74d"
 migrations_dir = "migrations"
 
-# KV namespace for session state, Baseline Design cache, usage counters, and replay protection
-# Internal identifier: SOVV_DATA (KV namespace title in Cloudflare dashboard)
 [[kv_namespaces]]
 binding = "KV"
 id = "3bd3ff5048a8468e82c574d7d66045c3"
 
-# Primary media/templates bucket
 [[r2_buckets]]
 binding = "TEMPLATES"
 bucket_name = "vibesdk-templates"
 
-# Error monitoring logs bucket (created 2026-07-07)
-# Logpush job id=1768279 writes workers_trace_events here
 [[r2_buckets]]
 binding = "LOGS"
 bucket_name = "sovereign-logs"
@@ -83,4 +78,6 @@ ENABLE_FLOW_SUGGESTION = "true"
 COOKIE_DOMAIN = ".defrag.app"
 STRIPE_PRICE_ID = "price_1Te0g9Bk78yJ8Hww8fFZCqhm"
 STRIPE_ANNUAL_PRICE_ID = "price_1Tq6nPBk78yJ8Hwwm0pxg4hH"
+BASELINE_GUIDE_PRICE_CENTS = "1000"
+# Set this to the verified pay-what-you-want Stripe Payment Link before surfacing it publicly.
 STRIPE_SUPPORT_LINK_URL = "https://support.stripe.com/contact"
