@@ -26,28 +26,12 @@ export interface Env {
   SESSION_SERVICE: Fetcher
 
   // ── Email ─────────────────────────────────────────────────────────────────
-  // Cloudflare send_email binding — preferred transactional email path.
-  // REQUIRES: Email Routing enabled on defrag.app + destination address verified.
-  // Sender must be from the Email Routing-active domain (info@defrag.app).
-  // Add [[send_email]] to wrangler.toml ONLY after Email Routing is configured.
-  // See docs/email-routing-standard.md for setup steps.
   EMAIL?: SendEmail
-
-  // Resend API key — current fallback for transactional email.
-  // Used when EMAIL binding is not yet configured.
   RESEND_API_KEY?: string
-
-  // Private forwarding address for Email Routing destination.
-  // Do not commit the actual value — set as a Worker secret.
   EMAIL_FORWARD_ADDRESS?: string
 
   // ── Queue ─────────────────────────────────────────────────────────────────
-  // Cloudflare Queue — pattern extraction, email jobs, webhook follow-up.
-  // Queue name: pattern-extraction-tasks
   QUEUE?: Queue
-
-  // Used for optional rate limiting in index.ts (unsafe binding in wrangler.toml).
-
 
   // ── Stripe ───────────────────────────────────────────────────────────────
   STRIPE_SECRET_KEY?: string
@@ -57,6 +41,7 @@ export interface Env {
   STRIPE_ANNUAL_PRICE_ID?: string
   STRIPE_ACCOUNT_ID?: string
   STRIPE_SUPPORT_LINK_URL?: string
+  BASELINE_GUIDE_PRICE_CENTS?: string
 
   // ── Turnstile ────────────────────────────────────────────────────────────
   TURNSTILE_SECRET_KEY?: string
@@ -64,13 +49,9 @@ export interface Env {
   TURNSTILE_SITE_KEY?: string
 
   // ── Cloudflare Access ────────────────────────────────────────────────────
-  // For admin/staging route protection via Cloudflare Access JWT validation.
-  TEAM_DOMAIN?: string  // e.g., https://your-team.cloudflareaccess.com
+  TEAM_DOMAIN?: string
   POLICY_AUD?: string
-
-  // Cookie domain apex for cross-subdomain auth. Example: defrag.app
   COOKIE_DOMAIN?: string
-
 
   // ── App config ───────────────────────────────────────────────────────────
   FREE_DAILY_LIMIT?: string
