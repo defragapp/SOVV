@@ -1,4 +1,5 @@
 import legacyBroker from "./index.js"
+import { buildPlatformAudit } from "./platform-audit.js"
 import { handleRepoApplyPatch, handleRepoDiff } from "./repo-patch-runtime.js"
 
 function authorized(request, env) {
@@ -27,13 +28,32 @@ async function withBrokerDiagnostics(response) {
   })
 }
 
+async function handlePlatformAudit(request, env) {
+  if (!authorized(request, env)) return json({ ok: false, error: "Unauthorized" }, 401)
+
+  try {
+    return json(await buildPlatformAudit(env))
+  } catch (error) {
+    return json({
+      ok: false,
+      status: "blocked",
+      platform: "Sovereign.OS",
+      error: error instanceof Error ? error.message : "Platform audit failed",
+      generated_at: new Date().toISOString(),
+    }, 500)
+  }
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url)
     if (request.method === "OPTIONS") return legacyBroker.fetch(request, env, ctx)
 
+    const isAuditRoute = request.method === "GET" && url.pathname === "/audit"
     const isPatchRoute = request.method === "POST" && url.pathname === "/repo/apply-patch"
     const isDiffRoute = request.method === "GET" && /^\/repo\/diff\/[A-Za-z0-9_-]+$/.test(url.pathname)
+
+    if (isAuditRoute) return handlePlatformAudit(request, env)
 
     if (isPatchRoute || isDiffRoute) {
       if (!authorized(request, env)) return json({ ok: false, error: "Unauthorized" }, 401)
