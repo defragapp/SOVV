@@ -1,186 +1,171 @@
 import type { Metadata } from "next"
+import Link from "next/link"
 import { SiteShell } from "@/components/marketing/site-shell"
 import { Container } from "@/components/ui/layout-primitives"
-import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Launch — Sovereign.os on Product Hunt",
-  description: "Sovereign.os is launching on Product Hunt. Pattern-aware AI for the moments that are hard to read while you're inside them.",
+  title: "Start with Sovereign.os",
+  description: "Start free, create a one-time Baseline Guide, or unlock the complete Sovereign.os experience with Pro.",
 }
+
+const PATHS = [
+  {
+    label: "Start free",
+    price: "$0",
+    cadence: "forever",
+    title: "Bring one real moment.",
+    description: "Use Defrag to see the pattern underneath a conflict, reaction, pressure point, or decision.",
+    features: ["15 sessions each day", "Baseline Design", "Pattern recognition", "Best Next Response"],
+    href: "/app/login?utm_source=launch&utm_medium=owned&utm_campaign=public_launch&utm_content=free",
+    cta: "Start free",
+    featured: false,
+  },
+  {
+    label: "One-time",
+    price: "$10",
+    cadence: "once",
+    title: "Get your personal operating guide.",
+    description: "A branded, downloadable guide to how you decide, process pressure, relate, and return to clarity.",
+    features: ["Built from your Baseline Design", "No subscription required", "Private downloadable edition", "Useful for you and your people"],
+    href: "/baseline-guide?utm_source=launch&utm_medium=owned&utm_campaign=public_launch&utm_content=guide",
+    cta: "Create my guide",
+    featured: false,
+  },
+  {
+    label: "Complete access",
+    price: "$20",
+    cadence: "/ month",
+    title: "Let understanding compound.",
+    description: "Unlock the complete system for ongoing decision support across Defrag, Alignment, and Covenant.",
+    features: ["Unlimited sessions", "Covenant and Alignment", "Saved Library depth", "Audio Overview and private invites"],
+    href: "/app/login?checkout=1&plan=monthly&utm_source=launch&utm_medium=owned&utm_campaign=public_launch&utm_content=pro",
+    cta: "Unlock Pro",
+    featured: true,
+  },
+] as const
+
+const MOMENTS = [
+  "A conversation keeps replaying in your head.",
+  "You know something feels off, but not why.",
+  "Two people remember the same moment differently.",
+  "Pressure is making the decision for you.",
+]
 
 function MetaLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="inline-flex items-center gap-2 mb-6">
+    <div className="mb-6 inline-flex items-center gap-2">
       <span className="h-px w-6 bg-[#e0743a]/60" />
-      <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#a8a29a]">{children}</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#a8a29a]">{children}</span>
     </div>
   )
 }
 
-const TAGLINES = [
-  "Pattern-aware AI for the moments that are hard to read while you're inside them.",
-  "The private notebook that turns reflection into direction.",
-  "Separate the moment from the pattern — before pressure chooses for you.",
-  "Your Baseline Design. Active in every session. Never exposed in outputs.",
-  "Defrag is free. Clarity is the product.",
-]
-
-const SCREENSHOTS = [
-  {
-    label: "Defrag workspace",
-    desc: "Pattern recognition in real time — what's active, what's repeating, your Best Next Response.",
-    file: "/defrag-app-mockup.png",
-  },
-  {
-    label: "Baseline Design",
-    desc: "Your private pattern map — built from birth data, active beneath every session.",
-    file: "/baseline-app-mockup.png",
-  },
-  {
-    label: "Covenant space",
-    desc: "Faith-connected reflection — one honest next step, grounded in values.",
-    file: "/covenant-app-mockup.png",
-  },
-  {
-    label: "Alignment space",
-    desc: "After the insight. Before the next move. Return to yourself.",
-    file: "/alignment-mockup.png",
-  },
-]
-
 export default function LaunchPage() {
   return (
     <SiteShell>
-      {/* Hero */}
-      <section className="relative w-full pt-32 pb-16 md:pt-40 md:pb-20 bg-[#08070a] overflow-hidden border-b border-white/5">
-        <div className="light-beam opacity-50" aria-hidden />
-        <Container className="relative z-10 flex flex-col items-center text-center max-w-3xl">
-          <MetaLabel>Product Hunt Launch</MetaLabel>
-          <h1 className="font-serif text-[clamp(2.2rem,5vw,4rem)] text-[#f4efe9] leading-[1.05] tracking-[-0.02em] text-balance mb-6">
-            <span className="text-glow">Sovereign.os</span>
-            <br />
-            <span style={{ color: "rgba(244,239,233,0.5)" }}>is live on Product Hunt.</span>
+      <section className="relative overflow-hidden border-b border-white/5 bg-[#08070a] pb-20 pt-32 md:pb-28 md:pt-44">
+        <div className="light-beam opacity-60" aria-hidden />
+        <Container className="relative z-10 flex max-w-4xl flex-col items-center text-center">
+          <MetaLabel>Sovereign.os · Public launch</MetaLabel>
+          <h1 className="max-w-4xl text-balance font-serif text-[clamp(3rem,7vw,6.5rem)] leading-[0.98] tracking-[-0.04em] text-[#f4efe9]">
+            See the pattern before it chooses for you.
           </h1>
-          <p className="text-[#a8a29a] text-base leading-relaxed max-w-md mb-8">
-            Pattern-aware AI for the moments that are hard to read while you&apos;re inside them.
+          <p className="mt-7 max-w-2xl text-base leading-relaxed text-[#a8a29a] md:text-lg">
+            Bring the real moment. Sovereign.os reads it through your personal Baseline Design, shows what may be repeating, and helps you choose a cleaner next move.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 items-center">
-            <a
-              href="https://www.producthunt.com/posts/sovereign-os"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-            >
-              Support on Product Hunt ↗
-            </a>
-            <Link href="/app/login" className="btn-secondary" style={{ opacity: 0.7 }}>
-              Try it free
-            </Link>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <Link href={PATHS[0].href} className="btn-primary min-w-[180px]">Start free</Link>
+            <Link href="#choose" className="btn-secondary min-w-[180px]">Choose your depth</Link>
           </div>
+          <p className="mt-4 text-[11px] text-[#4f4b47]">Private by design · No credit card to begin · Cancel Pro anytime</p>
         </Container>
       </section>
 
-      {/* Taglines */}
-      <section className="w-full py-16 bg-[#0c0a0d] border-t border-white/[0.04]">
-        <Container className="max-w-3xl">
-          <MetaLabel>Tagline variants</MetaLabel>
-          <div className="flex flex-col gap-3">
-            {TAGLINES.map((t, i) => (
-              <div
-                key={i}
-                className="border border-white/[0.06] bg-[#08070a] px-5 py-4 flex items-start justify-between gap-4 group"
-                style={{ borderRadius: 10 }}
-              >
-                <p className="text-[14px] text-[#c8c2bc] leading-relaxed flex-1">{t}</p>
-                <span className="font-mono text-[9px] text-[#4f4b47] shrink-0 mt-0.5">0{i + 1}</span>
+      <section className="border-b border-white/[0.04] bg-[#0c0a0d] py-10">
+        <Container className="max-w-5xl">
+          <div className="grid gap-px overflow-hidden border border-white/[0.06] bg-white/[0.05] sm:grid-cols-2 lg:grid-cols-4" style={{ borderRadius: 14 }}>
+            {MOMENTS.map((moment) => (
+              <div key={moment} className="bg-[#0c0a0d] p-5 text-sm leading-relaxed text-[#a8a29a]">
+                <span className="mr-2 text-[#e0743a]">●</span>{moment}
               </div>
             ))}
           </div>
         </Container>
       </section>
 
-      {/* Screenshots */}
-      <section className="w-full py-16 bg-[#08070a] border-t border-white/[0.04]">
-        <Container className="max-w-4xl">
-          <MetaLabel>Screenshots</MetaLabel>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {SCREENSHOTS.map((s) => (
-              <div
-                key={s.label}
-                className="border border-white/[0.07] bg-[#0c0a0d] overflow-hidden"
-                style={{ borderRadius: 12 }}
+      <section id="choose" className="bg-[#08070a] py-20 md:py-28">
+        <Container className="max-w-6xl">
+          <div className="mx-auto mb-12 max-w-2xl text-center">
+            <MetaLabel>Choose your depth</MetaLabel>
+            <h2 className="text-balance font-serif text-4xl tracking-[-0.03em] text-[#f4efe9] md:text-5xl">
+              Start where the value is obvious to you.
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-[#76716b]">
+              Free is a real daily product. The Guide is yours to keep. Pro is for ongoing, deeper use.
+            </p>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-3">
+            {PATHS.map((path) => (
+              <article
+                key={path.label}
+                className={`relative flex flex-col overflow-hidden rounded-3xl border p-7 md:p-8 ${
+                  path.featured
+                    ? "border-[#e0743a]/40 bg-[#0c0a0d] shadow-[0_30px_90px_rgba(0,0,0,0.35)]"
+                    : "border-white/[0.08] bg-[#0c0a0d]"
+                }`}
               >
-                <div className="aspect-[16/10] bg-[#08070a] flex items-center justify-center border-b border-white/[0.05]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={s.file}
-                    alt={s.label}
-                    className="w-full h-full object-cover"
-                  />
+                {path.featured ? <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_0%,rgba(224,116,58,0.10),transparent_72%)]" /> : null}
+                <div className="relative">
+                  <p className={`font-mono text-[9px] uppercase tracking-[0.2em] ${path.featured ? "text-[#e0743a]" : "text-[#76716b]"}`}>{path.label}</p>
+                  <div className="mt-4 flex items-baseline gap-2">
+                    <span className="font-serif text-5xl text-[#f4efe9]">{path.price}</span>
+                    <span className="text-sm text-[#76716b]">{path.cadence}</span>
+                  </div>
+                  <h3 className="mt-6 font-serif text-2xl tracking-[-0.02em] text-[#f4efe9]">{path.title}</h3>
+                  <p className="mt-3 min-h-[72px] text-sm leading-relaxed text-[#a8a29a]">{path.description}</p>
                 </div>
-                <div className="p-4">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#e0743a]/60 mb-1">{s.label}</p>
-                  <p className="text-[13px] text-[#76716b] leading-relaxed">{s.desc}</p>
+
+                <div className="relative my-7 flex flex-1 flex-col gap-3">
+                  {path.features.map((feature) => (
+                    <div key={feature} className="flex gap-3 text-sm text-[#a8a29a]">
+                      <span className="text-[#e0743a]">✓</span>
+                      <span>{feature}</span>
+                    </div>
+                  ))}
                 </div>
-              </div>
+
+                <Link href={path.href} className={`${path.featured ? "btn-primary" : "btn-secondary"} relative w-full text-center`}>
+                  {path.cta}
+                </Link>
+              </article>
             ))}
           </div>
         </Container>
       </section>
 
-      {/* Banner copy */}
-      <section className="w-full py-16 bg-[#0c0a0d] border-t border-white/[0.04]">
-        <Container className="max-w-3xl">
-          <MetaLabel>Banner copy</MetaLabel>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              {
-                label: "Short (60 chars)",
-                copy: "Pattern-aware AI for the moments that matter.",
-              },
-              {
-                label: "Medium (120 chars)",
-                copy: "Sovereign.os reads your moment through your Baseline Design — showing what's active, repeating, and what to do next.",
-              },
-              {
-                label: "Hunter comment",
-                copy: "Hey PH 👋 We built Sovereign.os because we needed it ourselves — a private place to bring the hard moment before the pattern ran the room. Defrag is free forever. Would love your support and honest feedback.",
-              },
-              {
-                label: "First comment",
-                copy: "Maker here. Sovereign.os is pattern-aware AI — it reads your situation through your Baseline Design (built from birth data + behavioral calibration) and gives you what's active, what may be repeating, and your Best Next Response. Defrag is free. Covenant and Alignment require Pro. Happy to answer any questions.",
-              },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="border border-white/[0.06] bg-[#08070a] p-5 flex flex-col gap-3"
-                style={{ borderRadius: 10 }}
-              >
-                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f4b47]">{item.label}</p>
-                <p className="text-[13px] text-[#a8a29a] leading-relaxed">{item.copy}</p>
-              </div>
-            ))}
+      <section className="border-t border-white/[0.05] bg-[#0c0a0d] py-20 md:py-28">
+        <Container className="grid max-w-5xl gap-10 md:grid-cols-2 md:items-center">
+          <div>
+            <MetaLabel>What changes</MetaLabel>
+            <h2 className="text-balance font-serif text-4xl tracking-[-0.03em] text-[#f4efe9] md:text-5xl">
+              Less decoding. More usable truth.
+            </h2>
+          </div>
+          <div className="space-y-5 text-base leading-relaxed text-[#a8a29a]">
+            <p>Sovereign does not ask you to become an expert in a framework. It translates the frameworks into direct language for the moment you are actually living.</p>
+            <p>Your Baseline Design creates continuity, so every session can understand more than the last without publicly exposing your personal inputs.</p>
           </div>
         </Container>
       </section>
 
-      {/* CTA */}
-      <section className="w-full py-20 bg-[#08070a] border-t border-white/5 text-center">
-        <Container className="max-w-xl">
-          <h2 className="font-serif text-3xl text-[#f4efe9] tracking-[-0.02em] mb-4">
-            Support the launch.
-          </h2>
-          <p className="text-[#76716b] text-base leading-relaxed mb-8">
-            An upvote on Product Hunt helps more people find Sovereign.os.
-          </p>
-          <a
-            href="https://www.producthunt.com/posts/sovereign-os"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary"
-          >
-            Upvote on Product Hunt ↗
-          </a>
+      <section className="relative overflow-hidden border-t border-white/[0.05] bg-[#08070a] py-24 text-center md:py-36">
+        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse 55% 45% at 50% 50%, rgba(224,116,58,0.10) 0%, transparent 72%)" }} aria-hidden />
+        <Container className="relative z-10 flex max-w-2xl flex-col items-center">
+          <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-[#76716b]">No perfect wording required</p>
+          <h2 className="mt-6 text-balance font-serif text-4xl tracking-[-0.03em] text-[#f4efe9] md:text-6xl">Bring the moment as it is.</h2>
+          <p className="mt-5 max-w-lg text-base leading-relaxed text-[#a8a29a]">Start free. See whether the understanding is useful. Upgrade only when you want the complete system.</p>
+          <Link href={PATHS[0].href} className="btn-primary mt-9 min-w-[190px]">Start free</Link>
         </Container>
       </section>
     </SiteShell>
