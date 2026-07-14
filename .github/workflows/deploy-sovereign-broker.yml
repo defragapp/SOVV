@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: sovereign-broker-deploy
@@ -93,3 +94,32 @@ jobs:
             broker-health-headers.txt
             broker-health-body.txt
           if-no-files-found: ignore
+
+      - name: Publish failed health diagnostics
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "## Sovereign broker deployment diagnostics"
+            echo
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "- Endpoint: \`https://sovereign-broker.defrag.app/health\`"
+            echo
+            echo "### Response headers"
+            echo '```text'
+            cat broker-health-headers.txt 2>/dev/null || echo "No response headers captured."
+            echo '```'
+            echo
+            echo "### Response body"
+            echo '```text'
+            head -c 4000 broker-health-body.txt 2>/dev/null || echo "No response body captured."
+            echo
+            echo '```'
+          } > broker-diagnostics.md
+
+          gh issue create \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Broker deployment failed: ${GITHUB_SHA::7}" \
+            --body-file broker-diagnostics.md
