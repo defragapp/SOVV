@@ -52,6 +52,14 @@ jobs:
           grep -q 'binding = "LOGS"' wrangler.toml
           grep -q 'bucket_name = "sovereign-logs"' wrangler.toml
 
+      - name: Validate broker runtime
+        working-directory: apps/sovereign-gpt/broker-worker
+        run: |
+          node --check src/index-v4.js
+          node --check src/platform-audit.js
+          node --check src/repo-patch-runtime.js
+          node --test src/platform-audit.test.js
+
       - name: Deploy sovereign-broker
         working-directory: apps/sovereign-gpt/broker-worker
         run: npx wrangler@latest deploy
