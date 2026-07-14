@@ -10,13 +10,14 @@ on:
       - main
     paths:
       - .release/web
+      - .release/api
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: deploy-cloudflare-web
+  group: deploy-cloudflare-production
   cancel-in-progress: false
 
 jobs:
@@ -32,7 +33,7 @@ jobs:
       PRODUCTION_WEB_URLS: https://defrag.app/,https://www.defrag.app/
       CLOUDFLARE_PURGE_HOSTS: defrag.app,www.defrag.app,app.defrag.app,sovereign.defrag.app
     steps:
-      - name: Check out reviewed PR commit
+      - name: Check out reviewed release commit
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || github.sha }}
@@ -62,3 +63,44 @@ jobs:
         run: pnpm run deploy
       - run: pnpm --filter @workspace/scripts run purge:production-web-cache
       - run: pnpm verify:production-web
+
+  deploy-api:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: true
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check out reviewed release commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || github.sha }}
+      - name: Validate Cloudflare configuration
+        shell: bash
+        run: |
+          missing=0
+          for name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is missing from GitHub repository secrets"
+              missing=1
+            fi
+          done
+          exit "$missing"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/secret-scan.js
+      - run: pnpm --filter ./apps/worker run typecheck
+      - run: pnpm --filter ./apps/worker run test
+      - name: Deploy sovereign-os-api directly
+        working-directory: apps/worker
+        run: pnpm run deploy
+      - name: Verify API health
+        run: curl --fail --silent --show-error --max-time 20 https://api.defrag.app/health
