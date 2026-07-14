@@ -1,11 +1,12 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { SiteShell } from "@/components/marketing/site-shell"
+import { SupportCheckout } from "@/components/marketing/support-checkout"
 import { Container } from "@/components/ui/layout-primitives"
 
 export const metadata: Metadata = {
   title: "Contact — Sovereign.os",
-  description: "Reach the Sovereign.os team. We respond to every message.",
+  description: "Reach the Sovereign.os team, get support, or contribute directly to continued development.",
 }
 
 function Arrow() {
@@ -16,7 +17,13 @@ function Arrow() {
   )
 }
 
-export default function ContactPage() {
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ support?: string }>
+}) {
+  const params = await searchParams
+
   return (
     <SiteShell>
       <section className="relative w-full overflow-hidden bg-[#08070a] pb-20 pt-36 md:pb-24 md:pt-48">
@@ -25,22 +32,22 @@ export default function ContactPage() {
           style={{ background: "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(224,116,58,0.05) 0%, transparent 60%)" }}
           aria-hidden
         />
-        <Container className="relative z-10 max-w-2xl">
+        <Container className="relative z-10 max-w-3xl">
           <div className="mb-8 inline-flex items-center gap-3">
             <span className="h-px w-8 bg-[#e0743a]/50" />
             <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#76716b]">Contact</span>
           </div>
           <h1 className="mb-6 text-balance font-serif text-[clamp(2.8rem,6vw,5rem)] leading-[0.97] tracking-[-0.03em] text-[#f4efe9]">
-            We respond to<br />every message.
+            Reach us directly.<br />Support what comes next.
           </h1>
-          <p className="max-w-md text-base leading-relaxed text-[#76716b]">
-            Questions, feedback, or something that didn&apos;t work the way you expected — reach us directly.
+          <p className="max-w-xl text-base leading-relaxed text-[#76716b]">
+            Questions, feedback, account support, or a direct contribution to continued Sovereign.os development.
           </p>
         </Container>
       </section>
 
       <section className="w-full bg-[#08070a] py-16 md:py-20">
-        <Container className="max-w-2xl">
+        <Container className="grid max-w-5xl gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="flex flex-col gap-px overflow-hidden border border-white/[0.06]" style={{ borderRadius: "var(--radius-container)" }}>
             <a href="mailto:info@defrag.app" className="group flex items-center justify-between border-b border-white/[0.04] bg-[#08070a] p-7 card-hover">
               <div>
@@ -76,6 +83,8 @@ export default function ContactPage() {
               </p>
             </div>
           </div>
+
+          <SupportCheckout status={params.support} />
         </Container>
       </section>
     </SiteShell>

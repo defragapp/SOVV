@@ -2,6 +2,7 @@ import legacyWorker from "./index.js"
 import type { Env } from "./types-env.js"
 import { getAuthUser } from "./auth.js"
 import { handleWebhookCompat } from "./billing-webhook-compat.js"
+import { handleSupportCheckout } from "./support-checkout.js"
 import {
   handleBaselineGuideCheckout,
   handleBaselineGuideDownload,
@@ -21,6 +22,10 @@ export default {
 
     if (request.method === "POST" && url.pathname === "/api/billing/webhook") {
       return handleWebhookCompat(request, env)
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/commerce/support/checkout") {
+      return handleSupportCheckout(request, env)
     }
 
     if (request.method === "POST" && url.pathname === "/api/commerce/baseline-guide/checkout") {
