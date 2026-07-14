@@ -1,5 +1,6 @@
 import type { Env } from "./types-env.js"
 import { handleWebhook } from "./billing.js"
+import { fulfillBaselineGuidePurchase } from "./commerce-webhook.js"
 
 const WEBHOOK_TOLERANCE_SECONDS = 300
 const IGNORED_EVENT_TTL_SECONDS = 60 * 60 * 24 * 7
@@ -142,6 +143,9 @@ export async function handleWebhookCompat(request: Request, env: Env): Promise<R
   } catch {
     return handleWebhook(recreateRequest(request, rawBody), env)
   }
+
+  const commerceResponse = await fulfillBaselineGuidePurchase(event, env)
+  if (commerceResponse) return commerceResponse
 
   const validation = validateKnownLifecycleEvent(event)
   if (!validation.valid) {
