@@ -79,29 +79,47 @@ async function githubSnapshot(env) {
 
 async function cloudflareSnapshot(env) {
   const headers = cloudflareHeaders(env)
-  const [workersData, pagesData] = await Promise.all([
+  const [workersResult, pagesResult] = await Promise.allSettled([
     requestJson(`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/workers/scripts`, { headers }),
     requestJson(`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/pages/projects/sovv-web/deployments?per_page=5`, { headers }),
   ])
 
+  const workers = workersResult.status === "fulfilled"
+    ? {
+        ok: true,
+        data: Array.isArray(workersResult.value?.result)
+          ? workersResult.value.result.map((worker) => ({
+              name: worker.id,
+              modified_on: worker.modified_on || null,
+              etag: worker.etag || null,
+            }))
+          : [],
+      }
+    : { ok: false, error: workersResult.reason?.message || "Workers request failed" }
+
+  const pages = pagesResult.status === "fulfilled"
+    ? {
+        ok: true,
+        data: Array.isArray(pagesResult.value?.result)
+          ? pagesResult.value.result.map((deployment) => ({
+              id: deployment.id,
+              environment: deployment.environment,
+              url: deployment.url,
+              created_on: deployment.created_on,
+              status: deployment.latest_stage?.status || deployment.latest_stage?.name || null,
+            }))
+          : [],
+      }
+    : { ok: false, error: pagesResult.reason?.message || "Pages request failed" }
+
+  if (!workers.ok && !pages.ok) {
+    throw new Error(`Workers: ${workers.error}; Pages: ${pages.error}`)
+  }
+
   return {
     connected: true,
-    workers: Array.isArray(workersData?.result)
-      ? workersData.result.map((worker) => ({
-          name: worker.id,
-          modified_on: worker.modified_on || null,
-          etag: worker.etag || null,
-        }))
-      : [],
-    sovv_web_deployments: Array.isArray(pagesData?.result)
-      ? pagesData.result.map((deployment) => ({
-          id: deployment.id,
-          environment: deployment.environment,
-          url: deployment.url,
-          created_on: deployment.created_on,
-          status: deployment.latest_stage?.status || deployment.latest_stage?.name || null,
-        }))
-      : [],
+    workers,
+    pages,
   }
 }
 
@@ -126,6 +144,12 @@ function settledResult(result) {
   return { ok: false, error: result.reason?.message || "Unknown error" }
 }
 
+function workerList(snapshot) {
+  return snapshot.cloudflare.ok && snapshot.cloudflare.data.workers?.ok
+    ? snapshot.cloudflare.data.workers.data
+    : []
+}
+
 function buildRecommendations(snapshot) {
   const recommendations = []
 
@@ -134,15 +158,22 @@ function buildRecommendations(snapshot) {
   }
   if (!snapshot.cloudflare.ok) {
     recommendations.push({ priority: 1, area: "cloudflare", action: "Restore Cloudflare API authorization and verify Worker/domain routing." })
+  } else if (!snapshot.cloudflare.data.workers?.ok) {
+    recommendations.push({ priority: 1, area: "cloudflare-workers", action: "Restore Cloudflare Workers read access before deployment decisions." })
   }
   if (snapshot.github.ok && snapshot.github.data.open_pull_requests.length > 0) {
     recommendations.push({ priority: 2, area: "repository", action: "Review and resolve open pull requests before starting overlapping platform work." })
   }
-  if (snapshot.cloudflare.ok && !snapshot.cloudflare.data.workers.some((worker) => worker.name === "sovereign-broker")) {
+
+  const workers = workerList(snapshot)
+  if (snapshot.cloudflare.ok && snapshot.cloudflare.data.workers?.ok && !workers.some((worker) => worker.name === "sovereign-broker")) {
     recommendations.push({ priority: 1, area: "broker", action: "Restore the sovereign-broker Worker deployment." })
   }
-  if (snapshot.cloudflare.ok && !snapshot.cloudflare.data.workers.some((worker) => worker.name === "sovv-web")) {
+  if (snapshot.cloudflare.ok && snapshot.cloudflare.data.workers?.ok && !workers.some((worker) => worker.name === "sovv-web")) {
     recommendations.push({ priority: 1, area: "web", action: "Restore the sovv-web Worker deployment." })
+  }
+  if (snapshot.cloudflare.ok && !snapshot.cloudflare.data.pages?.ok) {
+    recommendations.push({ priority: 3, area: "cloudflare-pages", action: "Pages evidence is unavailable; do not treat this as a Worker outage." })
   }
   if (!snapshot.stripe.ok) {
     recommendations.push({ priority: 2, area: "stripe", action: "Restore read-only Stripe connectivity before making monetization claims." })
@@ -190,4 +221,4 @@ export async function buildPlatformAudit(env) {
   }
 }
 
-export const __test = { buildRecommendations, settledResult }
+export const __test = { buildRecommendations, settledResult, workerList }
