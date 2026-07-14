@@ -3,11 +3,12 @@ import { getAuthUser } from "./auth.js";
 import { fetchWithTimeout, withLimitedRetry } from "./runtime-resilience.js";
 
 const DEFAULT_GUIDE_PRICE_CENTS = 1000;
+const PURCHASE_TTL_SECONDS = 60 * 60 * 24 * 365;
 
 function json(body: Record<string, unknown>, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
 }
 
@@ -84,17 +85,52 @@ export async function handleBaselineGuideCheckout(req: Request, env: Env): Promi
   return json({ url: payload.url });
 }
 
-export async function handleSupportRedirect(env: Env): Promise<Response> {
-  if (!env.STRIPE_SUPPORT_LINK_URL) {
-    return json({ error: "support_link_not_configured" }, 404);
+export async function handleBaselineGuideVerify(req: Request, env: Env): Promise<Response> {
+  const user = await getAuthUser(req, env.DB);
+  if (!user) return json({ error: "unauthorized" }, 401);
+  if (!env.STRIPE_SECRET_KEY) return json({ error: "commerce_not_configured" }, 503);
+
+  const sessionId = new URL(req.url).searchParams.get("session_id");
+  if (!sessionId || !/^cs_(test|live)_/.test(sessionId)) {
+    return json({ error: "invalid_session" }, 400);
   }
 
-  return Response.redirect(env.STRIPE_SUPPORT_LINK_URL, 302);
+  const response = await fetchWithTimeout(
+    `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
+    { headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` } },
+    10_000
+  );
+  const payload = await response.json() as Record<string, any>;
+
+  const validPurchase = response.ok
+    && payload.payment_status === "paid"
+    && payload.mode === "payment"
+    && payload.client_reference_id === user.id
+    && payload.metadata?.purchaseType === "baseline_guide";
+
+  if (!validPurchase) return json({ error: "purchase_not_verified" }, 402);
+
+  const record = {
+    userId: user.id,
+    sessionId,
+    paymentIntentId: typeof payload.payment_intent === "string" ? payload.payment_intent : null,
+    amountTotal: typeof payload.amount_total === "number" ? payload.amount_total : null,
+    currency: typeof payload.currency === "string" ? payload.currency : "usd",
+    purchasedAt: Date.now(),
+    status: "paid",
+  };
+
+  await env.KV.put(`purchase:baseline-guide:${user.id}`, JSON.stringify(record), {
+    expirationTtl: PURCHASE_TTL_SECONDS,
+  });
+
+  return json({ verified: true, purchase: record });
 }
 
-export function registerCommerceRoutes(router: any, getEnv: () => Env) {
-  router.post("/api/commerce/baseline-guide/checkout", (req: Request) =>
-    handleBaselineGuideCheckout(req, getEnv())
-  );
-  router.get("/api/commerce/support", () => handleSupportRedirect(getEnv()));
+export async function handleSupportRedirect(env: Env): Promise<Response> {
+  const url = env.STRIPE_SUPPORT_LINK_URL;
+  if (!url || !url.startsWith("https://buy.stripe.com/")) {
+    return json({ error: "support_link_not_configured" }, 404);
+  }
+  return Response.redirect(url, 302);
 }
