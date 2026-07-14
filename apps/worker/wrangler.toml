@@ -79,5 +79,5 @@ COOKIE_DOMAIN = ".defrag.app"
 STRIPE_PRICE_ID = "price_1Te0g9Bk78yJ8Hww8fFZCqhm"
 STRIPE_ANNUAL_PRICE_ID = "price_1Tq6nPBk78yJ8Hwwm0pxg4hH"
 BASELINE_GUIDE_PRICE_CENTS = "1000"
-# Set this to the verified pay-what-you-want Stripe Payment Link before surfacing it publicly.
-STRIPE_SUPPORT_LINK_URL = "https://support.stripe.com/contact"
+# STRIPE_SUPPORT_LINK_URL must be set as a Worker secret or environment variable
+# only after the pay-what-you-want Stripe Payment Link is verified.
