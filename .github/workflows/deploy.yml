@@ -1,7 +1,11 @@
 name: Deploy Cloudflare Workers
 
 on:
-  pull_request:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
     branches:
       - main
     paths:
@@ -28,7 +32,10 @@ jobs:
       PRODUCTION_WEB_URLS: https://defrag.app/,https://www.defrag.app/
       CLOUDFLARE_PURGE_HOSTS: defrag.app,www.defrag.app,app.defrag.app,sovereign.defrag.app
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out reviewed PR commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || github.sha }}
       - name: Validate Cloudflare configuration
         shell: bash
         run: |
@@ -50,7 +57,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: node scripts/secret-scan.js
       - run: pnpm --filter ./apps/web run build
-      - name: Deploy sovv-web
+      - name: Deploy sovv-web directly
         working-directory: apps/web
         run: pnpm run deploy
       - run: pnpm --filter @workspace/scripts run purge:production-web-cache
