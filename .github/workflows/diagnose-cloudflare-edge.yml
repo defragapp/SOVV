@@ -1,0 +1,131 @@
+name: Diagnose Cloudflare edge and builds
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/diagnose-cloudflare-edge.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+      ISSUE_NUMBER: "162"
+
+    steps:
+      - name: Validate required secrets
+        run: |
+          test -n "$CF_API_TOKEN"
+          test -n "$CF_ACCOUNT_ID"
+
+      - name: Inspect broker response
+        run: |
+          curl --silent --show-error --max-time 20 \
+            --dump-header broker-headers.txt \
+            --output broker-body.txt \
+            https://sovereign-broker.defrag.app/health || true
+
+      - name: Inspect Access applications
+        run: |
+          curl --silent --show-error --fail-with-body \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/access/apps?per_page=100" \
+            > access-apps.json || echo '{"success":false,"errors":[{"message":"Access applications request failed"}]}' > access-apps.json
+
+          jq '{success, errors, result: [.result[]? | {id, name, domain, type, app_launcher_visible, created_at, updated_at}]}' \
+            access-apps.json > access-apps-redacted.json
+
+      - name: Resolve zone and inspect rulesets
+        run: |
+          if [ -z "$CF_ZONE_ID" ]; then
+            curl --silent --show-error --fail-with-body \
+              -H "Authorization: Bearer $CF_API_TOKEN" \
+              "https://api.cloudflare.com/client/v4/zones?name=defrag.app&status=active&per_page=1" \
+              > zones.json || true
+            CF_ZONE_ID=$(jq -r '.result[0].id // empty' zones.json 2>/dev/null || true)
+            echo "CF_ZONE_ID=$CF_ZONE_ID" >> "$GITHUB_ENV"
+          fi
+
+          if [ -n "$CF_ZONE_ID" ]; then
+            curl --silent --show-error --fail-with-body \
+              -H "Authorization: Bearer $CF_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/rulesets" \
+              > rulesets.json || echo '{"success":false,"errors":[{"message":"Rulesets request failed"}]}' > rulesets.json
+          else
+            echo '{"success":false,"errors":[{"message":"Zone ID unavailable"}]}' > rulesets.json
+          fi
+
+          jq '{success, errors, result: [.result[]? | {id, name, kind, phase, version, last_updated}]}' \
+            rulesets.json > rulesets-redacted.json
+
+      - name: Inspect Worker scripts
+        run: |
+          curl --silent --show-error --fail-with-body \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/workers/scripts" \
+            > workers.json || echo '{"success":false,"errors":[{"message":"Workers request failed"}]}' > workers.json
+
+          jq '{success, errors, result: [.result[]? | {id, modified_on, etag}]}' \
+            workers.json > workers-redacted.json
+
+      - name: Publish diagnostics to issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          STATUS=$(awk 'toupper($1) ~ /^HTTP\// { code=$2 } END { print code }' broker-headers.txt)
+          ACCESS_MATCHES=$(jq -c '[.result[]? | select((.domain == "*.defrag.app") or (.domain == "sovereign-broker.defrag.app") or (.domain == "agent.defrag.app"))]' access-apps-redacted.json)
+          WORKERS=$(jq -c '[.result[]? | select(.id == "sovereign-broker" or .id == "sovv-web" or .id == "sovereign-os-api" or .id == "sovereign-control" or .id == "worker-ai" or .id == "worker-session")]' workers-redacted.json)
+
+          {
+            echo "## Automated Cloudflare diagnostic"
+            echo
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo
+            echo "### Broker edge response"
+            echo "- HTTP status: \`${STATUS:-missing}\`"
+            echo '```text'
+            sed -n '1,40p' broker-headers.txt
+            echo '```'
+            echo
+            echo "### Matching Access applications"
+            echo '```json'
+            echo "$ACCESS_MATCHES" | jq .
+            echo '```'
+            echo
+            echo "### Relevant Worker scripts"
+            echo '```json'
+            echo "$WORKERS" | jq .
+            echo '```'
+            echo
+            echo "### Zone rulesets"
+            echo '```json'
+            cat rulesets-redacted.json
+            echo '```'
+            echo
+            echo "No credentials, tokens, policies, or rule expressions are included in this report."
+          } > cloudflare-diagnostic.md
+
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file cloudflare-diagnostic.md
+
+      - name: Upload diagnostic artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloudflare-edge-diagnostics
+          path: |
+            broker-headers.txt
+            broker-body.txt
+            access-apps-redacted.json
+            rulesets-redacted.json
+            workers-redacted.json
