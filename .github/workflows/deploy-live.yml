@@ -15,23 +15,32 @@ on:
         description: Type DEPLOY
         required: true
         default: ""
+  push:
+    branches:
+      - main
+    paths:
+      - .release/web
+      - .release/api
+      - .release/broker
+      - .github/workflows/deploy-live.yml
 
 permissions:
   contents: read
 
 concurrency:
-  group: deploy-live-${{ github.event.inputs.target }}
+  group: deploy-live-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Validate confirmation
+      - name: Validate dispatch confirmation
+        if: github.event_name == 'workflow_dispatch'
         run: test "${{ github.event.inputs.confirm }}" = "DEPLOY"
 
   deploy-web:
-    if: github.event.inputs.target == 'web'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'web' || github.event_name == 'push' && contains(github.event.head_commit.message, '[release:web]')
     needs: validate
     runs-on: ubuntu-latest
     environment: production
@@ -62,7 +71,7 @@ jobs:
       - run: pnpm verify:production-web
 
   deploy-api:
-    if: github.event.inputs.target == 'api'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'api' || github.event_name == 'push' && contains(github.event.head_commit.message, '[release:api]')
     needs: validate
     runs-on: ubuntu-latest
     environment: production
@@ -93,7 +102,7 @@ jobs:
       - run: curl --fail --silent --show-error --max-time 20 https://api.defrag.app/health
 
   deploy-broker:
-    if: github.event.inputs.target == 'broker'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'broker' || github.event_name == 'push' && contains(github.event.head_commit.message, '[release:broker]')
     needs: validate
     runs-on: ubuntu-latest
     environment: production
