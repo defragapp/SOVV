@@ -1,47 +1,22 @@
 name: Deploy Live
 
 on:
-  workflow_dispatch:
-    inputs:
-      target:
-        description: Production surface
-        required: true
-        type: choice
-        options:
-          - web
-          - api
-          - broker
-      confirm:
-        description: Type DEPLOY
-        required: true
-        default: ""
   push:
     branches:
       - main
     paths:
       - .release/web
-      - .release/api
-      - .release/broker
-      - .github/workflows/deploy-live.yml
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: deploy-live-${{ github.ref }}
+  group: deploy-live-web
   cancel-in-progress: false
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Validate dispatch confirmation
-        if: github.event_name == 'workflow_dispatch'
-        run: test "${{ github.event.inputs.confirm }}" = "DEPLOY"
-
   deploy-web:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'web' || github.event_name == 'push' && contains(github.event.head_commit.message, '[release:web]')
-    needs: validate
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 30
@@ -69,62 +44,3 @@ jobs:
         run: pnpm run deploy
       - run: pnpm --filter @workspace/scripts run purge:production-web-cache
       - run: pnpm verify:production-web
-
-  deploy-api:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'api' || github.event_name == 'push' && contains(github.event.head_commit.message, '[release:api]')
-    needs: validate
-    runs-on: ubuntu-latest
-    environment: production
-    timeout-minutes: 20
-    env:
-      CI: true
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: node scripts/secret-scan.js
-      - run: pnpm --filter ./apps/worker run typecheck
-      - run: pnpm --filter ./apps/worker run test
-      - name: Apply migrations
-        working-directory: apps/worker
-        run: pnpm exec wrangler d1 migrations apply vibesdk-db --remote
-      - name: Deploy API
-        working-directory: apps/worker
-        run: pnpm run deploy
-      - run: curl --fail --silent --show-error --max-time 20 https://api.defrag.app/health
-
-  deploy-broker:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'broker' || github.event_name == 'push' && contains(github.event.head_commit.message, '[release:broker]')
-    needs: validate
-    runs-on: ubuntu-latest
-    environment: production
-    timeout-minutes: 20
-    env:
-      CI: true
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: node scripts/secret-scan.js
-      - run: node --check apps/sovereign-gpt/broker-worker/src/index-v4.js
-      - run: pnpm exec vitest run apps/sovereign-gpt/broker-worker/src/repo-patch-runtime.test.js
-      - name: Deploy broker
-        run: pnpm exec wrangler deploy --config apps/sovereign-gpt/broker-worker/wrangler.toml
-      - name: Verify broker
-        run: curl --fail --silent --show-error --max-time 20 https://sovereign-broker.defrag.app/health
