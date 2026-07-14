@@ -1,0 +1,42 @@
+openapi: 3.1.0
+info:
+  title: Sovereign.OS Platform Audit
+  description: Authenticated evidence-backed project-state audit for the Sovereign.OS engineering operator.
+  version: 1.0.0
+servers:
+  - url: https://sovereign-broker.defrag.app
+paths:
+  /audit:
+    get:
+      operationId: auditPlatform
+      summary: Rebuild PROJECT_STATE from GitHub, Cloudflare, deployment, and Stripe evidence
+      description: Returns partial evidence when one connected service is unavailable. Requires broker Bearer authentication.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Platform audit result
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401":
+          description: Missing or invalid broker token
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "500":
+          description: Audit runtime failure
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
