@@ -23,7 +23,7 @@ export function BaselineGuidePurchase({
       .then(async (res) => {
         if (!res.ok) throw new Error("We could not verify this purchase yet.")
         setState("verified")
-        setMessage("Purchase verified. Your Baseline Guide is ready to be generated from your saved design.")
+        setMessage("Purchase verified. Your branded Baseline Guide is ready to download.")
       })
       .catch((error: Error) => {
         setState("error")
@@ -64,14 +64,23 @@ export function BaselineGuidePurchase({
         </span>
       </div>
 
-      <button
-        type="button"
-        onClick={beginCheckout}
-        disabled={state === "loading"}
-        className="btn-primary mt-7 w-full disabled:cursor-wait disabled:opacity-60"
-      >
-        {state === "loading" ? "Preparing secure checkout…" : "Create my Baseline Guide"}
-      </button>
+      {state === "verified" ? (
+        <a
+          href="/api/commerce/baseline-guide/download"
+          className="btn-primary mt-7 block w-full text-center"
+        >
+          Download my Baseline Guide
+        </a>
+      ) : (
+        <button
+          type="button"
+          onClick={beginCheckout}
+          disabled={state === "loading"}
+          className="btn-primary mt-7 w-full disabled:cursor-wait disabled:opacity-60"
+        >
+          {state === "loading" ? "Preparing secure checkout…" : "Create my Baseline Guide"}
+        </button>
+      )}
 
       {message ? (
         <p className={`mt-4 text-sm leading-relaxed ${state === "verified" ? "text-[#d7c2b4]" : "text-[#d48b73]"}`}>
