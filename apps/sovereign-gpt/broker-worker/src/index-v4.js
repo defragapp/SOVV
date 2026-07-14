@@ -16,6 +16,17 @@ const json = (data, status = 200) => new Response(JSON.stringify(data), {
   },
 })
 
+async function withBrokerDiagnostics(response) {
+  const headers = new Headers(response.headers)
+  headers.set("X-Sovereign-Broker", "sovereign-dev-v3")
+  headers.set("X-Sovereign-Entrypoint", "index-v4")
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url)
@@ -31,6 +42,7 @@ export default {
         : handleRepoDiff(request, env)
     }
 
-    return legacyBroker.fetch(request, env, ctx)
+    const response = await legacyBroker.fetch(request, env, ctx)
+    return url.pathname === "/health" ? withBrokerDiagnostics(response) : response
   },
 }
