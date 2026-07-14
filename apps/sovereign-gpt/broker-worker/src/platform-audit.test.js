@@ -12,10 +12,17 @@ const healthyGithub = {
 const healthyCloudflare = {
   ok: true,
   data: {
-    workers: [
-      { name: "sovereign-broker" },
-      { name: "sovv-web" },
-    ],
+    workers: {
+      ok: true,
+      data: [
+        { name: "sovereign-broker" },
+        { name: "sovv-web" },
+      ],
+    },
+    pages: {
+      ok: true,
+      data: [],
+    },
   },
 }
 
@@ -52,7 +59,13 @@ test("prioritizes missing Cloudflare connectivity", () => {
 test("reports missing required workers", () => {
   const recommendations = __test.buildRecommendations({
     github: healthyGithub,
-    cloudflare: { ok: true, data: { workers: [] } },
+    cloudflare: {
+      ok: true,
+      data: {
+        workers: { ok: true, data: [] },
+        pages: { ok: true, data: [] },
+      },
+    },
     stripe: healthyStripe,
   })
 
@@ -60,6 +73,40 @@ test("reports missing required workers", () => {
     recommendations.filter((item) => item.priority === 1).map((item) => item.area),
     ["broker", "web"],
   )
+})
+
+test("does not treat missing Pages evidence as a Worker outage", () => {
+  const recommendations = __test.buildRecommendations({
+    github: healthyGithub,
+    cloudflare: {
+      ok: true,
+      data: {
+        workers: healthyCloudflare.data.workers,
+        pages: { ok: false, error: "404" },
+      },
+    },
+    stripe: healthyStripe,
+  })
+
+  assert.deepEqual(recommendations.map((item) => item.area), ["cloudflare-pages"])
+  assert.equal(recommendations[0].priority, 3)
+})
+
+test("reports Workers read failure separately from total Cloudflare failure", () => {
+  const recommendations = __test.buildRecommendations({
+    github: healthyGithub,
+    cloudflare: {
+      ok: true,
+      data: {
+        workers: { ok: false, error: "403" },
+        pages: { ok: true, data: [] },
+      },
+    },
+    stripe: healthyStripe,
+  })
+
+  assert.equal(recommendations[0].area, "cloudflare-workers")
+  assert.equal(recommendations[0].priority, 1)
 })
 
 test("reports open pull requests before general product work", () => {
