@@ -231,7 +231,7 @@ paths:
   /capabilities:
     get:
       operationId: getCapabilities
-      summary: Self-describing capability registry — lists all broker capabilities and current safety flag states
+      summary: Self-describing capability registry â lists all broker capabilities and current safety flag states
       responses:
         "200": { description: Capability map, content: { application/json: { schema: { $ref: "#/components/schemas/AnyResponse" } } } }
   /build/generate-component:
@@ -302,6 +302,21 @@ components:
   schemas:
     AnyResponse:
       type: object
+      properties:
+        ok:
+          type: boolean
+        error:
+          type: string
+        message:
+          type: string
+        status:
+          type: integer
+        result:
+          type: object
+          additionalProperties: true
+        data:
+          type: object
+          additionalProperties: true
       additionalProperties: true
     RepoReadFileRequest:
       type: object
