@@ -21,6 +21,7 @@ export function CookieConsent() {
   const handleAccept = () => {
     localStorage.setItem(COOKIE_KEY, "accepted");
     setConsent("accepted");
+    window.dispatchEvent(new Event("sovv:cookie-consent"));
     // Fire analytics init if accepted
     if (typeof window !== "undefined" && (window as any).gtag) {
       (window as any).gtag("consent", "update", {
@@ -33,6 +34,7 @@ export function CookieConsent() {
   const handleDecline = () => {
     localStorage.setItem(COOKIE_KEY, "declined");
     setConsent("declined");
+    window.dispatchEvent(new Event("sovv:cookie-consent"));
     if (typeof window !== "undefined" && (window as any).gtag) {
       (window as any).gtag("consent", "update", {
         analytics_storage: "denied",
