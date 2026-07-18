@@ -1,14 +1,14 @@
 /**
- * active-signals.ts — Baseline Active Signal Selection System
+ * active-signals.ts â Baseline Active Signal Selection System
  *
  * Pipeline:
  *   BaselineDesignDataset (full compute, server-side only)
- *   → selectActiveSignals()          — context-aware reduction
- *   → buildBaselineSignature()       — compressed identity line
- *   → buildTimingSignals()           — urgency/sensitivity/tolerance
- *   → buildOverlaySignals()          — two-person loop construction
- *   → buildRailData()                — structured right-panel data
- *   → formatActiveSignalsForPrompt() — AI-ready context string
+ *   â selectActiveSignals()          â context-aware reduction
+ *   â buildBaselineSignature()       â compressed identity line
+ *   â buildTimingSignals()           â urgency/sensitivity/tolerance
+ *   â buildOverlaySignals()          â two-person loop construction
+ *   â buildRailData()                â structured right-panel data
+ *   â formatActiveSignalsForPrompt() â AI-ready context string
  *
  * CRITICAL SYSTEM RULE:
  * Full baseline compute is never used directly in prompts or UI.
@@ -17,8 +17,8 @@
  * prompt hallucination, and inconsistent outputs.
  *
  * Signature line format (token order is locked):
- *   HD: 5/1 · TYPE: Generator · AUTH: Sacral · GK: 13/33 · RIS: Leo · NOD: 2/8
- *   Order: HD → TYPE → AUTH → GK → RIS → NOD
+ *   HD: 5/1 Â· TYPE: Generator Â· AUTH: Sacral Â· GK: 13/33 Â· RIS: Leo Â· NOD: 2/8
+ *   Order: HD â TYPE â AUTH â GK â RIS â NOD
  */
 
 import type { BaselineDesignDataset } from "./baseline-compiler.js"
@@ -50,11 +50,11 @@ export type OverlaySignals = {
   shift: string
 }
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ââ Types âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
-/** Compressed identity signature — shown once, bottom of result surface */
+/** Compressed identity signature â shown once, bottom of result surface */
 export interface BaselineSignature {
-  /** Encoded one-line signature: "HD: 5/1 · TYPE: Generator · AUTH: Sacral · GK: 13/33 · RIS: Leo · NOD: 2/8" */
+  /** Encoded one-line signature: "HD: 5/1 Â· TYPE: Generator Â· AUTH: Sacral Â· GK: 13/33 Â· RIS: Leo Â· NOD: 2/8" */
   line: string
   /** Individual tokens for structured rendering */
   tokens: Array<{ key: string; value: string }>
@@ -62,7 +62,7 @@ export interface BaselineSignature {
 
 
 
-/** Default rail data — quiet, compressed, factual.
+/** Default rail data â quiet, compressed, factual.
  *  Max 3 baseline signals. No raw framework data. */
 export interface RailSectionData {
   baseline: {
@@ -81,7 +81,7 @@ export interface RailSectionData {
   signature: string
 }
 
-/** Export payload — human-readable, no raw compute */
+/** Export payload â human-readable, no raw compute */
 export interface ExportPayload {
   result: Record<string, unknown>
   patternSummary: string
@@ -90,11 +90,11 @@ export interface ExportPayload {
   signature: string
 }
 
-// ── Signature builder ─────────────────────────────────────────────────────────
+// ââ Signature builder âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 /**
  * Build the compressed identity signature line from the full compute.
- * Format: HD: 5/1 · TYPE: Generator · AUTH: Sacral · GK: 13/33 · RIS: Leo · NOD: 2/8
+ * Format: HD: 5/1 Â· TYPE: Generator Â· AUTH: Sacral Â· GK: 13/33 Â· RIS: Leo Â· NOD: 2/8
  */
 export function buildBaselineSignature(dataset: BaselineDesignDataset): BaselineSignature {
   const tokens: Array<{ key: string; value: string }> = []
@@ -118,7 +118,7 @@ export function buildBaselineSignature(dataset: BaselineDesignDataset): Baseline
     tokens.push({ key: "AUTH", value: hd.authority })
   }
 
-  // Gene Keys — primary activation (first activation, sphere if available)
+  // Gene Keys â primary activation (first activation, sphere if available)
   if (gk?.activations?.length) {
     const primary = gk.activations[0]
     const gkLabel = primary.sphere
@@ -132,7 +132,7 @@ export function buildBaselineSignature(dataset: BaselineDesignDataset): Baseline
     tokens.push({ key: "RIS", value: ast.ascendant.sign })
   }
 
-  // Nodal axis — north node sign if available
+  // Nodal axis â north node sign if available
   const northNode = ast?.placements?.find(p => p.body === "NorthNode" || p.body === "True Node")
   if (northNode?.sign) {
     tokens.push({ key: "NOD", value: northNode.sign })
@@ -144,12 +144,12 @@ export function buildBaselineSignature(dataset: BaselineDesignDataset): Baseline
     tokens.push({ key: "POB", value: dataset.input.pob })
   }
 
-  const line = tokens.map(t => `${t.key}: ${t.value}`).join(" · ")
+  const line = tokens.map(t => `${t.key}: ${t.value}`).join(" Â· ")
 
   return { line, tokens }
 }
 
-// ── Active signal selector ────────────────────────────────────────────────────
+// ââ Active signal selector ââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 /**
  * Select the active behavioral signals from the full compute.
@@ -173,7 +173,7 @@ export function selectActiveSignals(
   const ast = dataset.frameworks?.astrology
   const aiData = dataset.aiDataset
 
-  // ── Pace: derived from HD type + authority ────────────────────────────────
+  // ââ Pace: derived from HD type + authority ââââââââââââââââââââââââââââââââ
   let pace: ActiveBaselineSignals["pace"] = "unknown"
   if (hd?.type) {
     const fastTypes = ["Manifestor", "Manifesting Generator"]
@@ -183,7 +183,7 @@ export function selectActiveSignals(
     else pace = "variable" // Generator
   }
 
-  // ── Stabilizes: what brings them back to center ───────────────────────────
+  // ââ Stabilizes: what brings them back to center âââââââââââââââââââââââââââ
   let stabilizes = "clarity"
   if (hd?.authority) {
     const auth = hd.authority.toLowerCase()
@@ -196,7 +196,7 @@ export function selectActiveSignals(
     else if (auth.includes("lunar")) stabilizes = "full lunar cycle"
   }
 
-  // ── Pressure response: from derived traits if available ───────────────────
+  // ââ Pressure response: from derived traits if available âââââââââââââââââââ
   let responds = "moves toward resolution"
   if (aiData?.derivedTraits?.length) {
     const pressureTrait = aiData.derivedTraits.find(t =>
@@ -207,7 +207,7 @@ export function selectActiveSignals(
     }
   }
 
-  // ── Protects: from identity anchors or sun sign ───────────────────────────
+  // ââ Protects: from identity anchors or sun sign âââââââââââââââââââââââââââ
   let protects = "autonomy"
   if (aiData?.identityAnchors?.length) {
     const anchor = aiData.identityAnchors[0]
@@ -229,14 +229,14 @@ export function selectActiveSignals(
     }
   }
 
-  // ── Pattern tendency: from appOverlays.defrag ─────────────────────────────
+  // ââ Pattern tendency: from appOverlays.defrag âââââââââââââââââââââââââââââ
   let pattern = "moves early under pressure"
   if (aiData?.appOverlays?.defrag?.likelyLoops?.length) {
     pattern = aiData.appOverlays.defrag.likelyLoops[0]
   }
 
-  // ── Evidence tags (internal, not shown to user) ───────────────────────────
-  // ── Cross-framework synthesis ─────────────────────────────────────────────────
+  // ââ Evidence tags (internal, not shown to user) âââââââââââââââââââââââââââ
+  // ââ Cross-framework synthesis âââââââââââââââââââââââââââââââââââââââââââââââââ
   // Compound signals from multiple frameworks produce stronger behavioral insights
   const gk = dataset.frameworks?.geneKeys
 
@@ -250,10 +250,10 @@ export function selectActiveSignals(
       const isProjector = hd.type?.includes("Projector")
       const isManifestar = hd.type?.includes("Manifestor") || hd.type?.includes("Manifesting")
       if (isProjector && waterMoon && !traitLines.some(t => t.includes("absorb"))) {
-        traitLines.push("Absorbs others' emotional states — needs recognition before acting")
+        traitLines.push("Absorbs others' emotional states â needs recognition before acting")
       }
       if (isManifestar && fireMoon && !traitLines.some(t => t.includes("initiat"))) {
-        traitLines.push("Initiates quickly under pressure — others may not be ready")
+        traitLines.push("Initiates quickly under pressure â others may not be ready")
       }
     }
   }
@@ -263,7 +263,7 @@ export function selectActiveSignals(
     const hasGate51 = (hd.gates as any[]).some((g: any) => g.gate === 51)
     const sun = ast.placements.find(p => p.body === "Sun")
     if (hasGate51 && sun?.sign === "Aries" && !traitLines.some(t => t.includes("shock"))) {
-      traitLines.push("Moves first under shock — initiates before others have processed")
+      traitLines.push("Moves first under shock â initiates before others have processed")
     }
   }
 
@@ -278,18 +278,31 @@ export function selectActiveSignals(
     if (moon) evidenceTags.push(`Moon in ${moon.sign}`)
   }
 
-  // ── Trait lines: human-readable for AI context ────────────────────────────
+  // ââ Trait lines: human-readable for AI context ââââââââââââââââââââââââââââ
   if (aiData?.derivedTraits?.length) {
     // Select top 3 most relevant traits based on context
+    // Relevance gate: keep valid Baseline signals only when they can change
+    // the current interpretation or next move. Avoid adding context by default.
+    const messageContext = context.message.toLowerCase()
+    const relevanceScore = (trait: { key: string; alignedExpression?: string[] }) => {
+      let score = 0
+      if (context.relational && trait.key.includes("relational")) score += 2
+      if (trait.key.includes("pressure") || trait.key.includes("strain")) score += 2
+      if (trait.key.includes("pace") || trait.key.includes("emotional")) score += 1
+
+      const keywords = messageContext.split(/\s+/).filter(Boolean)
+      if (keywords.some(word => trait.key.toLowerCase().includes(word))) score += 2
+      if (keywords.some(word => trait.alignedExpression?.join(" ").toLowerCase().includes(word))) score += 1
+
+      return score
+    }
+
     const relevantTraits = aiData.derivedTraits
-      .filter(t => {
-        if (context.relational) {
-          return t.key.includes("relational") || t.key.includes("pressure") ||
-                 t.key.includes("pace") || t.key.includes("emotional")
-        }
-        return true
-      })
+      .map(trait => ({ trait, score: relevanceScore(trait) }))
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score)
       .slice(0, 3)
+      .map(({ trait }) => trait)
 
     for (const trait of relevantTraits) {
       if (trait.alignedExpression?.[0]) {
@@ -314,7 +327,7 @@ export function selectActiveSignals(
   }
 }
 
-// ── Timing signal mapper ──────────────────────────────────────────────────────
+// ââ Timing signal mapper ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 /**
  * Derive timing signals from CURRENT sky context (live transits).
@@ -347,55 +360,55 @@ export function buildTimingSignals(
   let pacing: TimingSignals["pacing"] = "normal"
   const notes: string[] = []
 
-  // Mars retrograde → lower tolerance, higher urgency
+  // Mars retrograde â lower tolerance, higher urgency
   if (bodies["Mars"]?.retrograde) {
     urgency = "high"
     tolerance = "low"
-    notes.push("Mars retrograde — urgency is higher than usual, tolerance is lower")
+    notes.push("Mars retrograde â urgency is higher than usual, tolerance is lower")
   }
 
-  // Mercury retrograde → communication sensitivity up
+  // Mercury retrograde â communication sensitivity up
   if (bodies["Mercury"]?.retrograde) {
     sensitivity = "high"
-    notes.push("Mercury retrograde — communication lands differently right now")
+    notes.push("Mercury retrograde â communication lands differently right now")
   }
 
-  // Saturn retrograde → pacing slows, pressure to review
+  // Saturn retrograde â pacing slows, pressure to review
   if (bodies["Saturn"]?.retrograde) {
     pacing = "slow"
-    notes.push("Saturn retrograde — things are moving slower than they feel")
+    notes.push("Saturn retrograde â things are moving slower than they feel")
   }
 
-  // Venus retrograde → relational sensitivity high
+  // Venus retrograde â relational sensitivity high
   if (bodies["Venus"]?.retrograde) {
     sensitivity = "high"
-    notes.push("Venus retrograde — relational dynamics are more charged than usual")
+    notes.push("Venus retrograde â relational dynamics are more charged than usual")
   }
 
-  // ── Transit-based timing signals ─────────────────────────────────────────────
+  // ââ Transit-based timing signals âââââââââââââââââââââââââââââââââââââââââââââ
   // Check planetary positions for high-pressure configurations
-  // Saturn in Capricorn/Aquarius → structural pressure, accountability
+  // Saturn in Capricorn/Aquarius â structural pressure, accountability
   if (bodies["Saturn"]?.sign && ["Capricorn", "Aquarius"].includes(bodies["Saturn"].sign)) {
     if (tolerance !== "low") tolerance = "low"
-    notes.push("Saturn in " + bodies["Saturn"].sign + " — structural pressure, accountability active")
+    notes.push("Saturn in " + bodies["Saturn"].sign + " â structural pressure, accountability active")
   }
 
-  // Mars in Aries/Scorpio → high action energy, lower patience
+  // Mars in Aries/Scorpio â high action energy, lower patience
   if (bodies["Mars"]?.sign && ["Aries", "Scorpio"].includes(bodies["Mars"].sign)) {
     if (urgency !== "high") urgency = "moderate"
-    notes.push("Mars in " + bodies["Mars"].sign + " — action energy high, patience lower")
+    notes.push("Mars in " + bodies["Mars"].sign + " â action energy high, patience lower")
   }
 
-  // Moon in water signs → emotional sensitivity elevated
+  // Moon in water signs â emotional sensitivity elevated
   if (bodies["Moon"]?.sign && ["Pisces", "Cancer", "Scorpio"].includes(bodies["Moon"].sign)) {
     if (sensitivity !== "high") sensitivity = "high"
-    notes.push("Moon in " + bodies["Moon"].sign + " — emotional sensitivity elevated")
+    notes.push("Moon in " + bodies["Moon"].sign + " â emotional sensitivity elevated")
   }
 
-  // Jupiter in fire signs → expansion, optimism, may move too fast
+  // Jupiter in fire signs â expansion, optimism, may move too fast
   if (bodies["Jupiter"]?.sign && ["Aries", "Leo", "Sagittarius"].includes(bodies["Jupiter"].sign)) {
     if (pacing !== "slow") pacing = "fast"
-    notes.push("Jupiter in " + bodies["Jupiter"].sign + " — expansion energy, may move faster than usual")
+    notes.push("Jupiter in " + bodies["Jupiter"].sign + " â expansion energy, may move faster than usual")
   }
 
   // Derive state: reactive if any signal is elevated
@@ -409,7 +422,7 @@ export function buildTimingSignals(
   return { urgency, sensitivity, tolerance, pacing, state, note }
 }
 
-// ── Overlay signal builder ────────────────────────────────────────────────────
+// ââ Overlay signal builder ââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 /**
  * Build overlay signals for two-person analysis.
@@ -422,9 +435,9 @@ export function buildOverlaySignals(
   // Default: infer from user signals alone
   if (!otherSignals) {
     return {
-      loop: `${userSignals.pattern} → response → repeat`,
+      loop: `${userSignals.pattern} â response â repeat`,
       amplifier: "The pattern is running without a counterweight.",
-      shift: "Pace and sequence — not content.",
+      shift: "Pace and sequence â not content.",
     }
   }
 
@@ -454,7 +467,7 @@ export function buildOverlaySignals(
   return { loop, amplifier, shift }
 }
 
-// ── Rail data builder ─────────────────────────────────────────────────────────
+// ââ Rail data builder âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 /**
  * Build structured data for the right panel (rail).
@@ -483,11 +496,11 @@ export function buildRailData(
   }
 }
 
-// ── Prompt formatter ──────────────────────────────────────────────────────────
+// ââ Prompt formatter ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 /**
  * Format active signals for injection into the AI prompt.
- * This is the only baseline data the AI sees — no raw compute.
+ * This is the only baseline data the AI sees â no raw compute.
  */
 export function formatActiveSignalsForPrompt(
   signals: ActiveBaselineSignals,
@@ -495,7 +508,7 @@ export function formatActiveSignalsForPrompt(
   overlay?: OverlaySignals
 ): string {
   const lines: string[] = [
-    "BASELINE ACTIVE SIGNALS (internal — do not expose to user):",
+    "BASELINE ACTIVE SIGNALS (internal â do not expose to user):",
     `pace: ${signals.pace}`,
     `stabilizes: ${signals.stabilizes}`,
     `responds: ${signals.responds}`,
@@ -510,7 +523,7 @@ export function formatActiveSignalsForPrompt(
 
   lines.push(
     "",
-    "CURRENT SKY TIMING (use to explain why this moment feels amplified — do not expose raw values):",
+    "CURRENT SKY TIMING (use to explain why this moment feels amplified â do not expose raw values):",
     `urgency: ${timing.urgency}`,
     `sensitivity: ${timing.sensitivity}`,
     `tolerance: ${timing.tolerance}`,
@@ -521,15 +534,15 @@ export function formatActiveSignalsForPrompt(
     // Translate raw sky conditions into behavioral language only
     // Never expose framework terms (planet names, retrograde) to the AI
     const behavioralNote = timing.note
-      .replace(/Mars retrograde[^.—]*/gi, "heightened urgency and lower tolerance")
-      .replace(/Mercury retrograde[^.—]*/gi, "communication sensitivity elevated")
-      .replace(/Saturn retrograde[^.—]*/gi, "slower pacing, pressure to review")
-      .replace(/Venus retrograde[^.—]*/gi, "relational dynamics more charged")
-      .replace(/Saturn in [A-Za-z]+[^.—]*/gi, "structural pressure active")
-      .replace(/Mars in [A-Za-z]+[^.—]*/gi, "action energy elevated")
-      .replace(/Moon in [A-Za-z]+[^.—]*/gi, "emotional sensitivity elevated")
-      .replace(/Jupiter in [A-Za-z]+[^.—]*/gi, "expansion energy, faster pacing")
-      .replace(/[A-Z][a-z]+ (retrograde|in [A-Z][a-z]+)[^.—]*/g, "timing pressure active")
+      .replace(/Mars retrograde[^.â]*/gi, "heightened urgency and lower tolerance")
+      .replace(/Mercury retrograde[^.â]*/gi, "communication sensitivity elevated")
+      .replace(/Saturn retrograde[^.â]*/gi, "slower pacing, pressure to review")
+      .replace(/Venus retrograde[^.â]*/gi, "relational dynamics more charged")
+      .replace(/Saturn in [A-Za-z]+[^.â]*/gi, "structural pressure active")
+      .replace(/Mars in [A-Za-z]+[^.â]*/gi, "action energy elevated")
+      .replace(/Moon in [A-Za-z]+[^.â]*/gi, "emotional sensitivity elevated")
+      .replace(/Jupiter in [A-Za-z]+[^.â]*/gi, "expansion energy, faster pacing")
+      .replace(/[A-Z][a-z]+ (retrograde|in [A-Z][a-z]+)[^.â]*/g, "timing pressure active")
       .trim()
     if (behavioralNote) {
       lines.push(`current timing: ${behavioralNote}`)
@@ -539,7 +552,7 @@ export function formatActiveSignalsForPrompt(
   if (overlay) {
     lines.push(
       "",
-      "OVERLAY (internal — do not expose to user):",
+      "OVERLAY (internal â do not expose to user):",
       `loop: ${overlay.loop}`,
       `amplifier: ${overlay.amplifier}`,
       `shift: ${overlay.shift}`,
@@ -549,10 +562,10 @@ export function formatActiveSignalsForPrompt(
   return lines.join("\n")
 }
 
-// ── Export formatter ──────────────────────────────────────────────────────────
+// ââ Export formatter ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 /**
- * Build export payload — human-readable, no raw compute.
+ * Build export payload â human-readable, no raw compute.
  */
 export function buildExportPayload(
   result: Record<string, unknown>,
@@ -563,13 +576,13 @@ export function buildExportPayload(
   const patternSummary = [
     signals.pattern,
     signals.responds,
-  ].filter(Boolean).join(" · ")
+  ].filter(Boolean).join(" Â· ")
 
   const timingState = [
     `urgency: ${timing.urgency}`,
     `sensitivity: ${timing.sensitivity}`,
     `tolerance: ${timing.tolerance}`,
-  ].join(" · ")
+  ].join(" Â· ")
 
   return {
     result,
