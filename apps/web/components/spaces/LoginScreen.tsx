@@ -152,7 +152,7 @@ export default function LoginScreen() {
           } else if (d.baseline?.dob) {
             window.location.href = "/apps/defrag"
           } else {
-            // New user — go to settings to set up Baseline Design
+            // New user â go to settings to set up Baseline Design
             window.location.href = "/settings?onboard=1"
           }
         })
@@ -248,13 +248,13 @@ export default function LoginScreen() {
                   required
                   minLength={8}
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
-                  placeholder="••••••••"
+                  placeholder="â¢â¢â¢â¢â¢â¢â¢â¢"
                   className="w-full border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 text-base text-[#f4efe9] placeholder:text-[#4f4b47] outline-none transition-all duration-200 focus:border-white/25 focus:bg-white/[0.07]"
                   style={{ borderRadius: "var(--radius-input)", fontSize: "16px" }}
                 />
               </div>
 
-              {/* Password strength — only on register */}
+              {/* Password strength â only on register */}
               {mode === "register" && passwordStrength && (
                 <div className="mt-1.5">
                   <div className="h-0.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
@@ -269,7 +269,7 @@ export default function LoginScreen() {
                 </div>
               )}
 
-              {/* Turnstile — only on register */}
+              {/* Turnstile â only on register */}
               {mode === "register" && (
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-mono uppercase tracking-[0.14em] text-[#76716b]">Verification</label>
@@ -310,14 +310,14 @@ export default function LoginScreen() {
                 className="mt-2 w-full h-12 bg-[#f4efe9] text-[#08070a] text-sm font-medium tracking-tight transition-all duration-200 hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
                 style={{ borderRadius: "var(--radius-button)" }}
               >
-                {loading ? "···" : mode === "login" ? "Sign In" : "Create Account"}
+                {loading ? "Â·Â·Â·" : mode === "login" ? "Sign In" : "Create Account"}
               </button>
             </form>
 
             <p className="mt-6 text-center text-sm text-[#76716b] leading-relaxed">
               {mode === "register"
-                ? "Free tier · 15 sessions per day · Your Baseline Design stays private."
-                : "Your Baseline Design and Library are waiting."}
+                ? "Free tier Â· 15 sessions per day Â· Your Baseline Design stays private."
+                : ""}
             </p>
 
             {mode === "login" && (
@@ -336,7 +336,7 @@ export default function LoginScreen() {
 
           <div className="mt-5 text-center">
             <Link href="/" className="text-sm text-[#76716b] hover:text-[#a8a29a] transition-colors duration-200">
-              ← Back to Sovereign.os
+              â Back to Sovereign.os
             </Link>
           </div>
 
