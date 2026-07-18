@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -10,14 +11,24 @@ interface BeforeInstallPromptEvent extends Event {
 
 const DISMISSED_KEY = "sovv_pwa_dismissed";
 const INSTALLED_KEY = "sovv_pwa_installed";
+const COOKIE_CONSENT_KEY = "sovv_cookie_consent";
+const PROMPT_DELAY_MS = 30_000;
 
 export function PWAInstallPrompt() {
+  const pathname = usePathname();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [show, setShow] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
+    // Installation is a product-level prompt, not a marketing-page interruption.
+    const isProductExperience =
+      pathname?.startsWith("/apps/") ||
+      (pathname?.startsWith("/app/") && pathname !== "/app/login" && pathname !== "/app/signup");
+
+    if (!isProductExperience) return;
+
     // Check if already installed or dismissed
     if (
       localStorage.getItem(INSTALLED_KEY) ||
@@ -37,21 +48,25 @@ export function PWAInstallPrompt() {
 
     if (ios && safari) {
       setIsIOS(true);
-      // Show iOS instructions after a delay
-      setTimeout(() => setShow(true), 3000);
-      return;
+      // Wait until the user has spent time in the product and resolved privacy consent.
+      const timer = window.setTimeout(() => {
+        if (localStorage.getItem(COOKIE_CONSENT_KEY)) setShow(true);
+      }, PROMPT_DELAY_MS);
+      return () => window.clearTimeout(timer);
     }
 
     // Android/Chrome — listen for beforeinstallprompt
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setTimeout(() => setShow(true), 2000);
+      window.setTimeout(() => {
+        if (localStorage.getItem(COOKIE_CONSENT_KEY)) setShow(true);
+      }, PROMPT_DELAY_MS);
     };
 
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
-  }, []);
+  }, [pathname]);
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
